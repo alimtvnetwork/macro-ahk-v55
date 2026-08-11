@@ -23,13 +23,17 @@ const listeners = new Set<CreditPollListener>();
 export function onCreditPollTick(fn: CreditPollListener): () => void {
   listeners.add(fn);
 
-  return function () { listeners.delete(fn); };
+  return function () {
+    listeners.delete(fn); 
+  };
 }
 
 /** Fire all subscribers. Safe — never throws. */
 export function emitCreditPollTick(): void {
   listeners.forEach(function (fn) {
-    try { fn(); } catch (e: unknown) {
+    try {
+      fn(); 
+    } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       logError('CreditPollEvents', 'listener threw: ' + msg);
     }

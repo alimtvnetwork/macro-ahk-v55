@@ -43,7 +43,9 @@ function spyOnFallback(): FallbackSpies {
   return {
     err,
     log,
-    restore: () => { err.mockRestore(); log.mockRestore(); },
+    restore: () => {
+      err.mockRestore(); log.mockRestore(); 
+    },
   };
 }
 
@@ -124,7 +126,9 @@ describe('logDiagnosticFromCode — rejected logger shapes fall back cleanly', (
     ['console is not callable', { error: vi.fn(), console: 'nope' }],
     ['both non-callable', { error: 1, console: 2 }],
     ['error is a getter that throws', Object.defineProperty({ console: vi.fn() }, 'error', {
-      get() { throw new Error('boom'); },
+      get() {
+        throw new Error('boom'); 
+      },
     })],
   ];
 

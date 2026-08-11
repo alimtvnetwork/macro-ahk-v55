@@ -19,8 +19,8 @@
  */
 
 import {
-    assertEmittedShape,
-    PROJECT_NAMESPACE_KEYS,
+  assertEmittedShape,
+  PROJECT_NAMESPACE_KEYS,
 } from "./project-namespace-shape-guard";
 
 export { PROJECT_NAMESPACE_KEYS };
@@ -71,7 +71,7 @@ export interface NamespaceContext {
 /* ------------------------------------------------------------------ */
 
 function buildDocsObject(cn: string): string {
-    return `Object.freeze({
+  return `Object.freeze({
     overview: "RiseupAsiaMacroExt.Projects.${cn} — Per-project SDK namespace providing access to variables, URLs, XPath, cookies, KV store, files, metadata, logging, database, and REST API.",
     vars: "vars.get(key) → Promise<any> | vars.set(key, value) → Promise<void> | vars.getAll() → Promise<Record<string,any>>  —  Read/write project-scoped configuration variables via the extension bridge.",
     urls: "urls.getMatched() → UrlRule|null | urls.listOpen() → Tab[] | urls.getVariables() → Record<string,string>  —  Query matched URL rules and extract URL-template variables.",
@@ -101,50 +101,51 @@ function buildDocsObject(cn: string): string {
  */
 // eslint-disable-next-line max-lines-per-function
 export function buildProjectNamespaceScript(context: NamespaceContext): string {
-    const safe = (v: string) =>
-        v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
+  const safe = (v: string) =>
+    v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
 
-    const cn = safe(context.codeName);
-    const slug = safe(context.slug);
-    const name = safe(context.projectName);
-    const version = safe(context.projectVersion);
-    const pid = safe(context.projectId);
-    const description = safe(context.description ?? "");
+  const cn = safe(context.codeName);
+  const slug = safe(context.slug);
+  const name = safe(context.projectName);
+  const version = safe(context.projectVersion);
+  const pid = safe(context.projectId);
+  const description = safe(context.description ?? "");
 
-    // Serialize scripts array as inline JSON
-    const scriptsJson = JSON.stringify(
-        (context.scripts ?? []).map(s => ({
-            name: s.name,
-            order: s.order,
-            isEnabled: s.isEnabled,
-        })),
-    );
+  // Serialize scripts array as inline JSON
+  const scriptsJson = JSON.stringify(
+    (context.scripts ?? []).map(s => ({
+      name: s.name,
+      order: s.order,
+      isEnabled: s.isEnabled,
+    })),
+  );
 
-    // Serialize dependencies array as inline JSON
-    const depsJson = JSON.stringify(
-        (context.dependencies ?? []).map(d => ({
-            projectId: d.projectId,
-            version: d.version,
-        })),
-    );
+  // Serialize dependencies array as inline JSON
+  const depsJson = JSON.stringify(
+    (context.dependencies ?? []).map(d => ({
+      projectId: d.projectId,
+      version: d.version,
+    })),
+  );
 
-    // Serialize file cache as a frozen object { "filename": "content", ... }
-    const fileCacheObj: Record<string, string> = {};
-    for (const f of context.fileCache ?? []) {
-        fileCacheObj[f.name] = f.data;
-    }
-    const fileCacheJson = JSON.stringify(fileCacheObj);
+  // Serialize file cache as a frozen object { "filename": "content", ... }
+  const fileCacheObj: Record<string, string> = {};
+  for (const f of context.fileCache ?? []) {
+    fileCacheObj[f.name] = f.data;
+  }
 
-    // Serialize cookie bindings for runtime role-based lookup
-    const cookieBindingsJson = JSON.stringify(
-        (context.cookieBindings ?? []).map(b => ({
-            cookieName: b.cookieName,
-            url: b.url,
-            role: b.role,
-        })),
-    );
+  const fileCacheJson = JSON.stringify(fileCacheObj);
 
-    const iife = `;(function(){
+  // Serialize cookie bindings for runtime role-based lookup
+  const cookieBindingsJson = JSON.stringify(
+    (context.cookieBindings ?? []).map(b => ({
+      cookieName: b.cookieName,
+      url: b.url,
+      role: b.role,
+    })),
+  );
+
+  const iife = `;(function(){
 /* Per-project namespace: RiseupAsiaMacroExt.Projects.${cn} */
 var root = window.RiseupAsiaMacroExt;
 if (!root) { root = { Projects: {} }; window.RiseupAsiaMacroExt = root; }
@@ -286,16 +287,16 @@ root.Projects["${cn}"] = ns;
 console.log("[namespace] Registered RiseupAsiaMacroExt.Projects.${cn}");
 })();`;
 
-    /* Build-time guard — fail fast if the generator drifts from the shape
+  /* Build-time guard — fail fast if the generator drifts from the shape
        contract. Emits the exact missing sub-namespace list. */
-    assertEmittedShape(
-        iife,
-        `buildProjectNamespaceScript(codeName="${context.codeName}")`,
-    );
-    /* Touch the imported keys list so tree-shaking keeps it for runtime
+  assertEmittedShape(
+    iife,
+    `buildProjectNamespaceScript(codeName="${context.codeName}")`,
+  );
+  /* Touch the imported keys list so tree-shaking keeps it for runtime
        diagnostics consumers that import it from this module. */
-    void PROJECT_NAMESPACE_KEYS;
+  void PROJECT_NAMESPACE_KEYS;
 
-    return iife;
+  return iife;
 }
 

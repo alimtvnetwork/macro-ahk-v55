@@ -18,7 +18,9 @@ export function buildRowLeft(refs: ModalRefs, row: PromptRow, container: HTMLEle
   const left = document.createElement('div');
   left.style.cssText = 'flex:1;min-width:0;padding-right:8px;cursor:pointer;';
   left.title = 'Click to toggle body preview';
-  left.addEventListener('click', () => { togglePreview(refs, row, container, renderAllRoles); });
+  left.addEventListener('click', () => {
+    togglePreview(refs, row, container, renderAllRoles); 
+  });
   const isExpanded = refs.view.expandedIds.has(row.Id);
   const caret = isExpanded ? '▾ ' : '▸ ';
   const name = document.createElement('div');
@@ -41,29 +43,39 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
   setDefaultBtn.textContent = row.IsDefault ? 'Default' : 'Set default';
   setDefaultBtn.disabled = row.IsDefault === 1;
   setDefaultBtn.style.cssText = btnCss(row.IsDefault ? '#3a2f6b' : '#243050', '#e6edf7') + ';opacity:' + (row.IsDefault ? '0.6' : '1') + ';cursor:' + (row.IsDefault ? 'default' : 'pointer');
-  setDefaultBtn.addEventListener('click', () => { void handleSetDefault(refs, row, renderAllRoles); });
+  setDefaultBtn.addEventListener('click', () => {
+    void handleSetDefault(refs, row, renderAllRoles); 
+  });
 
   const dupBtn = document.createElement('button');
   dupBtn.textContent = 'Duplicate';
   dupBtn.style.cssText = btnCss('#243050', '#e6edf7');
-  dupBtn.addEventListener('click', () => { void handleDuplicate(refs, row, renderAllRoles); });
+  dupBtn.addEventListener('click', () => {
+    void handleDuplicate(refs, row, renderAllRoles); 
+  });
 
   const editBtn = document.createElement('button');
   editBtn.textContent = 'Edit';
   editBtn.title = 'Inline edit: rename or tweak body without leaving the library';
   editBtn.style.cssText = btnCss('#243050', '#e6edf7');
-  editBtn.addEventListener('click', () => { openInlineEditor(refs, rowEl, row, renderAllRoles); });
+  editBtn.addEventListener('click', () => {
+    openInlineEditor(refs, rowEl, row, renderAllRoles); 
+  });
 
   const quickEditBtn = document.createElement('button');
   quickEditBtn.textContent = 'Full editor';
   quickEditBtn.title = 'Open the full drift-guarded editor (shared with chip gears)';
   quickEditBtn.style.cssText = btnCss('#243050', '#e6edf7');
-  quickEditBtn.addEventListener('click', () => { void openPromptEditor({ role: row.Role, promptId: row.Id }); });
+  quickEditBtn.addEventListener('click', () => {
+    void openPromptEditor({ role: row.Role, promptId: row.Id }); 
+  });
 
   const delBtn = document.createElement('button');
   delBtn.textContent = 'Delete';
   delBtn.style.cssText = btnCss('#4a2230', '#f5c9c9');
-  delBtn.addEventListener('click', () => { void handleDelete(refs, row, renderAllRoles); });
+  delBtn.addEventListener('click', () => {
+    void handleDelete(refs, row, renderAllRoles); 
+  });
 
   const seedBody = getSeedBodyForSlug(row.Slug);
   const canReset = seedBody !== null && seedBody !== row.Body;
@@ -77,9 +89,12 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
     resetBtn.textContent = '↺ Reset';
     resetBtn.title = 'Restore this seeded prompt to its shipped default body';
     resetBtn.style.cssText = btnCss('#243050', '#ffe08a');
-    resetBtn.addEventListener('click', () => { void handleResetToDefault(refs, row, renderAllRoles); });
+    resetBtn.addEventListener('click', () => {
+      void handleResetToDefault(refs, row, renderAllRoles); 
+    });
     right.appendChild(resetBtn);
   }
+
   right.appendChild(delBtn);
 
   return right;
@@ -125,6 +140,7 @@ export function togglePreview(refs: ModalRefs, row: PromptRow, container: HTMLEl
   } else {
     refs.view.expandedIds.add(row.Id);
   }
+
   const fresh = buildRowContainer(refs, row, renderAllRoles);
   container.replaceWith(fresh);
 }

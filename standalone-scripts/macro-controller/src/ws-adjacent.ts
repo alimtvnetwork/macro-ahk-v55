@@ -22,7 +22,9 @@ import { gatedMoveToWorkspace } from './loop-move-gate';
 import { logError } from './error-utils';
 import { throwDiagnostic } from './errors/diagnostic-error';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // Helper — auth failure check
@@ -239,6 +241,7 @@ async function doFetchWorkspacesForMove(
   if (!window.marco?.api?.credits?.fetchWorkspaces) {
     throwDiagnostic('WS_CONTEXT_ADJACENT_E002', { missingApi: 'window.marco.api.credits.fetchWorkspaces' });
   }
+
   const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
   if (isAuthFailure(resp.status) && !isRetry) {

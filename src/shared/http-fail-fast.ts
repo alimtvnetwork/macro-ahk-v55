@@ -38,22 +38,25 @@ export interface HttpFailFastEventDetail {
 }
 
 const emitHttpFailFastEvent = (err: { status: number; method: string; url: string; reason: string; bodySnippet: string | null; toReportString: () => string }): void => {
-    if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") return;
-    try {
-        const detail: HttpFailFastEventDetail = {
-            status: err.status,
-            method: err.method,
-            url: err.url,
-            reason: err.reason,
-            bodySnippet: err.bodySnippet,
-            report: err.toReportString(),
-            at: new Date().toISOString(),
-        };
-        window.dispatchEvent(new CustomEvent(HTTP_FAIL_FAST_EVENT, { detail }));
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
+    return;
+  }
+
+  try {
+    const detail: HttpFailFastEventDetail = {
+      status: err.status,
+      method: err.method,
+      url: err.url,
+      reason: err.reason,
+      bodySnippet: err.bodySnippet,
+      report: err.toReportString(),
+      at: new Date().toISOString(),
+    };
+    window.dispatchEvent(new CustomEvent(HTTP_FAIL_FAST_EVENT, { detail }));
     // allow-swallow: event dispatch is best-effort UI surfacing; no listener is a valid state
-    } catch (err) {
+  } catch (err) {
     void 0; 
-}
+  }
 };
 
 export interface HttpCallContext {
@@ -72,24 +75,55 @@ export interface HttpFailureReport {
 const isOk = (status: number): boolean => status >= HTTP_OK_MIN && status < HTTP_OK_MAX;
 
 const reasonForStatus = (status: number): string => {
-    if (status === HttpCodes.UNAUTHORIZED) return "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).";
-    if (status === HttpCodes.FORBIDDEN) return "Forbidden — caller lacks permission for this resource.";
-    if (status === HttpCodes.NOT_FOUND) return "Not Found — endpoint or resource does not exist at this URL.";
-    if (status === 405) return "Method Not Allowed — server rejected this HTTP method; do NOT swap methods and retry.";
-    if (status === 408) return "Request Timeout — server-side timeout.";
-    if (status === HttpCodes.CONFLICT) return "Conflict — server state disagrees with request.";
-    if (status === 410) return "Gone — resource permanently removed.";
-    if (status === 429) return "Rate Limited — STOP all calls to this host immediately.";
-    if (status >= HttpCodes.INTERNAL_SERVER_ERROR && status < 600) return `Server Error ${status} — do NOT retry; surface to user.`;
-    if (status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR) return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
+  if (status === HttpCodes.UNAUTHORIZED) {
+    return "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).";
+  }
 
-    return `Unexpected HTTP status ${status}.`;
+  if (status === HttpCodes.FORBIDDEN) {
+    return "Forbidden — caller lacks permission for this resource.";
+  }
+
+  if (status === HttpCodes.NOT_FOUND) {
+    return "Not Found — endpoint or resource does not exist at this URL.";
+  }
+
+  if (status === 405) {
+    return "Method Not Allowed — server rejected this HTTP method; do NOT swap methods and retry.";
+  }
+
+  if (status === 408) {
+    return "Request Timeout — server-side timeout.";
+  }
+
+  if (status === HttpCodes.CONFLICT) {
+    return "Conflict — server state disagrees with request.";
+  }
+
+  if (status === 410) {
+    return "Gone — resource permanently removed.";
+  }
+
+  if (status === 429) {
+    return "Rate Limited — STOP all calls to this host immediately.";
+  }
+
+  if (status >= HttpCodes.INTERNAL_SERVER_ERROR && status < 600) {
+    return `Server Error ${status} — do NOT retry; surface to user.`;
+  }
+
+  if (status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR) {
+    return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
+  }
+
+  return `Unexpected HTTP status ${status}.`;
 };
 
 const truncateBody = (text: string): string => {
-    if (text.length <= BODY_SNIPPET_MAX) return text;
+  if (text.length <= BODY_SNIPPET_MAX) {
+    return text;
+  }
 
-    return text.slice(0, BODY_SNIPPET_MAX) + "…[truncated]";
+  return text.slice(0, BODY_SNIPPET_MAX) + "…[truncated]";
 };
 
 /**
@@ -97,44 +131,46 @@ const truncateBody = (text: string): string => {
  * Carries the full failure report shape per HEFF spec §5.
  */
 export class HttpFailFastError extends Error {
-    public readonly status: number;
-    public readonly method: string;
-    public readonly url: string;
-    public readonly bodySnippet: string | null;
-    public readonly reason: string;
+  public readonly status: number;
+  public readonly method: string;
+  public readonly url: string;
+  public readonly bodySnippet: string | null;
+  public readonly reason: string;
 
-    public constructor(report: HttpFailureReport) {
-        super(`HTTP ${report.status} on ${report.method} ${report.url} — ${report.reason}`);
-        this.name = "HttpFailFastError";
-        this.status = report.status;
-        this.method = report.method;
-        this.url = report.url;
-        this.bodySnippet = report.bodySnippet;
-        this.reason = report.reason;
-        // Step 7 (HEFF UI): emit a window-level event so any mounted
-        // HttpFailFastBanner can surface this failure without each caller
-        // wiring its own toast/banner. No-op in SW/Node contexts.
-        emitHttpFailFastEvent(this);
+  public constructor(report: HttpFailureReport) {
+    super(`HTTP ${report.status} on ${report.method} ${report.url} — ${report.reason}`);
+    this.name = "HttpFailFastError";
+    this.status = report.status;
+    this.method = report.method;
+    this.url = report.url;
+    this.bodySnippet = report.bodySnippet;
+    this.reason = report.reason;
+    // Step 7 (HEFF UI): emit a window-level event so any mounted
+    // HttpFailFastBanner can surface this failure without each caller
+    // wiring its own toast/banner. No-op in SW/Node contexts.
+    emitHttpFailFastEvent(this);
+  }
+
+  /** Mandatory HEFF report shape (spec §5). */
+  public toReportString(): string {
+    const body = this.bodySnippet === null ? "null" : this.bodySnippet;
+
+    return [
+      `HTTP ${this.status} on ${this.method} ${this.url}`,
+      `Body: ${body}`,
+      `Reason: ${this.reason}`,
+      REPORT_HALT_LINE,
+    ].join("\n");
+  }
+
+  /** True for network/DNS/refused errors. Always false here. */
+  public static isNetworkError(err: unknown): boolean {
+    if (err instanceof HttpFailFastError) {
+      return false;
     }
 
-    /** Mandatory HEFF report shape (spec §5). */
-    public toReportString(): string {
-        const body = this.bodySnippet === null ? "null" : this.bodySnippet;
-
-        return [
-            `HTTP ${this.status} on ${this.method} ${this.url}`,
-            `Body: ${body}`,
-            `Reason: ${this.reason}`,
-            REPORT_HALT_LINE,
-        ].join("\n");
-    }
-
-    /** True for network/DNS/refused errors. Always false here. */
-    public static isNetworkError(err: unknown): boolean {
-        if (err instanceof HttpFailFastError) return false;
-
-        return err instanceof TypeError;
-    }
+    return err instanceof TypeError;
+  }
 }
 
 /**
@@ -145,23 +181,25 @@ export class HttpFailFastError extends Error {
  * Returns the response for fluent chaining.
  */
 export const httpFailFast = async (response: Response, context: HttpCallContext): Promise<Response> => {
-    if (isOk(response.status)) return response;
+  if (isOk(response.status)) {
+    return response;
+  }
 
-    let bodySnippet: string | null = null;
-    try {
-        const text = await response.clone().text();
-        bodySnippet = truncateBody(text);
-    } catch (err) {
-        bodySnippet = null;
-    }
+  let bodySnippet: string | null = null;
+  try {
+    const text = await response.clone().text();
+    bodySnippet = truncateBody(text);
+  } catch (err) {
+    bodySnippet = null;
+  }
 
-    throw new HttpFailFastError({
-        status: response.status,
-        method: context.method,
-        url: context.url,
-        bodySnippet,
-        reason: reasonForStatus(response.status),
-    });
+  throw new HttpFailFastError({
+    status: response.status,
+    method: context.method,
+    url: context.url,
+    bodySnippet,
+    reason: reasonForStatus(response.status),
+  });
 };
 
 /**
@@ -169,8 +207,8 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
  * case where you don't need the un-checked Response object.
  */
 export const httpFetchOrThrow = async (url: string, init?: RequestInit): Promise<Response> => {
-    const method = (init?.method ?? "GET").toUpperCase();
-    const response = await fetch(url, init);
+  const method = (init?.method ?? "GET").toUpperCase();
+  const response = await fetch(url, init);
 
-    return httpFailFast(response, { method, url });
+  return httpFailFast(response, { method, url });
 };

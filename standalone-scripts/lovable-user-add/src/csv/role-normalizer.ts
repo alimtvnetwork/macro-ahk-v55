@@ -20,35 +20,35 @@ export interface RoleNormalizeResult {
 }
 
 const KNOWN_ROLES: ReadonlyMap<string, UserAddMembershipRoleCodeType> = new Map([
-    ["owner", UserAddMembershipRoleCodeType.Owner],
-    ["admin", UserAddMembershipRoleCodeType.Admin],
-    ["member", UserAddMembershipRoleCodeType.Member],
+  ["owner", UserAddMembershipRoleCodeType.Owner],
+  ["admin", UserAddMembershipRoleCodeType.Admin],
+  ["member", UserAddMembershipRoleCodeType.Member],
 ]);
 
 const EDITOR_KEY = "editor";
 
 export const normalizeRole = (raw: string | null): RoleNormalizeResult => {
-    if (raw === null) {
-        return { RoleCode: null, WasEditorNormalized: false, Error: null };
-    }
+  if (raw === null) {
+    return { RoleCode: null, WasEditorNormalized: false, Error: null };
+  }
 
-    const key = raw.trim().toLowerCase();
+  const key = raw.trim().toLowerCase();
 
-    if (key === EDITOR_KEY) {
-        return {
-            RoleCode: UserAddMembershipRoleCodeType.Member,
-            WasEditorNormalized: true, Error: null,
-        };
-    }
+  if (key === EDITOR_KEY) {
+    return {
+      RoleCode: UserAddMembershipRoleCodeType.Member,
+      WasEditorNormalized: true, Error: null,
+    };
+  }
 
-    const matched = KNOWN_ROLES.get(key);
+  const matched = KNOWN_ROLES.get(key);
 
-    if (matched === undefined) {
-        return {
-            RoleCode: null, WasEditorNormalized: false,
-            Error: `Unknown role: ${raw} (expected Owner/Admin/Member/Editor)`,
-        };
-    }
+  if (matched === undefined) {
+    return {
+      RoleCode: null, WasEditorNormalized: false,
+      Error: `Unknown role: ${raw} (expected Owner/Admin/Member/Editor)`,
+    };
+  }
 
-    return { RoleCode: matched, WasEditorNormalized: false, Error: null };
+  return { RoleCode: matched, WasEditorNormalized: false, Error: null };
 };

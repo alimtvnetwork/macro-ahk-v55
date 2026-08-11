@@ -21,9 +21,9 @@ export interface TaskStatusSeed {
 }
 
 export const TASK_STATUS_SEEDS: ReadonlyArray<TaskStatusSeed> = Object.freeze([
-    { Code: UserAddTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
-    { Code: UserAddTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
-    { Code: UserAddTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
-    { Code: UserAddTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
-    { Code: UserAddTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
+  { Code: UserAddTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
+  { Code: UserAddTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
+  { Code: UserAddTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
+  { Code: UserAddTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
+  { Code: UserAddTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
 ]);

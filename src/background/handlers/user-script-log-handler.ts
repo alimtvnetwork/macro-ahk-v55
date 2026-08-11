@@ -34,17 +34,17 @@ let rateCount = 0;
 
 /** Returns true if the message should be dropped due to rate limiting. */
 function isRateLimited(): boolean {
-    const now = Date.now();
-    const isNewWindow = now - rateWindowStart > RATE_WINDOW_MS;
+  const now = Date.now();
+  const isNewWindow = now - rateWindowStart > RATE_WINDOW_MS;
 
-    if (isNewWindow) {
-        rateWindowStart = now;
-        rateCount = 0;
-    }
+  if (isNewWindow) {
+    rateWindowStart = now;
+    rateCount = 0;
+  }
 
-    rateCount++;
+  rateCount++;
 
-    return rateCount > MAX_MESSAGES_PER_SECOND;
+  return rateCount > MAX_MESSAGES_PER_SECOND;
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,29 +72,29 @@ interface UserScriptLogPayload {
 
 /** Handles a USER_SCRIPT_LOG message from the injected SDK. */
 export async function handleUserScriptLog(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<OkResponse> {
-    const isDropped = isRateLimited();
+  const isDropped = isRateLimited();
 
-    if (isDropped) {
-        return { isOk: true };
-    }
-
-    const logRequest = message as MessageRequest & { payload: UserScriptLogPayload };
-    const payload = logRequest.payload;
-    const sanitizedMetadata = redactSensitiveMetadata(payload.metadata);
-
-    await insertUserScriptLogRow(payload, sanitizedMetadata);
-
-    const isErrorLevel = payload.level === "ERROR";
-
-    if (isErrorLevel) {
-        await insertUserScriptErrorRow(payload, sanitizedMetadata);
-    }
-
-    markLoggingDirty();
-
+  if (isDropped) {
     return { isOk: true };
+  }
+
+  const logRequest = message as MessageRequest & { payload: UserScriptLogPayload };
+  const payload = logRequest.payload;
+  const sanitizedMetadata = redactSensitiveMetadata(payload.metadata);
+
+  await insertUserScriptLogRow(payload, sanitizedMetadata);
+
+  const isErrorLevel = payload.level === "ERROR";
+
+  if (isErrorLevel) {
+    await insertUserScriptErrorRow(payload, sanitizedMetadata);
+  }
+
+  markLoggingDirty();
+
+  return { isOk: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -108,73 +108,73 @@ export async function handleUserScriptLog(
 
 /** Inserts a user-script log entry into logs.db. */
 function insertUserScriptLogRow(
-    payload: UserScriptLogPayload,
-    sanitizedMetadata: string | null,
+  payload: UserScriptLogPayload,
+  sanitizedMetadata: string | null,
 ): Promise<void> {
-    const db = getLogsDb();
-    const version = chrome.runtime.getManifest().version;
+  const db = getLogsDb();
+  const version = chrome.runtime.getManifest().version;
 
-    return resolveCurrentSessionId(version).then((sessionId) => {
-        db.run(
-            `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, Metadata, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
+  return resolveCurrentSessionId(version).then((sessionId) => {
+    db.run(
+      `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, Metadata, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                sessionId,
-                bindReq(payload.timestamp, new Date().toISOString()),
-                bindReq(payload.level, "INFO"),
-                "user-script",
-                bindReq(payload.category, "USER"),
-                bindReq(payload.action, "log"),
-                bindReq(payload.detail, ""),
-                sanitizedMetadata,
-                bindOpt(payload.projectId),
-                bindOpt(payload.urlRuleId),
-                bindOpt(payload.scriptId),
-                bindOpt(payload.configId),
-                bindReq(version, "0.0.0"),
-            ],
-        );
-    });
+      [
+        sessionId,
+        bindReq(payload.timestamp, new Date().toISOString()),
+        bindReq(payload.level, "INFO"),
+        "user-script",
+        bindReq(payload.category, "USER"),
+        bindReq(payload.action, "log"),
+        bindReq(payload.detail, ""),
+        sanitizedMetadata,
+        bindOpt(payload.projectId),
+        bindOpt(payload.urlRuleId),
+        bindOpt(payload.scriptId),
+        bindOpt(payload.configId),
+        bindReq(version, "0.0.0"),
+      ],
+    );
+  });
 }
 
 /** Inserts a corresponding error row when user script logs at ERROR level. */
 function insertUserScriptErrorRow(
-    payload: UserScriptLogPayload,
-    sanitizedMetadata: string | null,
+  payload: UserScriptLogPayload,
+  sanitizedMetadata: string | null,
 ): Promise<void> {
-    const db = getErrorsDb();
-    const version = chrome.runtime.getManifest().version;
+  const db = getErrorsDb();
+  const version = chrome.runtime.getManifest().version;
 
-    return resolveCurrentSessionId(version).then((sessionId) => {
-        db.run(
-            `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, Context, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
+  return resolveCurrentSessionId(version).then((sessionId) => {
+    db.run(
+      `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, Context, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, 'ERROR', 'user-script', ?, 'USER_SCRIPT_LOG_ERROR', ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                sessionId,
-                bindReq(payload.timestamp, new Date().toISOString()),
-                bindReq(payload.category, "USER"),
-                bindReq(payload.detail, "(no message)"),
-                sanitizedMetadata,
-                bindOpt(payload.projectId),
-                bindOpt(payload.urlRuleId),
-                bindOpt(payload.scriptId),
-                bindOpt(payload.configId),
-                bindReq(version, "0.0.0"),
-            ],
-        );
-    });
+      [
+        sessionId,
+        bindReq(payload.timestamp, new Date().toISOString()),
+        bindReq(payload.category, "USER"),
+        bindReq(payload.detail, "(no message)"),
+        sanitizedMetadata,
+        bindOpt(payload.projectId),
+        bindOpt(payload.urlRuleId),
+        bindOpt(payload.scriptId),
+        bindOpt(payload.configId),
+        bindReq(version, "0.0.0"),
+      ],
+    );
+  });
 }
 
 async function resolveCurrentSessionId(version: string): Promise<number> {
-    const currentSessionId = getCurrentSessionId();
+  const currentSessionId = getCurrentSessionId();
 
-    if (currentSessionId !== null) {
-        return Number(currentSessionId);
-    }
+  if (currentSessionId !== null) {
+    return Number(currentSessionId);
+  }
 
-    const newSessionId = await startSession(version);
+  const newSessionId = await startSession(version);
 
-    return Number(newSessionId);
+  return Number(newSessionId);
 }
 
 /* ------------------------------------------------------------------ */
@@ -183,39 +183,39 @@ async function resolveCurrentSessionId(version: string): Promise<number> {
 
 /** Redacts sensitive values in metadata JSON. */
 function redactSensitiveMetadata(metadata: string | null): string | null {
-    const hasNoMetadata = metadata === null || metadata === "";
+  const hasNoMetadata = metadata === null || metadata === "";
 
-    if (hasNoMetadata) {
-        return null;
-    }
+  if (hasNoMetadata) {
+    return null;
+  }
 
-    try {
-        const parsed = JSON.parse(metadata!) as Record<string, unknown>;
-        const redacted = redactObject(parsed);
+  try {
+    const parsed = JSON.parse(metadata!) as Record<string, unknown>;
+    const redacted = redactObject(parsed);
 
-        return JSON.stringify(redacted);
-    } catch (err) { 
-        return metadata;
-    }
+    return JSON.stringify(redacted);
+  } catch (err) { 
+    return metadata;
+  }
 }
 
 /** Recursively redacts sensitive keys in an object. */
 function redactObject(
-    metadataRecord: Record<string, unknown>,
+  metadataRecord: Record<string, unknown>,
 ): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
+  const result: Record<string, unknown> = {};
 
-    for (const key of Object.keys(metadataRecord)) {
-        const value = metadataRecord[key];
-        const isSensitiveKey = SENSITIVE_KEY_PATTERN.test(key);
-        const isStringValue = typeof value === "string";
+  for (const key of Object.keys(metadataRecord)) {
+    const value = metadataRecord[key];
+    const isSensitiveKey = SENSITIVE_KEY_PATTERN.test(key);
+    const isStringValue = typeof value === "string";
 
-        if (isSensitiveKey && isStringValue) {
-            result[key] = (value as string).slice(0, REDACTED_PREFIX_LENGTH) + REDACTED_SUFFIX;
-        } else {
-            result[key] = value;
-        }
+    if (isSensitiveKey && isStringValue) {
+      result[key] = (value as string).slice(0, REDACTED_PREFIX_LENGTH) + REDACTED_SUFFIX;
+    } else {
+      result[key] = value;
     }
+  }
 
-    return result;
+  return result;
 }

@@ -101,7 +101,10 @@ interface ModalHandlerStore {
 
 function ensureBackdrop(): HTMLDivElement {
   let bd = document.getElementById(BACKDROP_ID) as HTMLDivElement | null;
-  if (bd) return bd;
+  if (bd) {
+    return bd;
+  }
+
   bd = document.createElement('div');
   bd.id = BACKDROP_ID;
   bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:' + (Z_INDEX - 1) + ';display:none;';
@@ -112,7 +115,10 @@ function ensureBackdrop(): HTMLDivElement {
 
 function ensureModalEl(): HTMLDivElement {
   let el = document.getElementById(MODAL_ID) as HTMLDivElement | null;
-  if (el) return el;
+  if (el) {
+    return el;
+  }
+
   el = document.createElement('div');
   el.id = MODAL_ID;
   el.style.cssText = [
@@ -133,7 +139,10 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
+
   const store = el as HTMLElement & ModalHandlerStore;
   if (store._marcoRemixKey) {
     document.removeEventListener('keydown', store._marcoRemixKey, true);
@@ -146,8 +155,13 @@ export function hideRemixModal(): void {
   detachKeyHandler();
   const el = document.getElementById(MODAL_ID);
   const bd = document.getElementById(BACKDROP_ID);
-  if (el) el.style.display = 'none';
-  if (bd) bd.style.display = 'none';
+  if (el) {
+    el.style.display = 'none';
+  }
+
+  if (bd) {
+    bd.style.display = 'none';
+  }
 }
 
 /** Show the modal. Re-mounts handlers fresh on every call. */
@@ -158,6 +172,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
 
     return;
   }
+
   const bd = ensureBackdrop();
   const el = ensureModalEl();
   let state: ModalState = { submitting: false, error: '' };
@@ -170,10 +185,16 @@ export function showRemixModal(opts: RemixModalOpts): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
-      if (!t) return;
+      if (!t) {
+        return;
+      }
+
       const action = t.getAttribute('data-marco-action');
       if (action === 'close' || action === 'cancel') {
-        if (state.submitting) return;
+        if (state.submitting) {
+          return;
+        }
+
         e.stopPropagation();
         hideRemixModal();
       } else if (action === 'submit') {
@@ -181,8 +202,11 @@ export function showRemixModal(opts: RemixModalOpts): void {
         void doSubmit();
       }
     };
+
     bd.onclick = function (): void {
-      if (!state.submitting) hideRemixModal();
+      if (!state.submitting) {
+        hideRemixModal();
+      }
     };
   }
 
@@ -190,7 +214,10 @@ export function showRemixModal(opts: RemixModalOpts): void {
     const nameInput = el.querySelector<HTMLInputElement>('[data-marco-el="name"]');
     const histInput = el.querySelector<HTMLInputElement>('[data-marco-el="hist"]');
     const knowInput = el.querySelector<HTMLInputElement>('[data-marco-el="know"]');
-    if (!nameInput || !histInput || !knowInput) return;
+    if (!nameInput || !histInput || !knowInput) {
+      return;
+    }
+
     const projectName = nameInput.value.trim();
     if (!projectName) {
       state = { submitting: false, error: 'Project name cannot be empty.' };
@@ -199,6 +226,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
 
       return;
     }
+
     state = { submitting: true, error: '' };
     rerender();
     try {
@@ -238,14 +266,21 @@ export function showRemixModal(opts: RemixModalOpts): void {
   // Esc handler.
   detachKeyHandler();
   const onKey = function (e: KeyboardEvent): void {
-    if (e.key === 'Escape' && !state.submitting) hideRemixModal();
+    if (e.key === 'Escape' && !state.submitting) {
+      hideRemixModal();
+    }
   };
+
   (el as HTMLElement & ModalHandlerStore)._marcoRemixKey = onKey;
-  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, EVENT_LISTENER_DELAY_MS);
+  setTimeout(function () {
+    document.addEventListener('keydown', onKey, true); 
+  }, EVENT_LISTENER_DELAY_MS);
 
   // Focus name input for quick edit.
   setTimeout(function () {
     const ni = el.querySelector<HTMLInputElement>('[data-marco-el="name"]');
-    if (ni) { ni.focus(); ni.select(); }
+    if (ni) {
+      ni.focus(); ni.select(); 
+    }
   }, 30);
 }

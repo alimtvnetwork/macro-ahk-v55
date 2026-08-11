@@ -129,15 +129,25 @@ const createUIState = new CreateUIState();
 function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   subscribeVisibleWorkspaces(function (rows) {
     let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
-    try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) {
+    try {
+      config = getWorkspaceLifecycleConfig(); 
+    } catch (_e: unknown) {
       logError('MacroController', 'Unknown error');
       config = null;
     }
+
     const resolver: DisplayKindResolver = function (ws) {
-      if (!config) { return 'normal'; }
-      try { return classifyWorkspaceDisplayStatus(ws, config).kind; }
-      catch (_e: unknown) { return 'normal'; }
+      if (!config) {
+        return 'normal'; 
+      }
+
+      try {
+        return classifyWorkspaceDisplayStatus(ws, config).kind; 
+      } catch (_e: unknown) {
+        return 'normal'; 
+      }
     };
+
     summaryBar.update(computeDashboardSummary(rows, resolver), computeSummaryDetails(rows, resolver));
   });
 }

@@ -35,43 +35,49 @@ let isAttached = false;
 
 /** Reads the persisted trail from sessionStorage. */
 export function readClickTrail(): ClickTrailEntry[] {
-    try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (raw === null) return [];
-        const parsed = JSON.parse(raw) as ClickTrailEntry[];
-        if (Array.isArray(parsed) === false) return [];
-
-        return parsed;
-    } catch (err) { void 0;
-
-        return [];
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw === null) {
+      return [];
     }
+
+    const parsed = JSON.parse(raw) as ClickTrailEntry[];
+    if (Array.isArray(parsed) === false) {
+      return [];
+    }
+
+    return parsed;
+  } catch (err) {
+    void 0;
+
+    return [];
+  }
 }
 
 /** Appends an entry to the trail (ring-buffer trimmed to MAX_ENTRIES). */
 export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
-    try {
-        const current = readClickTrail();
-        const next: ClickTrailEntry[] = [
-            ...current,
-            { ...entry, at: new Date().toISOString() },
-        ];
-        const trimmed = next.length > MAX_ENTRIES
-            ? next.slice(next.length - MAX_ENTRIES)
-            : next;
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-    } catch (err) {
+  try {
+    const current = readClickTrail();
+    const next: ClickTrailEntry[] = [
+      ...current,
+      { ...entry, at: new Date().toISOString() },
+    ];
+    const trimmed = next.length > MAX_ENTRIES
+      ? next.slice(next.length - MAX_ENTRIES)
+      : next;
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+  } catch (err) {
     void 0; 
-}
+  }
 }
 
 /** Clears the live trail. Useful after the user reloads the extension. */
 export function clearClickTrail(): void {
-    try {
-        sessionStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch (err) {
     void 0; 
-}
+  }
 }
 
 /**
@@ -83,72 +89,85 @@ export function clearClickTrail(): void {
  * for `failureId`, ensuring the very first capture wins.
  */
 export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
-    const key = `${FROZEN_KEY_PREFIX}${failureId}`;
-    try {
-        const existing = sessionStorage.getItem(key);
-        if (existing !== null) {
-            const parsed = JSON.parse(existing) as ClickTrailEntry[];
-            if (Array.isArray(parsed)) return parsed;
-        }
-        const live = readClickTrail();
-        sessionStorage.setItem(key, JSON.stringify(live));
-        evictOldFrozenSnapshots(key);
-
-        return live;
-    } catch (err) { void 0;
-
-        return readClickTrail();
+  const key = `${FROZEN_KEY_PREFIX}${failureId}`;
+  try {
+    const existing = sessionStorage.getItem(key);
+    if (existing !== null) {
+      const parsed = JSON.parse(existing) as ClickTrailEntry[];
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
     }
+
+    const live = readClickTrail();
+    sessionStorage.setItem(key, JSON.stringify(live));
+    evictOldFrozenSnapshots(key);
+
+    return live;
+  } catch (err) {
+    void 0;
+
+    return readClickTrail();
+  }
 }
 
 /** Reads a previously frozen snapshot, or returns null if none was captured. */
 export function readFrozenClickTrail(failureId: string): ClickTrailEntry[] | null {
-    try {
-        const raw = sessionStorage.getItem(`${FROZEN_KEY_PREFIX}${failureId}`);
-        if (raw === null) return null;
-        const parsed = JSON.parse(raw) as ClickTrailEntry[];
-
-        return Array.isArray(parsed) ? parsed : null;
-    } catch (err) { void 0;
-
-        return null;
+  try {
+    const raw = sessionStorage.getItem(`${FROZEN_KEY_PREFIX}${failureId}`);
+    if (raw === null) {
+      return null;
     }
+
+    const parsed = JSON.parse(raw) as ClickTrailEntry[];
+
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (err) {
+    void 0;
+
+    return null;
+  }
 }
 
 /** Drops all frozen snapshots — call after the user explicitly reloads the extension. */
 export function clearFrozenClickTrails(): void {
-    try {
-        const keysToRemove: string[] = [];
-        for (let i = 0; i < sessionStorage.length; i += 1) {
-            const k = sessionStorage.key(i);
-            if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
-                keysToRemove.push(k);
-            }
-        }
-        keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch (err) {
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < sessionStorage.length; i += 1) {
+      const k = sessionStorage.key(i);
+      if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
+        keysToRemove.push(k);
+      }
+    }
+
+    keysToRemove.forEach((k) => sessionStorage.removeItem(k));
+  } catch (err) {
     void 0; 
-}
+  }
 }
 
 /** Trims frozen snapshot count to MAX_FROZEN_SNAPSHOTS, preserving `keepKey`. */
 function evictOldFrozenSnapshots(keepKey: string): void {
-    try {
-        const frozenKeys: string[] = [];
-        for (let i = 0; i < sessionStorage.length; i += 1) {
-            const k = sessionStorage.key(i);
-            if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
-                frozenKeys.push(k);
-            }
-        }
-        if (frozenKeys.length <= MAX_FROZEN_SNAPSHOTS) return;
-        const toRemove = frozenKeys
-            .filter((k) => k !== keepKey)
-            .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
-        toRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch (err) {
+  try {
+    const frozenKeys: string[] = [];
+    for (let i = 0; i < sessionStorage.length; i += 1) {
+      const k = sessionStorage.key(i);
+      if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
+        frozenKeys.push(k);
+      }
+    }
+
+    if (frozenKeys.length <= MAX_FROZEN_SNAPSHOTS) {
+      return;
+    }
+
+    const toRemove = frozenKeys
+      .filter((k) => k !== keepKey)
+      .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
+    toRemove.forEach((k) => sessionStorage.removeItem(k));
+  } catch (err) {
     void 0; 
-}
+  }
 }
 
 /**
@@ -157,71 +176,96 @@ function evictOldFrozenSnapshots(keepKey: string): void {
  * times (e.g., on every popup mount).
  */
 export function attachClickTrail(): void {
-    if (isAttached) return;
-    isAttached = true;
+  if (isAttached) {
+    return;
+  }
 
-    document.addEventListener(Events.CLICK, handleClick, { capture: true, passive: true });
-    document.addEventListener(Events.KEYDOWN, handleKeyDown, { capture: true, passive: true });
-    window.addEventListener("popstate", handlePopState);
+  isAttached = true;
 
-    recordTrail({ kind: "mount", label: `popup mounted @ ${location.pathname}` });
+  document.addEventListener(Events.CLICK, handleClick, { capture: true, passive: true });
+  document.addEventListener(Events.KEYDOWN, handleKeyDown, { capture: true, passive: true });
+  window.addEventListener("popstate", handlePopState);
+
+  recordTrail({ kind: "mount", label: `popup mounted @ ${location.pathname}` });
 }
 
 function handleClick(event: Event): void {
-    const target = event.target;
-    if (target instanceof Element === false) return;
+  const target = event.target;
+  if (target instanceof Element === false) {
+    return;
+  }
 
-    const element = target as Element;
-    const button = element.closest("button, a, [role='button']");
-    if (button === null) return;
+  const element = target as Element;
+  const button = element.closest("button, a, [role='button']");
+  if (button === null) {
+    return;
+  }
 
-    const label = extractLabel(button);
-    const descriptor = describeElement(button);
+  const label = extractLabel(button);
+  const descriptor = describeElement(button);
 
-    recordTrail({ kind: "click", label, target: descriptor });
+  recordTrail({ kind: "click", label, target: descriptor });
 }
 
 function handleKeyDown(event: Event): void {
-    const keyEvent = event as KeyboardEvent;
-    const isShortcut = keyEvent.metaKey || keyEvent.ctrlKey || keyEvent.altKey;
-    if (isShortcut === false) return;
+  const keyEvent = event as KeyboardEvent;
+  const isShortcut = keyEvent.metaKey || keyEvent.ctrlKey || keyEvent.altKey;
+  if (isShortcut === false) {
+    return;
+  }
 
-    const parts: string[] = [];
-    if (keyEvent.metaKey) parts.push("Cmd");
-    if (keyEvent.ctrlKey) parts.push("Ctrl");
-    if (keyEvent.altKey) parts.push("Alt");
-    if (keyEvent.shiftKey) parts.push("Shift");
-    parts.push(keyEvent.key);
+  const parts: string[] = [];
+  if (keyEvent.metaKey) {
+    parts.push("Cmd");
+  }
 
-    recordTrail({ kind: "key", label: parts.join("+") });
+  if (keyEvent.ctrlKey) {
+    parts.push("Ctrl");
+  }
+
+  if (keyEvent.altKey) {
+    parts.push("Alt");
+  }
+
+  if (keyEvent.shiftKey) {
+    parts.push("Shift");
+  }
+
+  parts.push(keyEvent.key);
+
+  recordTrail({ kind: "key", label: parts.join("+") });
 }
 
 function handlePopState(): void {
-    recordTrail({ kind: "route", label: `route → ${location.pathname}` });
+  recordTrail({ kind: "route", label: `route → ${location.pathname}` });
 }
 
 /** Extracts a clean text label from a clickable element. */
 function extractLabel(element: Element): string {
-    const aria = element.getAttribute("aria-label");
-    if (aria !== null && aria.trim() !== "") return aria.trim();
+  const aria = element.getAttribute("aria-label");
+  if (aria !== null && aria.trim() !== "") {
+    return aria.trim();
+  }
 
-    const text = element.textContent?.trim() ?? "";
-    if (text !== "") {
-        return text.length > 60 ? `${text.slice(0, 57)}…` : text;
-    }
+  const text = element.textContent?.trim() ?? "";
+  if (text !== "") {
+    return text.length > 60 ? `${text.slice(0, 57)}…` : text;
+  }
 
-    const title = element.getAttribute("title");
-    if (title !== null && title.trim() !== "") return title.trim();
+  const title = element.getAttribute("title");
+  if (title !== null && title.trim() !== "") {
+    return title.trim();
+  }
 
-    return "(unlabeled)";
+  return "(unlabeled)";
 }
 
 /** Builds a short tag.id.class descriptor for an element. */
 function describeElement(element: Element): string {
-    const tag = element.tagName.toLowerCase();
-    const id = element.id !== "" ? `#${element.id}` : "";
-    const classList = Array.from(element.classList).slice(0, 2).join(".");
-    const cls = classList !== "" ? `.${classList}` : "";
+  const tag = element.tagName.toLowerCase();
+  const id = element.id !== "" ? `#${element.id}` : "";
+  const classList = Array.from(element.classList).slice(0, 2).join(".");
+  const cls = classList !== "" ? `.${classList}` : "";
 
-    return `${tag}${id}${cls}`;
+  return `${tag}${id}${cls}`;
 }

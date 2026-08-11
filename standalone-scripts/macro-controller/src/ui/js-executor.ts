@@ -32,21 +32,29 @@ export function addLoopJsHistoryEntry(code: string, success: boolean, resultText
   const isDuplicate = loopJsHistory.length > 0 && loopJsHistory[0].code === code;
   if (!isDuplicate) {
     loopJsHistory.unshift(entry);
-    if (loopJsHistory.length > LOOP_JS_HISTORY_MAX) loopJsHistory.pop();
+    if (loopJsHistory.length > LOOP_JS_HISTORY_MAX) {
+      loopJsHistory.pop();
+    }
+
     logSub('JS history updated: ' + loopJsHistory.length + ' entries');
   }
+
   jsHistoryState.index = -1;
   renderLoopJsHistory();
 }
 
 export function renderLoopJsHistory(): void {
   const el = document.getElementById('loop-js-history');
-  if (!el) return;
+  if (!el) {
+    return;
+  }
+
   if (loopJsHistory.length === 0) {
     el.innerHTML = '<span style="color:#64748b;font-size:10px;">No commands yet</span>';
 
     return;
   }
+
   let html = '';
   for (const [histIndex, e] of loopJsHistory.entries()) {
     const statusColor = e.success ? '#4ade80' : '#ef4444';
@@ -59,6 +67,7 @@ export function renderLoopJsHistory(): void {
       + CssFragmentType.SpanStyleColor + cPanelFg + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.code.substring(0, 60) + '</span>'
       + '</div>';
   }
+
   el.innerHTML = html;
   // Bind click events for recall
   const items = el.querySelectorAll('.loop-js-hist-item');
@@ -78,7 +87,10 @@ export function renderLoopJsHistory(): void {
 
 export function navigateLoopJsHistory(direction: string): void {
   const ta = document.getElementById(IDS.JS_EXECUTOR) as HTMLTextAreaElement | null;
-  if (!ta || loopJsHistory.length === 0) return;
+  if (!ta || loopJsHistory.length === 0) {
+    return;
+  }
+
   if (direction === 'up') {
     if (jsHistoryState.index < loopJsHistory.length - 1) {
       jsHistoryState.index++;
@@ -102,6 +114,7 @@ export function executeJs(): void {
 
     return;
   }
+
   const code = (textbox as HTMLTextAreaElement).value.trim();
   if (!code) {
     log('No code to execute', 'warn');
@@ -116,6 +129,7 @@ export function executeJs(): void {
     if (result !== undefined) {
       console.log('[MacroLoop v' + VERSION + '] Result:', result);
     }
+
     log('JS execution completed successfully', 'success');
     addLoopJsHistoryEntry(code, true, resultStr.substring(0, 100));
   } catch(e: unknown) {

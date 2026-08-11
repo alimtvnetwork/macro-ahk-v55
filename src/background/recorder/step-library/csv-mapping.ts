@@ -56,23 +56,31 @@ const VARIABLE_NAME_RE = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
 
 /** Sanitise a header into a candidate variable name (used as a default). */
 export function suggestVariableName(header: string): string {
-    let cleaned = header.trim().replace(/[^A-Za-z0-9_]+/g, "_");
-    cleaned = cleaned.replace(/^_+|_+$/g, "");
-    if (cleaned === "") cleaned = "Var";
-    // Ensure leading char is a letter or underscore.
-    if (!/^[A-Za-z_]/.test(cleaned)) cleaned = `_${cleaned}`;
+  let cleaned = header.trim().replace(/[^A-Za-z0-9_]+/g, "_");
+  cleaned = cleaned.replace(/^_+|_+$/g, "");
+  if (cleaned === "") {
+    cleaned = "Var";
+  }
 
-    return cleaned.slice(0, 64);
+  // Ensure leading char is a letter or underscore.
+  if (!/^[A-Za-z_]/.test(cleaned)) {
+    cleaned = `_${cleaned}`;
+  }
+
+  return cleaned.slice(0, 64);
 }
 
 /** Returns null when valid; otherwise a human-readable reason. */
 export function validateVariableName(name: string): string | null {
-    if (name === "") return "Variable name cannot be empty.";
-    if (!VARIABLE_NAME_RE.test(name)) {
-        return `Variable name "${name}" is invalid — use 1–64 chars, letters/digits/underscore, must not start with a digit.`;
-    }
+  if (name === "") {
+    return "Variable name cannot be empty.";
+  }
 
-    return null;
+  if (!VARIABLE_NAME_RE.test(name)) {
+    return `Variable name "${name}" is invalid — use 1–64 chars, letters/digits/underscore, must not start with a digit.`;
+  }
+
+  return null;
 }
 
 /**
@@ -81,36 +89,46 @@ export function validateVariableName(name: string): string | null {
  * highlight the offending column).
  */
 export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
-    const { Headers, Row, Mappings } = opts;
-    if (Headers.length !== Row.length) {
-        return {
-            Ok: false,
-            Reason: `Row has ${Row.length} cell(s) but the header has ${Headers.length} column(s). The CSV is misaligned.`,
-            Column: null,
-        };
-    }
-    const headerToIdx = new Map<string, number>();
-    for (let i = 0; i < Headers.length; i++) headerToIdx.set(Headers[i], i);
+  const { Headers, Row, Mappings } = opts;
+  if (Headers.length !== Row.length) {
+    return {
+      Ok: false,
+      Reason: `Row has ${Row.length} cell(s) but the header has ${Headers.length} column(s). The CSV is misaligned.`,
+      Column: null,
+    };
+  }
 
-    const bag: Record<string, JsonValue> = {};
-    const seenVars = new Set<string>();
-    let used = 0;
-    for (const m of Mappings) {
-        if (m.Variable === null) continue;
-        const outcome = applyMapping(m, Row, headerToIdx, seenVars);
-        if (!outcome.Ok) return outcome;
-        bag[outcome.Variable] = outcome.Value;
-        used++;
-    }
-    if (used === 0) {
-        return {
-            Ok: false,
-            Reason: "No columns are mapped, every column is set to Skip. Map at least one column to a variable.",
-            Column: null,
-        };
+  const headerToIdx = new Map<string, number>();
+  for (let i = 0; i < Headers.length; i++) {
+    headerToIdx.set(Headers[i], i);
+  }
+
+  const bag: Record<string, JsonValue> = {};
+  const seenVars = new Set<string>();
+  let used = 0;
+  for (const m of Mappings) {
+    if (m.Variable === null) {
+      continue;
     }
 
-    return { Ok: true, Bag: bag, UsedColumns: used };
+    const outcome = applyMapping(m, Row, headerToIdx, seenVars);
+    if (!outcome.Ok) {
+      return outcome;
+    }
+
+    bag[outcome.Variable] = outcome.Value;
+    used++;
+  }
+
+  if (used === 0) {
+    return {
+      Ok: false,
+      Reason: "No columns are mapped, every column is set to Skip. Map at least one column to a variable.",
+      Column: null,
+    };
+  }
+
+  return { Ok: true, Bag: bag, UsedColumns: used };
 }
 
 type ApplyMappingResult =
@@ -118,42 +136,48 @@ type ApplyMappingResult =
     | { readonly Ok: false; readonly Reason: string; readonly Column: string | null };
 
 function applyMapping(
-    m: ColumnMapping,
-    row: ReadonlyArray<string>,
-    headerToIdx: ReadonlyMap<string, number>,
-    seenVars: Set<string>,
+  m: ColumnMapping,
+  row: ReadonlyArray<string>,
+  headerToIdx: ReadonlyMap<string, number>,
+  seenVars: Set<string>,
 ): ApplyMappingResult {
-    if (m.Variable === null) {
-        return { Ok: false, Reason: "Mapping variable was null.", Column: m.Column };
-    }
-    const idx = headerToIdx.get(m.Column);
-    if (idx === undefined) {
-        return {
-            Ok: false,
-            Reason: `Mapping references column "${m.Column}" which is not in the CSV header.`,
-            Column: m.Column,
-        };
-    }
-    const validation = validateVariableName(m.Variable);
-    if (validation !== null) return { Ok: false, Reason: validation, Column: m.Column };
-    if (seenVars.has(m.Variable)) {
-        return {
-            Ok: false,
-            Reason: `Two columns map to the same variable "${m.Variable}". Each variable name must be unique.`,
-            Column: m.Column,
-        };
-    }
-    seenVars.add(m.Variable);
-    const coerced = coerceValue(row[idx] ?? "", m.Coerce);
-    if (!coerced.Ok) {
-        return {
-            Ok: false,
-            Reason: `Column "${m.Column}" -> ${m.Variable}: ${coerced.Reason}`,
-            Column: m.Column,
-        };
-    }
+  if (m.Variable === null) {
+    return { Ok: false, Reason: "Mapping variable was null.", Column: m.Column };
+  }
 
-    return { Ok: true, Variable: m.Variable, Value: coerced.Value };
+  const idx = headerToIdx.get(m.Column);
+  if (idx === undefined) {
+    return {
+      Ok: false,
+      Reason: `Mapping references column "${m.Column}" which is not in the CSV header.`,
+      Column: m.Column,
+    };
+  }
+
+  const validation = validateVariableName(m.Variable);
+  if (validation !== null) {
+    return { Ok: false, Reason: validation, Column: m.Column };
+  }
+
+  if (seenVars.has(m.Variable)) {
+    return {
+      Ok: false,
+      Reason: `Two columns map to the same variable "${m.Variable}". Each variable name must be unique.`,
+      Column: m.Column,
+    };
+  }
+
+  seenVars.add(m.Variable);
+  const coerced = coerceValue(row[idx] ?? "", m.Coerce);
+  if (!coerced.Ok) {
+    return {
+      Ok: false,
+      Reason: `Column "${m.Column}" -> ${m.Variable}: ${coerced.Reason}`,
+      Column: m.Column,
+    };
+  }
+
+  return { Ok: true, Variable: m.Variable, Value: coerced.Value };
 }
 
 type CoerceResult =
@@ -161,56 +185,80 @@ type CoerceResult =
     | { readonly Ok: false; readonly Reason: string };
 
 function coerceValue(raw: string, kind: CoercionKind): CoerceResult {
-    switch (kind) {
-        case "string":  return { Ok: true, Value: raw };
-        case "number":  return coerceNumber(raw);
-        case "boolean": return coerceBoolean(raw);
-        case "json":    return coerceJson(raw);
-        case "auto":
-        default:        return coerceAuto(raw);
-    }
+  switch (kind) {
+    case "string":  return { Ok: true, Value: raw };
+    case "number":  return coerceNumber(raw);
+    case "boolean": return coerceBoolean(raw);
+    case "json":    return coerceJson(raw);
+    case "auto":
+    default:        return coerceAuto(raw);
+  }
 }
 
 function coerceNumber(raw: string): CoerceResult {
-    if (raw.trim() === "") return { Ok: false, Reason: 'Expected a number, got "" (empty cell).' };
-    const n = Number(raw);
-    if (!Number.isFinite(n)) return { Ok: false, Reason: `Expected a number, got "${raw}".` };
+  if (raw.trim() === "") {
+    return { Ok: false, Reason: 'Expected a number, got "" (empty cell).' };
+  }
 
-    return { Ok: true, Value: n };
+  const n = Number(raw);
+  if (!Number.isFinite(n)) {
+    return { Ok: false, Reason: `Expected a number, got "${raw}".` };
+  }
+
+  return { Ok: true, Value: n };
 }
 
 function coerceBoolean(raw: string): CoerceResult {
-    const t = raw.trim().toLowerCase();
-    if (t === "true" || t === "1" || t === "yes" || t === "y") return { Ok: true, Value: true };
-    if (t === "false" || t === "0" || t === "no" || t === "n" || t === "") return { Ok: true, Value: false };
+  const t = raw.trim().toLowerCase();
+  if (t === "true" || t === "1" || t === "yes" || t === "y") {
+    return { Ok: true, Value: true };
+  }
 
-    return { Ok: false, Reason: `Expected a boolean (true/false/yes/no/0/1), got "${raw}".` };
+  if (t === "false" || t === "0" || t === "no" || t === "n" || t === "") {
+    return { Ok: true, Value: false };
+  }
+
+  return { Ok: false, Reason: `Expected a boolean (true/false/yes/no/0/1), got "${raw}".` };
 }
 
 function coerceJson(raw: string): CoerceResult {
-    if (raw.trim() === "") return { Ok: true, Value: "" };
-    try {
-        return { Ok: true, Value: JSON.parse(raw) as JsonValue };
-    } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
+  if (raw.trim() === "") {
+    return { Ok: true, Value: "" };
+  }
 
-        return { Ok: false, Reason: `JSON parse error: ${msg}` };
-    }
+  try {
+    return { Ok: true, Value: JSON.parse(raw) as JsonValue };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+
+    return { Ok: false, Reason: `JSON parse error: ${msg}` };
+  }
 }
 
 function coerceAuto(raw: string): CoerceResult {
-    if (raw === "") return { Ok: true, Value: "" };
-    const t = raw.trim().toLowerCase();
-    if (t === "true") return { Ok: true, Value: true };
-    if (t === "false") return { Ok: true, Value: false };
-    // Number only when the trimmed text round-trips through Number,
-    // avoids e.g. "01" -> 1 surprises by requiring the printed form to match.
-    const trimmed = raw.trim();
-    if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
-        const n = Number(trimmed);
-        if (Number.isFinite(n) && String(n) === trimmed) return { Ok: true, Value: n };
-    }
+  if (raw === "") {
+    return { Ok: true, Value: "" };
+  }
 
-    return { Ok: true, Value: raw };
+  const t = raw.trim().toLowerCase();
+  if (t === "true") {
+    return { Ok: true, Value: true };
+  }
+
+  if (t === "false") {
+    return { Ok: true, Value: false };
+  }
+
+  // Number only when the trimmed text round-trips through Number,
+  // avoids e.g. "01" -> 1 surprises by requiring the printed form to match.
+  const trimmed = raw.trim();
+  if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
+    const n = Number(trimmed);
+    if (Number.isFinite(n) && String(n) === trimmed) {
+      return { Ok: true, Value: n };
+    }
+  }
+
+  return { Ok: true, Value: raw };
 }
 

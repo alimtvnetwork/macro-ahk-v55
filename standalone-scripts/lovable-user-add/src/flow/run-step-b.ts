@@ -23,40 +23,40 @@ interface MeasuredMembership {
 }
 
 const measurePromote = async (
-    api: LovableApiClient, request: StepBRequest,
+  api: LovableApiClient, request: StepBRequest,
 ): Promise<MeasuredMembership> => {
-    const startedAt = Date.now();
-    const value = await api.promoteToOwner(request.WorkspaceId, request.UserId);
+  const startedAt = Date.now();
+  const value = await api.promoteToOwner(request.WorkspaceId, request.UserId);
 
-    return { DurationMs: Date.now() - startedAt, Value: value };
+  return { DurationMs: Date.now() - startedAt, Value: value };
 };
 
 const buildOutcome = (
-    request: StepBRequest, measured: MeasuredMembership,
+  request: StepBRequest, measured: MeasuredMembership,
 ): StepBStepOutcome => ({
-    Step: StepBStepCodeType.PromoteToOwner,
-    DurationMs: measured.DurationMs,
-    WorkspaceId: request.WorkspaceId,
-    UserId: request.UserId,
+  Step: StepBStepCodeType.PromoteToOwner,
+  DurationMs: measured.DurationMs,
+  WorkspaceId: request.WorkspaceId,
+  UserId: request.UserId,
 });
 
 const failureFrom = (caught: unknown): StepBResult => ({
-    Outcomes: [], Membership: null,
-    Error: caught instanceof Error ? caught.message : String(caught),
+  Outcomes: [], Membership: null,
+  Error: caught instanceof Error ? caught.message : String(caught),
 });
 
 export const runStepB = async (
-    api: LovableApiClient, request: StepBRequest,
+  api: LovableApiClient, request: StepBRequest,
 ): Promise<StepBResult> => {
-    try {
-        const measured = await measurePromote(api, request);
+  try {
+    const measured = await measurePromote(api, request);
 
-        return {
-            Outcomes: [buildOutcome(request, measured)],
-            Membership: measured.Value,
-            Error: null,
-        };
-    } catch (caught: unknown) {
-        return failureFrom(caught);
-    }
+    return {
+      Outcomes: [buildOutcome(request, measured)],
+      Membership: measured.Value,
+      Error: null,
+    };
+  } catch (caught: unknown) {
+    return failureFrom(caught);
+  }
 };

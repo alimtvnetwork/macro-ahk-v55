@@ -31,64 +31,74 @@ interface Props {
 }
 
 export default function RecorderVisualisationPanel({ projectSlug }: Props): JSX.Element | null {
-    const ctrl = useRecorderVisualisationController(projectSlug);
-    const { data, loading, error, reload } = ctrl;
+  const ctrl = useRecorderVisualisationController(projectSlug);
+  const { data, loading, error, reload } = ctrl;
 
-    if (loading) {
-        return (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground p-4">
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading recorder data...
-            </div>
-        );
-    }
-    if (error) {
-        return (
-            <div className="space-y-3">
-                <div className="text-xs text-destructive p-3 border border-destructive/40 rounded-md bg-destructive/5 font-mono">
-                    {error}
-                </div>
-                <RecorderEmptyState
-                    projectSlug={projectSlug}
-                    hasDbError={true}
-                    onReload={() => { void reload(); }}
-                />
-            </div>
-        );
-    }
-    if (data === null) return null;
-
+  if (loading) {
     return (
-        <div className="space-y-4">
-            <RecorderVisualisationHeader
-                dataSources={data.dataSources}
-                stepCount={data.steps.length}
-                selfTestRunning={ctrl.selfTestRunning}
-                onSelfTest={() => { void ctrl.handleSelfTest(); }}
-                onExport={ctrl.handleExport}
-            />
-            {data.steps.length === 0 ? (
-                <RecorderEmptyState
-                    projectSlug={projectSlug}
-                    hasDbError={false}
-                    onReload={() => { void reload(); }}
-                />
-            ) : (
-                <RecorderVisualisationBody
-                    steps={data.steps}
-                    dataSources={data.dataSources}
-                    bindings={data.bindings}
-                    selectedStepId={ctrl.selectedStepId}
-                    selectors={ctrl.selectors}
-                    selectorsLoading={ctrl.selectorsLoading}
-                    tagsByStep={ctrl.tagsByStep}
-                    onSelectStep={ctrl.setSelectedStepId}
-                    onDelete={ctrl.handleDelete}
-                    onRename={ctrl.handleRename}
-                    onDescriptionSave={ctrl.handleDescriptionSave}
-                    onTagsSave={ctrl.handleTagsSave}
-                    onLinkChange={ctrl.handleLinkChange}
-                />
-            )}
-        </div>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground p-4">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading recorder data...
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-3">
+        <div className="text-xs text-destructive p-3 border border-destructive/40 rounded-md bg-destructive/5 font-mono">
+          {error}
+        </div>
+        <RecorderEmptyState
+          projectSlug={projectSlug}
+          hasDbError={true}
+          onReload={() => {
+            void reload(); 
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (data === null) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-4">
+      <RecorderVisualisationHeader
+        dataSources={data.dataSources}
+        stepCount={data.steps.length}
+        selfTestRunning={ctrl.selfTestRunning}
+        onSelfTest={() => {
+          void ctrl.handleSelfTest(); 
+        }}
+        onExport={ctrl.handleExport}
+      />
+      {data.steps.length === 0 ? (
+        <RecorderEmptyState
+          projectSlug={projectSlug}
+          hasDbError={false}
+          onReload={() => {
+            void reload(); 
+          }}
+        />
+      ) : (
+        <RecorderVisualisationBody
+          steps={data.steps}
+          dataSources={data.dataSources}
+          bindings={data.bindings}
+          selectedStepId={ctrl.selectedStepId}
+          selectors={ctrl.selectors}
+          selectorsLoading={ctrl.selectorsLoading}
+          tagsByStep={ctrl.tagsByStep}
+          onSelectStep={ctrl.setSelectedStepId}
+          onDelete={ctrl.handleDelete}
+          onRename={ctrl.handleRename}
+          onDescriptionSave={ctrl.handleDescriptionSave}
+          onTagsSave={ctrl.handleTagsSave}
+          onLinkChange={ctrl.handleLinkChange}
+        />
+      )}
+    </div>
+  );
 }

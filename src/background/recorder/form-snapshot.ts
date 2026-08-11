@@ -49,8 +49,8 @@ export interface CaptureFormSnapshotOptions {
 
 const SENSITIVE_NAME_RE = /password|secret|token|otp|pin|cvv|ssn|credit/i;
 const SENSITIVE_AUTOCOMPLETE = new Set([
-    "cc-number", "cc-csc", "one-time-code",
-    "current-password", "new-password",
+  "cc-number", "cc-csc", "one-time-code",
+  "current-password", "new-password",
 ]);
 
 /* ------------------------------------------------------------------ */
@@ -67,41 +67,52 @@ const SENSITIVE_AUTOCOMPLETE = new Set([
  * error.
  */
 function buildFieldsAndValues(
-    elements: readonly Element[],
-    verbose: boolean,
+  elements: readonly Element[],
+  verbose: boolean,
 ): { fields: FormFieldMeta[]; values: FormFieldValue[] } {
-    const fields: FormFieldMeta[] = [];
-    const values: FormFieldValue[] = [];
-    let fallbackIndex = 0;
-    for (const el of elements) {
-        const meta = readFieldMeta(el, () => `field#${++fallbackIndex}`);
-        fields.push(meta);
-        if (verbose) values.push(readFieldValue(el, meta));
+  const fields: FormFieldMeta[] = [];
+  const values: FormFieldValue[] = [];
+  let fallbackIndex = 0;
+  for (const el of elements) {
+    const meta = readFieldMeta(el, () => `field#${++fallbackIndex}`);
+    fields.push(meta);
+    if (verbose) {
+      values.push(readFieldValue(el, meta));
     }
+  }
 
-    return { fields, values };
+  return { fields, values };
 }
 
 export function captureFormSnapshot(
-    target: Element | null,
-    options?: CaptureFormSnapshotOptions,
+  target: Element | null,
+  options?: CaptureFormSnapshotOptions,
 ): FormSnapshot | null {
-    if (target === null || target === undefined) return null;
-    const verbose = options?.Verbose === true;
-    const now = options?.Now ?? defaultNow;
-    const container = findFormContainer(target);
-    if (container === null) return null;
-    const elements = collectFormFields(container);
-    if (elements.length === 0) return null;
-    const { fields, values } = buildFieldsAndValues(elements, verbose);
+  if (target === null || target === undefined) {
+    return null;
+  }
 
-    return {
-        Form: readFormHeader(container),
-        Fields: fields,
-        Values: verbose ? values : null,
-        Verbose: verbose,
-        CapturedAt: now().toISOString(),
-    };
+  const verbose = options?.Verbose === true;
+  const now = options?.Now ?? defaultNow;
+  const container = findFormContainer(target);
+  if (container === null) {
+    return null;
+  }
+
+  const elements = collectFormFields(container);
+  if (elements.length === 0) {
+    return null;
+  }
+
+  const { fields, values } = buildFieldsAndValues(elements, verbose);
+
+  return {
+    Form: readFormHeader(container),
+    Fields: fields,
+    Values: verbose ? values : null,
+    Verbose: verbose,
+    CapturedAt: now().toISOString(),
+  };
 }
 
 /**
@@ -110,20 +121,24 @@ export function captureFormSnapshot(
  * form snapshot.
  */
 export function isSubmitTarget(target: Element | null): boolean {
-    if (target === null) return false;
-    const tag = target.tagName.toLowerCase();
-    if (tag === "button") {
-        const type = (target.getAttribute("type") ?? "submit").toLowerCase();
-
-        return type === "submit";
-    }
-    if (tag === "input") {
-        const type = (target.getAttribute("type") ?? "").toLowerCase();
-
-        return type === "submit" || type === "image";
-    }
-
+  if (target === null) {
     return false;
+  }
+
+  const tag = target.tagName.toLowerCase();
+  if (tag === "button") {
+    const type = (target.getAttribute("type") ?? "submit").toLowerCase();
+
+    return type === "submit";
+  }
+
+  if (tag === "input") {
+    const type = (target.getAttribute("type") ?? "").toLowerCase();
+
+    return type === "submit" || type === "image";
+  }
+
+  return false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -131,147 +146,182 @@ export function isSubmitTarget(target: Element | null): boolean {
 /* ------------------------------------------------------------------ */
 
 function findFormContainer(target: Element): Element | null {
-    // Prefer a real <form>.
-    const form = target.closest("form");
-    if (form !== null) return form;
+  // Prefer a real <form>.
+  const form = target.closest("form");
+  if (form !== null) {
+    return form;
+  }
 
-    // Fallback: nearest ancestor with at least one form field descendant.
-    // Caps walk at 6 levels so we don't pick up the whole <body>.
-    let node: Element | null = target.parentElement;
-    let depth = 0;
-    while (node !== null && depth < 6) {
-        if (node.querySelector("input, textarea, select") !== null) {
-            return node;
-        }
-        node = node.parentElement;
-        depth++;
+  // Fallback: nearest ancestor with at least one form field descendant.
+  // Caps walk at 6 levels so we don't pick up the whole <body>.
+  let node: Element | null = target.parentElement;
+  let depth = 0;
+  while (node !== null && depth < 6) {
+    if (node.querySelector("input, textarea, select") !== null) {
+      return node;
     }
 
-    return null;
+    node = node.parentElement;
+    depth++;
+  }
+
+  return null;
 }
 
 function collectFormFields(container: Element): Element[] {
-    const out: Element[] = [];
-    const list = container.querySelectorAll("input, textarea, select");
-    for (let i = 0; i < list.length; i++) {
-        out.push(list[i]);
-    }
+  const out: Element[] = [];
+  const list = container.querySelectorAll("input, textarea, select");
+  for (let i = 0; i < list.length; i++) {
+    out.push(list[i]);
+  }
 
-    return out;
+  return out;
 }
 
 function readFormHeader(container: Element): FormSnapshot["Form"] {
-    const isForm = container.tagName.toLowerCase() === "form";
+  const isForm = container.tagName.toLowerCase() === "form";
 
-    return {
-        Tag: isForm ? "form" : "container",
-        Id: nullableAttr(container, "id"),
-        Name: nullableAttr(container, "name"),
-        Action: isForm ? nullableAttr(container, "action") : null,
-        Method: isForm ? (nullableAttr(container, "method")?.toUpperCase() ?? null) : null,
-    };
+  return {
+    Tag: isForm ? "form" : "container",
+    Id: nullableAttr(container, "id"),
+    Name: nullableAttr(container, "name"),
+    Action: isForm ? nullableAttr(container, "action") : null,
+    Method: isForm ? (nullableAttr(container, "method")?.toUpperCase() ?? null) : null,
+  };
 }
 
 function readFieldMeta(el: Element, fallbackName: () => string): FormFieldMeta {
-    const tag = el.tagName.toLowerCase();
-    const type = inferFieldType(el, tag);
-    const nativeName = nullableAttr(el, "name");
-    const id = nullableAttr(el, "id");
-    const ariaLabel = nullableAttr(el, "aria-label");
-    const placeholder = nullableAttr(el, "placeholder");
-    const displayName = nativeName ?? id ?? ariaLabel ?? placeholder ?? fallbackName();
+  const tag = el.tagName.toLowerCase();
+  const type = inferFieldType(el, tag);
+  const nativeName = nullableAttr(el, "name");
+  const id = nullableAttr(el, "id");
+  const ariaLabel = nullableAttr(el, "aria-label");
+  const placeholder = nullableAttr(el, "placeholder");
+  const displayName = nativeName ?? id ?? ariaLabel ?? placeholder ?? fallbackName();
 
-    return {
-        Name: displayName,
-        Type: type,
-        NativeName: nativeName,
-        Id: id,
-        Required: el.hasAttribute("required"),
-        Sensitive: classifySensitive(el, type, nativeName, id),
-    };
+  return {
+    Name: displayName,
+    Type: type,
+    NativeName: nativeName,
+    Id: id,
+    Required: el.hasAttribute("required"),
+    Sensitive: classifySensitive(el, type, nativeName, id),
+  };
 }
 
 function readFieldValue(el: Element, meta: FormFieldMeta): FormFieldValue {
-    const raw = readRawValue(el, meta.Type);
-    if (meta.Sensitive && raw.length > 0) {
-        return { Name: meta.Name, Value: "*".repeat(raw.length), Masked: true };
-    }
+  const raw = readRawValue(el, meta.Type);
+  if (meta.Sensitive && raw.length > 0) {
+    return { Name: meta.Name, Value: "*".repeat(raw.length), Masked: true };
+  }
 
-    return { Name: meta.Name, Value: raw, Masked: false };
+  return { Name: meta.Name, Value: raw, Masked: false };
 }
 
 function readMultiSelectValue(el: Element): string {
-    const sel = el as HTMLSelectElement;
-    const picked: string[] = [];
-    for (let i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].selected) picked.push(sel.options[i].value);
+  const sel = el as HTMLSelectElement;
+  const picked: string[] = [];
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].selected) {
+      picked.push(sel.options[i].value);
     }
+  }
 
-    return JSON.stringify(picked);
+  return JSON.stringify(picked);
 }
 
 function readFileListValue(el: Element): string {
-    const files = (el as HTMLInputElement).files;
-    if (files === null || files.length === 0) return "";
-    const names: string[] = [];
-    for (let i = 0; i < files.length; i++) names.push(files[i].name);
+  const files = (el as HTMLInputElement).files;
+  if (files === null || files.length === 0) {
+    return "";
+  }
 
-    return JSON.stringify(names);
+  const names: string[] = [];
+  for (let i = 0; i < files.length; i++) {
+    names.push(files[i].name);
+  }
+
+  return JSON.stringify(names);
 }
 
 function readRawValue(el: Element, type: FormFieldType): string {
-    if (type === "checkbox" || type === "radio") {
-        return (el as HTMLInputElement).checked === true ? "true" : "false";
-    }
-    if (type === "select-multiple") return readMultiSelectValue(el);
-    if (type === "file") return readFileListValue(el);
-    const v = (el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+  if (type === "checkbox" || type === "radio") {
+    return (el as HTMLInputElement).checked === true ? "true" : "false";
+  }
 
-    return typeof v === "string" ? v : "";
+  if (type === "select-multiple") {
+    return readMultiSelectValue(el);
+  }
+
+  if (type === "file") {
+    return readFileListValue(el);
+  }
+
+  const v = (el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+
+  return typeof v === "string" ? v : "";
 }
 
 function inferFieldType(el: Element, tag: string): FormFieldType {
-    if (tag === "textarea") return "textarea";
-    if (tag === "select") {
-        return (el as HTMLSelectElement).multiple ? "select-multiple" : "select";
-    }
-    const raw = (el.getAttribute("type") ?? "text").toLowerCase();
-    const known: ReadonlySet<FormFieldType> = new Set<FormFieldType>([
-        "text", "email", "password", "number", "tel", "url", "search",
-        "date", "datetime-local", "month", "week", "time", "color", "range",
-        "file", "hidden", "checkbox", "radio", "submit", "button",
-    ]);
+  if (tag === "textarea") {
+    return "textarea";
+  }
 
-    return known.has(raw as FormFieldType) ? (raw as FormFieldType) : "other";
+  if (tag === "select") {
+    return (el as HTMLSelectElement).multiple ? "select-multiple" : "select";
+  }
+
+  const raw = (el.getAttribute("type") ?? "text").toLowerCase();
+  const known: ReadonlySet<FormFieldType> = new Set<FormFieldType>([
+    "text", "email", "password", "number", "tel", "url", "search",
+    "date", "datetime-local", "month", "week", "time", "color", "range",
+    "file", "hidden", "checkbox", "radio", "submit", "button",
+  ]);
+
+  return known.has(raw as FormFieldType) ? (raw as FormFieldType) : "other";
 }
 
 function classifySensitive(
-    el: Element,
-    type: FormFieldType,
-    nativeName: string | null,
-    id: string | null,
+  el: Element,
+  type: FormFieldType,
+  nativeName: string | null,
+  id: string | null,
 ): boolean {
-    if (type === "password") return true;
-    const ac = (el.getAttribute("autocomplete") ?? "").toLowerCase();
-    if (ac.length > 0) {
-        for (const token of ac.split(/\s+/)) {
-            if (SENSITIVE_AUTOCOMPLETE.has(token)) return true;
-        }
-    }
-    if (nativeName !== null && SENSITIVE_NAME_RE.test(nativeName)) return true;
-    if (id !== null && SENSITIVE_NAME_RE.test(id)) return true;
+  if (type === "password") {
+    return true;
+  }
 
-    return false;
+  const ac = (el.getAttribute("autocomplete") ?? "").toLowerCase();
+  if (ac.length > 0) {
+    for (const token of ac.split(/\s+/)) {
+      if (SENSITIVE_AUTOCOMPLETE.has(token)) {
+        return true;
+      }
+    }
+  }
+
+  if (nativeName !== null && SENSITIVE_NAME_RE.test(nativeName)) {
+    return true;
+  }
+
+  if (id !== null && SENSITIVE_NAME_RE.test(id)) {
+    return true;
+  }
+
+  return false;
 }
 
 function nullableAttr(el: Element, name: string): string | null {
-    const v = el.getAttribute(name);
-    if (v === null) return null;
-    const trimmed = v.trim();
+  const v = el.getAttribute(name);
+  if (v === null) {
+    return null;
+  }
 
-    return trimmed.length === 0 ? null : trimmed;
+  const trimmed = v.trim();
+
+  return trimmed.length === 0 ? null : trimmed;
 }
 
 function defaultNow(): Date {
-    return new Date();
+  return new Date();
 }

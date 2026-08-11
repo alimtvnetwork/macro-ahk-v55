@@ -83,7 +83,9 @@ describe('explainEffectiveStatus — final status agrees with getEffectiveStatus
   it.each(scenarios)('$name: every skipped step has a non-empty reason', ({ ws, grace, refill }) => {
     const expl = explainEffectiveStatus(makeWs(ws), config(grace, refill), NOW);
     for (const step of expl.steps) {
-      if (!step.matched) expect(step.skippedReason && step.skippedReason.length > 0).toBe(true);
+      if (!step.matched) {
+        expect(step.skippedReason && step.skippedReason.length > 0).toBe(true);
+      }
     }
   });
 });

@@ -18,7 +18,7 @@ export const PROMPT_ROLES = ['plan', 'next', 'generic'] as const;
 export type PromptRole = typeof PROMPT_ROLES[number];
 
 export function isPromptRole(value: unknown): value is PromptRole {
-    return typeof value === 'string' && (PROMPT_ROLES as readonly string[]).includes(value);
+  return typeof value === 'string' && (PROMPT_ROLES as readonly string[]).includes(value);
 }
 
 /**
@@ -26,5 +26,5 @@ export function isPromptRole(value: unknown): value is PromptRole {
  * arm to force TS to error the moment a new role is added without a case.
  */
 export function assertNeverRole(value: never): never {
-    throwDiagnostic('TYPE_EXHAUSTIVE_E001', { discriminantValue: String(value), typeName: 'PromptRole' });
+  throwDiagnostic('TYPE_EXHAUSTIVE_E001', { discriminantValue: String(value), typeName: 'PromptRole' });
 }

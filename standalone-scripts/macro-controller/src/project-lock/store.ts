@@ -27,32 +27,32 @@ interface KvBridge {
 }
 
 function getKv(): KvBridge['kv'] | null {
-    const sdk = (window as unknown as { marco?: KvBridge }).marco;
+  const sdk = (window as unknown as { marco?: KvBridge }).marco;
 
-    return sdk && sdk.kv ? sdk.kv : null;
+  return sdk && sdk.kv ? sdk.kv : null;
 }
 
 function buildKey(ev: ProjectLockEvent): string {
-    return KEY_PREFIX + ev.WorkspaceId + ':' + ev.ProjectId + ':' + String(ev.DetectedAtMs);
+  return KEY_PREFIX + ev.WorkspaceId + ':' + ev.ProjectId + ':' + String(ev.DetectedAtMs);
 }
 
 function parseRow(raw: string): ProjectLockEvent | null {
-    try {
-        const parsed = JSON.parse(raw) as Partial<ProjectLockEvent>;
-        if (
-            typeof parsed.WorkspaceId === 'string' &&
+  try {
+    const parsed = JSON.parse(raw) as Partial<ProjectLockEvent>;
+    if (
+      typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.ProjectId === 'string' &&
             typeof parsed.DetectedAtMs === 'number' &&
             typeof parsed.Reason === 'string' &&
             typeof parsed.ReasonDetail === 'string'
-        ) {
-            return parsed as ProjectLockEvent;
-        }
-
-        return null;
-    } catch {
-        return null;
+    ) {
+      return parsed as ProjectLockEvent;
     }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -61,75 +61,80 @@ function parseRow(raw: string): ProjectLockEvent | null {
  * detected within `DUPLICATE_WINDOW_MS`.
  */
 export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boolean> {
-    const kv = getKv();
-    if (!kv) {
-        logError(
-            'LoopProjectLockEvent.persist',
-            'marco.kv unavailable — cannot persist project-lock event for ws=' + ev.WorkspaceId,
-        );
+  const kv = getKv();
+  if (!kv) {
+    logError(
+      'LoopProjectLockEvent.persist',
+      'marco.kv unavailable — cannot persist project-lock event for ws=' + ev.WorkspaceId,
+    );
 
-        return false;
-    }
-    try {
-        if (typeof kv.list === 'function') {
-            const recent = await kv.list(KEY_PREFIX + ev.WorkspaceId + ':' + ev.ProjectId + ':');
-            for (const entry of recent) {
-                const prev = parseRow(entry.value);
-                if (prev === null) {
-                    continue;
-                }
-                const sameReason = prev.Reason === ev.Reason;
-                const within = Math.abs(prev.DetectedAtMs - ev.DetectedAtMs) <= DUPLICATE_WINDOW_MS;
-                if (sameReason && within) {
-                    return false;
-                }
-            }
+    return false;
+  }
+
+  try {
+    if (typeof kv.list === 'function') {
+      const recent = await kv.list(KEY_PREFIX + ev.WorkspaceId + ':' + ev.ProjectId + ':');
+      for (const entry of recent) {
+        const prev = parseRow(entry.value);
+        if (prev === null) {
+          continue;
         }
-        await kv.set(buildKey(ev), JSON.stringify(ev));
-        log(
-            'LoopProjectLockEvent: persisted ws=' + ev.WorkspaceId +
+
+        const sameReason = prev.Reason === ev.Reason;
+        const within = Math.abs(prev.DetectedAtMs - ev.DetectedAtMs) <= DUPLICATE_WINDOW_MS;
+        if (sameReason && within) {
+          return false;
+        }
+      }
+    }
+
+    await kv.set(buildKey(ev), JSON.stringify(ev));
+    log(
+      'LoopProjectLockEvent: persisted ws=' + ev.WorkspaceId +
                 ' project=' + ev.ProjectId +
                 ' reason=' + ev.Reason,
-            'info',
-        );
+      'info',
+    );
 
-        return true;
-    } catch (caught: unknown) {
-        logError(
-            'LoopProjectLockEvent.persist',
-            'kv write failed for ws=' + ev.WorkspaceId,
-            caught,
-        );
+    return true;
+  } catch (caught: unknown) {
+    logError(
+      'LoopProjectLockEvent.persist',
+      'kv write failed for ws=' + ev.WorkspaceId,
+      caught,
+    );
 
-        return false;
-    }
+    return false;
+  }
 }
 
 /** Enumerate all persisted project-lock events, oldest first. */
 export async function listProjectLockEvents(): Promise<ReadonlyArray<ProjectLockEvent>> {
-    const kv = getKv();
-    if (!kv || typeof kv.list !== 'function') {
-        return [];
-    }
-    try {
-        const entries = await kv.list(KEY_PREFIX);
-        const rows: ProjectLockEvent[] = [];
-        for (const entry of entries) {
-            const row = parseRow(entry.value);
-            if (row !== null) {
-                rows.push(row);
-            }
-        }
-        rows.sort(function (a, b): number {
-            return a.DetectedAtMs - b.DetectedAtMs;
-        });
+  const kv = getKv();
+  if (!kv || typeof kv.list !== 'function') {
+    return [];
+  }
 
-        return rows;
-    } catch (caught: unknown) {
-        logError('LoopProjectLockEvent.list', 'kv.list failed', caught);
-
-        return [];
+  try {
+    const entries = await kv.list(KEY_PREFIX);
+    const rows: ProjectLockEvent[] = [];
+    for (const entry of entries) {
+      const row = parseRow(entry.value);
+      if (row !== null) {
+        rows.push(row);
+      }
     }
+
+    rows.sort(function (a, b): number {
+      return a.DetectedAtMs - b.DetectedAtMs;
+    });
+
+    return rows;
+  } catch (caught: unknown) {
+    logError('LoopProjectLockEvent.list', 'kv.list failed', caught);
+
+    return [];
+  }
 }
 
 export const LOOP_PROJECT_LOCK_KEY_PREFIX = KEY_PREFIX;

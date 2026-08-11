@@ -20,44 +20,44 @@ import { resolve } from 'node:path';
 const SRC = resolve(__dirname, '..', 'credit-fetch.ts');
 
 function getSchedulePostParseEnrichmentSource(): string {
-    const full = readFileSync(SRC, 'utf8').replace(/\r\n/g, '\n');
-    const start = full.indexOf('export function schedulePostParseEnrichment');
-    expect(start, 'schedulePostParseEnrichment must exist').toBeGreaterThan(-1);
-    const rest = full.slice(start);
-    const endRel = rest.indexOf('\n}\n');
+  const full = readFileSync(SRC, 'utf8').replace(/\r\n/g, '\n');
+  const start = full.indexOf('export function schedulePostParseEnrichment');
+  expect(start, 'schedulePostParseEnrichment must exist').toBeGreaterThan(-1);
+  const rest = full.slice(start);
+  const endRel = rest.indexOf('\n}\n');
 
-    return endRel === -1 ? rest : rest.slice(0, endRel + 2);
+  return endRel === -1 ? rest : rest.slice(0, endRel + 2);
 }
 
 describe('schedulePostParseEnrichment — per-row repaint contract', () => {
-    const body = getSchedulePostParseEnrichmentSource();
+  const body = getSchedulePostParseEnrichmentSource();
 
-    it('imports the per-row dropdown renderer (static or dynamic)', () => {
-        const full = readFileSync(SRC, 'utf8');
-        // Static import OR dynamic import('./ws-list-renderer') — both invoke
-        // populateLoopWorkspaceDropdown after enrichment; dynamic form is used
-        // to avoid a 2-node madge cycle (PlanTierType-17 step 18).
-        const staticImport = /import\s*\{\s*populateLoopWorkspaceDropdown\s*\}\s*from\s*['"]\.\/ws-list-renderer['"]/;
-        const dynamicImport = /import\(\s*['"]\.\/ws-list-renderer['"]\s*\)[\s\S]*populateLoopWorkspaceDropdown/;
-        expect(staticImport.test(full) || dynamicImport.test(full)).toBe(true);
-    });
+  it('imports the per-row dropdown renderer (static or dynamic)', () => {
+    const full = readFileSync(SRC, 'utf8');
+    // Static import OR dynamic import('./ws-list-renderer') — both invoke
+    // populateLoopWorkspaceDropdown after enrichment; dynamic form is used
+    // to avoid a 2-node madge cycle (PlanTierType-17 step 18).
+    const staticImport = /import\s*\{\s*populateLoopWorkspaceDropdown\s*\}\s*from\s*['"]\.\/ws-list-renderer['"]/;
+    const dynamicImport = /import\(\s*['"]\.\/ws-list-renderer['"]\s*\)[\s\S]*populateLoopWorkspaceDropdown/;
+    expect(staticImport.test(full) || dynamicImport.test(full)).toBe(true);
+  });
 
-    it('defines repaintWorkspaceRowsAfterEnrichment helper', () => {
-        const full = readFileSync(SRC, 'utf8');
-        expect(full).toMatch(/function\s+repaintWorkspaceRowsAfterEnrichment/);
-        expect(full).toMatch(/populateLoopWorkspaceDropdown\s*\(\s*\)/);
-    });
+  it('defines repaintWorkspaceRowsAfterEnrichment helper', () => {
+    const full = readFileSync(SRC, 'utf8');
+    expect(full).toMatch(/function\s+repaintWorkspaceRowsAfterEnrichment/);
+    expect(full).toMatch(/populateLoopWorkspaceDropdown\s*\(\s*\)/);
+  });
 
-    it('every mc().updateUI() inside the function is followed by repaintWorkspaceRowsAfterEnrichment', () => {
-        const updateUiCount = (body.match(/mc\(\)\.updateUI\(\)/g) || []).length;
-        const repaintCount = (body.match(/repaintWorkspaceRowsAfterEnrichment\(/g) || []).length;
-        expect(updateUiCount).toBeGreaterThanOrEqual(3);
-        expect(repaintCount).toBe(updateUiCount);
-    });
+  it('every mc().updateUI() inside the function is followed by repaintWorkspaceRowsAfterEnrichment', () => {
+    const updateUiCount = (body.match(/mc\(\)\.updateUI\(\)/g) || []).length;
+    const repaintCount = (body.match(/repaintWorkspaceRowsAfterEnrichment\(/g) || []).length;
+    expect(updateUiCount).toBeGreaterThanOrEqual(3);
+    expect(repaintCount).toBe(updateUiCount);
+  });
 
-    it('all three known enrichment scopes are tagged', () => {
-        expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]pro_0['"]\s*\)/);
-        expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]pro_1['"]\s*\)/);
-        expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]ktlo\/free\/cancelled['"]\s*\)/);
-    });
+  it('all three known enrichment scopes are tagged', () => {
+    expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]pro_0['"]\s*\)/);
+    expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]pro_1['"]\s*\)/);
+    expect(body).toMatch(/repaintWorkspaceRowsAfterEnrichment\(\s*['"]ktlo\/free\/cancelled['"]\s*\)/);
+  });
 });

@@ -128,18 +128,27 @@ function assignBooleanFields(entry: PromptEntry, raw: Record<string, unknown>): 
 function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
   const hasName = isNonEmptyString(raw['name']);
   const hasText = typeof raw['text'] === 'string';
-  if (!hasName || !hasText) return null;
+  if (!hasName || !hasText) {
+    return null;
+  }
+
   const entry: PromptEntry = { name: raw['name'] as string, text: raw['text'] as string };
   assignStringFields(entry, raw);
   assignBooleanFields(entry, raw);
   const rawTags = raw['tags'];
-  if (Array.isArray(rawTags)) entry.tags = rawTags.filter((t): t is string => typeof t === 'string');
+  if (Array.isArray(rawTags)) {
+    entry.tags = rawTags.filter((t): t is string => typeof t === 'string');
+  }
+
   const rawReplaceValues = raw['replaceValues'];
   if (Array.isArray(rawReplaceValues)) {
     entry.replaceValues = rawReplaceValues.filter((v): v is string => typeof v === 'string');
   }
+
   const rawRole = raw['role'];
-  if (isPromptRole(rawRole)) entry.role = rawRole;
+  if (isPromptRole(rawRole)) {
+    entry.role = rawRole;
+  }
 
   return entry;
 }
@@ -147,9 +156,18 @@ function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
 /** Validate the top-level envelope fields (id, versions, timestamps). */
 function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   const errors: string[] = [];
-  if (!UUID_RE.test(String(value['id']))) errors.push('Missing or malformed id (expected UUIDv4)');
-  if (value['schemaVersion'] !== PROMPTS_BUNDLE_SCHEMA_VERSION) errors.push(`schemaVersion must equal ${PROMPTS_BUNDLE_SCHEMA_VERSION}`);
-  if (typeof value['exportedAt'] !== 'string') errors.push('exportedAt must be an ISO-8601 string');
+  if (!UUID_RE.test(String(value['id']))) {
+    errors.push('Missing or malformed id (expected UUIDv4)');
+  }
+
+  if (value['schemaVersion'] !== PROMPTS_BUNDLE_SCHEMA_VERSION) {
+    errors.push(`schemaVersion must equal ${PROMPTS_BUNDLE_SCHEMA_VERSION}`);
+  }
+
+  if (typeof value['exportedAt'] !== 'string') {
+    errors.push('exportedAt must be an ISO-8601 string');
+  }
+
   const exporterVersion = value['exporterVersion'];
   if (typeof exporterVersion !== 'string' || !SEMVER_RE.test(exporterVersion)) {
     errors.push('exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
@@ -168,12 +186,14 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
 
       return;
     }
+
     const entry = coercePromptEntry(raw);
     if (!entry) {
       errors.push(`entries[${index}] missing required name/text`);
 
       return;
     }
+
     entries.push(entry);
   });
 
@@ -185,6 +205,7 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
   if (!isPlainObject(value)) {
     return { isValid: false, bundle: null, errors: ['Bundle root is not an object'] };
   }
+
   const errors = validateEnvelopeFields(value);
   const rawEntries = value['entries'];
   if (!Array.isArray(rawEntries)) {
@@ -192,13 +213,18 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
 
     return { isValid: false, bundle: null, errors };
   }
+
   const { entries, errors: entryErrors } = validateEntries(rawEntries);
   errors.push(...entryErrors);
   const rawEntryCount = value['entryCount'];
   if (rawEntryCount !== entries.length) {
     errors.push(`entryCount (${String(rawEntryCount)}) != entries.length (${entries.length})`);
   }
-  if (errors.length > 0) return { isValid: false, bundle: null, errors };
+
+  if (errors.length > 0) {
+    return { isValid: false, bundle: null, errors };
+  }
+
   const bundle: PromptsBundleV1 = {
     id: value['id'] as string,
     schemaVersion: 1,
@@ -211,15 +237,21 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
   if (rawFormat === 'json' || rawFormat === 'zip' || rawFormat === 'sqlite') {
     bundle.format = rawFormat;
   }
+
   const rawRevisions = value['revisions'];
   if (Array.isArray(rawRevisions)) {
     const validRevs = coerceBundleRevisions(rawRevisions);
-    if (validRevs.length > 0) bundle.revisions = validRevs;
+    if (validRevs.length > 0) {
+      bundle.revisions = validRevs;
+    }
   }
+
   const rawOrder = value['promptOrder'];
   if (Array.isArray(rawOrder)) {
     const orderStrings = rawOrder.filter((v): v is string => typeof v === 'string' && v.length > 0);
-    if (orderStrings.length > 0) bundle.promptOrder = orderStrings;
+    if (orderStrings.length > 0) {
+      bundle.promptOrder = orderStrings;
+    }
   }
 
   return { isValid: true, bundle, errors: [] };
@@ -239,8 +271,13 @@ function coerceBundleRevisionRow(item: Record<string, unknown>): BundleRevisionR
   const createdAtRaw = item['CreatedAt'];
   const createdAt = typeof createdAtRaw === 'number' ? createdAtRaw : Number(createdAtRaw);
   const reason = typeof item['Reason'] === 'string' ? item['Reason'] : 'import';
-  if (!slug || !name || !isPromptRole(role)) return null;
-  if (!Number.isFinite(createdAt)) return null;
+  if (!slug || !name || !isPromptRole(role)) {
+    return null;
+  }
+
+  if (!Number.isFinite(createdAt)) {
+    return null;
+  }
 
   return { Slug: slug, Name: name, Body: body, Role: role, ReplaceKey: rk, ReplaceValues: rv, CreatedAt: createdAt, Reason: reason };
 }
@@ -248,9 +285,14 @@ function coerceBundleRevisionRow(item: Record<string, unknown>): BundleRevisionR
 function coerceBundleRevisions(raw: unknown[]): BundleRevisionRow[] {
   const out: BundleRevisionRow[] = [];
   for (const item of raw) {
-    if (!isPlainObject(item)) continue;
+    if (!isPlainObject(item)) {
+      continue;
+    }
+
     const row = coerceBundleRevisionRow(item);
-    if (row) out.push(row);
+    if (row) {
+      out.push(row);
+    }
   }
 
   return out;
@@ -259,7 +301,10 @@ function coerceBundleRevisions(raw: unknown[]): BundleRevisionRow[] {
 /** Generate a UUIDv4. Prefers `crypto.randomUUID`, falls back to a hand-rolled v4. */
 function newBundleId(): string {
   const hasNativeUuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function';
-  if (hasNativeUuid) return crypto.randomUUID();
+  if (hasNativeUuid) {
+    return crypto.randomUUID();
+  }
+
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
@@ -294,14 +339,20 @@ export function buildPromptsBundle(
     entryCount: filtered.length,
     entries: filtered,
   };
-  if (options.format) bundle.format = options.format;
+  if (options.format) {
+    bundle.format = options.format;
+  }
+
   if (options.revisions && options.revisions.length > 0) {
     // Filter to revisions whose Slug matches an entry in the bundle. This
     // preserves the invariant that revisions never reference dropped rows.
     const slugSet = new Set(filtered.map((e) => e.slug).filter((s): s is string => typeof s === 'string' && s.length > 0));
     const kept = options.revisions.filter((r) => slugSet.has(r.Slug));
-    if (kept.length > 0) bundle.revisions = kept;
+    if (kept.length > 0) {
+      bundle.revisions = kept;
+    }
   }
+
   if (options.promptOrder && options.promptOrder.length > 0) {
     bundle.promptOrder = options.promptOrder.slice();
   }

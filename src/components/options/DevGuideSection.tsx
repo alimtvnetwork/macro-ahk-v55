@@ -65,12 +65,19 @@ function copyText(text: string) {
  * Returns null if no rule yields a launchable URL.
  */
 function tryResolveOne(rule: DevGuideTargetUrl): string | null {
-  if (!rule.pattern) return null;
+  if (!rule.pattern) {
+    return null;
+  }
+
   if (rule.matchType === "exact") {
     return /^https?:\/\//i.test(rule.pattern) ? rule.pattern : null;
   }
+
   if (rule.matchType === "glob") {
-    if (/^https?:\/\/\*/i.test(rule.pattern)) return null; // wildcard host — handled in fallback
+    if (/^https?:\/\/\*/i.test(rule.pattern)) {
+      return null;
+    } // wildcard host — handled in fallback
+
     const concrete = rule.pattern.replace(/\*+/g, "");
 
     return /^https?:\/\//i.test(concrete) ? concrete : null;
@@ -80,7 +87,10 @@ function tryResolveOne(rule: DevGuideTargetUrl): string | null {
 }
 
 function tryResolveWildcardHost(rule: DevGuideTargetUrl): string | null {
-  if (rule.matchType !== "glob" || !/^https?:\/\/\*/i.test(rule.pattern)) return null;
+  if (rule.matchType !== "glob" || !/^https?:\/\/\*/i.test(rule.pattern)) {
+    return null;
+  }
+
   const concrete = rule.pattern.replace(/^(https?:\/\/)\*\.?/i, "$1www.").replace(/\*+/g, "");
 
   return /^https?:\/\//i.test(concrete) ? concrete : null;
@@ -89,11 +99,16 @@ function tryResolveWildcardHost(rule: DevGuideTargetUrl): string | null {
 function resolveOpenableUrl(rules: DevGuideTargetUrl[]): string | null {
   for (const rule of rules) {
     const url = tryResolveOne(rule);
-    if (url) return url;
+    if (url) {
+      return url;
+    }
   }
+
   for (const rule of rules) {
     const url = tryResolveWildcardHost(rule);
-    if (url) return url;
+    if (url) {
+      return url;
+    }
   }
 
   return null;
@@ -220,7 +235,10 @@ function buildFullGuideText(namespace: string, sections: string[]): string {
 
   for (const s of sections) {
     const doc = sectionDocs[s]?.(namespace);
-    if (!doc) continue;
+    if (!doc) {
+      continue;
+    }
+
     lines.push(`## ${doc.title}`);
     lines.push(doc.description);
     lines.push("");
@@ -257,7 +275,10 @@ export function DevGuideSection({ namespace, section, targetUrls }: Props) {
     : null;
 
   const handleOpenMatchedTab = () => {
-    if (!openableUrl) return;
+    if (!openableUrl) {
+      return;
+    }
+
     window.open(openableUrl, "_blank", "noopener,noreferrer");
     toast.success(`Opening ${openableUrl} — switch to that tab and use DevTools console`);
   };
@@ -412,7 +433,9 @@ export function DevGuideSection({ namespace, section, targetUrls }: Props) {
 
           {sections.map((s) => {
             const doc = sectionDocs[s]?.(namespace);
-            if (!doc) return null;
+            if (!doc) {
+              return null;
+            }
 
             return (
               <div key={s} className="space-y-2">

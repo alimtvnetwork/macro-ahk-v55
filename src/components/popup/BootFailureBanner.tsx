@@ -99,12 +99,15 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       logError("BootFailureBanner.persistReportMode", `localStorage write failed for key=marco_support_report_mode value="${mode}" — preference will not survive reload`, caught);
     }
   };
+
   // Tally of warnings the activity timeline filtered out — disclosed in the
   // support report so the suppression is auditable. `bumpKey` is keyed on
   // `bootStep` so the count refreshes when the failure identity changes.
   const benignTally = useBenignWarningStats(bootStep === undefined ? 0 : bootStep.length);
 
-  if (!bootStep || !bootStep.startsWith("failed:")) return null;
+  if (!bootStep || !bootStep.startsWith("failed:")) {
+    return null;
+  }
 
   const failedStep = bootStep.replace("failed:", "");
   const cause = classifyCause(failedStep, bootError);
@@ -131,19 +134,22 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setCopied(true);
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
- // allow-swallow: clipboard denied; textarea fallback stays visible
+      // allow-swallow: clipboard denied; textarea fallback stays visible
       logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
 
   const handleCopySql = async () => {
-    if (ctx?.sql === null || ctx?.sql === undefined) return;
+    if (ctx?.sql === null || ctx?.sql === undefined) {
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(ctx.sql);
       setSqlCopied(true);
       setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
- // allow-swallow: clipboard denied; snippet stays visible for manual copy
+      // allow-swallow: clipboard denied; snippet stays visible for manual copy
       logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
@@ -173,7 +179,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setDownloaded(true);
       setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
- // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
+      // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
       logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
@@ -290,7 +296,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
                 </span>
               </div>
               <pre className="text-[10px] font-mono text-destructive/90 bg-background/60 rounded p-2 overflow-x-auto max-h-40 whitespace-pre-wrap break-words border border-destructive/20">
-{ctx.sql}
+                {ctx.sql}
               </pre>
             </div>
           ) : null}
@@ -452,18 +458,23 @@ function classifyCause(failedStep: string, bootError: string | null | undefined)
   if (errorText.includes("[WASM_FILE_MISSING_404]") || lower.includes("wasm file missing")) {
     return { kind: "wasm-missing", label: "WASM file missing" };
   }
+
   if (lower.includes("wasm") || lower.includes("sql-wasm")) {
     return { kind: "wasm", label: "WASM load" };
   }
+
   if (lower.includes("opfs") || lower.includes("getdirectory") || lower.includes("navigator.storage")) {
     return { kind: "opfs", label: "OPFS" };
   }
+
   if (lower.includes("chrome.storage") || lower.includes("storage quota") || lower.includes("quota_bytes")) {
     return { kind: "storage", label: "chrome.storage" };
   }
+
   if (lower.includes("migration") || lower.includes("alter table") || lower.includes("create table")) {
     return { kind: "migration", label: "Schema migration" };
   }
+
   if (failedStep === "db-init" && lower.includes("schema")) {
     return { kind: "schema", label: "Schema" };
   }
@@ -583,12 +594,15 @@ function buildReport(input: ReportInput): string {
     if (input.bootErrorContext.migrationVersion !== null) {
       lines.push(`  Migration:  v${input.bootErrorContext.migrationVersion}`);
     }
+
     if (input.bootErrorContext.migrationDescription !== null) {
       lines.push(`  Step:       ${input.bootErrorContext.migrationDescription}`);
     }
+
     if (input.bootErrorContext.scope !== null) {
       lines.push(`  Scope:      ${input.bootErrorContext.scope}`);
     }
+
     // SQL body is verbose — only included in full mode. Short mode shows
     // a one-line indicator so the operator knows it was captured.
     if (input.bootErrorContext.sql !== null) {
@@ -602,6 +616,7 @@ function buildReport(input: ReportInput): string {
         });
       }
     }
+
     lines.push("");
   }
 
@@ -616,6 +631,7 @@ function buildReport(input: ReportInput): string {
     if (p.headError !== null) {
       lines.push(`  HEAD error:     ${p.headError}`);
     }
+
     lines.push("");
   }
 
@@ -633,6 +649,7 @@ function buildReport(input: ReportInput): string {
       lines.push(`         ${m.label}`);
     });
   }
+
   lines.push("");
 
   if (isShort) {
@@ -660,6 +677,7 @@ function buildReport(input: ReportInput): string {
       lines.push(`  ${entry.at}  [${entry.kind}]  ${entry.label}${entry.target ? `  @ ${entry.target}` : ""}`);
     });
   }
+
   lines.push("");
 
   return lines.join("\n");

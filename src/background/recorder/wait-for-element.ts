@@ -18,10 +18,10 @@
  */
 
 import {
-    resolveSelectorKind,
-    waitForCondition,
-    type Condition,
-    type Predicate,
+  resolveSelectorKind,
+  waitForCondition,
+  type Condition,
+  type Predicate,
 } from "./condition-evaluator";
 import { SelectorKindType, WaitForPredicateType, PredicateEvaluationKindType, WaitForOutcomeReasonType, ReasonType } from "../../types/enums";
 
@@ -59,51 +59,51 @@ export interface WaitForOptions {
  * timeout elapses. Pure adapter — delegates to {@link waitForCondition}.
  */
 export async function waitForElement(
-    spec: WaitForSpec,
-    options: WaitForOptions,
+  spec: WaitForSpec,
+  options: WaitForOptions,
 ): Promise<WaitForOutcome> {
-    const condition = synthesizeCondition(spec);
-    const resolvedKind = resolveSelectorKind(spec.Kind ?? "Auto", spec.Expression);
+  const condition = synthesizeCondition(spec);
+  const resolvedKind = resolveSelectorKind(spec.Kind ?? "Auto", spec.Expression);
 
-    const result = await waitForCondition(condition, {
-        Doc: options.Doc,
-        TimeoutMs: spec.TimeoutMs,
-        PollMs: spec.PollMs,
-        Sleep: options.Sleep,
-        Now: options.Now,
-    });
+  const result = await waitForCondition(condition, {
+    Doc: options.Doc,
+    TimeoutMs: spec.TimeoutMs,
+    PollMs: spec.PollMs,
+    Sleep: options.Sleep,
+    Now: options.Now,
+  });
 
-    if (result.Ok) {
-        return { Ok: true, DurationMs: result.DurationMs, ResolvedKind: resolvedKind };
-    }
+  if (result.Ok) {
+    return { Ok: true, DurationMs: result.DurationMs, ResolvedKind: resolvedKind };
+  }
 
-    return mapFailure(result.Reason, result.Detail, result.DurationMs, spec);
+  return mapFailure(result.Reason, result.Detail, result.DurationMs, spec);
 }
 
 function synthesizeCondition(spec: WaitForSpec): Condition {
-    const predicate: Predicate = {
-        Selector: spec.Expression,
-        SelectorKind: spec.Kind ?? "Auto",
-        Matcher: { Kind: spec.Predicate === "Visible" ? "Visible" : "Exists" },
-    };
+  const predicate: Predicate = {
+    Selector: spec.Expression,
+    SelectorKind: spec.Kind ?? "Auto",
+    Matcher: { Kind: spec.Predicate === "Visible" ? "Visible" : "Exists" },
+  };
 
-    return predicate;
+  return predicate;
 }
 
 function mapFailure(
-    reason: ReasonType,
-    detail: string,
-    durationMs: number,
-    spec: WaitForSpec,
+  reason: ReasonType,
+  detail: string,
+  durationMs: number,
+  spec: WaitForSpec,
 ): WaitForOutcome {
-    if (reason === "InvalidSelector") {
-        return { Ok: false, DurationMs: durationMs, Reason: "InvalidSelector", Detail: detail };
-    }
+  if (reason === "InvalidSelector") {
+    return { Ok: false, DurationMs: durationMs, Reason: "InvalidSelector", Detail: detail };
+  }
 
-    return {
-        Ok: false,
-        DurationMs: durationMs,
-        Reason: "Timeout",
-        Detail: `WaitFor '${spec.Expression}' timed out after ${spec.TimeoutMs}ms`,
-    };
+  return {
+    Ok: false,
+    DurationMs: durationMs,
+    Reason: "Timeout",
+    Detail: `WaitFor '${spec.Expression}' timed out after ${spec.TimeoutMs}ms`,
+  };
 }

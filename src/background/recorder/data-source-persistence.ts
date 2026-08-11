@@ -29,48 +29,48 @@ export interface PersistedDataSource {
 /* ------------------------------------------------------------------ */
 
 export async function insertDataSource(
-    projectSlug: string,
-    filePath: string,
-    parsed: ParsedDataSource,
+  projectSlug: string,
+  filePath: string,
+  parsed: ParsedDataSource,
 ): Promise<PersistedDataSource> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
 
-    db.run(
-        `INSERT INTO DataSource (DataSourceKindId, FilePath, Columns, RowCount)
+  db.run(
+    `INSERT INTO DataSource (DataSourceKindId, FilePath, Columns, RowCount)
          VALUES (?, ?, ?, ?)`,
-        [
-            parsed.DataSourceKindId,
-            filePath,
-            JSON.stringify(parsed.Columns),
-            parsed.RowCount,
-        ],
-    );
+    [
+      parsed.DataSourceKindId,
+      filePath,
+      JSON.stringify(parsed.Columns),
+      parsed.RowCount,
+    ],
+  );
 
-    mgr.markDirty();
+  mgr.markDirty();
 
-    return readLatestRow(db, filePath);
+  return readLatestRow(db, filePath);
 }
 
 function readLatestRow(
-    db: SqlJsDatabase,
-    filePath: string,
+  db: SqlJsDatabase,
+  filePath: string,
 ): PersistedDataSource {
-    const result = db.exec(
-        `SELECT DataSourceId, DataSourceKindId, FilePath, Columns, RowCount, CreatedAt
+  const result = db.exec(
+    `SELECT DataSourceId, DataSourceKindId, FilePath, Columns, RowCount, CreatedAt
          FROM DataSource
          WHERE FilePath = ?
          ORDER BY DataSourceId DESC
          LIMIT 1`,
-        [filePath],
-    );
+    [filePath],
+  );
 
-    const row = result[0]?.values[0];
-    if (row === undefined) {
-        throw new Error(`DataSource row missing for "${filePath}" after insert`);
-    }
+  const row = result[0]?.values[0];
+  if (row === undefined) {
+    throw new Error(`DataSource row missing for "${filePath}" after insert`);
+  }
 
-    return rowToRecord(row);
+  return rowToRecord(row);
 }
 
 /* ------------------------------------------------------------------ */
@@ -78,20 +78,20 @@ function readLatestRow(
 /* ------------------------------------------------------------------ */
 
 export async function listDataSources(
-    projectSlug: string,
+  projectSlug: string,
 ): Promise<ReadonlyArray<PersistedDataSource>> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
 
-    const result = db.exec(
-        `SELECT DataSourceId, DataSourceKindId, FilePath, Columns, RowCount, CreatedAt
+  const result = db.exec(
+    `SELECT DataSourceId, DataSourceKindId, FilePath, Columns, RowCount, CreatedAt
          FROM DataSource
          ORDER BY DataSourceId DESC`,
-    );
+  );
 
-    const values = result[0]?.values ?? [];
+  const values = result[0]?.values ?? [];
 
-    return values.map(rowToRecord);
+  return values.map(rowToRecord);
 }
 
 /* ------------------------------------------------------------------ */
@@ -99,15 +99,15 @@ export async function listDataSources(
 /* ------------------------------------------------------------------ */
 
 function rowToRecord(row: ReadonlyArray<unknown>): PersistedDataSource {
-    const columnsRaw = row[3] as string;
-    const columns = JSON.parse(columnsRaw) as ReadonlyArray<string>;
+  const columnsRaw = row[3] as string;
+  const columns = JSON.parse(columnsRaw) as ReadonlyArray<string>;
 
-    return {
-        DataSourceId: row[0] as number,
-        DataSourceKindId: row[1] as number,
-        FilePath: row[2] as string,
-        Columns: columns,
-        RowCount: row[4] as number,
-        CreatedAt: row[5] as string,
-    };
+  return {
+    DataSourceId: row[0] as number,
+    DataSourceKindId: row[1] as number,
+    FilePath: row[2] as string,
+    Columns: columns,
+    RowCount: row[4] as number,
+    CreatedAt: row[5] as string,
+  };
 }

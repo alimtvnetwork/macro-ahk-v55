@@ -15,18 +15,18 @@ import type { StoredProject } from "../shared/project-types";
 import { STORAGE_KEY_ALL_SCRIPTS } from "../shared/constants";
 import { seedFromManifest } from "./manifest-seeder";
 import {
-    persistInjectionError,
-    persistInjectionInfo,
-    persistInjectionWarn,
+  persistInjectionError,
+  persistInjectionInfo,
+  persistInjectionWarn,
 } from "./injection-diagnostics";
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
 import { RunAtType } from "../types/enums";
 
 /** Known built-in script filenames that must always exist in the store. */
 const BUILTIN_SCRIPT_NAMES = new Set([
-    "macro-looping.js",
-    "marco-sdk.js",
-    "xpath.js",
+  "macro-looping.js",
+  "marco-sdk.js",
+  "xpath.js",
 ]);
 
 /**
@@ -42,36 +42,36 @@ const BUILTIN_DIST_MAP: Record<string, {
     isGlobal: boolean;
     runAt?: RunAtType;
 }> = {
-    "marco-sdk.js": {
-        folder: "marco-sdk",
-        seedId: "default-marco-sdk",
-        filePath: "projects/scripts/marco-sdk/marco-sdk.js",
-        loadOrder: 0,
-        isGlobal: true,
-        runAt: "document_start",
-    },
-    "xpath.js": {
-        folder: "xpath",
-        seedId: "default-xpath-utils",
-        filePath: "projects/scripts/xpath/xpath.js",
-        loadOrder: 1,
-        isGlobal: true,
-    },
-    "macro-looping.js": {
-        folder: "macro-controller",
-        seedId: "default-macro-looping",
-        filePath: "projects/scripts/macro-controller/macro-looping.js",
-        loadOrder: 2,
-        isGlobal: false,
-        runAt: "document_idle",
-    },
+  "marco-sdk.js": {
+    folder: "marco-sdk",
+    seedId: "default-marco-sdk",
+    filePath: "projects/scripts/marco-sdk/marco-sdk.js",
+    loadOrder: 0,
+    isGlobal: true,
+    runAt: "document_start",
+  },
+  "xpath.js": {
+    folder: "xpath",
+    seedId: "default-xpath-utils",
+    filePath: "projects/scripts/xpath/xpath.js",
+    loadOrder: 1,
+    isGlobal: true,
+  },
+  "macro-looping.js": {
+    folder: "macro-controller",
+    seedId: "default-macro-looping",
+    filePath: "projects/scripts/macro-controller/macro-looping.js",
+    loadOrder: 2,
+    isGlobal: false,
+    runAt: "document_idle",
+  },
 };
 
 /** Normalizes a path to its bare filename for matching. */
 function bareFilename(path: string): string {
-    const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
+  const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
 
-    return normalized.split("/").pop()?.split(/[?#]/)[0] ?? normalized;
+  return normalized.split("/").pop()?.split(/[?#]/)[0] ?? normalized;
 }
 
 /**
@@ -84,112 +84,112 @@ function bareFilename(path: string): string {
  */
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- multi-stage fallback with logging
 export async function ensureBuiltinScriptsExist(
-    projects: StoredProject[],
+  projects: StoredProject[],
 ): Promise<boolean> {
-    const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
-    const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
-        ? result[STORAGE_KEY_ALL_SCRIPTS]
-        : [];
+  const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
+  const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
+    ? result[STORAGE_KEY_ALL_SCRIPTS]
+    : [];
 
-    // Build a set of script names present in the store
-    const storedNames = new Set(stored.map((s) => bareFilename(s.name)));
+  // Build a set of script names present in the store
+  const storedNames = new Set(stored.map((s) => bareFilename(s.name)));
 
-    // Collect all built-in script paths referenced by any project
-    const missing: string[] = [];
-    for (const project of projects) {
-        for (const entry of project.scripts) {
-            const name = bareFilename(entry.path);
-            if (BUILTIN_SCRIPT_NAMES.has(name) && !storedNames.has(name)) {
-                missing.push(name);
-            }
-        }
+  // Collect all built-in script paths referenced by any project
+  const missing: string[] = [];
+  for (const project of projects) {
+    for (const entry of project.scripts) {
+      const name = bareFilename(entry.path);
+      if (BUILTIN_SCRIPT_NAMES.has(name) && !storedNames.has(name)) {
+        missing.push(name);
+      }
     }
+  }
 
-    if (missing.length === 0) {
-        return false;
-    }
+  if (missing.length === 0) {
+    return false;
+  }
 
-    void persistInjectionWarn(
-        "BUILTIN_GUARD_RESEED_REQUIRED",
-        `[builtin-guard] Missing built-in scripts in store: [${missing.join(", ")}] — reseeding from manifest`,
+  void persistInjectionWarn(
+    "BUILTIN_GUARD_RESEED_REQUIRED",
+    `[builtin-guard] Missing built-in scripts in store: [${missing.join(", ")}] — reseeding from manifest`,
+  );
+
+  logBgWarnError(
+    "[builtin-guard]",
+    `${missing.length} built-in script(s) missing from store\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Script entries for [${missing.join(", ")}]\n  Reason: Scripts referenced by projects but not found in storage — triggering reseed from manifest`,
+  );
+
+  // --- Stage 1: Try seed-manifest.json ---
+  try {
+    const seedResult = await seedFromManifest();
+    console.log(
+      "[builtin-guard] Manifest reseed result: %d scripts, %d configs across %d projects",
+      seedResult.scripts,
+      seedResult.configs,
+      seedResult.projects,
     );
 
+    if (seedResult.scripts > 0) {
+      void persistInjectionInfo(
+        "BUILTIN_GUARD_RESEED_COMPLETE",
+        `[builtin-guard] Reseed complete via manifest: ${seedResult.scripts} scripts, ${seedResult.configs} configs across ${seedResult.projects} projects`,
+      );
+
+      return true;
+    }
+
+    // Manifest returned 0 scripts — check if scripts are still missing
     logBgWarnError(
-        "[builtin-guard]",
-        `${missing.length} built-in script(s) missing from store\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Script entries for [${missing.join(", ")}]\n  Reason: Scripts referenced by projects but not found in storage — triggering reseed from manifest`,
+      "[builtin-guard]",
+      "seed-manifest.json returned 0 scripts — falling back to direct instruction.json seeding",
+    );
+    void persistInjectionWarn(
+      "BUILTIN_GUARD_MANIFEST_EMPTY",
+      `[builtin-guard] seed-manifest.json returned 0 scripts (projects=${seedResult.projects}, errors=${seedResult.errors.length}). Falling back to instruction.json.`,
+    );
+  } catch (err) {
+    logCaughtError(BgLogTag.BUILTIN_GUARD, `Manifest reseed failed\n  Path: chrome.runtime.getURL("seed-manifest.json")\n  Missing: Successful reseed of built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+    void persistInjectionError(
+      "BUILTIN_GUARD_MANIFEST_RESEED_FAILED",
+      `[builtin-guard] Manifest reseed failed\n  Path: seed-manifest.json\n  Missing: Built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
+      { contextDetail: `Missing built-ins: [${missing.join(", ")}]` },
+    );
+  }
+
+  // --- Stage 2: Direct instruction.json fallback ---
+  try {
+    const fallbackCount = await seedMissingBuiltinsDirectly(missing);
+    if (fallbackCount > 0) {
+      console.log(
+        "[builtin-guard] ✅ Direct fallback seeded %d built-in script(s)",
+        fallbackCount,
+      );
+      void persistInjectionInfo(
+        "BUILTIN_GUARD_DIRECT_SEED_COMPLETE",
+        `[builtin-guard] Direct instruction.json fallback seeded ${fallbackCount} script(s): [${missing.join(", ")}]`,
+      );
+
+      return true;
+    }
+
+    logBgWarnError(BgLogTag.BUILTIN_GUARD, `Direct fallback also seeded 0 scripts\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Any seeded script for [${missing.join(", ")}]\n  Reason: Both seed-manifest.json and per-script instruction.json fallback returned 0 scripts`);
+    await persistInjectionError(
+      "BUILTIN_GUARD_DIRECT_SEED_EMPTY",
+      `[builtin-guard] Direct instruction.json fallback seeded 0 scripts\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: Both manifest and direct fallback failed to restore built-ins`,
+      { contextDetail: "Both manifest and direct fallback failed to restore built-ins" },
     );
 
-    // --- Stage 1: Try seed-manifest.json ---
-    try {
-        const seedResult = await seedFromManifest();
-        console.log(
-            "[builtin-guard] Manifest reseed result: %d scripts, %d configs across %d projects",
-            seedResult.scripts,
-            seedResult.configs,
-            seedResult.projects,
-        );
+    return false;
+  } catch (err) {
+    logCaughtError(BgLogTag.BUILTIN_GUARD, `Direct fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+    await persistInjectionError(
+      "BUILTIN_GUARD_DIRECT_SEED_FAILED",
+      `[builtin-guard] Direct instruction.json fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
+      { contextDetail: `Missing built-ins: [${missing.join(", ")}]` },
+    );
 
-        if (seedResult.scripts > 0) {
-            void persistInjectionInfo(
-                "BUILTIN_GUARD_RESEED_COMPLETE",
-                `[builtin-guard] Reseed complete via manifest: ${seedResult.scripts} scripts, ${seedResult.configs} configs across ${seedResult.projects} projects`,
-            );
-
-            return true;
-        }
-
-        // Manifest returned 0 scripts — check if scripts are still missing
-        logBgWarnError(
-            "[builtin-guard]",
-            "seed-manifest.json returned 0 scripts — falling back to direct instruction.json seeding",
-        );
-        void persistInjectionWarn(
-            "BUILTIN_GUARD_MANIFEST_EMPTY",
-            `[builtin-guard] seed-manifest.json returned 0 scripts (projects=${seedResult.projects}, errors=${seedResult.errors.length}). Falling back to instruction.json.`,
-        );
-    } catch (err) {
-        logCaughtError(BgLogTag.BUILTIN_GUARD, `Manifest reseed failed\n  Path: chrome.runtime.getURL("seed-manifest.json")\n  Missing: Successful reseed of built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
-        void persistInjectionError(
-            "BUILTIN_GUARD_MANIFEST_RESEED_FAILED",
-            `[builtin-guard] Manifest reseed failed\n  Path: seed-manifest.json\n  Missing: Built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
-            { contextDetail: `Missing built-ins: [${missing.join(", ")}]` },
-        );
-    }
-
-    // --- Stage 2: Direct instruction.json fallback ---
-    try {
-        const fallbackCount = await seedMissingBuiltinsDirectly(missing);
-        if (fallbackCount > 0) {
-            console.log(
-                "[builtin-guard] ✅ Direct fallback seeded %d built-in script(s)",
-                fallbackCount,
-            );
-            void persistInjectionInfo(
-                "BUILTIN_GUARD_DIRECT_SEED_COMPLETE",
-                `[builtin-guard] Direct instruction.json fallback seeded ${fallbackCount} script(s): [${missing.join(", ")}]`,
-            );
-
-            return true;
-        }
-
-        logBgWarnError(BgLogTag.BUILTIN_GUARD, `Direct fallback also seeded 0 scripts\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Any seeded script for [${missing.join(", ")}]\n  Reason: Both seed-manifest.json and per-script instruction.json fallback returned 0 scripts`);
-        await persistInjectionError(
-            "BUILTIN_GUARD_DIRECT_SEED_EMPTY",
-            `[builtin-guard] Direct instruction.json fallback seeded 0 scripts\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: Both manifest and direct fallback failed to restore built-ins`,
-            { contextDetail: "Both manifest and direct fallback failed to restore built-ins" },
-        );
-
-        return false;
-    } catch (err) {
-        logCaughtError(BgLogTag.BUILTIN_GUARD, `Direct fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
-        await persistInjectionError(
-            "BUILTIN_GUARD_DIRECT_SEED_FAILED",
-            `[builtin-guard] Direct instruction.json fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
-            { contextDetail: `Missing built-ins: [${missing.join(", ")}]` },
-        );
-
-        return false;
-    }
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -206,124 +206,124 @@ const STUB_PREFIX = "// STUB: loaded from instruction.json fallback. Real code f
  */
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- per-script fetch+validate with fallback paths
 async function seedMissingBuiltinsDirectly(
-    missingNames: string[],
+  missingNames: string[],
 ): Promise<number> {
-    const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
-    const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
-        ? result[STORAGE_KEY_ALL_SCRIPTS]
-        : [];
+  const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
+  const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
+    ? result[STORAGE_KEY_ALL_SCRIPTS]
+    : [];
 
-    let seeded = 0;
-    const now = new Date().toISOString();
+  let seeded = 0;
+  const now = new Date().toISOString();
 
-    for (const scriptName of missingNames) {
-        const meta = BUILTIN_DIST_MAP[scriptName];
-        if (!meta) {
-            logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `No dist map entry for "${scriptName}"\n  Path: BUILTIN_DIST_MAP["${scriptName}"]\n  Missing: Distribution mapping (folder, seedId, filePath)\n  Reason: Script name not registered in BUILTIN_DIST_MAP — skipping`);
-            continue;
-        }
-
-        // Check if already present (by seedId or name)
-        const existsById = stored.some((s) => s.id === meta.seedId);
-        const existsByName = stored.some((s) => bareFilename(s.name) === scriptName);
-        if (existsById || existsByName) {
-            console.log("[builtin-guard:fallback] %s already in store (by %s) — skipping",
-                scriptName, existsById ? "id" : "name");
-            continue;
-        }
-
-        // Try to fetch instruction.json to get version/description
-        let description = `Built-in script: ${scriptName}`;
-        let version = "1.0.0";
-        const instrRelPath = `projects/scripts/${meta.folder}/instruction.json`;
-        const instrAbsUrl = chrome.runtime.getURL(instrRelPath);
-        console.log("[builtin-guard:fallback] Fetching instruction.json for %s → %s", scriptName, instrAbsUrl);
-        try {
-            const instrResp = ServiceResult.wrapFetch(await fetch(instrAbsUrl));
-            if (instrResp.isSuccess) {
-                // Phase 2c: instruction.json is the canonical PascalCase
-                // artifact. Reads use PascalCase keys with no fallback —
-                // a stale camelCase artifact will surface as defaults
-                // (description = "Built-in script: …", version = "1.0.0")
-                // rather than be silently remapped.
-                const instr = await instrResp.json() as { Description?: string; Version?: string };
-                description = instr.Description || description;
-                version = instr.Version || version;
-                console.log("[builtin-guard:fallback] ✅ Read instruction.json for %s: v%s (from %s)",
-                    scriptName, version, instrAbsUrl);
-            } else {
-                logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `instruction.json fetch returned non-OK\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: HTTP ${instrResp.status} — file may not exist in web_accessible_resources`);
-                void persistInjectionWarn(
-                    "BUILTIN_GUARD_INSTRUCTION_MISSING",
-                    `[builtin-guard:fallback] instruction.json not found\n  Path: ${instrAbsUrl}\n  Missing: Metadata for "${scriptName}"\n  Reason: HTTP ${instrResp.status}`,
-                );
-            }
-        } catch (fetchErr) {
-            logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch instruction.json\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
-            void persistInjectionError(
-                "BUILTIN_GUARD_INSTRUCTION_FETCH_FAILED",
-                `[builtin-guard:fallback] instruction.json fetch failed\n  Path: ${instrAbsUrl}\n  Missing: Metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`,
-            );
-        }
-
-        // Verify the actual script file exists in dist
-        let codeStub = STUB_PREFIX + `console.error("[builtin-guard::fallback] STUB: filePath fetch failed\\n  Path: ${meta.filePath}\\n  Missing: Real script code for \\"${scriptName}\\"\\n  Reason: Stub placeholder — fetch from extension bundle did not succeed");`;
-        const scriptAbsUrl = chrome.runtime.getURL(meta.filePath);
-        console.log("[builtin-guard:fallback] Fetching script file for %s → %s", scriptName, scriptAbsUrl);
-        try {
-            const scriptResp = ServiceResult.wrapFetch(await fetch(scriptAbsUrl));
-            if (scriptResp.isSuccess) {
-                const code = await scriptResp.text();
-                if (code && code.length > 10) {
-                    codeStub = code;
-                    console.log("[builtin-guard:fallback] ✅ Loaded %s directly (%d chars) from %s",
-                        scriptName, code.length, scriptAbsUrl);
-                } else {
-                    logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file returned empty/tiny response\n  Path: ${scriptAbsUrl}\n  Missing: Valid script code for "${scriptName}" (got ${code?.length ?? 0} chars, minimum 10 required)\n  Reason: Server returned near-empty response — build artifact may be corrupt or a placeholder`);
-                }
-            } else {
-                logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file fetch returned non-OK\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: HTTP ${scriptResp.status} — file may not exist in dist/ or web_accessible_resources`);
-                void persistInjectionWarn(
-                    "BUILTIN_GUARD_SCRIPT_FILE_MISSING",
-                    `[builtin-guard:fallback] Script file not found\n  Path: ${scriptAbsUrl}\n  Missing: "${scriptName}" built-in script\n  Reason: HTTP ${scriptResp.status}`,
-                );
-            }
-        } catch (fetchErr) {
-            logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch script file\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
-            void persistInjectionError(
-                "BUILTIN_GUARD_SCRIPT_FETCH_FAILED",
-                `[builtin-guard:fallback] Script fetch failed\n  Path: ${scriptAbsUrl}\n  Missing: "${scriptName}" built-in script code\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`,
-            );
-        }
-
-        const entry: StoredScript = {
-            id: meta.seedId,
-            name: scriptName,
-            description,
-            code: codeStub,
-            filePath: meta.filePath,
-            isAbsolute: false,
-            order: meta.loadOrder,
-            isEnabled: true,
-            isIife: true,
-            autoInject: false,
-            isGlobal: meta.isGlobal,
-            dependencies: [],
-            loadOrder: meta.loadOrder,
-            runAt: meta.runAt,
-            createdAt: now,
-            updatedAt: now,
-        };
-
-        stored.push(entry);
-        seeded++;
-        console.log("[builtin-guard:fallback] Seeded %s (id=%s, filePath=%s)",
-            scriptName, meta.seedId, meta.filePath);
+  for (const scriptName of missingNames) {
+    const meta = BUILTIN_DIST_MAP[scriptName];
+    if (!meta) {
+      logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `No dist map entry for "${scriptName}"\n  Path: BUILTIN_DIST_MAP["${scriptName}"]\n  Missing: Distribution mapping (folder, seedId, filePath)\n  Reason: Script name not registered in BUILTIN_DIST_MAP — skipping`);
+      continue;
     }
 
-    if (seeded > 0) {
-        await chrome.storage.local.set({ [STORAGE_KEY_ALL_SCRIPTS]: stored });
+    // Check if already present (by seedId or name)
+    const existsById = stored.some((s) => s.id === meta.seedId);
+    const existsByName = stored.some((s) => bareFilename(s.name) === scriptName);
+    if (existsById || existsByName) {
+      console.log("[builtin-guard:fallback] %s already in store (by %s) — skipping",
+        scriptName, existsById ? "id" : "name");
+      continue;
     }
 
-    return seeded;
+    // Try to fetch instruction.json to get version/description
+    let description = `Built-in script: ${scriptName}`;
+    let version = "1.0.0";
+    const instrRelPath = `projects/scripts/${meta.folder}/instruction.json`;
+    const instrAbsUrl = chrome.runtime.getURL(instrRelPath);
+    console.log("[builtin-guard:fallback] Fetching instruction.json for %s → %s", scriptName, instrAbsUrl);
+    try {
+      const instrResp = ServiceResult.wrapFetch(await fetch(instrAbsUrl));
+      if (instrResp.isSuccess) {
+        // Phase 2c: instruction.json is the canonical PascalCase
+        // artifact. Reads use PascalCase keys with no fallback —
+        // a stale camelCase artifact will surface as defaults
+        // (description = "Built-in script: …", version = "1.0.0")
+        // rather than be silently remapped.
+        const instr = await instrResp.json() as { Description?: string; Version?: string };
+        description = instr.Description || description;
+        version = instr.Version || version;
+        console.log("[builtin-guard:fallback] ✅ Read instruction.json for %s: v%s (from %s)",
+          scriptName, version, instrAbsUrl);
+      } else {
+        logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `instruction.json fetch returned non-OK\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: HTTP ${instrResp.status} — file may not exist in web_accessible_resources`);
+        void persistInjectionWarn(
+          "BUILTIN_GUARD_INSTRUCTION_MISSING",
+          `[builtin-guard:fallback] instruction.json not found\n  Path: ${instrAbsUrl}\n  Missing: Metadata for "${scriptName}"\n  Reason: HTTP ${instrResp.status}`,
+        );
+      }
+    } catch (fetchErr) {
+      logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch instruction.json\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
+      void persistInjectionError(
+        "BUILTIN_GUARD_INSTRUCTION_FETCH_FAILED",
+        `[builtin-guard:fallback] instruction.json fetch failed\n  Path: ${instrAbsUrl}\n  Missing: Metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`,
+      );
+    }
+
+    // Verify the actual script file exists in dist
+    let codeStub = STUB_PREFIX + `console.error("[builtin-guard::fallback] STUB: filePath fetch failed\\n  Path: ${meta.filePath}\\n  Missing: Real script code for \\"${scriptName}\\"\\n  Reason: Stub placeholder — fetch from extension bundle did not succeed");`;
+    const scriptAbsUrl = chrome.runtime.getURL(meta.filePath);
+    console.log("[builtin-guard:fallback] Fetching script file for %s → %s", scriptName, scriptAbsUrl);
+    try {
+      const scriptResp = ServiceResult.wrapFetch(await fetch(scriptAbsUrl));
+      if (scriptResp.isSuccess) {
+        const code = await scriptResp.text();
+        if (code && code.length > 10) {
+          codeStub = code;
+          console.log("[builtin-guard:fallback] ✅ Loaded %s directly (%d chars) from %s",
+            scriptName, code.length, scriptAbsUrl);
+        } else {
+          logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file returned empty/tiny response\n  Path: ${scriptAbsUrl}\n  Missing: Valid script code for "${scriptName}" (got ${code?.length ?? 0} chars, minimum 10 required)\n  Reason: Server returned near-empty response — build artifact may be corrupt or a placeholder`);
+        }
+      } else {
+        logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file fetch returned non-OK\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: HTTP ${scriptResp.status} — file may not exist in dist/ or web_accessible_resources`);
+        void persistInjectionWarn(
+          "BUILTIN_GUARD_SCRIPT_FILE_MISSING",
+          `[builtin-guard:fallback] Script file not found\n  Path: ${scriptAbsUrl}\n  Missing: "${scriptName}" built-in script\n  Reason: HTTP ${scriptResp.status}`,
+        );
+      }
+    } catch (fetchErr) {
+      logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch script file\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
+      void persistInjectionError(
+        "BUILTIN_GUARD_SCRIPT_FETCH_FAILED",
+        `[builtin-guard:fallback] Script fetch failed\n  Path: ${scriptAbsUrl}\n  Missing: "${scriptName}" built-in script code\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`,
+      );
+    }
+
+    const entry: StoredScript = {
+      id: meta.seedId,
+      name: scriptName,
+      description,
+      code: codeStub,
+      filePath: meta.filePath,
+      isAbsolute: false,
+      order: meta.loadOrder,
+      isEnabled: true,
+      isIife: true,
+      autoInject: false,
+      isGlobal: meta.isGlobal,
+      dependencies: [],
+      loadOrder: meta.loadOrder,
+      runAt: meta.runAt,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    stored.push(entry);
+    seeded++;
+    console.log("[builtin-guard:fallback] Seeded %s (id=%s, filePath=%s)",
+      scriptName, meta.seedId, meta.filePath);
+  }
+
+  if (seeded > 0) {
+    await chrome.storage.local.set({ [STORAGE_KEY_ALL_SCRIPTS]: stored });
+  }
+
+  return seeded;
 }

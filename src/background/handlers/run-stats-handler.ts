@@ -42,21 +42,21 @@ export interface RunStatsResponse {
 /* ------------------------------------------------------------------ */
 
 async function loadMetrics(): Promise<CycleMetric[]> {
-    try {
-        const result = await chrome.storage.local.get(STORAGE_KEY);
+  try {
+    const result = await chrome.storage.local.get(STORAGE_KEY);
 
-        return (result[STORAGE_KEY] as CycleMetric[]) ?? [];
-    } catch (err) { 
-        return [];
-    }
+    return (result[STORAGE_KEY] as CycleMetric[]) ?? [];
+  } catch (err) { 
+    return [];
+  }
 }
 
 async function saveMetrics(metrics: CycleMetric[]): Promise<void> {
-    // FIFO cap
-    const capped = metrics.length > MAX_ENTRIES
-        ? metrics.slice(metrics.length - MAX_ENTRIES)
-        : metrics;
-    await chrome.storage.local.set({ [STORAGE_KEY]: capped });
+  // FIFO cap
+  const capped = metrics.length > MAX_ENTRIES
+    ? metrics.slice(metrics.length - MAX_ENTRIES)
+    : metrics;
+  await chrome.storage.local.set({ [STORAGE_KEY]: capped });
 }
 
 /* ------------------------------------------------------------------ */
@@ -65,7 +65,7 @@ async function saveMetrics(metrics: CycleMetric[]): Promise<void> {
 
 /** Records a single cycle metric. */
 export async function handleRecordCycleMetric(payload: { projectId: string; cycleMs: number; loopCount: number; action: string }): Promise<{ isOk: true }> {
-    const cycleInput = payload as {
+  const cycleInput = payload as {
         cycleNumber: number;
         startTime: string;
         endTime: string;
@@ -73,62 +73,62 @@ export async function handleRecordCycleMetric(payload: { projectId: string; cycl
         errorMessage?: string;
     };
 
-    const start = new Date(cycleInput.startTime).getTime();
-    const end = new Date(cycleInput.endTime).getTime();
+  const start = new Date(cycleInput.startTime).getTime();
+  const end = new Date(cycleInput.endTime).getTime();
 
-    const metric: CycleMetric = {
-        cycleNumber: cycleInput.cycleNumber,
-        startTime: cycleInput.startTime,
-        endTime: cycleInput.endTime,
-        durationMs: end - start,
-        status: cycleInput.status,
-        ...(cycleInput.errorMessage ? { errorMessage: cycleInput.errorMessage } : {}),
-    };
+  const metric: CycleMetric = {
+    cycleNumber: cycleInput.cycleNumber,
+    startTime: cycleInput.startTime,
+    endTime: cycleInput.endTime,
+    durationMs: end - start,
+    status: cycleInput.status,
+    ...(cycleInput.errorMessage ? { errorMessage: cycleInput.errorMessage } : {}),
+  };
 
-    const existing = await loadMetrics();
-    existing.push(metric);
-    await saveMetrics(existing);
+  const existing = await loadMetrics();
+  existing.push(metric);
+  await saveMetrics(existing);
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 /** Returns aggregated run statistics + last 20 cycles. */
 export async function handleGetRunStats(): Promise<RunStatsResponse> {
-    const metrics = await loadMetrics();
+  const metrics = await loadMetrics();
 
-    const totalCycles = metrics.length;
-    const successCount = metrics.filter(entry => entry.status === "success").length;
-    const errorCount = metrics.filter(entry => entry.status === "error").length;
-    const skippedCount = metrics.filter(entry => entry.status === "skipped").length;
-    const successRate = totalCycles > 0 ? Math.round((successCount / totalCycles) * 1000) / 10 : 0;
+  const totalCycles = metrics.length;
+  const successCount = metrics.filter(entry => entry.status === "success").length;
+  const errorCount = metrics.filter(entry => entry.status === "error").length;
+  const skippedCount = metrics.filter(entry => entry.status === "skipped").length;
+  const successRate = totalCycles > 0 ? Math.round((successCount / totalCycles) * 1000) / 10 : 0;
 
-    const durations = metrics.filter(entry => entry.durationMs > 0).map(entry => entry.durationMs);
-    const avgDurationMs = durations.length > 0
-        ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
-        : 0;
+  const durations = metrics.filter(entry => entry.durationMs > 0).map(entry => entry.durationMs);
+  const avgDurationMs = durations.length > 0
+    ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
+    : 0;
 
-    const errorMetrics = metrics.filter(entry => entry.status === "error");
-    const lastErrorMessage = errorMetrics.length > 0
-        ? errorMetrics[errorMetrics.length - 1].errorMessage ?? null
-        : null;
+  const errorMetrics = metrics.filter(entry => entry.status === "error");
+  const lastErrorMessage = errorMetrics.length > 0
+    ? errorMetrics[errorMetrics.length - 1].errorMessage ?? null
+    : null;
 
-    const recentCycles = metrics.slice(-20);
+  const recentCycles = metrics.slice(-20);
 
-    return {
-        totalCycles,
-        successCount,
-        errorCount,
-        skippedCount,
-        successRate,
-        avgDurationMs,
-        lastErrorMessage,
-        recentCycles,
-    };
+  return {
+    totalCycles,
+    successCount,
+    errorCount,
+    skippedCount,
+    successRate,
+    avgDurationMs,
+    lastErrorMessage,
+    recentCycles,
+  };
 }
 
 /** Clears all stored run statistics. */
 export async function handleClearRunStats(): Promise<{ isOk: true }> {
-    await chrome.storage.local.remove(STORAGE_KEY);
+  await chrome.storage.local.remove(STORAGE_KEY);
 
-    return { isOk: true };
+  return { isOk: true };
 }

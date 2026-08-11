@@ -8,10 +8,10 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import {
-    QUEUE_PAUSE_ARIA_LABEL,
-    QUEUE_PAUSE_BUTTON_XPATH,
-    QUEUE_PLAY_BUTTON_XPATH,
-    QUEUE_RESUME_ARIA_LABEL,
+  QUEUE_PAUSE_ARIA_LABEL,
+  QUEUE_PAUSE_BUTTON_XPATH,
+  QUEUE_PLAY_BUTTON_XPATH,
+  QUEUE_RESUME_ARIA_LABEL,
 } from './selectors';
 import { QueueClickReasonType } from "../types/enums";
 import { logError } from "../error-utils";
@@ -22,54 +22,58 @@ export interface QueueClickResult {
 }
 
 function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
-    if (typeof document === 'undefined') {
-        return null;
-    }
-    try {
-        const node = document.evaluate(
-            xpath,
-            document,
-            null,
-            XPathResult.FIRST_ORDERED_NODE_TYPE,
-            null,
-        ).singleNodeValue;
-        if (node instanceof HTMLElement) {
-            return node;
-        }
-    } catch (err) {
-        logError('MacroController', 'Unknown error');
-    }
-    const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
+  if (typeof document === 'undefined') {
+    return null;
+  }
 
-    return all.length > 0 ? all[0] : null;
+  try {
+    const node = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null,
+    ).singleNodeValue;
+    if (node instanceof HTMLElement) {
+      return node;
+    }
+  } catch (err) {
+    logError('MacroController', 'Unknown error');
+  }
+
+  const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
+
+  return all.length > 0 ? all[0] : null;
 }
 
 export function isQueuePauseVisible(): boolean {
-    return findButton(QUEUE_PAUSE_BUTTON_XPATH, QUEUE_PAUSE_ARIA_LABEL) !== null;
+  return findButton(QUEUE_PAUSE_BUTTON_XPATH, QUEUE_PAUSE_ARIA_LABEL) !== null;
 }
 
 export function isQueueResumeVisible(): boolean {
-    return findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL) !== null;
+  return findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL) !== null;
 }
 
 export function pauseQueue(): QueueClickResult {
-    const btn = findButton(QUEUE_PAUSE_BUTTON_XPATH, QUEUE_PAUSE_ARIA_LABEL);
-    if (btn === null) {
-        return { clicked: false, reason: 'pause-missing' };
-    }
-    btn.click();
+  const btn = findButton(QUEUE_PAUSE_BUTTON_XPATH, QUEUE_PAUSE_ARIA_LABEL);
+  if (btn === null) {
+    return { clicked: false, reason: 'pause-missing' };
+  }
 
-    return { clicked: true, reason: 'ok' };
+  btn.click();
+
+  return { clicked: true, reason: 'ok' };
 }
 
 export function resumeQueue(): QueueClickResult {
-    const btn = findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL);
-    if (btn === null) {
-        return { clicked: false, reason: 'resume-missing' };
-    }
-    btn.click();
+  const btn = findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL);
+  if (btn === null) {
+    return { clicked: false, reason: 'resume-missing' };
+  }
 
-    return { clicked: true, reason: 'ok' };
+  btn.click();
+
+  return { clicked: true, reason: 'ok' };
 }
 
 export { readQueueCount, readQueueCountDetailed, QUEUE_COUNT_XPATH } from './queue-count';

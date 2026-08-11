@@ -47,31 +47,31 @@ const THIRTY_DAYS_AGO = new Date(Date.now() - 30 * 86_400_000).toISOString();
 const SNAPSHOT: WorkspaceCredit[] = [
   // Healthy PRO with high credits
   ws({ id: 'ws-001', fullName: 'Alpha-Pro-Active',
-       tier: 'PRO', available: 900,
-       subscriptionStatus: 'active' }),
+    tier: 'PRO', available: 900,
+    subscriptionStatus: 'active' }),
   // FREE workspace
   ws({ id: 'ws-002', fullName: 'Beta-Free',
-       tier: 'FREE', available: 50,
-       subscriptionStatus: 'active', plan: 'free' }),
+    tier: 'FREE', available: 50,
+    subscriptionStatus: 'active', plan: 'free' }),
   // PRO past_due (about-to-expire) with mid credits
   ws({ id: 'ws-003', fullName: 'Gamma-Pro-PastDue',
-       tier: 'PRO', available: 400,
-       subscriptionStatus: 'past_due',
-       subscriptionStatusChangedAt: FIVE_DAYS_AGO }),
+    tier: 'PRO', available: 400,
+    subscriptionStatus: 'past_due',
+    subscriptionStatusChangedAt: FIVE_DAYS_AGO }),
   // Expired PRO with high credits — recovery candidate
   ws({ id: 'ws-004', fullName: 'Delta-Expired-HighCredits',
-       tier: 'EXPIRED', available: 750,
-       subscriptionStatus: 'expired',
-       subscriptionStatusChangedAt: THIRTY_DAYS_AGO }),
+    tier: 'EXPIRED', available: 750,
+    subscriptionStatus: 'expired',
+    subscriptionStatusChangedAt: THIRTY_DAYS_AGO }),
   // Expired PRO with low credits
   ws({ id: 'ws-005', fullName: 'Epsilon-Expired-LowCredits',
-       tier: 'EXPIRED', available: 10,
-       subscriptionStatus: 'expired',
-       subscriptionStatusChangedAt: THIRTY_DAYS_AGO }),
+    tier: 'EXPIRED', available: 10,
+    subscriptionStatus: 'expired',
+    subscriptionStatusChangedAt: THIRTY_DAYS_AGO }),
   // FREE healthy
   ws({ id: 'ws-006', fullName: 'Zeta-Free-Healthy',
-       tier: 'FREE', available: 200,
-       subscriptionStatus: 'active', plan: 'free' }),
+    tier: 'FREE', available: 200,
+    subscriptionStatus: 'active', plan: 'free' }),
 ];
 
 function ids(survivors: ReturnType<typeof filterAndSortWorkspaces>): string[] {
@@ -80,7 +80,10 @@ function ids(survivors: ReturnType<typeof filterAndSortWorkspaces>): string[] {
  
 describe('Credit-sort filter E2E (v3.30.0)', () => {
   beforeEach(() => {
-    try { localStorage.clear(); } catch { /* jsdom */ }
+    try {
+      localStorage.clear(); 
+    } catch { /* jsdom */ }
+
     setLoopWsCreditSortMode('none');
   });
 
@@ -119,9 +122,9 @@ describe('Credit-sort filter E2E (v3.30.0)', () => {
     const withExpiringFree = [
       ...SNAPSHOT,
       ws({ id: 'ws-007', fullName: 'Eta-Free-Expiring',
-           tier: 'FREE', available: 999,
-           subscriptionStatus: 'past_due',
-           subscriptionStatusChangedAt: FIVE_DAYS_AGO, plan: 'free' }),
+        tier: 'FREE', available: 999,
+        subscriptionStatus: 'past_due',
+        subscriptionStatusChangedAt: FIVE_DAYS_AGO, plan: 'free' }),
     ];
     setLoopWsCreditSortMode('pro-high');
     const out = filterAndSortWorkspaces(withExpiringFree, '');

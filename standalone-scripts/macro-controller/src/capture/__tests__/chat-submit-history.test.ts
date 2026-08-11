@@ -35,7 +35,9 @@ const sampleRow = {
   FileId: 'f1', CharCount: 42, CreatedAt: 1_700_000_000_000, MetaJson: null,
 };
 
-beforeEach(() => { vi.clearAllMocks(); });
+beforeEach(() => {
+  vi.clearAllMocks(); 
+});
 
 describe('getProjectHistory', () => {
   it('clamps limit into [1, MAX_HISTORY_LIMIT] and defaults on NaN', async () => {
@@ -85,12 +87,16 @@ describe('exportProjectHistoryAsJson', () => {
 describe('deleteHistoryEntry', () => {
   it('deletes OPFS first, then row', async () => {
     const order: string[] = [];
-    deleteOpfsMock.mockImplementation(async () => { order.push('opfs');
+    deleteOpfsMock.mockImplementation(async () => {
+      order.push('opfs');
 
- return true; });
-    deleteRowMock.mockImplementation(async () => { order.push('row');
+      return true; 
+    });
+    deleteRowMock.mockImplementation(async () => {
+      order.push('row');
 
- return true; });
+      return true; 
+    });
     const r = await deleteHistoryEntry('p1', 1, 'f1');
     expect(order).toEqual(['opfs', 'row']);
     expect(r).toEqual({ isDeleted: true, opfsRemoved: true, rowRemoved: true });

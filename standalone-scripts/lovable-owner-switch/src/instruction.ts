@@ -17,34 +17,34 @@ import type { EmptySettings } from "../../types/instruction/seed/empty-settings"
 import { VERSION } from "../../shared-version";
 
 const instruction: ProjectInstruction<EmptySettings> = {
-    SchemaVersion: "1.0",
-    Name: "lovable-owner-switch",
-    DisplayName: "Lovable Owner Switch",
-    Version: VERSION,
-    Description: "Bulk-switch Lovable workspace ownership from a CSV of LoginEmail → OwnerEmail rows.",
-    World: InjectionWorldType.Main,
-    IsGlobal: false,
-    Dependencies: ["lovable-common"],
-    LoadOrder: 60,
-    Seed: {
-        Id: "default-lovable-owner-switch",
-        SeedOnInstall: true,
-        IsRemovable: false,
-        AutoInject: true,
-        RunAt: InjectionRunAtType.DocumentIdle,
-        TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
-        Cookies: [],
-        Settings: {},
-    },
-    Assets: {
-        Css: [],
-        Configs: [],
-        Scripts: [
-            { File: "lovable-owner-switch.js", Order: 1, IsIife: true },
-        ],
-        Templates: [],
-        Prompts: [],
-    },
+  SchemaVersion: "1.0",
+  Name: "lovable-owner-switch",
+  DisplayName: "Lovable Owner Switch",
+  Version: VERSION,
+  Description: "Bulk-switch Lovable workspace ownership from a CSV of LoginEmail → OwnerEmail rows.",
+  World: InjectionWorldType.Main,
+  IsGlobal: false,
+  Dependencies: ["lovable-common"],
+  LoadOrder: 60,
+  Seed: {
+    Id: "default-lovable-owner-switch",
+    SeedOnInstall: true,
+    IsRemovable: false,
+    AutoInject: true,
+    RunAt: InjectionRunAtType.DocumentIdle,
+    TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
+    Cookies: [],
+    Settings: {},
+  },
+  Assets: {
+    Css: [],
+    Configs: [],
+    Scripts: [
+      { File: "lovable-owner-switch.js", Order: 1, IsIife: true },
+    ],
+    Templates: [],
+    Prompts: [],
+  },
 };
 
 export default instruction;

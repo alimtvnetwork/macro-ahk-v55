@@ -24,28 +24,28 @@ export interface SignOutResult {
 }
 
 const clickXPath = async (
-    key: XPathKeyCodeType,
-    overrides: ReadonlyArray<XPathSettingSeed>,
+  key: XPathKeyCodeType,
+  overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<void> => {
-    const resolved = resolveXPath(key, overrides);
-    await waitForXPath(resolved.XPath);
-    clickButton(resolved.XPath);
-    await new Promise<void>((r) => globalThis.setTimeout(r, resolved.DelayMs));
+  const resolved = resolveXPath(key, overrides);
+  await waitForXPath(resolved.XPath);
+  clickButton(resolved.XPath);
+  await new Promise<void>((r) => globalThis.setTimeout(r, resolved.DelayMs));
 };
 
 export const runSignOut = async (
-    overrides: ReadonlyArray<XPathSettingSeed>,
+  overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<SignOutResult> => {
-    const startedAt = Date.now();
+  const startedAt = Date.now();
 
-    try {
-        await clickXPath(XPathKeyCodeType.ProfileButton, overrides);
-        await clickXPath(XPathKeyCodeType.SignOutButton, overrides);
+  try {
+    await clickXPath(XPathKeyCodeType.ProfileButton, overrides);
+    await clickXPath(XPathKeyCodeType.SignOutButton, overrides);
 
-        return { Succeeded: true, DurationMs: Date.now() - startedAt, Error: null };
-    } catch (caught: unknown) {
-        const message = caught instanceof Error ? caught.message : String(caught);
+    return { Succeeded: true, DurationMs: Date.now() - startedAt, Error: null };
+  } catch (caught: unknown) {
+    const message = caught instanceof Error ? caught.message : String(caught);
 
-        return { Succeeded: false, DurationMs: Date.now() - startedAt, Error: message };
-    }
+    return { Succeeded: false, DurationMs: Date.now() - startedAt, Error: message };
+  }
 };

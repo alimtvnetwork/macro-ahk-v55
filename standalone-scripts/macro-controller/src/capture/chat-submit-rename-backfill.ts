@@ -36,6 +36,7 @@ async function handleRename(projectId: string, oldName: string | null, newName: 
 
     return;
   }
+
   const isRenamed = await renameProjectChatSubmits(projectId, newName);
   if (!isRenamed) {
     logError(SCOPE, `renameProjectChatSubmits failed (projectId=${projectId}, oldName=${oldName ?? 'null'}, newName=${newName})`);
@@ -43,7 +44,10 @@ async function handleRename(projectId: string, oldName: string | null, newName: 
 }
 
 export function installChatSubmitRenameBackfill(): void {
-  if (isInstalled) return;
+  if (isInstalled) {
+    return;
+  }
+
   isInstalled = true;
   unsubscribe = subscribeProjectNameChange((projectId, oldName, newName) => {
     void handleRename(projectId, oldName, newName);
@@ -52,7 +56,10 @@ export function installChatSubmitRenameBackfill(): void {
 
 /** Test helper — tear down the singleton subscription between specs. */
 export function _resetChatSubmitRenameBackfillForTests(): void {
-  if (unsubscribe) unsubscribe();
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
   unsubscribe = null;
   isInstalled = false;
 }

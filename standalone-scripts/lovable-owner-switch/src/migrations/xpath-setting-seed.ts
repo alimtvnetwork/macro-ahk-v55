@@ -17,17 +17,17 @@ export interface XPathSettingSeed {
 }
 
 const buildSeeds = (): ReadonlyArray<XPathSettingSeed> => {
-    const out: XPathSettingSeed[] = [];
+  const out: XPathSettingSeed[] = [];
 
-    for (const key of Object.values(XPathKeyCodeType)) {
-        out.push({
-            KeyCode: key,
-            XPath: DefaultXPaths[key],
-            DelayMs: DefaultDelaysMs[key],
-        });
-    }
+  for (const key of Object.values(XPathKeyCodeType)) {
+    out.push({
+      KeyCode: key,
+      XPath: DefaultXPaths[key],
+      DelayMs: DefaultDelaysMs[key],
+    });
+  }
 
-    return Object.freeze(out);
+  return Object.freeze(out);
 };
 
 export const XPATH_SETTING_SEEDS: ReadonlyArray<XPathSettingSeed> = buildSeeds();

@@ -23,36 +23,46 @@ const HIDDEN_SCRIPT_PATHS = new Set(["combo-switch.js", "macro-controller.js"]);
 /* ------------------------------------------------------------------ */
 
 function normalizeScriptPath(path: string): string {
-    const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
-    const fileName = normalized.split("/").pop() ?? normalized;
+  const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
+  const fileName = normalized.split("/").pop() ?? normalized;
 
-    return fileName.split(/[?#]/)[0] ?? fileName;
+  return fileName.split(/[?#]/)[0] ?? fileName;
 }
 
 function isToggleableScript(script: ScriptEntry): boolean {
-    const normalizedPath = normalizeScriptPath(script.path);
-    const normalizedId = (script.id ?? "").trim().toLowerCase();
+  const normalizedPath = normalizeScriptPath(script.path);
+  const normalizedId = (script.id ?? "").trim().toLowerCase();
 
-    return TOGGLEABLE_SCRIPT_PATHS.has(normalizedPath)
+  return TOGGLEABLE_SCRIPT_PATHS.has(normalizedPath)
         || TOGGLEABLE_SCRIPT_IDS.has(normalizedId);
 }
 
 function isHiddenScript(script: ScriptEntry): boolean {
-    return HIDDEN_SCRIPT_PATHS.has(normalizeScriptPath(script.path));
+  return HIDDEN_SCRIPT_PATHS.has(normalizeScriptPath(script.path));
 }
 
 function resolveStatusIcon(status: string): string {
-    if (status === "injected") return "✅";
-    if (status === "failed") return "❌";
+  if (status === "injected") {
+    return "✅";
+  }
 
-    return "⬚";
+  if (status === "failed") {
+    return "❌";
+  }
+
+  return "⬚";
 }
 
 function resolveStatusClass(status: string): string {
-    if (status === "injected") return "injected";
-    if (status === "failed") return "failed";
+  if (status === "injected") {
+    return "injected";
+  }
 
-    return "inactive";
+  if (status === "failed") {
+    return "failed";
+  }
+
+  return "inactive";
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,162 +79,162 @@ interface ScriptsListProps {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 export function ScriptsList({
-    project,
-    onInjectSingle,
-    onToggleScript,
+  project,
+  onInjectSingle,
+  onToggleScript,
 }: ScriptsListProps) {
-    const platform = getPlatform();
-    const [hiddenScripts, setHiddenScripts] = useState<Set<string>>(new Set());
-    const [reinjectingScript, setReinjectingScript] = useState<string | null>(null);
+  const platform = getPlatform();
+  const [hiddenScripts, setHiddenScripts] = useState<Set<string>>(new Set());
+  const [reinjectingScript, setReinjectingScript] = useState<string | null>(null);
 
-    const activeProject = project?.activeProject ?? null;
-    const injected = project?.injectedScripts ?? {};
-    const scriptStates = useMemo(() => project?.scriptStates ?? {}, [project?.scriptStates]);
+  const activeProject = project?.activeProject ?? null;
+  const injected = project?.injectedScripts ?? {};
+  const scriptStates = useMemo(() => project?.scriptStates ?? {}, [project?.scriptStates]);
 
-    const allScripts = activeProject?.scripts ?? [];
-    const visibleScripts = allScripts.filter(
-        (s) => !isHiddenScript(s) && !hiddenScripts.has(s.path),
-    );
+  const allScripts = activeProject?.scripts ?? [];
+  const visibleScripts = allScripts.filter(
+    (s) => !isHiddenScript(s) && !hiddenScripts.has(s.path),
+  );
 
-    const handleToggle = useCallback(
-        (script: ScriptEntry) => {
-            const scriptId = script.id
+  const handleToggle = useCallback(
+    (script: ScriptEntry) => {
+      const scriptId = script.id
                 ?? (scriptStates as any)[script.path]?.id
                 ?? script.path;
-            onToggleScript(scriptId);
-        },
-        [scriptStates, onToggleScript],
-    );
+      onToggleScript(scriptId);
+    },
+    [scriptStates, onToggleScript],
+  );
 
-    const handleReinject = useCallback(
-        async (script: ScriptEntry) => {
-            setReinjectingScript(script.path);
-            try {
-                await onInjectSingle(script);
-            } finally {
-                setTimeout(() => setReinjectingScript(null), 1500);
-            }
-        },
-        [onInjectSingle],
-    );
+  const handleReinject = useCallback(
+    async (script: ScriptEntry) => {
+      setReinjectingScript(script.path);
+      try {
+        await onInjectSingle(script);
+      } finally {
+        setTimeout(() => setReinjectingScript(null), 1500);
+      }
+    },
+    [onInjectSingle],
+  );
 
-    const handleDelete = useCallback(
-        (script: ScriptEntry) => {
-            setHiddenScripts((prev) => new Set(prev).add(script.path));
-            const scriptId = script.id ?? "";
-            if (scriptId) {
-                void platform.sendMessage({
-                    type: "TOGGLE_SCRIPT",
-                    id: scriptId,
-                    forceDisable: true,
-                });
-            }
-        },
-        [platform],
-    );
+  const handleDelete = useCallback(
+    (script: ScriptEntry) => {
+      setHiddenScripts((prev) => new Set(prev).add(script.path));
+      const scriptId = script.id ?? "";
+      if (scriptId) {
+        void platform.sendMessage({
+          type: "TOGGLE_SCRIPT",
+          id: scriptId,
+          forceDisable: true,
+        });
+      }
+    },
+    [platform],
+  );
 
-    const handleJsEdit = useCallback(
-        (script: ScriptEntry) => {
-            const url = platform.getExtensionUrl(
-                `src/options/options.html#scripts?edit=${encodeURIComponent(script.path)}`,
-            );
-            platform.tabs.openUrl(url);
-        },
-        [platform],
-    );
+  const handleJsEdit = useCallback(
+    (script: ScriptEntry) => {
+      const url = platform.getExtensionUrl(
+        `src/options/options.html#scripts?edit=${encodeURIComponent(script.path)}`,
+      );
+      platform.tabs.openUrl(url);
+    },
+    [platform],
+  );
 
-    const handleConfigEdit = useCallback(
-        (configBinding: string) => {
-            const url = platform.getExtensionUrl(
-                `src/options/options.html#configs?edit=${encodeURIComponent(configBinding)}`,
-            );
-            platform.tabs.openUrl(url);
-        },
-        [platform],
-    );
+  const handleConfigEdit = useCallback(
+    (configBinding: string) => {
+      const url = platform.getExtensionUrl(
+        `src/options/options.html#configs?edit=${encodeURIComponent(configBinding)}`,
+      );
+      platform.tabs.openUrl(url);
+    },
+    [platform],
+  );
 
-    const title = activeProject
-        ? `Scripts — ${activeProject.name}`
-        : "Scripts";
+  const title = activeProject
+    ? `Scripts — ${activeProject.name}`
+    : "Scripts";
 
-    return (
-        <div className="section">
-            <div className="section-title">📜 {title}</div>
-            {visibleScripts.length === 0 ? (
-                <div className="empty-state">
-                    {activeProject ? "No scripts configured" : "No active project"}
-                </div>
-            ) : (
-                <div>
-                    {visibleScripts.map((script) => {
-                        const scriptId = script.id
+  return (
+    <div className="section">
+      <div className="section-title">📜 {title}</div>
+      {visibleScripts.length === 0 ? (
+        <div className="empty-state">
+          {activeProject ? "No scripts configured" : "No active project"}
+        </div>
+      ) : (
+        <div>
+          {visibleScripts.map((script) => {
+            const scriptId = script.id
                             ?? (scriptStates as any)[script.path]?.id
                             ?? "";
-                        const statusInfo = (injected as any)[script.path];
-                        const statusLabel = statusInfo?.status ?? "not loaded";
-                        const isEnabled = (scriptStates as any)[script.path]?.isEnabled
+            const statusInfo = (injected as any)[script.path];
+            const statusLabel = statusInfo?.status ?? "not loaded";
+            const isEnabled = (scriptStates as any)[script.path]?.isEnabled
                             ?? (script.isEnabled !== false);
-                        const isToggleable = isToggleableScript(script);
-                        const isReinjectingThis = reinjectingScript === script.path;
-                        const hasConfig = script.configBinding != null
+            const isToggleable = isToggleableScript(script);
+            const isReinjectingThis = reinjectingScript === script.path;
+            const hasConfig = script.configBinding != null
                             && script.configBinding !== "";
 
-                        return (
-                            <div
-                                key={script.path}
-                                className={`script-row${!isEnabled ? " script-row-disabled" : ""}`}
-                            >
-                                {isToggleable && (
-                                    <label className="script-toggle" title={isEnabled ? "Disable" : "Enable"}>
-                                        <input
-                                            type="checkbox"
-                                            className="script-toggle-input"
-                                            checked={isEnabled}
-                                            onChange={() => handleToggle(script)}
-                                        />
-                                        <span className="script-toggle-slider" />
-                                    </label>
-                                )}
-                                <span className="script-name">{script.path}</span>
-                                <span className="script-world">MAIN</span>
-                                <span className={`script-status ${resolveStatusClass(statusLabel)}`}>
-                                    {resolveStatusIcon(statusLabel)} {statusLabel}
-                                </span>
-                                <button
-                                    className="btn-link btn-js-edit"
-                                    onClick={() => handleJsEdit(script)}
-                                    title={`Edit JavaScript for ${script.path}`}
-                                >
+            return (
+              <div
+                key={script.path}
+                className={`script-row${!isEnabled ? " script-row-disabled" : ""}`}
+              >
+                {isToggleable && (
+                  <label className="script-toggle" title={isEnabled ? "Disable" : "Enable"}>
+                    <input
+                      type="checkbox"
+                      className="script-toggle-input"
+                      checked={isEnabled}
+                      onChange={() => handleToggle(script)}
+                    />
+                    <span className="script-toggle-slider" />
+                  </label>
+                )}
+                <span className="script-name">{script.path}</span>
+                <span className="script-world">MAIN</span>
+                <span className={`script-status ${resolveStatusClass(statusLabel)}`}>
+                  {resolveStatusIcon(statusLabel)} {statusLabel}
+                </span>
+                <button
+                  className="btn-link btn-js-edit"
+                  onClick={() => handleJsEdit(script)}
+                  title={`Edit JavaScript for ${script.path}`}
+                >
                                     JS Edit
-                                </button>
-                                {hasConfig && (
-                                    <button
-                                        className="btn-link btn-config-edit"
-                                        onClick={() => handleConfigEdit(script.configBinding!)}
-                                        title={`Edit config for ${script.path}`}
-                                    >
+                </button>
+                {hasConfig && (
+                  <button
+                    className="btn-link btn-config-edit"
+                    onClick={() => handleConfigEdit(script.configBinding!)}
+                    title={`Edit config for ${script.path}`}
+                  >
                                         Config
-                                    </button>
-                                )}
-                                <button
-                                    className="btn-small"
-                                    disabled={isReinjectingThis}
-                                    onClick={() => void handleReinject(script)}
-                                >
-                                    {isReinjectingThis ? "⏳" : "Reinject"}
-                                </button>
-                                <button
-                                    className="btn-small btn-delete"
-                                    onClick={() => handleDelete(script)}
-                                    title="Remove from list"
-                                >
+                  </button>
+                )}
+                <button
+                  className="btn-small"
+                  disabled={isReinjectingThis}
+                  onClick={() => void handleReinject(script)}
+                >
+                  {isReinjectingThis ? "⏳" : "Reinject"}
+                </button>
+                <button
+                  className="btn-small btn-delete"
+                  onClick={() => handleDelete(script)}
+                  title="Remove from list"
+                >
                                     ✕
-                                </button>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                </button>
+              </div>
+            );
+          })}
         </div>
-    );
+      )}
+    </div>
+  );
 }

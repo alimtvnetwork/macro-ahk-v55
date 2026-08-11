@@ -71,83 +71,83 @@ const PASCAL_CASE = /^[A-Z][A-Za-z0-9]*$/;
  * the CI guard and the runtime validator both pin against this map.
  */
 export const BUNDLE_SCHEMA: Readonly<Record<string, BundleTableContract>> = {
-    Projects: {
-        required: [
-            "Id", "Name", "Version", "CreatedAt", "UpdatedAt",
-            "TargetUrls", "Scripts", "Configs", "CookieRules", "Settings",
-        ],
-        optional: [
-            "Uid", "SchemaVersion", "Description",
-            // v5 additions — runtime fields that previously round-tripped as null
-            "Slug", "Cookies", "Dependencies", "IsGlobal", "IsRemovable",
-        ],
-    },
-    Scripts: {
-        required: ["Id", "Name", "Code", "RunOrder", "CreatedAt", "UpdatedAt"],
-        optional: [
-            "Uid", "Description", "RunAt", "ConfigBinding",
-            "IsIife", "HasDomUsage",
-            // v5 additions — auto-update path was being silently disabled on import
-            "UpdateUrl", "LastUpdateCheck",
-        ],
-    },
-    Configs: {
-        required: ["Id", "Name", "Json", "CreatedAt", "UpdatedAt"],
-        optional: ["Uid", "Description"],
-    },
-    Prompts: {
-        required: ["Id", "Name", "Text", "RunOrder", "CreatedAt", "UpdatedAt"],
-        optional: [
-            "Uid", "IsDefault", "IsFavorite", "Category",
-            // PromptsDetails view + runtime PromptsToCategory rollups can
-            // surface these in alternate exports — accept but never require.
-            "Slug", "Version", "SortOrder",
-        ],
-    },
-    Meta: {
-        required: ["Id", "Key", "Value"],
-        optional: [],
-    },
-    /**
+  Projects: {
+    required: [
+      "Id", "Name", "Version", "CreatedAt", "UpdatedAt",
+      "TargetUrls", "Scripts", "Configs", "CookieRules", "Settings",
+    ],
+    optional: [
+      "Uid", "SchemaVersion", "Description",
+      // v5 additions — runtime fields that previously round-tripped as null
+      "Slug", "Cookies", "Dependencies", "IsGlobal", "IsRemovable",
+    ],
+  },
+  Scripts: {
+    required: ["Id", "Name", "Code", "RunOrder", "CreatedAt", "UpdatedAt"],
+    optional: [
+      "Uid", "Description", "RunAt", "ConfigBinding",
+      "IsIife", "HasDomUsage",
+      // v5 additions — auto-update path was being silently disabled on import
+      "UpdateUrl", "LastUpdateCheck",
+    ],
+  },
+  Configs: {
+    required: ["Id", "Name", "Json", "CreatedAt", "UpdatedAt"],
+    optional: ["Uid", "Description"],
+  },
+  Prompts: {
+    required: ["Id", "Name", "Text", "RunOrder", "CreatedAt", "UpdatedAt"],
+    optional: [
+      "Uid", "IsDefault", "IsFavorite", "Category",
+      // PromptsDetails view + runtime PromptsToCategory rollups can
+      // surface these in alternate exports — accept but never require.
+      "Slug", "Version", "SortOrder",
+    ],
+  },
+  Meta: {
+    required: ["Id", "Key", "Value"],
+    optional: [],
+  },
+  /**
      * v6: row-per-dependency promotion of Projects.Dependencies JSON blob.
      * Optional table (absent in v4/v5 bundles, present in v6+ emits).
      */
-    Dependencies: {
-        required: [
-            "Id", "ProjectUid", "DependsOnProjectId",
-            "CreatedAt", "UpdatedAt",
-        ],
-        optional: ["Uid", "Version"],
-    },
-    /**
+  Dependencies: {
+    required: [
+      "Id", "ProjectUid", "DependsOnProjectId",
+      "CreatedAt", "UpdatedAt",
+    ],
+    optional: ["Uid", "Version"],
+  },
+  /**
      * v6: row-per-variable promotion of Projects.Settings.variables map.
      * Value is JSON-stringified to preserve non-string types (objects,
      * arrays, booleans, null) on round-trip. Optional table.
      */
-    Variables: {
-        required: [
-            "Id", "ProjectUid", "Name",
-            "CreatedAt", "UpdatedAt",
-        ],
-        optional: ["Uid", "Value"],
-    },
-    /**
+  Variables: {
+    required: [
+      "Id", "ProjectUid", "Name",
+      "CreatedAt", "UpdatedAt",
+    ],
+    optional: ["Uid", "Value"],
+  },
+  /**
      * v6: prompt category catalog. Optional — absent in v4/v5 bundles.
      * Names are globally unique; SortOrder reflects discovery order.
      */
-    PromptsCategory: {
-        required: ["Id", "Name", "CreatedAt"],
-        optional: ["Uid", "SortOrder"],
-    },
-    /**
+  PromptsCategory: {
+    required: ["Id", "Name", "CreatedAt"],
+    optional: ["Uid", "SortOrder"],
+  },
+  /**
      * v6: many-to-many junction between Prompts and PromptsCategory.
      * Stores PromptUid + CategoryName directly (not INTEGER Id pairs) so
      * the bundle is self-contained even without follow-up Id lookups.
      */
-    PromptsToCategory: {
-        required: ["Id", "PromptUid", "CategoryName", "CreatedAt"],
-        optional: [],
-    },
+  PromptsToCategory: {
+    required: ["Id", "PromptUid", "CategoryName", "CreatedAt"],
+    optional: [],
+  },
 } as const;
 
 /** Tables that MUST exist in a full bundle. */
@@ -217,193 +217,203 @@ export interface SqlExecCapable {
  */
 /* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */
 export function validateBundleSchema(
-    db: SqlExecCapable,
-    mode: BundleModeType = "full",
+  db: SqlExecCapable,
+  mode: BundleModeType = "full",
 ): BundleValidationResult {
-    const errors: BundleValidationError[] = [];
+  const errors: BundleValidationError[] = [];
 
-    let actualTables: string[] = [];
-    try {
-        const rows = db.exec(
-            "SELECT name FROM sqlite_master WHERE type='table' " +
+  let actualTables: string[] = [];
+  try {
+    const rows = db.exec(
+      "SELECT name FROM sqlite_master WHERE type='table' " +
             "AND name NOT LIKE 'sqlite_%'",
-        );
-        actualTables = rows[0]?.values.map((r) => String(r[0])) ?? [];
-    } catch (e) {
-        return {
-            ok: false,
-            formatVersion: null,
-            errors: [{
-                code: "READ_ERROR",
-                message: `Cannot read sqlite_master from bundle: ${(e as Error).message}`,
-            }],
-        };
+    );
+    actualTables = rows[0]?.values.map((r) => String(r[0])) ?? [];
+  } catch (e) {
+    return {
+      ok: false,
+      formatVersion: null,
+      errors: [{
+        code: "READ_ERROR",
+        message: `Cannot read sqlite_master from bundle: ${(e as Error).message}`,
+      }],
+    };
+  }
+
+  /* ---- 1. Required tables present ---- */
+  const requiredTables = mode === "full"
+    ? REQUIRED_TABLES
+    : REQUIRED_PROMPTS_ONLY_TABLES;
+  for (const t of requiredTables) {
+    if (!actualTables.includes(t)) {
+      // Friendlier hint when the legacy lowercase variant exists
+      const legacy = t.toLowerCase();
+      const hint = actualTables.includes(legacy)
+        ? ` Found legacy '${legacy}' instead — bundle predates the PascalCase migration (v4) and must be re-exported from a newer build.`
+        : "";
+      errors.push({
+        code: "MISSING_TABLE",
+        table: t,
+        message: `Required table '${t}' is missing from bundle.${hint}`,
+      });
+    }
+  }
+
+  /* ---- 2. Unknown / legacy table detection ---- */
+  for (const t of actualTables) {
+    if (BUNDLE_SCHEMA[t] !== undefined) {
+      continue;
     }
 
-    /* ---- 1. Required tables present ---- */
-    const requiredTables = mode === "full"
-        ? REQUIRED_TABLES
-        : REQUIRED_PROMPTS_ONLY_TABLES;
-    for (const t of requiredTables) {
-        if (!actualTables.includes(t)) {
-            // Friendlier hint when the legacy lowercase variant exists
-            const legacy = t.toLowerCase();
-            const hint = actualTables.includes(legacy)
-                ? ` Found legacy '${legacy}' instead — bundle predates the PascalCase migration (v4) and must be re-exported from a newer build.`
-                : "";
-            errors.push({
-                code: "MISSING_TABLE",
-                table: t,
-                message: `Required table '${t}' is missing from bundle.${hint}`,
-            });
-        }
-    }
-
-    /* ---- 2. Unknown / legacy table detection ---- */
-    for (const t of actualTables) {
-        if (BUNDLE_SCHEMA[t] !== undefined) continue;
-        // Distinguish "legacy snake_case" from "completely unknown" so the
-        // user gets a precise migration message rather than a generic one.
-        if (t.includes("_") || /^[a-z]/.test(t)) {
-            errors.push({
-                code: "LEGACY_SNAKE_CASE",
-                table: t,
-                message:
+    // Distinguish "legacy snake_case" from "completely unknown" so the
+    // user gets a precise migration message rather than a generic one.
+    if (t.includes("_") || /^[a-z]/.test(t)) {
+      errors.push({
+        code: "LEGACY_SNAKE_CASE",
+        table: t,
+        message:
                     `Bundle contains legacy table '${t}'. PascalCase is required ` +
                     `(format_version 4+). Re-export from a newer build of the extension.`,
-            });
-        } else if (!PASCAL_CASE.test(t)) {
-            errors.push({
-                code: "NON_PASCAL_TABLE",
-                table: t,
-                message: `Bundle table '${t}' is not PascalCase.`,
-            });
-        } else {
-            errors.push({
-                code: "UNKNOWN_TABLE",
-                table: t,
-                message:
+      });
+    } else if (!PASCAL_CASE.test(t)) {
+      errors.push({
+        code: "NON_PASCAL_TABLE",
+        table: t,
+        message: `Bundle table '${t}' is not PascalCase.`,
+      });
+    } else {
+      errors.push({
+        code: "UNKNOWN_TABLE",
+        table: t,
+        message:
                     `Bundle contains unknown table '${t}' that is not part of ` +
                     `the v4 contract. Refusing to import to avoid silent data loss.`,
-            });
-        }
+      });
     }
+  }
 
-    /* ---- 3. Per-table column checks ---- */
-    for (const tableName of Object.keys(BUNDLE_SCHEMA)) {
-        if (!actualTables.includes(tableName)) continue; // already reported above
-        const contract = BUNDLE_SCHEMA[tableName];
-        validateTableColumns(db, tableName, contract, errors);
-    }
+  /* ---- 3. Per-table column checks ---- */
+  for (const tableName of Object.keys(BUNDLE_SCHEMA)) {
+    if (!actualTables.includes(tableName)) {
+      continue;
+    } // already reported above
 
-    /* ---- 4. format_version gate ---- */
-    let formatVersion: string | null = null;
-    if (actualTables.includes("Meta")) {
-        try {
-            const rows = db.exec(
-                "SELECT Value FROM Meta WHERE Key = 'format_version'",
-            );
-            formatVersion = rows[0]?.values[0]?.[0] != null
-                ? String(rows[0].values[0][0])
-                : null;
-        } catch (err) {
-            // Fall back to legacy lowercase Meta — but that itself is a
-            // PascalCase violation already reported above. Don't double-fail.
-            console.warn("[sqlite-bundle-contract] Meta.format_version query failed; legacy schema suspected", err);
-        }
+    const contract = BUNDLE_SCHEMA[tableName];
+    validateTableColumns(db, tableName, contract, errors);
+  }
+
+  /* ---- 4. format_version gate ---- */
+  let formatVersion: string | null = null;
+  if (actualTables.includes("Meta")) {
+    try {
+      const rows = db.exec(
+        "SELECT Value FROM Meta WHERE Key = 'format_version'",
+      );
+      formatVersion = rows[0]?.values[0]?.[0] != null
+        ? String(rows[0].values[0][0])
+        : null;
+    } catch (err) {
+      // Fall back to legacy lowercase Meta — but that itself is a
+      // PascalCase violation already reported above. Don't double-fail.
+      console.warn("[sqlite-bundle-contract] Meta.format_version query failed; legacy schema suspected", err);
     }
-    if (formatVersion === null && mode === "full") {
-        errors.push({
-            code: "MISSING_FORMAT_VERSION",
-            message:
+  }
+
+  if (formatVersion === null && mode === "full") {
+    errors.push({
+      code: "MISSING_FORMAT_VERSION",
+      message:
                 "Bundle is missing Meta.format_version. v3 and earlier bundles " +
                 "are not supported by strict import — re-export from a newer build.",
-        });
-    } else if (
-        formatVersion !== null &&
+    });
+  } else if (
+    formatVersion !== null &&
         !SUPPORTED_FORMAT_VERSIONS.includes(formatVersion as typeof SUPPORTED_FORMAT_VERSIONS[number])
-    ) {
-        errors.push({
-            code: "UNSUPPORTED_FORMAT_VERSION",
-            message:
+  ) {
+    errors.push({
+      code: "UNSUPPORTED_FORMAT_VERSION",
+      message:
                 `Bundle declares format_version='${formatVersion}'. ` +
                 `This build supports: ${SUPPORTED_FORMAT_VERSIONS.join(", ")}.`,
-        });
-    }
+    });
+  }
 
-    return { ok: errors.length === 0, formatVersion, errors };
+  return { ok: errors.length === 0, formatVersion, errors };
 }
 
 /* eslint-disable-next-line max-lines-per-function */
 function validateTableColumns(
-    db: SqlExecCapable,
-    tableName: string,
-    contract: BundleTableContract,
-    errors: BundleValidationError[],
+  db: SqlExecCapable,
+  tableName: string,
+  contract: BundleTableContract,
+  errors: BundleValidationError[],
 ): void {
-    let actualColumns: string[];
-    try {
-        // PRAGMA table_info is schema-introspection — uses the table NAME
-        // as a literal identifier, not a bind value, so we inline-quote it
-        // (table is already validated against the contract whitelist).
-        const rows = db.exec(`PRAGMA table_info("${tableName}")`);
-        actualColumns = rows[0]?.values.map((r) => String(r[1])) ?? [];
-    } catch (e) {
-        errors.push({
-            code: "READ_ERROR",
-            table: tableName,
-            message: `Cannot introspect columns of '${tableName}': ${(e as Error).message}`,
-        });
+  let actualColumns: string[];
+  try {
+    // PRAGMA table_info is schema-introspection — uses the table NAME
+    // as a literal identifier, not a bind value, so we inline-quote it
+    // (table is already validated against the contract whitelist).
+    const rows = db.exec(`PRAGMA table_info("${tableName}")`);
+    actualColumns = rows[0]?.values.map((r) => String(r[1])) ?? [];
+  } catch (e) {
+    errors.push({
+      code: "READ_ERROR",
+      table: tableName,
+      message: `Cannot introspect columns of '${tableName}': ${(e as Error).message}`,
+    });
 
-        return;
-    }
+    return;
+  }
 
-    const allowed = new Set([...contract.required, ...contract.optional]);
+  const allowed = new Set([...contract.required, ...contract.optional]);
 
-    /* Missing required columns */
-    for (const col of contract.required) {
-        if (!actualColumns.includes(col)) {
-            errors.push({
-                code: "MISSING_COLUMN",
-                table: tableName,
-                column: col,
-                message:
+  /* Missing required columns */
+  for (const col of contract.required) {
+    if (!actualColumns.includes(col)) {
+      errors.push({
+        code: "MISSING_COLUMN",
+        table: tableName,
+        column: col,
+        message:
                     `Required column '${tableName}.${col}' is missing. ` +
                     `Bundle does not match the v4 PascalCase contract.`,
-            });
-        }
+      });
+    }
+  }
+
+  /* Unknown / legacy columns */
+  for (const col of actualColumns) {
+    if (allowed.has(col)) {
+      continue;
     }
 
-    /* Unknown / legacy columns */
-    for (const col of actualColumns) {
-        if (allowed.has(col)) continue;
-        if (col.includes("_") || /^[a-z]/.test(col)) {
-            errors.push({
-                code: "LEGACY_SNAKE_CASE",
-                table: tableName,
-                column: col,
-                message:
+    if (col.includes("_") || /^[a-z]/.test(col)) {
+      errors.push({
+        code: "LEGACY_SNAKE_CASE",
+        table: tableName,
+        column: col,
+        message:
                     `Bundle column '${tableName}.${col}' uses legacy ` +
                     `snake_case/camelCase. PascalCase is required (v4).`,
-            });
-        } else if (!PASCAL_CASE.test(col)) {
-            errors.push({
-                code: "NON_PASCAL_COLUMN",
-                table: tableName,
-                column: col,
-                message: `Column '${tableName}.${col}' is not PascalCase.`,
-            });
-        } else {
-            errors.push({
-                code: "UNKNOWN_COLUMN",
-                table: tableName,
-                column: col,
-                message:
+      });
+    } else if (!PASCAL_CASE.test(col)) {
+      errors.push({
+        code: "NON_PASCAL_COLUMN",
+        table: tableName,
+        column: col,
+        message: `Column '${tableName}.${col}' is not PascalCase.`,
+      });
+    } else {
+      errors.push({
+        code: "UNKNOWN_COLUMN",
+        table: tableName,
+        column: col,
+        message:
                     `Bundle has unknown column '${tableName}.${col}' not declared ` +
                     `in the v4 contract. Refusing to import to avoid silent data loss.`,
-            });
-        }
+      });
     }
+  }
 }
 
 /**
@@ -414,19 +424,22 @@ function validateTableColumns(
  * toast / dialog stays readable when an entire schema is wrong.
  */
 export function formatValidationError(result: BundleValidationResult): string {
-    if (result.ok) return "";
-    const MAX = 10;
-    const head = result.errors.slice(0, MAX).map((e, i) => `  ${i + 1}. [${e.code}] ${e.message}`);
-    const tail = result.errors.length > MAX
-        ? [`  … and ${result.errors.length - MAX} more error(s).`]
-        : [];
+  if (result.ok) {
+    return "";
+  }
 
-    return [
-        `Bundle schema validation failed (${result.errors.length} error${result.errors.length === 1 ? "" : "s"}):`,
-        ...head,
-        ...tail,
-        "",
-        "The bundle does not conform to the PascalCase v4 contract. " +
+  const MAX = 10;
+  const head = result.errors.slice(0, MAX).map((e, i) => `  ${i + 1}. [${e.code}] ${e.message}`);
+  const tail = result.errors.length > MAX
+    ? [`  … and ${result.errors.length - MAX} more error(s).`]
+    : [];
+
+  return [
+    `Bundle schema validation failed (${result.errors.length} error${result.errors.length === 1 ? "" : "s"}):`,
+    ...head,
+    ...tail,
+    "",
+    "The bundle does not conform to the PascalCase v4 contract. " +
         "Re-export from a current build of the extension, or use a migration tool.",
-    ].join("\n");
+  ].join("\n");
 }

@@ -45,13 +45,17 @@ export interface CaptureChatSubmitResult {
 }
 
 function truncateForOpfs(text: string): string {
-  if (text.length <= MAX_TEXT_CHARS) return text;
+  if (text.length <= MAX_TEXT_CHARS) {
+    return text;
+  }
 
   return text.slice(0, MAX_TEXT_CHARS);
 }
 
 function bodyForDisk(text: string, isVerbose: boolean): string {
-  if (!isVerbose) return REDACTED_PLACEHOLDER;
+  if (!isVerbose) {
+    return REDACTED_PLACEHOLDER;
+  }
 
   return truncateForOpfs(text);
 }
@@ -68,6 +72,7 @@ async function persistCapture(
   if (!fileId) {
     return { isCaptured: false, projectId, fileId: null, reason: 'opfs-save-failed' };
   }
+
   const isRowInserted = await insertChatSubmit({
     projectId, projectName, source, fileId,
     charCount: text.length, createdAt: Date.now(), metaJson,
@@ -75,6 +80,7 @@ async function persistCapture(
   if (!isRowInserted) {
     return { isCaptured: false, projectId, fileId, reason: 'db-insert-failed' };
   }
+
   // Fire-and-forget: enforcer failures are logged internally and must
   // not fail the capture — the row is already persisted.
   void enforceChatSubmitWindow(projectId).catch((err) => {
@@ -89,6 +95,7 @@ export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<
   if (trimmed.length === 0) {
     return { isCaptured: false, projectId: null, fileId: null, reason: 'empty-text' };
   }
+
   // Install rename backfill once + poll rename detection on every capture.
   // Cheap: install is idempotent; notify is a pure map lookup.
   installChatSubmitRenameBackfill();
@@ -99,6 +106,7 @@ export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<
 
     return { isCaptured: false, projectId: null, fileId: null, reason: 'no-project-id' };
   }
+
   const isVerbose = input.isVerbose === true;
   const metaJson = input.metaJson ?? null;
 

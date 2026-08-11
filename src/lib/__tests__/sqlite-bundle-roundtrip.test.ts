@@ -65,24 +65,28 @@ vi.mock("@/lib/message-client", () => ({
 
         return {};
       }
+
       case "SAVE_SCRIPT": {
         const s = msg.script as StoredScript;
         store.scripts = store.scripts.filter((x) => x.id !== s.id).concat(s);
 
         return {};
       }
+
       case "SAVE_CONFIG": {
         const c = msg.config as StoredConfig;
         store.configs = store.configs.filter((x) => x.id !== c.id).concat(c);
 
         return {};
       }
+
       case "SAVE_PROMPT": {
         const p = msg.prompt as PromptEntry;
         store.prompts = store.prompts.filter((x) => x.id !== p.id).concat(p);
 
         return {};
       }
+
       case "DELETE_PROJECT":
         store.projects = store.projects.filter((x) => x.id !== msg.projectId);
 
@@ -148,6 +152,7 @@ beforeEach(() => {
 
         return new Response(buf, { status: 200 });
       }
+
       throw new Error(`Unexpected fetch in test: ${path}`);
     }),
   );
@@ -324,224 +329,243 @@ describe("sqlite-bundle, full round-trip", () => {
     // eslint-disable-next-line sonarjs/cognitive-complexity -- single integration test asserting every contracted field
     async () => {
     /* ---- 1. Seed source workspace ---- */
-    const fixture = buildFixture();
-    store = structuredClone(fixture);
+      const fixture = buildFixture();
+      store = structuredClone(fixture);
 
-    /* ---- 2. Export ---- */
-    await exportAllAsSqliteZip();
-    expect(lastExportedBlob, "exporter should produce a Blob").not.toBeNull();
-    const exportedBlob = lastExportedBlob!;
-    expect(exportedBlob.size).toBeGreaterThan(0);
+      /* ---- 2. Export ---- */
+      await exportAllAsSqliteZip();
+      expect(lastExportedBlob, "exporter should produce a Blob").not.toBeNull();
+      const exportedBlob = lastExportedBlob!;
+      expect(exportedBlob.size).toBeGreaterThan(0);
 
-    /* ---- 3. Confirm zip envelope shape (one .db inside) ---- */
-    const JSZip = (await import("jszip")).default;
-    const zip = await JSZip.loadAsync(await exportedBlob.arrayBuffer());
-    const names = Object.keys(zip.files);
-    expect(names, "zip should contain exactly one entry").toEqual(["marco-backup.db"]);
+      /* ---- 3. Confirm zip envelope shape (one .db inside) ---- */
+      const JSZip = (await import("jszip")).default;
+      const zip = await JSZip.loadAsync(await exportedBlob.arrayBuffer());
+      const names = Object.keys(zip.files);
+      expect(names, "zip should contain exactly one entry").toEqual(["marco-backup.db"]);
 
-    /* ---- 4. Wipe workspace ---- */
-    store = { projects: [], scripts: [], configs: [], prompts: [] };
+      /* ---- 4. Wipe workspace ---- */
+      store = { projects: [], scripts: [], configs: [], prompts: [] };
 
-    /* ---- 5. Import the same zip as a File ---- */
-    const file = new File([exportedBlob], "marco-backup.zip", { type: "application/zip" });
-    const result = await importFromSqliteZip(file);
+      /* ---- 5. Import the same zip as a File ---- */
+      const file = new File([exportedBlob], "marco-backup.zip", { type: "application/zip" });
+      const result = await importFromSqliteZip(file);
 
-    /* ---- 6. Counts (v5: prompts now part of full round-trip) ---- */
-    expect(result).toEqual({
-      projectCount: fixture.projects.length,
-      scriptCount: fixture.scripts.length,
-      configCount: fixture.configs.length,
-      promptCount: fixture.prompts.length,
-    });
+      /* ---- 6. Counts (v5: prompts now part of full round-trip) ---- */
+      expect(result).toEqual({
+        projectCount: fixture.projects.length,
+        scriptCount: fixture.scripts.length,
+        configCount: fixture.configs.length,
+        promptCount: fixture.prompts.length,
+      });
 
-    /* ---- 7. Per-artifact deep equality ---- */
-    expect(store.projects).toHaveLength(fixture.projects.length);
-    expect(store.scripts).toHaveLength(fixture.scripts.length);
-    expect(store.configs).toHaveLength(fixture.configs.length);
-    expect(store.prompts).toHaveLength(fixture.prompts.length);
+      /* ---- 7. Per-artifact deep equality ---- */
+      expect(store.projects).toHaveLength(fixture.projects.length);
+      expect(store.scripts).toHaveLength(fixture.scripts.length);
+      expect(store.configs).toHaveLength(fixture.configs.length);
+      expect(store.prompts).toHaveLength(fixture.prompts.length);
 
-    const byId = <T extends { id: string }>(xs: T[]) =>
-      Object.fromEntries(xs.map((x) => [x.id, x]));
+      const byId = <T extends { id: string }>(xs: T[]) =>
+        Object.fromEntries(xs.map((x) => [x.id, x]));
 
-    /* Projects, every contracted field must come back identical, INCLUDING
+      /* Projects, every contracted field must come back identical, INCLUDING
      * the v5 additions (slug / cookies / dependencies / isGlobal /
      * isRemovable). Each of these was a documented data-loss bug pre-v5
      * and the audit's "P-1 / P-2 / P-3 / P-4" findings. */
-    const importedProject = byId(store.projects)["proj-uid-1"];
-    const sourceProject = fixture.projects[0];
-    expect(importedProject).toMatchObject({
-      id: sourceProject.id,
-      schemaVersion: sourceProject.schemaVersion,
-      name: sourceProject.name,
-      slug: sourceProject.slug,
-      version: sourceProject.version,
-      description: sourceProject.description,
-      targetUrls: sourceProject.targetUrls,
-      scripts: sourceProject.scripts,
-      configs: sourceProject.configs,
-      cookies: sourceProject.cookies,
-      cookieRules: sourceProject.cookieRules,
-      dependencies: sourceProject.dependencies,
-      settings: sourceProject.settings,
-      isGlobal: sourceProject.isGlobal,
-      isRemovable: sourceProject.isRemovable,
-      createdAt: sourceProject.createdAt,
-      updatedAt: sourceProject.updatedAt,
-    });
-
-    /* Scripts, boolean flags, optional fields, AND v5 update fields. */
-    for (const src of fixture.scripts) {
-      const imp = byId(store.scripts)[src.id];
-      expect(imp, `script ${src.id} survived round-trip`).toBeDefined();
-      expect(imp).toMatchObject({
-        id: src.id,
-        name: src.name,
-        code: src.code,
-        order: src.order,
-        isIife: src.isIife ?? false,
-        hasDomUsage: src.hasDomUsage ?? false,
-        createdAt: src.createdAt,
-        updatedAt: src.updatedAt,
+      const importedProject = byId(store.projects)["proj-uid-1"];
+      const sourceProject = fixture.projects[0];
+      expect(importedProject).toMatchObject({
+        id: sourceProject.id,
+        schemaVersion: sourceProject.schemaVersion,
+        name: sourceProject.name,
+        slug: sourceProject.slug,
+        version: sourceProject.version,
+        description: sourceProject.description,
+        targetUrls: sourceProject.targetUrls,
+        scripts: sourceProject.scripts,
+        configs: sourceProject.configs,
+        cookies: sourceProject.cookies,
+        cookieRules: sourceProject.cookieRules,
+        dependencies: sourceProject.dependencies,
+        settings: sourceProject.settings,
+        isGlobal: sourceProject.isGlobal,
+        isRemovable: sourceProject.isRemovable,
+        createdAt: sourceProject.createdAt,
+        updatedAt: sourceProject.updatedAt,
       });
-      // Optional fields, only assert when the source had them.
-      if (src.description !== undefined) expect(imp.description).toBe(src.description);
-      if (src.runAt !== undefined) expect(imp.runAt).toBe(src.runAt);
-      if (src.configBinding !== undefined) expect(imp.configBinding).toBe(src.configBinding);
-      // v5, auto-update path. Pre-v5, both fields silently became undefined.
-      if (src.updateUrl !== undefined) expect(imp.updateUrl).toBe(src.updateUrl);
-      if (src.lastUpdateCheck !== undefined) expect(imp.lastUpdateCheck).toBe(src.lastUpdateCheck);
-    }
 
-    /* Configs, JSON column must round-trip byte-identical. */
-    for (const src of fixture.configs) {
-      const imp = byId(store.configs)[src.id];
-      expect(imp).toMatchObject({
-        id: src.id,
-        name: src.name,
-        description: src.description,
-        json: src.json,
-        createdAt: src.createdAt,
-        updatedAt: src.updatedAt,
-      });
-    }
+      /* Scripts, boolean flags, optional fields, AND v5 update fields. */
+      for (const src of fixture.scripts) {
+        const imp = byId(store.scripts)[src.id];
+        expect(imp, `script ${src.id} survived round-trip`).toBeDefined();
+        expect(imp).toMatchObject({
+          id: src.id,
+          name: src.name,
+          code: src.code,
+          order: src.order,
+          isIife: src.isIife ?? false,
+          hasDomUsage: src.hasDomUsage ?? false,
+          createdAt: src.createdAt,
+          updatedAt: src.updatedAt,
+        });
+        // Optional fields, only assert when the source had them.
+        if (src.description !== undefined) {
+          expect(imp.description).toBe(src.description);
+        }
 
-    /* Prompts, full restore via mock store (was DB-only pre-v5). The Slug
+        if (src.runAt !== undefined) {
+          expect(imp.runAt).toBe(src.runAt);
+        }
+
+        if (src.configBinding !== undefined) {
+          expect(imp.configBinding).toBe(src.configBinding);
+        }
+
+        // v5, auto-update path. Pre-v5, both fields silently became undefined.
+        if (src.updateUrl !== undefined) {
+          expect(imp.updateUrl).toBe(src.updateUrl);
+        }
+
+        if (src.lastUpdateCheck !== undefined) {
+          expect(imp.lastUpdateCheck).toBe(src.lastUpdateCheck);
+        }
+      }
+
+      /* Configs, JSON column must round-trip byte-identical. */
+      for (const src of fixture.configs) {
+        const imp = byId(store.configs)[src.id];
+        expect(imp).toMatchObject({
+          id: src.id,
+          name: src.name,
+          description: src.description,
+          json: src.json,
+          createdAt: src.createdAt,
+          updatedAt: src.updatedAt,
+        });
+      }
+
+      /* Prompts, full restore via mock store (was DB-only pre-v5). The Slug
      * field is the headline v5 fix because the Task Next resolver keys on it. */
-    for (const src of fixture.prompts) {
-      const imp = byId(store.prompts)[src.id];
-      expect(imp, `prompt ${src.id} restored to message store`).toBeDefined();
-      expect(imp).toMatchObject({
-        id: src.id,
-        name: src.name,
-        text: src.text,
-        order: src.order,
-        isDefault: src.isDefault ?? false,
-        isFavorite: src.isFavorite ?? false,
-        createdAt: src.createdAt,
-        updatedAt: src.updatedAt,
+      for (const src of fixture.prompts) {
+        const imp = byId(store.prompts)[src.id];
+        expect(imp, `prompt ${src.id} restored to message store`).toBeDefined();
+        expect(imp).toMatchObject({
+          id: src.id,
+          name: src.name,
+          text: src.text,
+          order: src.order,
+          isDefault: src.isDefault ?? false,
+          isFavorite: src.isFavorite ?? false,
+          createdAt: src.createdAt,
+          updatedAt: src.updatedAt,
+        });
+        if (src.slug !== undefined) {
+          expect(imp.slug).toBe(src.slug);
+        }
+
+        if (src.category !== undefined) {
+          expect(imp.category).toBe(src.category);
+        }
+      }
+
+      /* ---- 8. Direct DB inspection, Meta + raw column shape ---- */
+      const dbBuf = await zip.file("marco-backup.db")!.async("uint8array");
+      const SQL = await initSqlJs({
+        locateFile: (f: string) =>
+          resolvePath(__dirname, "../../../node_modules/sql.js/dist", f),
       });
-      if (src.slug !== undefined) expect(imp.slug).toBe(src.slug);
-      if (src.category !== undefined) expect(imp.category).toBe(src.category);
-    }
+      const db = new SQL.Database(dbBuf);
 
-    /* ---- 8. Direct DB inspection, Meta + raw column shape ---- */
-    const dbBuf = await zip.file("marco-backup.db")!.async("uint8array");
-    const SQL = await initSqlJs({
-      locateFile: (f: string) =>
-        resolvePath(__dirname, "../../../node_modules/sql.js/dist", f),
-    });
-    const db = new SQL.Database(dbBuf);
-
-    /* Prompts, every PascalCase column must be present and accurate at
+      /* Prompts, every PascalCase column must be present and accurate at
      * the SQLite layer too (belt + braces against a future read regression). */
-    const promptsRows = db.exec(
-      "SELECT Uid, Slug, Name, Text, RunOrder, IsDefault, IsFavorite, Category " +
+      const promptsRows = db.exec(
+        "SELECT Uid, Slug, Name, Text, RunOrder, IsDefault, IsFavorite, Category " +
       "FROM Prompts ORDER BY RunOrder",
-    );
-    expect(promptsRows[0]?.values, "Prompts table populated").toHaveLength(
-      fixture.prompts.length,
-    );
-    const promptByUid = new Map(
-      promptsRows[0].values.map((row) => [String(row[0]), row]),
-    );
-    for (const src of fixture.prompts) {
-      const row = promptByUid.get(src.id);
-      expect(row, `prompt ${src.id} present in exported DB`).toBeDefined();
-      const [, slug, name, text, runOrder, isDefault, isFavorite, category] = row!;
-      expect(slug ?? null).toBe(src.slug ?? null);
-      expect(name).toBe(src.name);
-      expect(text).toBe(src.text);
-      expect(Number(runOrder)).toBe(src.order);
-      expect(Number(isDefault)).toBe(src.isDefault ? 1 : 0);
-      expect(Number(isFavorite)).toBe(src.isFavorite ? 1 : 0);
-      expect(category ?? null).toBe(src.category ?? null);
-    }
+      );
+      expect(promptsRows[0]?.values, "Prompts table populated").toHaveLength(
+        fixture.prompts.length,
+      );
+      const promptByUid = new Map(
+        promptsRows[0].values.map((row) => [String(row[0]), row]),
+      );
+      for (const src of fixture.prompts) {
+        const row = promptByUid.get(src.id);
+        expect(row, `prompt ${src.id} present in exported DB`).toBeDefined();
+        const [, slug, name, text, runOrder, isDefault, isFavorite, category] = row!;
+        expect(slug ?? null).toBe(src.slug ?? null);
+        expect(name).toBe(src.name);
+        expect(text).toBe(src.text);
+        expect(Number(runOrder)).toBe(src.order);
+        expect(Number(isDefault)).toBe(src.isDefault ? 1 : 0);
+        expect(Number(isFavorite)).toBe(src.isFavorite ? 1 : 0);
+        expect(category ?? null).toBe(src.category ?? null);
+      }
 
-    /* Projects, raw-DB inspection of the v5 PascalCase columns that were
+      /* Projects, raw-DB inspection of the v5 PascalCase columns that were
      * silently dropped pre-v5 (audit P-1: Cookies, P-2: Dependencies,
      * P-3: IsGlobal/IsRemovable, P-4: Slug). Asserting at the SQLite layer
      * (not just at the importer's parsed output) catches an entire class
      * of regressions where insertProjects drops a column but readProjects
      * happens to reconstruct it from elsewhere. */
-    const projectRows = db.exec(
-      "SELECT Uid, Slug, Cookies, Dependencies, IsGlobal, IsRemovable " +
+      const projectRows = db.exec(
+        "SELECT Uid, Slug, Cookies, Dependencies, IsGlobal, IsRemovable " +
       "FROM Projects",
-    );
-    expect(projectRows[0]?.values, "Projects table populated").toHaveLength(
-      fixture.projects.length,
-    );
-    const projectByUid = new Map(
-      projectRows[0].values.map((row) => [String(row[0]), row]),
-    );
-    for (const src of fixture.projects) {
-      const row = projectByUid.get(src.id);
-      expect(row, `project ${src.id} present in exported DB`).toBeDefined();
-      const [, slug, cookiesJson, depsJson, isGlobal, isRemovable] = row!;
-      expect(slug ?? null).toBe(src.slug ?? null);
-      // JSON-encoded columns: parse and deep-compare so whitespace / key
-      // ordering differences in JSON.stringify don't fail the test.
-      expect(JSON.parse(String(cookiesJson))).toEqual(src.cookies ?? []);
-      expect(JSON.parse(String(depsJson))).toEqual(src.dependencies ?? []);
-      expect(Number(isGlobal)).toBe(src.isGlobal ? 1 : 0);
-      expect(Number(isRemovable)).toBe(src.isRemovable === false ? 0 : 1);
-    }
+      );
+      expect(projectRows[0]?.values, "Projects table populated").toHaveLength(
+        fixture.projects.length,
+      );
+      const projectByUid = new Map(
+        projectRows[0].values.map((row) => [String(row[0]), row]),
+      );
+      for (const src of fixture.projects) {
+        const row = projectByUid.get(src.id);
+        expect(row, `project ${src.id} present in exported DB`).toBeDefined();
+        const [, slug, cookiesJson, depsJson, isGlobal, isRemovable] = row!;
+        expect(slug ?? null).toBe(src.slug ?? null);
+        // JSON-encoded columns: parse and deep-compare so whitespace / key
+        // ordering differences in JSON.stringify don't fail the test.
+        expect(JSON.parse(String(cookiesJson))).toEqual(src.cookies ?? []);
+        expect(JSON.parse(String(depsJson))).toEqual(src.dependencies ?? []);
+        expect(Number(isGlobal)).toBe(src.isGlobal ? 1 : 0);
+        expect(Number(isRemovable)).toBe(src.isRemovable === false ? 0 : 1);
+      }
 
-    /* Scripts, raw-DB inspection of v5 auto-update columns. Pre-v5 these
+      /* Scripts, raw-DB inspection of v5 auto-update columns. Pre-v5 these
      * were never emitted, so the auto-update path was silently disabled
      * after every import. Belt + braces: assert at the SQLite layer too. */
-    const scriptRows = db.exec(
-      "SELECT Uid, UpdateUrl, LastUpdateCheck FROM Scripts",
-    );
-    expect(scriptRows[0]?.values, "Scripts table populated").toHaveLength(
-      fixture.scripts.length,
-    );
-    const scriptByUid = new Map(
-      scriptRows[0].values.map((row) => [String(row[0]), row]),
-    );
-    for (const src of fixture.scripts) {
-      const row = scriptByUid.get(src.id);
-      expect(row, `script ${src.id} present in exported DB`).toBeDefined();
-      const [, updateUrl, lastUpdateCheck] = row!;
-      expect((updateUrl as string | null) ?? null).toBe(src.updateUrl ?? null);
-      expect((lastUpdateCheck as string | null) ?? null).toBe(
-        src.lastUpdateCheck ?? null,
+      const scriptRows = db.exec(
+        "SELECT Uid, UpdateUrl, LastUpdateCheck FROM Scripts",
       );
-    }
+      expect(scriptRows[0]?.values, "Scripts table populated").toHaveLength(
+        fixture.scripts.length,
+      );
+      const scriptByUid = new Map(
+        scriptRows[0].values.map((row) => [String(row[0]), row]),
+      );
+      for (const src of fixture.scripts) {
+        const row = scriptByUid.get(src.id);
+        expect(row, `script ${src.id} present in exported DB`).toBeDefined();
+        const [, updateUrl, lastUpdateCheck] = row!;
+        expect((updateUrl as string | null) ?? null).toBe(src.updateUrl ?? null);
+        expect((lastUpdateCheck as string | null) ?? null).toBe(
+          src.lastUpdateCheck ?? null,
+        );
+      }
 
-    /* Meta, declares format_version='6' (this build's emit version). */
-    const metaRows = db.exec(
-      "SELECT Key, Value FROM Meta WHERE Key IN ('format_version', 'exported_at')",
-    );
-    const meta = Object.fromEntries(
-      (metaRows[0]?.values ?? []).map((r) => [String(r[0]), String(r[1])]),
-    );
-    expect(meta.format_version).toBe("6");
-    expect(meta.exported_at, "exported_at is an ISO timestamp").toMatch(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
-    );
+      /* Meta, declares format_version='6' (this build's emit version). */
+      const metaRows = db.exec(
+        "SELECT Key, Value FROM Meta WHERE Key IN ('format_version', 'exported_at')",
+      );
+      const meta = Object.fromEntries(
+        (metaRows[0]?.values ?? []).map((r) => [String(r[0]), String(r[1])]),
+      );
+      expect(meta.format_version).toBe("6");
+      expect(meta.exported_at, "exported_at is an ISO timestamp").toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      );
 
-    db.close();
-  });
+      db.close();
+    });
 });
 
 /* ------------------------------------------------------------------ */

@@ -26,14 +26,14 @@ export interface TaskSignOutResult {
 const STUB_PENDING_MESSAGE = "Task sign-out stubbed — actual DOM clicks land in P18 (shared XPath module)";
 
 export const runTaskSignOut = async (
-    taskId: string, sink: UserAddLogSink,
+  taskId: string, sink: UserAddLogSink,
 ): Promise<TaskSignOutResult> => {
-    const startedAt = Date.now();
-    sink.write(buildUserAddEntry(
-        taskId, null, UserAddLogPhaseType.SignOut, UserAddLogSeverityType.Warn, STUB_PENDING_MESSAGE,
-    ));
+  const startedAt = Date.now();
+  sink.write(buildUserAddEntry(
+    taskId, null, UserAddLogPhaseType.SignOut, UserAddLogSeverityType.Warn, STUB_PENDING_MESSAGE,
+  ));
 
-    return Promise.resolve({
-        Succeeded: false, DurationMs: Date.now() - startedAt, Error: STUB_PENDING_MESSAGE,
-    });
+  return Promise.resolve({
+    Succeeded: false, DurationMs: Date.now() - startedAt, Error: STUB_PENDING_MESSAGE,
+  });
 };

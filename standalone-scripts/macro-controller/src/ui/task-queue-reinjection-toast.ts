@@ -59,8 +59,14 @@ function renderTaskQueueReinjectionToast(options: ReinjectionToastOptions): void
   const toast = createToastShell();
   const continueButton = createActionButton('Continue');
   const clearButton = createActionButton('Clear');
-  continueButton.onclick = function (): void { removeExistingToast(); };
-  clearButton.onclick = function (): void { void clearQueueAndToast(options); };
+  continueButton.onclick = function (): void {
+    removeExistingToast(); 
+  };
+
+  clearButton.onclick = function (): void {
+    void clearQueueAndToast(options); 
+  };
+
   toast.appendChild(createToastMessage(options.pendingCount));
   toast.appendChild(continueButton);
   toast.appendChild(clearButton);
@@ -77,6 +83,7 @@ export async function mountTaskQueueReinjectionToast(): Promise<void> {
 
       return;
     }
+
     renderTaskQueueReinjectionToast({ projectId, pendingCount, queue });
     log('TaskQueueReinjection: surfaced ' + pendingCount + ' queued tasks for project ' + projectId, 'info');
   } catch (caught: CaughtError) {

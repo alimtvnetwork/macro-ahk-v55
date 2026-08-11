@@ -67,58 +67,69 @@ export interface CsvParseFailure {
 export type CsvParseResult = CsvParseSuccess | CsvParseFailure;
 
 export function parseCsv(raw: string, context: CsvParseContext = {}): CsvParseResult {
-    const source = context.Source ?? null;
-    const guard = guardSize(raw, source);
-    if (guard !== null) { return guard; }
-    const stripped = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
-    const delimiter = detectDelimiter(stripped);
+  const source = context.Source ?? null;
+  const guard = guardSize(raw, source);
+  if (guard !== null) {
+    return guard; 
+  }
 
-    const tok = tokenize(stripped, delimiter, source);
-    if (tok.error !== null) { return tok.error; }
-    const records = trimTrailingBlankRecords(tok.records);
-    if (records.length === 0) {
-        return failCsv("CSV contained no rows after trimming blank lines.", null, "no-rows", source);
-    }
+  const stripped = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+  const delimiter = detectDelimiter(stripped);
 
-    const headers = normaliseHeaders(records[0]);
-    const headerErr = validateHeaders(headers, source);
-    if (headerErr !== null) { return headerErr; }
+  const tok = tokenize(stripped, delimiter, source);
+  if (tok.error !== null) {
+    return tok.error; 
+  }
 
-    const dataRows = records.slice(1);
-    if (dataRows.length > MAX_ROWS) {
-        return failCsv(
-            `CSV has ${dataRows.length} data rows; the limit is ${MAX_ROWS}. Reduce or split the file.`,
-            null, "row-limit", source,
-        );
-    }
+  const records = trimTrailingBlankRecords(tok.records);
+  if (records.length === 0) {
+    return failCsv("CSV contained no rows after trimming blank lines.", null, "no-rows", source);
+  }
 
-    const warnings = [...tok.warnings];
-    const aligned = alignRowsToHeaders(dataRows, headers.length, warnings);
+  const headers = normaliseHeaders(records[0]);
+  const headerErr = validateHeaders(headers, source);
+  if (headerErr !== null) {
+    return headerErr; 
+  }
 
-    return { Ok: true, Delimiter: delimiter, Headers: headers, Rows: aligned, Warnings: warnings };
+  const dataRows = records.slice(1);
+  if (dataRows.length > MAX_ROWS) {
+    return failCsv(
+      `CSV has ${dataRows.length} data rows; the limit is ${MAX_ROWS}. Reduce or split the file.`,
+      null, "row-limit", source,
+    );
+  }
+
+  const warnings = [...tok.warnings];
+  const aligned = alignRowsToHeaders(dataRows, headers.length, warnings);
+
+  return { Ok: true, Delimiter: delimiter, Headers: headers, Rows: aligned, Warnings: warnings };
 }
 
 function failCsv(
-    reason: string,
-    lineNumber: number | null,
-    branch: CsvFailureBranch,
-    source: string | null,
+  reason: string,
+  lineNumber: number | null,
+  branch: CsvFailureBranch,
+  source: string | null,
 ): CsvParseFailure {
-    const prefix = source !== null && source.length > 0 ? `[${source}] ` : "";
+  const prefix = source !== null && source.length > 0 ? `[${source}] ` : "";
 
-    return { Ok: false, Reason: `${prefix}${reason} (branch: ${branch})`, LineNumber: lineNumber, Branch: branch, Source: source };
+  return { Ok: false, Reason: `${prefix}${reason} (branch: ${branch})`, LineNumber: lineNumber, Branch: branch, Source: source };
 }
 
 function guardSize(raw: string, source: string | null): CsvParseFailure | null {
-    if (raw.length === 0) { return failCsv("CSV is empty.", null, "empty-input", source); }
-    if (raw.length > MAX_BYTES) {
-        return failCsv(
-            `CSV exceeds the ${formatBytes(MAX_BYTES)} in-memory limit (got ${formatBytes(raw.length)}). Trim the file or split it.`,
-            null, "size-limit", source,
-        );
-    }
+  if (raw.length === 0) {
+    return failCsv("CSV is empty.", null, "empty-input", source); 
+  }
 
-    return null;
+  if (raw.length > MAX_BYTES) {
+    return failCsv(
+      `CSV exceeds the ${formatBytes(MAX_BYTES)} in-memory limit (got ${formatBytes(raw.length)}). Trim the file or split it.`,
+      null, "size-limit", source,
+    );
+  }
+
+  return null;
 }
 
 interface TokenizerState {
@@ -131,61 +142,79 @@ interface TokenizerState {
 }
 
 function makeTokenizerState(): TokenizerState {
-    return { field: "", row: [], inQuotes: false, line: 1, records: [], warnings: [] };
+  return { field: "", row: [], inQuotes: false, line: 1, records: [], warnings: [] };
 }
 
 /** Consume one char while inside quotes. Returns new index (may skip an escaped quote). */
 function stepQuoted(source: string, i: number, ch: string, state: TokenizerState): number {
-    if (ch === '"') {
-        if (source[i + 1] === '"') { state.field += '"';
+  if (ch === '"') {
+    if (source[i + 1] === '"') {
+      state.field += '"';
 
- return i + 1; }
-        state.inQuotes = false;
-
-        return i;
+      return i + 1; 
     }
-    if (ch === "\n") { state.line++; }
-    state.field += ch;
+
+    state.inQuotes = false;
 
     return i;
+  }
+
+  if (ch === "\n") {
+    state.line++; 
+  }
+
+  state.field += ch;
+
+  return i;
 }
 
 function commitRow(state: TokenizerState): void {
-    state.row.push(state.field);
-    state.records.push(state.row);
-    state.row = [];
-    state.field = "";
-    state.line++;
+  state.row.push(state.field);
+  state.records.push(state.row);
+  state.row = [];
+  state.field = "";
+  state.line++;
 }
 
 /** Consume one char while not inside quotes. Returns new index. */
 function stepUnquoted(source: string, i: number, ch: string, delimiter: string, state: TokenizerState): number {
-    if (ch === '"') {
-        if (state.field.length === 0) { state.inQuotes = true;
+  if (ch === '"') {
+    if (state.field.length === 0) {
+      state.inQuotes = true;
 
- return i; }
-        state.field += ch;
-        if (state.warnings.length < 5) {
-            state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
-        }
-
-        return i;
+      return i; 
     }
-    if (ch === delimiter) { state.row.push(state.field); state.field = "";
 
- return i; }
-    if (ch === "\r") {
-        const next = source[i + 1] === "\n" ? i + 1 : i;
-        commitRow(state);
-
-        return next;
-    }
-    if (ch === "\n") { commitRow(state);
-
- return i; }
     state.field += ch;
+    if (state.warnings.length < 5) {
+      state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
+    }
 
     return i;
+  }
+
+  if (ch === delimiter) {
+    state.row.push(state.field); state.field = "";
+
+    return i; 
+  }
+
+  if (ch === "\r") {
+    const next = source[i + 1] === "\n" ? i + 1 : i;
+    commitRow(state);
+
+    return next;
+  }
+
+  if (ch === "\n") {
+    commitRow(state);
+
+    return i; 
+  }
+
+  state.field += ch;
+
+  return i;
 }
 
 function tokenize(source: string, delimiter: DelimiterType, sourceLabel: string | null): {
@@ -193,121 +222,159 @@ function tokenize(source: string, delimiter: DelimiterType, sourceLabel: string 
     warnings: string[];
     error: CsvParseFailure | null;
 } {
-    const state = makeTokenizerState();
-    for (let i = 0; i < source.length; i++) {
-        const ch = source[i];
-        i = state.inQuotes
-            ? stepQuoted(source, i, ch, state)
-            : stepUnquoted(source, i, ch, delimiter, state);
-    }
-    if (state.inQuotes) {
-        return {
-            records: [],
-            warnings: state.warnings,
-            error: failCsv(
-                `Unterminated quoted field, file ends inside a "..." block. Check for a missing closing quote near line ${state.line}.`,
-                state.line, "unterminated-quote", sourceLabel,
-            ),
-        };
-    }
-    if (state.field !== "" || state.row.length > 0) {
-        state.row.push(state.field);
-        state.records.push(state.row);
-    }
+  const state = makeTokenizerState();
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    i = state.inQuotes
+      ? stepQuoted(source, i, ch, state)
+      : stepUnquoted(source, i, ch, delimiter, state);
+  }
 
-    return { records: state.records, warnings: state.warnings, error: null };
+  if (state.inQuotes) {
+    return {
+      records: [],
+      warnings: state.warnings,
+      error: failCsv(
+        `Unterminated quoted field, file ends inside a "..." block. Check for a missing closing quote near line ${state.line}.`,
+        state.line, "unterminated-quote", sourceLabel,
+      ),
+    };
+  }
+
+  if (state.field !== "" || state.row.length > 0) {
+    state.row.push(state.field);
+    state.records.push(state.row);
+  }
+
+  return { records: state.records, warnings: state.warnings, error: null };
 }
 
 function trimTrailingBlankRecords(records: string[][]): string[][] {
-    const out = records.slice();
-    while (out.length > 0 && out[out.length - 1].every((c) => c === "")) { out.pop(); }
+  const out = records.slice();
+  while (out.length > 0 && out[out.length - 1].every((c) => c === "")) {
+    out.pop(); 
+  }
 
-    return out;
+  return out;
 }
 
 function validateHeaders(headers: ReadonlyArray<string>, source: string | null): CsvParseFailure | null {
-    const dupes = findDuplicateHeaders(headers);
-    if (dupes.length > 0) {
-        const quoted = dupes.map((h) => `"${h}"`).join(", ");
+  const dupes = findDuplicateHeaders(headers);
+  if (dupes.length > 0) {
+    const quoted = dupes.map((h) => `"${h}"`).join(", ");
 
-        return failCsv(
-            `Duplicate column header(s): ${quoted}. Each column must have a unique name.`,
-            1, "duplicate-headers", source,
-        );
-    }
-    if (headers.some((h) => h === "")) {
-        return failCsv(
-            "Header row contains an empty column name. Every column needs a header.",
-            1, "empty-header", source,
-        );
-    }
+    return failCsv(
+      `Duplicate column header(s): ${quoted}. Each column must have a unique name.`,
+      1, "duplicate-headers", source,
+    );
+  }
 
-    return null;
+  if (headers.some((h) => h === "")) {
+    return failCsv(
+      "Header row contains an empty column name. Every column needs a header.",
+      1, "empty-header", source,
+    );
+  }
+
+  return null;
 }
 
 function alignRowsToHeaders(dataRows: string[][], width: number, warnings: string[]): string[][] {
-    const aligned: string[][] = [];
-    let padCount = 0;
-    let truncCount = 0;
-    for (const original of dataRows) {
-        if (original.length < width) {
-            const padded = original.slice();
-            while (padded.length < width) { padded.push(""); }
-            aligned.push(padded);
-            padCount++;
-        } else if (original.length > width) {
-            aligned.push(original.slice(0, width));
-            truncCount++;
-        } else {
-            aligned.push(original);
-        }
-    }
-    if (padCount > 0) { warnings.push(`${padCount} row(s) had fewer columns than the header, padded with empty strings.`); }
-    if (truncCount > 0) { warnings.push(`${truncCount} row(s) had extra columns, extras were dropped.`); }
+  const aligned: string[][] = [];
+  let padCount = 0;
+  let truncCount = 0;
+  for (const original of dataRows) {
+    if (original.length < width) {
+      const padded = original.slice();
+      while (padded.length < width) {
+        padded.push(""); 
+      }
 
-    return aligned;
+      aligned.push(padded);
+      padCount++;
+    } else if (original.length > width) {
+      aligned.push(original.slice(0, width));
+      truncCount++;
+    } else {
+      aligned.push(original);
+    }
+  }
+
+  if (padCount > 0) {
+    warnings.push(`${padCount} row(s) had fewer columns than the header, padded with empty strings.`); 
+  }
+
+  if (truncCount > 0) {
+    warnings.push(`${truncCount} row(s) had extra columns, extras were dropped.`); 
+  }
+
+  return aligned;
 }
 
 function detectDelimiter(source: string): DelimiterType {
-    // Inspect the first line, ignoring quoted regions.
-    let inQuotes = false;
-    let commas = 0;
-    let semis = 0;
-    for (let i = 0; i < source.length; i++) {
-        const ch = source[i];
-        if (ch === '"') {
-            if (inQuotes && source[i + 1] === '"') { i++; continue; }
-            inQuotes = !inQuotes;
-            continue;
-        }
-        if (inQuotes) continue;
-        if (ch === "\n" || ch === "\r") break;
-        if (ch === ",") commas++;
-        else if (ch === ";") semis++;
+  // Inspect the first line, ignoring quoted regions.
+  let inQuotes = false;
+  let commas = 0;
+  let semis = 0;
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    if (ch === '"') {
+      if (inQuotes && source[i + 1] === '"') {
+        i++; continue; 
+      }
+
+      inQuotes = !inQuotes;
+      continue;
     }
 
-    return semis > commas ? ";" : ",";
+    if (inQuotes) {
+      continue;
+    }
+
+    if (ch === "\n" || ch === "\r") {
+      break;
+    }
+
+    if (ch === ",") {
+      commas++;
+    } else if (ch === ";") {
+      semis++;
+    }
+  }
+
+  return semis > commas ? ";" : ",";
 }
 
 function normaliseHeaders(cells: ReadonlyArray<string>): string[] {
-    return cells.map((c) => c.trim());
+  return cells.map((c) => c.trim());
 }
 
 function findDuplicateHeaders(headers: ReadonlyArray<string>): string[] {
-    const seen = new Set<string>();
-    const dupes = new Set<string>();
-    for (const h of headers) {
-        if (h === "") continue;
-        if (seen.has(h)) dupes.add(h);
-        else seen.add(h);
+  const seen = new Set<string>();
+  const dupes = new Set<string>();
+  for (const h of headers) {
+    if (h === "") {
+      continue;
     }
 
-    return Array.from(dupes);
+    if (seen.has(h)) {
+      dupes.add(h);
+    } else {
+      seen.add(h);
+    }
+  }
+
+  return Array.from(dupes);
 }
 
 function formatBytes(n: number): string {
-    if (n < 1024) return `${n} B`;
-    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  if (n < 1024) {
+    return `${n} B`;
+  }
 
-    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+  if (n < 1024 * 1024) {
+    return `${(n / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }

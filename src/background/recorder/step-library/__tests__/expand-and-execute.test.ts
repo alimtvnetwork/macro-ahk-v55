@@ -19,49 +19,55 @@ import initSqlJs, { type SqlJsStatic } from "sql.js";
 import { StepLibraryDb } from "../db";
 import { StepKindId, MAX_RUN_GROUP_CALL_DEPTH } from "../schema";
 import {
-    expandRunGroups,
-    executeRunGroup,
-    type ExpansionResult,
-    type ExpansionSuccess,
-    type ExpansionFailure,
-    type ExecuteRunGroupOutcome,
-    type ExecuteRunGroupFailure,
+  expandRunGroups,
+  executeRunGroup,
+  type ExpansionResult,
+  type ExpansionSuccess,
+  type ExpansionFailure,
+  type ExecuteRunGroupOutcome,
+  type ExecuteRunGroupFailure,
 } from "../run-group-runner";
 import type { FailureReport } from "../../failure-logger";
 
 let SQL: SqlJsStatic;
 
 beforeAll(async () => {
-    const wasmPath = resolve(__dirname, "../../../../../node_modules/sql.js/dist/sql-wasm.wasm");
-    const wasmBinary = readFileSync(wasmPath);
-    SQL = await initSqlJs({
-        wasmBinary: wasmBinary.buffer.slice(
-            wasmBinary.byteOffset,
-            wasmBinary.byteOffset + wasmBinary.byteLength,
-        ),
-    });
+  const wasmPath = resolve(__dirname, "../../../../../node_modules/sql.js/dist/sql-wasm.wasm");
+  const wasmBinary = readFileSync(wasmPath);
+  SQL = await initSqlJs({
+    wasmBinary: wasmBinary.buffer.slice(
+      wasmBinary.byteOffset,
+      wasmBinary.byteOffset + wasmBinary.byteLength,
+    ),
+  });
 });
 
 function freshDb(): StepLibraryDb {
-    return new StepLibraryDb(new SQL.Database());
+  return new StepLibraryDb(new SQL.Database());
 }
 
 function asExpansionSuccess(r: ExpansionResult): ExpansionSuccess {
-    if (!r.Ok) throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
+  if (!r.Ok) {
+    throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
+  }
 
-    return r;
+  return r;
 }
 
 function asExpansionFailure(r: ExpansionResult): ExpansionFailure {
-    if (r.Ok) throw new Error(`Expected expansion failure, got plan with ${r.Steps.length} steps`);
+  if (r.Ok) {
+    throw new Error(`Expected expansion failure, got plan with ${r.Steps.length} steps`);
+  }
 
-    return r;
+  return r;
 }
 
 function asExecuteFailure(r: ExecuteRunGroupOutcome): ExecuteRunGroupFailure {
-    if (r.Ok) throw new Error("Expected executeRunGroup to fail");
+  if (r.Ok) {
+    throw new Error("Expected executeRunGroup to fail");
+  }
 
-    return r;
+  return r;
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,104 +75,106 @@ function asExecuteFailure(r: ExecuteRunGroupOutcome): ExecuteRunGroupFailure {
 /* ------------------------------------------------------------------ */
 
 describe("expandRunGroups", () => {
-    it("flattens nested RunGroup chains preserving order + GroupPath", () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+  it("flattens nested RunGroup chains preserving order + GroupPath", () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
 
-        const root  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Root" });
-        const helper = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Helper" });
-        const inner  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Inner" });
+    const root  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Root" });
+    const helper = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Helper" });
+    const inner  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Inner" });
 
-        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Click, LabelType: "InnerA" });
-        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Type,  LabelType: "InnerB" });
+    db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Click, LabelType: "InnerA" });
+    db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Type,  LabelType: "InnerB" });
 
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Pre" });
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.RunGroup, TargetStepGroupId: inner, LabelType: "→Inner" });
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Post" });
+    db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Pre" });
+    db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.RunGroup, TargetStepGroupId: inner, LabelType: "→Inner" });
+    db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Post" });
 
-        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, LabelType: "Start" });
-        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.RunGroup, TargetStepGroupId: helper, LabelType: "→Helper" });
+    db.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, LabelType: "Start" });
+    db.appendStep({ StepGroupId: root, StepKindId: StepKindId.RunGroup, TargetStepGroupId: helper, LabelType: "→Helper" });
 
-        const plan = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: root }));
+    const plan = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: root }));
 
-        // No RunGroup steps survive expansion.
-        expect(plan.Steps.every(s => s.Step.StepKindId !== StepKindId.RunGroup)).toBe(true);
-        expect(plan.Steps.map(s => s.Step.LabelType)).toEqual([
-            "Start", "Pre", "InnerA", "InnerB", "Post",
-        ]);
-        expect(plan.Steps.map(s => s.GroupPath.join(">"))).toEqual([
-            "Root", "Root>Helper", "Root>Helper>Inner", "Root>Helper>Inner", "Root>Helper",
-        ]);
-        // PlanIndex is dense + sequential.
-        expect(plan.Steps.map(s => s.PlanIndex)).toEqual([0, 1, 2, 3, 4]);
-        expect(plan.GroupsVisited).toBe(3);
-    });
+    // No RunGroup steps survive expansion.
+    expect(plan.Steps.every(s => s.Step.StepKindId !== StepKindId.RunGroup)).toBe(true);
+    expect(plan.Steps.map(s => s.Step.LabelType)).toEqual([
+      "Start", "Pre", "InnerA", "InnerB", "Post",
+    ]);
+    expect(plan.Steps.map(s => s.GroupPath.join(">"))).toEqual([
+      "Root", "Root>Helper", "Root>Helper>Inner", "Root>Helper>Inner", "Root>Helper",
+    ]);
+    // PlanIndex is dense + sequential.
+    expect(plan.Steps.map(s => s.PlanIndex)).toEqual([0, 1, 2, 3, 4]);
+    expect(plan.GroupsVisited).toBe(3);
+  });
 
-    it("by default drops disabled steps from the plan; opt-in keeps them", () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
-        const sOn = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "On" });
-        const sOff = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "Off" });
-        db.raw.exec(`UPDATE Step SET IsDisabled = 1 WHERE StepId = ${sOff};`);
+  it("by default drops disabled steps from the plan; opt-in keeps them", () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
+    const sOn = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "On" });
+    const sOff = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "Off" });
+    db.raw.exec(`UPDATE Step SET IsDisabled = 1 WHERE StepId = ${sOff};`);
 
-        const dropped = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: g }));
-        expect(dropped.Steps.map(s => s.Step.StepId)).toEqual([sOn]);
-        expect(dropped.DisabledSkipped).toBe(1);
+    const dropped = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: g }));
+    expect(dropped.Steps.map(s => s.Step.StepId)).toEqual([sOn]);
+    expect(dropped.DisabledSkipped).toBe(1);
 
-        const kept = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: g, skipDisabled: false }));
-        expect(kept.Steps.map(s => s.Step.StepId)).toEqual([sOn, sOff]);
-        expect(kept.DisabledSkipped).toBe(0);
-    });
+    const kept = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: g, skipDisabled: false }));
+    expect(kept.Steps.map(s => s.Step.StepId)).toEqual([sOn, sOff]);
+    expect(kept.DisabledSkipped).toBe(0);
+  });
 
-    it("rejects cycles at expansion time without producing any plan steps from the bad branch", () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const a = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "A" });
-        const b = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "B" });
-        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.Click, LabelType: "leadIn" });
-        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, LabelType: "A→B" });
-        db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, LabelType: "B→A" });
+  it("rejects cycles at expansion time without producing any plan steps from the bad branch", () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const a = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "A" });
+    const b = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "B" });
+    db.appendStep({ StepGroupId: a, StepKindId: StepKindId.Click, LabelType: "leadIn" });
+    db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, LabelType: "A→B" });
+    db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, LabelType: "B→A" });
 
-        const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: a }));
-        expect(failure.Reason).toBe("RunGroupCycle");
-        // The pre-cycle leaf was already added to the plan — surfaced via PartialSteps.
-        expect(failure.PartialSteps.map(s => s.Step.LabelType)).toEqual(["leadIn"]);
-        expect(failure.CallStack).toEqual(["A", "B"]);
-    });
+    const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: a }));
+    expect(failure.Reason).toBe("RunGroupCycle");
+    // The pre-cycle leaf was already added to the plan — surfaced via PartialSteps.
+    expect(failure.PartialSteps.map(s => s.Step.LabelType)).toEqual(["leadIn"]);
+    expect(failure.CallStack).toEqual(["A", "B"]);
+  });
 
-    it("rejects depth overflow during expansion", () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const ids: number[] = [];
-        for (let i = 0; i < MAX_RUN_GROUP_CALL_DEPTH + 2; i++) {
-            ids.push(db.createGroup({
-                ProjectId: projectId, ParentStepGroupId: null, Name: `G${i}`,
-            }));
-        }
-        for (let i = 0; i < ids.length - 1; i++) {
-            db.appendStep({
-                StepGroupId: ids[i],
-                StepKindId: StepKindId.RunGroup,
-                TargetStepGroupId: ids[i + 1],
-                LabelType: `→G${i + 1}`,
-            });
-        }
-        const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: ids[0] }));
-        expect(failure.Reason).toBe("RunGroupDepthExceeded");
-    });
+  it("rejects depth overflow during expansion", () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const ids: number[] = [];
+    for (let i = 0; i < MAX_RUN_GROUP_CALL_DEPTH + 2; i++) {
+      ids.push(db.createGroup({
+        ProjectId: projectId, ParentStepGroupId: null, Name: `G${i}`,
+      }));
+    }
 
-    it("rejects unknown root and cross-project root", () => {
-        const db = freshDb();
-        const p1 = db.upsertProject({ ExternalId: "p1", Name: "P1" });
-        const p2 = db.upsertProject({ ExternalId: "p2", Name: "P2" });
-        const g = db.createGroup({ ProjectId: p1, ParentStepGroupId: null, Name: "Owned" });
+    for (let i = 0; i < ids.length - 1; i++) {
+      db.appendStep({
+        StepGroupId: ids[i],
+        StepKindId: StepKindId.RunGroup,
+        TargetStepGroupId: ids[i + 1],
+        LabelType: `→G${i + 1}`,
+      });
+    }
 
-        expect(asExpansionFailure(expandRunGroups({ db, projectId: p1, rootGroupId: 9999 })).Reason)
-            .toBe("MissingRootGroup");
-        expect(asExpansionFailure(expandRunGroups({ db, projectId: p2, rootGroupId: g })).Reason)
-            .toBe("TargetNotInProject");
-    });
+    const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: ids[0] }));
+    expect(failure.Reason).toBe("RunGroupDepthExceeded");
+  });
+
+  it("rejects unknown root and cross-project root", () => {
+    const db = freshDb();
+    const p1 = db.upsertProject({ ExternalId: "p1", Name: "P1" });
+    const p2 = db.upsertProject({ ExternalId: "p2", Name: "P2" });
+    const g = db.createGroup({ ProjectId: p1, ParentStepGroupId: null, Name: "Owned" });
+
+    expect(asExpansionFailure(expandRunGroups({ db, projectId: p1, rootGroupId: 9999 })).Reason)
+      .toBe("MissingRootGroup");
+    expect(asExpansionFailure(expandRunGroups({ db, projectId: p2, rootGroupId: g })).Reason)
+      .toBe("TargetNotInProject");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -174,95 +182,99 @@ describe("expandRunGroups", () => {
 /* ------------------------------------------------------------------ */
 
 function assertCanonicalReport(r: FailureReport): void {
-    // Every required field present + correctly-typed (smoke-check the schema).
-    expect(typeof r.Phase).toBe("string");
-    expect(typeof r.Message).toBe("string");
-    expect(typeof r.Reason).toBe("string");
-    expect(typeof r.ReasonDetail).toBe("string");
-    expect(typeof r.Timestamp).toBe("string");
-    expect(typeof r.SourceFile).toBe("string");
-    expect(typeof r.Verbose).toBe("boolean");
-    expect(Array.isArray(r.Selectors)).toBe(true);
-    expect(Array.isArray(r.Variables)).toBe(true);
-    // Nullables present even when null.
-    expect(r).toHaveProperty("StackTrace");
-    expect(r).toHaveProperty("DomContext");
-    expect(r).toHaveProperty("DataRow");
-    expect(r).toHaveProperty("ResolvedXPath");
-    expect(r).toHaveProperty("CapturedHtml");
-    expect(r).toHaveProperty("FormSnapshot");
+  // Every required field present + correctly-typed (smoke-check the schema).
+  expect(typeof r.Phase).toBe("string");
+  expect(typeof r.Message).toBe("string");
+  expect(typeof r.Reason).toBe("string");
+  expect(typeof r.ReasonDetail).toBe("string");
+  expect(typeof r.Timestamp).toBe("string");
+  expect(typeof r.SourceFile).toBe("string");
+  expect(typeof r.Verbose).toBe("boolean");
+  expect(Array.isArray(r.Selectors)).toBe(true);
+  expect(Array.isArray(r.Variables)).toBe(true);
+  // Nullables present even when null.
+  expect(r).toHaveProperty("StackTrace");
+  expect(r).toHaveProperty("DomContext");
+  expect(r).toHaveProperty("DataRow");
+  expect(r).toHaveProperty("ResolvedXPath");
+  expect(r).toHaveProperty("CapturedHtml");
+  expect(r).toHaveProperty("FormSnapshot");
 }
 
 describe("executeRunGroup", () => {
-    it("returns Ok+Result on success", async () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
+  it("returns Ok+Result on success", async () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
+    db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
 
-        const out = await executeRunGroup({
-            db, projectId, rootGroupId: g, executeLeafStep: () => null,
-        });
-        expect(out.Ok).toBe(true);
-        if (out.Ok) expect(out.Result.StepsExecuted).toBe(1);
+    const out = await executeRunGroup({
+      db, projectId, rootGroupId: g, executeLeafStep: () => null,
     });
+    expect(out.Ok).toBe(true);
+    if (out.Ok) {
+      expect(out.Result.StepsExecuted).toBe(1);
+    }
+  });
 
-    it("synthesizes a canonical FailureReport for cycle errors", async () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Loop" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, LabelType: "self" });
+  it("synthesizes a canonical FailureReport for cycle errors", async () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Loop" });
+    db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, LabelType: "self" });
 
-        const out = asExecuteFailure(await executeRunGroup({
-            db, projectId, rootGroupId: g, executeLeafStep: () => null,
-        }));
-        expect(out.Result.Reason).toBe("RunGroupCycle");
-        assertCanonicalReport(out.FailureReport);
-        expect(out.FailureReport.ReasonDetail).toContain("RunnerReason=RunGroupCycle");
-        expect(out.FailureReport.StepKind).toBe("RunGroup");
-        expect(out.FailureReport.SourceFile).toContain("run-group-runner.ts");
-    });
+    const out = asExecuteFailure(await executeRunGroup({
+      db, projectId, rootGroupId: g, executeLeafStep: () => null,
+    }));
+    expect(out.Result.Reason).toBe("RunGroupCycle");
+    assertCanonicalReport(out.FailureReport);
+    expect(out.FailureReport.ReasonDetail).toContain("RunnerReason=RunGroupCycle");
+    expect(out.FailureReport.StepKind).toBe("RunGroup");
+    expect(out.FailureReport.SourceFile).toContain("run-group-runner.ts");
+  });
 
-    it("synthesizes a canonical FailureReport for depth overflow", async () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const ids: number[] = [];
-        for (let i = 0; i < MAX_RUN_GROUP_CALL_DEPTH + 2; i++) {
-            ids.push(db.createGroup({
-                ProjectId: projectId, ParentStepGroupId: null, Name: `D${i}`,
-            }));
-        }
-        for (let i = 0; i < ids.length - 1; i++) {
-            db.appendStep({
-                StepGroupId: ids[i], StepKindId: StepKindId.RunGroup,
-                TargetStepGroupId: ids[i + 1], LabelType: `→D${i + 1}`,
-            });
-        }
-        const out = asExecuteFailure(await executeRunGroup({
-            db, projectId, rootGroupId: ids[0], executeLeafStep: () => null,
-        }));
-        expect(out.Result.Reason).toBe("RunGroupDepthExceeded");
-        assertCanonicalReport(out.FailureReport);
-        expect(out.FailureReport.ReasonDetail).toContain(`RunnerReason=RunGroupDepthExceeded`);
-    });
+  it("synthesizes a canonical FailureReport for depth overflow", async () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const ids: number[] = [];
+    for (let i = 0; i < MAX_RUN_GROUP_CALL_DEPTH + 2; i++) {
+      ids.push(db.createGroup({
+        ProjectId: projectId, ParentStepGroupId: null, Name: `D${i}`,
+      }));
+    }
 
-    it("passes leaf FailureReport through unchanged (no synthesis)", async () => {
-        const db = freshDb();
-        const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
-        const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "L" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
+    for (let i = 0; i < ids.length - 1; i++) {
+      db.appendStep({
+        StepGroupId: ids[i], StepKindId: StepKindId.RunGroup,
+        TargetStepGroupId: ids[i + 1], LabelType: `→D${i + 1}`,
+      });
+    }
 
-        const fakeReport: FailureReport = {
-            Phase: "Replay", Message: "no match", Reason: "ZeroMatches",
-            ReasonDetail: "all selectors missed", StackTrace: null, StepId: 1, Index: 0,
-            StepKind: "Click", Selectors: [], Variables: [], DomContext: null, DataRow: null,
-            ResolvedXPath: null, Timestamp: "2026-04-26T00:00:00.000Z", SourceFile: "leaf",
-            Verbose: false, CapturedHtml: null, FormSnapshot: null,
-        };
-        const out = asExecuteFailure(await executeRunGroup({
-            db, projectId, rootGroupId: g, executeLeafStep: () => fakeReport,
-        }));
-        expect(out.Result.Reason).toBe("LeafStepFailed");
-        expect(out.FailureReport).toBe(fakeReport); // identity — not re-synthesized
-    });
+    const out = asExecuteFailure(await executeRunGroup({
+      db, projectId, rootGroupId: ids[0], executeLeafStep: () => null,
+    }));
+    expect(out.Result.Reason).toBe("RunGroupDepthExceeded");
+    assertCanonicalReport(out.FailureReport);
+    expect(out.FailureReport.ReasonDetail).toContain(`RunnerReason=RunGroupDepthExceeded`);
+  });
+
+  it("passes leaf FailureReport through unchanged (no synthesis)", async () => {
+    const db = freshDb();
+    const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+    const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "L" });
+    db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
+
+    const fakeReport: FailureReport = {
+      Phase: "Replay", Message: "no match", Reason: "ZeroMatches",
+      ReasonDetail: "all selectors missed", StackTrace: null, StepId: 1, Index: 0,
+      StepKind: "Click", Selectors: [], Variables: [], DomContext: null, DataRow: null,
+      ResolvedXPath: null, Timestamp: "2026-04-26T00:00:00.000Z", SourceFile: "leaf",
+      Verbose: false, CapturedHtml: null, FormSnapshot: null,
+    };
+    const out = asExecuteFailure(await executeRunGroup({
+      db, projectId, rootGroupId: g, executeLeafStep: () => fakeReport,
+    }));
+    expect(out.Result.Reason).toBe("LeafStepFailed");
+    expect(out.FailureReport).toBe(fakeReport); // identity — not re-synthesized
+  });
 });

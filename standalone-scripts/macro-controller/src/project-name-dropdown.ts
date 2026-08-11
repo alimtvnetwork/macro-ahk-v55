@@ -87,8 +87,14 @@ function buildDropdownItem(entry: MenuEntry, ctx: ProjectNameDropdownCtx): HTMLE
     +   '<span style="font-weight:600;">' + entry.label + '</span>'
     +   '<span style="font-size:9px;color:#94a3b8;">' + entry.sublabel + '</span>'
     + '</span>';
-  item.onmouseenter = function (): void { item.style.background = 'rgba(0,122,204,0.18)'; };
-  item.onmouseleave = function (): void { item.style.background = 'transparent'; };
+  item.onmouseenter = function (): void {
+    item.style.background = 'rgba(0,122,204,0.18)'; 
+  };
+
+  item.onmouseleave = function (): void {
+    item.style.background = 'transparent'; 
+  };
+
   item.onclick = function (e: MouseEvent): void {
     e.stopPropagation();
     removeProjectNameDropdown();
@@ -130,6 +136,7 @@ export function showProjectNameDropdown(
   for (const entry of entries) {
     dd.appendChild(buildDropdownItem(entry, ctx));
   }
+
   const last = dd.lastElementChild as HTMLElement | null;
   if (last) {
     last.style.borderBottom = 'none';
@@ -140,6 +147,7 @@ export function showProjectNameDropdown(
     if (typeof document === 'undefined') {
       return;
     }
+
     document.addEventListener('click', removeProjectNameDropdown, { once: true });
   }, 10);
 
@@ -169,6 +177,7 @@ export function buildProjectNameCaret(
     if (!ctx) {
       return;
     }
+
     showProjectNameDropdown(arrow, ctx, handlers);
   };
 

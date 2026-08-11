@@ -44,7 +44,9 @@ import { throwDiagnostic } from './errors/diagnostic-error';
 const LOG_SCOPE_LOOP_CYCLE = 'loop-cycle';
 
 /** Shorthand for MacroController singleton */
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // Injected by loop-cycle.ts on module load to avoid a static import cycle.
 let _runCycleRef: (() => void) | null = null;
@@ -86,6 +88,7 @@ async function doubleConfirmAndMove(threshold: number): Promise<void> {
 
     return;
   }
+
   const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
   if (resp.isFail) {
@@ -298,6 +301,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
     if (!window.marco?.api?.credits?.fetchWorkspaces) {
       throwDiagnostic('LOOP_FALLBACK_SDK_E001', { op: 'doCycleFetchWithToken' });
     }
+
     const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
     if (isAuthFailure(resp.status) && !isRetryAttempt) {

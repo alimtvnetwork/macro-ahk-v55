@@ -21,37 +21,40 @@ export interface KeywordEventPlaybackState {
 }
 
 export function useKeywordEventPlayback(): KeywordEventPlaybackState {
-    const [runningId, setRunningId] = useState<string | null>(null);
-    const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
-    const controllerRef = useRef<AbortController | null>(null);
+  const [runningId, setRunningId] = useState<string | null>(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
 
-    useEffect(() => () => controllerRef.current?.abort(), []);
+  useEffect(() => () => controllerRef.current?.abort(), []);
 
-    const cancel = useCallback(() => {
-        controllerRef.current?.abort();
+  const cancel = useCallback(() => {
+    controllerRef.current?.abort();
+    controllerRef.current = null;
+  }, []);
+
+  const play = useCallback(async (event: KeywordEvent, target?: EventTarget | null): Promise<PlaybackResult> => {
+    controllerRef.current?.abort();
+    const ctrl = new AbortController();
+    controllerRef.current = ctrl;
+    setRunningId(event.Id);
+    setCurrentStepIndex(null);
+    try {
+      return await runKeywordEvent(event, {
+        target: target ?? undefined,
+        signal: ctrl.signal,
+        onStep: (_s: KeywordEventStep, i: number) => setCurrentStepIndex(i),
+      });
+    } finally {
+      if (controllerRef.current === ctrl) {
         controllerRef.current = null;
-    }, []);
+      }
 
-    const play = useCallback(async (event: KeywordEvent, target?: EventTarget | null): Promise<PlaybackResult> => {
-        controllerRef.current?.abort();
-        const ctrl = new AbortController();
-        controllerRef.current = ctrl;
-        setRunningId(event.Id);
-        setCurrentStepIndex(null);
-        try {
-            return await runKeywordEvent(event, {
-                target: target ?? undefined,
-                signal: ctrl.signal,
-                onStep: (_s: KeywordEventStep, i: number) => setCurrentStepIndex(i),
-            });
-        } finally {
-            if (controllerRef.current === ctrl) controllerRef.current = null;
-            setRunningId(prev => (prev === event.Id ? null : prev));
-            setCurrentStepIndex(null);
-        }
-    }, []);
+      setRunningId(prev => (prev === event.Id ? null : prev));
+      setCurrentStepIndex(null);
+    }
+  }, []);
 
-    const isRunning = useCallback((id: string): boolean => runningId === id, [runningId]);
+  const isRunning = useCallback((id: string): boolean => runningId === id, [runningId]);
 
-    return { runningId, currentStepIndex, play, cancel, isRunning };
+  return { runningId, currentStepIndex, play, cancel, isRunning };
 }

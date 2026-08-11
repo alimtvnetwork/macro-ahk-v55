@@ -26,19 +26,19 @@ export interface BannerPattern {
  * (text-only scan) so DOM-structure churn does not break collapse.
  */
 export const BANNER_PATTERNS: readonly BannerPattern[] = [
-    {
-        xpath: "/html/body/div[2]/main/div/div[1]",
-        anyText: ["Payment issue detected."],
-    },
-    {
-        xpath: "/html/body/div[2]/main/div/div[1]/div",
-        anyText: [
-            "Update payment method",
-            "Final notice",
-            "reverted to the Free plan",
-            "payment isn't updated",
-        ],
-    },
+  {
+    xpath: "/html/body/div[2]/main/div/div[1]",
+    anyText: ["Payment issue detected."],
+  },
+  {
+    xpath: "/html/body/div[2]/main/div/div[1]/div",
+    anyText: [
+      "Update payment method",
+      "Final notice",
+      "reverted to the Free plan",
+      "payment isn't updated",
+    ],
+  },
 ];
 
 /**
@@ -48,11 +48,11 @@ export const BANNER_PATTERNS: readonly BannerPattern[] = [
  * contains one of these needles and uses that as the collapse target.
  */
 export const BANNER_TEXT_NEEDLES: readonly string[] = [
-    "payment issue detected",
-    "update payment method",
-    "final notice",
-    "reverted to the free plan",
-    "payment isn't updated",
+  "payment issue detected",
+  "update payment method",
+  "final notice",
+  "reverted to the free plan",
+  "payment isn't updated",
 ];
 
 /** Cap the text-fallback scan so we don't pay for huge documents. */

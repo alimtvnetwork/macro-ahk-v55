@@ -14,9 +14,9 @@ import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-see
 import { MembershipRoleApiCodeType } from "../../../lovable-common/src/api/membership-role-api-code";
 
 export const toStepAApiRole = (role: UserAddMembershipRoleCodeType): MembershipRoleApiCodeType => {
-    if (role === UserAddMembershipRoleCodeType.Admin) {
-        return MembershipRoleApiCodeType.Admin;
-    }
+  if (role === UserAddMembershipRoleCodeType.Admin) {
+    return MembershipRoleApiCodeType.Admin;
+  }
 
-    return MembershipRoleApiCodeType.Member;
+  return MembershipRoleApiCodeType.Member;
 };

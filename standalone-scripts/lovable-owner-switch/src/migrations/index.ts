@@ -23,8 +23,8 @@ export interface OwnerSwitchMigration {
 const MIGRATION_VERSION = 1;
 
 export const OWNER_SWITCH_MIGRATION_V1: OwnerSwitchMigration = Object.freeze({
-    Version: MIGRATION_VERSION,
-    Ddl: ALL_DDL,
-    TaskStatusSeeds: TASK_STATUS_SEEDS,
-    XPathSeeds: XPATH_SETTING_SEEDS,
+  Version: MIGRATION_VERSION,
+  Ddl: ALL_DDL,
+  TaskStatusSeeds: TASK_STATUS_SEEDS,
+  XPathSeeds: XPATH_SETTING_SEEDS,
 });

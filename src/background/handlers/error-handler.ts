@@ -24,7 +24,7 @@ let dbManager: DbManager | null = null;
 
 /** Binds the error handler to an initialized DbManager. */
 export function bindErrorDbManager(manager: DbManager): void {
-    dbManager = manager;
+  dbManager = manager;
 }
 
 /* ------------------------------------------------------------------ */
@@ -32,25 +32,26 @@ export function bindErrorDbManager(manager: DbManager): void {
 /* ------------------------------------------------------------------ */
 
 function getErrorsDb() {
-    if (dbManager === null) {
-        throw new Error(
-            "[error-handler] DbManager not bound — boot may still be in progress or failed. " +
+  if (dbManager === null) {
+    throw new Error(
+      "[error-handler] DbManager not bound — boot may still be in progress or failed. " +
             "Check service worker console for boot errors.",
-        );
-    }
+    );
+  }
 
-    return dbManager!.getErrorsDb();
+  return dbManager!.getErrorsDb();
 }
 
 /** Collects all rows from a prepared statement. */
 function collectRows(stmt: { step(): boolean; getAsObject(): SqlRow; free(): void }): SqlRow[] {
-    const rows: SqlRow[] = [];
-    while (stmt.step()) {
-        rows.push(stmt.getAsObject());
-    }
-    stmt.free();
+  const rows: SqlRow[] = [];
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject());
+  }
 
-    return rows;
+  stmt.free();
+
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -59,26 +60,26 @@ function collectRows(stmt: { step(): boolean; getAsObject(): SqlRow; free(): voi
 
 /** Returns currently active (unresolved) errors. */
 export async function handleGetActiveErrors(): Promise<{ errors: SqlRow[] }> {
-    const db = getErrorsDb();
-    const errors = queryUnresolvedErrors(db);
-    const hasErrors = errors.length > 0;
-    if (hasErrors) {
-        setHealthState("DEGRADED");
-    }
+  const db = getErrorsDb();
+  const errors = queryUnresolvedErrors(db);
+  const hasErrors = errors.length > 0;
+  if (hasErrors) {
+    setHealthState("DEGRADED");
+  }
 
-    return { errors };
+  return { errors };
 }
 
 /** Queries unresolved error rows for the current session, newest first. */
 function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
-    const currentSessionId = getCurrentSessionId();
+  const currentSessionId = getCurrentSessionId();
 
-    if (currentSessionId === null) {
-        return [];
-    }
+  if (currentSessionId === null) {
+    return [];
+  }
 
-    const stmt = db.prepare(
-        `SELECT
+  const stmt = db.prepare(
+    `SELECT
             Id as id,
             Timestamp as timestamp,
             Level as level,
@@ -99,10 +100,10 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
            AND SessionId = ?
          ORDER BY Timestamp DESC
          LIMIT 100`,
-    );
-    stmt.bind([currentSessionId]);
+  );
+  stmt.bind([currentSessionId]);
 
-    return collectRows(stmt);
+  return collectRows(stmt);
 }
 
 /* ------------------------------------------------------------------ */
@@ -111,9 +112,9 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
 
 /** Records a user script error into the errors database. */
 export async function handleUserScriptError(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<OkResponse> {
-    const request = message as MessageRequest & {
+  const request = message as MessageRequest & {
         scriptId: string;
         message: string;
         stack: string;
@@ -121,7 +122,7 @@ export async function handleUserScriptError(
         projectId?: string;
     };
 
-    insertUserScriptError(request);
+  insertUserScriptError(request);
     dbManager!.markDirty();
     broadcastErrorCountChange();
 
@@ -137,26 +138,27 @@ export async function handleUserScriptError(
  * Fire-and-forget — failures are silently ignored.
  */
 function broadcastErrorCountChange(): void {
-    try {
-        const db = getErrorsDb();
-        const stmt = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0");
-        let count = 0;
-        if (stmt.step()) {
-            const row = stmt.getAsObject() as { cnt: number };
-            count = row.cnt;
-        }
-        stmt.free();
-
-        chrome.runtime.sendMessage({ type: "ERROR_COUNT_CHANGED", count }).catch((sendErr) => {
-            // No listeners is the common case (popup/options closed). Use debug so
-            // we keep a breadcrumb without polluting the error log on every broadcast.
-            console.debug("[error-handler] ERROR_COUNT_CHANGED broadcast had no receiver:", sendErr);
-        });
-    } catch (broadcastErr) {
-        // Last-resort sink: cannot route through logCaughtError because the errors DB
-        // itself may be unavailable here (this function reads from it).
-        console.warn("[error-handler] broadcastErrorCountChange failed — DB not ready or count query threw:", broadcastErr);
+  try {
+    const db = getErrorsDb();
+    const stmt = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0");
+    let count = 0;
+    if (stmt.step()) {
+      const row = stmt.getAsObject() as { cnt: number };
+      count = row.cnt;
     }
+
+    stmt.free();
+
+    chrome.runtime.sendMessage({ type: "ERROR_COUNT_CHANGED", count }).catch((sendErr) => {
+      // No listeners is the common case (popup/options closed). Use debug so
+      // we keep a breadcrumb without polluting the error log on every broadcast.
+      console.debug("[error-handler] ERROR_COUNT_CHANGED broadcast had no receiver:", sendErr);
+    });
+  } catch (broadcastErr) {
+    // Last-resort sink: cannot route through logCaughtError because the errors DB
+    // itself may be unavailable here (this function reads from it).
+    console.warn("[error-handler] broadcastErrorCountChange failed — DB not ready or count query threw:", broadcastErr);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -165,8 +167,8 @@ function broadcastErrorCountChange(): void {
 
 /** Marks all unresolved errors as resolved. */
 export async function handleClearErrors(): Promise<OkResponse> {
-    const db = getErrorsDb();
-    db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0");
+  const db = getErrorsDb();
+  db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0");
     dbManager!.markDirty();
     setHealthState("HEALTHY");
     broadcastErrorCountChange();
@@ -182,22 +184,22 @@ function insertUserScriptError(request: {
     scriptCode?: string;
     projectId?: string;
 }): void {
-    const db = getErrorsDb();
-    const now = new Date().toISOString();
-    const version = chrome.runtime.getManifest().version;
-    const codeSnippet = request.scriptCode?.slice(0, 500) ?? null;
+  const db = getErrorsDb();
+  const now = new Date().toISOString();
+  const version = chrome.runtime.getManifest().version;
+  const codeSnippet = request.scriptCode?.slice(0, 500) ?? null;
 
-    db.run(
-        `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
+  db.run(
+    `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
          VALUES ('', ?, 'ERROR', 'user-script', 'INJECTION', 'USER_SCRIPT_ERROR', ?, ?, ?, ?, ?, ?)`,
-        [
-            now,
-            bindReq(request.message, "(no message)"),
-            bindOpt(request.stack),
-            bindReq(request.scriptId, "unknown"),
-            bindOpt(request.projectId),
-            codeSnippet,
-            bindReq(version, "0.0.0"),
-        ],
-    );
+    [
+      now,
+      bindReq(request.message, "(no message)"),
+      bindOpt(request.stack),
+      bindReq(request.scriptId, "unknown"),
+      bindOpt(request.projectId),
+      codeSnippet,
+      bindReq(version, "0.0.0"),
+    ],
+  );
 }

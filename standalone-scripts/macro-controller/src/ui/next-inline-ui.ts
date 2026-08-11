@@ -99,8 +99,13 @@ interface NextPromptEntry {
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  if (!target) return '';
-  if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
+  if (!target) {
+    return '';
+  }
+
+  if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) {
+    return target.value || '';
+  }
 
   return (target as HTMLElement).innerText || (target as HTMLElement).textContent || '';
 }
@@ -125,8 +130,11 @@ function findNextVariant(entries: NextPromptEntry[], n: number): string | null {
 
 function findNextTemplate(entries: NextPromptEntry[], n: number, source: string): string | null {
   for (const e of entries) {
-    if ((e.slug || '').toLowerCase() !== 'next-steps' || !e.text) continue;
-      const key = e.replaceKey || REPLACE_KEY_DEFAULT;
+    if ((e.slug || '').toLowerCase() !== 'next-steps' || !e.text) {
+      continue;
+    }
+
+    const key = e.replaceKey || REPLACE_KEY_DEFAULT;
     log('NextInline.resolve: using raw next template from ' + source + ' for N=' + n, 'info');
 
     return substituteNextValue(e.text, key, n);
@@ -138,9 +146,14 @@ function findNextTemplate(entries: NextPromptEntry[], n: number, source: string)
 function resolveNextVariantText(deps: TaskNextDeps, n: number): string | null {
   const entries = (deps.getPromptsConfig().entries || []) as NextPromptEntry[];
   const variant = findNextVariant(entries, n);
-  if (variant) return variant;
+  if (variant) {
+    return variant;
+  }
+
   const template = findNextTemplate(entries, n, 'loaded prompts') || findNextTemplate(DEFAULT_PROMPTS, n, 'DEFAULT_PROMPTS');
-  if (template) return template;
+  if (template) {
+    return template;
+  }
 
   // Fallback: legacy single static "Next Tasks" prompt
   const legacy = findNextTasksPrompt(deps);
@@ -165,8 +178,12 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
     // (the eager import previously broke tests that mock ../ui/prompt-loader).
     const bridge = await import('../db/sql-bridge');
     const result = await bridge.runWithBridgeRetry(
-      function() { return mod.getDefaultPromptForRole('next'); },
-      function(r) { return r.isSuccess ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
+      function() {
+        return mod.getDefaultPromptForRole('next'); 
+      },
+      function(r) {
+        return r.isSuccess ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); 
+      },
     );
     if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
@@ -174,6 +191,7 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
 
       return substituteToken(result.value.Body, key, n);
     }
+
     log('NextInline.resolve: no next-default row in DB; falling back to JSON library', 'info');
   } catch (err) {
     logError('NextInline', 'resolveNextTextDbFirst DB read failed; falling back to JSON library', err);
@@ -192,6 +210,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
 
     return;
   }
+
   const text = await resolveNextTextDbFirst(deps, n);
   if (!text) {
     showPasteToast('❌ Next ' + n + ': prompt not found in library', true);
@@ -199,6 +218,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
 
     return;
   }
+
   const existing = readEditorText();
   const combined = existing.trim().length > 0
     ? existing.replace(/\s+$/, '') + '\n\n' + text
@@ -210,6 +230,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
 
       return;
     }
+
     log('NextInline.stage: appended Next ' + n + ' (' + text.length + ' chars) — no submit', 'info');
     showPasteToast('📝 Next ' + n + ' staged — press Enter to send', false);
   } catch (e) {
@@ -226,12 +247,17 @@ function planClickHandler(n: number): void {
 
     return;
   }
+
   const clamped = Math.max(PLAN_MIN, Math.min(PLAN_MAX, n));
   // v4.34.0: clicking a PlanTierType preset also mirrors the number into the
   // Repeat count textbox so the user can immediately hit 🔁 Repeat
   // without retyping it. Repeat still requires an explicit Run click.
-  try { setRepeatCount(clamped); }
-  catch (e) { log('PlanInline: setRepeatCount failed - ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  try {
+    setRepeatCount(clamped); 
+  } catch (e) {
+    log('PlanInline: setRepeatCount failed - ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
+
   void triggerPlanPasteFromInline(clamped);
 }
 
@@ -249,7 +275,9 @@ function makePlanPresetButton(n: number, highlighted: boolean): HTMLButtonElemen
   b.dataset['n'] = String(n);
   b.dataset['highlighted'] = highlighted ? '1' : '0';
   attachChipHover(b, hoverBg);
-  b.onclick = function () { planClickHandler(n); };
+  b.onclick = function () {
+    planClickHandler(n); 
+  };
 
   return b;
 }
@@ -272,6 +300,7 @@ function getPopoverAnnouncer(): HTMLElement {
   if (_popoverAnnouncer && document.body.contains(_popoverAnnouncer)) {
     return _popoverAnnouncer;
   }
+
   const announcerElement = document.createElement('div');
   announcerElement.id = 'marco-popover-announcer';
   announcerElement.setAttribute(ATTR_ROLE, 'status');
@@ -284,14 +313,20 @@ function getPopoverAnnouncer(): HTMLElement {
 
   return announcerElement;
 }
+
 function announcePopover(message: string): void {
   const announcerElement = getPopoverAnnouncer();
   announcerElement.textContent = '';
   // Next tick so repeated identical text still triggers a live-region update.
-  setTimeout(() => { announcerElement.textContent = message; }, 20);
+  setTimeout(() => {
+    announcerElement.textContent = message; 
+  }, 20);
 }
+
 function itemLabel(element: HTMLElement | null): string {
-  if (!element) return '';
+  if (!element) {
+    return '';
+  }
 
   return (
     element.getAttribute(ATTR_ARIA_LABEL)
@@ -310,8 +345,14 @@ function getVisibleMenuItems(panel: HTMLElement): HTMLElement[] {
 function isVisibleMenuItem(element: HTMLElement): boolean {
   let current: HTMLElement | null = element;
   while (current) {
-    if (current.style.display === STYLE_DISPLAY_NONE || current.hasAttribute('hidden')) return false;
-    if (current === document.body) break;
+    if (current.style.display === STYLE_DISPLAY_NONE || current.hasAttribute('hidden')) {
+      return false;
+    }
+
+    if (current === document.body) {
+      break;
+    }
+
     current = current.parentElement;
   }
 
@@ -321,7 +362,10 @@ function isVisibleMenuItem(element: HTMLElement): boolean {
 function syncMenuItems(panel: HTMLElement): void {
   const menuItems = Array.from(panel.querySelectorAll<HTMLElement>(SEL_ENABLED_BUTTON));
   for (const menuItem of menuItems) {
-    if (!menuItem.hasAttribute(ATTR_ROLE)) menuItem.setAttribute(ATTR_ROLE, MENU_ITEM_ROLE);
+    if (!menuItem.hasAttribute(ATTR_ROLE)) {
+      menuItem.setAttribute(ATTR_ROLE, MENU_ITEM_ROLE);
+    }
+
     menuItem.setAttribute(ATTR_TABINDEX, '-1');
   }
 }
@@ -340,20 +384,40 @@ function announceMenuOpen(panel: HTMLElement, menuName: string): void {
 }
 
 function handleMenuFocusIn(panel: HTMLElement, event: FocusEvent): void {
-  if (panel.style.display === STYLE_DISPLAY_NONE) return;
+  if (panel.style.display === STYLE_DISPLAY_NONE) {
+    return;
+  }
+
   const target = event.target;
-  if (!(target instanceof HTMLElement)) return;
-  if (target === panel) return;
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  if (target === panel) {
+    return;
+  }
+
   const label = itemLabel(target);
-  if (label) announcePopover(label);
+  if (label) {
+    announcePopover(label);
+  }
 }
 
 function createDocumentFocusTrap(panel: HTMLElement, trigger: HTMLElement): (event: FocusEvent) => void {
   return (event: FocusEvent): void => {
-    if (panel.style.display === STYLE_DISPLAY_NONE) return;
+    if (panel.style.display === STYLE_DISPLAY_NONE) {
+      return;
+    }
+
     const target = event.target;
-    if (!(target instanceof Node)) return;
-    if (panel.contains(target) || trigger.contains(target)) return;
+    if (!(target instanceof Node)) {
+      return;
+    }
+
+    if (panel.contains(target) || trigger.contains(target)) {
+      return;
+    }
+
     getVisibleMenuItems(panel)[0]?.focus();
   };
 }
@@ -362,18 +426,33 @@ function createTrapActivator(focusTrap: (event: FocusEvent) => void): (active: b
   let isTrapInstalled = false;
 
   return (active: boolean): void => {
-    if (active && !isTrapInstalled) document.addEventListener('focusin', focusTrap, true);
-    if (!active && isTrapInstalled) document.removeEventListener('focusin', focusTrap, true);
+    if (active && !isTrapInstalled) {
+      document.addEventListener('focusin', focusTrap, true);
+    }
+
+    if (!active && isTrapInstalled) {
+      document.removeEventListener('focusin', focusTrap, true);
+    }
+
     isTrapInstalled = active;
   };
 }
 
 function attachTriggerTabTrap(panel: HTMLElement, trigger: HTMLElement): void {
   trigger.addEventListener('keydown', (event) => {
-    if (event.key !== 'Tab') return;
-    if (panel.style.display === STYLE_DISPLAY_NONE) return;
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    if (panel.style.display === STYLE_DISPLAY_NONE) {
+      return;
+    }
+
     const menuItems = getVisibleMenuItems(panel);
-    if (menuItems.length === 0) return;
+    if (menuItems.length === 0) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
     (event.shiftKey ? menuItems[menuItems.length - 1] : menuItems[0])?.focus();
@@ -405,6 +484,7 @@ function handleMenuNavigation(event: KeyboardEvent, menuItems: HTMLElement[], cu
 
     return true;
   }
+
   if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
     focusMenuItemByDelta(event, menuItems, currentIndex, -1);
 
@@ -421,6 +501,7 @@ function handleMenuEdgeKey(event: KeyboardEvent, menuItems: HTMLElement[]): bool
 
     return true;
   }
+
   if (event.key === 'End') {
     event.preventDefault();
     menuItems[menuItems.length - 1]?.focus();
@@ -433,7 +514,10 @@ function handleMenuEdgeKey(event: KeyboardEvent, menuItems: HTMLElement[]): bool
 
 function createMenuKeydownHandler(panel: HTMLElement, trigger: HTMLElement, onClose: () => void): (event: KeyboardEvent) => void {
   return (event: KeyboardEvent): void => {
-    if (panel.style.display === STYLE_DISPLAY_NONE) return;
+    if (panel.style.display === STYLE_DISPLAY_NONE) {
+      return;
+    }
+
     if (event.key === 'Escape') {
       event.stopPropagation();
       onClose();
@@ -441,13 +525,25 @@ function createMenuKeydownHandler(panel: HTMLElement, trigger: HTMLElement, onCl
 
       return;
     }
+
     const menuItems = getVisibleMenuItems(panel);
-    if (menuItems.length === 0) return;
+    if (menuItems.length === 0) {
+      return;
+    }
+
     const activeElement = document.activeElement as HTMLElement | null;
     const currentIndex = activeElement ? menuItems.indexOf(activeElement) : -1;
-    if (handleMenuNavigation(event, menuItems, currentIndex)) return;
-    if (handleMenuEdgeKey(event, menuItems)) return;
-    if (event.key === 'Tab') focusTabbedMenuItem(event, menuItems, currentIndex);
+    if (handleMenuNavigation(event, menuItems, currentIndex)) {
+      return;
+    }
+
+    if (handleMenuEdgeKey(event, menuItems)) {
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      focusTabbedMenuItem(event, menuItems, currentIndex);
+    }
   };
 }
 
@@ -605,12 +701,16 @@ function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): void {
     panel.style.bottom = String(Math.max(0, Math.round(window.innerHeight - rect.top + gap))) + 'px';
     panel.style.maxHeight = String(Math.max(120, Math.floor(spaceAbove - gap - margin))) + 'px';
   }
+
   panel.style.overflowY = 'auto';
 }
 
 function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a11y: PopoverA11y, open: boolean): void {
   const wasOpen = isPopoverOpen(panel);
-  if (open) positionPopoverFixed(panel, button);
+  if (open) {
+    positionPopoverFixed(panel, button);
+  }
+
   panel.style.display = open ? STYLE_DISPLAY_FLEX : STYLE_DISPLAY_NONE;
   button.setAttribute(ATTR_ARIA_EXPANDED, open ? 'true' : 'false');
   a11y.setTrapActive(open);
@@ -627,6 +727,7 @@ function wirePopoverButton(button: HTMLButtonElement, panel: HTMLElement, setOpe
     event.stopPropagation();
     setOpen(!isPopoverOpen(panel));
   };
+
   button.addEventListener('keydown', (event) => handlePopoverButtonKeydown(event, panel, setOpen));
 }
 
@@ -637,6 +738,7 @@ function handlePopoverButtonKeydown(event: KeyboardEvent, panel: HTMLElement, se
 
     return;
   }
+
   if ((event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') && !isPopoverOpen(panel)) {
     event.preventDefault();
     setOpen(true);
@@ -645,9 +747,15 @@ function handlePopoverButtonKeydown(event: KeyboardEvent, panel: HTMLElement, se
 
 function createOutsidePopoverCloser(container: HTMLElement, panel: HTMLElement, button: HTMLElement, setOpen: (open: boolean) => void): (event: Event) => void {
   return (event: Event): void => {
-    if (!isPopoverOpen(panel)) return;
+    if (!isPopoverOpen(panel)) {
+      return;
+    }
+
     const target = event.target;
-    if (target instanceof Node && container.contains(target)) return;
+    if (target instanceof Node && container.contains(target)) {
+      return;
+    }
+
     setOpen(false);
     button.focus();
   };
@@ -663,8 +771,14 @@ function resetChipOverflow(body: HTMLElement, panel: HTMLElement, overflowWrap: 
   // Only in-flow chips (skip those already cloned into the overflow panel/wrap).
   const allChips = Array.from(body.querySelectorAll<HTMLElement>(SEL_CHIP));
   const chips = allChips.filter((chip) => !overflowWrap.contains(chip));
-  for (const chip of chips) chip.style.display = '';
-  while (panel.firstChild) panel.removeChild(panel.firstChild);
+  for (const chip of chips) {
+    chip.style.display = '';
+  }
+
+  while (panel.firstChild) {
+    panel.removeChild(panel.firstChild);
+  }
+
   overflowWrap.style.display = STYLE_DISPLAY_NONE;
 
   return chips;
@@ -674,24 +788,34 @@ function collectHiddenChipPresets(body: HTMLElement, chips: HTMLElement[]): Hidd
   const hiddenPresets: HiddenChipPreset[] = [];
   for (let index = chips.length - 1; index >= 0; index--) {
     const chip = chips[index];
-    if (!chip) continue;
+    if (!chip) {
+      continue;
+    }
+
     chip.style.display = STYLE_DISPLAY_NONE;
     const n = Number(chip.dataset['n'] || '0');
     const hi = chip.dataset['highlighted'] === '1';
     hiddenPresets.unshift({ n, hi });
-    if (body.scrollWidth <= body.clientWidth + 1) break;
+    if (body.scrollWidth <= body.clientWidth + 1) {
+      break;
+    }
   }
 
   return hiddenPresets;
 }
 
 function fillChipOverflowPanel(panel: HTMLElement, hiddenPresets: HiddenChipPreset[], buildChipByN: (n: number, highlighted: boolean) => HTMLElement): void {
-  for (const { n, hi } of hiddenPresets) panel.appendChild(buildChipByN(n, hi));
+  for (const { n, hi } of hiddenPresets) {
+    panel.appendChild(buildChipByN(n, hi));
+  }
 }
 
 function recomputeChipOverflow(body: HTMLElement, shell: PopoverShell, buildChipByN: (n: number, highlighted: boolean) => HTMLElement, a11y: PopoverA11y): void {
   const chips = resetChipOverflow(body, shell.panel, shell.wrap);
-  if (body.scrollWidth <= body.clientWidth + 1) return;
+  if (body.scrollWidth <= body.clientWidth + 1) {
+    return;
+  }
+
   shell.wrap.style.display = STYLE_DISPLAY_INLINE_BLOCK;
   fillChipOverflowPanel(shell.panel, collectHiddenChipPresets(body, chips), buildChipByN);
   a11y.syncItems();
@@ -717,6 +841,7 @@ function wireChipOverflowPopover(shell: PopoverShell): PopoverA11y {
   const setOpen = (open: boolean): void => {
     setPopoverVisibility(shell.panel, shell.button, a11y, open);
   };
+
   wirePopoverButton(shell.button, shell.panel, setOpen);
   registerPointerPopoverCloser(createOutsidePopoverCloser(shell.wrap, shell.panel, shell.button, setOpen));
 
@@ -741,10 +866,13 @@ export function installChipOverflow(
 function restoreActionOverflowPositions(original: Map<HTMLElement, OriginalActionPosition>): void {
   for (const [actionElement, position] of original) {
     const next = position.next && position.next.parentNode === position.parent ? position.next : null;
-    try { position.parent.insertBefore(actionElement, next); } catch (err) {
+    try {
+      position.parent.insertBefore(actionElement, next); 
+    } catch (err) {
       logError('MacroController', 'Unknown error');
     }
   }
+
   original.clear();
 }
 
@@ -758,10 +886,15 @@ function collectOverflowActions(body: HTMLElement, actions: HTMLElement[]): HTML
   const hiddenActions: HTMLElement[] = [];
   for (let index = actions.length - 1; index >= 0; index--) {
     const actionElement = actions[index];
-    if (!actionElement) continue;
+    if (!actionElement) {
+      continue;
+    }
+
     actionElement.style.display = STYLE_DISPLAY_NONE;
     hiddenActions.unshift(actionElement);
-    if (body.scrollWidth <= body.clientWidth + 1) break;
+    if (body.scrollWidth <= body.clientWidth + 1) {
+      break;
+    }
   }
 
   return hiddenActions;
@@ -779,9 +912,15 @@ function recomputeActionOverflow(body: HTMLElement, shell: PopoverShell, origina
   restoreActionOverflowPositions(original);
   shell.wrap.style.display = STYLE_DISPLAY_NONE;
   setOpen(false);
-  if (body.scrollWidth <= body.clientWidth + 1) return;
+  if (body.scrollWidth <= body.clientWidth + 1) {
+    return;
+  }
+
   const actions = getTrailingActions(body, shell.wrap);
-  if (actions.length === 0) return;
+  if (actions.length === 0) {
+    return;
+  }
+
   shell.wrap.style.display = STYLE_DISPLAY_INLINE_BLOCK;
   moveActionsToOverflowPanel(shell.panel, original, collectOverflowActions(body, actions));
   a11y.syncItems();
@@ -815,19 +954,24 @@ export function installActionOverflow(
   const setOpen = (open: boolean): void => {
     setPopoverVisibility(shell.panel, shell.button, a11y, open);
   };
+
   wirePopoverButton(shell.button, shell.panel, setOpen);
   registerPointerPopoverCloser(createOutsidePopoverCloser(shell.wrap, shell.panel, shell.button, setOpen));
   const original = new Map<HTMLElement, OriginalActionPosition>();
   const recompute = (): void => {
     recomputeActionOverflow(body, shell, original, a11y, setOpen);
   };
+
   observeOverflow(body, recompute);
 
   return recompute;
 }
 
 function populatePlanDropup(panel: HTMLElement, values: readonly number[]): void {
-  while (panel.firstChild) panel.removeChild(panel.firstChild);
+  while (panel.firstChild) {
+    panel.removeChild(panel.firstChild);
+  }
+
   // v4.399: numbers on TOP so they're always visible when the popover flips
   // upward against the viewport bottom. Prompt-management actions render
   // below the grid.
@@ -835,9 +979,12 @@ function populatePlanDropup(panel: HTMLElement, values: readonly number[]): void
   chipGrid.style.cssText = 'display:grid;grid-template-columns:repeat(6,auto);gap:4px;margin-bottom:6px;';
   for (const n of values) {
     const b = makePlanPresetButton(n, PLAN_PRESETS_HIGHLIGHT.has(n));
-    b.addEventListener('click', function () { panel.style.display = 'none'; });
+    b.addEventListener('click', function () {
+      panel.style.display = 'none'; 
+    });
     chipGrid.appendChild(b);
   }
+
   panel.appendChild(chipGrid);
   panel.appendChild(buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: 'rgba(245,158,11,0.85)' }));
 }
@@ -882,9 +1029,13 @@ function buildPlanDropup(anchor: HTMLElement, trigger: HTMLButtonElement): PlanD
   const a11y = enhancePopoverA11y(panel, trigger, () => setOpen(false), 'PlanTierType menu');
   const rePopulate = (values: readonly number[]): void => {
     populatePlanDropup(panel, values);
-    if (isPopoverOpen(panel)) positionPopoverFixed(panel, trigger);
+    if (isPopoverOpen(panel)) {
+      positionPopoverFixed(panel, trigger);
+    }
+
     a11y.syncItems();
   };
+
   rePopulate(PLAN_PRESETS);
   const setOpen = (open: boolean): void => setPopoverVisibility(panel, trigger, a11y, open);
   wirePlanTriggerAria(trigger, panel.id);
@@ -916,7 +1067,10 @@ function buildSplitStrip(): HTMLElement {
   body.appendChild(hint);
 
   for (const n of PLAN_PRESETS) {
-    if (!PLAN_PRESETS_HIGHLIGHT.has(n)) continue;
+    if (!PLAN_PRESETS_HIGHLIGHT.has(n)) {
+      continue;
+    }
+
     body.appendChild(makePlanPresetButton(n, true));
   }
 
@@ -941,7 +1095,9 @@ function buildSplitStrip(): HTMLElement {
 
   // v4.16+: per-strip toggle removed — the shared frame header owns the single
   // minimize/maximize chevron so we no longer have two competing controls.
-  subscribeInlineStripGroupCollapse(function () { applyInlineStripGroupCollapse(); });
+  subscribeInlineStripGroupCollapse(function () {
+    applyInlineStripGroupCollapse(); 
+  });
   applyInlineStripGroupCollapse();
 
   return root;
@@ -968,7 +1124,9 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
   // mid-recovery by an impatient double-click.
   b.onclick = function () {
     void import('./async-guard').then(function(mod) {
-      const guarded = mod.guardAsyncClick(b, function() { return stageNextPrompt(deps, n); });
+      const guarded = mod.guardAsyncClick(b, function() {
+        return stageNextPrompt(deps, n); 
+      });
       void guarded();
     });
   };
@@ -1030,7 +1188,10 @@ function buildNextMoreWrap(): HTMLElement {
   moreBtn.onclick = function (ev) {
     ev.stopPropagation();
     const willOpen = panel.style.display !== 'flex';
-    if (willOpen) positionPopoverFixed(panel, moreBtn);
+    if (willOpen) {
+      positionPopoverFixed(panel, moreBtn);
+    }
+
     panel.style.display = willOpen ? 'flex' : 'none';
   };
 
@@ -1042,13 +1203,20 @@ async function refreshNextChipsFromDb(deps: TaskNextDeps, body: HTMLElement, mor
     const { resolveConfiguredChipValues } = await import('./configured-chip-values');
     const values = await resolveConfiguredChipValues('next', [...NEXT_PRESETS]);
     const isSame = values.length === NEXT_PRESETS.length && values.every((v, i) => v === NEXT_PRESETS[i]);
-    if (isSame) return;
+    if (isSame) {
+      return;
+    }
+
     const chips = Array.from(body.querySelectorAll<HTMLElement>('[data-chip="1"]'));
-    for (const c of chips) c.remove();
+    for (const c of chips) {
+      c.remove();
+    }
+
     const overflowAnchor = body.querySelector<HTMLElement>('[data-role="chip-overflow"]') || moreWrap;
     for (const n of values) {
       body.insertBefore(makeNextPresetButton(deps, n, NEXT_PRESETS_HIGHLIGHT.has(n)), overflowAnchor);
     }
+
     recomputeOverflow();
     log('NextInline: chips refreshed from DB - ' + values.join(','), 'info');
   } catch (err) {
@@ -1067,12 +1235,17 @@ function buildNextStrip(deps: TaskNextDeps): HTMLElement {
   const recomputeOverflow = installChipOverflow(body, moreWrap, (n, hi) => makeNextPresetButton(deps, n, hi), 'rgba(124,58,237,0.6)');
   installActionOverflow(body, 'rgba(124,58,237,0.6)');
   void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
-  subscribeInlineStripGroupCollapse(function () { applyInlineStripGroupCollapse(); });
+  subscribeInlineStripGroupCollapse(function () {
+    applyInlineStripGroupCollapse(); 
+  });
   // v4.402.0: refresh the numbered chips whenever a prompt edit lands so a
   // user who just edited the Next default via the gear menu sees the new
   // active row on the next click without a reload.
   subscribePromptsChanged(function(detail) {
-    if (detail.role && detail.role !== 'next') return;
+    if (detail.role && detail.role !== 'next') {
+      return;
+    }
+
     void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
   });
 
@@ -1090,16 +1263,28 @@ function tryMountInline(deps: TaskNextDeps): boolean {
 
     return true;
   }
-  if (document.getElementById(INLINE_ID) && document.getElementById(SPLIT_ID)) return true;
+
+  if (document.getElementById(INLINE_ID) && document.getElementById(SPLIT_ID)) {
+    return true;
+  }
+
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  if (!target) return false;
+  if (!target) {
+    return false;
+  }
+
   const host = (target.closest && target.closest('form')) || target.parentElement;
-  if (!host || !host.parentElement) return false;
+  if (!host || !host.parentElement) {
+    return false;
+  }
 
   // v4.16+: mount into shared frame so PlanTierType/Next/Repeat share one visual unit
   // and one minimize/maximize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
-  if (!framed) return false;
+  if (!framed) {
+    return false;
+  }
+
   const body = framed.body;
 
   // Order top→bottom inside the frame: PlanTierType → Next → (Repeat appended after).
@@ -1109,6 +1294,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
     splitStrip.style.margin = '0';
     body.appendChild(splitStrip);
   }
+
   if (!document.getElementById(INLINE_ID)) {
     const strip = buildNextStrip(deps);
     strip.id = INLINE_ID;
@@ -1120,6 +1306,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
       body.appendChild(strip);
     }
   }
+
   applyInlineStripGroupCollapse();
   log('NextInline: strips mounted (plan + next, paste-only) into unified frame', 'info');
 
@@ -1143,7 +1330,10 @@ function registerPointerPopoverCloser(handler: (ev: Event) => void): void {
 function _teardownPointerPopoverClosers(): void {
   while (_pointerPopoverClosers.length) {
     const handler = _pointerPopoverClosers.pop();
-    if (!handler) continue;
+    if (!handler) {
+      continue;
+    }
+
     document.removeEventListener('mousedown', handler, true);
     document.removeEventListener('touchstart', handler, true);
   }
@@ -1156,34 +1346,56 @@ function _teardownPointerPopoverClosers(): void {
  */
 function attachDropupOutsideCloser(panel: HTMLElement, anchor: HTMLElement): void {
   const closer = (ev: MouseEvent): void => {
-    if (panel.style.display === 'none') return;
-    if (ev.target instanceof Node && anchor.contains(ev.target)) return;
+    if (panel.style.display === 'none') {
+      return;
+    }
+
+    if (ev.target instanceof Node && anchor.contains(ev.target)) {
+      return;
+    }
+
     panel.style.display = 'none';
   };
+
   document.addEventListener('click', closer, true);
   _dropupClosers.push(closer);
 }
 
 function _registerNextInlineTeardownOnce(): void {
-  if (_pagehideRegistered || typeof window === 'undefined') return;
+  if (_pagehideRegistered || typeof window === 'undefined') {
+    return;
+  }
+
   _pagehideRegistered = true;
   window.addEventListener('pagehide', function () {
-    if (_observer) { _observer.disconnect(); _observer = null; }
+    if (_observer) {
+      _observer.disconnect(); _observer = null; 
+    }
+
     while (_dropupClosers.length) {
       const c = _dropupClosers.pop();
-      if (c) document.removeEventListener('click', c, true);
+      if (c) {
+        document.removeEventListener('click', c, true);
+      }
     }
+
     _teardownPointerPopoverClosers();
   });
 }
 
 /** Test-only: reset teardown state and disconnect observers. */
 export function __resetNextInlineForTests(): void {
-  if (_observer) { _observer.disconnect(); _observer = null; }
+  if (_observer) {
+    _observer.disconnect(); _observer = null; 
+  }
+
   while (_dropupClosers.length) {
     const c = _dropupClosers.pop();
-    if (c) document.removeEventListener('click', c, true);
+    if (c) {
+      document.removeEventListener('click', c, true);
+    }
   }
+
   _teardownPointerPopoverClosers();
   _pagehideRegistered = false;
 }
@@ -1204,7 +1416,10 @@ export function __positionPopoverFixedForTests(panel: HTMLElement, button: HTMLE
 export const SHOW_LEGACY_INLINE_STRIPS = true;
 
 function isLegacyStripsEnabled(): boolean {
-  if (SHOW_LEGACY_INLINE_STRIPS) return true;
+  if (SHOW_LEGACY_INLINE_STRIPS) {
+    return true;
+  }
+
   const w = (typeof window !== 'undefined' ? window : {}) as Record<string, unknown>;
 
   return w['__MARCO_SHOW_LEGACY_INLINE_STRIPS__'] === true;
@@ -1214,18 +1429,35 @@ export function mountNextInlineStrip(deps: TaskNextDeps): void {
   if (!isLegacyStripsEnabled()) {
     // Strips suppressed — remove any pre-existing mounts so the UI is clean.
     const a = document.getElementById(INLINE_ID);
-    if (a && a.parentElement) a.parentElement.removeChild(a);
+    if (a && a.parentElement) {
+      a.parentElement.removeChild(a);
+    }
+
     const b = document.getElementById(SPLIT_ID);
-    if (b && b.parentElement) b.parentElement.removeChild(b);
+    if (b && b.parentElement) {
+      b.parentElement.removeChild(b);
+    }
 
     return;
   }
-  if (tryMountInline(deps)) return;
-  if (_observer) return;
+
+  if (tryMountInline(deps)) {
+    return;
+  }
+
+  if (_observer) {
+    return;
+  }
+
   _registerNextInlineTeardownOnce();
   _observer = new MutationObserver(function () {
-    if (typeof document === 'undefined' || !document.body) return;
-    if (!document.getElementById(INLINE_ID) || !document.getElementById(SPLIT_ID)) tryMountInline(deps);
+    if (typeof document === 'undefined' || !document.body) {
+      return;
+    }
+
+    if (!document.getElementById(INLINE_ID) || !document.getElementById(SPLIT_ID)) {
+      tryMountInline(deps);
+    }
   });
   _observer.observe(document.body, { childList: true, subtree: true });
 }

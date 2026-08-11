@@ -51,42 +51,67 @@ export interface TokenWatchdogState {
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) {
+      return null;
+    }
+
     const payload = parts[1];
     const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
 
     return JSON.parse(decoded);
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     return null;
   }
 }
 
 function extractToken(result: Record<string, unknown> | null): string | null {
-  if (!result) return null;
+  if (!result) {
+    return null;
+  }
+
   for (const key of ["token", "authToken", "sessionId"]) {
     const tokenValue = result[key];
-    if (typeof tokenValue === "string" && tokenValue.length > 0) return tokenValue;
+    if (typeof tokenValue === "string" && tokenValue.length > 0) {
+      return tokenValue;
+    }
   }
 
   return null;
 }
 
 function formatTtl(sec: number | null): string {
-  if (sec === null) return "Unknown";
-  if (sec <= 0) return "Expired";
+  if (sec === null) {
+    return "Unknown";
+  }
+
+  if (sec <= 0) {
+    return "Expired";
+  }
+
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m ${s}s`;
+  if (h > 0) {
+    return `${h}h ${m}m`;
+  }
+
+  if (m > 0) {
+    return `${m}m ${s}s`;
+  }
 
   return `${s}s`;
 }
 
 function maskToken(token: string | null): string {
-  if (!token) return "No token";
-  if (token.length < 20) return "•".repeat(token.length);
+  if (!token) {
+    return "No token";
+  }
+
+  if (token.length < 20) {
+    return "•".repeat(token.length);
+  }
 
   return `${token.slice(0, 8)}…${token.slice(-6)}`;
 }
@@ -182,7 +207,9 @@ export function useTokenWatchdog(): TokenWatchdogState {
   // TTL countdown + auto-refresh — visibility-paused (PERF-10).
   useVisibilityPausedInterval(() => {
     const exp = expRef.current;
-    if (exp === null) { return; }
+    if (exp === null) {
+      return; 
+    }
 
     const remaining = exp - Math.floor(Date.now() / 1000);
     setTtlSec(remaining);

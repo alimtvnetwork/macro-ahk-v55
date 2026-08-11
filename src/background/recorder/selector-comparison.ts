@@ -25,10 +25,10 @@ import type { DomContext } from "./failure-logger";
 import { ElementErrorType } from "../../types/enums";
 
 const SELECTOR_KIND_NAMES: Readonly<Record<number, string>> = {
-    1: "XPathFull",
-    2: "XPathRelative",
-    3: "Css",
-    4: "Aria",
+  1: "XPathFull",
+  2: "XPathRelative",
+  3: "Css",
+  4: "Aria",
 };
 
 export interface SelectorAttemptComparison {
@@ -68,36 +68,38 @@ export interface SelectorComparison {
  * evaluated correctly.
  */
 export function compareSelectorAttempts(
-    selectors: ReadonlyArray<PersistedSelector>,
-    doc: Document,
+  selectors: ReadonlyArray<PersistedSelector>,
+  doc: Document,
 ): SelectorComparison {
-    const attempts = selectors.map((sel) => evaluateOne(sel, selectors, doc));
-    sortAttempts(attempts);
+  const attempts = selectors.map((sel) => evaluateOne(sel, selectors, doc));
+  sortAttempts(attempts);
 
-    return summariseComparison(attempts);
+  return summariseComparison(attempts);
 }
 
 function sortAttempts(attempts: SelectorAttemptComparison[]): void {
-    attempts.sort((a, b) => {
-        if (a.IsPrimary !== b.IsPrimary) { return a.IsPrimary ? -1 : 1; }
+  attempts.sort((a, b) => {
+    if (a.IsPrimary !== b.IsPrimary) {
+      return a.IsPrimary ? -1 : 1; 
+    }
 
-        return a.SelectorId - b.SelectorId;
-    });
+    return a.SelectorId - b.SelectorId;
+  });
 }
 
 function summariseComparison(
-    attempts: ReadonlyArray<SelectorAttemptComparison>,
+  attempts: ReadonlyArray<SelectorAttemptComparison>,
 ): SelectorComparison {
-    const primary = attempts.find((a) => a.IsPrimary) ?? null;
-    const primaryMatched = primary?.Matched ?? false;
-    const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
+  const primary = attempts.find((a) => a.IsPrimary) ?? null;
+  const primaryMatched = primary?.Matched ?? false;
+  const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
 
-    return {
-        Attempts: attempts,
-        PrimaryMatched: primaryMatched,
-        AnyFallbackMatched: anyFallbackMatched,
-        DriftDetected: !primaryMatched && anyFallbackMatched,
-    };
+  return {
+    Attempts: attempts,
+    PrimaryMatched: primaryMatched,
+    AnyFallbackMatched: anyFallbackMatched,
+    DriftDetected: !primaryMatched && anyFallbackMatched,
+  };
 }
 
 type AttemptBase = Omit<
@@ -106,133 +108,135 @@ type AttemptBase = Omit<
 >;
 
 function evaluateOne(
-    selector: PersistedSelector,
-    all: ReadonlyArray<PersistedSelector>,
-    doc: Document,
+  selector: PersistedSelector,
+  all: ReadonlyArray<PersistedSelector>,
+  doc: Document,
 ): SelectorAttemptComparison {
-    const base = buildAttemptBase(selector);
-    const resolveOutcome = resolveExpression(selector, all);
-    if (resolveOutcome.error !== null) {
-        return failedAttempt(base, selector.Expression, resolveOutcome.error);
-    }
+  const base = buildAttemptBase(selector);
+  const resolveOutcome = resolveExpression(selector, all);
+  if (resolveOutcome.error !== null) {
+    return failedAttempt(base, selector.Expression, resolveOutcome.error);
+  }
 
-    return tryLookupAttempt(base, selector.SelectorKindId, resolveOutcome.expression, doc);
+  return tryLookupAttempt(base, selector.SelectorKindId, resolveOutcome.expression, doc);
 }
 
 function buildAttemptBase(selector: PersistedSelector): AttemptBase {
-    const kind = SELECTOR_KIND_NAMES[selector.SelectorKindId] ?? `Kind${selector.SelectorKindId}`;
+  const kind = SELECTOR_KIND_NAMES[selector.SelectorKindId] ?? `Kind${selector.SelectorKindId}`;
 
-    return {
-        SelectorId: selector.SelectorId,
-        Kind: kind,
-        Expression: selector.Expression,
-        IsPrimary: selector.IsPrimary === 1,
-    };
+  return {
+    SelectorId: selector.SelectorId,
+    Kind: kind,
+    Expression: selector.Expression,
+    IsPrimary: selector.IsPrimary === 1,
+  };
 }
 
 function resolveExpression(
-    selector: PersistedSelector, all: ReadonlyArray<PersistedSelector>,
+  selector: PersistedSelector, all: ReadonlyArray<PersistedSelector>,
 ): { expression: string; error: string | null } {
-    if (selector.SelectorKindId !== SelectorKindId.XPathRelative) {
-        return { expression: selector.Expression, error: null };
-    }
-    try {
-        const synthetic = withSyntheticPrimary(all, selector.SelectorId);
+  if (selector.SelectorKindId !== SelectorKindId.XPathRelative) {
+    return { expression: selector.Expression, error: null };
+  }
 
-        return { expression: resolveStepSelector(synthetic).Expression, error: null };
-    } catch (err) {
-        return { expression: selector.Expression, error: errorMessage(err) };
-    }
+  try {
+    const synthetic = withSyntheticPrimary(all, selector.SelectorId);
+
+    return { expression: resolveStepSelector(synthetic).Expression, error: null };
+  } catch (err) {
+    return { expression: selector.Expression, error: errorMessage(err) };
+  }
 }
 
 function withSyntheticPrimary(
-    all: ReadonlyArray<PersistedSelector>, primaryId: number,
+  all: ReadonlyArray<PersistedSelector>, primaryId: number,
 ): PersistedSelector[] {
-    return all.map((s) => ({ ...s, IsPrimary: s.SelectorId === primaryId ? 1 : 0 }));
+  return all.map((s) => ({ ...s, IsPrimary: s.SelectorId === primaryId ? 1 : 0 }));
 }
 
 function tryLookupAttempt(
-    base: AttemptBase, kindId: number, resolved: string, doc: Document,
+  base: AttemptBase, kindId: number, resolved: string, doc: Document,
 ): SelectorAttemptComparison {
-    try {
-        const { element, count } = lookup(kindId, resolved, doc);
+  try {
+    const { element, count } = lookup(kindId, resolved, doc);
 
-        return successfulAttempt(base, resolved, element, count);
-    } catch (err) {
-        return failedAttempt(base, resolved, errorMessage(err));
-    }
+    return successfulAttempt(base, resolved, element, count);
+  } catch (err) {
+    return failedAttempt(base, resolved, errorMessage(err));
+  }
 }
 
 function successfulAttempt(
-    base: AttemptBase, resolved: string, element: Element | null, count: number,
+  base: AttemptBase, resolved: string, element: Element | null, count: number,
 ): SelectorAttemptComparison {
-    return {
-        ...base,
-        ResolvedExpression: resolved,
-        Matched: element !== null,
-        MatchCount: count,
-        Element: element !== null ? readDomContext(element) : null,
-        Error: null,
-    };
+  return {
+    ...base,
+    ResolvedExpression: resolved,
+    Matched: element !== null,
+    MatchCount: count,
+    Element: element !== null ? readDomContext(element) : null,
+    Error: null,
+  };
 }
 
 function failedAttempt(
-    base: AttemptBase, resolved: string, error: string,
+  base: AttemptBase, resolved: string, error: string,
 ): SelectorAttemptComparison {
-    return {
-        ...base,
-        ResolvedExpression: resolved,
-        Matched: false,
-        MatchCount: 0,
-        Element: null,
-        Error: error,
-    };
+  return {
+    ...base,
+    ResolvedExpression: resolved,
+    Matched: false,
+    MatchCount: 0,
+    Element: null,
+    Error: error,
+  };
 }
 
 function errorMessage(err: unknown): string {
-    return err instanceof Error ? err.message : String(err);
+  return err instanceof Error ? err.message : String(err);
 }
 
 function lookup(
-    kindId: number,
-    expression: string,
-    doc: Document,
+  kindId: number,
+  expression: string,
+  doc: Document,
 ): { element: Element | null; count: number } {
-    if (kindId === SelectorKindId.XPathFull || kindId === SelectorKindId.XPathRelative) {
-        return xpathLookup(expression, doc);
-    }
-    const list = doc.querySelectorAll(expression);
+  if (kindId === SelectorKindId.XPathFull || kindId === SelectorKindId.XPathRelative) {
+    return xpathLookup(expression, doc);
+  }
 
-    return { element: list.length > 0 ? list[0] : null, count: list.length };
+  const list = doc.querySelectorAll(expression);
+
+  return { element: list.length > 0 ? list[0] : null, count: list.length };
 }
 
 function xpathLookup(
-    expression: string, doc: Document,
+  expression: string, doc: Document,
 ): { element: Element | null; count: number } {
-    const snapshot = doc.evaluate(
-        expression, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
-    );
-    const count = snapshot.snapshotLength;
-    const first = count > 0 ? snapshot.snapshotItem(0) : null;
+  const snapshot = doc.evaluate(
+    expression, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
+  );
+  const count = snapshot.snapshotLength;
+  const first = count > 0 ? snapshot.snapshotItem(0) : null;
 
-    return { element: first instanceof Element ? first : null, count };
+  return { element: first instanceof Element ? first : null, count };
 }
 
 function readDomContext(element: Element): DomContext {
-    return {
-        TagName: element.tagName.toLowerCase(),
-        Id:        nonEmptyAttr(element, "id"),
-        ClassName: nonEmptyAttr(element, "class"),
-        AriaLabel: nonEmptyAttr(element, "aria-label"),
-        Name:      nonEmptyAttr(element, "name"),
-        Type:      nonEmptyAttr(element, "type"),
-        TextSnippet: (element.textContent ?? "").trim().slice(0, 120),
-        OuterHtmlSnippet: element.outerHTML?.slice(0, 240) ?? "",
-    };
+  return {
+    TagName: element.tagName.toLowerCase(),
+    Id:        nonEmptyAttr(element, "id"),
+    ClassName: nonEmptyAttr(element, "class"),
+    AriaLabel: nonEmptyAttr(element, "aria-label"),
+    Name:      nonEmptyAttr(element, "name"),
+    Type:      nonEmptyAttr(element, "type"),
+    TextSnippet: (element.textContent ?? "").trim().slice(0, 120),
+    OuterHtmlSnippet: element.outerHTML?.slice(0, 240) ?? "",
+  };
 }
 
 function nonEmptyAttr(element: Element, name: string): string | null {
-    const value = element.getAttribute(name);
+  const value = element.getAttribute(name);
 
-    return value !== null && value.length > 0 ? value : null;
+  return value !== null && value.length > 0 ? value : null;
 }

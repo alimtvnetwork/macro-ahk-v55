@@ -37,10 +37,16 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
       for (const childElement of body.children) {
         const childHtmlElement = childElement as HTMLElement;
         if (childHtmlElement.dataset.role === 'action-overflow') {
-          if (childHtmlElement.style.display !== 'none') w += OVERFLOW_W;
+          if (childHtmlElement.style.display !== 'none') {
+            w += OVERFLOW_W;
+          }
+
           continue;
         }
-        if (childHtmlElement.dataset.trailingAction === '1' && childHtmlElement.style.display !== 'none') w += ACTION_W;
+
+        if (childHtmlElement.dataset.trailingAction === '1' && childHtmlElement.style.display !== 'none') {
+          w += ACTION_W;
+        }
       }
 
       return w;

@@ -24,60 +24,60 @@ interface FailureReportsPanelProps {
 }
 
 export function FailureReportsPanel({ reports, onDownload, onCopy }: FailureReportsPanelProps) {
-    const s = useFailureReportsPanel({ reports, onDownload, onCopy });
+  const s = useFailureReportsPanel({ reports, onDownload, onCopy });
 
-    return (
-        <Card>
-            <CardHeader className="flex flex-col gap-2 pb-2 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
+  return (
+    <Card>
+      <CardHeader className="flex flex-col gap-2 pb-2 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive" />
                     Failure Reports
-                    <Badge variant="secondary" className="ml-1">{reports.length}</Badge>
-                </CardTitle>
-                <FailureReportsToolbar
-                    reportsLength={reports.length}
-                    allSelected={s.allSelected}
-                    noneSelected={s.noneSelected}
-                    exportFormat={s.exportFormat}
-                    setExportFormat={s.setExportFormat}
-                    validPickedStep={s.validPickedStep}
-                    setPickedStep={s.setPickedStep}
-                    stepOptions={s.stepOptions}
-                    toggleAll={s.toggleAll}
-                    onExport={s.handleExport}
-                    onExportLast={s.handleExportLast}
-                    onCopyLast={s.handleCopyLast}
-                    onExportByStep={s.handleExportByStep}
-                />
-            </CardHeader>
-            <CardContent>
-                {reports.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic py-4 text-center">
+          <Badge variant="secondary" className="ml-1">{reports.length}</Badge>
+        </CardTitle>
+        <FailureReportsToolbar
+          reportsLength={reports.length}
+          allSelected={s.allSelected}
+          noneSelected={s.noneSelected}
+          exportFormat={s.exportFormat}
+          setExportFormat={s.setExportFormat}
+          validPickedStep={s.validPickedStep}
+          setPickedStep={s.setPickedStep}
+          stepOptions={s.stepOptions}
+          toggleAll={s.toggleAll}
+          onExport={s.handleExport}
+          onExportLast={s.handleExportLast}
+          onCopyLast={s.handleCopyLast}
+          onExportByStep={s.handleExportByStep}
+        />
+      </CardHeader>
+      <CardContent>
+        {reports.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic py-4 text-center">
                         No failures recorded.
-                    </p>
-                ) : (
-                    <ScrollArea className="h-64 pr-2">
-                        <ul className="space-y-1.5">
-                            {reports.map((r, i) => {
-                                const key = rowKey(r, i);
+          </p>
+        ) : (
+          <ScrollArea className="h-64 pr-2">
+            <ul className="space-y-1.5">
+              {reports.map((r, i) => {
+                const key = rowKey(r, i);
 
-                                return (
-                                    <FailureReportRow
-                                        key={key}
-                                        report={r}
-                                        rowKey={key}
-                                        index={i}
-                                        checked={s.selected.has(key)}
-                                        expanded={s.expanded.has(key)}
-                                        onToggle={() => s.toggle(key)}
-                                        onToggleExpanded={() => s.toggleExpanded(key)}
-                                    />
-                                );
-                            })}
-                        </ul>
-                    </ScrollArea>
-                )}
-            </CardContent>
-        </Card>
-    );
+                return (
+                  <FailureReportRow
+                    key={key}
+                    report={r}
+                    rowKey={key}
+                    index={i}
+                    checked={s.selected.has(key)}
+                    expanded={s.expanded.has(key)}
+                    onToggle={() => s.toggle(key)}
+                    onToggleExpanded={() => s.toggleExpanded(key)}
+                  />
+                );
+              })}
+            </ul>
+          </ScrollArea>
+        )}
+      </CardContent>
+    </Card>
+  );
 }

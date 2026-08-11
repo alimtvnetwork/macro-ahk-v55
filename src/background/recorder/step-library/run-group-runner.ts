@@ -137,57 +137,68 @@ export interface RunGroupOptions {
 /* ------------------------------------------------------------------ */
 
 function preflightRoot(
-    opts: RunGroupOptions,
-    trace: RunStepTraceEntry[],
+  opts: RunGroupOptions,
+  trace: RunStepTraceEntry[],
 ): { root: StepGroupRow; failure: null } | { root: null; failure: RunGroupFailure } {
-    const root = findGroup(opts.db, opts.rootGroupId);
-    if (root === null) {
-        return { root: null, failure: {
-            Ok: false, Reason: "MissingRootGroup",
-            ReasonDetail:
+  const root = findGroup(opts.db, opts.rootGroupId);
+  if (root === null) {
+    return { root: null, failure: {
+      Ok: false, Reason: "MissingRootGroup",
+      ReasonDetail:
                 `runGroup: rootGroupId=${opts.rootGroupId} not found in StepGroup table. ` +
                 `Caller must pass an existing StepGroupId, was the group deleted between ` +
                 `selection and execution?`,
-            FailedStepId: null, FailedGroupId: opts.rootGroupId,
-            CallStack: [], FailureReport: null, Trace: trace,
-        } };
-    }
-    if (root.ProjectId !== opts.projectId) {
-        return { root: null, failure: {
-            Ok: false, Reason: "TargetNotInProject",
-            ReasonDetail:
+      FailedStepId: null, FailedGroupId: opts.rootGroupId,
+      CallStack: [], FailureReport: null, Trace: trace,
+    } };
+  }
+
+  if (root.ProjectId !== opts.projectId) {
+    return { root: null, failure: {
+      Ok: false, Reason: "TargetNotInProject",
+      ReasonDetail:
                 `runGroup: rootGroupId=${opts.rootGroupId} belongs to ProjectId=${root.ProjectId}, ` +
                 `but caller passed ProjectId=${opts.projectId}. Refusing to cross project boundary.`,
-            FailedStepId: null, FailedGroupId: opts.rootGroupId,
-            CallStack: [], FailureReport: null, Trace: trace,
-        } };
-    }
+      FailedStepId: null, FailedGroupId: opts.rootGroupId,
+      CallStack: [], FailureReport: null, Trace: trace,
+    } };
+  }
 
-    return { root, failure: null };
+  return { root, failure: null };
 }
 
 export async function runGroup(opts: RunGroupOptions): Promise<RunGroupResult> {
-    const now = opts.now ?? defaultNow;
-    const trace: RunStepTraceEntry[] = [];
-    const pre = preflightRoot(opts, trace);
-    if (pre.failure !== null) return pre.failure;
+  const now = opts.now ?? defaultNow;
+  const trace: RunStepTraceEntry[] = [];
+  const pre = preflightRoot(opts, trace);
+  if (pre.failure !== null) {
+    return pre.failure;
+  }
 
-    let executed = 0, skipped = 0, entered = 0;
-    const counters = {
-        bumpExecuted: () => { executed++; },
-        bumpSkipped:  () => { skipped++; },
-        bumpEntered:  () => { entered++; },
-    };
+  let executed = 0, skipped = 0, entered = 0;
+  const counters = {
+    bumpExecuted: () => {
+      executed++; 
+    },
+    bumpSkipped:  () => {
+      skipped++; 
+    },
+    bumpEntered:  () => {
+      entered++; 
+    },
+  };
 
-    const failure = await runOne({
-        db: opts.db, projectId: opts.projectId, group: pre.root,
-        callStackIds: [], callStackNames: [],
-        executeLeafStep: opts.executeLeafStep,
-        trace, now, counters,
-    });
-    if (failure !== null) return failure;
+  const failure = await runOne({
+    db: opts.db, projectId: opts.projectId, group: pre.root,
+    callStackIds: [], callStackNames: [],
+    executeLeafStep: opts.executeLeafStep,
+    trace, now, counters,
+  });
+  if (failure !== null) {
+    return failure;
+  }
 
-    return { Ok: true, StepsExecuted: executed, StepsSkipped: skipped, GroupsEntered: entered, Trace: trace };
+  return { Ok: true, StepsExecuted: executed, StepsSkipped: skipped, GroupsEntered: entered, Trace: trace };
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,266 +222,293 @@ interface FrameContext {
 }
 
 function enterGroupTrace(frame: FrameContext, newStackNames: ReadonlyArray<string>): void {
-    pushTrace(frame.trace, {
-        StepId: -1,
-        StepGroupId: frame.group.StepGroupId,
-        StepKindId: StepKindId.RunGroup,
-        LabelType: `→ enter "${frame.group.Name}"`,
-        OrderIndex: -1,
-        GroupPath: newStackNames,
-        Outcome: "EnteredGroup",
-        StartedAt: frame.now().toISOString(),
-        DurationMs: 0,
-    });
+  pushTrace(frame.trace, {
+    StepId: -1,
+    StepGroupId: frame.group.StepGroupId,
+    StepKindId: StepKindId.RunGroup,
+    LabelType: `→ enter "${frame.group.Name}"`,
+    OrderIndex: -1,
+    GroupPath: newStackNames,
+    Outcome: "EnteredGroup",
+    StartedAt: frame.now().toISOString(),
+    DurationMs: 0,
+  });
 }
 
 function exitGroupTrace(frame: FrameContext, newStackNames: ReadonlyArray<string>): void {
-    pushTrace(frame.trace, {
-        StepId: -1,
-        StepGroupId: frame.group.StepGroupId,
-        StepKindId: StepKindId.RunGroup,
-        LabelType: `← exit "${frame.group.Name}"`,
-        OrderIndex: -1,
-        GroupPath: newStackNames,
-        Outcome: "ExitedGroup",
-        StartedAt: frame.now().toISOString(),
-        DurationMs: 0,
-    });
+  pushTrace(frame.trace, {
+    StepId: -1,
+    StepGroupId: frame.group.StepGroupId,
+    StepKindId: StepKindId.RunGroup,
+    LabelType: `← exit "${frame.group.Name}"`,
+    OrderIndex: -1,
+    GroupPath: newStackNames,
+    Outcome: "ExitedGroup",
+    StartedAt: frame.now().toISOString(),
+    DurationMs: 0,
+  });
 }
 
 function traceDisabledStep(frame: FrameContext, step: StepRow, newStackNames: ReadonlyArray<string>): void {
-    frame.counters.bumpSkipped();
-    pushTrace(frame.trace, buildSkippedTraceEntry(step, newStackNames, frame.now()));
+  frame.counters.bumpSkipped();
+  pushTrace(frame.trace, buildSkippedTraceEntry(step, newStackNames, frame.now()));
 }
 
 function buildSkippedTraceEntry(step: StepRow, groupPath: ReadonlyArray<string>, now: Date): RunStepTraceEntry {
-    return {
-        StepId: step.StepId,
-        StepGroupId: step.StepGroupId,
-        StepKindId: step.StepKindId,
-        LabelType: step.LabelType,
-        OrderIndex: step.OrderIndex,
-        GroupPath: groupPath,
-        Outcome: "Skipped",
-        StartedAt: now.toISOString(),
-        DurationMs: 0,
-    };
+  return {
+    StepId: step.StepId,
+    StepGroupId: step.StepGroupId,
+    StepKindId: step.StepKindId,
+    LabelType: step.LabelType,
+    OrderIndex: step.OrderIndex,
+    GroupPath: groupPath,
+    Outcome: "Skipped",
+    StartedAt: now.toISOString(),
+    DurationMs: 0,
+  };
 }
 
 async function processFrameStep(
-    step: StepRow,
-    frame: FrameContext,
-    newStackIds: ReadonlyArray<number>,
-    newStackNames: ReadonlyArray<string>,
+  step: StepRow,
+  frame: FrameContext,
+  newStackIds: ReadonlyArray<number>,
+  newStackNames: ReadonlyArray<string>,
 ): Promise<RunGroupFailure | null> {
-    if (step.IsDisabled) {
-        traceDisabledStep(frame, step, newStackNames);
+  if (step.IsDisabled) {
+    traceDisabledStep(frame, step, newStackNames);
 
-        return null;
-    }
-    const childFrame: FrameContext = { ...frame, callStackIds: newStackIds, callStackNames: newStackNames };
-    if (step.StepKindId === StepKindId.RunGroup) {
-        return invokeRunGroupStep(step, childFrame);
-    }
+    return null;
+  }
 
-    return invokeLeafStep(step, childFrame);
+  const childFrame: FrameContext = { ...frame, callStackIds: newStackIds, callStackNames: newStackNames };
+  if (step.StepKindId === StepKindId.RunGroup) {
+    return invokeRunGroupStep(step, childFrame);
+  }
+
+  return invokeLeafStep(step, childFrame);
 }
 
 async function runOne(frame: FrameContext): Promise<RunGroupFailure | null> {
-    const newStackIds = [...frame.callStackIds, frame.group.StepGroupId];
-    const newStackNames = [...frame.callStackNames, frame.group.Name];
-    frame.counters.bumpEntered();
-    enterGroupTrace(frame, newStackNames);
+  const newStackIds = [...frame.callStackIds, frame.group.StepGroupId];
+  const newStackNames = [...frame.callStackNames, frame.group.Name];
+  frame.counters.bumpEntered();
+  enterGroupTrace(frame, newStackNames);
 
-    for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
-        const failure = await processFrameStep(step, frame, newStackIds, newStackNames);
-        if (failure !== null) return failure;
+  for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
+    const failure = await processFrameStep(step, frame, newStackIds, newStackNames);
+    if (failure !== null) {
+      return failure;
     }
+  }
 
-    exitGroupTrace(frame, newStackNames);
+  exitGroupTrace(frame, newStackNames);
 
-    return null;
+  return null;
 }
 
 function resolveRunGroupTarget(
-    step: StepRow,
-    frame: FrameContext,
+  step: StepRow,
+  frame: FrameContext,
 ): { target: StepGroupRow; failure: null } | { target: null; failure: RunGroupFailure } {
-    const nullFail = failNullTargetGroup(step, frame);
-    if (nullFail !== null) return { target: null, failure: nullFail };
-    const target = findGroup(frame.db, step.TargetStepGroupId as number);
-    const missingFail = failMissingTargetGroup(step, frame, target);
-    if (missingFail !== null) return { target: null, failure: missingFail };
-    const resolvedTarget = target as StepGroupRow;
-    const crossFail = failCrossProjectTarget(step, frame, resolvedTarget);
-    if (crossFail !== null) return { target: null, failure: crossFail };
+  const nullFail = failNullTargetGroup(step, frame);
+  if (nullFail !== null) {
+    return { target: null, failure: nullFail };
+  }
 
-    return { target: resolvedTarget, failure: null };
+  const target = findGroup(frame.db, step.TargetStepGroupId as number);
+  const missingFail = failMissingTargetGroup(step, frame, target);
+  if (missingFail !== null) {
+    return { target: null, failure: missingFail };
+  }
+
+  const resolvedTarget = target as StepGroupRow;
+  const crossFail = failCrossProjectTarget(step, frame, resolvedTarget);
+  if (crossFail !== null) {
+    return { target: null, failure: crossFail };
+  }
+
+  return { target: resolvedTarget, failure: null };
 }
 
 function failNullTargetGroup(step: StepRow, frame: FrameContext): RunGroupFailure | null {
-    if (step.TargetStepGroupId !== null) return null;
+  if (step.TargetStepGroupId !== null) {
+    return null;
+  }
 
-    return failure(frame, {
-        Reason: "MissingTargetGroup",
-        ReasonDetail:
+  return failure(frame, {
+    Reason: "MissingTargetGroup",
+    ReasonDetail:
             `Step ${step.StepId} (kind=RunGroup) has TargetStepGroupId=NULL. ` +
             `The referenced group was likely deleted (FK ON DELETE SET NULL fired). ` +
             `Re-link this step to a valid group or remove it.`,
-        failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
-    });
+    failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
+  });
 }
 
 function failMissingTargetGroup(
-    step: StepRow,
-    frame: FrameContext,
-    target: StepGroupRow | null,
+  step: StepRow,
+  frame: FrameContext,
+  target: StepGroupRow | null,
 ): RunGroupFailure | null {
-    if (target !== null) return null;
+  if (target !== null) {
+    return null;
+  }
 
-    return failure(frame, {
-        Reason: "MissingTargetGroup",
-        ReasonDetail:
+  return failure(frame, {
+    Reason: "MissingTargetGroup",
+    ReasonDetail:
             `Step ${step.StepId} (kind=RunGroup) targets StepGroupId=${step.TargetStepGroupId} ` +
             `but no such group exists. Database is inconsistent, expected FK to have ` +
             `enforced this; check PRAGMA foreign_keys is ON.`,
-        failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
-    });
+    failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
+  });
 }
 
 function failCrossProjectTarget(
-    step: StepRow,
-    frame: FrameContext,
-    target: StepGroupRow,
+  step: StepRow,
+  frame: FrameContext,
+  target: StepGroupRow,
 ): RunGroupFailure | null {
-    if (target.ProjectId === frame.projectId) return null;
+  if (target.ProjectId === frame.projectId) {
+    return null;
+  }
 
-    return failure(frame, {
-        Reason: "TargetNotInProject",
-        ReasonDetail:
+  return failure(frame, {
+    Reason: "TargetNotInProject",
+    ReasonDetail:
             `Step ${step.StepId} targets group "${target.Name}" (ProjectId=${target.ProjectId}) ` +
             `but the runner is bound to ProjectId=${frame.projectId}. ` +
             `Cross-project RunGroup is forbidden, re-import the dependency into this project.`,
-        failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
-    });
+    failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
+  });
 }
 
 function checkFrameStackConstraints(
-    step: StepRow,
-    frame: FrameContext,
-    target: StepGroupRow,
+  step: StepRow,
+  frame: FrameContext,
+  target: StepGroupRow,
 ): RunGroupFailure | null {
-    if (frame.callStackIds.includes(target.StepGroupId)) {
-        const cycle = [...frame.callStackNames, target.Name].join(" → ");
+  if (frame.callStackIds.includes(target.StepGroupId)) {
+    const cycle = [...frame.callStackNames, target.Name].join(" → ");
 
-        return failure(frame, {
-            Reason: "RunGroupCycle",
-            ReasonDetail:
+    return failure(frame, {
+      Reason: "RunGroupCycle",
+      ReasonDetail:
                 `RunGroup cycle detected: ${cycle}. Group "${target.Name}" is already ` +
                 `executing higher up the call stack. Recursion is not supported, break ` +
                 `the cycle by extracting the shared steps into a leaf-only group.`,
-            failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
-        });
-    }
-    if (frame.callStackIds.length + 1 > MAX_RUN_GROUP_CALL_DEPTH) {
-        return failure(frame, {
-            Reason: "RunGroupDepthExceeded",
-            ReasonDetail:
+      failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
+    });
+  }
+
+  if (frame.callStackIds.length + 1 > MAX_RUN_GROUP_CALL_DEPTH) {
+    return failure(frame, {
+      Reason: "RunGroupDepthExceeded",
+      ReasonDetail:
                 `RunGroup call stack would reach depth ${frame.callStackIds.length + 1}, ` +
                 `exceeding MAX_RUN_GROUP_CALL_DEPTH=${MAX_RUN_GROUP_CALL_DEPTH}. ` +
                 `Flatten deeply nested compositions or raise the limit in schema.ts.`,
-            failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
-        });
-    }
+      failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
+    });
+  }
 
-    return null;
+  return null;
 }
 
 function validateRunGroupStepTarget(
-    step: StepRow,
-    frame: FrameContext,
+  step: StepRow,
+  frame: FrameContext,
 ): { target: StepGroupRow; failure: null } | { target: null; failure: RunGroupFailure } {
-    const resolved = resolveRunGroupTarget(step, frame);
-    if (resolved.failure !== null) return resolved;
-    const stackFailure = checkFrameStackConstraints(step, frame, resolved.target);
-    if (stackFailure !== null) return { target: null, failure: stackFailure };
+  const resolved = resolveRunGroupTarget(step, frame);
+  if (resolved.failure !== null) {
+    return resolved;
+  }
 
-    return { target: resolved.target, failure: null };
+  const stackFailure = checkFrameStackConstraints(step, frame, resolved.target);
+  if (stackFailure !== null) {
+    return { target: null, failure: stackFailure };
+  }
+
+  return { target: resolved.target, failure: null };
 }
 
 async function invokeRunGroupStep(
-    step: StepRow,
-    frame: FrameContext,
+  step: StepRow,
+  frame: FrameContext,
 ): Promise<RunGroupFailure | null> {
-    const check = validateRunGroupStepTarget(step, frame);
-    if (check.failure !== null) return check.failure;
+  const check = validateRunGroupStepTarget(step, frame);
+  if (check.failure !== null) {
+    return check.failure;
+  }
 
-    return runOne({ ...frame, group: check.target });
+  return runOne({ ...frame, group: check.target });
 }
 
 async function runLeafExecutor(
-    step: StepRow,
-    frame: FrameContext,
-    startedAt: Date,
+  step: StepRow,
+  frame: FrameContext,
+  startedAt: Date,
 ): Promise<FailureReport | null> {
-    const ctx: LeafStepContext = {
-        ProjectId: frame.projectId,
-        GroupPath: frame.callStackNames,
-        CallStackGroupIds: frame.callStackIds,
-    };
-    try {
-        return await frame.executeLeafStep(step, ctx);
-    } catch (caught) {
-        return synthesizeFailureReport(step, caught, startedAt);
-    }
+  const ctx: LeafStepContext = {
+    ProjectId: frame.projectId,
+    GroupPath: frame.callStackNames,
+    CallStackGroupIds: frame.callStackIds,
+  };
+  try {
+    return await frame.executeLeafStep(step, ctx);
+  } catch (caught) {
+    return synthesizeFailureReport(step, caught, startedAt);
+  }
 }
 
 function traceLeafOutcome(frame: FrameContext, step: StepRow, startedAt: Date, report: FailureReport | null): void {
-    const durationMs = Math.max(0, frame.now().getTime() - startedAt.getTime());
-    pushTrace(frame.trace, buildLeafOutcomeTraceEntry(step, frame.callStackNames, startedAt, durationMs, report));
+  const durationMs = Math.max(0, frame.now().getTime() - startedAt.getTime());
+  pushTrace(frame.trace, buildLeafOutcomeTraceEntry(step, frame.callStackNames, startedAt, durationMs, report));
 }
 
 function buildLeafOutcomeTraceEntry(
-    step: StepRow,
-    groupPath: ReadonlyArray<string>,
-    startedAt: Date,
-    durationMs: number,
-    report: FailureReport | null,
+  step: StepRow,
+  groupPath: ReadonlyArray<string>,
+  startedAt: Date,
+  durationMs: number,
+  report: FailureReport | null,
 ): RunStepTraceEntry {
-    return {
-        StepId: step.StepId,
-        StepGroupId: step.StepGroupId,
-        StepKindId: step.StepKindId,
-        LabelType: step.LabelType,
-        OrderIndex: step.OrderIndex,
-        GroupPath: groupPath,
-        Outcome: report === null ? "Executed" : "Failed",
-        StartedAt: startedAt.toISOString(),
-        DurationMs: durationMs,
-    };
+  return {
+    StepId: step.StepId,
+    StepGroupId: step.StepGroupId,
+    StepKindId: step.StepKindId,
+    LabelType: step.LabelType,
+    OrderIndex: step.OrderIndex,
+    GroupPath: groupPath,
+    Outcome: report === null ? "Executed" : "Failed",
+    StartedAt: startedAt.toISOString(),
+    DurationMs: durationMs,
+  };
 }
 
 async function invokeLeafStep(
-    step: StepRow,
-    frame: FrameContext,
+  step: StepRow,
+  frame: FrameContext,
 ): Promise<RunGroupFailure | null> {
-    const startedAt = frame.now();
-    const report = await runLeafExecutor(step, frame, startedAt);
-    frame.counters.bumpExecuted();
-    traceLeafOutcome(frame, step, startedAt, report);
-    if (report === null) return null;
+  const startedAt = frame.now();
+  const report = await runLeafExecutor(step, frame, startedAt);
+  frame.counters.bumpExecuted();
+  traceLeafOutcome(frame, step, startedAt, report);
+  if (report === null) {
+    return null;
+  }
 
-    return {
-        Ok: false, Reason: "LeafStepFailed",
-        ReasonDetail:
+  return {
+    Ok: false, Reason: "LeafStepFailed",
+    ReasonDetail:
             `Leaf step ${step.StepId} (kind=${stepKindName(step.StepKindId)}) failed at ` +
             `"${frame.callStackNames.join(" → ")}". See FailureReport for selectors / variables / DOM context.`,
-        FailedStepId: step.StepId,
-        FailedGroupId: frame.group.StepGroupId,
-        CallStack: frame.callStackNames,
-        FailureReport: report,
-        Trace: frame.trace,
-    };
+    FailedStepId: step.StepId,
+    FailedGroupId: frame.group.StepGroupId,
+    CallStack: frame.callStackNames,
+    FailureReport: report,
+    Trace: frame.trace,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -478,98 +516,101 @@ async function invokeLeafStep(
 /* ------------------------------------------------------------------ */
 
 function findGroup(db: StepLibraryDb, stepGroupId: number): StepGroupRow | null {
-    const stmt = db.raw.prepare(
-        `SELECT StepGroupId, ProjectId, ParentStepGroupId, Name, Description,
+  const stmt = db.raw.prepare(
+    `SELECT StepGroupId, ProjectId, ParentStepGroupId, Name, Description,
                 OrderIndex, IsArchived, CreatedAt, UpdatedAt
          FROM StepGroup WHERE StepGroupId = ?;`,
-    );
-    try {
-        stmt.bind([stepGroupId]);
-        if (!stmt.step()) return null;
-        const r = stmt.getAsObject() as unknown as StepGroupRow;
-
-        return { ...r, IsArchived: Boolean(r.IsArchived) };
-    } finally {
-        stmt.free();
+  );
+  try {
+    stmt.bind([stepGroupId]);
+    if (!stmt.step()) {
+      return null;
     }
+
+    const r = stmt.getAsObject() as unknown as StepGroupRow;
+
+    return { ...r, IsArchived: Boolean(r.IsArchived) };
+  } finally {
+    stmt.free();
+  }
 }
 
 function failure(
-    frame: FrameContext,
-    input: {
+  frame: FrameContext,
+  input: {
         Reason: RunGroupFailureReason;
         ReasonDetail: string;
         failedStepId: number | null;
         failedGroupId: number | null;
     },
 ): RunGroupFailure {
-    return {
-        Ok: false,
-        Reason: input.Reason,
-        ReasonDetail: input.ReasonDetail,
-        FailedStepId: input.failedStepId,
-        FailedGroupId: input.failedGroupId,
-        CallStack: frame.callStackNames,
-        FailureReport: null,
-        Trace: frame.trace,
-    };
+  return {
+    Ok: false,
+    Reason: input.Reason,
+    ReasonDetail: input.ReasonDetail,
+    FailedStepId: input.failedStepId,
+    FailedGroupId: input.failedGroupId,
+    CallStack: frame.callStackNames,
+    FailureReport: null,
+    Trace: frame.trace,
+  };
 }
 
 function pushTrace(buf: RunStepTraceEntry[], entry: RunStepTraceEntry): void {
-    buf.push(entry);
+  buf.push(entry);
 }
 
 function defaultNow(): Date {
-    return new Date();
+  return new Date();
 }
 
 function stepKindName(kind: StepKindId): string {
-    switch (kind) {
-        case StepKindId.Click:    return "Click";
-        case StepKindId.Type:     return "Type";
-        case StepKindId.Select:   return "Select";
-        case StepKindId.JsInline: return "JsInline";
-        case StepKindId.Wait:     return "Wait";
-        case StepKindId.RunGroup: return "RunGroup";
-        default:                  return `Unknown(${String(kind)})`;
-    }
+  switch (kind) {
+    case StepKindId.Click:    return "Click";
+    case StepKindId.Type:     return "Type";
+    case StepKindId.Select:   return "Select";
+    case StepKindId.JsInline: return "JsInline";
+    case StepKindId.Wait:     return "Wait";
+    case StepKindId.RunGroup: return "RunGroup";
+    default:                  return `Unknown(${String(kind)})`;
+  }
 }
 
 function synthesizeFailureReport(step: StepRow, error: unknown, startedAt: Date): FailureReport {
-    const message = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? (error.stack ?? null) : null;
+  const message = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? (error.stack ?? null) : null;
 
-    return buildSynthesizedFailureReport(step, message, stack, startedAt);
+  return buildSynthesizedFailureReport(step, message, stack, startedAt);
 }
 
 function buildSynthesizedFailureReport(
-    step: StepRow,
-    message: string,
-    stack: string | null,
-    startedAt: Date,
+  step: StepRow,
+  message: string,
+  stack: string | null,
+  startedAt: Date,
 ): FailureReport {
-    return {
-        Phase: "Replay",
-        Message: message,
-        Reason: "Unknown",
-        ReasonDetail:
+  return {
+    Phase: "Replay",
+    Message: message,
+    Reason: "Unknown",
+    ReasonDetail:
             `Leaf executor threw a raw error instead of returning a FailureReport. ` +
             `The runner synthesized this report so downstream consumers receive the canonical shape.`,
-        StackTrace: stack,
-        StepId: step.StepId,
-        Index: step.OrderIndex,
-        StepKind: stepKindName(step.StepKindId),
-        Selectors: [],
-        Variables: [],
-        DomContext: null,
-        DataRow: null,
-        ResolvedXPath: null,
-        Timestamp: startedAt.toISOString(),
-        SourceFile: "src/background/recorder/step-library/run-group-runner.ts",
-        Verbose: false,
-        CapturedHtml: null,
-        FormSnapshot: null,
-    };
+    StackTrace: stack,
+    StepId: step.StepId,
+    Index: step.OrderIndex,
+    StepKind: stepKindName(step.StepKindId),
+    Selectors: [],
+    Variables: [],
+    DomContext: null,
+    DataRow: null,
+    ResolvedXPath: null,
+    Timestamp: startedAt.toISOString(),
+    SourceFile: "src/background/recorder/step-library/run-group-runner.ts",
+    Verbose: false,
+    CapturedHtml: null,
+    FormSnapshot: null,
+  };
 }
 
 /* ================================================================== */
@@ -630,68 +671,77 @@ export interface ExpandOptions {
  * preview cannot show a plan that the runner would refuse to execute.
  */
 function expansionFailure(
-    frame: Pick<ExpansionFrame, ExpansionFailureFrameType>,
-    reason: Exclude<RunGroupFailureReason, "LeafStepFailed">,
-    detail: string,
-    stepId: number | null,
-    stackNames: ReadonlyArray<string>,
+  frame: Pick<ExpansionFrame, ExpansionFailureFrameType>,
+  reason: Exclude<RunGroupFailureReason, "LeafStepFailed">,
+  detail: string,
+  stepId: number | null,
+  stackNames: ReadonlyArray<string>,
 ): ExpansionFailure {
-    return {
-        Ok: false, Reason: reason, ReasonDetail: detail,
-        FailedStepId: stepId,
-        FailedGroupId: frame.group.StepGroupId,
-        CallStack: stackNames,
-        PartialSteps: frame.plan,
-    };
+  return {
+    Ok: false, Reason: reason, ReasonDetail: detail,
+    FailedStepId: stepId,
+    FailedGroupId: frame.group.StepGroupId,
+    CallStack: stackNames,
+    PartialSteps: frame.plan,
+  };
 }
 
 function preflightExpansionRoot(
-    opts: ExpandOptions,
-    plan: ExpandedStep[],
+  opts: ExpandOptions,
+  plan: ExpandedStep[],
 ): { root: StepGroupRow; failure: null } | { root: null; failure: ExpansionFailure } {
-    const root = findGroup(opts.db, opts.rootGroupId);
-    if (root === null) {
-        return { root: null, failure: {
-            Ok: false, Reason: "MissingRootGroup",
-            ReasonDetail:
+  const root = findGroup(opts.db, opts.rootGroupId);
+  if (root === null) {
+    return { root: null, failure: {
+      Ok: false, Reason: "MissingRootGroup",
+      ReasonDetail:
                 `expandRunGroups: rootGroupId=${opts.rootGroupId} not found in StepGroup. ` +
                 `Cannot build an execution plan for a group that does not exist.`,
-            FailedStepId: null, FailedGroupId: opts.rootGroupId,
-            CallStack: [], PartialSteps: plan,
-        } };
-    }
-    if (root.ProjectId !== opts.projectId) {
-        return { root: null, failure: {
-            Ok: false, Reason: "TargetNotInProject",
-            ReasonDetail:
+      FailedStepId: null, FailedGroupId: opts.rootGroupId,
+      CallStack: [], PartialSteps: plan,
+    } };
+  }
+
+  if (root.ProjectId !== opts.projectId) {
+    return { root: null, failure: {
+      Ok: false, Reason: "TargetNotInProject",
+      ReasonDetail:
                 `expandRunGroups: rootGroupId=${opts.rootGroupId} belongs to ProjectId=${root.ProjectId}, ` +
                 `not the requested ProjectId=${opts.projectId}.`,
-            FailedStepId: null, FailedGroupId: opts.rootGroupId,
-            CallStack: [], PartialSteps: plan,
-        } };
-    }
+      FailedStepId: null, FailedGroupId: opts.rootGroupId,
+      CallStack: [], PartialSteps: plan,
+    } };
+  }
 
-    return { root, failure: null };
+  return { root, failure: null };
 }
 
 export function expandRunGroups(opts: ExpandOptions): ExpansionResult {
-    const skipDisabled = opts.skipDisabled !== false;
-    const plan: ExpandedStep[] = [];
-    let groupsVisited = 0;
-    let disabledSkipped = 0;
+  const skipDisabled = opts.skipDisabled !== false;
+  const plan: ExpandedStep[] = [];
+  let groupsVisited = 0;
+  let disabledSkipped = 0;
 
-    const pre = preflightExpansionRoot(opts, plan);
-    if (pre.failure !== null) return pre.failure;
+  const pre = preflightExpansionRoot(opts, plan);
+  if (pre.failure !== null) {
+    return pre.failure;
+  }
 
-    const failure = walkForExpansion({
-        db: opts.db, projectId: opts.projectId, group: pre.root,
-        callStackIds: [], callStackNames: [], plan, skipDisabled,
-        onGroupEnter: () => { groupsVisited++; },
-        onDisabledSkipped: () => { disabledSkipped++; },
-    });
-    if (failure !== null) return failure;
+  const failure = walkForExpansion({
+    db: opts.db, projectId: opts.projectId, group: pre.root,
+    callStackIds: [], callStackNames: [], plan, skipDisabled,
+    onGroupEnter: () => {
+      groupsVisited++; 
+    },
+    onDisabledSkipped: () => {
+      disabledSkipped++; 
+    },
+  });
+  if (failure !== null) {
+    return failure;
+  }
 
-    return { Ok: true, Steps: plan, GroupsVisited: groupsVisited, DisabledSkipped: disabledSkipped };
+  return { Ok: true, Steps: plan, GroupsVisited: groupsVisited, DisabledSkipped: disabledSkipped };
 }
 
 interface ExpansionFrame {
@@ -707,111 +757,123 @@ interface ExpansionFrame {
 }
 
 function walkForExpansion(frame: ExpansionFrame): ExpansionFailure | null {
-    const newStackIds = [...frame.callStackIds, frame.group.StepGroupId];
-    const newStackNames = [...frame.callStackNames, frame.group.Name];
-    frame.onGroupEnter();
+  const newStackIds = [...frame.callStackIds, frame.group.StepGroupId];
+  const newStackNames = [...frame.callStackNames, frame.group.Name];
+  frame.onGroupEnter();
 
-    for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
-        const result = processExpansionStep(step, frame, newStackIds, newStackNames);
-        if (result !== null) return result;
+  for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
+    const result = processExpansionStep(step, frame, newStackIds, newStackNames);
+    if (result !== null) {
+      return result;
     }
+  }
 
-    return null;
+  return null;
 }
 
 function processExpansionStep(
-    step: StepRow,
-    frame: ExpansionFrame,
-    newStackIds: ReadonlyArray<number>,
-    newStackNames: ReadonlyArray<string>,
+  step: StepRow,
+  frame: ExpansionFrame,
+  newStackIds: ReadonlyArray<number>,
+  newStackNames: ReadonlyArray<string>,
 ): ExpansionFailure | null {
-    if (step.IsDisabled && frame.skipDisabled) {
-        frame.onDisabledSkipped();
+  if (step.IsDisabled && frame.skipDisabled) {
+    frame.onDisabledSkipped();
 
-        return null;
-    }
-    if (step.StepKindId !== StepKindId.RunGroup) {
-        frame.plan.push({
-            Step: step, GroupPath: newStackNames,
-            CallStackGroupIds: newStackIds, PlanIndex: frame.plan.length,
-        });
+    return null;
+  }
 
-        return null;
-    }
-    const guard = validateRunGroupTarget(frame, step, newStackIds, newStackNames);
-    if (guard !== null) return guard;
-    const target = findGroup(frame.db, step.TargetStepGroupId as number);
-    if (target === null) {
-        return expansionFailure(frame, "MissingTargetGroup",
-            `Internal: target vanished between validation and recursion (StepId=${step.StepId})`,
-            step.StepId, newStackNames);
-    }
-
-    return walkForExpansion({
-        ...frame, group: target,
-        callStackIds: newStackIds, callStackNames: newStackNames,
+  if (step.StepKindId !== StepKindId.RunGroup) {
+    frame.plan.push({
+      Step: step, GroupPath: newStackNames,
+      CallStackGroupIds: newStackIds, PlanIndex: frame.plan.length,
     });
+
+    return null;
+  }
+
+  const guard = validateRunGroupTarget(frame, step, newStackIds, newStackNames);
+  if (guard !== null) {
+    return guard;
+  }
+
+  const target = findGroup(frame.db, step.TargetStepGroupId as number);
+  if (target === null) {
+    return expansionFailure(frame, "MissingTargetGroup",
+      `Internal: target vanished between validation and recursion (StepId=${step.StepId})`,
+      step.StepId, newStackNames);
+  }
+
+  return walkForExpansion({
+    ...frame, group: target,
+    callStackIds: newStackIds, callStackNames: newStackNames,
+  });
 }
 
 function checkTargetResolution(
-    frame: ExpansionFrame,
-    step: StepRow,
-    stackNames: ReadonlyArray<string>,
+  frame: ExpansionFrame,
+  step: StepRow,
+  stackNames: ReadonlyArray<string>,
 ): { target: StepGroupRow; failure: null } | { target: null; failure: ExpansionFailure } {
-    if (step.TargetStepGroupId === null) {
-        return { target: null, failure: expansionFailure(frame, "MissingTargetGroup",
-            `Step ${step.StepId} (kind=RunGroup) has TargetStepGroupId=NULL. Re-link or remove.`,
-            step.StepId, stackNames) };
-    }
-    const target = findGroup(frame.db, step.TargetStepGroupId);
-    if (target === null) {
-        return { target: null, failure: expansionFailure(frame, "MissingTargetGroup",
-            `Step ${step.StepId} targets StepGroupId=${step.TargetStepGroupId} but no such group exists.`,
-            step.StepId, stackNames) };
-    }
-    if (target.ProjectId !== frame.projectId) {
-        return { target: null, failure: expansionFailure(frame, "TargetNotInProject",
-            `Step ${step.StepId} targets group "${target.Name}" in ProjectId=${target.ProjectId}; ` +
-            `expansion is bound to ProjectId=${frame.projectId}.`,
-            step.StepId, stackNames) };
-    }
+  if (step.TargetStepGroupId === null) {
+    return { target: null, failure: expansionFailure(frame, "MissingTargetGroup",
+      `Step ${step.StepId} (kind=RunGroup) has TargetStepGroupId=NULL. Re-link or remove.`,
+      step.StepId, stackNames) };
+  }
 
-    return { target, failure: null };
+  const target = findGroup(frame.db, step.TargetStepGroupId);
+  if (target === null) {
+    return { target: null, failure: expansionFailure(frame, "MissingTargetGroup",
+      `Step ${step.StepId} targets StepGroupId=${step.TargetStepGroupId} but no such group exists.`,
+      step.StepId, stackNames) };
+  }
+
+  if (target.ProjectId !== frame.projectId) {
+    return { target: null, failure: expansionFailure(frame, "TargetNotInProject",
+      `Step ${step.StepId} targets group "${target.Name}" in ProjectId=${target.ProjectId}; ` +
+            `expansion is bound to ProjectId=${frame.projectId}.`,
+      step.StepId, stackNames) };
+  }
+
+  return { target, failure: null };
 }
 
 function checkStackConstraints(
-    frame: ExpansionFrame,
-    step: StepRow,
-    target: StepGroupRow,
-    stackIds: ReadonlyArray<number>,
-    stackNames: ReadonlyArray<string>,
+  frame: ExpansionFrame,
+  step: StepRow,
+  target: StepGroupRow,
+  stackIds: ReadonlyArray<number>,
+  stackNames: ReadonlyArray<string>,
 ): ExpansionFailure | null {
-    if (stackIds.includes(target.StepGroupId)) {
-        const cycle = [...stackNames, target.Name].join(" → ");
+  if (stackIds.includes(target.StepGroupId)) {
+    const cycle = [...stackNames, target.Name].join(" → ");
 
-        return expansionFailure(frame, "RunGroupCycle",
-            `RunGroup cycle detected during expansion: ${cycle}`, step.StepId, stackNames);
-    }
-    if (stackIds.length + 1 > MAX_RUN_GROUP_CALL_DEPTH) {
-        return expansionFailure(frame, "RunGroupDepthExceeded",
-            `Expansion would reach depth ${stackIds.length + 1}, exceeding ` +
+    return expansionFailure(frame, "RunGroupCycle",
+      `RunGroup cycle detected during expansion: ${cycle}`, step.StepId, stackNames);
+  }
+
+  if (stackIds.length + 1 > MAX_RUN_GROUP_CALL_DEPTH) {
+    return expansionFailure(frame, "RunGroupDepthExceeded",
+      `Expansion would reach depth ${stackIds.length + 1}, exceeding ` +
             `MAX_RUN_GROUP_CALL_DEPTH=${MAX_RUN_GROUP_CALL_DEPTH}.`,
-            step.StepId, stackNames);
-    }
+      step.StepId, stackNames);
+  }
 
-    return null;
+  return null;
 }
 
 function validateRunGroupTarget(
-    frame: ExpansionFrame,
-    step: StepRow,
-    stackIds: ReadonlyArray<number>,
-    stackNames: ReadonlyArray<string>,
+  frame: ExpansionFrame,
+  step: StepRow,
+  stackIds: ReadonlyArray<number>,
+  stackNames: ReadonlyArray<string>,
 ): ExpansionFailure | null {
-    const resolved = checkTargetResolution(frame, step, stackNames);
-    if (resolved.failure !== null) return resolved.failure;
+  const resolved = checkTargetResolution(frame, step, stackNames);
+  if (resolved.failure !== null) {
+    return resolved.failure;
+  }
 
-    return checkStackConstraints(frame, step, resolved.target, stackIds, stackNames);
+  return checkStackConstraints(frame, step, resolved.target, stackIds, stackNames);
 }
 
 /* ================================================================== */
@@ -845,41 +907,43 @@ export type ExecuteRunGroupOutcome = ExecuteRunGroupSuccess | ExecuteRunGroupFai
  * when you need the discriminated `RunGroupFailure` for trace UIs.
  */
 export async function executeRunGroup(opts: RunGroupOptions): Promise<ExecuteRunGroupOutcome> {
-    const result = await runGroup(opts);
-    if (result.Ok) return { Ok: true, Result: result };
+  const result = await runGroup(opts);
+  if (result.Ok) {
+    return { Ok: true, Result: result };
+  }
 
-    const report: FailureReport =
+  const report: FailureReport =
         result.FailureReport ?? buildRunnerLevelFailureReport(result, opts);
 
-    return { Ok: false, Result: result, FailureReport: report };
+  return { Ok: false, Result: result, FailureReport: report };
 }
 
 function buildRunnerLevelFailureReport(
-    failure: RunGroupFailure,
-    opts: RunGroupOptions,
+  failure: RunGroupFailure,
+  opts: RunGroupOptions,
 ): FailureReport {
-    const now = (opts.now ?? defaultNow)();
+  const now = (opts.now ?? defaultNow)();
 
-    return {
-        Phase: "Replay",
-        Message: `RunGroup failed: ${failure.Reason}`,
-        Reason: "Unknown",
-        ReasonDetail:
+  return {
+    Phase: "Replay",
+    Message: `RunGroup failed: ${failure.Reason}`,
+    Reason: "Unknown",
+    ReasonDetail:
             `RunnerReason=${failure.Reason}. ${failure.ReasonDetail} ` +
             `CallStack=[${failure.CallStack.join(" → ")}]`,
-        StackTrace: null,
-        StepId: failure.FailedStepId,
-        Index: null,
-        StepKind: failure.FailedStepId === null ? null : "RunGroup",
-        Selectors: [],
-        Variables: [],
-        DomContext: null,
-        DataRow: null,
-        ResolvedXPath: null,
-        Timestamp: now.toISOString(),
-        SourceFile: "src/background/recorder/step-library/run-group-runner.ts",
-        Verbose: false,
-        CapturedHtml: null,
-        FormSnapshot: null,
-    };
+    StackTrace: null,
+    StepId: failure.FailedStepId,
+    Index: null,
+    StepKind: failure.FailedStepId === null ? null : "RunGroup",
+    Selectors: [],
+    Variables: [],
+    DomContext: null,
+    DataRow: null,
+    ResolvedXPath: null,
+    Timestamp: now.toISOString(),
+    SourceFile: "src/background/recorder/step-library/run-group-runner.ts",
+    Verbose: false,
+    CapturedHtml: null,
+    FormSnapshot: null,
+  };
 }

@@ -79,6 +79,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
 
       return { forced, error: message };
     }
+
     forced += 1;
     emitPromptSeedEvent({
       event: 'reseed.force', role: row.role, slug: row.slug,
@@ -109,6 +110,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
 
       return { ok: false, mode, error: String(seedResult.error ?? 'seed failed') };
     }
+
     let forcedUpdates: number | undefined;
     if (force) {
       const { forced, error } = await forceResetDefaultBodies();
@@ -122,14 +124,20 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
         return { ok: false, mode, forcedUpdates: forced, error };
       }
     }
+
     log('[ReseedCommand] on-demand reseed complete (' + mode + ')', 'success');
     const completeEvent: Parameters<typeof emitPromptSeedEvent>[0] = {
       event: EV_RESEED_COMPLETE, outcome: 'ok', detail: mode,
     };
-    if (forcedUpdates !== undefined) completeEvent.metrics = { forcedUpdates };
+    if (forcedUpdates !== undefined) {
+      completeEvent.metrics = { forcedUpdates };
+    }
+
     emitPromptSeedEvent(completeEvent);
     const result: ReseedResult = { ok: true, mode };
-    if (forcedUpdates !== undefined) result.forcedUpdates = forcedUpdates;
+    if (forcedUpdates !== undefined) {
+      result.forcedUpdates = forcedUpdates;
+    }
 
     return result;
   } catch (err) {
@@ -154,12 +162,14 @@ export function installReseedCommandGlobal(): void {
     w.__marcoReseedPrompts = reseedPromptsOnDemand;
     log('[ReseedCommand] window.__marcoReseedPrompts installed', 'info');
   }
+
   if (!w.__marcoCheckPromptHealth) {
     w.__marcoCheckPromptHealth = async () => {
       const { runPromptHealthCheck } = await import('./prompt-health-check');
 
       return runPromptHealthCheck();
     };
+
     log('[ReseedCommand] window.__marcoCheckPromptHealth installed', 'info');
   }
 }

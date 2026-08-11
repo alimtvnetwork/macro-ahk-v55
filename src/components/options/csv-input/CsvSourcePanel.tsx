@@ -20,23 +20,23 @@ export interface CsvSourcePanelProps {
 }
 
 export function CsvSourcePanel(props: CsvSourcePanelProps): JSX.Element {
-    return (
-        <>
-            <CsvDropZone
-                loadedFileName={props.loadedFileName}
-                dragOver={props.dragOver}
-                onDragOverChange={props.onDragOverChange}
-                onDropFile={props.onDropFile}
-                onPickFile={props.onPickFile}
-            />
-            {!props.hasParsed && (
-                <CsvPastePanel
-                    pasted={props.pasted}
-                    onPastedChange={props.onPastedChange}
-                    parseError={props.parseError}
-                    onParseClick={props.onParseClick}
-                />
-            )}
-        </>
-    );
+  return (
+    <>
+      <CsvDropZone
+        loadedFileName={props.loadedFileName}
+        dragOver={props.dragOver}
+        onDragOverChange={props.onDragOverChange}
+        onDropFile={props.onDropFile}
+        onPickFile={props.onPickFile}
+      />
+      {!props.hasParsed && (
+        <CsvPastePanel
+          pasted={props.pasted}
+          onPastedChange={props.onPastedChange}
+          parseError={props.parseError}
+          onParseClick={props.onParseClick}
+        />
+      )}
+    </>
+  );
 }

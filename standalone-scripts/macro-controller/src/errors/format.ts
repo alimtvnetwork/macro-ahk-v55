@@ -60,7 +60,9 @@ export function formatDiagnosticToast(
   const attempted = buildAttemptedLine(err);
   const rejected = buildRejectedLine(err);
   const nextFix = buildNextFixLine(err);
-  const body = [attempted, rejected, nextFix].filter(function(s) { return s.length > 0; }).join('\n');
+  const body = [attempted, rejected, nextFix].filter(function(s) {
+    return s.length > 0; 
+  }).join('\n');
   const footerCode = 'code=' + err.code;
   const payload: DiagnosticToast = {
     title: title,
@@ -129,7 +131,9 @@ function humanizeAction(action: string): string {
     .toLowerCase()
     .split('_')
     .map(function(w, i) {
-      if (i === 0 && w.length > 0) return w.charAt(0).toUpperCase() + w.slice(1);
+      if (i === 0 && w.length > 0) {
+        return w.charAt(0).toUpperCase() + w.slice(1);
+      }
 
       return w;
     })
@@ -153,19 +157,34 @@ function buildRejectedLine(err: DiagnosticError): string {
   const skip = new Set(['role', 'slug', 'status', 'url']);
   const parts: string[] = [];
   for (const [k, v] of Object.entries(err.context)) {
-    if (skip.has(k)) continue;
-    if (v === null || v === undefined) continue;
-    if (typeof v === 'object') continue; // keep the toast one-line-per-key
+    if (skip.has(k)) {
+      continue;
+    }
+
+    if (v === null || v === undefined) {
+      continue;
+    }
+
+    if (typeof v === 'object') {
+      continue;
+    } // keep the toast one-line-per-key
+
     parts.push(k + '=' + String(v));
   }
-  if (parts.length === 0) return '';
+
+  if (parts.length === 0) {
+    return '';
+  }
 
   return 'Details: ' + parts.join(', ');
 }
 
 function buildNextFixLine(err: DiagnosticError): string {
   const hint = err.entry.nextFixHint;
-  if (!hint) return '';
+  if (!hint) {
+    return '';
+  }
+
   // The hint can itself reference {placeholders}. Interpolate the same way
   // DiagnosticError does for its message.
   const interpolated = hint.replace(/(^|[^{])\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g,
@@ -191,6 +210,7 @@ function assertProfessionalWording(payload: DiagnosticToast): void {
       );
     }
   }
+
   // W1: reject bare "Failed" / "Error" as the entire body content.
   if (/^\s*(failed|error)\s*[.:!]?\s*$/i.test(payload.body)) {
     throw new Error(

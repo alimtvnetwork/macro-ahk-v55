@@ -100,7 +100,10 @@ export function ScriptToggleList({ scripts, onToggle, lastRunResults = [] }: Pro
                     </Tooltip>
                     {(() => {
                       const result = resultsByName.get(script.name) ?? resultsByName.get(script.id);
-                      if (!result) return null;
+                      if (!result) {
+                        return null;
+                      }
+
                       if (result.isSuccess) {
                         return (
                           <Badge variant="outline" className="text-[9px] px-1 py-0 gap-0.5 border-[hsl(var(--success))]/50 text-[hsl(var(--success))]">
@@ -109,8 +112,12 @@ export function ScriptToggleList({ scripts, onToggle, lastRunResults = [] }: Pro
                           </Badge>
                         );
                       }
+
                       const skipCfg = result.skipReason ? SKIP_BADGE_CONFIG[result.skipReason] : null;
-                      if (!skipCfg) return null;
+                      if (!skipCfg) {
+                        return null;
+                      }
+
                       const Icon = skipCfg.icon;
 
                       return (

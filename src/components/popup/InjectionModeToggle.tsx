@@ -32,6 +32,7 @@ export function InjectionModeToggle() {
       } catch (caught) {
         logError("InjectionModeToggle.load", "GET_SETTINGS failed — toggle will remain in default OFF state until settings become available", caught);
       }
+
       setLoading(false);
     })();
   }, []);
@@ -48,7 +49,9 @@ export function InjectionModeToggle() {
     }
   }, []);
 
-  if (loading) return null;
+  if (loading) {
+    return null;
+  }
 
   return (
     <Tooltip>

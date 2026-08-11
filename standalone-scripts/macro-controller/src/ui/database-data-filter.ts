@@ -47,7 +47,9 @@ export function buildFilterBar(
 
   valueInput.onkeydown = (event) => {
     const isEnterKey = event.key === 'Enter';
-    if (isEnterKey) searchButton.click();
+    if (isEnterKey) {
+      searchButton.click();
+    }
   };
 
   const hasActiveFilter = filter !== null && filter !== undefined && filter.column !== '' && filter.value !== '';
@@ -79,7 +81,10 @@ function buildColumnSelect(
     option.value = column;
     option.textContent = column;
     const isSelected = filter !== null && filter !== undefined && filter.column === column;
-    if (isSelected) option.selected = true;
+    if (isSelected) {
+      option.selected = true;
+    }
+
     select.appendChild(option);
   }
 
@@ -101,8 +106,11 @@ function buildModeSelect(filter: FilterState | null | undefined): HTMLSelectElem
   exactOption.textContent = 'Exact';
 
   const isExactMode = filter?.mode === 'exact';
-  if (isExactMode) exactOption.selected = true;
-  else likeOption.selected = true;
+  if (isExactMode) {
+    exactOption.selected = true;
+  } else {
+    likeOption.selected = true;
+  }
 
   select.appendChild(likeOption);
   select.appendChild(exactOption);

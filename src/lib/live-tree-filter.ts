@@ -40,39 +40,41 @@ export interface LiveTreeFilterResult {
 }
 
 function normalize(query: string): string {
-    return query.trim().toLowerCase();
+  return query.trim().toLowerCase();
 }
 
 function stepMatches(step: StepRow, q: string): boolean {
-    const label = (step.LabelType ?? "").toLowerCase();
-    if (label.includes(q)) { return true; }
+  const label = (step.LabelType ?? "").toLowerCase();
+  if (label.includes(q)) {
+    return true; 
+  }
 
-    return stepKindLabel(step.StepKindId).toLowerCase().includes(q);
+  return stepKindLabel(step.StepKindId).toLowerCase().includes(q);
 }
 
 /* eslint-disable-next-line max-lines-per-function */
 export function filterLiveTree(
-    forest: ReadonlyArray<LiveTreeNode>,
-    stepsByGroup: ReadonlyMap<number, ReadonlyArray<StepRow>>,
-    rawQuery: string,
+  forest: ReadonlyArray<LiveTreeNode>,
+  stepsByGroup: ReadonlyMap<number, ReadonlyArray<StepRow>>,
+  rawQuery: string,
 ): LiveTreeFilterResult {
-    const q = normalize(rawQuery);
-    if (q.length === 0) {
-        return {
-            Forest: forest.map((n) => cloneNode(n)),
-            ExpandIds: new Set(),
-            StepsByGroup: stepsByGroup,
-            StepMatchCount: 0,
-            GroupMatchCount: 0,
-        };
-    }
+  const q = normalize(rawQuery);
+  if (q.length === 0) {
+    return {
+      Forest: forest.map((n) => cloneNode(n)),
+      ExpandIds: new Set(),
+      StepsByGroup: stepsByGroup,
+      StepMatchCount: 0,
+      GroupMatchCount: 0,
+    };
+  }
 
-    const expand = new Set<number>();
-    const filteredSteps = new Map<number, ReadonlyArray<StepRow>>();
-    let stepMatchCount = 0;
-    let groupMatchCount = 0;
+  const expand = new Set<number>();
+  const filteredSteps = new Map<number, ReadonlyArray<StepRow>>();
+  let stepMatchCount = 0;
+  let groupMatchCount = 0;
 
-    /**
+  /**
      * Recursive walker. Returns `null` when the node and its descendants
      * have no matches; otherwise returns a pruned clone with only the
      * branches that lead to a match.
@@ -81,48 +83,54 @@ export function filterLiveTree(
      * case the entire subtree is included verbatim (no per-node filtering)
      * so the user sees the matched group's full content.
      */
-    function walk(node: LiveTreeNode, inheritedMatch: boolean): LiveTreeNode | null {
-        const groupNameMatch = node.Group.Name.toLowerCase().includes(q);
-        const effectiveMatch = inheritedMatch || groupNameMatch;
-        const ownSteps = stepsByGroup.get(node.Group.StepGroupId) ?? [];
+  function walk(node: LiveTreeNode, inheritedMatch: boolean): LiveTreeNode | null {
+    const groupNameMatch = node.Group.Name.toLowerCase().includes(q);
+    const effectiveMatch = inheritedMatch || groupNameMatch;
+    const ownSteps = stepsByGroup.get(node.Group.StepGroupId) ?? [];
 
-        const matchedSteps = effectiveMatch
-            ? ownSteps
-            : ownSteps.filter((s) => stepMatches(s, q));
+    const matchedSteps = effectiveMatch
+      ? ownSteps
+      : ownSteps.filter((s) => stepMatches(s, q));
 
-        const children = node.Children
-            .map((c) => walk(c, effectiveMatch))
-            .filter((c): c is LiveTreeNode => c !== null);
+    const children = node.Children
+      .map((c) => walk(c, effectiveMatch))
+      .filter((c): c is LiveTreeNode => c !== null);
 
-        const hasOwnMatch = effectiveMatch || matchedSteps.length > 0;
-        if (!hasOwnMatch && children.length === 0) { return null; }
-
-        if (groupNameMatch) { groupMatchCount += 1; }
-        // Always count the steps we'll surface, including those auto-included
-        // when the parent group matched, so the result count matches what the
-        // user actually sees in the tree.
-        stepMatchCount += matchedSteps.length;
-        if (matchedSteps.length > 0) {
-            filteredSteps.set(node.Group.StepGroupId, matchedSteps);
-        }
-        expand.add(node.Group.StepGroupId);
-
-        return { Group: node.Group, Children: children };
+    const hasOwnMatch = effectiveMatch || matchedSteps.length > 0;
+    if (!hasOwnMatch && children.length === 0) {
+      return null; 
     }
 
-    const filteredForest = forest
-        .map((n) => walk(n, false))
-        .filter((n): n is LiveTreeNode => n !== null);
+    if (groupNameMatch) {
+      groupMatchCount += 1; 
+    }
 
-    return {
-        Forest: filteredForest,
-        ExpandIds: expand,
-        StepsByGroup: filteredSteps,
-        StepMatchCount: stepMatchCount,
-        GroupMatchCount: groupMatchCount,
-    };
+    // Always count the steps we'll surface, including those auto-included
+    // when the parent group matched, so the result count matches what the
+    // user actually sees in the tree.
+    stepMatchCount += matchedSteps.length;
+    if (matchedSteps.length > 0) {
+      filteredSteps.set(node.Group.StepGroupId, matchedSteps);
+    }
+
+    expand.add(node.Group.StepGroupId);
+
+    return { Group: node.Group, Children: children };
+  }
+
+  const filteredForest = forest
+    .map((n) => walk(n, false))
+    .filter((n): n is LiveTreeNode => n !== null);
+
+  return {
+    Forest: filteredForest,
+    ExpandIds: expand,
+    StepsByGroup: filteredSteps,
+    StepMatchCount: stepMatchCount,
+    GroupMatchCount: groupMatchCount,
+  };
 }
 
 function cloneNode(node: LiveTreeNode): LiveTreeNode {
-    return { Group: node.Group, Children: node.Children.map(cloneNode) };
+  return { Group: node.Group, Children: node.Children.map(cloneNode) };
 }

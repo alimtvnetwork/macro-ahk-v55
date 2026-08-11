@@ -40,7 +40,9 @@ interface StepLocation {
 
 /** Encode a location to a sortable ID string */
 function encodeId(loc: StepLocation): string {
-  if (loc.container === "top") return `top-${loc.index}`;
+  if (loc.container === "top") {
+    return `top-${loc.index}`;
+  }
 
   return `cond-${loc.conditionIndex}-${loc.container}-${loc.index}`;
 }
@@ -48,7 +50,9 @@ function encodeId(loc: StepLocation): string {
 /** Decode a sortable ID back to a location */
 function decodeId(id: string): StepLocation | null {
   const topMatch = id.match(/^top-(\d+)$/);
-  if (topMatch) return { container: "top", index: Number(topMatch[1]) };
+  if (topMatch) {
+    return { container: "top", index: Number(topMatch[1]) };
+  }
 
   const branchMatch = id.match(/^cond-(\d+)-(then|else)-(\d+)$/);
   if (branchMatch) {
@@ -137,9 +141,15 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
   /** Get a step from the steps array given a location */
   const getStepAtLocation = useCallback((loc: StepLocation, source: ChainStep[]): ChainStep | null => {
-    if (loc.container === "top") return source[loc.index] ?? null;
+    if (loc.container === "top") {
+      return source[loc.index] ?? null;
+    }
+
     const parent = source[loc.conditionIndex!];
-    if (!parent || parent.type !== "condition") return null;
+    if (!parent || parent.type !== "condition") {
+      return null;
+    }
+
     const branch = loc.container === "then" ? parent.then : parent.else;
 
     return branch[loc.index] ?? null;
@@ -153,6 +163,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
       return [newSteps, removed];
     }
+
     const parent = newSteps[loc.conditionIndex!] as StepCondition;
     const branch = loc.container === "then" ? parent.then : parent.else;
     const [removed] = branch.splice(loc.index, 1);
@@ -168,6 +179,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
       return newSteps;
     }
+
     const parent = newSteps[loc.conditionIndex!] as StepCondition;
     const branch = loc.container === "then" ? parent.then : parent.else;
     branch.splice(loc.index, 0, step);
@@ -215,11 +227,15 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    if (!over || active.id === over.id) {
+      return;
+    }
 
     const fromLoc = decodeId(String(active.id));
     const toLoc = decodeId(String(over.id));
-    if (!fromLoc || !toLoc) return;
+    if (!fromLoc || !toLoc) {
+      return;
+    }
 
     // Same container → simple reorder
     if (
@@ -230,14 +246,18 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         if (fromLoc.container === "top") {
           return arrayMove(prev, fromLoc.index, toLoc.index);
         }
+
         const newSteps = prev.map((s) =>
           s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s,
         );
         const parent = newSteps[fromLoc.conditionIndex!] as StepCondition;
         const branch = fromLoc.container === "then" ? parent.then : parent.else;
         const reordered = arrayMove(branch, fromLoc.index, toLoc.index);
-        if (fromLoc.container === "then") parent.then = reordered;
-        else parent.else = reordered;
+        if (fromLoc.container === "then") {
+          parent.then = reordered;
+        } else {
+          parent.else = reordered;
+        }
 
         return newSteps;
       });
@@ -263,15 +283,23 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
   };
 
   const handleSave = async () => {
-    if (!name.trim()) { toast.error("Chain name is required");
+    if (!name.trim()) {
+      toast.error("Chain name is required");
 
- return; }
-    if (!slug.trim()) { toast.error("Chain slug is required");
+      return; 
+    }
 
- return; }
-    if (steps.length === 0) { toast.error("Add at least one step");
+    if (!slug.trim()) {
+      toast.error("Chain slug is required");
 
- return; }
+      return; 
+    }
+
+    if (steps.length === 0) {
+      toast.error("Add at least one step");
+
+      return; 
+    }
 
     setSaving(true);
     try {
@@ -314,7 +342,9 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         </div>
 
         {/* Trigger */}
-        <TriggerConfigPanel triggerType={triggerType} triggerConfig={triggerConfig} onChange={(t, c) => { setTriggerType(t); setTriggerConfig(c); }} />
+        <TriggerConfigPanel triggerType={triggerType} triggerConfig={triggerConfig} onChange={(t, c) => {
+          setTriggerType(t); setTriggerConfig(c); 
+        }} />
 
         {/* Steps */}
         <div className="space-y-2">

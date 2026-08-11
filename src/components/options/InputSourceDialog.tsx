@@ -14,12 +14,12 @@ import { Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 import { InputSourceBody } from "./input-source/input-source-sections";
@@ -31,28 +31,28 @@ interface Props {
 }
 
 export default function InputSourceDialog({ open, onOpenChange }: Props) {
-    const api = useInputSourceDraft(open, onOpenChange);
+  const api = useInputSourceDraft(open, onOpenChange);
 
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
                         Run-time input source
-                    </DialogTitle>
-                    <DialogDescription>
+          </DialogTitle>
+          <DialogDescription>
                         Fetch a fresh JSON bag from your endpoint at the start of every batch run.
                         The fetched values are merged on top of each group's saved input bag, endpoint
                         keys win on collision.
-                    </DialogDescription>
-                </DialogHeader>
-                <InputSourceBody api={api} />
-                <DialogFooter>
-                    <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-                    <Button onClick={api.handleSave}>Save settings</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
+          </DialogDescription>
+        </DialogHeader>
+        <InputSourceBody api={api} />
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={api.handleSave}>Save settings</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }

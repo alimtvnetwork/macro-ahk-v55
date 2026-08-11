@@ -17,13 +17,13 @@ export { mountLogViewer } from "./log-viewer-shell";
 export { buildLogTable } from "./log-viewer-table";
 export { copyEntriesToClipboard } from "./log-viewer-copy";
 export {
-    formatEntriesAsText, formatTimestampLocal, formatRowIndex,
+  formatEntriesAsText, formatTimestampLocal, formatRowIndex,
 } from "./log-viewer-format";
 export {
-    buildFilterSelect, collectUniquePhases, filterEntries, FILTER_ALL_VALUE,
+  buildFilterSelect, collectUniquePhases, filterEntries, FILTER_ALL_VALUE,
 } from "./log-viewer-filter";
 export { LogViewerSeverityCodeType } from "./log-viewer-types";
 export type { LogViewerEntry, LogViewerOptions } from "./log-viewer-types";
 export {
-    TITLE_VIEWER, LABEL_COPY, LABEL_COPIED, LABEL_COPY_FAILED, LABEL_FILTER_ALL, LABEL_EMPTY,
+  TITLE_VIEWER, LABEL_COPY, LABEL_COPIED, LABEL_COPY_FAILED, LABEL_FILTER_ALL, LABEL_EMPTY,
 } from "./log-viewer-constants";

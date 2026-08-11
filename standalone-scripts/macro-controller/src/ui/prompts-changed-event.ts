@@ -24,25 +24,36 @@ export interface PromptsChangedDetail {
 }
 
 export function dispatchPromptsChanged(detail: PromptsChangedDetail = {}): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   try {
     document.dispatchEvent(new CustomEvent(PROMPTS_CHANGED_EVENT, { detail }));
   } catch (err) {
     logError('MacroController', 'Unknown error');
     // Older jsdom environments without CustomEvent fall back to a plain Event.
-    try { document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); } catch (err) {
+    try {
+      document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); 
+    } catch (err) {
       logError('MacroController', 'Unknown error');
     }
   }
 }
 
 export function subscribePromptsChanged(handler: (detail: PromptsChangedDetail) => void): () => void {
-  if (typeof document === 'undefined') return function() { /* noop */ };
+  if (typeof document === 'undefined') {
+    return function() { /* noop */ };
+  }
+
   const listener = function(ev: Event): void {
     const detail = (ev as CustomEvent<PromptsChangedDetail>).detail ?? {};
     handler(detail);
   };
+
   document.addEventListener(PROMPTS_CHANGED_EVENT, listener);
 
-  return function() { document.removeEventListener(PROMPTS_CHANGED_EVENT, listener); };
+  return function() {
+    document.removeEventListener(PROMPTS_CHANGED_EVENT, listener); 
+  };
 }

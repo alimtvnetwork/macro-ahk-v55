@@ -57,14 +57,26 @@ function walkLcsTable(table: number[][], a: readonly string[], b: readonly strin
   let i = a.length;
   let j = b.length;
   while (i > 0 && j > 0) {
-    if (a[i - 1] === b[j - 1]) { out.push({ op: DIFF_OP_EQUAL, text: a[i - 1] as string }); i -= 1; j -= 1; continue; }
+    if (a[i - 1] === b[j - 1]) {
+      out.push({ op: DIFF_OP_EQUAL, text: a[i - 1] as string }); i -= 1; j -= 1; continue; 
+    }
+
     const up = (table[i - 1] as number[])[j] as number;
     const left = (table[i] as number[])[j - 1] as number;
-    if (up >= left) { out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string }); i -= 1; }
-    else { out.push({ op: DIFF_OP_ADD, text: b[j - 1] as string }); j -= 1; }
+    if (up >= left) {
+      out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string }); i -= 1; 
+    } else {
+      out.push({ op: DIFF_OP_ADD, text: b[j - 1] as string }); j -= 1; 
+    }
   }
-  while (i > 0) { out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string }); i -= 1; }
-  while (j > 0) { out.push({ op: DIFF_OP_ADD, text: b[j - 1] as string }); j -= 1; }
+
+  while (i > 0) {
+    out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string }); i -= 1; 
+  }
+
+  while (j > 0) {
+    out.push({ op: DIFF_OP_ADD, text: b[j - 1] as string }); j -= 1; 
+  }
 
   return out.reverse();
 }
@@ -80,9 +92,13 @@ export function summarizeDiff(lines: readonly DiffLine[]): DiffStats {
   let removed = 0;
   let unchanged = 0;
   for (const line of lines) {
-    if (line.op === DIFF_OP_ADD) added += 1;
-    else if (line.op === DIFF_OP_REMOVE) removed += 1;
-    else unchanged += 1;
+    if (line.op === DIFF_OP_ADD) {
+      added += 1;
+    } else if (line.op === DIFF_OP_REMOVE) {
+      removed += 1;
+    } else {
+      unchanged += 1;
+    }
   }
 
   return { added, removed, unchanged };
@@ -106,7 +122,10 @@ export function renderDiffPane(before: string, after: string): HTMLElement {
 
     return pane;
   }
-  for (const line of diff) pane.appendChild(buildDiffRow(line));
+
+  for (const line of diff) {
+    pane.appendChild(buildDiffRow(line));
+  }
 
   return pane;
 }
@@ -139,15 +158,25 @@ function buildDiffRow(line: DiffLine): HTMLElement {
 }
 
 function prefixFor(op: DiffOp): string {
-  if (op === DIFF_OP_ADD) return '+ ';
-  if (op === DIFF_OP_REMOVE) return '- ';
+  if (op === DIFF_OP_ADD) {
+    return '+ ';
+  }
+
+  if (op === DIFF_OP_REMOVE) {
+    return '- ';
+  }
 
   return '  ';
 }
 
 function rowCssFor(op: DiffOp): string {
-  if (op === DIFF_OP_ADD) return 'white-space:pre-wrap;background:' + COLOR_ADD_BG + ';color:' + COLOR_ADD_FG + ';padding:0 4px;';
-  if (op === DIFF_OP_REMOVE) return 'white-space:pre-wrap;background:' + COLOR_REMOVE_BG + ';color:' + COLOR_REMOVE_FG + ';padding:0 4px;';
+  if (op === DIFF_OP_ADD) {
+    return 'white-space:pre-wrap;background:' + COLOR_ADD_BG + ';color:' + COLOR_ADD_FG + ';padding:0 4px;';
+  }
+
+  if (op === DIFF_OP_REMOVE) {
+    return 'white-space:pre-wrap;background:' + COLOR_REMOVE_BG + ';color:' + COLOR_REMOVE_FG + ';padding:0 4px;';
+  }
 
   return 'white-space:pre-wrap;color:' + cPanelFgDim + ';padding:0 4px;';
 }

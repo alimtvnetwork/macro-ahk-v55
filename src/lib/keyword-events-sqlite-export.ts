@@ -31,8 +31,8 @@ import type JSZipType from "jszip";
 
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
 import {
-    buildExportFilename,
-    buildExportPayload,
+  buildExportFilename,
+  buildExportPayload,
 } from "@/lib/keyword-event-bulk-actions";
 import { KeywordEventsExportStageType } from "../types/enums";
 
@@ -85,16 +85,16 @@ const CREATE_META_TABLE = `
 /* ------------------------------------------------------------------ */
 
 async function initDb(): Promise<Database> {
-    const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+  const SQL = await initSqlJs({ locateFile: () => WASM_URL });
 
-    return new SQL.Database();
+  return new SQL.Database();
 }
 
 /** Lazy JSZip loader — keeps the ~95 kB out of the recorder chunk. */
 async function loadJSZip(): Promise<typeof JSZipType> {
-    const mod = await import("jszip");
+  const mod = await import("jszip");
 
-    return mod.default;
+  return mod.default;
 }
 
 /* ------------------------------------------------------------------ */
@@ -102,46 +102,46 @@ async function loadJSZip(): Promise<typeof JSZipType> {
 /* ------------------------------------------------------------------ */
 
 function insertKeywordEvents(
-    db: Database,
-    events: ReadonlyArray<KeywordEvent>,
-    now: string,
+  db: Database,
+  events: ReadonlyArray<KeywordEvent>,
+  now: string,
 ): void {
-    const stmt = db.prepare(`
+  const stmt = db.prepare(`
         INSERT INTO KeywordEvents
             (Uid, Keyword, Description, Enabled, Steps, Target, Tags, Category,
              PauseAfterMs, SortOrder, CreatedAt, UpdatedAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    events.forEach((ev, i) => {
-        stmt.run([
-            ev.Id,
-            ev.Keyword ?? "",
-            ev.Description ?? null,
-            ev.Enabled ? 1 : 0,
-            JSON.stringify(ev.Steps ?? []),
-            ev.Target === undefined ? null : JSON.stringify(ev.Target),
-            ev.Tags === undefined ? null : JSON.stringify(ev.Tags),
-            ev.Category !== undefined && ev.Category !== "" ? ev.Category : null,
-            typeof ev.PauseAfterMs === "number" ? ev.PauseAfterMs : null,
-            i,
-            now,
-            now,
-        ]);
-    });
+  events.forEach((ev, i) => {
+    stmt.run([
+      ev.Id,
+      ev.Keyword ?? "",
+      ev.Description ?? null,
+      ev.Enabled ? 1 : 0,
+      JSON.stringify(ev.Steps ?? []),
+      ev.Target === undefined ? null : JSON.stringify(ev.Target),
+      ev.Tags === undefined ? null : JSON.stringify(ev.Tags),
+      ev.Category !== undefined && ev.Category !== "" ? ev.Category : null,
+      typeof ev.PauseAfterMs === "number" ? ev.PauseAfterMs : null,
+      i,
+      now,
+      now,
+    ]);
+  });
 
-    stmt.free();
+  stmt.free();
 }
 
 function insertMeta(db: Database, count: number, now: string): void {
-    db.run(`INSERT INTO Meta (Key, Value) VALUES ('format_version', ?)`, [
-        KEYWORD_EVENTS_FORMAT_VERSION,
-    ]);
-    db.run(`INSERT INTO Meta (Key, Value) VALUES ('bundle_kind', ?)`, [
-        KEYWORD_EVENTS_BUNDLE_KIND,
-    ]);
-    db.run(`INSERT INTO Meta (Key, Value) VALUES ('exported_at', ?)`, [now]);
-    db.run(`INSERT INTO Meta (Key, Value) VALUES ('event_count', ?)`, [String(count)]);
+  db.run(`INSERT INTO Meta (Key, Value) VALUES ('format_version', ?)`, [
+    KEYWORD_EVENTS_FORMAT_VERSION,
+  ]);
+  db.run(`INSERT INTO Meta (Key, Value) VALUES ('bundle_kind', ?)`, [
+    KEYWORD_EVENTS_BUNDLE_KIND,
+  ]);
+  db.run(`INSERT INTO Meta (Key, Value) VALUES ('exported_at', ?)`, [now]);
+  db.run(`INSERT INTO Meta (Key, Value) VALUES ('event_count', ?)`, [String(count)]);
 }
 
 /**
@@ -170,33 +170,36 @@ export interface KeywordEventsExportProgress {
 export type KeywordEventsExportProgressFn = (p: KeywordEventsExportProgress) => void;
 
 const STAGE_FRACTION: Record<KeywordEventsExportStage, number> = {
-    "discovery": 0.05,
-    "sqlite-build": 0.35,
-    "zip-bundle": 0.75,
-    "download": 0.95,
-    "done": 1,
+  "discovery": 0.05,
+  "sqlite-build": 0.35,
+  "zip-bundle": 0.75,
+  "download": 0.95,
+  "done": 1,
 };
 
 const STAGE_LABEL: Record<KeywordEventsExportStage, string> = {
-    "discovery": "Collecting selected events",
-    "sqlite-build": "Building SQLite database",
-    "zip-bundle": "Compressing ZIP bundle",
-    "download": "Starting download",
-    "done": "Export complete",
+  "discovery": "Collecting selected events",
+  "sqlite-build": "Building SQLite database",
+  "zip-bundle": "Compressing ZIP bundle",
+  "download": "Starting download",
+  "done": "Export complete",
 };
 
 function emitProgress(
-    onProgress: KeywordEventsExportProgressFn | undefined,
-    stage: KeywordEventsExportStage,
-    eventCount: number,
+  onProgress: KeywordEventsExportProgressFn | undefined,
+  stage: KeywordEventsExportStage,
+  eventCount: number,
 ): void {
-    if (!onProgress) return;
-    onProgress({
-        stage,
-        fraction: STAGE_FRACTION[stage],
-        label: STAGE_LABEL[stage],
-        eventCount,
-    });
+  if (!onProgress) {
+    return;
+  }
+
+  onProgress({
+    stage,
+    fraction: STAGE_FRACTION[stage],
+    label: STAGE_LABEL[stage],
+    eventCount,
+  });
 }
 
 /**
@@ -205,20 +208,20 @@ function emitProgress(
  * the on-disk schema without touching the DOM/Blob layer.
  */
 export async function buildKeywordEventsSqliteDb(
-    events: ReadonlyArray<KeywordEvent>,
+  events: ReadonlyArray<KeywordEvent>,
 ): Promise<Uint8Array> {
-    const db = await initDb();
-    const now = new Date().toISOString();
-    try {
-        db.run(CREATE_KEYWORD_EVENTS_TABLE);
-        db.run(CREATE_META_TABLE);
-        insertKeywordEvents(db, events, now);
-        insertMeta(db, events.length, now);
+  const db = await initDb();
+  const now = new Date().toISOString();
+  try {
+    db.run(CREATE_KEYWORD_EVENTS_TABLE);
+    db.run(CREATE_META_TABLE);
+    insertKeywordEvents(db, events, now);
+    insertMeta(db, events.length, now);
 
-        return db.export();
-    } finally {
-        db.close();
-    }
+    return db.export();
+  } finally {
+    db.close();
+  }
 }
 
 export interface KeywordEventsZipResult {
@@ -236,31 +239,31 @@ export interface KeywordEventsZipResult {
  * are emitted by {@link downloadKeywordEventsZip}).
  */
 export async function buildKeywordEventsZip(
-    events: ReadonlyArray<KeywordEvent>,
-    onProgress?: KeywordEventsExportProgressFn,
+  events: ReadonlyArray<KeywordEvent>,
+  onProgress?: KeywordEventsExportProgressFn,
 ): Promise<KeywordEventsZipResult> {
-    emitProgress(onProgress, "discovery", events.length);
+  emitProgress(onProgress, "discovery", events.length);
 
-    emitProgress(onProgress, "sqlite-build", events.length);
-    const [dbData, JSZipCtor] = await Promise.all([
-        buildKeywordEventsSqliteDb(events),
-        loadJSZip(),
-    ]);
+  emitProgress(onProgress, "sqlite-build", events.length);
+  const [dbData, JSZipCtor] = await Promise.all([
+    buildKeywordEventsSqliteDb(events),
+    loadJSZip(),
+  ]);
 
-    emitProgress(onProgress, "zip-bundle", events.length);
-    const zip = new JSZipCtor();
-    zip.file(DB_FILENAME, dbData);
-    zip.file(
-        JSON_FILENAME,
-        JSON.stringify(buildExportPayload(events), null, 2),
-    );
+  emitProgress(onProgress, "zip-bundle", events.length);
+  const zip = new JSZipCtor();
+  zip.file(DB_FILENAME, dbData);
+  zip.file(
+    JSON_FILENAME,
+    JSON.stringify(buildExportPayload(events), null, 2),
+  );
 
-    const blob = await zip.generateAsync({
-        type: "blob",
-        compression: "DEFLATE",
-    });
+  const blob = await zip.generateAsync({
+    type: "blob",
+    compression: "DEFLATE",
+  });
 
-    return { blob, filename: buildExportFilename() };
+  return { blob, filename: buildExportFilename() };
 }
 
 /**
@@ -271,15 +274,15 @@ export async function buildKeywordEventsZip(
  * Reports progress through all 5 stages when {@link onProgress} given.
  */
 export async function downloadKeywordEventsZip(
-    events: ReadonlyArray<KeywordEvent>,
-    onProgress?: KeywordEventsExportProgressFn,
+  events: ReadonlyArray<KeywordEvent>,
+  onProgress?: KeywordEventsExportProgressFn,
 ): Promise<KeywordEventsZipResult> {
-    const result = await buildKeywordEventsZip(events, onProgress);
-    emitProgress(onProgress, "download", events.length);
-    await triggerDownload(result.blob, result.filename);
-    emitProgress(onProgress, "done", events.length);
+  const result = await buildKeywordEventsZip(events, onProgress);
+  emitProgress(onProgress, "download", events.length);
+  await triggerDownload(result.blob, result.filename);
+  emitProgress(onProgress, "done", events.length);
 
-    return result;
+  return result;
 }
 
 /**
@@ -288,36 +291,40 @@ export async function downloadKeywordEventsZip(
  * a JSON payload accidentally being routed through the ZIP download path.
  */
 async function assertIsZipBlob(blob: Blob, context: string): Promise<void> {
-    if (blob.size < 4) {
-        throw new Error(
-            `${context}: produced blob is ${blob.size} bytes — too small to be a valid ZIP. `
-            + `Expected PKZIP signature 'PK\\x03\\x04'. Aborting download to avoid a corrupt file.`,
-        );
-    }
-    const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
-    const ok = header[0] === 0x50 && header[1] === 0x4b
-        && header[2] === 0x03 && header[3] === 0x04;
-    if (ok) return;
-    const looksLikeJson = header[0] === 0x7b || header[0] === 0x5b;
-    const hex = Array.from(header)
-        .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-        .join(" ");
-    const hint = looksLikeJson
-        ? "Payload looks like JSON, not a ZIP — the export was likely routed through the wrong serializer."
-        : "First 4 bytes do not match the PKZIP local-file-header signature (50 4B 03 04).";
+  if (blob.size < 4) {
     throw new Error(
-        `${context}: produced blob is not a valid ZIP. First bytes: [${hex}]. ${hint}`,
+      `${context}: produced blob is ${blob.size} bytes — too small to be a valid ZIP. `
+            + `Expected PKZIP signature 'PK\\x03\\x04'. Aborting download to avoid a corrupt file.`,
     );
+  }
+
+  const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
+  const ok = header[0] === 0x50 && header[1] === 0x4b
+        && header[2] === 0x03 && header[3] === 0x04;
+  if (ok) {
+    return;
+  }
+
+  const looksLikeJson = header[0] === 0x7b || header[0] === 0x5b;
+  const hex = Array.from(header)
+    .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+    .join(" ");
+  const hint = looksLikeJson
+    ? "Payload looks like JSON, not a ZIP — the export was likely routed through the wrong serializer."
+    : "First 4 bytes do not match the PKZIP local-file-header signature (50 4B 03 04).";
+  throw new Error(
+    `${context}: produced blob is not a valid ZIP. First bytes: [${hex}]. ${hint}`,
+  );
 }
 
 async function triggerDownload(blob: Blob, filename: string): Promise<void> {
-    await assertIsZipBlob(blob, `Export "${filename}"`);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  await assertIsZipBlob(blob, `Export "${filename}"`);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }

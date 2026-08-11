@@ -13,10 +13,10 @@
  */
 
 import {
-    RunSummaryRowStatus, RunSummaryScriptCodeType,
+  RunSummaryRowStatus, RunSummaryScriptCodeType,
 } from "../../../lovable-common/src/report/run-summary-types";
 import type {
-    RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
+  RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
 } from "../../../lovable-common/src/report/run-summary-types";
 import { UserAddRowOutcomeCodeType } from "./row-types";
 import { UserAddLogSeverityType } from "./log-sink";
@@ -24,96 +24,96 @@ import type { UserAddRowResult } from "./row-types";
 import type { UserAddLogEntry } from "./log-sink";
 
 const statusFor = (outcome: UserAddRowOutcomeCodeType): RunSummaryRowStatus => {
-    if (outcome === UserAddRowOutcomeCodeType.Succeeded) {
-        return RunSummaryRowStatus.Succeeded;
-    }
+  if (outcome === UserAddRowOutcomeCodeType.Succeeded) {
+    return RunSummaryRowStatus.Succeeded;
+  }
 
-    if (outcome === UserAddRowOutcomeCodeType.StepBFailedMemberAdded) {
-        return RunSummaryRowStatus.PartiallySucceeded;
-    }
+  if (outcome === UserAddRowOutcomeCodeType.StepBFailedMemberAdded) {
+    return RunSummaryRowStatus.PartiallySucceeded;
+  }
 
-    return RunSummaryRowStatus.Failed;
+  return RunSummaryRowStatus.Failed;
 };
 
 const stepAAction = (result: UserAddRowResult): RunSummaryAction => {
-    if (result.StepASucceeded) {
-        const userId = result.UserId ?? "?";
-        const wsId = result.WorkspaceId ?? "?";
+  if (result.StepASucceeded) {
+    const userId = result.UserId ?? "?";
+    const wsId = result.WorkspaceId ?? "?";
 
-        return { Code: "AddMembership", Outcome: "ok", Detail: `UserId=${userId} Workspace=${wsId}` };
-    }
+    return { Code: "AddMembership", Outcome: "ok", Detail: `UserId=${userId} Workspace=${wsId}` };
+  }
 
-    return { Code: "AddMembership", Outcome: "failed", Detail: result.LastError };
+  return { Code: "AddMembership", Outcome: "failed", Detail: result.LastError };
 };
 
 const stepBAction = (result: UserAddRowResult): RunSummaryAction | null => {
-    if (!result.StepBRan) {
-        return { Code: "PromoteToOwner", Outcome: "skipped", Detail: "Role does not require promotion" };
-    }
+  if (!result.StepBRan) {
+    return { Code: "PromoteToOwner", Outcome: "skipped", Detail: "Role does not require promotion" };
+  }
 
-    if (result.Outcome === UserAddRowOutcomeCodeType.Succeeded) {
-        return { Code: "PromoteToOwner", Outcome: "ok", Detail: `UserId=${result.UserId ?? "?"}` };
-    }
+  if (result.Outcome === UserAddRowOutcomeCodeType.Succeeded) {
+    return { Code: "PromoteToOwner", Outcome: "ok", Detail: `UserId=${result.UserId ?? "?"}` };
+  }
 
-    return { Code: "PromoteToOwner", Outcome: "failed", Detail: result.LastError };
+  return { Code: "PromoteToOwner", Outcome: "failed", Detail: result.LastError };
 };
 
 const buildActions = (result: UserAddRowResult): ReadonlyArray<RunSummaryAction> => {
-    const actions: RunSummaryAction[] = [stepAAction(result)];
+  const actions: RunSummaryAction[] = [stepAAction(result)];
 
-    if (result.StepASucceeded) {
-        const stepB = stepBAction(result);
+  if (result.StepASucceeded) {
+    const stepB = stepBAction(result);
 
-        if (stepB !== null) {
-            actions.push(stepB);
-        }
+    if (stepB !== null) {
+      actions.push(stepB);
     }
+  }
 
-    return actions;
+  return actions;
 };
 
 const replayHintFor = (result: UserAddRowResult): RunSummaryRow["ReplayHint"] => {
-    if (result.Outcome === UserAddRowOutcomeCodeType.StepBFailedMemberAdded) {
-        return Object.freeze({
-            StepASucceeded: true,
-            WorkspaceId: result.WorkspaceId,
-            UserId: result.UserId,
-            ReplayInstruction:
-                "Re-run will SKIP Step A (member already in workspace) and retry only the PUT promote.",
-        });
-    }
-
-    if (result.Outcome === UserAddRowOutcomeCodeType.Succeeded) {
-        return Object.freeze({ ReplayInstruction: "Row complete — no replay needed" });
-    }
-
+  if (result.Outcome === UserAddRowOutcomeCodeType.StepBFailedMemberAdded) {
     return Object.freeze({
-        StepASucceeded: false,
-        ReplayInstruction: "Re-run the entire row (Step A POST + optional Step B PUT).",
+      StepASucceeded: true,
+      WorkspaceId: result.WorkspaceId,
+      UserId: result.UserId,
+      ReplayInstruction:
+                "Re-run will SKIP Step A (member already in workspace) and retry only the PUT promote.",
     });
+  }
+
+  if (result.Outcome === UserAddRowOutcomeCodeType.Succeeded) {
+    return Object.freeze({ ReplayInstruction: "Row complete — no replay needed" });
+  }
+
+  return Object.freeze({
+    StepASucceeded: false,
+    ReplayInstruction: "Re-run the entire row (Step A POST + optional Step B PUT).",
+  });
 };
 
 const buildRow = (result: UserAddRowResult): RunSummaryRow => ({
-    RowIndex: result.RowIndex,
-    Status: statusFor(result.Outcome),
-    OutcomeCode: result.Outcome,
-    DurationMs: result.DurationMs,
-    LastError: result.LastError,
-    Actions: buildActions(result),
-    ReplayHint: replayHintFor(result),
+  RowIndex: result.RowIndex,
+  Status: statusFor(result.Outcome),
+  OutcomeCode: result.Outcome,
+  DurationMs: result.DurationMs,
+  LastError: result.LastError,
+  Actions: buildActions(result),
+  ReplayHint: replayHintFor(result),
 });
 
 const countRows = (rows: ReadonlyArray<RunSummaryRow>): RunSummaryCounts => ({
-    Total: rows.length,
-    Succeeded: rows.filter((r) => r.Status === RunSummaryRowStatus.Succeeded).length,
-    Failed: rows.filter((r) => r.Status === RunSummaryRowStatus.Failed).length,
-    PartiallySucceeded: rows.filter((r) => r.Status === RunSummaryRowStatus.PartiallySucceeded).length,
+  Total: rows.length,
+  Succeeded: rows.filter((r) => r.Status === RunSummaryRowStatus.Succeeded).length,
+  Failed: rows.filter((r) => r.Status === RunSummaryRowStatus.Failed).length,
+  PartiallySucceeded: rows.filter((r) => r.Status === RunSummaryRowStatus.PartiallySucceeded).length,
 });
 
 const noticesFrom = (entries: ReadonlyArray<UserAddLogEntry>): ReadonlyArray<string> => {
-    return entries
-        .filter((e) => e.Severity === UserAddLogSeverityType.Warn || e.Severity === UserAddLogSeverityType.Error)
-        .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
+  return entries
+    .filter((e) => e.Severity === UserAddLogSeverityType.Warn || e.Severity === UserAddLogSeverityType.Error)
+    .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
 };
 
 export interface UserAddSummaryInput {
@@ -123,14 +123,14 @@ export interface UserAddSummaryInput {
 }
 
 export const buildUserAddRunSummary = (input: UserAddSummaryInput): RunSummary => {
-    const rows = input.Results.map(buildRow);
+  const rows = input.Results.map(buildRow);
 
-    return {
-        Script: RunSummaryScriptCodeType.UserAdd,
-        TaskId: input.TaskId,
-        GeneratedAtUtc: new Date().toISOString(),
-        Counts: countRows(rows),
-        Rows: rows,
-        Notices: noticesFrom(input.LogEntries),
-    };
+  return {
+    Script: RunSummaryScriptCodeType.UserAdd,
+    TaskId: input.TaskId,
+    GeneratedAtUtc: new Date().toISOString(),
+    Counts: countRows(rows),
+    Rows: rows,
+    Notices: noticesFrom(input.LogEntries),
+  };
 };

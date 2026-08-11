@@ -45,7 +45,9 @@ vi.mock('../../db/project-chat-submit-db', () => {
     deleteChatSubmit: vi.fn(async (id: number) => {
       const before = rows.length;
       const idx = rows.findIndex((r) => r.Id === id);
-      if (idx >= 0) rows.splice(idx, 1);
+      if (idx >= 0) {
+        rows.splice(idx, 1);
+      }
 
       return rows.length < before;
     }),

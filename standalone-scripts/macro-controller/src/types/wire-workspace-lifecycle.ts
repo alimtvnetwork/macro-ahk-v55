@@ -32,7 +32,9 @@ export interface WireWorkspaceLifecycle {
 
 function readNestedRecord(source: Record<string, unknown>, key: string): Record<string, unknown> {
   const value = source[key];
-  if (value === null || typeof value !== 'object') return {};
+  if (value === null || typeof value !== 'object') {
+    return {};
+  }
 
   return value as Record<string, unknown>;
 }

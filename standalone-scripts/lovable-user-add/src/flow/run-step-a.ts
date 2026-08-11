@@ -21,10 +21,10 @@ import type { StepARequest, StepAResult, StepAStepOutcome } from "./step-a-types
 import type { MembershipSummary } from "../../../lovable-common/src/api/lovable-api-types";
 
 const measure = async <T>(run: () => Promise<T>): Promise<{ Value: T; DurationMs: number }> => {
-    const startedAt = Date.now();
-    const value = await run();
+  const startedAt = Date.now();
+  const value = await run();
 
-    return { Value: value, DurationMs: Date.now() - startedAt };
+  return { Value: value, DurationMs: Date.now() - startedAt };
 };
 
 interface ChainState {
@@ -34,40 +34,40 @@ interface ChainState {
 }
 
 const runChain = async (api: LovableApiClient, request: StepARequest): Promise<ChainState> => {
-    const wsStart = Date.now();
-    const workspaceId = extractWorkspaceId(request.WorkspaceUrl);
-    const wsMs = Date.now() - wsStart;
-    const apiRole = toStepAApiRole(request.RoleCode);
-    const post = await measure(() => api.addMembership(workspaceId, {
-        Email: request.MemberEmail, Role: apiRole,
-    }));
+  const wsStart = Date.now();
+  const workspaceId = extractWorkspaceId(request.WorkspaceUrl);
+  const wsMs = Date.now() - wsStart;
+  const apiRole = toStepAApiRole(request.RoleCode);
+  const post = await measure(() => api.addMembership(workspaceId, {
+    Email: request.MemberEmail, Role: apiRole,
+  }));
 
-    return {
-        Outcomes: [
-            { Step: StepAStepCodeType.ResolveWorkspaceId, DurationMs: wsMs, WorkspaceId: workspaceId, UserId: null },
-            { Step: StepAStepCodeType.PostMembership, DurationMs: post.DurationMs, WorkspaceId: workspaceId, UserId: post.Value.UserId },
-        ],
-        Membership: post.Value,
-        WorkspaceId: workspaceId,
-    };
+  return {
+    Outcomes: [
+      { Step: StepAStepCodeType.ResolveWorkspaceId, DurationMs: wsMs, WorkspaceId: workspaceId, UserId: null },
+      { Step: StepAStepCodeType.PostMembership, DurationMs: post.DurationMs, WorkspaceId: workspaceId, UserId: post.Value.UserId },
+    ],
+    Membership: post.Value,
+    WorkspaceId: workspaceId,
+  };
 };
 
 const failureFrom = (caught: unknown): StepAResult => ({
-    Outcomes: [], Membership: null, WorkspaceId: null,
-    Error: caught instanceof Error ? caught.message : String(caught),
+  Outcomes: [], Membership: null, WorkspaceId: null,
+  Error: caught instanceof Error ? caught.message : String(caught),
 });
 
 export const runStepA = async (
-    api: LovableApiClient, request: StepARequest,
+  api: LovableApiClient, request: StepARequest,
 ): Promise<StepAResult> => {
-    try {
-        const chain = await runChain(api, request);
+  try {
+    const chain = await runChain(api, request);
 
-        return {
-            Outcomes: chain.Outcomes, Membership: chain.Membership,
-            WorkspaceId: chain.WorkspaceId, Error: null,
-        };
-    } catch (caught: unknown) {
-        return failureFrom(caught);
-    }
+    return {
+      Outcomes: chain.Outcomes, Membership: chain.Membership,
+      WorkspaceId: chain.WorkspaceId, Error: null,
+    };
+  } catch (caught: unknown) {
+    return failureFrom(caught);
+  }
 };

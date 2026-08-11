@@ -11,7 +11,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { openPromptCreationModal } from '../prompt-injection';
 import { PLAN_NEXT_SEED_ROWS } from '../../seed/plan-next-prompts';
 
-beforeEach(() => { document.body.innerHTML = ''; });
+beforeEach(() => {
+  document.body.innerHTML = ''; 
+});
 
 function openPlanEditorWith(bodyText: string): {
   badge: HTMLElement;

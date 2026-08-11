@@ -58,7 +58,9 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   log(fn + ': Tier 2 — Opening project dialog to read workspace name...', 'check');
   logSub('ProjectButtonXPath: ' + CONFIG.PROJECT_BUTTON_XPATH, 1);
   logSub('WorkspaceNameXPath: ' + CONFIG.WORKSPACE_XPATH, 1);
-  if (keepDialogOpen) logSub('keepDialogOpen=true — caller will close dialog after Step 3', 1);
+  if (keepDialogOpen) {
+    logSub('keepDialogOpen=true — caller will close dialog after Step 3', 1);
+  }
 
   return findProjectButtonWithRetry(fn, 3, 1000).then(function(btn: Element | null) {
     if (!btn) {
@@ -91,7 +93,9 @@ function tryFindProjectButton(ctx: ProjectBtnRetryCtx): void {
 
   if (!btn) {
     btn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
-    if (btn) { logSub('Project button found via fallback findElement (attempt ' + ctx.attempt + ')', 1); }
+    if (btn) {
+      logSub('Project button found via fallback findElement (attempt ' + ctx.attempt + ')', 1); 
+    }
   }
 
   if (btn) {
@@ -103,7 +107,9 @@ function tryFindProjectButton(ctx: ProjectBtnRetryCtx): void {
 
   if (ctx.attempt < ctx.maxRetries) {
     logSub('Project button not found (attempt ' + ctx.attempt + '/' + ctx.maxRetries + ') — retrying in ' + ctx.delayMs + 'ms...', 1);
-    setTimeout(function() { tryFindProjectButton(ctx); }, ctx.delayMs);
+    setTimeout(function() {
+      tryFindProjectButton(ctx); 
+    }, ctx.delayMs);
   } else {
     logSub('Project button not found after ' + ctx.maxRetries + ' attempts', 1);
     ctx.resolve(null);
@@ -167,13 +173,20 @@ function resolveChosenWorkspace(
   for (const c of matchedCandidates) {
     const key = c.matched.id || normalizeWorkspaceName(c.matched.fullName || c.matched.name || '');
     const existing = uniqueById[key];
-    if (!existing || (!existing.selected && c.selected)) uniqueById[key] = c;
+    if (!existing || (!existing.selected && c.selected)) {
+      uniqueById[key] = c;
+    }
   }
 
   const uniqueMatches = Object.values(uniqueById);
   const selected = uniqueMatches.find(m => m.selected);
-  if (selected) return selected;
-  if (uniqueMatches.length === 1) return uniqueMatches[0];
+  if (selected) {
+    return selected;
+  }
+
+  if (uniqueMatches.length === 1) {
+    return uniqueMatches[0];
+  }
 
   if (uniqueMatches.length === 0 && perWs.length === 1) {
     log(fn + ': XPath candidates not cleanly matchable, but only one workspace exists — selecting it', 'warn');
@@ -196,6 +209,7 @@ function applyChosenWorkspace(
 
     return;
   }
+
   const firstRaw = (allNodes[0].textContent || '').trim();
   const projectName = getDisplayProjectName();
   const isValidRawWorkspace = isValidWorkspaceCandidateName(firstRaw, projectName);
@@ -231,11 +245,15 @@ function handlePollTimeout(
     state.workspaceName = cssFallback.matched.fullName || cssFallback.matched.name;
     loopCreditState.currentWs = cssFallback.matched;
     log(fn + ': ⚠️ Workspace detected via CSS fallback: "' + cssFallback.rawName + '" → ' + state.workspaceName, 'warn');
-    if (!keepDialogOpen) closeProjectDialogSafe(btn);
+    if (!keepDialogOpen) {
+      closeProjectDialogSafe(btn);
+    }
+
     resolve();
 
     return;
   }
+
   log(fn + ': CSS fallback also failed — preserving existing workspace', 'warn');
   if (!keepDialogOpen) {
     closeDialogAndDefault(fn, btn, perWs, resolve);
@@ -266,6 +284,7 @@ function pollForWorkspaceName(fn: string, btn: Element, perWs: WorkspaceCredit[]
       } else {
         logSub('keepDialogOpen=true — leaving dialog open for Step 3 (progress bar)', 1);
       }
+
       resolve();
 
       return;
@@ -327,6 +346,7 @@ function closeDialogAndDefault(fn: string, btn: Element, _perWs: WorkspaceCredit
   } else {
     log(fn + LabelType.KeepingExistingWs + state.workspaceName, 'warn');
   }
+
   closeProjectDialogSafe(btn);
   resolve();
 }

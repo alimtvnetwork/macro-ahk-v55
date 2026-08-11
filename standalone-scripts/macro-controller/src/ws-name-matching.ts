@@ -75,6 +75,7 @@ export function pushWorkspaceNameCandidate(target: Array<{ name: string; selecte
   if (!cleaned) {
     return;
   }
+
   const normalized = normalizeWorkspaceName(cleaned);
   if (!normalized) {
     return;
@@ -89,6 +90,7 @@ export function pushWorkspaceNameCandidate(target: Array<{ name: string; selecte
       return;
     }
   }
+
   target.push({ name: cleaned, selected: selected });
 }
 
@@ -106,6 +108,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
     if (!trimmedLine) {
       continue;
     }
+
     pushWorkspaceNameCandidate(target, trimmedLine, selected);
 
     const stripped = trimmedLine.replace(/^(workspace|current workspace|selected workspace|project)\s*[:\u002D]\s*/i, '').trim();
@@ -119,6 +122,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
       if (!trimmedToken) {
         continue;
       }
+
       pushWorkspaceNameCandidate(target, trimmedToken, selected);
     }
   }
@@ -147,6 +151,7 @@ export function isLikelySelectedWorkspaceNode(node: Node): boolean {
     if (/(^|\s)(selected|active|current|checked)(\s|$)/.test(className) || /\bis-(selected|active|current|checked)\b/.test(className)) {
       return true;
     }
+
     el = el.parentElement;
   }
 
@@ -165,7 +170,9 @@ function collectFromElement(
   expandWorkspaceNameCandidates((el.textContent || '').trim(), selected, candidates);
   for (const key of attrKeys) {
     const attributeValue = el.getAttribute(key);
-    if (attributeValue) expandWorkspaceNameCandidates(attributeValue, selected, candidates);
+    if (attributeValue) {
+      expandWorkspaceNameCandidates(attributeValue, selected, candidates);
+    }
   }
 }
 

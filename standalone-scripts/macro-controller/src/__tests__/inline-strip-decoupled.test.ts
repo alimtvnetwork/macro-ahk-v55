@@ -45,9 +45,9 @@ vi.mock('../ui/task-next-ui', () => ({
 // prefers the DB `next-default` row. Force the miss path so the JSON-library
 // resolver still runs — that's what these tests pin.
 vi.mock('../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   getDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 

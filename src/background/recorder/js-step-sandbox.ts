@@ -24,17 +24,17 @@
  */
 
 const FORBIDDEN_TOKENS: ReadonlyArray<RegExp> = [
-    /\beval\s*\(/,
-    /\bnew\s+Function\b/,
-    /\bFunction\s*\(/,
-    /\bwindow\b/,
-    /\bdocument\b/,
-    /\bglobalThis\b/,
-    /\bchrome\b/,
-    /\bprocess\b/,
-    /\bimport\s*\(/,
-    /\brequire\s*\(/,
-    /\b__proto__\b/,
+  /\beval\s*\(/,
+  /\bnew\s+Function\b/,
+  /\bFunction\s*\(/,
+  /\bwindow\b/,
+  /\bdocument\b/,
+  /\bglobalThis\b/,
+  /\bchrome\b/,
+  /\bprocess\b/,
+  /\bimport\s*\(/,
+  /\brequire\s*\(/,
+  /\b__proto__\b/,
 ];
 
 export interface JsInlineContext {
@@ -56,40 +56,42 @@ export class JsExecError extends Error {}
  * does not parse; defence-in-depth alongside the strict-mode wrapper.
  */
 export function validateJsBody(body: string): void {
-    if (typeof body !== "string" || body.trim().length === 0) {
-        throw new JsValidationError("InlineJs body cannot be empty");
+  if (typeof body !== "string" || body.trim().length === 0) {
+    throw new JsValidationError("InlineJs body cannot be empty");
+  }
+
+  if (body.length > 4000) {
+    throw new JsValidationError("InlineJs body exceeds 4000-char limit");
+  }
+
+  for (const token of FORBIDDEN_TOKENS) {
+    if (token.test(body)) {
+      throw new JsValidationError(
+        `InlineJs body contains forbidden token matching ${token.source}`,
+      );
     }
-    if (body.length > 4000) {
-        throw new JsValidationError("InlineJs body exceeds 4000-char limit");
-    }
-    for (const token of FORBIDDEN_TOKENS) {
-        if (token.test(body)) {
-            throw new JsValidationError(
-                `InlineJs body contains forbidden token matching ${token.source}`,
-            );
-        }
-    }
+  }
 }
 
 /**
  * Compile a body string into a callable. Separated for caching in callers.
  */
 function compileBody(
-    body: string,
+  body: string,
 ): (ctx: JsInlineContext, log: (msg: string) => void) => unknown {
-    const wrapped = `"use strict"; ${body}`;
+  const wrapped = `"use strict"; ${body}`;
 
-    return new Function("Ctx", "Log", wrapped) as (
+  return new Function("Ctx", "Log", wrapped) as (
         ctx: JsInlineContext,
         log: (msg: string) => void,
     ) => unknown;
 }
 
 function freezeCtx(ctx: JsInlineContext): JsInlineContext {
-    return Object.freeze({
-        Row: ctx.Row ? Object.freeze({ ...ctx.Row }) : null,
-        Vars: Object.freeze({ ...ctx.Vars }),
-    });
+  return Object.freeze({
+    Row: ctx.Row ? Object.freeze({ ...ctx.Row }) : null,
+    Vars: Object.freeze({ ...ctx.Vars }),
+  });
 }
 
 /**
@@ -97,31 +99,34 @@ function freezeCtx(ctx: JsInlineContext): JsInlineContext {
  * for static rejects and `JsExecError` for runtime failures (with cause).
  */
 async function runCompiledBody(
-    fn: (ctx: JsInlineContext, log: (message: string) => void) => unknown,
-    ctx: JsInlineContext,
-    logs: string[],
+  fn: (ctx: JsInlineContext, log: (message: string) => void) => unknown,
+  ctx: JsInlineContext,
+  logs: string[],
 ): Promise<unknown> {
-    const frozen = freezeCtx(ctx);
-    const log = (message: string): void => { logs.push(String(message)); };
-    const out = fn.call(null, frozen, log);
+  const frozen = freezeCtx(ctx);
+  const log = (message: string): void => {
+    logs.push(String(message)); 
+  };
 
-    return out instanceof Promise ? await out : out;
+  const out = fn.call(null, frozen, log);
+
+  return out instanceof Promise ? await out : out;
 }
 
 export async function executeJsBody(
-    body: string,
-    ctx: JsInlineContext,
+  body: string,
+  ctx: JsInlineContext,
 ): Promise<JsInlineResult> {
-    validateJsBody(body);
-    const fn = compileBody(body);
-    const logs: string[] = [];
-    const start = Date.now();
-    try {
-        const value = await runCompiledBody(fn, ctx, logs);
+  validateJsBody(body);
+  const fn = compileBody(body);
+  const logs: string[] = [];
+  const start = Date.now();
+  try {
+    const value = await runCompiledBody(fn, ctx, logs);
 
-        return { ReturnValue: value, LogLines: logs, DurationMs: Date.now() - start };
-    } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        throw new JsExecError(`InlineJs execution failed: ${message}`);
-    }
+    return { ReturnValue: value, LogLines: logs, DurationMs: Date.now() - start };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new JsExecError(`InlineJs execution failed: ${message}`);
+  }
 }

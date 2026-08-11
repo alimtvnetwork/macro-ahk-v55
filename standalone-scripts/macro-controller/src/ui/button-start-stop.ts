@@ -20,6 +20,7 @@ export function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): 
     startStopBtn.style.filter = 'brightness(1.12)'; 
     startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
   };
+
   startStopBtn.onmouseleave = function() { 
     startStopBtn.style.filter = ''; 
     startStopBtn.style.boxShadow = cBtnStartGlow; 

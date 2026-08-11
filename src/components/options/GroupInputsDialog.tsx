@@ -9,12 +9,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { FileJson, Trash2 } from "lucide-react";
 
@@ -33,48 +33,48 @@ export interface GroupInputsDialogProps {
 }
 
 export function GroupInputsDialog(props: GroupInputsDialogProps): JSX.Element {
-    const { open, groupName, groupId, currentBag, onOpenChange } = props;
-    const controller = useGroupInputsController(props);
+  const { open, groupName, groupId, currentBag, onOpenChange } = props;
+  const controller = useGroupInputsController(props);
 
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <FileJson className="h-5 w-5" /> Apply input data
-                    </DialogTitle>
-                    <GroupInputsDescription groupName={groupName} />
-                </DialogHeader>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileJson className="h-5 w-5" /> Apply input data
+          </DialogTitle>
+          <GroupInputsDescription groupName={groupName} />
+        </DialogHeader>
 
-                <DropZone
-                    dragOver={controller.dragOver}
-                    setDragOver={controller.setDragOver}
-                    currentBag={currentBag}
-                    onLoadCurrent={controller.handleLoadCurrent}
-                    onFilePick={controller.handleFilePick}
-                    onDrop={controller.handleDrop}
-                />
+        <DropZone
+          dragOver={controller.dragOver}
+          setDragOver={controller.setDragOver}
+          currentBag={currentBag}
+          onLoadCurrent={controller.handleLoadCurrent}
+          onFilePick={controller.handleFilePick}
+          onDrop={controller.handleDrop}
+        />
 
-                <JsonEditor
-                    text={controller.text}
-                    setText={controller.setText}
-                    parseResult={controller.parseResult}
-                />
+        <JsonEditor
+          text={controller.text}
+          setText={controller.setText}
+          parseResult={controller.parseResult}
+        />
 
-                <GroupInputsFooter groupId={groupId} currentBag={currentBag} controller={controller} onOpenChange={onOpenChange} />
-            </DialogContent>
-        </Dialog>
-    );
+        <GroupInputsFooter groupId={groupId} currentBag={currentBag} controller={controller} onOpenChange={onOpenChange} />
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function GroupInputsDescription({ groupName }: { groupName: string | null }): JSX.Element {
-    return <DialogDescription>Paste or upload a JSON object of variables for <span className="font-medium text-foreground">{groupName ?? "(no group selected)"}</span>. Values are substituted into <code className="rounded bg-muted px-1">{"{{Placeholder}}"}</code> tokens at recording / execution time.</DialogDescription>;
+  return <DialogDescription>Paste or upload a JSON object of variables for <span className="font-medium text-foreground">{groupName ?? "(no group selected)"}</span>. Values are substituted into <code className="rounded bg-muted px-1">{"{{Placeholder}}"}</code> tokens at recording / execution time.</DialogDescription>;
 }
 
 type GroupInputsController = ReturnType<typeof useGroupInputsController>;
 
 function GroupInputsFooter(props: { groupId: number | null; currentBag: GroupInputBag | null; controller: GroupInputsController; onOpenChange: (open: boolean) => void }): JSX.Element {
-    const { groupId, currentBag, controller, onOpenChange } = props;
+  const { groupId, currentBag, controller, onOpenChange } = props;
 
-    return <DialogFooter className="gap-2 sm:gap-2"><Button variant="ghost" onClick={controller.handleClear} disabled={groupId === null || currentBag === null} className="mr-auto text-destructive hover:text-destructive"><Trash2 className="mr-1 h-4 w-4" />Clear bag</Button><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button><Button onClick={controller.handleApply} disabled={groupId === null || !controller.parseResult.Ok}>Apply</Button></DialogFooter>;
+  return <DialogFooter className="gap-2 sm:gap-2"><Button variant="ghost" onClick={controller.handleClear} disabled={groupId === null || currentBag === null} className="mr-auto text-destructive hover:text-destructive"><Trash2 className="mr-1 h-4 w-4" />Clear bag</Button><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button><Button onClick={controller.handleApply} disabled={groupId === null || !controller.parseResult.Ok}>Apply</Button></DialogFooter>;
 }

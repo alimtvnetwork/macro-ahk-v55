@@ -14,12 +14,16 @@ const DEFAULT_THEME: EditorThemeName = "dracula";
 const VALID: Set<string> = new Set<EditorThemeName>(["dracula", "monokai", "nord", "light"]);
 
 let listeners: Array<() => void> = [];
-function emit() { listeners.forEach((l) => l()); }
+function emit() {
+  listeners.forEach((l) => l()); 
+}
 
 function getSnapshot(): EditorThemeName {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
-    if (v && VALID.has(v)) return v as EditorThemeName;
+    if (v && VALID.has(v)) {
+      return v as EditorThemeName;
+    }
   } catch (caught) {
     logError("useEditorTheme.getSnapshot", "localStorage read failed — falling back to default theme (SSR/sandbox?)", caught);
   }
@@ -30,9 +34,13 @@ function getSnapshot(): EditorThemeName {
 /** React hook — returns current theme + setter. */
 export function useEditorTheme() {
   const theme = useSyncExternalStore(
-    (callback) => { listeners.push(callback);
+    (callback) => {
+      listeners.push(callback);
 
- return () => { listeners = listeners.filter((l) => l !== callback); }; },
+      return () => {
+        listeners = listeners.filter((l) => l !== callback); 
+      }; 
+    },
     getSnapshot,
     () => DEFAULT_THEME,
   );
@@ -43,6 +51,7 @@ export function useEditorTheme() {
     } catch (caught) {
       logError("useEditorTheme.setTheme", `localStorage write failed for key "${STORAGE_KEY}" — theme will not persist across reloads`, caught);
     }
+
     emit();
   }, []);
 

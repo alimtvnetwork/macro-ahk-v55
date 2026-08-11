@@ -14,12 +14,19 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
   if (typeof ws.numProjects === 'number' && ws.numProjects > 0) {
     lines.push('  Projects: ' + ws.numProjects);
   }
+
   lines.push('  Git Sync: ' + (ws.gitSyncEnabled ? 'enabled' : 'disabled'));
-  if (ws.subscriptionStatus) lines.push('  Subscription Status: ' + ws.subscriptionStatus);
+  if (ws.subscriptionStatus) {
+    lines.push('  Subscription Status: ' + ws.subscriptionStatus);
+  }
+
   if (ws.subscriptionStatusChangedAt) {
     const days = (function () {
       const t = Date.parse(ws.subscriptionStatusChangedAt);
-      if (!Number.isFinite(t)) return 0;
+      if (!Number.isFinite(t)) {
+        return 0;
+      }
+
       const diff = Date.now() - t;
 
       return diff > 0 ? Math.floor(diff / 86_400_000) : 0;
@@ -27,9 +34,18 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
     const suffix = days > 0 ? ' (' + days + 'd ago)' : '';
     lines.push('  Status Changed: ' + ws.subscriptionStatusChangedAt + suffix);
   }
-  if (ws.nextRefillAt) lines.push('  Next Refill: ' + ws.nextRefillAt);
-  if (ws.billingPeriodEndAt) lines.push('  Billing Period Ends: ' + ws.billingPeriodEndAt);
-  if (ws.createdAt) lines.push('  Created: ' + ws.createdAt);
+
+  if (ws.nextRefillAt) {
+    lines.push('  Next Refill: ' + ws.nextRefillAt);
+  }
+
+  if (ws.billingPeriodEndAt) {
+    lines.push('  Billing Period Ends: ' + ws.billingPeriodEndAt);
+  }
+
+  if (ws.createdAt) {
+    lines.push('  Created: ' + ws.createdAt);
+  }
 
   return lines;
 }
@@ -52,7 +68,10 @@ function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
   lines.push('  Billing: ' + ws.used + '/' + ws.limit + ' used');
   lines.push('  Rollover: ' + ws.rolloverUsed + '/' + ws.rolloverLimit + ' used');
   lines.push('  Daily: ' + ws.dailyUsed + '/' + ws.dailyLimit + ' used');
-  if (ws.freeGranted > 0) lines.push('  Trial: ' + ws.freeRemaining + '/' + ws.freeGranted + ' remaining');
+  if (ws.freeGranted > 0) {
+    lines.push('  Trial: ' + ws.freeRemaining + '/' + ws.freeGranted + ' remaining');
+  }
+
   lines.push('  Status: ' + (ws.subscriptionStatus || 'N/A'));
   if (isExpiredWs(ws)) {
     const startDate = formatExpiryStartDate(ws);
@@ -63,10 +82,16 @@ function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
       lines.push('  Expired since: ' + datePart + durPart);
     }
   }
+
   if (ws.raw) {
     const r = ws.raw;
-    if (r.last_trial_credit_period) lines.push('  Trial Period: ' + r.last_trial_credit_period);
-    if (r.subscription_status) lines.push('  Subscription: ' + r.subscription_status);
+    if (r.last_trial_credit_period) {
+      lines.push('  Trial Period: ' + r.last_trial_credit_period);
+    }
+
+    if (r.subscription_status) {
+      lines.push('  Subscription: ' + r.subscription_status);
+    }
   }
 
   return lines;

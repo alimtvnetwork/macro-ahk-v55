@@ -10,5 +10,5 @@
 import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 
 export const shouldRunStepB = (roleCode: UserAddMembershipRoleCodeType): boolean => {
-    return roleCode === UserAddMembershipRoleCodeType.Owner;
+  return roleCode === UserAddMembershipRoleCodeType.Owner;
 };

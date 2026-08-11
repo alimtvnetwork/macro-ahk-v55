@@ -32,10 +32,10 @@ const DEFAULT_TIMEOUT_MS = 8000;
 const CORRUPT_PLACEHOLDER_PREFIX = "Corrupt webhook log entry";
 
 export const ALL_WEBHOOK_EVENTS = [
-    "GroupRunSucceeded",
-    "GroupRunFailed",
-    "BatchComplete",
-    "RecordingStopped",
+  "GroupRunSucceeded",
+  "GroupRunFailed",
+  "BatchComplete",
+  "RecordingStopped",
 ] as const;
 
 export type WebhookEventKind = typeof ALL_WEBHOOK_EVENTS[number];
@@ -59,12 +59,12 @@ export interface WebhookConfig {
 }
 
 export const DEFAULT_WEBHOOK_CONFIG: WebhookConfig = {
-    Enabled: false,
-    Url: "",
-    TimeoutMs: DEFAULT_TIMEOUT_MS,
-    Headers: [],
-    Events: [...ALL_WEBHOOK_EVENTS],
-    SecretToken: "",
+  Enabled: false,
+  Url: "",
+  TimeoutMs: DEFAULT_TIMEOUT_MS,
+  Headers: [],
+  Events: [...ALL_WEBHOOK_EVENTS],
+  SecretToken: "",
 };
 
 export type WebhookPayload = Record<string, unknown>;
@@ -119,13 +119,15 @@ export type WebhookDeliveryResult =
 /* ------------------------------------------------------------------ */
 
 export function isWebhookSuccess(r: WebhookDeliveryResult): r is WebhookDeliverySuccess {
-    return r.Kind === "success";
+  return r.Kind === "success";
 }
+
 export function isWebhookSkipped(r: WebhookDeliveryResult): r is WebhookDeliverySkipped {
-    return r.Kind === "skipped";
+  return r.Kind === "skipped";
 }
+
 export function isWebhookFailure(r: WebhookDeliveryResult): r is WebhookDeliveryFailure {
-    return r.Kind === "failure";
+  return r.Kind === "failure";
 }
 
 /* ------------------------------------------------------------------ */
@@ -133,38 +135,43 @@ export function isWebhookFailure(r: WebhookDeliveryResult): r is WebhookDelivery
 /* ------------------------------------------------------------------ */
 
 function safeLocalStorage(): Storage | null {
-    try {
-        if (typeof localStorage === "undefined") return null;
-
-        return localStorage;
-    } catch (err) { 
-        return null;
+  try {
+    if (typeof localStorage === "undefined") {
+      return null;
     }
+
+    return localStorage;
+  } catch (err) { 
+    return null;
+  }
 }
 
 function nowIso(): string {
-    return new Date().toISOString();
+  return new Date().toISOString();
 }
 
 function isPlainRecord(v: unknown): v is Record<string, unknown> {
-    return typeof v === "object" && v !== null && !Array.isArray(v);
+  return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
 function asString(v: unknown, fallback: string): string {
-    return typeof v === "string" ? v : fallback;
+  return typeof v === "string" ? v : fallback;
 }
-function asNumber(v: unknown, fallback: number): number {
-    return typeof v === "number" && Number.isFinite(v) ? v : fallback;
-}
-function asBool(v: unknown, fallback: boolean): boolean {
-    return typeof v === "boolean" ? v : fallback;
-}
-function asEvent(v: unknown): WebhookEventKind {
-    if (typeof v === "string" && (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(v)) {
-        return v as WebhookEventKind;
-    }
 
-    return "GroupRunSucceeded";
+function asNumber(v: unknown, fallback: number): number {
+  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
+}
+
+function asBool(v: unknown, fallback: boolean): boolean {
+  return typeof v === "boolean" ? v : fallback;
+}
+
+function asEvent(v: unknown): WebhookEventKind {
+  if (typeof v === "string" && (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(v)) {
+    return v as WebhookEventKind;
+  }
+
+  return "GroupRunSucceeded";
 }
 
 /* ------------------------------------------------------------------ */
@@ -172,57 +179,69 @@ function asEvent(v: unknown): WebhookEventKind {
 /* ------------------------------------------------------------------ */
 
 export function loadWebhookConfig(): WebhookConfig {
-    const ls = safeLocalStorage();
-    if (!ls) return { ...DEFAULT_WEBHOOK_CONFIG };
-    try {
-        const raw = ls.getItem(CONFIG_STORAGE_KEY);
-        if (!raw) return { ...DEFAULT_WEBHOOK_CONFIG };
-        const parsed: unknown = JSON.parse(raw);
-        if (!isPlainRecord(parsed)) return { ...DEFAULT_WEBHOOK_CONFIG };
-        const headers: WebhookHeader[] = Array.isArray(parsed.Headers)
-            ? parsed.Headers
-                  .filter(isPlainRecord)
-                  .map((h) => ({
-                      Name: asString(h.Name, ""),
-                      Value: asString(h.Value, ""),
-                  }))
-            : [];
-        const events: WebhookEventKind[] = Array.isArray(parsed.Events)
-            ? parsed.Events
-                  .filter((e): e is string => typeof e === "string")
-                  .filter((e): e is WebhookEventKind => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(e))
-            : [...ALL_WEBHOOK_EVENTS];
+  const ls = safeLocalStorage();
+  if (!ls) {
+    return { ...DEFAULT_WEBHOOK_CONFIG };
+  }
 
-        return {
-            Enabled: asBool(parsed.Enabled, false),
-            Url: asString(parsed.Url, ""),
-            TimeoutMs: asNumber(parsed.TimeoutMs, DEFAULT_TIMEOUT_MS),
-            Headers: headers,
-            Events: events,
-            SecretToken: asString(parsed.SecretToken, ""),
-        };
-    } catch (err) { 
-        return { ...DEFAULT_WEBHOOK_CONFIG };
+  try {
+    const raw = ls.getItem(CONFIG_STORAGE_KEY);
+    if (!raw) {
+      return { ...DEFAULT_WEBHOOK_CONFIG };
     }
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPlainRecord(parsed)) {
+      return { ...DEFAULT_WEBHOOK_CONFIG };
+    }
+
+    const headers: WebhookHeader[] = Array.isArray(parsed.Headers)
+      ? parsed.Headers
+        .filter(isPlainRecord)
+        .map((h) => ({
+          Name: asString(h.Name, ""),
+          Value: asString(h.Value, ""),
+        }))
+      : [];
+    const events: WebhookEventKind[] = Array.isArray(parsed.Events)
+      ? parsed.Events
+        .filter((e): e is string => typeof e === "string")
+        .filter((e): e is WebhookEventKind => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(e))
+      : [...ALL_WEBHOOK_EVENTS];
+
+    return {
+      Enabled: asBool(parsed.Enabled, false),
+      Url: asString(parsed.Url, ""),
+      TimeoutMs: asNumber(parsed.TimeoutMs, DEFAULT_TIMEOUT_MS),
+      Headers: headers,
+      Events: events,
+      SecretToken: asString(parsed.SecretToken, ""),
+    };
+  } catch (err) { 
+    return { ...DEFAULT_WEBHOOK_CONFIG };
+  }
 }
 
 export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
-    const ls = safeLocalStorage();
-    const normalized: WebhookConfig = {
-        Enabled: !!config.Enabled,
-        Url: typeof config.Url === "string" ? config.Url : "",
-        TimeoutMs: Number.isFinite(config.TimeoutMs) && config.TimeoutMs > 0 ? config.TimeoutMs : DEFAULT_TIMEOUT_MS,
-        Headers: (config.Headers ?? []).map((h) => ({ Name: h.Name ?? "", Value: h.Value ?? "" })),
-        Events: (config.Events ?? []).filter((k) => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(k)),
-        SecretToken: typeof config.SecretToken === "string" ? config.SecretToken : "",
-    };
-    if (ls) {
-        try { ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); }catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
- // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
+  const ls = safeLocalStorage();
+  const normalized: WebhookConfig = {
+    Enabled: !!config.Enabled,
+    Url: typeof config.Url === "string" ? config.Url : "",
+    TimeoutMs: Number.isFinite(config.TimeoutMs) && config.TimeoutMs > 0 ? config.TimeoutMs : DEFAULT_TIMEOUT_MS,
+    Headers: (config.Headers ?? []).map((h) => ({ Name: h.Name ?? "", Value: h.Value ?? "" })),
+    Events: (config.Events ?? []).filter((k) => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(k)),
+    SecretToken: typeof config.SecretToken === "string" ? config.SecretToken : "",
+  };
+  if (ls) {
+    try {
+      ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); 
+    }catch (err) {
+      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
     }
+    // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
+  }
 
-    return normalized;
+  return normalized;
 }
 
 /* ------------------------------------------------------------------ */
@@ -230,36 +249,40 @@ export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
 /* ------------------------------------------------------------------ */
 
 function buildCorruptPlaceholder(reason: string): WebhookDeliveryFailure {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "failure",
-        Ok: false,
-        Skipped: false,
-        Event: "GroupRunFailed",
-        Url: "",
-        Status: null,
-        Error: `${CORRUPT_PLACEHOLDER_PREFIX}: ${reason}`,
-        DurationMs: 0,
-        EmittedAt: nowIso(),
-        Payload: null,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "failure",
+    Ok: false,
+    Skipped: false,
+    Event: "GroupRunFailed",
+    Url: "",
+    Status: null,
+    Error: `${CORRUPT_PLACEHOLDER_PREFIX}: ${reason}`,
+    DurationMs: 0,
+    EmittedAt: nowIso(),
+    Payload: null,
+  };
 }
 
 export function migrateWebhookDeliveryResult(input: unknown): WebhookDeliveryResult {
-    if (!isPlainRecord(input)) return buildCorruptPlaceholder("entry is not an object");
-    const versionField = input.SchemaVersion;
-    const hasVersion = typeof versionField === "number";
-    if (hasVersion && versionField !== WEBHOOK_RESULT_SCHEMA_VERSION) {
-        return buildCorruptPlaceholder(`unknown SchemaVersion ${String(versionField)}`);
-    }
-    // No version field => v1 legacy blob; upgrade in place.
-    const common = extractCommonFields(input);
-    switch (input.Kind) {
-        case "success": return migrateSuccess(input, common);
-        case "skipped": return migrateSkipped(input, common);
-        case "failure": return migrateFailure(input, common);
-        default:        return buildCorruptPlaceholder(`unknown Kind ${String(input.Kind)}`);
-    }
+  if (!isPlainRecord(input)) {
+    return buildCorruptPlaceholder("entry is not an object");
+  }
+
+  const versionField = input.SchemaVersion;
+  const hasVersion = typeof versionField === "number";
+  if (hasVersion && versionField !== WEBHOOK_RESULT_SCHEMA_VERSION) {
+    return buildCorruptPlaceholder(`unknown SchemaVersion ${String(versionField)}`);
+  }
+
+  // No version field => v1 legacy blob; upgrade in place.
+  const common = extractCommonFields(input);
+  switch (input.Kind) {
+    case "success": return migrateSuccess(input, common);
+    case "skipped": return migrateSkipped(input, common);
+    case "failure": return migrateFailure(input, common);
+    default:        return buildCorruptPlaceholder(`unknown Kind ${String(input.Kind)}`);
+  }
 }
 
 interface CommonMigratedFields {
@@ -270,49 +293,49 @@ interface CommonMigratedFields {
 }
 
 function extractCommonFields(input: Record<string, unknown>): CommonMigratedFields {
-    return {
-        Event: asEvent(input.Event),
-        DurationMs: asNumber(input.DurationMs, 0),
-        EmittedAt: asString(input.EmittedAt, nowIso()),
-        Payload: isPlainRecord(input.Payload) ? (input.Payload as WebhookPayload) : null,
-    };
+  return {
+    Event: asEvent(input.Event),
+    DurationMs: asNumber(input.DurationMs, 0),
+    EmittedAt: asString(input.EmittedAt, nowIso()),
+    Payload: isPlainRecord(input.Payload) ? (input.Payload as WebhookPayload) : null,
+  };
 }
 
 function migrateSuccess(input: Record<string, unknown>, c: CommonMigratedFields): WebhookDeliveryResult {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "success", Ok: true, Skipped: false,
-        Event: c.Event,
-        Url: asString(input.Url, ""),
-        Status: asNumber(input.Status, 0),
-        DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "success", Ok: true, Skipped: false,
+    Event: c.Event,
+    Url: asString(input.Url, ""),
+    Status: asNumber(input.Status, 0),
+    DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
+  };
 }
 
 function migrateSkipped(input: Record<string, unknown>, c: CommonMigratedFields): WebhookDeliveryResult {
-    const url = typeof input.Url === "string" ? input.Url : null;
+  const url = typeof input.Url === "string" ? input.Url : null;
 
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "skipped", Ok: true, Skipped: true,
-        Event: c.Event, Url: url,
-        SkipReason: asString(input.SkipReason, "Skipped"),
-        DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "skipped", Ok: true, Skipped: true,
+    Event: c.Event, Url: url,
+    SkipReason: asString(input.SkipReason, "Skipped"),
+    DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
+  };
 }
 
 function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields): WebhookDeliveryResult {
-    const status = typeof input.Status === "number" ? input.Status : null;
+  const status = typeof input.Status === "number" ? input.Status : null;
 
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "failure", Ok: false, Skipped: false,
-        Event: c.Event,
-        Url: asString(input.Url, ""),
-        Status: status,
-        Error: asString(input.Error, "Unknown error"),
-        DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "failure", Ok: false, Skipped: false,
+    Event: c.Event,
+    Url: asString(input.Url, ""),
+    Status: status,
+    Error: asString(input.Error, "Unknown error"),
+    DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -320,39 +343,55 @@ function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields)
 /* ------------------------------------------------------------------ */
 
 function readLogRaw(): unknown[] {
-    const ls = safeLocalStorage();
-    if (!ls) return [];
-    try {
-        const raw = ls.getItem(LOG_STORAGE_KEY);
-        if (!raw) return [];
-        const parsed: unknown = JSON.parse(raw);
+  const ls = safeLocalStorage();
+  if (!ls) {
+    return [];
+  }
 
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (err) { 
-        return [];
+  try {
+    const raw = ls.getItem(LOG_STORAGE_KEY);
+    if (!raw) {
+      return [];
     }
+
+    const parsed: unknown = JSON.parse(raw);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) { 
+    return [];
+  }
 }
 
 function writeLog(entries: ReadonlyArray<WebhookDeliveryResult>): void {
-    const ls = safeLocalStorage();
-    if (!ls) return;
-    try {
-        ls.setItem(LOG_STORAGE_KEY, JSON.stringify(entries.slice(0, LOG_MAX_ENTRIES)));
-    }catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
- // allow-swallow: delivery-log write is best-effort; loss of one log entry must not break the run
+  const ls = safeLocalStorage();
+  if (!ls) {
+    return;
+  }
+
+  try {
+    ls.setItem(LOG_STORAGE_KEY, JSON.stringify(entries.slice(0, LOG_MAX_ENTRIES)));
+  }catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+  }
+  // allow-swallow: delivery-log write is best-effort; loss of one log entry must not break the run
 }
 
 export function getDeliveryLog(): ReadonlyArray<WebhookDeliveryResult> {
-    return readLogRaw().map(migrateWebhookDeliveryResult);
+  return readLogRaw().map(migrateWebhookDeliveryResult);
 }
 
 export function clearDeliveryLog(): void {
-    const ls = safeLocalStorage();
-    if (!ls) return;
-    try { ls.removeItem(LOG_STORAGE_KEY); }catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
- // allow-swallow: clearing the delivery log is best-effort cleanup
+  const ls = safeLocalStorage();
+  if (!ls) {
+    return;
+  }
+
+  try {
+    ls.removeItem(LOG_STORAGE_KEY); 
+  }catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+  }
+  // allow-swallow: clearing the delivery log is best-effort cleanup
 }
 
 export interface RepairReport {
@@ -362,27 +401,28 @@ export interface RepairReport {
 }
 
 export function repairDeliveryLog(): RepairReport {
-    const raw = readLogRaw();
-    const errors: string[] = [];
-    const kept: WebhookDeliveryResult[] = [];
-    let removed = 0;
-    for (const entry of raw) {
-        const migrated = migrateWebhookDeliveryResult(entry);
-        if (isWebhookFailure(migrated) && migrated.Error.startsWith(CORRUPT_PLACEHOLDER_PREFIX)) {
-            removed += 1;
-            errors.push(migrated.Error);
-        } else {
-            kept.push(migrated);
-        }
+  const raw = readLogRaw();
+  const errors: string[] = [];
+  const kept: WebhookDeliveryResult[] = [];
+  let removed = 0;
+  for (const entry of raw) {
+    const migrated = migrateWebhookDeliveryResult(entry);
+    if (isWebhookFailure(migrated) && migrated.Error.startsWith(CORRUPT_PLACEHOLDER_PREFIX)) {
+      removed += 1;
+      errors.push(migrated.Error);
+    } else {
+      kept.push(migrated);
     }
-    writeLog(kept);
+  }
 
-    return { Removed: removed, Kept: kept.length, Errors: errors };
+  writeLog(kept);
+
+  return { Removed: removed, Kept: kept.length, Errors: errors };
 }
 
 function appendLog(entry: WebhookDeliveryResult): void {
-    const current = getDeliveryLog();
-    writeLog([entry, ...current]);
+  const current = getDeliveryLog();
+  writeLog([entry, ...current]);
 }
 
 /* ------------------------------------------------------------------ */
@@ -402,20 +442,28 @@ export interface GroupRunPayloadInput {
 }
 
 export function buildGroupRunPayload(input: GroupRunPayloadInput): WebhookPayload {
-    const out: WebhookPayload = {
-        ProjectId: input.ProjectId,
-        GroupId: input.GroupId,
-        GroupName: input.GroupName,
-        DurationMs: input.DurationMs,
-        StepsExecuted: input.StepsExecuted,
-        Outcome: input.Outcome,
-        EmittedAt: nowIso(),
-    };
-    if (input.FailureReason !== undefined) out.FailureReason = input.FailureReason;
-    if (input.FailedStepId !== undefined) out.FailedStepId = input.FailedStepId;
-    if (input.IsTest) out.IsTest = true;
+  const out: WebhookPayload = {
+    ProjectId: input.ProjectId,
+    GroupId: input.GroupId,
+    GroupName: input.GroupName,
+    DurationMs: input.DurationMs,
+    StepsExecuted: input.StepsExecuted,
+    Outcome: input.Outcome,
+    EmittedAt: nowIso(),
+  };
+  if (input.FailureReason !== undefined) {
+    out.FailureReason = input.FailureReason;
+  }
 
-    return out;
+  if (input.FailedStepId !== undefined) {
+    out.FailedStepId = input.FailedStepId;
+  }
+
+  if (input.IsTest) {
+    out.IsTest = true;
+  }
+
+  return out;
 }
 
 export interface BatchCompletePayloadInput {
@@ -429,16 +477,16 @@ export interface BatchCompletePayloadInput {
 }
 
 export function buildBatchCompletePayload(input: BatchCompletePayloadInput): WebhookPayload {
-    return {
-        ProjectId: input.ProjectId,
-        TotalGroups: input.TotalGroups,
-        Succeeded: input.Succeeded,
-        Failed: input.Failed,
-        Skipped: input.Skipped,
-        DurationMs: input.DurationMs,
-        Ok: input.Ok,
-        EmittedAt: nowIso(),
-    };
+  return {
+    ProjectId: input.ProjectId,
+    TotalGroups: input.TotalGroups,
+    Succeeded: input.Succeeded,
+    Failed: input.Failed,
+    Skipped: input.Skipped,
+    DurationMs: input.DurationMs,
+    Ok: input.Ok,
+    EmittedAt: nowIso(),
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -446,19 +494,24 @@ export function buildBatchCompletePayload(input: BatchCompletePayloadInput): Web
 /* ------------------------------------------------------------------ */
 
 function substitute(template: string, payload: WebhookPayload, event: WebhookEventKind): string {
-    if (!template.includes("{{")) return template;
-    const lookup: Record<string, unknown> = {
-        ...payload,
-        Event: event,
-        Outcome: payload.Outcome ?? event,
-    };
+  if (!template.includes("{{")) {
+    return template;
+  }
 
-    return template.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_m, key: string) => {
-        const v = lookup[key];
-        if (v === undefined || v === null) return "";
+  const lookup: Record<string, unknown> = {
+    ...payload,
+    Event: event,
+    Outcome: payload.Outcome ?? event,
+  };
 
-        return typeof v === "string" ? v : String(v);
-    });
+  return template.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_m, key: string) => {
+    const v = lookup[key];
+    if (v === undefined || v === null) {
+      return "";
+    }
+
+    return typeof v === "string" ? v : String(v);
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -474,142 +527,152 @@ export interface DispatchOptions {
  * no retries, no backoff, no scheduled redelivery.
  */
 export async function dispatchWebhook(
-    event: WebhookEventKind,
-    payload: WebhookPayload,
-    options: DispatchOptions = {},
+  event: WebhookEventKind,
+  payload: WebhookPayload,
+  options: DispatchOptions = {},
 ): Promise<WebhookDeliveryResult> {
-    const config = options.config ?? loadWebhookConfig();
-    const emittedAt = nowIso();
+  const config = options.config ?? loadWebhookConfig();
+  const emittedAt = nowIso();
 
-    const skip = checkSkipReason(config, event);
-    if (skip !== null) {
-        return recordEntry(buildSkipped(event, config.Url || null, skip, emittedAt, payload));
-    }
+  const skip = checkSkipReason(config, event);
+  if (skip !== null) {
+    return recordEntry(buildSkipped(event, config.Url || null, skip, emittedAt, payload));
+  }
 
-    const finalUrl = substitute(config.Url, payload, event);
-    const headers = buildHeaders(config, payload, event);
-    const body = JSON.stringify({ Event: event, Payload: payload, EmittedAt: emittedAt });
+  const finalUrl = substitute(config.Url, payload, event);
+  const headers = buildHeaders(config, payload, event);
+  const body = JSON.stringify({ Event: event, Payload: payload, EmittedAt: emittedAt });
 
-    return recordEntry(await performFetch(event, finalUrl, headers, body, config, emittedAt, payload));
+  return recordEntry(await performFetch(event, finalUrl, headers, body, config, emittedAt, payload));
 }
 
 function recordEntry<T extends WebhookDeliveryResult>(entry: T): T {
-    appendLog(entry);
+  appendLog(entry);
 
-    return entry;
+  return entry;
 }
 
 function checkSkipReason(config: WebhookConfig, event: WebhookEventKind): string | null {
-    if (!config.Enabled) return "Webhook disabled";
-    if (!config.Url || config.Url.trim().length === 0) return "URL empty";
-    if (config.Events.length > 0 && !config.Events.includes(event)) {
-        return `Event ${event} not subscribed`;
-    }
+  if (!config.Enabled) {
+    return "Webhook disabled";
+  }
 
-    return null;
+  if (!config.Url || config.Url.trim().length === 0) {
+    return "URL empty";
+  }
+
+  if (config.Events.length > 0 && !config.Events.includes(event)) {
+    return `Event ${event} not subscribed`;
+  }
+
+  return null;
 }
 
 function buildSkipped(
-    event: WebhookEventKind,
-    url: string | null,
-    reason: string,
-    emittedAt: string,
-    payload: WebhookPayload,
+  event: WebhookEventKind,
+  url: string | null,
+  reason: string,
+  emittedAt: string,
+  payload: WebhookPayload,
 ): WebhookDeliverySkipped {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "skipped", Ok: true, Skipped: true,
-        Event: event, Url: url, SkipReason: reason,
-        DurationMs: 0, EmittedAt: emittedAt, Payload: payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "skipped", Ok: true, Skipped: true,
+    Event: event, Url: url, SkipReason: reason,
+    DurationMs: 0, EmittedAt: emittedAt, Payload: payload,
+  };
 }
 
 function buildHeaders(
-    config: WebhookConfig, payload: WebhookPayload, event: WebhookEventKind,
+  config: WebhookConfig, payload: WebhookPayload, event: WebhookEventKind,
 ): Record<string, string> {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    for (const h of config.Headers) {
-        const name = (h.Name ?? "").trim();
-        if (!name) continue;
-        headers[name] = substitute(h.Value ?? "", payload, event);
-    }
-    if (config.SecretToken && config.SecretToken.trim().length > 0) {
-        headers["X-Marco-Token"] = config.SecretToken;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  for (const h of config.Headers) {
+    const name = (h.Name ?? "").trim();
+    if (!name) {
+      continue;
     }
 
-    return headers;
+    headers[name] = substitute(h.Value ?? "", payload, event);
+  }
+
+  if (config.SecretToken && config.SecretToken.trim().length > 0) {
+    headers["X-Marco-Token"] = config.SecretToken;
+  }
+
+  return headers;
 }
 
 async function performFetch(
-    event: WebhookEventKind,
-    finalUrl: string,
-    headers: Record<string, string>,
-    body: string,
-    config: WebhookConfig,
-    emittedAt: string,
-    payload: WebhookPayload,
+  event: WebhookEventKind,
+  finalUrl: string,
+  headers: Record<string, string>,
+  body: string,
+  config: WebhookConfig,
+  emittedAt: string,
+  payload: WebhookPayload,
 ): Promise<WebhookDeliveryResult> {
-    const startedAt = Date.now();
-    const timeoutMs = config.TimeoutMs > 0 ? config.TimeoutMs : DEFAULT_TIMEOUT_MS;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-        const res = await fetch(finalUrl, { method: "POST", headers, body, signal: controller.signal });
-        clearTimeout(timer);
-        const durationMs = Date.now() - startedAt;
+  const startedAt = Date.now();
+  const timeoutMs = config.TimeoutMs > 0 ? config.TimeoutMs : DEFAULT_TIMEOUT_MS;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(finalUrl, { method: "POST", headers, body, signal: controller.signal });
+    clearTimeout(timer);
+    const durationMs = Date.now() - startedAt;
 
-        return res.ok
-            ? buildSuccess(event, finalUrl, res.status, durationMs, emittedAt, payload)
-            : buildHttpFailure(event, finalUrl, res.status, res.statusText, durationMs, emittedAt, payload);
-    } catch (err) {
-        clearTimeout(timer);
-        const durationMs = Date.now() - startedAt;
+    return res.ok
+      ? buildSuccess(event, finalUrl, res.status, durationMs, emittedAt, payload)
+      : buildHttpFailure(event, finalUrl, res.status, res.statusText, durationMs, emittedAt, payload);
+  } catch (err) {
+    clearTimeout(timer);
+    const durationMs = Date.now() - startedAt;
 
-        return buildErrorFailure(event, finalUrl, err, timeoutMs, durationMs, emittedAt, payload);
-    }
+    return buildErrorFailure(event, finalUrl, err, timeoutMs, durationMs, emittedAt, payload);
+  }
 }
 
 function buildSuccess(
-    event: WebhookEventKind, url: string, status: number,
-    durationMs: number, emittedAt: string, payload: WebhookPayload,
+  event: WebhookEventKind, url: string, status: number,
+  durationMs: number, emittedAt: string, payload: WebhookPayload,
 ): WebhookDeliverySuccess {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "success", Ok: true, Skipped: false,
-        Event: event, Url: url, Status: status,
-        DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "success", Ok: true, Skipped: false,
+    Event: event, Url: url, Status: status,
+    DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
+  };
 }
 
 function buildHttpFailure(
-    event: WebhookEventKind, url: string, status: number, statusText: string,
-    durationMs: number, emittedAt: string, payload: WebhookPayload,
+  event: WebhookEventKind, url: string, status: number, statusText: string,
+  durationMs: number, emittedAt: string, payload: WebhookPayload,
 ): WebhookDeliveryFailure {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "failure", Ok: false, Skipped: false,
-        Event: event, Url: url, Status: status,
-        Error: `HEFF: HTTP ${status} on POST ${url}, ${statusText || "non-2xx"}. `
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "failure", Ok: false, Skipped: false,
+    Event: event, Url: url, Status: status,
+    Error: `HEFF: HTTP ${status} on POST ${url}, ${statusText || "non-2xx"}. `
             + `Single-attempt webhook (webhook-fail-fast); no retry. Loop halted.`,
-        DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
-    };
+    DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
+  };
 }
 
 function buildErrorFailure(
-    event: WebhookEventKind, url: string, err: unknown, timeoutMs: number,
-    durationMs: number, emittedAt: string, payload: WebhookPayload,
+  event: WebhookEventKind, url: string, err: unknown, timeoutMs: number,
+  durationMs: number, emittedAt: string, payload: WebhookPayload,
 ): WebhookDeliveryFailure {
-    const aborted = err instanceof DOMException && err.name === "AbortError";
-    const message = aborted
-        ? `Timeout after ${timeoutMs}ms`
-        : err instanceof Error ? err.message : String(err);
+  const aborted = err instanceof DOMException && err.name === "AbortError";
+  const message = aborted
+    ? `Timeout after ${timeoutMs}ms`
+    : err instanceof Error ? err.message : String(err);
 
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "failure", Ok: false, Skipped: false,
-        Event: event, Url: url, Status: null,
-        Error: message,
-        DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "failure", Ok: false, Skipped: false,
+    Event: event, Url: url, Status: null,
+    Error: message,
+    DurationMs: durationMs, EmittedAt: emittedAt, Payload: payload,
+  };
 }
 

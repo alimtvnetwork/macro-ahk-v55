@@ -138,7 +138,9 @@ function extractCodes(source: string): readonly string[] {
   let match: RegExpExecArray | null;
   CODE_PATTERN.lastIndex = 0;
   while ((match = CODE_PATTERN.exec(source)) !== null) {
-    if (match[1]) seen.add(match[1]);
+    if (match[1]) {
+      seen.add(match[1]);
+    }
   }
 
   return [...seen];
@@ -168,7 +170,10 @@ describe('per-area migration — referenced codes stay in-area', () => {
     const allowed = new Set<ErrorArea>(allowedAreas);
     for (const code of codes) {
       const entry = ERROR_CODES[code];
-      if (!entry) continue; // covered by suite A
+      if (!entry) {
+        continue;
+      } // covered by suite A
+
       expect(
         allowed.has(entry.area),
         `${path} emits ${code} whose area="${entry.area}" is not in allowedAreas=[${allowedAreas.join(', ')}]`,
@@ -191,7 +196,10 @@ describe('per-area migration — no orphan registry entries', () => {
   const registeredCodes = Object.keys(ERROR_CODES);
 
   it.each(registeredCodes)('%s has a live emitter or is intentionally unemitted', (code) => {
-    if (INTENTIONALLY_UNEMITTED.has(code)) return;
+    if (INTENTIONALLY_UNEMITTED.has(code)) {
+      return;
+    }
+
     expect(
       emittedUnion.has(code),
       `Registered code ${code} has no live emitter across MIGRATED_MODULES. ` +

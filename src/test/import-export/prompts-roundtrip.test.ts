@@ -55,7 +55,10 @@ describe("prompts-roundtrip", () => {
     const db = await openCachedDb();
     try {
       for (const p of fixture.prompts) {
-        if (!p.category) continue;
+        if (!p.category) {
+          continue;
+        }
+
         const res = db.exec("SELECT Category FROM Prompts WHERE Slug = ?", [p.slug ?? ""]);
         expect(String(res[0].values[0][0])).toBe(p.category);
       }

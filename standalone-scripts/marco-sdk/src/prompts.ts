@@ -83,99 +83,119 @@ interface CacheRecord {
 }
 
 function computeHash(entries: PromptEntry[]): string {
-    const parts: string[] = [];
-    for (const e of entries) {
-        parts.push(`${e.name || ""}:${(e.text || "").length}`);
-    }
-    parts.sort();
+  const parts: string[] = [];
+  for (const e of entries) {
+    parts.push(`${e.name || ""}:${(e.text || "").length}`);
+  }
 
-    return parts.join("|");
+  parts.sort();
+
+  return parts.join("|");
 }
 
 function openIdb(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-        try {
-            const req = indexedDB.open(IDB_NAME, IDB_VERSION);
-            req.onupgradeneeded = () => {
-                const db = req.result;
-                if (!db.objectStoreNames.contains(IDB_STORE)) {
-                    db.createObjectStore(IDB_STORE, { keyPath: "id" });
-                }
-            };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        } catch (e) {
-            NamespaceLogger.error('resolvePrompt', 'Failed to resolve prompt', e);
-            reject(e);
+  return new Promise((resolve, reject) => {
+    try {
+      const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE, { keyPath: "id" });
         }
-    });
+      };
+
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      NamespaceLogger.error('resolvePrompt', 'Failed to resolve prompt', e);
+      reject(e);
+    }
+  });
 }
 
 function readCache(): Promise<CacheRecord | null> {
-    return openIdb()
-        .then((db) => {
-            return new Promise<CacheRecord | null>((resolve) => {
-                try {
-                    const tx = db.transaction(IDB_STORE, "readonly");
-                    const store = tx.objectStore(IDB_STORE);
-                    const req = store.get(IDB_KEY);
-                    req.onsuccess = () => {
-                        const record = req.result as CacheRecord | undefined;
-                        if (record?.schemaVersion !== CACHE_SCHEMA_VERSION) {
-                            resolve(null);
+  return openIdb()
+    .then((db) => {
+      return new Promise<CacheRecord | null>((resolve) => {
+        try {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const store = tx.objectStore(IDB_STORE);
+          const req = store.get(IDB_KEY);
+          req.onsuccess = () => {
+            const record = req.result as CacheRecord | undefined;
+            if (record?.schemaVersion !== CACHE_SCHEMA_VERSION) {
+              resolve(null);
 
-                            return;
-                        }
-                        resolve(record.entries?.length ? record : null);
-                    };
-                    req.onerror = () => resolve(null);
-                    tx.oncomplete = () => db.close();
-                } catch {
-                    resolve(null);
-                }
-            });
-        })
-        .catch((e) => { NamespaceLogger.error('fetchPromptList', 'Failed to fetch prompt list', e);
+              return;
+            }
 
- return null; });
+            resolve(record.entries?.length ? record : null);
+          };
+
+          req.onerror = () => resolve(null);
+          tx.oncomplete = () => db.close();
+        } catch {
+          resolve(null);
+        }
+      });
+    })
+    .catch((e) => {
+      NamespaceLogger.error('fetchPromptList', 'Failed to fetch prompt list', e);
+
+      return null; 
+    });
 }
 
 function writeCache(entries: PromptEntry[]): Promise<void> {
-    const hash = computeHash(entries);
+  const hash = computeHash(entries);
 
-    return openIdb()
-        .then((db) => {
-            return new Promise<void>((resolve) => {
-                try {
-                    const tx = db.transaction(IDB_STORE, "readwrite");
-                    const store = tx.objectStore(IDB_STORE);
-                    store.put({ id: IDB_KEY, schemaVersion: CACHE_SCHEMA_VERSION, entries, fetchedAt: Date.now(), hash });
-                    tx.oncomplete = () => { db.close(); resolve(); };
-                    tx.onerror = () => { db.close(); resolve(); };
-                } catch {
-                    resolve();
-                }
-            });
-        })
-        .catch((e) => { NamespaceLogger.error('cachePrompt', 'Failed to cache prompt', e); });
+  return openIdb()
+    .then((db) => {
+      return new Promise<void>((resolve) => {
+        try {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          const store = tx.objectStore(IDB_STORE);
+          store.put({ id: IDB_KEY, schemaVersion: CACHE_SCHEMA_VERSION, entries, fetchedAt: Date.now(), hash });
+          tx.oncomplete = () => {
+            db.close(); resolve(); 
+          };
+
+          tx.onerror = () => {
+            db.close(); resolve(); 
+          };
+        } catch {
+          resolve();
+        }
+      });
+    })
+    .catch((e) => {
+      NamespaceLogger.error('cachePrompt', 'Failed to cache prompt', e); 
+    });
 }
 
 function clearCache(): Promise<void> {
-    return openIdb()
-        .then((db) => {
-            return new Promise<void>((resolve) => {
-                try {
-                    const tx = db.transaction(IDB_STORE, "readwrite");
-                    const store = tx.objectStore(IDB_STORE);
-                    store.delete(IDB_KEY);
-                    tx.oncomplete = () => { db.close(); resolve(); };
-                    tx.onerror = () => { db.close(); resolve(); };
-                } catch {
-                    resolve();
-                }
-            });
-        })
-        .catch((e) => { NamespaceLogger.error('clearPromptCache', 'Failed to clear prompt cache', e); });
+  return openIdb()
+    .then((db) => {
+      return new Promise<void>((resolve) => {
+        try {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          const store = tx.objectStore(IDB_STORE);
+          store.delete(IDB_KEY);
+          tx.oncomplete = () => {
+            db.close(); resolve(); 
+          };
+
+          tx.onerror = () => {
+            db.close(); resolve(); 
+          };
+        } catch {
+          resolve();
+        }
+      });
+    })
+    .catch((e) => {
+      NamespaceLogger.error('clearPromptCache', 'Failed to clear prompt cache', e); 
+    });
 }
 
 /* ------------------------------------------------------------------ */
@@ -183,28 +203,28 @@ function clearCache(): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 function normalize(raw: Array<Partial<PromptEntry>>): PromptEntry[] {
-    const out: PromptEntry[] = [];
-    for (const p of raw) {
-        const name = typeof p.name === "string" ? p.name : "";
-        const text = typeof p.text === "string" ? p.text : "";
-        if (name && text) {
-            out.push({
-                id: p.id,
-                name,
-                text,
-                category: p.category,
-                categories: p.categories,
-                version: p.version,
-                order: p.order,
-                isDefault: p.isDefault,
-                isFavorite: p.isFavorite,
-                createdAt: p.createdAt,
-                updatedAt: p.updatedAt,
-            });
-        }
+  const out: PromptEntry[] = [];
+  for (const p of raw) {
+    const name = typeof p.name === "string" ? p.name : "";
+    const text = typeof p.text === "string" ? p.text : "";
+    if (name && text) {
+      out.push({
+        id: p.id,
+        name,
+        text,
+        category: p.category,
+        categories: p.categories,
+        version: p.version,
+        order: p.order,
+        isDefault: p.isDefault,
+        isFavorite: p.isFavorite,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      });
     }
+  }
 
-    return out;
+  return out;
 }
 
 /* ------------------------------------------------------------------ */
@@ -215,22 +235,23 @@ const MAX_RETRIES = 3;
 const RETRY_DELAYS = [0, 1500, 3000];
 
 async function fetchFromBridge(): Promise<PromptEntry[]> {
-    for (let i = 0; i < MAX_RETRIES; i++) {
-        if (RETRY_DELAYS[i] > 0) {
-            await new Promise((r) => setTimeout(r, RETRY_DELAYS[i]));
-        }
-        try {
-            const resp = await sendMessage<{ prompts?: Array<Partial<PromptEntry>> }>("GET_PROMPTS");
-            const entries = normalize(resp?.prompts ?? []);
-            if (entries.length > 0) {
-                return entries;
-            }
-        } catch (caught) {
-            NamespaceLogger.error("fetchFromBridge", `GET_PROMPTS attempt ${i + 1}/${RETRY_DELAYS.length} failed — will retry per RETRY_DELAYS schedule`, caught);
-        }
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    if (RETRY_DELAYS[i] > 0) {
+      await new Promise((r) => setTimeout(r, RETRY_DELAYS[i]));
     }
 
-    return [];
+    try {
+      const resp = await sendMessage<{ prompts?: Array<Partial<PromptEntry>> }>("GET_PROMPTS");
+      const entries = normalize(resp?.prompts ?? []);
+      if (entries.length > 0) {
+        return entries;
+      }
+    } catch (caught) {
+      NamespaceLogger.error("fetchFromBridge", `GET_PROMPTS attempt ${i + 1}/${RETRY_DELAYS.length} failed — will retry per RETRY_DELAYS schedule`, caught);
+    }
+  }
+
+  return [];
 }
 
 /* ------------------------------------------------------------------ */
@@ -251,89 +272,96 @@ const DEFAULT_PASTE_XPATH = "/html/body/div[3]/div/div[2]/main/div/div/div[1]/di
 /* ------------------------------------------------------------------ */
 
 function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null {
-    // Try XPath
-    if (xpath) {
-        try {
-            const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-            if (result.singleNodeValue instanceof HTMLElement) {
-                return result.singleNodeValue;
-            }
-        } catch (caught) {
-            NamespaceLogger.error("findPasteTarget", `document.evaluate(xpath="${xpath}") threw — invalid XPath syntax; falling through to selector/fallback strategies`, caught);
-        }
+  // Try XPath
+  if (xpath) {
+    try {
+      const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (result.singleNodeValue instanceof HTMLElement) {
+        return result.singleNodeValue;
+      }
+    } catch (caught) {
+      NamespaceLogger.error("findPasteTarget", `document.evaluate(xpath="${xpath}") threw — invalid XPath syntax; falling through to selector/fallback strategies`, caught);
     }
-    // Try selector
-    if (selector) {
-        const found = document.querySelector<HTMLElement>(selector);
-        if (found) return found;
-    }
-    // Fallback selectors
-    const fallbacks = [
-        "form textarea[placeholder]",
-        'div[contenteditable="true"]',
-        "textarea.ProseMirror",
-        '[data-testid="prompt-input"]',
-    ];
-    for (const sel of fallbacks) {
-        const found = document.querySelector<HTMLElement>(sel);
-        if (found) return found;
-    }
+  }
 
-    return null;
+  // Try selector
+  if (selector) {
+    const found = document.querySelector<HTMLElement>(selector);
+    if (found) {
+      return found;
+    }
+  }
+
+  // Fallback selectors
+  const fallbacks = [
+    "form textarea[placeholder]",
+    'div[contenteditable="true"]',
+    "textarea.ProseMirror",
+    '[data-testid="prompt-input"]',
+  ];
+  for (const sel of fallbacks) {
+    const found = document.querySelector<HTMLElement>(sel);
+    if (found) {
+      return found;
+    }
+  }
+
+  return null;
 }
 
 function injectText(text: string, target: HTMLElement): boolean {
-    target.focus();
+  target.focus();
 
-    if (target.tagName === "TEXTAREA" || target.tagName === "INPUT") {
-        const input = target as HTMLInputElement;
-        const currentVal = input.value || "";
-        const newVal = currentVal + (currentVal.length > 0 ? "\n" : "") + text;
-        const nativeSetter =
+  if (target.tagName === "TEXTAREA" || target.tagName === "INPUT") {
+    const input = target as HTMLInputElement;
+    const currentVal = input.value || "";
+    const newVal = currentVal + (currentVal.length > 0 ? "\n" : "") + text;
+    const nativeSetter =
             Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value") ??
             Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value");
-        if (nativeSetter?.set) {
-            nativeSetter.set.call(target, newVal);
-        } else {
-            input.value = newVal;
-        }
-        target.dispatchEvent(new Event("input", { bubbles: true }));
-        target.dispatchEvent(new Event("change", { bubbles: true }));
-
-        return true;
+    if (nativeSetter?.set) {
+      nativeSetter.set.call(target, newVal);
+    } else {
+      input.value = newVal;
     }
 
-    // Contenteditable
-    const sel = window.getSelection();
-    if (sel) {
-        const range = document.createRange();
-        range.selectNodeContents(target);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-    }
-
-    const existingText = (target.textContent || "").trim();
-    const prefix = existingText.length > 0 ? "\n" : "";
-    const fullText = prefix + text;
-
-    const execOk = document.execCommand("insertText", false, fullText);
-    if (!execOk) {
-        const dt = new DataTransfer();
-        dt.setData("text/plain", fullText);
-        const pasteEvent = new ClipboardEvent("paste", {
-            clipboardData: dt,
-            bubbles: true,
-            cancelable: true,
-        });
-        if (!target.dispatchEvent(pasteEvent)) {
-            return false;
-        }
-    }
-
-    target.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: fullText }));
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    target.dispatchEvent(new Event("change", { bubbles: true }));
 
     return true;
+  }
+
+  // Contenteditable
+  const sel = window.getSelection();
+  if (sel) {
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  const existingText = (target.textContent || "").trim();
+  const prefix = existingText.length > 0 ? "\n" : "";
+  const fullText = prefix + text;
+
+  const execOk = document.execCommand("insertText", false, fullText);
+  if (!execOk) {
+    const dt = new DataTransfer();
+    dt.setData("text/plain", fullText);
+    const pasteEvent = new ClipboardEvent("paste", {
+      clipboardData: dt,
+      bubbles: true,
+      cancelable: true,
+    });
+    if (!target.dispatchEvent(pasteEvent)) {
+      return false;
+    }
+  }
+
+  target.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: fullText }));
+
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -341,59 +369,63 @@ function injectText(text: string, target: HTMLElement): boolean {
 /* ------------------------------------------------------------------ */
 
 async function getAllCached(): Promise<PromptEntry[]> {
-    // 1. In-memory
-    if (memoryCache && memoryCache.length > 0) {
-        return memoryCache;
-    }
+  // 1. In-memory
+  if (memoryCache && memoryCache.length > 0) {
+    return memoryCache;
+  }
 
-    // Deduplicate concurrent calls
-    if (loadingPromise) {
-        return loadingPromise;
-    }
-
-    loadingPromise = (async () => {
-        try {
-            // 2. IndexedDB cache
-            const cached = await readCache();
-            if (cached && cached.entries.length > 0) {
-                memoryCache = cached.entries;
-                // Background revalidation (fire-and-forget)
-                backgroundRevalidate(cached.hash);
-
-                return cached.entries;
-            }
-
-            // 3. Extension bridge with retry
-            const bridgePrompts = await fetchFromBridge();
-            if (bridgePrompts.length > 0) {
-                memoryCache = bridgePrompts;
-                await writeCache(bridgePrompts);
-
-                return bridgePrompts;
-            }
-
-            return [];
-        } finally {
-            loadingPromise = null;
-        }
-    })();
-
+  // Deduplicate concurrent calls
+  if (loadingPromise) {
     return loadingPromise;
+  }
+
+  loadingPromise = (async () => {
+    try {
+      // 2. IndexedDB cache
+      const cached = await readCache();
+      if (cached && cached.entries.length > 0) {
+        memoryCache = cached.entries;
+        // Background revalidation (fire-and-forget)
+        backgroundRevalidate(cached.hash);
+
+        return cached.entries;
+      }
+
+      // 3. Extension bridge with retry
+      const bridgePrompts = await fetchFromBridge();
+      if (bridgePrompts.length > 0) {
+        memoryCache = bridgePrompts;
+        await writeCache(bridgePrompts);
+
+        return bridgePrompts;
+      }
+
+      return [];
+    } finally {
+      loadingPromise = null;
+    }
+  })();
+
+  return loadingPromise;
 }
 
 async function backgroundRevalidate(cachedHash: string): Promise<void> {
-    try {
-        const fresh = await fetchFromBridge();
-        if (fresh.length === 0) return;
-
-        const freshHash = computeHash(fresh);
-        if (freshHash === cachedHash) return;
-
-        memoryCache = fresh;
-        await writeCache(fresh);
-    } catch (caught) {
-        NamespaceLogger.error("revalidatePromptCache", "Background revalidation failed — memoryCache may be stale until next refresh", caught);
+  try {
+    const fresh = await fetchFromBridge();
+    if (fresh.length === 0) {
+      return;
     }
+
+    const freshHash = computeHash(fresh);
+    if (freshHash === cachedHash) {
+      return;
+    }
+
+    memoryCache = fresh;
+    await writeCache(fresh);
+  } catch (caught) {
+    NamespaceLogger.error("revalidatePromptCache", "Background revalidation failed — memoryCache may be stale until next refresh", caught);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -402,69 +434,74 @@ async function backgroundRevalidate(cachedHash: string): Promise<void> {
 
 // eslint-disable-next-line max-lines-per-function
 export function createPromptsApi(): PromptsApi {
-    return {
-        async getAll(): Promise<PromptEntry[]> {
-            return getAllCached();
-        },
+  return {
+    async getAll(): Promise<PromptEntry[]> {
+      return getAllCached();
+    },
 
-        async save(prompt: SavePromptInput): Promise<PromptEntry> {
-            const resp = await sendMessage<{ prompt: PromptEntry }>("SAVE_PROMPT", { prompt });
-            // Invalidate caches after mutation
-            memoryCache = null;
-            await clearCache();
+    async save(prompt: SavePromptInput): Promise<PromptEntry> {
+      const resp = await sendMessage<{ prompt: PromptEntry }>("SAVE_PROMPT", { prompt });
+      // Invalidate caches after mutation
+      memoryCache = null;
+      await clearCache();
 
-            return resp.prompt;
-        },
+      return resp.prompt;
+    },
 
-        async delete(id: string): Promise<void> {
-            await sendMessage<void>("DELETE_PROMPT", { id });
-            memoryCache = null;
-            await clearCache();
-        },
+    async delete(id: string): Promise<void> {
+      await sendMessage<void>("DELETE_PROMPT", { id });
+      memoryCache = null;
+      await clearCache();
+    },
 
-        async reorder(ids: string[]): Promise<void> {
-            await sendMessage<void>("REORDER_PROMPTS", { ids });
-            memoryCache = null;
-            await clearCache();
-        },
+    async reorder(ids: string[]): Promise<void> {
+      await sendMessage<void>("REORDER_PROMPTS", { ids });
+      memoryCache = null;
+      await clearCache();
+    },
 
-        inject(text: string, options?: { pasteTargetXPath?: string; pasteTargetSelector?: string }): boolean {
-            const target = findPasteTarget(
-                options?.pasteTargetXPath ?? DEFAULT_PASTE_XPATH,
-                options?.pasteTargetSelector,
-            );
-            if (!target) {
-                // Fallback: copy to clipboard
-                navigator.clipboard.writeText(text).catch((e) => { NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); });
+    inject(text: string, options?: { pasteTargetXPath?: string; pasteTargetSelector?: string }): boolean {
+      const target = findPasteTarget(
+        options?.pasteTargetXPath ?? DEFAULT_PASTE_XPATH,
+        options?.pasteTargetSelector,
+      );
+      if (!target) {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(text).catch((e) => {
+          NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); 
+        });
 
-                return false;
-            }
-            try {
-                return injectText(text, target);
-            } catch {
-                navigator.clipboard.writeText(text).catch((e) => { NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); });
+        return false;
+      }
 
-                return false;
-            }
-        },
+      try {
+        return injectText(text, target);
+      } catch {
+        navigator.clipboard.writeText(text).catch((e) => {
+          NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); 
+        });
 
-        async getConfig(): Promise<ResolvedPromptsConfig> {
-            const entries = await getAllCached();
+        return false;
+      }
+    },
 
-            return {
-                entries,
-                pasteTargetXPath: DEFAULT_PASTE_XPATH,
-                pasteTargetSelector: "",
-            };
-        },
+    async getConfig(): Promise<ResolvedPromptsConfig> {
+      const entries = await getAllCached();
 
-        async invalidateCache(): Promise<void> {
-            memoryCache = null;
-            await clearCache();
-        },
+      return {
+        entries,
+        pasteTargetXPath: DEFAULT_PASTE_XPATH,
+        pasteTargetSelector: "",
+      };
+    },
 
-        async preWarm(): Promise<PromptEntry[]> {
-            return getAllCached();
-        },
-    };
+    async invalidateCache(): Promise<void> {
+      memoryCache = null;
+      await clearCache();
+    },
+
+    async preWarm(): Promise<PromptEntry[]> {
+      return getAllCached();
+    },
+  };
 }

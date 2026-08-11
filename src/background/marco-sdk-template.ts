@@ -60,13 +60,13 @@ function __marcoNotify(message,level,durationMs){
 /** Builds the SDK IIFE string for injection into a page (MAIN world). */
 // eslint-disable-next-line max-lines-per-function
 export function buildMarcoSdkScript(sdkContext: SdkContext): string {
-    const safeProjectId = escapeForTemplate(sdkContext.projectId);
-    const safeScriptId = escapeForTemplate(sdkContext.scriptId);
-    const safeConfigId = escapeForTemplate(sdkContext.configId);
-    const safeUrlRuleId = escapeForTemplate(sdkContext.urlRuleId);
-    const safeVersion = escapeForTemplate(sdkContext.version);
+  const safeProjectId = escapeForTemplate(sdkContext.projectId);
+  const safeScriptId = escapeForTemplate(sdkContext.scriptId);
+  const safeConfigId = escapeForTemplate(sdkContext.configId);
+  const safeUrlRuleId = escapeForTemplate(sdkContext.urlRuleId);
+  const safeVersion = escapeForTemplate(sdkContext.version);
 
-    return `(function(){
+  return `(function(){
 if(window.marco){
 if(!window.RiseupAsiaMacroExt){window.RiseupAsiaMacroExt={Projects:{}};}
 else if(!window.RiseupAsiaMacroExt.Projects){window.RiseupAsiaMacroExt.Projects={};}
@@ -158,9 +158,9 @@ __marcoNotify("Marco Controller v" + __ctx.version + " loaded","info",2500);
 
 /** Escapes a string for safe embedding in a JS template literal. */
 function escapeForTemplate(value: string): string {
-    return value
-        .replace(/\\/g, "\\\\")
-        .replace(/"/g, '\\"')
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r");
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
 }

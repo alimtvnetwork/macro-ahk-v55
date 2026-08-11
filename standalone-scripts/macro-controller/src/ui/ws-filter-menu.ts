@@ -111,8 +111,14 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
   row.appendChild(labelSpan);
   row.appendChild(hintSpan);
 
-  row.onmouseover = function () { row.style.background = 'rgba(139,92,246,0.18)'; };
-  row.onmouseout = function () { row.style.background = 'transparent'; };
+  row.onmouseover = function () {
+    row.style.background = 'rgba(139,92,246,0.18)'; 
+  };
+
+  row.onmouseout = function () {
+    row.style.background = 'transparent'; 
+  };
+
   row.onclick = function (e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -147,7 +153,9 @@ function buildMinCreditsRow(populate: () => void): HTMLElement {
     'width:48px;padding:2px 4px;border:1px solid ' + cPrimary +
     ';border-radius:3px;background:' + cPanelBg +
     ';color:#22d3ee;font-size:10px;outline:none;font-family:monospace;text-align:right;';
-  input.oninput = function () { populate(); };
+  input.oninput = function () {
+    populate(); 
+  };
 
   row.appendChild(labelWrap);
   row.appendChild(input);
@@ -188,7 +196,9 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
     {
       id: ID_FREE_FILTER, icon: '🆓', label: 'Free only', hint: 'daily > 0',
       initialActive: deps.getLoopWsFreeOnly(),
-      onToggle: function (active: boolean) { deps.setLoopWsFreeOnly(active); },
+      onToggle: function (active: boolean) {
+        deps.setLoopWsFreeOnly(active); 
+      },
     },
     {
       id: ID_ROLLOVER_FILTER, icon: '🔄', label: 'Rollover only', hint: 'rollover > 0',
@@ -204,25 +214,33 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
       id: ID_EXPIRED_CREDITS_FILTER, icon: '⏰', label: 'Expired w/ credits',
       hint: 'available > 5, sorted desc',
       initialActive: deps.getLoopWsExpiredWithCredits(),
-      onToggle: function (active: boolean) { deps.setLoopWsExpiredWithCredits(active); },
+      onToggle: function (active: boolean) {
+        deps.setLoopWsExpiredWithCredits(active); 
+      },
     },
     {
       id: ID_EXPIRING_FILTER, icon: '⚠️', label: 'Expiring',
       hint: 'past-due only, sorted by urgency',
       initialActive: deps.getLoopWsExpiring(),
-      onToggle: function (active: boolean) { deps.setLoopWsExpiring(active); },
+      onToggle: function (active: boolean) {
+        deps.setLoopWsExpiring(active); 
+      },
     },
     {
       id: ID_REFILL_SOON_FILTER, icon: '🔁', label: 'Refill soon',
       hint: 'about-to-refill only',
       initialActive: deps.getLoopWsRefillSoon(),
-      onToggle: function (active: boolean) { deps.setLoopWsRefillSoon(active); },
+      onToggle: function (active: boolean) {
+        deps.setLoopWsRefillSoon(active); 
+      },
     },
     {
       id: ID_REFILL_PRIORITY_FILTER, icon: '⏳', label: 'Refill priority',
       hint: 'sort by urgency × credits',
       initialActive: deps.getLoopWsRefillPriority(),
-      onToggle: function (active: boolean) { deps.setLoopWsRefillPriority(active); },
+      onToggle: function (active: boolean) {
+        deps.setLoopWsRefillPriority(active); 
+      },
     },
     {
       id: ID_COMPACT_TOGGLE, icon: '⚡', label: 'Compact view', hint: 'available/total only',
@@ -259,11 +277,16 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
   function syncVisualState(activeMode: CreditSortModeType): void {
     for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
       const el = document.getElementById(id);
-      if (!el) continue;
+      if (!el) {
+        continue;
+      }
+
       const isActive = mode === activeMode;
       el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
       const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
-      if (chip) chip.textContent = isActive ? '◉' : '○';
+      if (chip) {
+        chip.textContent = isActive ? '◉' : '○';
+      }
     }
   }
 
@@ -307,8 +330,14 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
     row.appendChild(labelSpan);
     row.appendChild(hintSpan);
 
-    row.onmouseover = function () { row.style.background = 'rgba(139,92,246,0.18)'; };
-    row.onmouseout = function () { row.style.background = 'transparent'; };
+    row.onmouseover = function () {
+      row.style.background = 'rgba(139,92,246,0.18)'; 
+    };
+
+    row.onmouseout = function () {
+      row.style.background = 'transparent'; 
+    };
+
     row.onclick = function (e: Event) {
       e.preventDefault();
       e.stopPropagation();
@@ -337,6 +366,7 @@ function buildPopover(deps: WsFilterMenuDeps): HTMLElement {
   for (const config of buildFilterRowConfigs(deps)) {
     popover.appendChild(buildFilterRow(config, deps.populateLoopWorkspaceDropdown));
   }
+
   popover.appendChild(buildMinCreditsRow(deps.populateLoopWorkspaceDropdown));
 
   popover.appendChild(buildCreditSortHeader());
@@ -369,7 +399,10 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
   let outsideHandler: ((e: MouseEvent) => void) | null = null;
 
   function close(): void {
-    if (popover) popover!.style.display = 'none';
+    if (popover) {
+popover!.style.display = 'none';
+    }
+
     if (outsideHandler) {
       document.removeEventListener('mousedown', outsideHandler, true);
       outsideHandler = null;
@@ -384,12 +417,14 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
         popover = buildPopover(deps);
         wrap.appendChild(popover);
       }
+
       const isOpen = popover!.style.display !== 'none';
       if (isOpen) {
         close();
 
         return;
       }
+
       popover!.style.display = 'block';
       outsideHandler = function (ev: MouseEvent) {
         const target = ev.target as Node | null;
@@ -397,9 +432,12 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
           close();
         }
       };
+
       // attach in the next tick so the click that opened us isn't treated as outside
       setTimeout(function () {
-        if (outsideHandler) document.addEventListener('mousedown', outsideHandler, true);
+        if (outsideHandler) {
+          document.addEventListener('mousedown', outsideHandler, true);
+        }
       }, 0);
     } catch (err: unknown) {
       logError('wsFilterMenu', 'Failed to toggle filter menu popover', err);

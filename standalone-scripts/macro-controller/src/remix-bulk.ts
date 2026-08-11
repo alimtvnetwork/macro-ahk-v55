@@ -42,17 +42,21 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   if (!sdk || !sdk.api || !sdk.api.projects || typeof sdk.api.projects.list !== 'function') {
     throwDiagnostic('REMIX_BULK_E001', { missingApi: 'window.marco.api.projects.list', wsId });
   }
+
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
   if (resp.isFail) {
     throwDiagnostic('REMIX_BULK_E003', { status: resp.status, wsId });
   }
+
   const data = resp.data as { projects?: Array<{ id?: string; name?: string }> };
   const list = Array.isArray(data.projects) ? data.projects : [];
   const out: ProjectEntry[] = [];
   for (const p of list) {
     const id = typeof p.id === 'string' ? p.id : '';
     const name = typeof p.name === 'string' ? p.name : '';
-    if (id) out.push({ id, name: name || id });
+    if (id) {
+      out.push({ id, name: name || id });
+    }
   }
 
   return out;
@@ -64,10 +68,15 @@ function baseFamily(name: string): string {
 }
 
 function pickTargetProject(projects: ReadonlyArray<ProjectEntry>, sourceBase: string): ProjectEntry | null {
-  if (projects.length === 0) return null;
+  if (projects.length === 0) {
+    return null;
+  }
+
   if (sourceBase) {
     for (const p of projects) {
-      if (baseFamily(p.name) === sourceBase) return p;
+      if (baseFamily(p.name) === sourceBase) {
+        return p;
+      }
     }
   }
 
@@ -108,7 +117,9 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
   const perWs = loopCreditState.perWorkspace || [];
   const wsById = new Map<string, { id: string; name: string }>();
   for (const ws of perWs) {
-    if (ws && ws.id) wsById.set(ws.id, { id: ws.id, name: ws.fullName || ws.name || ws.id });
+    if (ws && ws.id) {
+      wsById.set(ws.id, { id: ws.id, name: ws.fullName || ws.name || ws.id });
+    }
   }
 
   const config = getRemixConfig();
@@ -131,6 +142,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
       if (!target) {
         throwDiagnostic('REMIX_BULK_E002', { wsId, sourceBase: sourceBase || '(none)' });
       }
+
       const existing = await fetchWorkspaceProjectNames(wsId);
       const { name } = resolveNextName(target.name, existing, {
         nextSuffixSeparator: config.nextSuffixSeparator,
@@ -164,7 +176,10 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
   const tone = failed === 0 ? 'success' : (success === 0 ? 'error' : 'warn');
   const icon = failed === 0 ? '✅' : (success === 0 ? '❌' : '⚠');
   let summary = icon + ' Bulk Remix Next — ' + success + '/' + checked.length + ' succeeded';
-  if (failed > 0) summary += ' · ' + failed + ' failed';
+  if (failed > 0) {
+    summary += ' · ' + failed + ' failed';
+  }
+
   showToast(summary, tone);
   if (failures.length > 0) {
     log('[BulkRemixNext] failures:\n  - ' + failures.join('\n  - '), 'warn');

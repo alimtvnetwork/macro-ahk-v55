@@ -18,103 +18,105 @@ export interface InjectionDiagnosticContext {
 
 /** Persists an informational injection log entry. */
 export async function persistInjectionInfo(
-    action: string,
-    detail: string,
-    context: InjectionDiagnosticContext = {},
+  action: string,
+  detail: string,
+  context: InjectionDiagnosticContext = {},
 ): Promise<void> {
-    await persistLogEntry("INFO", action, detail, context);
+  await persistLogEntry("INFO", action, detail, context);
 }
 
 /** Persists a warning-level injection log entry. */
 export async function persistInjectionWarn(
-    action: string,
-    detail: string,
-    context: InjectionDiagnosticContext = {},
+  action: string,
+  detail: string,
+  context: InjectionDiagnosticContext = {},
 ): Promise<void> {
-    await persistLogEntry("WARN", action, detail, context);
+  await persistLogEntry("WARN", action, detail, context);
 }
 
 async function persistLogEntry(
-    level: LevelType,
-    action: string,
-    detail: string,
-    context: InjectionDiagnosticContext,
+  level: LevelType,
+  action: string,
+  detail: string,
+  context: InjectionDiagnosticContext,
 ): Promise<void> {
-    try {
-        await handleLogEntry({
-            type: MessageType.LOG_ENTRY,
-            level,
-            source: "background",
-            category: "INJECTION",
-            action,
-            detail,
-            scriptId: context.scriptId,
-            projectId: context.projectId,
-            configId: context.configId,
-        } as MessageRequest);
-    } catch (err) {
+  try {
+    await handleLogEntry({
+      type: MessageType.LOG_ENTRY,
+      level,
+      source: "background",
+      category: "INJECTION",
+      action,
+      detail,
+      scriptId: context.scriptId,
+      projectId: context.projectId,
+      configId: context.configId,
+    } as MessageRequest);
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 /** Persists an injection error entry. */
 export async function persistInjectionError(
-    errorCode: string,
-    message: string,
-    context: InjectionDiagnosticContext & {
+  errorCode: string,
+  message: string,
+  context: InjectionDiagnosticContext & {
         contextDetail?: string;
         scriptFile?: string;
         stackTrace?: string;
     } = {},
 ): Promise<void> {
-    try {
-        await handleLogError({
-            type: MessageType.LOG_ERROR,
-            level: "ERROR",
-            source: "background",
-            category: "INJECTION",
-            errorCode,
-            message,
-            stackTrace: context.stackTrace,
-            context: context.contextDetail,
-            scriptId: context.scriptId,
-            projectId: context.projectId,
-            configId: context.configId,
-            scriptFile: context.scriptFile,
-        } as MessageRequest);
-    } catch (err) {
+  try {
+    await handleLogError({
+      type: MessageType.LOG_ERROR,
+      level: "ERROR",
+      source: "background",
+      category: "INJECTION",
+      errorCode,
+      message,
+      stackTrace: context.stackTrace,
+      context: context.contextDetail,
+      scriptId: context.scriptId,
+      projectId: context.projectId,
+      configId: context.configId,
+      scriptFile: context.scriptFile,
+    } as MessageRequest);
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 /** Mirrors a diagnostic message into the active tab console. */
 export async function mirrorDiagnosticToTab(
-    tabId: number,
-    message: string,
-    level: MirrorDiagnosticToTabLevelType = "warn",
+  tabId: number,
+  message: string,
+  level: MirrorDiagnosticToTabLevelType = "warn",
 ): Promise<void> {
-    try {
-        await chrome.scripting.executeScript({
-            target: { tabId },
-            world: "MAIN",
-            func: (detail: string, entryLevel: MirrorDiagnosticToTabLevelType) => {
-                if (entryLevel === "error") {
-                    console.error(detail);
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "MAIN",
+      func: (detail: string, entryLevel: MirrorDiagnosticToTabLevelType) => {
+        if (entryLevel === "error") {
+          console.error(detail);
 
-                    return;
-                }
-                if (entryLevel === "warn") {
-                    console.warn(detail);
+          return;
+        }
 
-                    return;
-                }
-                console.log(detail);
-            },
-            args: [message, level],
-        });
-    } catch (err) {
+        if (entryLevel === "warn") {
+          console.warn(detail);
+
+          return;
+        }
+
+        console.log(detail);
+      },
+      args: [message, level],
+    });
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 /**
@@ -125,58 +127,66 @@ export async function mirrorDiagnosticToTab(
  */
 // eslint-disable-next-line max-lines-per-function
 export async function mirrorPipelineLogsToTab(
-    tabId: number,
-    lines: Array<{ "msg": string; level: PipelineLineLevelType }>,
-    groupTitle?: string,
+  tabId: number,
+  lines: Array<{ "msg": string; level: PipelineLineLevelType }>,
+  groupTitle?: string,
 ): Promise<void> {
-    if (lines.length === 0) return;
-    try {
-        await chrome.scripting.executeScript({
-            target: { tabId },
-            world: "MAIN",
-            func: (
-                entries: Array<{ "msg": string; level: string }>,
-                title: string | undefined,
-            // eslint-disable-next-line sonarjs/cognitive-complexity
-            ) => {
-                const realEntries = entries.filter((e) => e.level !== "__group__" && e.level !== "__groupEnd__");
-                const hasErrors = realEntries.some((e) => e.level === "error");
-                const hasWarns = realEntries.some((e) => e.level === "warn");
+  if (lines.length === 0) {
+    return;
+  }
 
-                const groupColor = hasErrors
-                    ? "color:#ff6b6b;font-weight:bold"
-                    : hasWarns
-                        ? "color:#ffa94d;font-weight:bold"
-                        : "color:#51cf66;font-weight:bold";
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "MAIN",
+      func: (
+        entries: Array<{ "msg": string; level: string }>,
+        title: string | undefined,
+        // eslint-disable-next-line sonarjs/cognitive-complexity
+      ) => {
+        const realEntries = entries.filter((e) => e.level !== "__group__" && e.level !== "__groupEnd__");
+        const hasErrors = realEntries.some((e) => e.level === "error");
+        const hasWarns = realEntries.some((e) => e.level === "warn");
 
-                const label = title ?? "[Marco] Injection Pipeline";
-                console.groupCollapsed(`%c${label}`, groupColor);
+        const groupColor = hasErrors
+          ? "color:#ff6b6b;font-weight:bold"
+          : hasWarns
+            ? "color:#ffa94d;font-weight:bold"
+            : "color:#51cf66;font-weight:bold";
 
-                for (const entry of entries) {
-                    if (entry.level === "__group__") {
-                        console.groupCollapsed(`%c${entry["msg"]}`, "color:#74c0fc;font-weight:bold");
-                        continue;
-                    }
-                    if (entry.level === "__groupEnd__") {
-                        console.groupEnd();
-                        continue;
-                    }
+        const label = title ?? "[Marco] Injection Pipeline";
+        console.groupCollapsed(`%c${label}`, groupColor);
 
-                    const lineColor =
+        for (const entry of entries) {
+          if (entry.level === "__group__") {
+            console.groupCollapsed(`%c${entry["msg"]}`, "color:#74c0fc;font-weight:bold");
+            continue;
+          }
+
+          if (entry.level === "__groupEnd__") {
+            console.groupEnd();
+            continue;
+          }
+
+          const lineColor =
                         entry.level === "error" ? "color:#ff6b6b"
-                            : entry.level === "warn" ? "color:#ffa94d"
-                                : "color:#adb5bd";
+                          : entry.level === "warn" ? "color:#ffa94d"
+                            : "color:#adb5bd";
 
-                    if (entry.level === "error") console.error(`%c${entry["msg"]}`, lineColor);
-                    else if (entry.level === "warn") console.warn(`%c${entry["msg"]}`, lineColor);
-                    else console.log(`%c${entry["msg"]}`, lineColor);
-                }
+          if (entry.level === "error") {
+            console.error(`%c${entry["msg"]}`, lineColor);
+          } else if (entry.level === "warn") {
+            console.warn(`%c${entry["msg"]}`, lineColor);
+          } else {
+            console.log(`%c${entry["msg"]}`, lineColor);
+          }
+        }
 
-                console.groupEnd();
-            },
-            args: [lines, groupTitle],
-        });
-    } catch (err) {
+        console.groupEnd();
+      },
+      args: [lines, groupTitle],
+    });
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }

@@ -16,10 +16,10 @@ import { logBgError } from "@/background/bg-logger";
 
 /** Returns true if the URL matches the given rule and is not excluded. */
 export function isUrlMatch(url: string, rule: UrlRule): boolean {
-    const isIncluded = evaluateMatchType(url, rule);
-    const isExcluded = isIncluded && checkExcludePattern(url, rule.excludePattern);
+  const isIncluded = evaluateMatchType(url, rule);
+  const isExcluded = isIncluded && checkExcludePattern(url, rule.excludePattern);
 
-    return isIncluded && isExcluded === false;
+  return isIncluded && isExcluded === false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -28,18 +28,18 @@ export function isUrlMatch(url: string, rule: UrlRule): boolean {
 
 /** Evaluates the URL against the rule based on match type. */
 function evaluateMatchType(url: string, rule: UrlRule): boolean {
-    switch (rule.matchType) {
-        case "exact":
-            return isExactMatch(url, rule.pattern);
-        case "prefix":
-            return isPrefixMatch(url, rule.pattern);
-        case "glob":
-            return isGlobMatch(url, rule.pattern);
-        case "regex":
-            return isRegexMatch(url, rule.pattern);
-        default:
-            return false;
-    }
+  switch (rule.matchType) {
+    case "exact":
+      return isExactMatch(url, rule.pattern);
+    case "prefix":
+      return isPrefixMatch(url, rule.pattern);
+    case "glob":
+      return isGlobMatch(url, rule.pattern);
+    case "regex":
+      return isRegexMatch(url, rule.pattern);
+    default:
+      return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -48,39 +48,39 @@ function evaluateMatchType(url: string, rule: UrlRule): boolean {
 
 /** Exact match — ignores query string and fragment. */
 function isExactMatch(url: string, pattern: string): boolean {
-    const urlWithoutQuery = stripQueryAndFragment(url);
-    const patternWithoutQuery = stripQueryAndFragment(pattern);
+  const urlWithoutQuery = stripQueryAndFragment(url);
+  const patternWithoutQuery = stripQueryAndFragment(pattern);
 
-    return urlWithoutQuery === patternWithoutQuery;
+  return urlWithoutQuery === patternWithoutQuery;
 }
 
 /** Prefix match — URL starts with pattern. */
 function isPrefixMatch(url: string, pattern: string): boolean {
-    return url.startsWith(pattern);
+  return url.startsWith(pattern);
 }
 
 /** Glob match — converts glob to regex. */
 function isGlobMatch(url: string, pattern: string): boolean {
-    const regexPattern = convertGlobToRegex(pattern);
+  const regexPattern = convertGlobToRegex(pattern);
 
-    try {
-        const regex = new RegExp(regexPattern);
+  try {
+    const regex = new RegExp(regexPattern);
 
-        return regex.test(url);
-    } catch (err) { 
-        return false;
-    }
+    return regex.test(url);
+  } catch (err) { 
+    return false;
+  }
 }
 
 /** Regex match with error handling. */
 function isRegexMatch(url: string, pattern: string): boolean {
-    try {
-        const regex = new RegExp(pattern);
+  try {
+    const regex = new RegExp(pattern);
 
-        return regex.test(url);
-    } catch (err) { 
-        return false;
-    }
+    return regex.test(url);
+  } catch (err) { 
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -89,35 +89,35 @@ function isRegexMatch(url: string, pattern: string): boolean {
 
 /** Strips query string and fragment from a URL. */
 function stripQueryAndFragment(url: string): string {
-    const queryIndex = url.indexOf("?");
-    const fragmentIndex = url.indexOf("#");
+  const queryIndex = url.indexOf("?");
+  const fragmentIndex = url.indexOf("#");
 
-    let endIndex = url.length;
+  let endIndex = url.length;
 
-    const hasQuery = queryIndex >= 0;
-    const hasFragment = fragmentIndex >= 0;
+  const hasQuery = queryIndex >= 0;
+  const hasFragment = fragmentIndex >= 0;
 
-    if (hasQuery) {
-        endIndex = queryIndex;
-    }
+  if (hasQuery) {
+    endIndex = queryIndex;
+  }
 
-    const isFragmentEarlier = hasFragment && fragmentIndex < endIndex;
+  const isFragmentEarlier = hasFragment && fragmentIndex < endIndex;
 
-    if (isFragmentEarlier) {
-        endIndex = fragmentIndex;
-    }
+  if (isFragmentEarlier) {
+    endIndex = fragmentIndex;
+  }
 
-    return url.slice(0, endIndex);
+  return url.slice(0, endIndex);
 }
 
 /** Converts a glob pattern to a regex string. */
 function convertGlobToRegex(glob: string): string {
-    const escaped = glob
-        .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-        .replace(/\*/g, ".*")
-        .replace(/\?/g, ".");
+  const escaped = glob
+    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+    .replace(/\*/g, ".*")
+    .replace(/\?/g, ".");
 
-    return `^${escaped}$`;
+  return `^${escaped}$`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -126,30 +126,31 @@ function convertGlobToRegex(glob: string): string {
 
 /** Checks if the URL pathname matches the exclude regex pattern. */
 function checkExcludePattern(
-    url: string,
-    excludePattern: string | undefined,
+  url: string,
+  excludePattern: string | undefined,
 ): boolean {
-    const hasPattern = excludePattern !== undefined && excludePattern !== "";
-    if (hasPattern === false) {
-        return false;
-    }
+  const hasPattern = excludePattern !== undefined && excludePattern !== "";
+  if (hasPattern === false) {
+    return false;
+  }
 
-    try {
-        const pathname = extractPathname(url);
-        const regex = new RegExp(excludePattern!);
+  try {
+    const pathname = extractPathname(url);
+    const regex = new RegExp(excludePattern!);
 
-        return regex.test(pathname);
-    } catch (err) {         logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
+    return regex.test(pathname);
+  } catch (err) {
+    logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
 
-        return false;
-    }
+    return false;
+  }
 }
 
 /** Extracts the pathname from a URL string. */
 function extractPathname(url: string): string {
-    try {
-        return new URL(url).pathname;
-    } catch (err) { 
-        return url;
-    }
+  try {
+    return new URL(url).pathname;
+  } catch (err) { 
+    return url;
+  }
 }

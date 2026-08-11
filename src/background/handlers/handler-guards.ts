@@ -37,34 +37,34 @@ export interface HandlerErrorResponse {
 
 /** Returns a non-empty string if the value qualifies, otherwise null. */
 function asNonEmptyString(value: unknown): string | null {
-    return typeof value === "string" && value.length > 0 ? value : null;
+  return typeof value === "string" && value.length > 0 ? value : null;
 }
 
 export function requireProjectId(value: unknown): string | null {
-    return asNonEmptyString(value);
+  return asNonEmptyString(value);
 }
 
 export function requireKey(value: unknown): string | null {
-    return asNonEmptyString(value);
+  return asNonEmptyString(value);
 }
 
 export function requireSlug(value: unknown): string | null {
-    return asNonEmptyString(value);
+  return asNonEmptyString(value);
 }
 
 export function requireField(value: unknown): string | null {
-    return asNonEmptyString(value);
+  return asNonEmptyString(value);
 }
 
 /** Builds a uniform error response naming the missing field + handler op. */
 export function missingFieldError(
-    field: string,
-    op: string,
+  field: string,
+  op: string,
 ): HandlerErrorResponse {
-    return {
-        isOk: false,
-        errorMessage: `[${op}] Missing or invalid '${field}' (expected non-empty string)`,
-    };
+  return {
+    isOk: false,
+    errorMessage: `[${op}] Missing or invalid '${field}' (expected non-empty string)`,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -77,9 +77,11 @@ export function missingFieldError(
  *   other primitives      → String(value)
  */
 export function bindOpt(value: unknown): string | null {
-    if (value === undefined || value === null || value === "") return null;
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
 
-    return typeof value === "string" ? value : String(value);
+  return typeof value === "string" ? value : String(value);
 }
 
 /**
@@ -87,9 +89,11 @@ export function bindOpt(value: unknown): string | null {
  * supplied fallback (used for NOT NULL columns where null would also fail).
  */
 export function bindReq(value: unknown, fallback: string): string {
-    if (value === undefined || value === null || value === "") return fallback;
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
 
-    return typeof value === "string" ? value : String(value);
+  return typeof value === "string" ? value : String(value);
 }
 
 /**
@@ -100,13 +104,13 @@ export function bindReq(value: unknown, fallback: string): string {
  * e.g. dynamic-column INSERTs in the project query builder.
  */
 export class SqliteBindError extends Error {
-    constructor(public readonly paramIndex: number, public readonly op: string) {
-        super(
-            `[${op}] SQLite bind param at index ${paramIndex} is undefined — `
+  constructor(public readonly paramIndex: number, public readonly op: string) {
+    super(
+      `[${op}] SQLite bind param at index ${paramIndex} is undefined — `
             + `coerce to null or supply a fallback before binding.`,
-        );
-        this.name = "SqliteBindError";
-    }
+    );
+    this.name = "SqliteBindError";
+  }
 }
 
 /**
@@ -116,26 +120,42 @@ export class SqliteBindError extends Error {
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity -- multi-stage SQL shape inference (INSERT/UPDATE/SELECT) with column-name fallback chain; splitting fragments the safety contract
 export function safeBind(
-    params: ReadonlyArray<unknown>,
-    op: string,
-    options: { allowUndefined?: boolean } = {},
+  params: ReadonlyArray<unknown>,
+  op: string,
+  options: { allowUndefined?: boolean } = {},
 ): Array<string | number | null | Uint8Array> {
-    const allowUndefined = options.allowUndefined ?? true;
-    const out: Array<string | number | null | Uint8Array> = [];
-    for (let i = 0; i < params.length; i++) {
-        const v = params[i];
-        if (v === undefined) {
-            if (!allowUndefined) throw new SqliteBindError(i, op);
-            out.push(null);
-            continue;
-        }
-        if (v === null) { out.push(null); continue; }
-        if (typeof v === "string" || typeof v === "number") { out.push(v); continue; }
-        if (v instanceof Uint8Array) { out.push(v); continue; }
-        if (typeof v === "boolean") { out.push(v ? 1 : 0); continue; }
-        // Fallback: stringify objects so they at least don't crash sql.js
-        out.push(String(v));
+  const allowUndefined = options.allowUndefined ?? true;
+  const out: Array<string | number | null | Uint8Array> = [];
+  for (let i = 0; i < params.length; i++) {
+    const v = params[i];
+    if (v === undefined) {
+      if (!allowUndefined) {
+        throw new SqliteBindError(i, op);
+      }
+
+      out.push(null);
+      continue;
     }
 
-    return out;
+    if (v === null) {
+      out.push(null); continue; 
+    }
+
+    if (typeof v === "string" || typeof v === "number") {
+      out.push(v); continue; 
+    }
+
+    if (v instanceof Uint8Array) {
+      out.push(v); continue; 
+    }
+
+    if (typeof v === "boolean") {
+      out.push(v ? 1 : 0); continue; 
+    }
+
+    // Fallback: stringify objects so they at least don't crash sql.js
+    out.push(String(v));
+  }
+
+  return out;
 }

@@ -29,9 +29,9 @@ import { Events } from "@/constants/events";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 import { isOriginSeen, markOriginSeen } from "./seen-origins";
 import {
-    isOriginDismissedForTab,
-    dismissOriginForTab,
-    persistDismissOrigin,
+  isOriginDismissedForTab,
+  dismissOriginForTab,
+  persistDismissOrigin,
 } from "./dismissed-origins";
 import { ToastActionType } from "../types/enums";
 import { logBgError } from "@/background/bg-logger";
@@ -47,10 +47,13 @@ interface ToastActionMessage {
 }
 
 function isToastActionMessage(m: unknown): m is ToastActionMessage {
-    if (m === null || typeof m !== "object") return false;
-    const o = m as Record<string, unknown>;
+  if (m === null || typeof m !== "object") {
+    return false;
+  }
 
-    return o.type === MSG_TYPE
+  const o = m as Record<string, unknown>;
+
+  return o.type === MSG_TYPE
         && (o.action === "accept" || o.action === "dismiss-tab" || o.action === "dismiss-persist")
         && typeof o.url === "string";
 }
@@ -64,84 +67,93 @@ function isToastActionMessage(m: unknown): m is ToastActionMessage {
  */
 // eslint-disable-next-line max-lines-per-function -- serialized page payload; must be self-contained (chrome.scripting.executeScript func-toString)
 function toastPagePayload(origin: string): void {
-    const ID = "marco-first-attach-toast";
-    if (document.getElementById(ID)) return;
+  const ID = "marco-first-attach-toast";
+  if (document.getElementById(ID)) {
+    return;
+  }
 
-    function btn(label: string, action: string, primary: boolean): HTMLButtonElement {
-        const b = document.createElement("button");
-        b.textContent = label;
-        b.dataset.action = action;
-        b.style.cssText = [
-            "padding:6px 10px",
-            "border-radius:6px",
-            "border:1px solid " + (primary ? "#4f46e5" : "#3a3a5a"),
-            "background:" + (primary ? "#4f46e5" : "transparent"),
-            "color:" + (primary ? "#fff" : "#e8edf3"),
-            "font-size:12px",
-            "cursor:pointer",
-        ].join(";");
+  function btn(label: string, action: string, primary: boolean): HTMLButtonElement {
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.dataset.action = action;
+    b.style.cssText = [
+      "padding:6px 10px",
+      "border-radius:6px",
+      "border:1px solid " + (primary ? "#4f46e5" : "#3a3a5a"),
+      "background:" + (primary ? "#4f46e5" : "transparent"),
+      "color:" + (primary ? "#fff" : "#e8edf3"),
+      "font-size:12px",
+      "cursor:pointer",
+    ].join(";");
 
-        return b;
+    return b;
+  }
+
+  function buildRoot(): HTMLDivElement {
+    const r = document.createElement("div");
+    r.id = ID;
+    r.setAttribute("role", "dialog");
+    r.setAttribute("aria-label", "Marco auto-attach prompt");
+    r.style.cssText = [
+      "position:fixed", "bottom:20px", "right:20px",
+      "z-index:2147483647", "max-width:340px", "padding:14px 16px",
+      "background:#1a1a2e", "color:#e8edf3",
+      "border:1px solid #2d2d4a", "border-radius:10px",
+      "box-shadow:0 10px 30px rgba(0,0,0,0.45)",
+      "font:13px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+    ].join(";");
+    const title = document.createElement("div");
+    title.textContent = "Marco attached to this site";
+    title.style.cssText = "font-weight:600;margin-bottom:4px;color:#fff";
+    const body = document.createElement("div");
+    body.textContent = `Keep auto-attaching on ${origin}?`;
+    body.style.cssText = "color:#b8c0d0;margin-bottom:10px";
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:6px;flex-wrap:wrap";
+    row.append(
+      btn("Yes, keep", "accept", true),
+      btn("Not now", "dismiss-tab", false),
+      btn("Don't ask for this site", "dismiss-persist", false),
+    );
+    r.append(title, body, row);
+
+    return r;
+  }
+
+  function wire(r: HTMLDivElement): void {
+    let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
+    function cleanup(): void {
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId); timeoutId = null; 
+      }
+
+      r.removeEventListener(Events.CLICK, onClick);
+      window.removeEventListener("pagehide", cleanup);
+      if (r.isConnected) {
+        r.remove();
+      }
     }
 
-    function buildRoot(): HTMLDivElement {
-        const r = document.createElement("div");
-        r.id = ID;
-        r.setAttribute("role", "dialog");
-        r.setAttribute("aria-label", "Marco auto-attach prompt");
-        r.style.cssText = [
-            "position:fixed", "bottom:20px", "right:20px",
-            "z-index:2147483647", "max-width:340px", "padding:14px 16px",
-            "background:#1a1a2e", "color:#e8edf3",
-            "border:1px solid #2d2d4a", "border-radius:10px",
-            "box-shadow:0 10px 30px rgba(0,0,0,0.45)",
-            "font:13px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
-        ].join(";");
-        const title = document.createElement("div");
-        title.textContent = "Marco attached to this site";
-        title.style.cssText = "font-weight:600;margin-bottom:4px;color:#fff";
-        const body = document.createElement("div");
-        body.textContent = `Keep auto-attaching on ${origin}?`;
-        body.style.cssText = "color:#b8c0d0;margin-bottom:10px";
-        const row = document.createElement("div");
-        row.style.cssText = "display:flex;gap:6px;flex-wrap:wrap";
-        row.append(
-            btn("Yes, keep", "accept", true),
-            btn("Not now", "dismiss-tab", false),
-            btn("Don't ask for this site", "dismiss-persist", false),
+    function onClick(e: Event): void {
+      const t = e.target as HTMLElement;
+      const a = t?.dataset?.action;
+      if (typeof a === "string" && a.length > 0) {
+        window.postMessage(
+          { type: "MARCO_FIRST_ATTACH_ACTION", action: a, url: window.location.href },
+          window.location.origin,
         );
-        r.append(title, body, row);
-
-        return r;
+        cleanup();
+      }
     }
 
-    function wire(r: HTMLDivElement): void {
-        let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
-        function cleanup(): void {
-            if (timeoutId !== null) { window.clearTimeout(timeoutId); timeoutId = null; }
-            r.removeEventListener(Events.CLICK, onClick);
-            window.removeEventListener("pagehide", cleanup);
-            if (r.isConnected) r.remove();
-        }
-        function onClick(e: Event): void {
-            const t = e.target as HTMLElement;
-            const a = t?.dataset?.action;
-            if (typeof a === "string" && a.length > 0) {
-                window.postMessage(
-                    { type: "MARCO_FIRST_ATTACH_ACTION", action: a, url: window.location.href },
-                    window.location.origin,
-                );
-                cleanup();
-            }
-        }
-        r.addEventListener(Events.CLICK, onClick);
-        window.addEventListener("pagehide", cleanup, { once: true });
-        timeoutId = window.setTimeout(cleanup, 30_000);
-    }
+    r.addEventListener(Events.CLICK, onClick);
+    window.addEventListener("pagehide", cleanup, { once: true });
+    timeoutId = window.setTimeout(cleanup, 30_000);
+  }
 
-    const root = buildRoot();
-    document.documentElement.appendChild(root);
-    wire(root);
+  const root = buildRoot();
+  document.documentElement.appendChild(root);
+  wire(root);
 }
 
 /**
@@ -150,30 +162,42 @@ function toastPagePayload(origin: string): void {
  * chrome.runtime.sendMessage so the background bridge can react.
  */
 function bridgePagePayload(): void {
-    if ((window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge) return;
-    (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = true;
+  if ((window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge) {
+    return;
+  }
 
-    const cleanup = (): void => {
-        window.removeEventListener(Events.MESSAGE, onMessage);
-        window.removeEventListener("pagehide", cleanup);
-        (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = false;
-    };
+  (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = true;
 
-    const onMessage = (e: MessageEvent): void => {
-        if (e.source !== window) return;
-        const d = e.data;
-        if (d === null || typeof d !== "object") return;
-        const o = d as Record<string, unknown>;
-        if (o.type !== "MARCO_FIRST_ATTACH_ACTION") return;
-        try {
-            chrome.runtime.sendMessage(o);
-        } catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
-    };
+  const cleanup = (): void => {
+    window.removeEventListener(Events.MESSAGE, onMessage);
+    window.removeEventListener("pagehide", cleanup);
+    (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = false;
+  };
 
-    window.addEventListener(Events.MESSAGE, onMessage);
-    window.addEventListener("pagehide", cleanup, { once: true });
+  const onMessage = (e: MessageEvent): void => {
+    if (e.source !== window) {
+      return;
+    }
+
+    const d = e.data;
+    if (d === null || typeof d !== "object") {
+      return;
+    }
+
+    const o = d as Record<string, unknown>;
+    if (o.type !== "MARCO_FIRST_ATTACH_ACTION") {
+      return;
+    }
+
+    try {
+      chrome.runtime.sendMessage(o);
+    } catch (err) {
+      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+    }
+  };
+
+  window.addEventListener(Events.MESSAGE, onMessage);
+  window.addEventListener("pagehide", cleanup, { once: true });
 }
 
 /**
@@ -181,40 +205,51 @@ function bridgePagePayload(): void {
  * seen, dismissed (tab or persistent), or if scripting fails.
  */
 export async function maybeShowFirstAttachToast(
-    tabId: number,
-    url: string,
+  tabId: number,
+  url: string,
 ): Promise<void> {
-    if (isOriginDismissedForTab(tabId, url)) return;
-    if (isOriginSeen(url)) return;
+  if (isOriginDismissedForTab(tabId, url)) {
+    return;
+  }
 
-    let origin = "";
-    try { origin = new URL(url).origin; } catch (err) { 
- return; }
-    if (origin === "") return;
+  if (isOriginSeen(url)) {
+    return;
+  }
 
-    try {
-        await chrome.scripting.executeScript({
-            target: { tabId },
-            world: "MAIN",
-            func: toastPagePayload,
-            args: [origin],
-        });
-        await chrome.scripting.executeScript({
-            target: { tabId },
-            world: "ISOLATED",
-            func: bridgePagePayload,
-        });
-        // Optimistically mark seen so we don't double-fire on bursts;
-        // user can still explicitly dismiss via the toast buttons.
-        void markOriginSeen(url);
-    } catch (err) {
-        // Restricted URLs / closed tabs — log once, no retry.
-        logCaughtError(
-            BgLogTag.MARCO,
-            `[first-attach-toast] inject skipped tab=${tabId} url=${url}`,
+  let origin = "";
+  try {
+    origin = new URL(url).origin; 
+  } catch (err) { 
+    return; 
+  }
+
+  if (origin === "") {
+    return;
+  }
+
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "MAIN",
+      func: toastPagePayload,
+      args: [origin],
+    });
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "ISOLATED",
+      func: bridgePagePayload,
+    });
+    // Optimistically mark seen so we don't double-fire on bursts;
+    // user can still explicitly dismiss via the toast buttons.
+    void markOriginSeen(url);
+  } catch (err) {
+    // Restricted URLs / closed tabs — log once, no retry.
+    logCaughtError(
+      BgLogTag.MARCO,
+      `[first-attach-toast] inject skipped tab=${tabId} url=${url}`,
             err as Error,
-        );
-    }
+    );
+  }
 }
 
 /**
@@ -222,24 +257,30 @@ export async function maybeShowFirstAttachToast(
  * Call once from boot.
  */
 export function registerFirstAttachToastBridge(): void {
-    chrome.runtime.onMessage.addListener((message, sender) => {
-        if (!isToastActionMessage(message)) return false;
-        const tabId = sender.tab?.id;
-        const url = message.url;
-        if (typeof tabId !== "number") return false;
+  chrome.runtime.onMessage.addListener((message, sender) => {
+    if (!isToastActionMessage(message)) {
+      return false;
+    }
 
-        if (message.action === "accept") {
-            void markOriginSeen(url);
-        } else if (message.action === "dismiss-tab") {
-            dismissOriginForTab(tabId, url);
-        } else if (message.action === "dismiss-persist") {
-            void persistDismissOrigin(url);
-            void markOriginSeen(url);
-        }
-        console.log(
-            `[first-attach-toast] action=${message.action} tab=${tabId} url=${url}`,
-        );
+    const tabId = sender.tab?.id;
+    const url = message.url;
+    if (typeof tabId !== "number") {
+      return false;
+    }
 
-        return false;
-    });
+    if (message.action === "accept") {
+      void markOriginSeen(url);
+    } else if (message.action === "dismiss-tab") {
+      dismissOriginForTab(tabId, url);
+    } else if (message.action === "dismiss-persist") {
+      void persistDismissOrigin(url);
+      void markOriginSeen(url);
+    }
+
+    console.log(
+      `[first-attach-toast] action=${message.action} tab=${tabId} url=${url}`,
+    );
+
+    return false;
+  });
 }

@@ -21,8 +21,14 @@ export function createMenuItem(ctx: MenuCtx, icon: string, label: string, title:
   item.style.cssText = ctx.menuBtnStyle;
   item.title = title || label;
   item.innerHTML = '<span style="font-size:12px;width:18px;text-align:center;">' + icon + '</span><span>' + label + '</span>';
-  item.onmouseover = function() { item.style.background = 'rgba(139,92,246,0.2)'; };
-  item.onmouseout = function() { item.style.background = 'transparent'; };
+  item.onmouseover = function() {
+    item.style.background = 'rgba(139,92,246,0.2)'; 
+  };
+
+  item.onmouseout = function() {
+    item.style.background = 'transparent'; 
+  };
+
   item.onclick = function(e) {
     e.stopPropagation();
     ctx.menuDropdown.style.display = 'none';
@@ -65,7 +71,10 @@ function positionSub(ctx: SubmenuCtx): void {
 // right edge; opens down by default, flips up near the bottom edge.
 // Step A5: recompute on scroll/resize while open; tear down on close.
 function showSub(ctx: SubmenuCtx): void {
-  if (ctx.hideTimer) { clearTimeout(ctx.hideTimer); ctx.hideTimer = null; }
+  if (ctx.hideTimer) {
+    clearTimeout(ctx.hideTimer); ctx.hideTimer = null; 
+  }
+
   ctx.subPanel.style.visibility = 'hidden';
   ctx.subPanel.style.display = 'block';
   positionSub(ctx);
@@ -73,12 +82,18 @@ function showSub(ctx: SubmenuCtx): void {
   if (!ctx.reflowHandler) {
     let raf = 0;
     const handler = (): void => {
-      if (raf) { return; }
+      if (raf) {
+        return; 
+      }
+
       raf = window.requestAnimationFrame(function() {
         raf = 0;
-        if (ctx.subPanel.style.display !== 'none') { positionSub(ctx); }
+        if (ctx.subPanel.style.display !== 'none') {
+          positionSub(ctx); 
+        }
       });
     };
+
     ctx.reflowHandler = handler;
     window.addEventListener('scroll', handler, true);
     window.addEventListener('resize', handler);
@@ -95,8 +110,13 @@ function hideSub(ctx: SubmenuCtx): void {
 }
 
 function scheduleSub(ctx: SubmenuCtx): void {
-  if (ctx.hideTimer) { clearTimeout(ctx.hideTimer); ctx.hideTimer = null; }
-  ctx.hideTimer = setTimeout(function() { hideSub(ctx); }, 150);
+  if (ctx.hideTimer) {
+    clearTimeout(ctx.hideTimer); ctx.hideTimer = null; 
+  }
+
+  ctx.hideTimer = setTimeout(function() {
+    hideSub(ctx); 
+  }, 150);
 }
 
 export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: HTMLElement; panel: HTMLElement } {
@@ -117,15 +137,27 @@ export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: 
     showSub(subCtx);
     trigger.setAttribute(ATTR_ARIA_EXPANDED, 'true');
   };
-  trigger.onmouseout = function() { trigger.style.background = 'transparent'; };
+
+  trigger.onmouseout = function() {
+    trigger.style.background = 'transparent'; 
+  };
+
   trigger.onclick = function(e) {
     e.stopPropagation();
     const open = subPanel.style.display === 'none' || subPanel.style.display === '';
-    if (open) { showSub(subCtx); } else { hideSub(subCtx); }
+    if (open) {
+      showSub(subCtx); 
+    } else {
+      hideSub(subCtx); 
+    }
+
     trigger.setAttribute(ATTR_ARIA_EXPANDED, open ? 'true' : 'false');
   };
+
   trigger.onkeydown = function(e) {
-    if (e.key === 'Escape') { hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); }
+    if (e.key === 'Escape') {
+      hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); 
+    }
   };
 
   subPanel.setAttribute('data-marco-submenu', label);
@@ -133,14 +165,26 @@ export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: 
   subPanel.setAttribute('aria-label', label);
   subPanel.style.cssText = 'display:none;position:fixed;min-width:170px;background:' + cPanelBg + ';border:1px solid ' + cPrimary + ';border-radius:' + lDropdownRadius + ';z-index:100004;box-shadow:' + lDropdownShadow + ';padding:4px 0;';
   subPanel.onkeydown = function(e) {
-    if (e.key === 'Escape') { hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); }
+    if (e.key === 'Escape') {
+      hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); 
+    }
   };
 
-  subPanel.onmouseover = function() { showSub(subCtx); };
-  subPanel.onmouseout = function() { scheduleSub(subCtx); };
+  subPanel.onmouseover = function() {
+    showSub(subCtx); 
+  };
 
-  wrapper.onmouseover = function() { showSub(subCtx); };
-  wrapper.onmouseout = function() { scheduleSub(subCtx); };
+  subPanel.onmouseout = function() {
+    scheduleSub(subCtx); 
+  };
+
+  wrapper.onmouseover = function() {
+    showSub(subCtx); 
+  };
+
+  wrapper.onmouseout = function() {
+    scheduleSub(subCtx); 
+  };
 
   wrapper.appendChild(trigger);
   document.body.appendChild(subPanel);

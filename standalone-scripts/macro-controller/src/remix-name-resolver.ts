@@ -42,6 +42,7 @@ export function parseName(name: string): ParsedName {
   if (!match) {
     return { base: trimmed, separator: '', vLetter: '', current: 1 };
   }
+
   const [, base, separator, vLetter, numStr] = match;
   const count = Number(numStr);
 
@@ -90,6 +91,7 @@ export function resolveNextName(
   if (!currentName || !currentName.trim()) {
     throwDiagnostic('REMIX_RESOLVE_E001', { reason: 'currentName is empty', currentName: currentName ?? '' });
   }
+
   const parsed = parseName(currentName);
   const casing = config.nextVCasing || 'preserve';
   // Start at current+1 so "Foo-V2" → "Foo-V3", "Foo" (current=1) → "Foo-V2".
@@ -106,6 +108,7 @@ export function resolveNextName(
         maxCollisionIncrements: config.maxCollisionIncrements,
       });
     }
+
     candidate = buildName(parsed, candidateNum, config.nextSuffixSeparator, casing);
   }
 

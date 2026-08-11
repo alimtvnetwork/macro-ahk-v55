@@ -62,6 +62,7 @@ export function installSpaRouteGuard(): () => void {
   if (alreadyInstalled) {
     return noopTeardown;
   }
+
   window.__marcoRouteGuardInstalled = true;
 
   lastProjectId = extractProjectIdFromUrl();
@@ -149,6 +150,7 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
     if (state.running) {
       stopLoop();
     }
+
     const label = leftProject ? 'left project' : 'switched project';
     log('[SpaRouteGuard] ' + label + ' via ' + source + ' (was=' + previous + ', now=' + (currentProjectId ?? '(none)') + ') — loop stopped', 'warn');
     try {

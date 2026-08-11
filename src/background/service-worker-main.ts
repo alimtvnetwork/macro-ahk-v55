@@ -37,54 +37,54 @@ import { EXTENSION_VERSION } from "../shared/constants";
 /* ------------------------------------------------------------------ */
 
 try {
-    chrome.action.setTitle({ title: `Macro Controller v${EXTENSION_VERSION}` });
+  chrome.action.setTitle({ title: `Macro Controller v${EXTENSION_VERSION}` });
 } catch (err) { // allow-swallow: chrome.action unavailable in test/preview SW contexts; tooltip is cosmetic
-    logCaughtError(BgLogTag.MARCO, "chrome.action.setTitle failed (non-fatal — tooltip skipped)", err);
+  logCaughtError(BgLogTag.MARCO, "chrome.action.setTitle failed (non-fatal — tooltip skipped)", err);
 }
 
 const BOOT_FAST_PATH_TYPES = new Set<string>([
-    MessageType.GET_OPTIONS_BOOTSTRAP,
-    MessageType.GET_ALL_PROJECTS,
-    MessageType.SAVE_PROJECT,
-    MessageType.DELETE_PROJECT,
-    MessageType.GET_ALL_SCRIPTS,
-    MessageType.SAVE_SCRIPT,
-    MessageType.DELETE_SCRIPT,
-    MessageType.GET_ALL_CONFIGS,
-    MessageType.SAVE_CONFIG,
-    MessageType.DELETE_CONFIG,
-    MessageType.GET_CONFIG,
-    MessageType.GET_TOKEN,
-    MessageType.REFRESH_TOKEN,
-    MessageType.AUTH_GET_TOKEN,
-    MessageType.AUTH_GET_SOURCE,
-    MessageType.AUTH_REFRESH,
-    MessageType.COOKIES_GET,
-    MessageType.COOKIES_GET_DETAIL,
-    MessageType.COOKIES_GET_ALL,
+  MessageType.GET_OPTIONS_BOOTSTRAP,
+  MessageType.GET_ALL_PROJECTS,
+  MessageType.SAVE_PROJECT,
+  MessageType.DELETE_PROJECT,
+  MessageType.GET_ALL_SCRIPTS,
+  MessageType.SAVE_SCRIPT,
+  MessageType.DELETE_SCRIPT,
+  MessageType.GET_ALL_CONFIGS,
+  MessageType.SAVE_CONFIG,
+  MessageType.DELETE_CONFIG,
+  MessageType.GET_CONFIG,
+  MessageType.GET_TOKEN,
+  MessageType.REFRESH_TOKEN,
+  MessageType.AUTH_GET_TOKEN,
+  MessageType.AUTH_GET_SOURCE,
+  MessageType.AUTH_REFRESH,
+  MessageType.COOKIES_GET,
+  MessageType.COOKIES_GET_DETAIL,
+  MessageType.COOKIES_GET_ALL,
 ]);
 
 function isBootFastPathMessage(message: unknown): boolean {
-    const hasType = typeof message === "object" && message !== null && "type" in message;
+  const hasType = typeof message === "object" && message !== null && "type" in message;
 
-    if (!hasType) {
-        return false;
-    }
+  if (!hasType) {
+    return false;
+  }
 
-    const type = (message as { type?: unknown }).type;
-    if (typeof type !== "string") {
-        return false;
-    }
+  const type = (message as { type?: unknown }).type;
+  if (typeof type !== "string") {
+    return false;
+  }
 
-    // __PING__ is the cold-start readiness handshake. It MUST always be
-    // answered synchronously with `{ type: '__PONG__' }` — never buffered,
-    // never queued behind boot. tests/e2e/cold-start.spec.ts contracts
-    // this exact shape; changing it breaks CI.
-    if (type === "__PING__") {
-        return true;
-    }
+  // __PING__ is the cold-start readiness handshake. It MUST always be
+  // answered synchronously with `{ type: '__PONG__' }` — never buffered,
+  // never queued behind boot. tests/e2e/cold-start.spec.ts contracts
+  // this exact shape; changing it breaks CI.
+  if (type === "__PING__") {
+    return true;
+  }
 
-    return BOOT_FAST_PATH_TYPES.has(type);
+  return BOOT_FAST_PATH_TYPES.has(type);
 }
 
 /* ------------------------------------------------------------------ */
@@ -92,35 +92,35 @@ function isBootFastPathMessage(message: unknown): boolean {
 /* ------------------------------------------------------------------ */
 
 chrome.runtime.onMessage.addListener(
-    (
-        message: unknown,
-        sender: chrome.runtime.MessageSender,
-        sendResponse: (response: unknown) => void,
-    ) => {
-        // Fast path: __PING__ always replies synchronously, regardless of
-        // boot state, listener order, or handler-registry contents. This
-        // guarantees the cold-start handshake never receives `{ isOk: true }`
-        // from another listener or from the buffered-replay path.
-        const messageType =
+  (
+    message: unknown,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response: unknown) => void,
+  ) => {
+    // Fast path: __PING__ always replies synchronously, regardless of
+    // boot state, listener order, or handler-registry contents. This
+    // guarantees the cold-start handshake never receives `{ isOk: true }`
+    // from another listener or from the buffered-replay path.
+    const messageType =
             typeof message === "object" && message !== null && "type" in message
-                ? (message as { type?: unknown }).type
-                : undefined;
-        if (messageType === "__PING__") {
-            sendResponse({ type: "__PONG__" });
+              ? (message as { type?: unknown }).type
+              : undefined;
+    if (messageType === "__PING__") {
+      sendResponse({ type: "__PONG__" });
 
-            return false;
-        }
+      return false;
+    }
 
-        const shouldHandleImmediately = isInitialized() || isBootFastPathMessage(message);
+    const shouldHandleImmediately = isInitialized() || isBootFastPathMessage(message);
 
-        if (shouldHandleImmediately) {
-            void handleMessage(message, sender, sendResponse);
-        } else {
-            bufferMessage(message, sender, sendResponse);
-        }
+    if (shouldHandleImmediately) {
+      void handleMessage(message, sender, sendResponse);
+    } else {
+      bufferMessage(message, sender, sendResponse);
+    }
 
-        return true;
-    },
+    return true;
+  },
 );
 
 /* ------------------------------------------------------------------ */
@@ -134,24 +134,24 @@ chrome.runtime.onMessage.addListener(
  * being installed.
  */
 const registrations: Array<[string, () => void]> = [
-    ["auto-injector", registerAutoInjector],
-    ["install-listener", registerInstallListener],
-    ["cookie-watcher", registerCookieWatcher],
-    ["context-menu", registerContextMenu],
-    ["shortcut-commands", registerShortcutCommands],
-    ["spa-reinject", registerSpaReinject],
-    ["url-trigger", registerUrlTriggers],
-    ["keepalive", registerKeepalive],
-    ["hot-reload", startHotReload],
-    ["new-tab-tracker", startNewTabTracker],
+  ["auto-injector", registerAutoInjector],
+  ["install-listener", registerInstallListener],
+  ["cookie-watcher", registerCookieWatcher],
+  ["context-menu", registerContextMenu],
+  ["shortcut-commands", registerShortcutCommands],
+  ["spa-reinject", registerSpaReinject],
+  ["url-trigger", registerUrlTriggers],
+  ["keepalive", registerKeepalive],
+  ["hot-reload", startHotReload],
+  ["new-tab-tracker", startNewTabTracker],
 ];
 
 for (const [label, register] of registrations) {
-    try {
-        register();
-    } catch (err) {
-        logCaughtError(BgLogTag.MARCO, `Registration '${label}' failed (non-fatal)`, err);
-    }
+  try {
+    register();
+  } catch (err) {
+    logCaughtError(BgLogTag.MARCO, `Registration '${label}' failed (non-fatal)`, err);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -159,11 +159,11 @@ for (const [label, register] of registrations) {
 /* ------------------------------------------------------------------ */
 
 try {
-    chrome.tabs.onRemoved.addListener((tabId) => {
-        removeTabInjection(tabId);
-    });
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    removeTabInjection(tabId);
+  });
 } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "tabs.onRemoved registration failed", err);
+  logCaughtError(BgLogTag.MARCO, "tabs.onRemoved registration failed", err);
 }
 
 /* ------------------------------------------------------------------ */

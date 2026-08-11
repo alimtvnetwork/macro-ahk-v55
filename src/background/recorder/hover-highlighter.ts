@@ -20,55 +20,73 @@ const SMART_GROUP_ROLE_SELECTOR =
 /* ------------------------------------------------------------------ */
 
 export function findSmartGroup(el: Element): Element | null {
-    const form = el.closest("form");
-    if (form !== null) return form;
+  const form = el.closest("form");
+  if (form !== null) {
+    return form;
+  }
 
-    const fieldset = el.closest("fieldset");
-    if (fieldset !== null) return fieldset;
+  const fieldset = el.closest("fieldset");
+  if (fieldset !== null) {
+    return fieldset;
+  }
 
-    const tr = el.closest("tr");
-    if (tr !== null) return tr;
+  const tr = el.closest("tr");
+  if (tr !== null) {
+    return tr;
+  }
 
-    const role = el.closest(SMART_GROUP_ROLE_SELECTOR);
-    if (role !== null) return role;
+  const role = el.closest(SMART_GROUP_ROLE_SELECTOR);
+  if (role !== null) {
+    return role;
+  }
 
-    const cardLike = closestByClassToken(el, ["card", "panel", "field-row", "form-group"]);
-    if (cardLike !== null) return cardLike;
+  const cardLike = closestByClassToken(el, ["card", "panel", "field-row", "form-group"]);
+  if (cardLike !== null) {
+    return cardLike;
+  }
 
-    const flexGrid = closestFlexOrGrid(el);
-    if (flexGrid !== null) return flexGrid;
+  const flexGrid = closestFlexOrGrid(el);
+  if (flexGrid !== null) {
+    return flexGrid;
+  }
 
-    return el.parentElement;
+  return el.parentElement;
 }
 
 function closestByClassToken(el: Element, tokens: ReadonlyArray<string>): Element | null {
-    let current: Element | null = el;
-    while (current !== null) {
-        const cls = current.className;
-        const isString = typeof cls === "string";
-        if (isString) {
-            const lower = cls.toLowerCase();
-            const hasToken = tokens.some((t) => lower.includes(t));
-            if (hasToken) return current;
-        }
-        current = current.parentElement;
+  let current: Element | null = el;
+  while (current !== null) {
+    const cls = current.className;
+    const isString = typeof cls === "string";
+    if (isString) {
+      const lower = cls.toLowerCase();
+      const hasToken = tokens.some((t) => lower.includes(t));
+      if (hasToken) {
+        return current;
+      }
     }
 
-    return null;
+    current = current.parentElement;
+  }
+
+  return null;
 }
 
 function closestFlexOrGrid(el: Element): Element | null {
-    let current: Element | null = el.parentElement;
-    while (current !== null) {
-        const styles = current.ownerDocument?.defaultView?.getComputedStyle(current);
-        const display = styles?.display ?? "";
-        const isFlexOrGrid = display === "flex" || display === "grid";
-        const hasMultipleChildren = current.childElementCount >= 2;
-        if (isFlexOrGrid && hasMultipleChildren) return current;
-        current = current.parentElement;
+  let current: Element | null = el.parentElement;
+  while (current !== null) {
+    const styles = current.ownerDocument?.defaultView?.getComputedStyle(current);
+    const display = styles?.display ?? "";
+    const isFlexOrGrid = display === "flex" || display === "grid";
+    const hasMultipleChildren = current.childElementCount >= 2;
+    if (isFlexOrGrid && hasMultipleChildren) {
+      return current;
     }
 
-    return null;
+    current = current.parentElement;
+  }
+
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -76,14 +94,14 @@ function closestFlexOrGrid(el: Element): Element | null {
 /* ------------------------------------------------------------------ */
 
 export function nthAncestor(el: Element, depth: number): Element {
-    let current: Element = el;
-    let remaining = depth;
-    while (remaining > 0 && current.parentElement !== null) {
-        current = current.parentElement;
-        remaining--;
-    }
+  let current: Element = el;
+  let remaining = depth;
+  while (remaining > 0 && current.parentElement !== null) {
+    current = current.parentElement;
+    remaining--;
+  }
 
-    return current;
+  return current;
 }
 
 /* ------------------------------------------------------------------ */
@@ -147,212 +165,264 @@ interface HighlighterHandlers {
 }
 
 export function mountHoverHighlighter(
-    doc: Document = document,
+  doc: Document = document,
 ): HoverHighlighterHandle {
-    removeExistingHighlighterHost(doc);
-    const nodes = buildHighlighterNodes(doc);
-    const state: InternalState = {
-        OperationModeType: "off", HoverTarget: null, AncestorOffset: 0, AltHeld: false, RafToken: null,
-    };
-    const schedulePaint = createPaintScheduler(nodes, state, doc);
-    const handlers = createHighlighterHandlers(nodes.host, state, schedulePaint);
-    attachHighlighterListeners(doc, handlers);
+  removeExistingHighlighterHost(doc);
+  const nodes = buildHighlighterNodes(doc);
+  const state: InternalState = {
+    OperationModeType: "off", HoverTarget: null, AncestorOffset: 0, AltHeld: false, RafToken: null,
+  };
+  const schedulePaint = createPaintScheduler(nodes, state, doc);
+  const handlers = createHighlighterHandlers(nodes.host, state, schedulePaint);
+  attachHighlighterListeners(doc, handlers);
 
-    return buildHighlighterHandle(nodes.host, state, schedulePaint, doc, handlers);
+  return buildHighlighterHandle(nodes.host, state, schedulePaint, doc, handlers);
 }
 
 function removeExistingHighlighterHost(doc: Document): void {
-    const existing = doc.getElementById(HOVER_HIGHLIGHTER_HOST_ID);
-    if (existing !== null) { existing.remove(); }
+  const existing = doc.getElementById(HOVER_HIGHLIGHTER_HOST_ID);
+  if (existing !== null) {
+    existing.remove(); 
+  }
 }
 
 function buildHighlighterNodes(doc: Document): HighlighterNodes {
-    const host = doc.createElement("div");
-    host.id = HOVER_HIGHLIGHTER_HOST_ID;
-    host.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:2147483647;";
-    doc.body.appendChild(host);
-    const root = host.attachShadow({ mode: "closed" });
-    appendHighlighterStyle(doc, root);
-    const { primaryEl, groupEl, chipEl } = createHighlighterOverlays(doc);
-    root.append(groupEl, primaryEl, chipEl);
+  const host = doc.createElement("div");
+  host.id = HOVER_HIGHLIGHTER_HOST_ID;
+  host.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:2147483647;";
+  doc.body.appendChild(host);
+  const root = host.attachShadow({ mode: "closed" });
+  appendHighlighterStyle(doc, root);
+  const { primaryEl, groupEl, chipEl } = createHighlighterOverlays(doc);
+  root.append(groupEl, primaryEl, chipEl);
 
-    return { host, primaryEl, groupEl, chipEl };
+  return { host, primaryEl, groupEl, chipEl };
 }
 
 function appendHighlighterStyle(doc: Document, root: ShadowRoot): void {
-    const style = doc.createElement("style");
-    style.textContent = STYLE;
-    root.appendChild(style);
+  const style = doc.createElement("style");
+  style.textContent = STYLE;
+  root.appendChild(style);
 }
 
 function createHighlighterOverlays(doc: Document): {
     primaryEl: HTMLDivElement; groupEl: HTMLDivElement; chipEl: HTMLDivElement;
 } {
-    const groupEl = doc.createElement("div");
-    groupEl.className = "outline-group hidden";
-    const primaryEl = doc.createElement("div");
-    primaryEl.className = "outline-primary hidden";
-    const chipEl = doc.createElement("div");
-    chipEl.className = "chip hidden";
+  const groupEl = doc.createElement("div");
+  groupEl.className = "outline-group hidden";
+  const primaryEl = doc.createElement("div");
+  primaryEl.className = "outline-primary hidden";
+  const chipEl = doc.createElement("div");
+  chipEl.className = "chip hidden";
 
-    return { primaryEl, groupEl, chipEl };
+  return { primaryEl, groupEl, chipEl };
 }
 
 function createPaintScheduler(
-    nodes: HighlighterNodes, state: InternalState, doc: Document,
+  nodes: HighlighterNodes, state: InternalState, doc: Document,
 ): () => void {
-    const paint = (): void => {
-        state.RafToken = null;
-        renderHighlighter(nodes, state);
-    };
+  const paint = (): void => {
+    state.RafToken = null;
+    renderHighlighter(nodes, state);
+  };
 
-    return () => {
-        if (state.RafToken !== null) { return; }
-        const win = doc.defaultView;
-        if (win === null) { return; }
-        state.RafToken = win.requestAnimationFrame(paint);
-    };
+  return () => {
+    if (state.RafToken !== null) {
+      return; 
+    }
+
+    const win = doc.defaultView;
+    if (win === null) {
+      return; 
+    }
+
+    state.RafToken = win.requestAnimationFrame(paint);
+  };
 }
 
 function renderHighlighter(nodes: HighlighterNodes, state: InternalState): void {
-    const target = state.HoverTarget;
-    if (target === null || state.OperationModeType === "off") {
-        hideHighlighterNodes(nodes);
+  const target = state.HoverTarget;
+  if (target === null || state.OperationModeType === "off") {
+    hideHighlighterNodes(nodes);
 
-        return;
-    }
-    const resolved = nthAncestor(target, state.AncestorOffset);
-    paintPrimary(nodes.primaryEl, resolved);
-    paintGroup(nodes.groupEl, resolved);
-    paintChip(nodes.chipEl, resolved, state.AncestorOffset);
+    return;
+  }
+
+  const resolved = nthAncestor(target, state.AncestorOffset);
+  paintPrimary(nodes.primaryEl, resolved);
+  paintGroup(nodes.groupEl, resolved);
+  paintChip(nodes.chipEl, resolved, state.AncestorOffset);
 }
 
 function hideHighlighterNodes(nodes: HighlighterNodes): void {
-    nodes.primaryEl.classList.add("hidden");
-    nodes.groupEl.classList.add("hidden");
-    nodes.chipEl.classList.add("hidden");
+  nodes.primaryEl.classList.add("hidden");
+  nodes.groupEl.classList.add("hidden");
+  nodes.chipEl.classList.add("hidden");
 }
 
 function paintPrimary(primaryEl: HTMLDivElement, resolved: Element): void {
-    applyRect(primaryEl, resolved.getBoundingClientRect());
-    primaryEl.classList.remove("hidden");
+  applyRect(primaryEl, resolved.getBoundingClientRect());
+  primaryEl.classList.remove("hidden");
 }
 
 function paintGroup(groupEl: HTMLDivElement, resolved: Element): void {
-    const group = findSmartGroup(resolved);
-    if (group !== null && group !== resolved) {
-        applyRect(groupEl, group.getBoundingClientRect());
-        groupEl.classList.remove("hidden");
-    } else {
-        groupEl.classList.add("hidden");
-    }
+  const group = findSmartGroup(resolved);
+  if (group !== null && group !== resolved) {
+    applyRect(groupEl, group.getBoundingClientRect());
+    groupEl.classList.remove("hidden");
+  } else {
+    groupEl.classList.add("hidden");
+  }
 }
 
 function paintChip(chipEl: HTMLDivElement, resolved: Element, depthOffset: number): void {
-    const rect = resolved.getBoundingClientRect();
-    chipEl.textContent = describeElement(resolved, depthOffset);
-    chipEl.style.transform =
+  const rect = resolved.getBoundingClientRect();
+  chipEl.textContent = describeElement(resolved, depthOffset);
+  chipEl.style.transform =
         `translate(${Math.round(rect.left)}px, ${Math.round(Math.max(rect.top - 18, 0))}px)`;
-    chipEl.classList.remove("hidden");
+  chipEl.classList.remove("hidden");
 }
 
 function createHighlighterHandlers(
-    host: HTMLElement, state: InternalState, schedulePaint: () => void,
+  host: HTMLElement, state: InternalState, schedulePaint: () => void,
 ): HighlighterHandlers {
-    return {
-        onMouseMove: (event) => handleHighlighterMouseMove(event, host, state, schedulePaint),
-        onKeyDown: (event) => handleHighlighterKeyDown(event, state, schedulePaint),
-        onKeyUp: (event) => { if (event.key === "Alt") { state.AltHeld = false; } },
-        onWheel: (event) => handleHighlighterWheel(event, state, schedulePaint),
-        onReplayStart: (event) => handleReplayStart(event, state, schedulePaint),
-        onReplayEnd: () => handleReplayEnd(state, schedulePaint),
-    };
+  return {
+    onMouseMove: (event) => handleHighlighterMouseMove(event, host, state, schedulePaint),
+    onKeyDown: (event) => handleHighlighterKeyDown(event, state, schedulePaint),
+    onKeyUp: (event) => {
+      if (event.key === "Alt") {
+        state.AltHeld = false; 
+      } 
+    },
+    onWheel: (event) => handleHighlighterWheel(event, state, schedulePaint),
+    onReplayStart: (event) => handleReplayStart(event, state, schedulePaint),
+    onReplayEnd: () => handleReplayEnd(state, schedulePaint),
+  };
 }
 
 function handleHighlighterMouseMove(
-    event: MouseEvent, host: HTMLElement, state: InternalState, schedulePaint: () => void,
+  event: MouseEvent, host: HTMLElement, state: InternalState, schedulePaint: () => void,
 ): void {
-    if (state.OperationModeType === "off") { return; }
-    const target = event.target;
-    if (!(target instanceof Element)) { return; }
-    if (host.contains(target)) { return; }
-    if (state.HoverTarget !== target) {
-        state.HoverTarget = target;
-        if (!state.AltHeld) { state.AncestorOffset = 0; }
+  if (state.OperationModeType === "off") {
+    return; 
+  }
+
+  const target = event.target;
+  if (!(target instanceof Element)) {
+    return; 
+  }
+
+  if (host.contains(target)) {
+    return; 
+  }
+
+  if (state.HoverTarget !== target) {
+    state.HoverTarget = target;
+    if (!state.AltHeld) {
+      state.AncestorOffset = 0; 
     }
-    schedulePaint();
+  }
+
+  schedulePaint();
 }
 
 function handleHighlighterKeyDown(
-    event: KeyboardEvent, state: InternalState, schedulePaint: () => void,
+  event: KeyboardEvent, state: InternalState, schedulePaint: () => void,
 ): void {
-    if (event.key !== "Alt") { return; }
-    state.AltHeld = true;
-    if (state.AncestorOffset === 0) { state.AncestorOffset = 1; }
-    schedulePaint();
+  if (event.key !== "Alt") {
+    return; 
+  }
+
+  state.AltHeld = true;
+  if (state.AncestorOffset === 0) {
+    state.AncestorOffset = 1; 
+  }
+
+  schedulePaint();
 }
 
 function handleHighlighterWheel(
-    event: WheelEvent, state: InternalState, schedulePaint: () => void,
+  event: WheelEvent, state: InternalState, schedulePaint: () => void,
 ): void {
-    if (!state.AltHeld) { return; }
-    const direction = event.deltaY < 0 ? 1 : -1;
-    state.AncestorOffset = Math.max(0, state.AncestorOffset + direction);
-    schedulePaint();
+  if (!state.AltHeld) {
+    return; 
+  }
+
+  const direction = event.deltaY < 0 ? 1 : -1;
+  state.AncestorOffset = Math.max(0, state.AncestorOffset + direction);
+  schedulePaint();
 }
 
 function handleReplayStart(event: Event, state: InternalState, schedulePaint: () => void): void {
-    if (state.OperationModeType !== "replay") { return; }
-    const detail = (event as CustomEvent<{ Element?: Element }>).detail;
-    const target = detail?.Element ?? null;
-    if (target === null) { return; }
-    state.HoverTarget = target;
-    state.AncestorOffset = 0;
-    schedulePaint();
+  if (state.OperationModeType !== "replay") {
+    return; 
+  }
+
+  const detail = (event as CustomEvent<{ Element?: Element }>).detail;
+  const target = detail?.Element ?? null;
+  if (target === null) {
+    return; 
+  }
+
+  state.HoverTarget = target;
+  state.AncestorOffset = 0;
+  schedulePaint();
 }
 
 function handleReplayEnd(state: InternalState, schedulePaint: () => void): void {
-    if (state.OperationModeType !== "replay") { return; }
-    state.HoverTarget = null;
-    schedulePaint();
+  if (state.OperationModeType !== "replay") {
+    return; 
+  }
+
+  state.HoverTarget = null;
+  schedulePaint();
 }
 
 function attachHighlighterListeners(doc: Document, handlers: HighlighterHandlers): void {
-    doc.addEventListener("mousemove", handlers.onMouseMove, { passive: true });
-    doc.addEventListener(Events.KEYDOWN, handlers.onKeyDown, { passive: true });
-    doc.addEventListener(Events.KEYUP, handlers.onKeyUp, { passive: true });
-    doc.addEventListener("wheel", handlers.onWheel, { passive: true });
-    doc.addEventListener("replay:step:start", handlers.onReplayStart);
-    doc.addEventListener("replay:step:end", handlers.onReplayEnd);
+  doc.addEventListener("mousemove", handlers.onMouseMove, { passive: true });
+  doc.addEventListener(Events.KEYDOWN, handlers.onKeyDown, { passive: true });
+  doc.addEventListener(Events.KEYUP, handlers.onKeyUp, { passive: true });
+  doc.addEventListener("wheel", handlers.onWheel, { passive: true });
+  doc.addEventListener("replay:step:start", handlers.onReplayStart);
+  doc.addEventListener("replay:step:end", handlers.onReplayEnd);
 }
 
 function detachHighlighterListeners(doc: Document, handlers: HighlighterHandlers): void {
-    doc.removeEventListener("mousemove", handlers.onMouseMove);
-    doc.removeEventListener(Events.KEYDOWN, handlers.onKeyDown);
-    doc.removeEventListener(Events.KEYUP, handlers.onKeyUp);
-    doc.removeEventListener("wheel", handlers.onWheel);
-    doc.removeEventListener("replay:step:start", handlers.onReplayStart);
-    doc.removeEventListener("replay:step:end", handlers.onReplayEnd);
+  doc.removeEventListener("mousemove", handlers.onMouseMove);
+  doc.removeEventListener(Events.KEYDOWN, handlers.onKeyDown);
+  doc.removeEventListener(Events.KEYUP, handlers.onKeyUp);
+  doc.removeEventListener("wheel", handlers.onWheel);
+  doc.removeEventListener("replay:step:start", handlers.onReplayStart);
+  doc.removeEventListener("replay:step:end", handlers.onReplayEnd);
 }
 
 function buildHighlighterHandle(
-    host: HTMLElement,
-    state: InternalState,
-    schedulePaint: () => void,
-    doc: Document,
-    handlers: HighlighterHandlers,
+  host: HTMLElement,
+  state: InternalState,
+  schedulePaint: () => void,
+  doc: Document,
+  handlers: HighlighterHandlers,
 ): HoverHighlighterHandle {
-    return {
-        Host: host,
-        SetMode(mode) {
-            state.OperationModeType = mode;
-            if (mode === "off") { state.HoverTarget = null; state.AncestorOffset = 0; }
-            schedulePaint();
-        },
-        GetMode() { return state.OperationModeType; },
-        Outline(target) { state.HoverTarget = target; state.AncestorOffset = 0; schedulePaint(); },
-        Destroy() { detachHighlighterListeners(doc, handlers); host.remove(); },
-    };
+  return {
+    Host: host,
+    SetMode(mode) {
+      state.OperationModeType = mode;
+      if (mode === "off") {
+        state.HoverTarget = null; state.AncestorOffset = 0; 
+      }
+
+      schedulePaint();
+    },
+    GetMode() {
+      return state.OperationModeType; 
+    },
+    Outline(target) {
+      state.HoverTarget = target; state.AncestorOffset = 0; schedulePaint(); 
+    },
+    Destroy() {
+      detachHighlighterListeners(doc, handlers); host.remove(); 
+    },
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -360,18 +430,18 @@ function buildHighlighterHandle(
 /* ------------------------------------------------------------------ */
 
 function applyRect(el: HTMLElement, r: DOMRect): void {
-    el.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
-    el.style.width = `${Math.round(r.width)}px`;
-    el.style.height = `${Math.round(r.height)}px`;
+  el.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
+  el.style.width = `${Math.round(r.width)}px`;
+  el.style.height = `${Math.round(r.height)}px`;
 }
 
 export function describeElement(el: Element, depthOffset: number): string {
-    const tag = el.tagName.toLowerCase();
-    const id = el.id !== "" ? `#${el.id}` : "";
-    const cls = typeof el.className === "string" && el.className !== ""
-        ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
-        : "";
-    const depth = depthOffset > 0 ? `  · depth +${depthOffset}` : "";
+  const tag = el.tagName.toLowerCase();
+  const id = el.id !== "" ? `#${el.id}` : "";
+  const cls = typeof el.className === "string" && el.className !== ""
+    ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
+    : "";
+  const depth = depthOffset > 0 ? `  · depth +${depthOffset}` : "";
 
-    return `${tag}${id}${cls}${depth}`;
+  return `${tag}${id}${cls}${depth}`;
 }

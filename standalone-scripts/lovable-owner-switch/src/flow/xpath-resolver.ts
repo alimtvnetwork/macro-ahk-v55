@@ -17,19 +17,19 @@ export interface ResolvedXPath {
 }
 
 const fromDefaults = (key: XPathKeyCodeType): ResolvedXPath => ({
-    XPath: DefaultXPaths[key],
-    DelayMs: DefaultDelaysMs[key],
+  XPath: DefaultXPaths[key],
+  DelayMs: DefaultDelaysMs[key],
 });
 
 export const resolveXPath = (
-    key: XPathKeyCodeType,
-    overrides: ReadonlyArray<XPathSettingSeed>,
+  key: XPathKeyCodeType,
+  overrides: ReadonlyArray<XPathSettingSeed>,
 ): ResolvedXPath => {
-    const match = overrides.find((row) => row.KeyCode === key);
+  const match = overrides.find((row) => row.KeyCode === key);
 
-    if (match === undefined) {
-        return fromDefaults(key);
-    }
+  if (match === undefined) {
+    return fromDefaults(key);
+  }
 
-    return { XPath: match.XPath, DelayMs: match.DelayMs };
+  return { XPath: match.XPath, DelayMs: match.DelayMs };
 };

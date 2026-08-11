@@ -37,6 +37,7 @@ function resetCheckButtonState(ctx: CheckButtonCtx): void {
     clearTimeout(ctx.checkInFlightTimer);
     ctx.checkInFlightTimer = null;
   }
+
   ctx.checkInFlight = false;
   ctx.checkBtn.textContent = '☑ Check';
   ctx.checkBtn.style.opacity = '1';
@@ -79,9 +80,17 @@ export function createCheckButton(deps: CheckButtonDeps): CheckButtonResult {
   checkBtn.textContent = '☑ Check';
   checkBtn.title = 'One-shot credit check';
   checkBtn.style.cssText = btnStyle + 'background:' + cBtnCheckGrad + ';color:#fff;box-shadow:' + cBtnCheckGlow + ';border:1px solid rgba(255,255,255,0.08);';
-  checkBtn.onmouseenter = function() { checkBtn.style.filter = 'brightness(1.12)'; checkBtn.style.boxShadow = '0 2px 8px rgba(232,71,95,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; };
-  checkBtn.onmouseleave = function() { checkBtn.style.filter = ''; checkBtn.style.boxShadow = cBtnCheckGlow; };
-  checkBtn.onmousedown = function() { checkBtn.style.filter = 'brightness(0.92)'; checkBtn.style.boxShadow = '0 0 4px rgba(232,71,95,0.2)'; };
+  checkBtn.onmouseenter = function() {
+    checkBtn.style.filter = 'brightness(1.12)'; checkBtn.style.boxShadow = '0 2px 8px rgba(232,71,95,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
+  };
+
+  checkBtn.onmouseleave = function() {
+    checkBtn.style.filter = ''; checkBtn.style.boxShadow = cBtnCheckGlow; 
+  };
+
+  checkBtn.onmousedown = function() {
+    checkBtn.style.filter = 'brightness(0.92)'; checkBtn.style.boxShadow = '0 0 4px rgba(232,71,95,0.2)'; 
+  };
 
   const ctx: CheckButtonCtx = {
     checkInFlight: false,
@@ -90,7 +99,9 @@ export function createCheckButton(deps: CheckButtonDeps): CheckButtonResult {
     updateAuthBadge: updateAuthBadge,
   };
 
-  checkBtn.onclick = function() { _handleCheckClick(ctx); };
+  checkBtn.onclick = function() {
+    _handleCheckClick(ctx); 
+  };
 
   return { checkBtn, resetCheckButtonState: () => resetCheckButtonState(ctx) };
 }
@@ -102,10 +113,13 @@ function _handleCheckClick(ctx: CheckButtonCtx): void {
 
     return;
   }
+
   if (state.isDelegating) {
     log('Check blocked: move/delegation in progress', 'warn');
     checkBtn.style.opacity = '0.5';
-    setTimeout(function() { checkBtn.style.opacity = '1'; }, Timings.POLL_INTERVAL_NORMAL);
+    setTimeout(function() {
+      checkBtn.style.opacity = '1'; 
+    }, Timings.POLL_INTERVAL_NORMAL);
 
     return;
   }
@@ -144,6 +158,7 @@ function _handleCheckClick(ctx: CheckButtonCtx): void {
         updateAuthBadge(false, 'none');
         showToast('⚠️ No auth token — check may be incomplete', 'warn');
       }
+
       checkBtn.textContent = '⏳ Checking…';
       doRunCheck(ctx);
     });

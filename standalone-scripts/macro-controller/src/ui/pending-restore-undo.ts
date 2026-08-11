@@ -66,79 +66,102 @@ export interface PendingRestoreUndo {
 }
 
 function safeLocalStorage(): Storage | null {
-    try {
-        if (typeof window === 'undefined' || !window.localStorage) return null;
-
-        return window.localStorage;
-    } catch {
-        return null;
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return null;
     }
+
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 }
 
 export function writePendingRestoreUndo(record: PendingRestoreUndo): void {
-    const store = safeLocalStorage();
-    if (!store) return;
-    try {
-        store.setItem(STORAGE_KEY, JSON.stringify(record));
-    } catch (err) {
-        logError(LOG_SCOPE, 'write failed', err);
-    }
+  const store = safeLocalStorage();
+  if (!store) {
+    return;
+  }
+
+  try {
+    store.setItem(STORAGE_KEY, JSON.stringify(record));
+  } catch (err) {
+    logError(LOG_SCOPE, 'write failed', err);
+  }
 }
 
 export function readPendingRestoreUndo(): PendingRestoreUndo | null {
-    const store = safeLocalStorage();
-    if (!store) return null;
-    let raw: string | null = null;
-    try {
-        raw = store.getItem(STORAGE_KEY);
-    } catch {
-        return null;
-    }
-    if (raw === null || raw === '') return null;
-    try {
-        const parsed = JSON.parse(raw) as PendingRestoreUndo;
-        if (!parsed || typeof parsed !== 'object') return null;
-        if (typeof parsed.expiresAt !== 'number' || typeof parsed.createdAt !== 'number') return null;
-        if (!parsed.payload || typeof parsed.payload !== 'object') return null;
+  const store = safeLocalStorage();
+  if (!store) {
+    return null;
+  }
 
-        return parsed;
-    } catch (err) {
-        logError(LOG_SCOPE, 'parse failed', err);
+  let raw: string | null = null;
+  try {
+    raw = store.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
 
-        return null;
+  if (raw === null || raw === '') {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as PendingRestoreUndo;
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
     }
+
+    if (typeof parsed.expiresAt !== 'number' || typeof parsed.createdAt !== 'number') {
+      return null;
+    }
+
+    if (!parsed.payload || typeof parsed.payload !== 'object') {
+      return null;
+    }
+
+    return parsed;
+  } catch (err) {
+    logError(LOG_SCOPE, 'parse failed', err);
+
+    return null;
+  }
 }
 
 export function clearPendingRestoreUndo(): void {
-    const store = safeLocalStorage();
-    if (!store) return;
-    try {
-        store.removeItem(STORAGE_KEY);
-    } catch (err) {
-        console.error();
-    }
+  const store = safeLocalStorage();
+  if (!store) {
+    return;
+  }
+
+  try {
+    store.removeItem(STORAGE_KEY);
+  } catch (err) {
+    console.error();
+  }
 }
 
 async function reverseUpdate(p: UpdatePayload): Promise<{ ok: boolean; error?: string }> {
-    const revert = await upsertPrompt({
-        id: p.restoredId,
-        previousBody: p.restoredBody,
-        previousReplaceKey: p.restoredReplaceKey,
-        slug: p.slug,
-        name: p.name,
-        body: p.preBody,
-        role: p.role,
-        replaceKey: p.preReplaceKey,
-        replaceValues: p.preReplaceValues,
-    });
+  const revert = await upsertPrompt({
+    id: p.restoredId,
+    previousBody: p.restoredBody,
+    previousReplaceKey: p.restoredReplaceKey,
+    slug: p.slug,
+    name: p.name,
+    body: p.preBody,
+    role: p.role,
+    replaceKey: p.preReplaceKey,
+    replaceValues: p.preReplaceValues,
+  });
 
-    return revert.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
+  return revert.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
 }
 
 async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: string }> {
-    const del = await deletePromptById(p.newId);
+  const del = await deletePromptById(p.newId);
 
-    return del.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
+  return del.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
 }
 
 /**
@@ -147,60 +170,65 @@ async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: s
  * toast clears the record. Returns `true` if a toast was re-rendered.
  */
 export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
-    const record = readPendingRestoreUndo();
-    if (!record) return false;
-    const remaining = record.expiresAt - now;
-    if (remaining <= 0) {
-        clearPendingRestoreUndo();
+  const record = readPendingRestoreUndo();
+  if (!record) {
+    return false;
+  }
 
-        return false;
+  const remaining = record.expiresAt - now;
+  if (remaining <= 0) {
+    clearPendingRestoreUndo();
+
+    return false;
+  }
+
+  const restoredId = record.payload.kind === 'update'
+    ? record.payload.restoredId
+    : record.payload.newId;
+
+  showUndoToast(record.message, async () => {
+    clearPendingRestoreUndo();
+    const result = record.payload.kind === 'update'
+      ? await reverseUpdate(record.payload)
+      : await reverseInsert(record.payload);
+    if (result.isFail) {
+      logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
+      showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
+
+      return;
     }
-    const restoredId = record.payload.kind === 'update'
-        ? record.payload.restoredId
-        : record.payload.newId;
 
-    showUndoToast(record.message, async () => {
-        clearPendingRestoreUndo();
-        const result = record.payload.kind === 'update'
-            ? await reverseUpdate(record.payload)
-            : await reverseInsert(record.payload);
-        if (result.isFail) {
-            logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
-            showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
+    showToast('↺ Reverted restore', 'success');
+  }, {
+    undoLabel: record.undoLabel,
+    timeoutMs: remaining,
+    restoredId,
+  });
 
-            return;
-        }
-        showToast('↺ Reverted restore', 'success');
-    }, {
-        undoLabel: record.undoLabel,
-        timeoutMs: remaining,
-        restoredId,
-    });
+  // Clear on expiry too. showUndoToast auto-dismisses after `remaining`;
+  // we drop the record shortly after to keep localStorage tidy even if
+  // the user never clicks Undo.
+  setTimeout(() => {
+    const current = readPendingRestoreUndo();
+    if (current && current.createdAt === record.createdAt) {
+      clearPendingRestoreUndo();
+    }
+  }, remaining + 500);
 
-    // Clear on expiry too. showUndoToast auto-dismisses after `remaining`;
-    // we drop the record shortly after to keep localStorage tidy even if
-    // the user never clicks Undo.
-    setTimeout(() => {
-        const current = readPendingRestoreUndo();
-        if (current && current.createdAt === record.createdAt) {
-            clearPendingRestoreUndo();
-        }
-    }, remaining + 500);
-
-    return true;
+  return true;
 }
 
 // Auto-hydrate on module load in a real browser context. Tests import the
 // named helpers directly and drive them explicitly, so we gate on
 // `document` to avoid firing during Node-side unit tests.
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-    // Defer to the next tick so consumers that import this module during
-    // extension boot don't race with database availability.
-    setTimeout(() => {
-        try {
-            hydratePendingRestoreUndo();
-        } catch (err) {
-            logError(LOG_SCOPE, 'auto-hydrate threw', err);
-        }
-    }, 0);
+  // Defer to the next tick so consumers that import this module during
+  // extension boot don't race with database availability.
+  setTimeout(() => {
+    try {
+      hydratePendingRestoreUndo();
+    } catch (err) {
+      logError(LOG_SCOPE, 'auto-hydrate threw', err);
+    }
+  }, 0);
 }

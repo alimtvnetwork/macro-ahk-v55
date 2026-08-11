@@ -124,8 +124,12 @@ describe('buildBreakdownTable — integration', () => {
       effectAllowed: '',
       dropEffect: '',
       _data: '',
-      setData(_t: string, v: string) { this._data = v; },
-      getData(_t: string) { return this._data; },
+      setData(_t: string, v: string) {
+        this._data = v; 
+      },
+      getData(_t: string) {
+        return this._data; 
+      },
     };
     fromRow.dispatchEvent(Object.assign(new Event('dragstart', { bubbles: true }), { dataTransfer: dt }));
     toRow.dispatchEvent(Object.assign(new Event('drop', { bubbles: true }), { dataTransfer: dt, preventDefault: () => {} }));

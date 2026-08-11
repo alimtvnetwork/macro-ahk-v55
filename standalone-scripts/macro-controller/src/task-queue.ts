@@ -35,13 +35,18 @@ const STATE_KEY = 'queue_state';
  */
 export async function loadTaskQueue(): Promise<TaskQueueState> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return { tasks: [], history: [], isPaused: false };
+  if (!projectId) {
+    return { tasks: [], history: [], isPaused: false };
+  }
 
   const store = getProjectKvStore('macro-controller');
   const stateData = await store.get<TaskQueueState>(SECTION, `${STATE_KEY}_${projectId}`);
 
   if (stateData) {
-    if (!stateData.history) stateData.history = [];
+    if (!stateData.history) {
+      stateData.history = [];
+    }
+
     log(`[TaskQueue] Loaded ${stateData.tasks.length} tasks and ${stateData.history.length} history items for project ${projectId}`, 'info');
 
     return stateData;
@@ -55,7 +60,9 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
  */
 export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return;
+  if (!projectId) {
+    return;
+  }
 
   const store = getProjectKvStore('macro-controller');
   await store.set(SECTION, `${STATE_KEY}_${projectId}`, queueState);
@@ -71,7 +78,9 @@ export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
  */
 export async function addTaskToQueue(prompt: string, projectName: string): Promise<MacroTask | null> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return null;
+  if (!projectId) {
+    return null;
+  }
 
   const queueState = await loadTaskQueue();
   const newTask: MacroTask = {
@@ -100,13 +109,21 @@ export async function updateTaskStatus(taskId: string, status: MacroTask['status
   if (index !== -1) {
     const task = queueState.tasks[index];
     task.status = status;
-    if (error) task.error = error;
+    if (error) {
+      task.error = error;
+    }
     
     // Move completed/failed to history
     if (status === 'completed' || status === 'failed') {
-      if (!queueState.history) queueState.history = [];
+      if (!queueState.history) {
+        queueState.history = [];
+      }
+
       queueState.history.unshift(task);
-      if (queueState.history.length > 50) queueState.history.pop();
+      if (queueState.history.length > 50) {
+        queueState.history.pop();
+      }
+
       queueState.tasks.splice(index, 1);
     }
     
@@ -184,7 +201,10 @@ export async function retryFailedTasks(): Promise<void> {
  * Bulk delete tasks by ID.
  */
 export async function bulkDeleteTasks(taskIds: string[]): Promise<void> {
-  if (taskIds.length === 0) return;
+  if (taskIds.length === 0) {
+    return;
+  }
+
   const queueState = await loadTaskQueue();
   const initialCount = queueState.tasks.length + (queueState.history?.length ?? 0);
   
@@ -206,7 +226,10 @@ export async function bulkDeleteTasks(taskIds: string[]): Promise<void> {
  * Bulk retry/re-queue tasks by ID.
  */
 export async function bulkRetryTasks(taskIds: string[]): Promise<void> {
-  if (taskIds.length === 0) return;
+  if (taskIds.length === 0) {
+    return;
+  }
+
   const queueState = await loadTaskQueue();
   let count = 0;
 
@@ -243,8 +266,13 @@ export async function bulkRetryTasks(taskIds: string[]): Promise<void> {
  * Shared queue delay countdown state.
  */
 let _queueDelayUntil = 0;
-export function setQueueDelayUntil(ts: number): void { _queueDelayUntil = ts; }
-export function getQueueDelayUntil(): number { return _queueDelayUntil; }
+export function setQueueDelayUntil(ts: number): void {
+  _queueDelayUntil = ts; 
+}
+
+export function getQueueDelayUntil(): number {
+  return _queueDelayUntil; 
+}
 
 /**
  * Reorder a task in the queue.
@@ -252,7 +280,9 @@ export function getQueueDelayUntil(): number { return _queueDelayUntil; }
 export async function reorderTask(taskId: string, direction: DirectionType): Promise<void> {
   const queueState = await loadTaskQueue();
   const index = queueState.tasks.findIndex(t => t.id === taskId);
-  if (index === -1) return;
+  if (index === -1) {
+    return;
+  }
 
   if (direction === 'up' && index > 0) {
     [queueState.tasks[index - 1], queueState.tasks[index]] = [queueState.tasks[index], queueState.tasks[index - 1]];

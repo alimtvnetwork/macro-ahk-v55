@@ -23,22 +23,22 @@ import { WorkspaceStorage } from "@/lib/workspace-storage";
 import initSqlJs, { type Database, type SqlJsStatic } from "sql.js";
 
 import {
-    StepLibraryDb,
-    type ProjectRow,
-    type StepGroupRow,
-    type StepRow,
+  StepLibraryDb,
+  type ProjectRow,
+  type StepGroupRow,
+  type StepRow,
 } from "@/background/recorder/step-library/db";
 import {
-    type GroupInputsMap,
+  type GroupInputsMap,
 } from "@/background/recorder/step-library/group-inputs";
 import { StepKindId } from "@/background/recorder/step-library/schema";
 import {
-    useBootstrap,
-    useRemoteBytesSync,
-    useLibraryMutations,
-    useGroupInputMutations,
-    useResetAndRetry,
-    useAssembleApi,
+  useBootstrap,
+  useRemoteBytesSync,
+  useLibraryMutations,
+  useGroupInputMutations,
+  useResetAndRetry,
+  useAssembleApi,
 } from "./step-library/step-library-hooks";
 import type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState } from "./use-step-library-types";
 import { SqlStageType } from "../../standalone-scripts/macro-controller/src/types/enums";
@@ -78,38 +78,40 @@ const DEFAULT_PROJECT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000001";
 // StepLibraryLoadError type is defined in `use-step-library-types.ts` and re-exported above.
 
 function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadError {
-    const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
-    if (stage === "sqljs") {
-        return {
-            Kind: "SqlJsLoad",
-            Message: message,
-            Hint: "Could not download the SQL engine (sql.js WASM) from the CDN. Check your internet connection, then click Retry.",
-            Recoverable: true,
-        };
-    }
-    if (stage === "storage-read") {
-        return {
-            Kind: "StorageRead",
-            Message: message,
-            Hint: "Your saved step-library data appears to be corrupted or unreadable. Click Reset to clear it and start with an empty library.",
-            Recoverable: true,
-        };
-    }
-    if (stage === "storage-write") {
-        return {
-            Kind: "StorageWrite",
-            Message: message,
-            Hint: "Browser storage is full or unavailable (private/incognito mode often blocks writes). Free up space or use a normal window, then Retry.",
-            Recoverable: true,
-        };
-    }
-
+  const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
+  if (stage === "sqljs") {
     return {
-        Kind: "Unknown",
-        Message: message,
-        Hint: "Something went wrong while opening the step library. Try retrying — if the problem persists, reset to clear local state.",
-        Recoverable: true,
+      Kind: "SqlJsLoad",
+      Message: message,
+      Hint: "Could not download the SQL engine (sql.js WASM) from the CDN. Check your internet connection, then click Retry.",
+      Recoverable: true,
     };
+  }
+
+  if (stage === "storage-read") {
+    return {
+      Kind: "StorageRead",
+      Message: message,
+      Hint: "Your saved step-library data appears to be corrupted or unreadable. Click Reset to clear it and start with an empty library.",
+      Recoverable: true,
+    };
+  }
+
+  if (stage === "storage-write") {
+    return {
+      Kind: "StorageWrite",
+      Message: message,
+      Hint: "Browser storage is full or unavailable (private/incognito mode often blocks writes). Free up space or use a normal window, then Retry.",
+      Recoverable: true,
+    };
+  }
+
+  return {
+    Kind: "Unknown",
+    Message: message,
+    Hint: "Something went wrong while opening the step library. Try retrying — if the problem persists, reset to clear local state.",
+    Recoverable: true,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -118,11 +120,11 @@ function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadEr
 
 let sqlPromise: Promise<SqlJsStatic> | null = null;
 function loadSql(): Promise<SqlJsStatic> {
-    if (sqlPromise === null) {
-        sqlPromise = initSqlJs({ locateFile: () => WASM_CDN_URL });
-    }
+  if (sqlPromise === null) {
+    sqlPromise = initSqlJs({ locateFile: () => WASM_CDN_URL });
+  }
 
-    return sqlPromise;
+  return sqlPromise;
 }
 
 /**
@@ -140,14 +142,16 @@ type StorageReadResult =
     | { Kind: "Error"; Error: unknown };
 
 async function readBytesFromStorage(): Promise<StorageReadResult> {
-    try {
-        const bytes = await WorkspaceStorage.get<Uint8Array>(STORAGE_KEY);
-        if (!bytes) return { Kind: "Empty" };
-
-        return { Kind: "Bytes", Bytes: bytes };
-    } catch (err) {
-        return { Kind: "Error", Error: err };
+  try {
+    const bytes = await WorkspaceStorage.get<Uint8Array>(STORAGE_KEY);
+    if (!bytes) {
+      return { Kind: "Empty" };
     }
+
+    return { Kind: "Bytes", Bytes: bytes };
+  } catch (err) {
+    return { Kind: "Error", Error: err };
+  }
 }
 
 /**
@@ -155,15 +159,15 @@ async function readBytesFromStorage(): Promise<StorageReadResult> {
  * distinguish "saved fine" from "stayed in memory only".
  */
 async function writeBytesToStorage(bytes: Uint8Array): Promise<{ Ok: true } | { Ok: false; Error: unknown }> {
-    try {
-        await WorkspaceStorage.set(STORAGE_KEY, bytes);
+  try {
+    await WorkspaceStorage.set(STORAGE_KEY, bytes);
 
-        return { Ok: true };
-    } catch (err) {
-        console.warn("useStepLibrary: WorkspaceStorage write failed", err);
+    return { Ok: true };
+  } catch (err) {
+    console.warn("useStepLibrary: WorkspaceStorage write failed", err);
 
-        return { Ok: false, Error: err };
-    }
+    return { Ok: false, Error: err };
+  }
 }
 
 type OpenLibraryResult =
@@ -172,37 +176,49 @@ type OpenLibraryResult =
     | { Kind: "Err"; Error: StepLibraryLoadError };
 
 function openDatabase(sqljs: SqlJsStatic, readResult: StorageReadResult): Database {
-    if (readResult.Kind === "Empty") return new sqljs.Database();
-    if (readResult.Kind === "Bytes") return new sqljs.Database(readResult.Bytes);
-
-    // Should never happen: caller filters "Error" before invoking us.
+  if (readResult.Kind === "Empty") {
     return new sqljs.Database();
+  }
+
+  if (readResult.Kind === "Bytes") {
+    return new sqljs.Database(readResult.Bytes);
+  }
+
+  // Should never happen: caller filters "Error" before invoking us.
+  return new sqljs.Database();
 }
 
 async function ensureProjectSeeded(wrapper: StepLibraryDb): Promise<{ ProjectId: number; SeedError: StepLibraryLoadError | null }> {
-    const existing = wrapper.listProjects();
-    if (existing.length > 0) return { ProjectId: existing[0].ProjectId, SeedError: null };
-    const projectId = wrapper.upsertProject({
-        ExternalId: DEFAULT_PROJECT_EXTERNAL_ID,
-        Name: DEFAULT_PROJECT_NAME,
-    });
-    seedExampleData(wrapper, projectId);
-    const writeResult = await writeBytesToStorage(wrapper.exportDbBytes());
-    if (writeResult.Ok) return { ProjectId: projectId, SeedError: null };
+  const existing = wrapper.listProjects();
+  if (existing.length > 0) {
+    return { ProjectId: existing[0].ProjectId, SeedError: null };
+  }
 
-    return { ProjectId: projectId, SeedError: classifyLoadError(writeResult.Error, "storage-write") };
+  const projectId = wrapper.upsertProject({
+    ExternalId: DEFAULT_PROJECT_EXTERNAL_ID,
+    Name: DEFAULT_PROJECT_NAME,
+  });
+  seedExampleData(wrapper, projectId);
+  const writeResult = await writeBytesToStorage(wrapper.exportDbBytes());
+  if (writeResult.Ok) {
+    return { ProjectId: projectId, SeedError: null };
+  }
+
+  return { ProjectId: projectId, SeedError: classifyLoadError(writeResult.Error, "storage-write") };
 }
 
 async function openLibraryAndMaybeSeed(sqljs: SqlJsStatic, readResult: StorageReadResult): Promise<OpenLibraryResult> {
-    try {
-        const wrapper = new StepLibraryDb(openDatabase(sqljs, readResult));
-        const seeded = await ensureProjectSeeded(wrapper);
-        if (seeded.SeedError !== null) return { Kind: "Err", Error: seeded.SeedError };
-
-        return { Kind: "Ok", Wrapper: wrapper, ProjectId: seeded.ProjectId, Bytes: wrapper.exportDbBytes() };
-    } catch (err) {
-        return { Kind: "Err", Error: classifyLoadError(err, "other") };
+  try {
+    const wrapper = new StepLibraryDb(openDatabase(sqljs, readResult));
+    const seeded = await ensureProjectSeeded(wrapper);
+    if (seeded.SeedError !== null) {
+      return { Kind: "Err", Error: seeded.SeedError };
     }
+
+    return { Kind: "Ok", Wrapper: wrapper, ProjectId: seeded.ProjectId, Bytes: wrapper.exportDbBytes() };
+  } catch (err) {
+    return { Kind: "Err", Error: classifyLoadError(err, "other") };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -217,68 +233,71 @@ async function openLibraryAndMaybeSeed(sqljs: SqlJsStatic, readResult: StorageRe
  * single memoized API surface.
  */
 export function useStepLibrary(): UseStepLibraryApi {
-    const [sql, setSql] = useState<SqlJsStatic | null>(null);
-    const [lib, setLib] = useState<StepLibraryDb | null>(null);
-    const [project, setProject] = useState<ProjectRow | null>(null);
-    const [groups, setGroups] = useState<ReadonlyArray<StepGroupRow>>([]);
-    const [stepsByGroup, setStepsByGroup] = useState<ReadonlyMap<number, ReadonlyArray<StepRow>>>(new Map());
-    const [error, setError] = useState<string | null>(null);
-    const [loadError, setLoadError] = useState<StepLibraryLoadError | null>(null);
-    const [groupInputs, setGroupInputs] = useState<GroupInputsMap>(() => new Map());
-    const [loading, setLoading] = useState(true);
-    const [dbBytes, setDbBytes] = useState<Uint8Array | null>(null);
-    const [bootstrapNonce, setBootstrapNonce] = useState(0);
+  const [sql, setSql] = useState<SqlJsStatic | null>(null);
+  const [lib, setLib] = useState<StepLibraryDb | null>(null);
+  const [project, setProject] = useState<ProjectRow | null>(null);
+  const [groups, setGroups] = useState<ReadonlyArray<StepGroupRow>>([]);
+  const [stepsByGroup, setStepsByGroup] = useState<ReadonlyMap<number, ReadonlyArray<StepRow>>>(new Map());
+  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<StepLibraryLoadError | null>(null);
+  const [groupInputs, setGroupInputs] = useState<GroupInputsMap>(() => new Map());
+  const [loading, setLoading] = useState(true);
+  const [dbBytes, setDbBytes] = useState<Uint8Array | null>(null);
+  const [bootstrapNonce, setBootstrapNonce] = useState(0);
 
-    useRemoteBytesSync({
-        sql, lib, project, dbBytes,
-        setLib, setGroups, setStepsByGroup, setDbBytes,
-        refreshFromDb,
-    });
+  useRemoteBytesSync({
+    sql, lib, project, dbBytes,
+    setLib, setGroups, setStepsByGroup, setDbBytes,
+    refreshFromDb,
+  });
 
-    useBootstrap({
-        bootstrapNonce, loadSql, resetSqlPromise, readBytesFromStorage,
-        openLibraryAndMaybeSeed, classifyLoadError, refreshFromDb,
-        setters: {
-            setSql, setLib, setProject, setGroups, setStepsByGroup,
-            setGroupInputs, setError, setLoadError, setLoading, setDbBytes,
-        },
-    });
+  useBootstrap({
+    bootstrapNonce, loadSql, resetSqlPromise, readBytesFromStorage,
+    openLibraryAndMaybeSeed, classifyLoadError, refreshFromDb,
+    setters: {
+      setSql, setLib, setProject, setGroups, setStepsByGroup,
+      setGroupInputs, setError, setLoadError, setLoading, setDbBytes,
+    },
+  });
 
-    const mutations = useLibraryMutations({
-        lib, project, stepsByGroup,
-        setGroups, setStepsByGroup, setDbBytes,
-        refreshFromDb, writeBytesToStorage,
-    });
-    const { setGroupInput, clearGroupInput } = useGroupInputMutations(setGroupInputs);
-    const { resetAll, retryLoad } = useResetAndRetry({
-        storageKey: STORAGE_KEY, resetSqlPromise, setBootstrapNonce,
-    });
+  const mutations = useLibraryMutations({
+    lib, project, stepsByGroup,
+    setGroups, setStepsByGroup, setDbBytes,
+    refreshFromDb, writeBytesToStorage,
+  });
+  const { setGroupInput, clearGroupInput } = useGroupInputMutations(setGroupInputs);
+  const { resetAll, retryLoad } = useResetAndRetry({
+    storageKey: STORAGE_KEY, resetSqlPromise, setBootstrapNonce,
+  });
 
-    return useAssembleApi({
-        loading, error, loadError, sql, lib, project, groups, stepsByGroup, groupInputs,
-        mutations, setGroupInput, clearGroupInput, resetAll, retryLoad,
-    });
+  return useAssembleApi({
+    loading, error, loadError, sql, lib, project, groups, stepsByGroup, groupInputs,
+    mutations, setGroupInput, clearGroupInput, resetAll, retryLoad,
+  });
 }
 
-function resetSqlPromise(): void { sqlPromise = null; }
+function resetSqlPromise(): void {
+  sqlPromise = null; 
+}
 
 /* ------------------------------------------------------------------ */
 /*  Internals                                                          */
 /* ------------------------------------------------------------------ */
 
 function refreshFromDb(
-    lib: StepLibraryDb,
-    projectId: number,
-    setGroups: (g: ReadonlyArray<StepGroupRow>) => void,
-    setStepsByGroup: (m: ReadonlyMap<number, ReadonlyArray<StepRow>>) => void,
+  lib: StepLibraryDb,
+  projectId: number,
+  setGroups: (g: ReadonlyArray<StepGroupRow>) => void,
+  setStepsByGroup: (m: ReadonlyMap<number, ReadonlyArray<StepRow>>) => void,
 ): void {
-    const groups = lib.listGroups(projectId);
-    setGroups(groups);
-    const map = new Map<number, ReadonlyArray<StepRow>>();
-    for (const g of groups) {
-        map.set(g.StepGroupId, lib.listSteps(g.StepGroupId));
-    }
-    setStepsByGroup(map);
+  const groups = lib.listGroups(projectId);
+  setGroups(groups);
+  const map = new Map<number, ReadonlyArray<StepRow>>();
+  for (const g of groups) {
+    map.set(g.StepGroupId, lib.listSteps(g.StepGroupId));
+  }
+
+  setStepsByGroup(map);
 }
 
 /**
@@ -287,63 +306,63 @@ function refreshFromDb(
  * the real recorder data.
  */
 function seedOnboardingClicks(lib: StepLibraryDb, onboarding: number, login: number): void {
-    lib.appendStep({
-        StepGroupId: onboarding,
-        StepKindId: StepKindId.Click,
-        LabelType: "Click Get Started",
-        PayloadJson: JSON.stringify({ Selector: "#get-started" }),
-    });
-    lib.appendStep({
-        StepGroupId: onboarding,
-        StepKindId: StepKindId.RunGroup,
-        LabelType: "Run Login subroutine",
-        TargetStepGroupId: login,
-    });
+  lib.appendStep({
+    StepGroupId: onboarding,
+    StepKindId: StepKindId.Click,
+    LabelType: "Click Get Started",
+    PayloadJson: JSON.stringify({ Selector: "#get-started" }),
+  });
+  lib.appendStep({
+    StepGroupId: onboarding,
+    StepKindId: StepKindId.RunGroup,
+    LabelType: "Run Login subroutine",
+    TargetStepGroupId: login,
+  });
 }
 
 function seedLoginSteps(lib: StepLibraryDb, login: number): void {
-    lib.appendStep({
-        StepGroupId: login,
-        StepKindId: StepKindId.Type,
-        LabelType: "Type email",
-        PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
-    });
-    lib.appendStep({
-        StepGroupId: login,
-        StepKindId: StepKindId.Click,
-        LabelType: "Click Sign in",
-        PayloadJson: JSON.stringify({ Selector: "#signin" }),
-    });
+  lib.appendStep({
+    StepGroupId: login,
+    StepKindId: StepKindId.Type,
+    LabelType: "Type email",
+    PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
+  });
+  lib.appendStep({
+    StepGroupId: login,
+    StepKindId: StepKindId.Click,
+    LabelType: "Click Sign in",
+    PayloadJson: JSON.stringify({ Selector: "#signin" }),
+  });
 }
 
 function seedExampleData(lib: StepLibraryDb, projectId: number): void {
-    const onboarding = lib.createGroup({
-        ProjectId: projectId, ParentStepGroupId: null,
-        Name: "Onboarding", Description: "End-to-end signup flow",
-    });
-    const login = lib.createGroup({
-        ProjectId: projectId, ParentStepGroupId: onboarding,
-        Name: "Login", Description: "Sign-in subroutine",
-    });
-    seedOnboardingClicks(lib, onboarding, login);
-    seedLoginSteps(lib, login);
-    lib.createGroup({
-        ProjectId: projectId, ParentStepGroupId: null,
-        Name: "Checkout", Description: "Cart + payment macros",
-    });
+  const onboarding = lib.createGroup({
+    ProjectId: projectId, ParentStepGroupId: null,
+    Name: "Onboarding", Description: "End-to-end signup flow",
+  });
+  const login = lib.createGroup({
+    ProjectId: projectId, ParentStepGroupId: onboarding,
+    Name: "Login", Description: "Sign-in subroutine",
+  });
+  seedOnboardingClicks(lib, onboarding, login);
+  seedLoginSteps(lib, login);
+  lib.createGroup({
+    ProjectId: projectId, ParentStepGroupId: null,
+    Name: "Checkout", Description: "Cart + payment macros",
+  });
 }
 
 /** StepKind id → human label, for the right-pane preview. */
 export function stepKindLabel(id: StepKindId): string {
-    switch (id) {
-        case StepKindId.Click:    return "Click";
-        case StepKindId.Type:     return "Type";
-        case StepKindId.Select:   return "Select";
-        case StepKindId.JsInline: return "JS";
-        case StepKindId.Wait:     return "Wait";
-        case StepKindId.RunGroup: return "Run group";
-        case StepKindId.Hotkey:      return "Hotkey";
-        case StepKindId.UrlTabClick: return "URL tab click";
-        default:                     return `Kind ${String(id)}`;
-    }
+  switch (id) {
+    case StepKindId.Click:    return "Click";
+    case StepKindId.Type:     return "Type";
+    case StepKindId.Select:   return "Select";
+    case StepKindId.JsInline: return "JS";
+    case StepKindId.Wait:     return "Wait";
+    case StepKindId.RunGroup: return "Run group";
+    case StepKindId.Hotkey:      return "Hotkey";
+    case StepKindId.UrlTabClick: return "URL tab click";
+    default:                     return `Kind ${String(id)}`;
+  }
 }

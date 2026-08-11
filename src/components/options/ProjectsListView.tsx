@@ -84,8 +84,11 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
       const confirmed = window.confirm(
         "⚠️ Replace All will DELETE all existing projects, scripts, and configs before importing.\n\nThis is destructive and cannot be undone. Continue?"
       );
-      if (!confirmed) return;
+      if (!confirmed) {
+        return;
+      }
     }
+
     sqliteFileRef.current?.click();
   };
 
@@ -112,7 +115,9 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
 
   const handleSqliteFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     setImporting(true);
     try {
@@ -146,6 +151,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
           description,
         );
       }
+
       window.location.reload();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Import failed";
@@ -157,7 +163,10 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
   }, [importMode]);
 
   const handleConfirmImport = useCallback(async () => {
-    if (!pendingFile || !preview) return;
+    if (!pendingFile || !preview) {
+      return;
+    }
+
     const summary = buildImportSummary(preview, "replace");
     setPreviewOpen(false);
     setImporting(true);
@@ -179,7 +188,10 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
   }, [pendingFile, preview]);
 
   const handleMergeImport = useCallback(async () => {
-    if (!pendingFile || !preview) return;
+    if (!pendingFile || !preview) {
+      return;
+    }
+
     const summary = buildImportSummary(preview, "merge");
     setPreviewOpen(false);
     setImporting(true);
@@ -285,7 +297,11 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
         <ToggleGroup
           type="single"
           value={importMode}
-          onValueChange={(mode) => { if (mode) setImportMode(mode as PopupActionsModeType); }}
+          onValueChange={(mode) => {
+            if (mode) {
+              setImportMode(mode as PopupActionsModeType);
+            } 
+          }}
           className="bg-muted/50 border border-border rounded-md p-0.5"
         >
           <ToggleGroupItem value="merge" className="text-xs h-7 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-sm">
@@ -355,7 +371,9 @@ interface BundlePreviewDialogProps {
 function BundlePreviewDialog({ open, preview, importing, onConfirm, onMerge, onCancel }: BundlePreviewDialogProps) {
   const [backingUp, setBackingUp] = useState(false);
 
-  if (!preview) return null;
+  if (!preview) {
+    return null;
+  }
 
   const handleBackupFirst = async () => {
     setBackingUp(true);
@@ -520,57 +538,59 @@ function CategoryBreakdownTable({ preview }: { preview: BundlePreview }) {
 
 // eslint-disable-next-line max-lines-per-function
 function DiffSection({ label, icon, items }: { label: string; icon: React.ReactNode; items: DiffItem[] }) {
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return null;
+  }
 
   const newCount = items.filter((i) => i.status === "new").length;
   const overwriteCount = items.filter((i) => i.status === "overwrite").length;
 
   return (
     <TooltipProvider delayDuration={200}>
-    <div>
-      <div className="flex items-center gap-2 mb-1">
-        <p className="text-xs font-semibold text-foreground">{label}</p>
-        {newCount > 0 && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 cursor-help">
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-xs font-semibold text-foreground">{label}</p>
+          {newCount > 0 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 cursor-help">
                 +{newCount} new
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs max-w-[200px]">
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs max-w-[200px]">
               Items not found locally — they will be added as new entries.
-            </TooltipContent>
-          </Tooltip>
-        )}
-        {overwriteCount > 0 && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-amber-500/40 text-amber-600 dark:text-amber-400 cursor-help">
-                {overwriteCount} overwrite
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs max-w-[200px]">
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {overwriteCount > 0 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-amber-500/40 text-amber-600 dark:text-amber-400 cursor-help">
+                  {overwriteCount} overwrite
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs max-w-[200px]">
               Items with matching IDs already exist — they will be replaced with the imported version.
-            </TooltipContent>
-          </Tooltip>
-        )}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+        <ul className="space-y-0.5">
+          {items.map((item, i) => (
+            <li key={i} className="text-xs text-muted-foreground flex items-center gap-1.5">
+              {icon}
+              <span className="flex-1 truncate">{item.name}</span>
+              <span className={`text-[9px] font-medium uppercase tracking-wider ${
+                item.status === "new"
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-amber-600 dark:text-amber-400"
+              }`}>
+                {item.status}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="space-y-0.5">
-        {items.map((item, i) => (
-          <li key={i} className="text-xs text-muted-foreground flex items-center gap-1.5">
-            {icon}
-            <span className="flex-1 truncate">{item.name}</span>
-            <span className={`text-[9px] font-medium uppercase tracking-wider ${
-              item.status === "new"
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-amber-600 dark:text-amber-400"
-            }`}>
-              {item.status}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
     </TooltipProvider>
   );
 }
@@ -729,14 +749,21 @@ function SelectProjectsExportDialog({
 
   // Reset selection whenever the dialog opens so re-opens start clean.
   const handleOpenChange = (next: boolean) => {
-    if (!next) setSelectedIds(new Set());
+    if (!next) {
+      setSelectedIds(new Set());
+    }
+
     onOpenChange(next);
   };
 
   const toggle = (id: string, on: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (on) next.add(id); else next.delete(id);
+      if (on) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
 
       return next;
     });
@@ -755,6 +782,7 @@ function SelectProjectsExportDialog({
 
       return;
     }
+
     setBusy(true);
     try {
       // Multi-select uses the same real-SQLite-in-ZIP format as the full
@@ -829,7 +857,9 @@ function SelectProjectsExportDialog({
             Cancel
           </Button>
           <Button
-            onClick={() => { void handleExport(); }}
+            onClick={() => {
+              void handleExport(); 
+            }}
             disabled={busy || selectedIds.size === 0}
             data-testid="projects-export-selected-apply"
           >

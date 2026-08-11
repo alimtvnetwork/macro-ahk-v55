@@ -32,7 +32,10 @@ function isReadMemoryRow(value: unknown): value is ReadMemoryRow {
 function coerceRows(rows: readonly unknown[]): ReadMemoryRow[] {
   const out: ReadMemoryRow[] = [];
   for (const raw of rows) {
-    if (!isReadMemoryRow(raw)) continue;
+    if (!isReadMemoryRow(raw)) {
+      continue;
+    }
+
     const flag = typeof raw.IsDefault === 'number' ? raw.IsDefault : Number(raw.IsDefault);
     out.push({ Id: raw.Id, Slug: raw.Slug, Name: raw.Name, IsDefault: Number.isFinite(flag) ? flag : 0 });
   }
@@ -48,7 +51,9 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + "OR Name LIKE '" + DUPLICATE_PREFIX + "%' "
     + 'ORDER BY IsDefault DESC, Slug ASC';
   const resp = await runSqlBridge('QUERY', sql);
-  if (resp.isFail || !Array.isArray(resp.rows)) return [];
+  if (resp.isFail || !Array.isArray(resp.rows)) {
+    return [];
+  }
 
   return coerceRows(resp.rows as unknown[]);
 }
@@ -84,6 +89,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
 
     return false;
   }
+
   await invalidateJsonCopy();
 
   return true;
@@ -120,8 +126,13 @@ function buildDeactivateButton(row: ReadMemoryRow, onDone: () => void): HTMLElem
     'padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;'
     + 'border:1px solid rgba(255,255,255,0.15);cursor:' + (disabled ? 'not-allowed' : 'pointer') + ';'
     + 'color:#fff;background:' + (disabled ? 'rgba(75,85,99,0.4)' : '#dc2626') + ';';
-  if (isCanonical) btn.title = 'Cannot deactivate the canonical Read Memory prompt';
-  btn.onclick = () => { void handleDeactivateClick(row, btn, onDone); };
+  if (isCanonical) {
+    btn.title = 'Cannot deactivate the canonical Read Memory prompt';
+  }
+
+  btn.onclick = () => {
+    void handleDeactivateClick(row, btn, onDone); 
+  };
 
   return btn;
 }
@@ -136,6 +147,7 @@ async function handleDeactivateClick(row: ReadMemoryRow, btn: HTMLButtonElement,
 
     return;
   }
+
   btn.disabled = false;
   btn.textContent = 'Retry';
 }
@@ -150,6 +162,7 @@ function buildTableHeader(): HTMLElement {
     styleCell(th, 'font-weight:700;color:#fff;');
     tr.appendChild(th);
   }
+
   thead.appendChild(tr);
 
   return thead;
@@ -158,8 +171,12 @@ function buildTableHeader(): HTMLElement {
 function appendCell(tr: HTMLElement, content: string | HTMLElement, mono = false): void {
   const td = document.createElement('td');
   styleCell(td, mono ? 'font-family:ui-monospace,monospace;' : '');
-  if (typeof content === 'string') td.textContent = content;
-  else td.appendChild(content);
+  if (typeof content === 'string') {
+    td.textContent = content;
+  } else {
+    td.appendChild(content);
+  }
+
   tr.appendChild(td);
 }
 
@@ -194,7 +211,10 @@ function buildTable(rows: readonly ReadMemoryRow[], onDone: () => void): HTMLEle
   table.style.cssText = 'width:100%;border-collapse:collapse;background:transparent;';
   table.appendChild(buildTableHeader());
   const tbody = document.createElement('tbody');
-  for (const row of rows) tbody.appendChild(buildRow(row, onDone));
+  for (const row of rows) {
+    tbody.appendChild(buildRow(row, onDone));
+  }
+
   table.appendChild(tbody);
 
   return table;
@@ -235,7 +255,12 @@ function mountBackdrop(panel: HTMLElement, onClose: () => void): HTMLElement {
   backdrop.style.cssText =
     'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,0.55);'
     + 'display:flex;align-items:center;justify-content:center;';
-  backdrop.onclick = (evt) => { if (evt.target === backdrop) onClose(); };
+  backdrop.onclick = (evt) => {
+    if (evt.target === backdrop) {
+      onClose();
+    } 
+  };
+
   backdrop.appendChild(panel);
   document.body.appendChild(backdrop);
 
@@ -254,25 +279,39 @@ function buildPanel(): HTMLElement {
 
 async function renderBody(panel: HTMLElement, refresh: () => Promise<void>): Promise<void> {
   const body = panel.querySelector<HTMLElement>('[data-role="body"]');
-  if (!body) return;
+  if (!body) {
+    return;
+  }
+
   body.replaceChildren(buildLoadingState());
   const rows = await fetchReadMemoryRows();
   const parts: HTMLElement[] = [buildSubtitle(rows.length)];
-  parts.push(rows.length === 0 ? buildEmptyState() : buildTable(rows, () => { void refresh(); }));
+  parts.push(rows.length === 0 ? buildEmptyState() : buildTable(rows, () => {
+    void refresh(); 
+  }));
   body.replaceChildren(...parts);
 }
 
 /** Open the Read Memory admin modal. Idempotent: no-op if already open. */
 export async function openReadMemoryAdminModal(): Promise<void> {
-  if (document.getElementById(MODAL_ID)) return;
+  if (document.getElementById(MODAL_ID)) {
+    return;
+  }
+
   const panel = buildPanel();
-  const close = (): void => { document.getElementById(MODAL_ID)?.remove(); };
+  const close = (): void => {
+    document.getElementById(MODAL_ID)?.remove(); 
+  };
+
   panel.appendChild(buildHeader(close));
   const body = document.createElement('div');
   body.setAttribute('data-role', 'body');
   panel.appendChild(body);
   mountBackdrop(panel, close);
-  const refresh = async (): Promise<void> => { await renderBody(panel, refresh); };
+  const refresh = async (): Promise<void> => {
+    await renderBody(panel, refresh); 
+  };
+
   await refresh();
 }
 

@@ -53,6 +53,7 @@ async function populate(refs: RenderRefs): Promise<void> {
 
       return;
     }
+
     rows = listed.value ?? [];
   } catch (err) {
     logError('NextSelector', 'listPromptsByRole threw', err);
@@ -72,9 +73,13 @@ async function populate(refs: RenderRefs): Promise<void> {
     opt.value = String(row.Id);
     const marker = row.IsDefault ? '★ ' : '';
     opt.textContent = marker + row.Name;
-    if (row.IsDefault) opt.selected = true;
+    if (row.IsDefault) {
+      opt.selected = true;
+    }
+
     refs.select.appendChild(opt);
   }
+
   refs.select.disabled = false;
   refs.editBtn.disabled = false;
 }
@@ -82,7 +87,10 @@ async function populate(refs: RenderRefs): Promise<void> {
 async function onSelectionChanged(refs: RenderRefs): Promise<void> {
   const raw = refs.select.value;
   const id = Number.parseInt(raw, 10);
-  if (!Number.isFinite(id) || id <= 0) return;
+  if (!Number.isFinite(id) || id <= 0) {
+    return;
+  }
+
   try {
     const result = await setDefaultPromptForRole(id, 'next');
     if (result.isFail) {
@@ -91,6 +99,7 @@ async function onSelectionChanged(refs: RenderRefs): Promise<void> {
 
       return;
     }
+
     log('NextSelector: default next prompt set to Id=' + id, 'info');
     showPasteToast('▶ Next prompt switched', false);
     await populate(refs);
@@ -109,6 +118,7 @@ async function onEditClicked(refs: RenderRefs): Promise<void> {
     } else {
       await openPromptEditor({ role: 'next' });
     }
+
     // Refresh names/labels in case the user renamed the prompt.
     await populate(refs);
   } catch (err) {
@@ -152,7 +162,9 @@ export function buildNextSelectorControl(): HTMLElement {
 
   const refs: RenderRefs = { select, editBtn, hint };
 
-  select.addEventListener('change', function () { void onSelectionChanged(refs); });
+  select.addEventListener('change', function () {
+    void onSelectionChanged(refs); 
+  });
   editBtn.addEventListener('click', function (ev) {
     ev.preventDefault();
     ev.stopPropagation();

@@ -15,54 +15,57 @@ import { BulkRenameSequenceDialog } from "@/components/recorder/KeywordEventBulk
 import { logError } from "@/components/recorder/recorder-logger";
 
 describe("BulkRenameSequenceDialog help tooltip", () => {
-    beforeEach(() => {
-        try { localStorage.clear(); } catch (err) {
-        logError("AutoCatch", "Automatically caught swallowed error", err); }
-    });
+  beforeEach(() => {
+    try {
+      localStorage.clear(); 
+    } catch (err) {
+      logError("AutoCatch", "Automatically caught swallowed error", err); 
+    }
+  });
 
-    function renderOpen(): void {
-        render(
-            <BulkRenameSequenceDialog
-                open
-                onOpenChange={() => {}}
-                selectedEvents={[
+  function renderOpen(): void {
+    render(
+      <BulkRenameSequenceDialog
+        open
+        onOpenChange={() => {}}
+        selectedEvents={[
                     { Id: "a", Keyword: "alpha", Enabled: true } as never,
                     { Id: "b", Keyword: "beta", Enabled: true } as never,
-                ]}
-                allEvents={[]}
-                onApply={() => {}}
-            />,
-        );
-    }
+        ]}
+        allEvents={[]}
+        onApply={() => {}}
+      />,
+    );
+  }
 
-    it("exposes a help trigger with an accessible label", () => {
-        renderOpen();
-        const trigger = screen.getByTestId("keyword-events-bulk-rename-help");
-        expect(trigger).toHaveAttribute("aria-label", "How {n} and Separator work");
+  it("exposes a help trigger with an accessible label", () => {
+    renderOpen();
+    const trigger = screen.getByTestId("keyword-events-bulk-rename-help");
+    expect(trigger).toHaveAttribute("aria-label", "How {n} and Separator work");
+  });
+
+  it("reveals the {n} + Separator example text when focused", async () => {
+    renderOpen();
+    const trigger = screen.getByTestId("keyword-events-bulk-rename-help");
+
+    await act(async () => {
+      trigger.focus();
+      fireEvent.focus(trigger);
+      fireEvent.pointerEnter(trigger);
+      fireEvent.mouseEnter(trigger);
+      // Allow Radix's open-delay (150ms) to elapse.
+      await new Promise(r => setTimeout(r, 200));
     });
 
-    it("reveals the {n} + Separator example text when focused", async () => {
-        renderOpen();
-        const trigger = screen.getByTestId("keyword-events-bulk-rename-help");
+    // Radix portals the tooltip — search the whole document.
+    const bodyText = document.body.textContent ?? "";
 
-        await act(async () => {
-            trigger.focus();
-            fireEvent.focus(trigger);
-            fireEvent.pointerEnter(trigger);
-            fireEvent.mouseEnter(trigger);
-            // Allow Radix's open-delay (150ms) to elapse.
-            await new Promise(r => setTimeout(r, 200));
-        });
-
-        // Radix portals the tooltip — search the whole document.
-        const bodyText = document.body.textContent ?? "";
-
-        expect(bodyText).toContain("How sequencing works");
-        expect(bodyText).toContain("{n}");
-        expect(bodyText).toContain("Login {n}");
-        expect(bodyText).toContain("Login 01");
-        expect(bodyText).toContain("Login 02");
-        expect(bodyText).toContain("Separator");
-        expect(bodyText).toContain("Step-01");
-    });
+    expect(bodyText).toContain("How sequencing works");
+    expect(bodyText).toContain("{n}");
+    expect(bodyText).toContain("Login {n}");
+    expect(bodyText).toContain("Login 01");
+    expect(bodyText).toContain("Login 02");
+    expect(bodyText).toContain("Separator");
+    expect(bodyText).toContain("Step-01");
+  });
 });

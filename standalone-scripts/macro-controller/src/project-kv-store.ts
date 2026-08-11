@@ -100,7 +100,10 @@ function txGet<T>(db: IDBDatabase, key: string): Promise<T | null> {
       const rec = req.result as KvRecord | undefined;
       resolve(rec ? (rec.value as T) : null);
     };
-    req.onerror = function () { reject(req.error); };
+
+    req.onerror = function () {
+      reject(req.error); 
+    };
   });
 }
 
@@ -109,8 +112,13 @@ function txPut(db: IDBDatabase, record: KvRecord): Promise<void> {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     const req = store.put(record);
-    req.onsuccess = function () { resolve(); };
-    req.onerror = function () { reject(req.error); };
+    req.onsuccess = function () {
+      resolve(); 
+    };
+
+    req.onerror = function () {
+      reject(req.error); 
+    };
   });
 }
 
@@ -119,8 +127,13 @@ function txDelete(db: IDBDatabase, key: string): Promise<void> {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     const req = store.delete(key);
-    req.onsuccess = function () { resolve(); };
-    req.onerror = function () { reject(req.error); };
+    req.onsuccess = function () {
+      resolve(); 
+    };
+
+    req.onerror = function () {
+      reject(req.error); 
+    };
   });
 }
 
@@ -131,9 +144,14 @@ function txGetAllBySection(db: IDBDatabase, section: string): Promise<KvRecord[]
     const req = store.getAll();
     req.onsuccess = function () {
       const all = (req.result || []) as KvRecord[];
-      resolve(all.filter(function (r) { return r.section === section; }));
+      resolve(all.filter(function (r) {
+        return r.section === section; 
+      }));
     };
-    req.onerror = function () { reject(req.error); };
+
+    req.onerror = function () {
+      reject(req.error); 
+    };
   });
 }
 
@@ -148,6 +166,7 @@ async function getDb(projectName: string): Promise<IDBDatabase> {
   if (dbCache[dbName]) {
     return dbCache[dbName];
   }
+
   const db = await openDb(dbName);
   dbCache[dbName] = db;
 

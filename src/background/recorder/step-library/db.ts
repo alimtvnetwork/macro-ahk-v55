@@ -71,110 +71,113 @@ export interface StepRow {
  * in a fresh DB or a deserialised one.
  */
 export class StepLibraryDb {
-    constructor(private readonly db: Database) {
-        applySchema(db);
-    }
+  constructor(private readonly db: Database) {
+    applySchema(db);
+  }
 
-    /** Direct DB access for the persistence/export layer. */
-    get raw(): Database { return this.db; }
+  /** Direct DB access for the persistence/export layer. */
+  get raw(): Database {
+    return this.db; 
+  }
 
-    /* -------------------- Project --------------------------------- */
+  /* -------------------- Project --------------------------------- */
 
-    upsertProject(input: { ExternalId: string; Name: string }): number {
-        const stmt = this.db.prepare(
-            `INSERT INTO Project (ProjectExternalId, Name) VALUES (?, ?)
+  upsertProject(input: { ExternalId: string; Name: string }): number {
+    const stmt = this.db.prepare(
+      `INSERT INTO Project (ProjectExternalId, Name) VALUES (?, ?)
              ON CONFLICT(ProjectExternalId) DO UPDATE SET
                  Name = excluded.Name,
                  UpdatedAt = datetime('now')
              RETURNING ProjectId;`,
-        );
-        try {
-            stmt.bind([input.ExternalId, input.Name]);
-            if (!stmt.step()) {
-                throw new Error("upsertProject: RETURNING returned no row");
-            }
-            const row = stmt.getAsObject();
+    );
+    try {
+      stmt.bind([input.ExternalId, input.Name]);
+      if (!stmt.step()) {
+        throw new Error("upsertProject: RETURNING returned no row");
+      }
 
-            return row.ProjectId as number;
-        } finally {
-            stmt.free();
-        }
+      const row = stmt.getAsObject();
+
+      return row.ProjectId as number;
+    } finally {
+      stmt.free();
     }
+  }
 
-    listProjects(): readonly ProjectRow[] {
-        return this.selectAll<ProjectRow>(
-            `SELECT ProjectId, ProjectExternalId, Name, CreatedAt, UpdatedAt
+  listProjects(): readonly ProjectRow[] {
+    return this.selectAll<ProjectRow>(
+      `SELECT ProjectId, ProjectExternalId, Name, CreatedAt, UpdatedAt
              FROM Project ORDER BY Name COLLATE NOCASE ASC;`,
-        );
-    }
+    );
+  }
 
-    /* -------------------- StepGroup ------------------------------- */
+  /* -------------------- StepGroup ------------------------------- */
 
-    listGroups(projectId: number): readonly StepGroupRow[] {
-        return this.selectAll<StepGroupRow>(
-            `SELECT StepGroupId, ProjectId, ParentStepGroupId, Name, Description,
+  listGroups(projectId: number): readonly StepGroupRow[] {
+    return this.selectAll<StepGroupRow>(
+      `SELECT StepGroupId, ProjectId, ParentStepGroupId, Name, Description,
                     OrderIndex, IsArchived, CreatedAt, UpdatedAt
              FROM StepGroup
              WHERE ProjectId = ?
              ORDER BY ParentStepGroupId IS NULL DESC,
                       ParentStepGroupId ASC,
                       OrderIndex ASC, Name COLLATE NOCASE ASC;`,
-            [projectId],
-        ).map(coerceGroupRow);
-    }
+      [projectId],
+    ).map(coerceGroupRow);
+  }
 
-    createGroup(input: {
+  createGroup(input: {
         ProjectId: number;
         ParentStepGroupId: number | null;
         Name: string;
         Description?: string | null;
         OrderIndex?: number;
     }): number {
-        const stmt = this.db.prepare(
-            `INSERT INTO StepGroup
+    const stmt = this.db.prepare(
+      `INSERT INTO StepGroup
                 (ProjectId, ParentStepGroupId, Name, Description, OrderIndex)
              VALUES (?, ?, ?, ?, ?)
              RETURNING StepGroupId;`,
-        );
-        try {
-            stmt.bind([
-                input.ProjectId,
-                input.ParentStepGroupId,
-                input.Name,
-                input.Description ?? null,
-                input.OrderIndex ?? 0,
-            ]);
-            if (!stmt.step()) {
-                throw new Error("createGroup: RETURNING returned no row");
-            }
+    );
+    try {
+      stmt.bind([
+        input.ProjectId,
+        input.ParentStepGroupId,
+        input.Name,
+        input.Description ?? null,
+        input.OrderIndex ?? 0,
+      ]);
+      if (!stmt.step()) {
+        throw new Error("createGroup: RETURNING returned no row");
+      }
 
-            return stmt.getAsObject().StepGroupId as number;
-        } finally {
-            stmt.free();
-        }
+      return stmt.getAsObject().StepGroupId as number;
+    } finally {
+      stmt.free();
     }
+  }
 
-    renameGroup(stepGroupId: number, newName: string): void {
-        this.exec(
-            `UPDATE StepGroup SET Name = ?, UpdatedAt = datetime('now')
+  renameGroup(stepGroupId: number, newName: string): void {
+    this.exec(
+      `UPDATE StepGroup SET Name = ?, UpdatedAt = datetime('now')
              WHERE StepGroupId = ?;`,
-            [newName, stepGroupId],
-        );
-    }
+      [newName, stepGroupId],
+    );
+  }
 
-    moveGroup(stepGroupId: number, newParentId: number | null): void {
-        this.exec(
-            `UPDATE StepGroup SET ParentStepGroupId = ?, UpdatedAt = datetime('now')
+  moveGroup(stepGroupId: number, newParentId: number | null): void {
+    this.exec(
+      `UPDATE StepGroup SET ParentStepGroupId = ?, UpdatedAt = datetime('now')
              WHERE StepGroupId = ?;`,
-            [newParentId, stepGroupId],
-        );
-    }
+      [newParentId, stepGroupId],
+    );
+  }
 
-    deleteGroup(stepGroupId: number): void {
-        this.exec(`DELETE FROM StepGroup WHERE StepGroupId = ?;`, [stepGroupId]);
-    }
+  deleteGroup(stepGroupId: number): void {
+    this.exec(`DELETE FROM StepGroup WHERE StepGroupId = ?;`, [stepGroupId]);
+  }
 
-    /**
+  /**
      * Reorder sibling groups under a single parent. Behaves like
      * `reorderSteps`: validates that every supplied id belongs to the
      * given (project, parent) bucket and that the count matches the
@@ -183,297 +186,310 @@ export class StepLibraryDb {
      *
      * `parentStepGroupId === null` reorders root-level groups.
      */
-    reorderGroups(
-        projectId: number,
-        parentStepGroupId: number | null,
-        orderedStepGroupIds: readonly number[],
-    ): void {
-        const owned = new Set(
-            this.listGroups(projectId)
-                .filter((g) => (g.ParentStepGroupId ?? null) === parentStepGroupId)
-                .map((g) => g.StepGroupId),
-        );
-        this.assertReorderIdsOwned(owned, orderedStepGroupIds, parentStepGroupId, projectId);
-        this.runReorderTransaction(orderedStepGroupIds);
-    }
+  reorderGroups(
+    projectId: number,
+    parentStepGroupId: number | null,
+    orderedStepGroupIds: readonly number[],
+  ): void {
+    const owned = new Set(
+      this.listGroups(projectId)
+        .filter((g) => (g.ParentStepGroupId ?? null) === parentStepGroupId)
+        .map((g) => g.StepGroupId),
+    );
+    this.assertReorderIdsOwned(owned, orderedStepGroupIds, parentStepGroupId, projectId);
+    this.runReorderTransaction(orderedStepGroupIds);
+  }
 
-    private assertReorderIdsOwned(
-        owned: ReadonlySet<number>,
-        orderedStepGroupIds: readonly number[],
-        parentStepGroupId: number | null,
-        projectId: number,
-    ): void {
-        for (const id of orderedStepGroupIds) {
-            if (!owned.has(id)) {
-                throw new Error(
-                    `reorderGroups: StepGroupId ${id} is not a child of parent=${String(parentStepGroupId)} ` +
+  private assertReorderIdsOwned(
+    owned: ReadonlySet<number>,
+    orderedStepGroupIds: readonly number[],
+    parentStepGroupId: number | null,
+    projectId: number,
+  ): void {
+    for (const id of orderedStepGroupIds) {
+      if (!owned.has(id)) {
+        throw new Error(
+          `reorderGroups: StepGroupId ${id} is not a child of parent=${String(parentStepGroupId)} ` +
                     `in ProjectId=${projectId}. Refusing partial reorder, would corrupt OrderIndex.`,
-                );
-            }
-        }
-        if (orderedStepGroupIds.length !== owned.size) {
-            throw new Error(
-                `reorderGroups: expected ${owned.size} sibling ids, got ${orderedStepGroupIds.length}. ` +
+        );
+      }
+    }
+
+    if (orderedStepGroupIds.length !== owned.size) {
+      throw new Error(
+        `reorderGroups: expected ${owned.size} sibling ids, got ${orderedStepGroupIds.length}. ` +
                 `Caller must pass the COMPLETE list of siblings under parent=${String(parentStepGroupId)}.`,
-            );
-        }
+      );
     }
+  }
 
-    private runReorderTransaction(orderedStepGroupIds: readonly number[]): void {
-        this.db.exec("BEGIN;");
-        try {
-            const stmt = this.db.prepare(
-                `UPDATE StepGroup SET OrderIndex = ?, UpdatedAt = datetime('now')
+  private runReorderTransaction(orderedStepGroupIds: readonly number[]): void {
+    this.db.exec("BEGIN;");
+    try {
+      const stmt = this.db.prepare(
+        `UPDATE StepGroup SET OrderIndex = ?, UpdatedAt = datetime('now')
                  WHERE StepGroupId = ?;`,
-            );
-            try {
-                for (let i = 0; i < orderedStepGroupIds.length; i++) {
-                    stmt.run([i, orderedStepGroupIds[i]]);
-                }
-            } finally {
-                stmt.free();
-            }
-            this.db.exec("COMMIT;");
-        } catch (e) {
-            this.db.exec("ROLLBACK;");
-            throw e;
+      );
+      try {
+        for (let i = 0; i < orderedStepGroupIds.length; i++) {
+          stmt.run([i, orderedStepGroupIds[i]]);
         }
-    }
+      } finally {
+        stmt.free();
+      }
 
-    /**
+      this.db.exec("COMMIT;");
+    } catch (e) {
+      this.db.exec("ROLLBACK;");
+      throw e;
+    }
+  }
+
+  /**
      * Toggle the `IsArchived` flag on a single group. Archiving does
      * NOT touch nested groups or steps — they remain queryable; the UI
      * is responsible for hiding archived subtrees behind a toggle.
      */
-    setGroupArchived(stepGroupId: number, archived: boolean): void {
-        this.exec(
-            `UPDATE StepGroup SET IsArchived = ?, UpdatedAt = datetime('now')
+  setGroupArchived(stepGroupId: number, archived: boolean): void {
+    this.exec(
+      `UPDATE StepGroup SET IsArchived = ?, UpdatedAt = datetime('now')
              WHERE StepGroupId = ?;`,
-            [archived ? 1 : 0, stepGroupId],
-        );
-    }
+      [archived ? 1 : 0, stepGroupId],
+    );
+  }
 
-    /* -------------------- Step ------------------------------------ */
+  /* -------------------- Step ------------------------------------ */
 
-    listSteps(stepGroupId: number): readonly StepRow[] {
-        return this.selectAll<StepRow>(
-            `SELECT StepId, StepGroupId, OrderIndex, StepKindId, LabelType,
+  listSteps(stepGroupId: number): readonly StepRow[] {
+    return this.selectAll<StepRow>(
+      `SELECT StepId, StepGroupId, OrderIndex, StepKindId, LabelType,
                     PayloadJson, TargetStepGroupId, IsDisabled, CreatedAt, UpdatedAt
              FROM Step
              WHERE StepGroupId = ?
              ORDER BY OrderIndex ASC, StepId ASC;`,
-            [stepGroupId],
-        ).map(coerceStepRow);
-    }
+      [stepGroupId],
+    ).map(coerceStepRow);
+  }
 
-    appendStep(input: {
+  appendStep(input: {
         StepGroupId: number;
         StepKindId: StepKindId;
         LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }): number {
-        this.assertAppendStepInvariants(input);
-        const nextOrder = this.scalarNumber(
-            `SELECT COALESCE(MAX(OrderIndex), -1) + 1 FROM Step WHERE StepGroupId = ?;`,
-            [input.StepGroupId],
-        );
+    this.assertAppendStepInvariants(input);
+    const nextOrder = this.scalarNumber(
+      `SELECT COALESCE(MAX(OrderIndex), -1) + 1 FROM Step WHERE StepGroupId = ?;`,
+      [input.StepGroupId],
+    );
 
-        return this.insertStepRow(input, nextOrder);
-    }
+    return this.insertStepRow(input, nextOrder);
+  }
 
-    private assertAppendStepInvariants(input: {
+  private assertAppendStepInvariants(input: {
         StepKindId: StepKindId;
         TargetStepGroupId?: number | null;
     }): void {
-        const isRunGroup = input.StepKindId === StepKindId.RunGroup;
-        const hasTarget = input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null;
-        if (isRunGroup && !hasTarget) {
-            throw new Error(
-                "appendStep: StepKind=RunGroup requires TargetStepGroupId. " +
+    const isRunGroup = input.StepKindId === StepKindId.RunGroup;
+    const hasTarget = input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null;
+    if (isRunGroup && !hasTarget) {
+      throw new Error(
+        "appendStep: StepKind=RunGroup requires TargetStepGroupId. " +
                 "Without a target the runner cannot resolve which group to invoke.",
-            );
-        }
-        if (!isRunGroup && hasTarget) {
-            throw new Error("appendStep: TargetStepGroupId is only valid when StepKind=RunGroup.");
-        }
+      );
     }
 
-    private insertStepRow(input: {
+    if (!isRunGroup && hasTarget) {
+      throw new Error("appendStep: TargetStepGroupId is only valid when StepKind=RunGroup.");
+    }
+  }
+
+  private insertStepRow(input: {
         StepGroupId: number;
         StepKindId: StepKindId;
         LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }, nextOrder: number): number {
-        const stmt = this.db.prepare(
-            `INSERT INTO Step
+    const stmt = this.db.prepare(
+      `INSERT INTO Step
                 (StepGroupId, OrderIndex, StepKindId, LabelType, PayloadJson, TargetStepGroupId)
              VALUES (?, ?, ?, ?, ?, ?)
              RETURNING StepId;`,
+    );
+    try {
+      stmt.bind([
+        input.StepGroupId,
+        nextOrder,
+        input.StepKindId,
+        input.LabelType ?? null,
+        input.PayloadJson ?? null,
+        input.TargetStepGroupId ?? null,
+      ]);
+      if (!stmt.step()) {
+        throw new Error("appendStep: RETURNING returned no row"); 
+      }
+
+      return stmt.getAsObject().StepId as number;
+    } finally {
+      stmt.free();
+    }
+  }
+
+  reorderSteps(stepGroupId: number, orderedStepIds: readonly number[]): void {
+    // Verify all IDs belong to this group; reject mixed-group reorders.
+    const owned = new Set(this.listSteps(stepGroupId).map((s) => s.StepId));
+    for (const id of orderedStepIds) {
+      if (!owned.has(id)) {
+        throw new Error(
+          `reorderSteps: StepId ${id} does not belong to StepGroup ${stepGroupId}`,
         );
-        try {
-            stmt.bind([
-                input.StepGroupId,
-                nextOrder,
-                input.StepKindId,
-                input.LabelType ?? null,
-                input.PayloadJson ?? null,
-                input.TargetStepGroupId ?? null,
-            ]);
-            if (!stmt.step()) { throw new Error("appendStep: RETURNING returned no row"); }
-
-            return stmt.getAsObject().StepId as number;
-        } finally {
-            stmt.free();
-        }
+      }
     }
 
-    reorderSteps(stepGroupId: number, orderedStepIds: readonly number[]): void {
-        // Verify all IDs belong to this group; reject mixed-group reorders.
-        const owned = new Set(this.listSteps(stepGroupId).map((s) => s.StepId));
-        for (const id of orderedStepIds) {
-            if (!owned.has(id)) {
-                throw new Error(
-                    `reorderSteps: StepId ${id} does not belong to StepGroup ${stepGroupId}`,
-                );
-            }
-        }
-        if (orderedStepIds.length !== owned.size) {
-            throw new Error(
-                `reorderSteps: expected ${owned.size} step IDs, got ${orderedStepIds.length}`,
-            );
-        }
-        this.db.exec("BEGIN;");
-        try {
-            const stmt = this.db.prepare(
-                `UPDATE Step SET OrderIndex = ?, UpdatedAt = datetime('now')
+    if (orderedStepIds.length !== owned.size) {
+      throw new Error(
+        `reorderSteps: expected ${owned.size} step IDs, got ${orderedStepIds.length}`,
+      );
+    }
+
+    this.db.exec("BEGIN;");
+    try {
+      const stmt = this.db.prepare(
+        `UPDATE Step SET OrderIndex = ?, UpdatedAt = datetime('now')
                  WHERE StepId = ?;`,
-            );
-            try {
-                for (let i = 0; i < orderedStepIds.length; i++) {
-                    stmt.run([i, orderedStepIds[i]]);
-                }
-            } finally {
-                stmt.free();
-            }
-            this.db.exec("COMMIT;");
-        } catch (e) {
-            this.db.exec("ROLLBACK;");
-            throw e;
+      );
+      try {
+        for (let i = 0; i < orderedStepIds.length; i++) {
+          stmt.run([i, orderedStepIds[i]]);
         }
-    }
+      } finally {
+        stmt.free();
+      }
 
-    deleteStep(stepId: number): void {
-        this.exec(`DELETE FROM Step WHERE StepId = ?;`, [stepId]);
+      this.db.exec("COMMIT;");
+    } catch (e) {
+      this.db.exec("ROLLBACK;");
+      throw e;
     }
+  }
 
-    /**
+  deleteStep(stepId: number): void {
+    this.exec(`DELETE FROM Step WHERE StepId = ?;`, [stepId]);
+  }
+
+  /**
      * Edit a single step in place. The (StepKindId, TargetStepGroupId)
      * invariant from `appendStep` applies here too: RunGroup steps
      * require a target, every other kind must have target=null.
      * `OrderIndex` is preserved — use `reorderSteps` to move a step.
      */
-    updateStep(input: {
+  updateStep(input: {
         StepId: number;
         StepKindId: StepKindId;
         LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }): void {
-        const isRunGroup = input.StepKindId === StepKindId.RunGroup;
-        if (isRunGroup && (input.TargetStepGroupId === undefined || input.TargetStepGroupId === null)) {
-            throw new Error(
-                "updateStep: StepKind=RunGroup requires TargetStepGroupId.",
-            );
-        }
-        if (!isRunGroup && input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null) {
-            throw new Error(
-                "updateStep: TargetStepGroupId is only valid when StepKind=RunGroup.",
-            );
-        }
-        this.exec(
-            `UPDATE Step
+    const isRunGroup = input.StepKindId === StepKindId.RunGroup;
+    if (isRunGroup && (input.TargetStepGroupId === undefined || input.TargetStepGroupId === null)) {
+      throw new Error(
+        "updateStep: StepKind=RunGroup requires TargetStepGroupId.",
+      );
+    }
+
+    if (!isRunGroup && input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null) {
+      throw new Error(
+        "updateStep: TargetStepGroupId is only valid when StepKind=RunGroup.",
+      );
+    }
+
+    this.exec(
+      `UPDATE Step
              SET StepKindId = ?, LabelType = ?, PayloadJson = ?, TargetStepGroupId = ?,
                  UpdatedAt = datetime('now')
              WHERE StepId = ?;`,
-            [
-                input.StepKindId,
-                input.LabelType ?? null,
-                input.PayloadJson ?? null,
-                input.TargetStepGroupId ?? null,
-                input.StepId,
-            ],
-        );
-    }
+      [
+        input.StepKindId,
+        input.LabelType ?? null,
+        input.PayloadJson ?? null,
+        input.TargetStepGroupId ?? null,
+        input.StepId,
+      ],
+    );
+  }
 
-    /**
+  /**
      * Toggle the `IsDisabled` flag on a single step. The runner's
      * expansion phase (`expandRunGroups`) drops disabled steps from
      * the plan when `skipDisabled` is left at its default `true`, so
      * flipping this flag is the canonical way to test that a step is
      * skipped at runtime without having to delete + re-create it.
      */
-    setStepDisabled(stepId: number, disabled: boolean): void {
-        this.exec(
-            `UPDATE Step SET IsDisabled = ?, UpdatedAt = datetime('now')
+  setStepDisabled(stepId: number, disabled: boolean): void {
+    this.exec(
+      `UPDATE Step SET IsDisabled = ?, UpdatedAt = datetime('now')
              WHERE StepId = ?;`,
-            [disabled ? 1 : 0, stepId],
-        );
+      [disabled ? 1 : 0, stepId],
+    );
+  }
+
+  /* -------------------- Snapshot -------------------------------- */
+
+  /** Serialize the entire DB to bytes (for export). */
+  exportDbBytes(): Uint8Array {
+    return this.db.export();
+  }
+
+  /* -------------------- Private --------------------------------- */
+
+  private exec(sql: string, params: ReadonlyArray<number | string | null>): void {
+    const stmt = this.db.prepare(sql);
+    try {
+      stmt.run(params as Array<number | string | null>);
+    } finally {
+      stmt.free();
     }
+  }
 
-    /* -------------------- Snapshot -------------------------------- */
+  private selectAll<T>(sql: string, params: ReadonlyArray<number | string | null> = []): T[] {
+    const stmt = this.db.prepare(sql);
+    try {
+      stmt.bind(params as Array<number | string | null>);
+      const rows: T[] = [];
+      while (stmt.step()) {
+        rows.push(stmt.getAsObject() as unknown as T);
+      }
 
-    /** Serialize the entire DB to bytes (for export). */
-    exportDbBytes(): Uint8Array {
-        return this.db.export();
+      return rows;
+    } finally {
+      stmt.free();
     }
+  }
 
-    /* -------------------- Private --------------------------------- */
+  private scalarNumber(sql: string, params: ReadonlyArray<number | string | null>): number {
+    const stmt = this.db.prepare(sql);
+    try {
+      stmt.bind(params as Array<number | string | null>);
+      if (!stmt.step()) {
+        return 0;
+      }
 
-    private exec(sql: string, params: ReadonlyArray<number | string | null>): void {
-        const stmt = this.db.prepare(sql);
-        try {
-            stmt.run(params as Array<number | string | null>);
-        } finally {
-            stmt.free();
-        }
+      const v = stmt.get()[0];
+
+      return typeof v === "number" ? v : 0;
+    } finally {
+      stmt.free();
     }
-
-    private selectAll<T>(sql: string, params: ReadonlyArray<number | string | null> = []): T[] {
-        const stmt = this.db.prepare(sql);
-        try {
-            stmt.bind(params as Array<number | string | null>);
-            const rows: T[] = [];
-            while (stmt.step()) {
-                rows.push(stmt.getAsObject() as unknown as T);
-            }
-
-            return rows;
-        } finally {
-            stmt.free();
-        }
-    }
-
-    private scalarNumber(sql: string, params: ReadonlyArray<number | string | null>): number {
-        const stmt = this.db.prepare(sql);
-        try {
-            stmt.bind(params as Array<number | string | null>);
-            if (!stmt.step()) return 0;
-            const v = stmt.get()[0];
-
-            return typeof v === "number" ? v : 0;
-        } finally {
-            stmt.free();
-        }
-    }
+  }
 }
 
 /** sql.js returns INTEGERs as numbers but TINYINT booleans need coercion. */
 function coerceGroupRow(r: StepGroupRow): StepGroupRow {
-    return { ...r, IsArchived: Boolean(r.IsArchived) };
+  return { ...r, IsArchived: Boolean(r.IsArchived) };
 }
 
 function coerceStepRow(r: StepRow): StepRow {
-    return { ...r, IsDisabled: Boolean(r.IsDisabled) };
+  return { ...r, IsDisabled: Boolean(r.IsDisabled) };
 }

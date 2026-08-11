@@ -32,11 +32,11 @@ vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
   sendToExtension: (...args: unknown[]) => _mockSend!(...args as [string, unknown]),
 }));
 vi.mock('../ui/extension-relay', () => ({
-    sendToExtension: vi.fn(async (_channel, payload) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel, payload) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return (typeof responsesQueue !== 'undefined' && responsesQueue.length) ? responsesQueue.shift() : (typeof nextResponse !== 'undefined' ? nextResponse : { ok: true, isFail: false, isSuccess: true });
-    }),
+    return (typeof responsesQueue !== 'undefined' && responsesQueue.length) ? responsesQueue.shift() : (typeof nextResponse !== 'undefined' ? nextResponse : { ok: true, isFail: false, isSuccess: true });
+  }),
 }));
 
 import { createOpenTabsSection } from '../ui/section-open-tabs';

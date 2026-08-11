@@ -92,5 +92,6 @@ export function openRemixRedirect(redirectUrl: string): void {
 
     return;
   }
+
   window.open(redirectUrl, '_blank', 'noopener');
 }

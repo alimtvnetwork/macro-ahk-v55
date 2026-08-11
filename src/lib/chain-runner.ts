@@ -63,7 +63,9 @@ export class ChainRunner {
   /* ---------------------------------------------------------------- */
 
   async run(): Promise<void> {
-    if ((this.state.status as any) === "running") return;
+    if ((this.state.status as any) === "running") {
+      return;
+    }
 
     this.abortController = new AbortController();
     this.state.startedAt = new Date().toISOString();
@@ -85,13 +87,19 @@ export class ChainRunner {
   }
 
   pause() {
-    if (this.state.status !== "running") return;
+    if (this.state.status !== "running") {
+      return;
+    }
+
     this.paused = true;
     this.setStatus("paused");
   }
 
   resume() {
-    if (this.state.status !== "paused") return;
+    if (this.state.status !== "paused") {
+      return;
+    }
+
     this.paused = false;
     this.setStatus("running");
     this.pauseResolve?.();
@@ -110,6 +118,7 @@ export class ChainRunner {
         this.state.stepStatuses[i] = "skipped";
       }
     }
+
     this.state.completedAt = new Date().toISOString();
     this.setStatus("cancelled");
   }
@@ -119,9 +128,13 @@ export class ChainRunner {
   /* ---------------------------------------------------------------- */
 
   private async waitIfPaused(): Promise<void> {
-    if (!this.paused) return;
+    if (!this.paused) {
+      return;
+    }
 
-    return new Promise<void>((resolve) => { this.pauseResolve = resolve; });
+    return new Promise<void>((resolve) => {
+      this.pauseResolve = resolve; 
+    });
   }
 
   private async executeSteps(flatSteps: FlattenedStep[], startIndex: number): Promise<void> {
@@ -132,7 +145,10 @@ export class ChainRunner {
     let flatIdx = startIndex;
 
     while (flatIdx < flatSteps.length) {
-      if (this.abortController?.signal.aborted) return;
+      if (this.abortController?.signal.aborted) {
+        return;
+      }
+
       await this.waitIfPaused();
 
       const { step, depth } = flatSteps[flatIdx];
@@ -151,6 +167,7 @@ export class ChainRunner {
         } else {
           await this.executeSingleStep(step);
         }
+
         this.setStepStatus(flatIdx, "done");
       } catch (err) {
         this.setStepStatus(flatIdx, "error");
@@ -168,7 +185,10 @@ export class ChainRunner {
 
   private async executeBranchSteps(branch: ChainStep[], startIdx: number): Promise<void> {
     for (let i = 0; i < branch.length; i++) {
-      if (this.abortController?.signal.aborted) return;
+      if (this.abortController?.signal.aborted) {
+        return;
+      }
+
       await this.waitIfPaused();
       this.setStepStatus(startIdx + i, "running");
       try {

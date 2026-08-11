@@ -58,7 +58,9 @@ function isOnProjectPageForShortcut(): boolean {
       || host.endsWith('.lovableproject.com')
     );
 
-    if (!isSupportedHost) return false;
+    if (!isSupportedHost) {
+      return false;
+    }
 
     const isSettings = path.includes('/settings');
     const isProjectPath = path.includes('/projects/');
@@ -78,7 +80,9 @@ const TASK_NEXT_PRESETS: Record<string, number> = {
 
 /** Handle Ctrl+Shift digit shortcuts for Task Next presets. Returns true if handled. */
 function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): boolean {
-  if (!e.ctrlKey || !e.shiftKey || e.altKey || !taskNextDeps) return false;
+  if (!e.ctrlKey || !e.shiftKey || e.altKey || !taskNextDeps) {
+    return false;
+  }
 
   const preset = TASK_NEXT_PRESETS[e.key];
   if (preset !== undefined) {
@@ -88,6 +92,7 @@ function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): 
 
     return true;
   }
+
   if (e.key >= '1' && e.key <= '9') {
     e.preventDefault();
     const count = parseInt(e.key, 10);
@@ -96,6 +101,7 @@ function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): 
 
     return true;
   }
+
   if (e.key === '0') {
     e.preventDefault();
     log('Ctrl+Shift+0 → Task Next ×10');
@@ -117,26 +123,43 @@ function handleCtrlOnlyShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): bo
     jsBody.style.display = hidden ? '' : 'none';
     if (hidden) {
       const ta = document.getElementById('marco-js-executor');
-      if (ta) ta.focus();
+      if (ta) {
+        ta.focus();
+      }
     }
 
     return true;
   }
-  if (e.key === ',' || e.code === 'Comma') { e.preventDefault(); showSettingsDialog(settingsDeps);
 
- return true; }
-  if (e.key === '1') { e.preventDefault(); positionLoopController(plCtx, 'bottom-left');
+  if (e.key === ',' || e.code === 'Comma') {
+    e.preventDefault(); showSettingsDialog(settingsDeps);
 
- return true; }
-  if (e.key === '3') { e.preventDefault(); positionLoopController(plCtx, 'bottom-right');
+    return true; 
+  }
 
- return true; }
-  if (e.key === 'ArrowUp') { e.preventDefault(); log('Ctrl+Up → Force Move UP via API'); forceSwitch('up');
+  if (e.key === '1') {
+    e.preventDefault(); positionLoopController(plCtx, 'bottom-left');
 
- return true; }
-  if (e.key === 'ArrowDown') { e.preventDefault(); log('Ctrl+Down → Force Move DOWN via API'); forceSwitch('down');
+    return true; 
+  }
 
- return true; }
+  if (e.key === '3') {
+    e.preventDefault(); positionLoopController(plCtx, 'bottom-right');
+
+    return true; 
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault(); log('Ctrl+Up → Force Move UP via API'); forceSwitch('up');
+
+    return true; 
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault(); log('Ctrl+Down → Force Move DOWN via API'); forceSwitch('down');
+
+    return true; 
+  }
 
   return false;
 }
@@ -150,7 +173,9 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
     e.preventDefault();
     const isHidden = ui.style.display === 'none';
     log('Ctrl+Alt+H pressed on MacroLoop, isHidden=' + isHidden);
-    if (isHidden) restorePanel(plCtx);
+    if (isHidden) {
+      restorePanel(plCtx);
+    }
 
     return true;
   }
@@ -185,11 +210,22 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
  */
 export function registerKeyboardHandlers(deps: KeyboardHandlerDeps): void {
   document.addEventListener('keydown', function(e: KeyboardEvent) {
-    if (handleTaskNextShortcut(e, deps.taskNextDeps)) return;
-    if (!e.ctrlKey) return;
-    if (!e.altKey && !e.shiftKey) { handleCtrlOnlyShortcut(e, deps);
+    if (handleTaskNextShortcut(e, deps.taskNextDeps)) {
+      return;
+    }
 
- return; }
-    if (e.altKey && !e.shiftKey) { handleCtrlAltShortcut(e, deps); }
+    if (!e.ctrlKey) {
+      return;
+    }
+
+    if (!e.altKey && !e.shiftKey) {
+      handleCtrlOnlyShortcut(e, deps);
+
+      return; 
+    }
+
+    if (e.altKey && !e.shiftKey) {
+      handleCtrlAltShortcut(e, deps); 
+    }
   });
 }

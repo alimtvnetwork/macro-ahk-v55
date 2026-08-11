@@ -98,17 +98,17 @@ const tabDecisionCache: Map<number, TabDecision> = new Map();
 
 /** Returns the cached decision for a tab, or undefined if none. */
 export function getTabDecision(tabId: number): TabDecision | undefined {
-    return tabDecisionCache.get(tabId);
+  return tabDecisionCache.get(tabId);
 }
 
 /** Stores a fresh decision for a tab. */
 export function setTabDecision(tabId: number, decision: TabDecision): void {
-    tabDecisionCache.set(tabId, decision);
+  tabDecisionCache.set(tabId, decision);
 }
 
 /** Removes the cached decision for a tab (call on close/invalidate). */
 export function clearTabDecision(tabId: number): void {
-    tabDecisionCache.delete(tabId);
+  tabDecisionCache.delete(tabId);
 }
 
 /**
@@ -118,9 +118,9 @@ export function clearTabDecision(tabId: number): void {
  * point of the cache.
  */
 export function isSameDecisionFingerprint(tabId: number, urlFp: string): boolean {
-    const cached = tabDecisionCache.get(tabId);
+  const cached = tabDecisionCache.get(tabId);
 
-    return cached !== undefined && cached.urlFp === urlFp;
+  return cached !== undefined && cached.urlFp === urlFp;
 }
 
 /* ------------------------------------------------------------------ */
@@ -129,22 +129,22 @@ export function isSameDecisionFingerprint(tabId: number, urlFp: string): boolean
 
 /** Returns the currently active project ID. */
 export function getActiveProjectId(): string | null {
-    return activeProjectId;
+  return activeProjectId;
 }
 
 /** Returns the tab injection records. */
 export function getTabInjections(): Record<number, TabInjectionRecord> {
-    return tabInjections;
+  return tabInjections;
 }
 
 /** Returns the current health state. */
 export function getHealthState(): TransientState["healthState"] {
-    return healthState;
+  return healthState;
 }
 
 /** Returns the current session ID. */
 export function getCurrentSessionId(): string {
-    return currentSessionId;
+  return currentSessionId;
 }
 
 /* ------------------------------------------------------------------ */
@@ -153,33 +153,33 @@ export function getCurrentSessionId(): string {
 
 /** Updates the active project ID. */
 export function setActiveProjectId(id: string | null): void {
-    activeProjectId = id;
+  activeProjectId = id;
 }
 
 /** Records a script injection for a tab. */
 export function setTabInjection(tabId: number, record: TabInjectionRecord): void {
-    tabInjections[tabId] = record;
+  tabInjections[tabId] = record;
 }
 
 /** Removes injection tracking for a closed tab. */
 export function removeTabInjection(tabId: number): void {
-    delete tabInjections[tabId];
-    tabDecisionCache.delete(tabId);
+  delete tabInjections[tabId];
+  tabDecisionCache.delete(tabId);
 }
 
 /** Updates the health state. */
 export function setHealthState(state: TransientState["healthState"]): void {
-    healthState = state;
+  healthState = state;
 }
 
 /** Updates the current session ID. */
 export function setCurrentSessionId(id: string): void {
-    currentSessionId = id;
+  currentSessionId = id;
 }
 
 /** Updates the persistence mode. */
 export function setPersistenceMode(mode: TransientState["persistenceMode"]): void {
-    persistenceMode = mode;
+  persistenceMode = mode;
 }
 
 /* ------------------------------------------------------------------ */
@@ -188,44 +188,44 @@ export function setPersistenceMode(mode: TransientState["persistenceMode"]): voi
 
 /** Restores transient state from chrome.storage.session on wake. */
 export async function rehydrateState(): Promise<void> {
-    const stored = await (chrome.storage as unknown as { session: { get: (k: string) => Promise<Record<string, unknown>> } }).session.get(SESSION_KEY);
-    const state: TransientState = (stored[SESSION_KEY] as TransientState | undefined) ?? getDefaultState();
+  const stored = await (chrome.storage as unknown as { session: { get: (k: string) => Promise<Record<string, unknown>> } }).session.get(SESSION_KEY);
+  const state: TransientState = (stored[SESSION_KEY] as TransientState | undefined) ?? getDefaultState();
 
-    activeProjectId = state.activeProjectId;
-    tabInjections = state.tabInjections;
-    healthState = state.healthState;
-    currentSessionId = state.currentSessionId;
-    persistenceMode = state.persistenceMode;
+  activeProjectId = state.activeProjectId;
+  tabInjections = state.tabInjections;
+  healthState = state.healthState;
+  currentSessionId = state.currentSessionId;
+  persistenceMode = state.persistenceMode;
 
-    await pruneClosedTabs();
-    console.log("[state-manager] State rehydrated");
+  await pruneClosedTabs();
+  console.log("[state-manager] State rehydrated");
 }
 
 /** Returns the default empty transient state. */
 function getDefaultState(): TransientState {
-    return {
-        activeProjectId: null,
-        tabInjections: {},
-        healthState: "HEALTHY",
-        currentSessionId: "",
-        persistenceMode: "memory",
-        lastFlushTimestamp: new Date().toISOString(),
-    };
+  return {
+    activeProjectId: null,
+    tabInjections: {},
+    healthState: "HEALTHY",
+    currentSessionId: "",
+    persistenceMode: "memory",
+    lastFlushTimestamp: new Date().toISOString(),
+  };
 }
 
 /** Removes injection entries for tabs that no longer exist. */
 async function pruneClosedTabs(): Promise<void> {
-    const tabs = await (chrome.tabs.query as (q: unknown) => Promise<Array<{ id?: number }>>)({});
-    const validTabIds = new Set(tabs.map((t) => t.id));
+  const tabs = await (chrome.tabs.query as (q: unknown) => Promise<Array<{ id?: number }>>)({});
+  const validTabIds = new Set(tabs.map((t) => t.id));
 
-    for (const tabIdStr of Object.keys(tabInjections)) {
-        const tabId = Number(tabIdStr);
-        const isTabClosed = !validTabIds.has(tabId);
+  for (const tabIdStr of Object.keys(tabInjections)) {
+    const tabId = Number(tabIdStr);
+    const isTabClosed = !validTabIds.has(tabId);
 
-        if (isTabClosed) {
-            delete tabInjections[tabId];
-        }
+    if (isTabClosed) {
+      delete tabInjections[tabId];
     }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -234,14 +234,14 @@ async function pruneClosedTabs(): Promise<void> {
 
 /** Saves all transient state to chrome.storage.session. */
 export async function saveTransientState(): Promise<void> {
-    const state: TransientState = {
-        activeProjectId,
-        tabInjections,
-        healthState,
-        currentSessionId,
-        persistenceMode,
-        lastFlushTimestamp: new Date().toISOString(),
-    };
+  const state: TransientState = {
+    activeProjectId,
+    tabInjections,
+    healthState,
+    currentSessionId,
+    persistenceMode,
+    lastFlushTimestamp: new Date().toISOString(),
+  };
 
-    await (chrome.storage as unknown as { session: { set: (i: Record<string, unknown>) => Promise<void> } }).session.set({ [SESSION_KEY]: state });
+  await (chrome.storage as unknown as { session: { set: (i: Record<string, unknown>) => Promise<void> } }).session.set({ [SESSION_KEY]: state });
 }

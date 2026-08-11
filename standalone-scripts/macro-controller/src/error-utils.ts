@@ -36,9 +36,17 @@ type SdkLogger = NonNullable<RiseupAsiaMacroExtNamespace['Logger']>;
  * Handles Error instances, strings, and arbitrary objects.
  */
 export function toErrorMessage(e: CaughtError): string {
-  if (e instanceof Error) return e.message;
-  if (typeof e === 'string') return e;
-  if (e !== null && e !== undefined) return String(e);
+  if (e instanceof Error) {
+    return e.message;
+  }
+
+  if (typeof e === 'string') {
+    return e;
+  }
+
+  if (e !== null && e !== undefined) {
+    return String(e);
+  }
 
   return 'Unknown error';
 }
@@ -49,7 +57,9 @@ export function toErrorMessage(e: CaughtError): string {
  */
 function readSdkNamespace(): RiseupAsiaMacroExtNamespace | undefined {
   try {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
 
     return window.RiseupAsiaMacroExt;
   } catch {
@@ -97,7 +107,9 @@ function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
  * like `metric`, `trace`) are accepted and ignored.
  */
 function isSdkLogger(value: unknown): value is SdkLogger {
-  if (!isObjectRecord(value)) return false;
+  if (!isObjectRecord(value)) {
+    return false;
+  }
 
   return isFunction(value.error) && isFunction(value.console);
 }
@@ -105,7 +117,9 @@ function isSdkLogger(value: unknown): value is SdkLogger {
 /** Resolve the SDK logger, or undefined if the namespace is not ready. */
 function getLogger(): SdkLogger | undefined {
   const ns = readSdkNamespace();
-  if (!ns) return undefined;
+  if (!ns) {
+    return undefined;
+  }
 
   return isSdkLogger(ns.Logger) ? ns.Logger : undefined;
 }
@@ -118,12 +132,19 @@ function prefix(scope: string): string {
 /** Structured error logging, delegates to console.error(). */
 export function logError(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
-  if (logger) { logger.error(scope, message, error);
+  if (logger) {
+    logger.error(scope, message, error);
 
- return; }
+    return; 
+  }
+
   const base = prefix(scope) + message;
-  // eslint-disable-next-line no-restricted-syntax -- fallback when RiseupAsiaMacroExt.Logger is not yet registered
-  if (error !== undefined) { console.error(base, error); } else { console.error(base); }
+   
+  if (error !== undefined) {
+    console.error(base, error); 
+  } else {
+    console.error(base); 
+  }
 }
 
 /** Type guard for a method on the logger object without double-casting. */
@@ -137,8 +158,9 @@ export function logDebug(scope: string, message: string): void {
   if (logger && hasLoggerMethod(logger, 'debug')) {
     logger.debug(scope, message);
 
- return;
+    return;
   }
+
   console.debug(prefix(scope) + message);
 }
 
@@ -148,19 +170,27 @@ export function logWarn(scope: string, message: string): void {
   if (logger && hasLoggerMethod(logger, 'warn')) {
     logger.warn(scope, message);
 
- return;
+    return;
   }
+
   console.warn(prefix(scope) + message);
 }
 
 /** General structured console output, delegates to RiseupAsiaMacroExt.Logger.console(). */
 export function logConsole(scope: string, message: string, ...args: RiseupAsiaLogArg[]): void {
   const logger = getLogger();
-  if (logger) { logger.console(scope, message, ...args);
+  if (logger) {
+    logger.console(scope, message, ...args);
 
- return; }
+    return; 
+  }
+
   const base = prefix(scope) + message;
-  if (args.length > 0) { console.log(base, ...args); } else { console.log(base); }
+  if (args.length > 0) {
+    console.log(base, ...args); 
+  } else {
+    console.log(base); 
+  }
 }
 
 /** Stack trace logging, delegates to RiseupAsiaMacroExt.Logger.stackTrace(). */
@@ -169,8 +199,9 @@ export function logStackTrace(scope: string, message: string, error?: CaughtErro
   if (logger && hasLoggerMethod(logger, 'stackTrace')) {
     logger.stackTrace(scope, message, error);
 
- return;
+    return;
   }
+
   const base = prefix(scope) + message;
   const stack = (error instanceof Error && error.stack) ? error.stack : new Error().stack || '';
   // eslint-disable-next-line no-restricted-syntax -- fallback when RiseupAsiaMacroExt.Logger is not yet registered
@@ -270,6 +301,7 @@ export function logDiagnostic(err: DiagnosticError): DiagnosticReport {
 
     return report;
   }
+
   const base = prefix(scope) + '[' + report.code + '] ' + report.message;
   // eslint-disable-next-line no-restricted-syntax -- fallback when RiseupAsiaMacroExt.Logger is not yet registered
   console.error(base, err);
@@ -324,7 +356,9 @@ export function wrapCaught(
   context: DiagnosticContext,
   caught: CaughtError,
 ): DiagnosticError {
-  if (isDiagnosticError(caught)) return caught;
+  if (isDiagnosticError(caught)) {
+    return caught;
+  }
 
   return new DiagnosticError(code, context, caught);
 }

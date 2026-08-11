@@ -25,23 +25,23 @@ type SqlJs = import("sql.js").SqlJsStatic;
  * and loadFromStorage skipped schema application for existing databases.
  */
 function ensureIdempotentSchema(db: SqlJsDatabase, schema: string): void {
-    try {
-        db.run(schema);
-    } catch (err) {
-        // Schema may contain statements that conflict with existing objects
-        // (e.g., column already exists). Fall back to statement-by-statement.
-        const statements = schema
-            .split(";")
-            .map(s => s.trim())
-            .filter(s => s.length > 0);
-        for (const stmt of statements) {
-            try {
-                db.run(stmt);
-            } catch (err) {
-            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
-        }
+  try {
+    db.run(schema);
+  } catch (err) {
+    // Schema may contain statements that conflict with existing objects
+    // (e.g., column already exists). Fall back to statement-by-statement.
+    const statements = schema
+      .split(";")
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    for (const stmt of statements) {
+      try {
+        db.run(stmt);
+      } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+      }
     }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -50,59 +50,59 @@ function ensureIdempotentSchema(db: SqlJsDatabase, schema: string): void {
 
 /** Loads an existing DB file from OPFS, or creates a fresh one. */
 export async function loadOrCreateFromOpfs(
-    SQL: SqlJs,
-    root: FileSystemDirectoryHandle,
-    name: string,
-    schema: string,
+  SQL: SqlJs,
+  root: FileSystemDirectoryHandle,
+  name: string,
+  schema: string,
 ): Promise<SqlJsDatabase> {
-    const existingBuffer = await readOpfsFile(root, name);
-    const hasExisting = existingBuffer !== null;
+  const existingBuffer = await readOpfsFile(root, name);
+  const hasExisting = existingBuffer !== null;
 
-    if (hasExisting) {
-        const db = new SQL.Database(new Uint8Array(existingBuffer));
-        // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
-        ensureIdempotentSchema(db, schema);
-
-        return db;
-    }
-
-    const db = new SQL.Database();
-    db.run(schema);
-    await saveToOpfs(root, name, db);
+  if (hasExisting) {
+    const db = new SQL.Database(new Uint8Array(existingBuffer));
+    // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
+    ensureIdempotentSchema(db, schema);
 
     return db;
+  }
+
+  const db = new SQL.Database();
+  db.run(schema);
+  await saveToOpfs(root, name, db);
+
+  return db;
 }
 
 /** Reads a file from OPFS, returning null if it doesn't exist. */
 async function readOpfsFile(
-    root: FileSystemDirectoryHandle,
-    name: string,
+  root: FileSystemDirectoryHandle,
+  name: string,
 ): Promise<ArrayBuffer | null> {
-    try {
-        const handle = await root.getFileHandle(name, { create: false });
-        const file = await handle.getFile();
-        const buffer = await file.arrayBuffer();
-        const hasContent = buffer.byteLength > 0;
+  try {
+    const handle = await root.getFileHandle(name, { create: false });
+    const file = await handle.getFile();
+    const buffer = await file.arrayBuffer();
+    const hasContent = buffer.byteLength > 0;
 
-        return hasContent ? buffer : null;
-    } catch (err) { 
-        return null;
-    }
+    return hasContent ? buffer : null;
+  } catch (err) { 
+    return null;
+  }
 }
 
 /** Writes a database to an OPFS file. */
 export async function saveToOpfs(
-    root: FileSystemDirectoryHandle,
-    name: string,
-    db: SqlJsDatabase,
+  root: FileSystemDirectoryHandle,
+  name: string,
+  db: SqlJsDatabase,
 ): Promise<void> {
-    const handle = await root.getFileHandle(name, { create: true });
-    const writable = await handle.createWritable();
+  const handle = await root.getFileHandle(name, { create: true });
+  const writable = await handle.createWritable();
 
-    // sql.js .export() returns Uint8Array; cast through unknown to satisfy
-    // the FileSystemWriteChunkType strict ArrayBufferView<ArrayBuffer> shape.
-    await writable.write(db.export() as unknown as FileSystemWriteChunkType);
-    await writable.close();
+  // sql.js .export() returns Uint8Array; cast through unknown to satisfy
+  // the FileSystemWriteChunkType strict ArrayBufferView<ArrayBuffer> shape.
+  await writable.write(db.export() as unknown as FileSystemWriteChunkType);
+  await writable.close();
 }
 
 /* ------------------------------------------------------------------ */
@@ -111,25 +111,25 @@ export async function saveToOpfs(
 
 /** Loads a DB from chrome.storage.local by key. */
 export async function loadFromStorage(
-    SQL: SqlJs,
-    key: string,
-    schema: string,
+  SQL: SqlJs,
+  key: string,
+  schema: string,
 ): Promise<SqlJsDatabase> {
-    const stored = await chrome.storage.local.get(key);
-    const hasStored = stored[key] !== undefined;
+  const stored = await chrome.storage.local.get(key);
+  const hasStored = stored[key] !== undefined;
 
-    if (hasStored) {
-        const db = new SQL.Database(new Uint8Array(stored[key] as ArrayBuffer | ArrayLike<number>));
-        // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
-        ensureIdempotentSchema(db, schema);
-
-        return db;
-    }
-
-    const db = new SQL.Database();
-    db.run(schema);
+  if (hasStored) {
+    const db = new SQL.Database(new Uint8Array(stored[key] as ArrayBuffer | ArrayLike<number>));
+    // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
+    ensureIdempotentSchema(db, schema);
 
     return db;
+  }
+
+  const db = new SQL.Database();
+  db.run(schema);
+
+  return db;
 }
 
 /** Options for flushing databases to chrome.storage.local. */
@@ -142,8 +142,8 @@ interface FlushStorageOptions {
 
 /** Saves databases to chrome.storage.local. */
 export async function flushToStorage(options: FlushStorageOptions): Promise<void> {
-    await chrome.storage.local.set({
-        [options.logsKey]: Array.from(options.logsDb.export()),
-        [options.errorsKey]: Array.from(options.errorsDb.export()),
-    });
+  await chrome.storage.local.set({
+    [options.logsKey]: Array.from(options.logsDb.export()),
+    [options.errorsKey]: Array.from(options.errorsDb.export()),
+  });
 }

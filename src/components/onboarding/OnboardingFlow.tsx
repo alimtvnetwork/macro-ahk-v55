@@ -47,6 +47,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     if (previous === step) {
       return; // ignore re-renders that don't change step
     }
+
     const next = [...stepHistoryRef.current, step];
     stepHistoryRef.current = next;
     setStepHistory(next);
@@ -121,17 +122,17 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       {/* Content */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-xl relative overflow-hidden">
-            <div
-              key={step}
-              className="page-enter"
-            >
-              <OnboardingStepBoundary stepId={step}>
-                {step === "welcome" && <WelcomeStep />}
-                {step === "project" && <ProjectStep />}
-                {step === "permissions" && <PermissionsStep />}
-                {step === "ready" && <ReadyStep />}
-              </OnboardingStepBoundary>
-            </div>
+          <div
+            key={step}
+            className="page-enter"
+          >
+            <OnboardingStepBoundary stepId={step}>
+              {step === "welcome" && <WelcomeStep />}
+              {step === "project" && <ProjectStep />}
+              {step === "permissions" && <PermissionsStep />}
+              {step === "ready" && <ReadyStep />}
+            </OnboardingStepBoundary>
+          </div>
 
           {/* Navigation */}
           <div className="flex items-center justify-between mt-8" role="group" aria-label="Onboarding navigation">
@@ -246,13 +247,13 @@ function ProjectStep() {
         <Badge variant="outline" className="mb-2">
           Pre-configured
         </Badge>
-         <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="text-2xl font-bold tracking-tight">
            Default Project: Macro Controller
-         </h2>
-         <p className="text-muted-foreground">
+        </h2>
+        <p className="text-muted-foreground">
            Marco ships with a built-in project targeting supported domains. Here's
            what it does:
-         </p>
+        </p>
       </div>
 
       <Card className="border-primary/20 bg-primary/5">
@@ -357,7 +358,7 @@ function PermissionsStep() {
         <p className="text-muted-foreground">
            Marco needs host permissions to inject scripts on additional domains.
            These are <strong>optional</strong> — skip if you only use the default target sites.
-         </p>
+        </p>
       </div>
 
       <div className="space-y-3">

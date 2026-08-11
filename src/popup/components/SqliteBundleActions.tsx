@@ -8,9 +8,9 @@ import { Timings } from "../../constants/timing";
 
 import { useState, useCallback, useRef } from "react";
 import {
-    exportAllAsSqliteZip,
-    importFromSqliteZip,
-    mergeFromSqliteZip,
+  exportAllAsSqliteZip,
+  importFromSqliteZip,
+  mergeFromSqliteZip,
 } from "../../lib/sqlite-bundle";
 import { PopupActionsModeType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
@@ -32,118 +32,123 @@ interface SqliteBundleActionsProps {
 
 // eslint-disable-next-line max-lines-per-function
 export function SqliteBundleActions({
-    logSuccess,
-    logError,
-    logInfo,
-    debugOk,
-    debugError,
+  logSuccess,
+  logError,
+  logInfo,
+  debugOk,
+  debugError,
 }: SqliteBundleActionsProps) {
-    const [importMode, setImportMode] = useState<PopupActionsModeType>("replace");
-    const [exportLabel, setExportLabel] = useState("🗄️ Export DB");
-    const [importLabel, setImportLabel] = useState("📥 Import");
-    const fileRef = useRef<HTMLInputElement>(null);
+  const [importMode, setImportMode] = useState<PopupActionsModeType>("replace");
+  const [exportLabel, setExportLabel] = useState("🗄️ Export DB");
+  const [importLabel, setImportLabel] = useState("📥 Import");
+  const fileRef = useRef<HTMLInputElement>(null);
 
-    const resetExport = useCallback(() => {
-        setTimeout(() => setExportLabel("🗄️ Export DB"), Timings.TIMEOUT_NORMAL);
-    }, []);
+  const resetExport = useCallback(() => {
+    setTimeout(() => setExportLabel("🗄️ Export DB"), Timings.TIMEOUT_NORMAL);
+  }, []);
 
-    const resetImport = useCallback(() => {
-        setTimeout(() => setImportLabel("📥 Import"), Timings.TIMEOUT_NORMAL);
-    }, []);
+  const resetImport = useCallback(() => {
+    setTimeout(() => setImportLabel("📥 Import"), Timings.TIMEOUT_NORMAL);
+  }, []);
 
-    const handleExport = useCallback(async () => {
-        setExportLabel("⏳ Exporting...");
-        try {
-            await exportAllAsSqliteZip();
-            logSuccess("SQLite Export", "Downloaded marco-backup.zip");
-            debugOk("SQLite Export");
-            setExportLabel("✅ Done!");
-        } catch (err) {
-            const reason = err instanceof Error ? err.message : String(err);
-            logError("SQLite Export", `Export failed: ${reason}`);
-            debugError("SQLite Export", reason);
-            setExportLabel("❌ Failed");
-        }
-        resetExport();
-    }, [logSuccess, logError, debugOk, debugError, resetExport]);
+  const handleExport = useCallback(async () => {
+    setExportLabel("⏳ Exporting...");
+    try {
+      await exportAllAsSqliteZip();
+      logSuccess("SQLite Export", "Downloaded marco-backup.zip");
+      debugOk("SQLite Export");
+      setExportLabel("✅ Done!");
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : String(err);
+      logError("SQLite Export", `Export failed: ${reason}`);
+      debugError("SQLite Export", reason);
+      setExportLabel("❌ Failed");
+    }
 
-    const handleImportClick = useCallback(() => {
-        if (importMode === "replace") {
-            const isConfirmed = confirm(
-                "⚠️ Replace All will DELETE all existing projects, scripts, and configs before importing.\n\nThis is destructive and cannot be undone. Continue?",
-            );
-            if (!isConfirmed) return;
-        }
-        fileRef.current?.click();
-    }, [importMode]);
+    resetExport();
+  }, [logSuccess, logError, debugOk, debugError, resetExport]);
 
-    const handleFileChange = useCallback(
-        async (file: File) => {
-            const modeLabel = importMode === "replace" ? "Replacing" : "Merging";
-            setImportLabel("⏳ Importing...");
-            logInfo("SQLite Import", `${modeLabel} from ${file.name}...`);
+  const handleImportClick = useCallback(() => {
+    if (importMode === "replace") {
+      const isConfirmed = confirm(
+        "⚠️ Replace All will DELETE all existing projects, scripts, and configs before importing.\n\nThis is destructive and cannot be undone. Continue?",
+      );
+      if (!isConfirmed) {
+        return;
+      }
+    }
 
-            try {
-                const result = importMode === "replace"
-                    ? await importFromSqliteZip(file)
-                    : await mergeFromSqliteZip(file);
-                const detail = `${modeLabel} complete — ${result.projectCount} projects, ${result.scriptCount} scripts, ${result.configCount} configs`;
-                logSuccess("SQLite Import", detail);
-                debugOk("SQLite Import");
-                setImportLabel("✅ Done!");
-            } catch (err) {
-                const reason = err instanceof Error ? err.message : String(err);
-                logError("SQLite Import", `Import failed: ${reason}`);
-                debugError("SQLite Import", reason);
-                setImportLabel("❌ Failed");
-            }
-            resetImport();
-        },
-        [importMode, logSuccess, logError, logInfo, debugOk, debugError, resetImport],
-    );
+    fileRef.current?.click();
+  }, [importMode]);
 
-    return (
-        <>
-            <input
-                ref={fileRef}
-                type="file"
-                accept=".zip"
-                className="hidden"
-                onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                        void handleFileChange(file);
-                        e.target.value = "";
-                    }
-                }}
-            />
-            <div className="sqlite-bundle-actions">
-                <div className="sqlite-bar">
-                    <button className="btn-action" onClick={handleImportClick}>
-                        {importLabel}
-                    </button>
-                    <div className="import-mode-toggle">
-                        <button
-                            className={`mode-btn${importMode === "merge" ? " active" : ""}`}
-                            onClick={() => setImportMode("merge")}
-                            type="button"
-                        >
+  const handleFileChange = useCallback(
+    async (file: File) => {
+      const modeLabel = importMode === "replace" ? "Replacing" : "Merging";
+      setImportLabel("⏳ Importing...");
+      logInfo("SQLite Import", `${modeLabel} from ${file.name}...`);
+
+      try {
+        const result = importMode === "replace"
+          ? await importFromSqliteZip(file)
+          : await mergeFromSqliteZip(file);
+        const detail = `${modeLabel} complete — ${result.projectCount} projects, ${result.scriptCount} scripts, ${result.configCount} configs`;
+        logSuccess("SQLite Import", detail);
+        debugOk("SQLite Import");
+        setImportLabel("✅ Done!");
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        logError("SQLite Import", `Import failed: ${reason}`);
+        debugError("SQLite Import", reason);
+        setImportLabel("❌ Failed");
+      }
+
+      resetImport();
+    },
+    [importMode, logSuccess, logError, logInfo, debugOk, debugError, resetImport],
+  );
+
+  return (
+    <>
+      <input
+        ref={fileRef}
+        type="file"
+        accept=".zip"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            void handleFileChange(file);
+            e.target.value = "";
+          }
+        }}
+      />
+      <div className="sqlite-bundle-actions">
+        <div className="sqlite-bar">
+          <button className="btn-action" onClick={handleImportClick}>
+            {importLabel}
+          </button>
+          <div className="import-mode-toggle">
+            <button
+              className={`mode-btn${importMode === "merge" ? " active" : ""}`}
+              onClick={() => setImportMode("merge")}
+              type="button"
+            >
                             Merge
-                        </button>
-                        <button
-                            className={`mode-btn${importMode === "replace" ? " active" : ""}`}
-                            onClick={() => setImportMode("replace")}
-                            type="button"
-                        >
+            </button>
+            <button
+              className={`mode-btn${importMode === "replace" ? " active" : ""}`}
+              onClick={() => setImportMode("replace")}
+              type="button"
+            >
                             Replace All
-                        </button>
-                    </div>
-                    <div className="bar-divider" />
-                    <button className="btn-action" onClick={() => void handleExport()}>
-                        {exportLabel}
-                    </button>
-                </div>
-            </div>
-        </>
-    );
+            </button>
+          </div>
+          <div className="bar-divider" />
+          <button className="btn-action" onClick={() => void handleExport()}>
+            {exportLabel}
+          </button>
+        </div>
+      </div>
+    </>
+  );
 }

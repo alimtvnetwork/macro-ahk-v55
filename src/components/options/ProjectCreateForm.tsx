@@ -33,9 +33,17 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const applyManifest = useCallback((manifest: Record<string, unknown>) => {
-    if (typeof manifest.name === "string") setName((prev) => prev || manifest.name as string);
-    if (typeof manifest.version === "string") setVersion((prev) => prev === "1.0.0" ? manifest.version as string : prev);
-    if (typeof manifest.description === "string") setDescription((prev) => prev || manifest.description as string);
+    if (typeof manifest.name === "string") {
+      setName((prev) => prev || manifest.name as string);
+    }
+
+    if (typeof manifest.version === "string") {
+      setVersion((prev) => prev === "1.0.0" ? manifest.version as string : prev);
+    }
+
+    if (typeof manifest.description === "string") {
+      setDescription((prev) => prev || manifest.description as string);
+    }
 
     if (Array.isArray(manifest.scripts)) {
       const bindings: ScriptBinding[] = manifest.scripts.map((s: Record<string, unknown>, i: number) => ({
@@ -64,7 +72,10 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
 
   const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) void handleJsonFileImport(file);
+    if (file) {
+      void handleJsonFileImport(file);
+    }
+
     e.target.value = "";
   }, [handleJsonFileImport]);
 
@@ -171,15 +182,17 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
           {/* Import zone */}
           <div className="space-y-2">
             <div
-              onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault(); setIsDragOver(true); 
+              }}
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleFolderDrop}
               className={`
                 border-2 border-dashed rounded-md p-4 text-center transition-all duration-200 cursor-pointer
                 ${isDragOver
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-muted-foreground/20 text-muted-foreground hover:border-primary/40"
-                }
+      ? "border-primary bg-primary/5 text-primary"
+      : "border-muted-foreground/20 text-muted-foreground hover:border-primary/40"
+    }
               `}
             >
               <Upload className="h-4 w-4 mx-auto mb-1" />

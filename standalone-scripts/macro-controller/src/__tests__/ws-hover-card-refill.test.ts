@@ -18,8 +18,12 @@ const MS_PER_DAY = 86_400_000;
 
 // Freeze the system clock so relative-time formatters (Date.now()) inside
 // ws-hover-card.ts produce deterministic projections (Warning starts on, etc.).
-beforeAll(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); });
-afterAll(() => { vi.useRealTimers(); });
+beforeAll(() => {
+  vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); 
+});
+afterAll(() => {
+  vi.useRealTimers(); 
+});
 
 function config(refillWarn: number): WorkspaceLifecycleConfig {
   return {
@@ -63,10 +67,16 @@ function extractRefillSection(html: string): string {
   let cursor = 0;
   while (cursor < html.length) {
     const headerStart = html.indexOf(HEADER_MARKER, cursor);
-    if (headerStart === -1) return '';
+    if (headerStart === -1) {
+      return '';
+    }
+
     const sectionOpen = html.lastIndexOf('<div', headerStart);
     const headerCloseIdx = html.indexOf('</div>', headerStart);
-    if (headerCloseIdx === -1) return '';
+    if (headerCloseIdx === -1) {
+      return '';
+    }
+
     const headerBlock = html.slice(headerStart, headerCloseIdx + 6);
     if (headerBlock.includes('>Refill</div>')) {
       const nextHeaderIdx = html.indexOf(HEADER_MARKER, headerCloseIdx);
@@ -75,6 +85,7 @@ function extractRefillSection(html: string): string {
         ? html.slice(sectionOpen)
         : html.slice(sectionOpen, html.lastIndexOf('<div', nextHeaderIdx));
     }
+
     cursor = headerCloseIdx + 6;
   }
 

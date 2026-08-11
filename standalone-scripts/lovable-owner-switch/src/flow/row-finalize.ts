@@ -15,27 +15,27 @@ import type { RowExecutionContext, RowExecutionResult } from "./row-types";
 import type { RowStateStore, RowStateUpdate } from "./row-state-store";
 
 const buildUpdate = (rowIndex: number, result: RowExecutionResult): RowStateUpdate => ({
-    RowIndex: rowIndex,
-    IsDone: result.IsDone,
-    HasError: result.HasError,
-    LastError: result.LastError,
-    CompletedAtUtc: result.IsDone ? new Date().toISOString() : null,
-    Outcome: result.Outcome,
-    PromotedOwners: result.PromotedOwners,
+  RowIndex: rowIndex,
+  IsDone: result.IsDone,
+  HasError: result.HasError,
+  LastError: result.LastError,
+  CompletedAtUtc: result.IsDone ? new Date().toISOString() : null,
+  Outcome: result.Outcome,
+  PromotedOwners: result.PromotedOwners,
 });
 
 export const finalizeRow = (
-    ctx: RowExecutionContext,
-    sink: LogSink,
-    store: RowStateStore,
-    result: RowExecutionResult,
+  ctx: RowExecutionContext,
+  sink: LogSink,
+  store: RowStateStore,
+  result: RowExecutionResult,
 ): RowExecutionResult => {
-    sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Row,
-        result.HasError ? LogSeverityType.Error : LogSeverityType.Info,
-        `Row ${ctx.Row.RowIndex} → ${result.Outcome} in ${result.DurationMs}ms`,
-    ));
-    store.update(buildUpdate(ctx.Row.RowIndex, result));
+  sink.write(buildEntry(
+    ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Row,
+    result.HasError ? LogSeverityType.Error : LogSeverityType.Info,
+    `Row ${ctx.Row.RowIndex} → ${result.Outcome} in ${result.DurationMs}ms`,
+  ));
+  store.update(buildUpdate(ctx.Row.RowIndex, result));
 
-    return result;
+  return result;
 };

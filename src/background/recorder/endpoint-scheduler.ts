@@ -34,32 +34,41 @@ interface SchedulerAccumulator {
 }
 
 function registerFetch(
-    spec: ScheduledFetch,
-    acc: SchedulerAccumulator,
-    onTick: (dataSourceId: number) => void,
-    setIntervalImpl: typeof setInterval,
+  spec: ScheduledFetch,
+  acc: SchedulerAccumulator,
+  onTick: (dataSourceId: number) => void,
+  setIntervalImpl: typeof setInterval,
 ): void {
-    const capped = acc.active.length >= MAX_ACTIVE_TIMERS;
-    const tooSmall = spec.IntervalMs < MIN_INTERVAL_MS;
-    if (capped || tooSmall) { acc.skipped.push(spec.DataSourceId);
+  const capped = acc.active.length >= MAX_ACTIVE_TIMERS;
+  const tooSmall = spec.IntervalMs < MIN_INTERVAL_MS;
+  if (capped || tooSmall) {
+    acc.skipped.push(spec.DataSourceId);
 
- return; }
-    acc.handles.push(setIntervalImpl(() => onTick(spec.DataSourceId), spec.IntervalMs));
-    acc.active.push(spec.DataSourceId);
+    return; 
+  }
+
+  acc.handles.push(setIntervalImpl(() => onTick(spec.DataSourceId), spec.IntervalMs));
+  acc.active.push(spec.DataSourceId);
 }
 
 export function startScheduler(
-    fetches: ReadonlyArray<ScheduledFetch>,
-    onTick: (dataSourceId: number) => void,
-    setIntervalImpl: typeof setInterval = setInterval,
-    clearIntervalImpl: typeof clearInterval = clearInterval,
+  fetches: ReadonlyArray<ScheduledFetch>,
+  onTick: (dataSourceId: number) => void,
+  setIntervalImpl: typeof setInterval = setInterval,
+  clearIntervalImpl: typeof clearInterval = clearInterval,
 ): SchedulerStartResult {
-    const acc: SchedulerAccumulator = { handles: [], active: [], skipped: [] };
-    for (const spec of fetches) registerFetch(spec, acc, onTick, setIntervalImpl);
-    const teardown = (): void => {
-        for (const h of acc.handles) clearIntervalImpl(h);
-        acc.handles.length = 0;
-    };
+  const acc: SchedulerAccumulator = { handles: [], active: [], skipped: [] };
+  for (const spec of fetches) {
+    registerFetch(spec, acc, onTick, setIntervalImpl);
+  }
 
-    return { Teardown: teardown, Active: acc.active, Skipped: acc.skipped };
+  const teardown = (): void => {
+    for (const h of acc.handles) {
+      clearIntervalImpl(h);
+    }
+
+    acc.handles.length = 0;
+  };
+
+  return { Teardown: teardown, Active: acc.active, Skipped: acc.skipped };
 }

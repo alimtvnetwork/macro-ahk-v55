@@ -111,10 +111,15 @@ export function StorageBrowserView() {
     }
   }, [platform]);
 
-  useEffect(() => { void loadTables(); }, [loadTables]);
+  useEffect(() => {
+    void loadTables(); 
+  }, [loadTables]);
 
   const handleClearAll = async () => {
-    if (!confirm("⚠️ This will DELETE all rows from ALL tables. Are you sure?")) return;
+    if (!confirm("⚠️ This will DELETE all rows from ALL tables. Are you sure?")) {
+      return;
+    }
+
     try {
       const resp = await platform.sendMessage<{ cleared: string[] }>({ type: "STORAGE_CLEAR_ALL" });
       toast.success(`Cleared ${resp.cleared?.length ?? 0} tables`);
@@ -125,7 +130,10 @@ export function StorageBrowserView() {
   };
 
   const handleReseed = async () => {
-    if (!confirm("⚠️ This will DELETE all data and re-populate from defaults. Continue?")) return;
+    if (!confirm("⚠️ This will DELETE all data and re-populate from defaults. Continue?")) {
+      return;
+    }
+
     try {
       const resp = await platform.sendMessage<{ seeded: string[] }>({ type: "STORAGE_RESEED" });
       toast.success(`Reseeded: ${resp.seeded?.join(", ") ?? "done"}`);
@@ -161,11 +169,15 @@ export function StorageBrowserView() {
         const keys = Object.keys(sessionStorage);
         setSessionCount(keys.length);
         let size = 0;
-        for (const k of keys) size += (sessionStorage.getItem(k) ?? "").length * 2;
+        for (const k of keys) {
+          size += (sessionStorage.getItem(k) ?? "").length * 2;
+        }
+
         setSessionSize(size);
       }
     } catch (err) { /* swallowed */
- setSessionCount(0); }
+      setSessionCount(0); 
+    }
 
     // Cookies
     try {
@@ -180,7 +192,8 @@ export function StorageBrowserView() {
         setCookieCount(document.cookie ? document.cookie.split(";").length : 0);
       }
     } catch (err) { /* swallowed */
- setCookieCount(0); }
+      setCookieCount(0); 
+    }
 
     // LocalStorage / chrome.storage.local
     try {
@@ -198,11 +211,15 @@ export function StorageBrowserView() {
         const keys = Object.keys(localStorage);
         setLocalCount(keys.length);
         let size = 0;
-        for (const k of keys) size += (localStorage.getItem(k) ?? "").length * 2;
+        for (const k of keys) {
+          size += (localStorage.getItem(k) ?? "").length * 2;
+        }
+
         setLocalSize(size);
       }
     } catch (err) { /* swallowed */
- setLocalCount(0); }
+      setLocalCount(0); 
+    }
   }, []);
 
   const tableItems = tables.filter(t => !t.isView);
@@ -216,7 +233,9 @@ export function StorageBrowserView() {
         tableName={selectedTable}
         primaryKeys={tableInfo?.primaryKeys ?? ["id"]}
         isView={selectedIsView}
-        onBack={() => { setSelectedTable(null); setSelectedIsView(false); void loadTables(); }}
+        onBack={() => {
+          setSelectedTable(null); setSelectedIsView(false); void loadTables(); 
+        }}
       />
     );
   }
@@ -371,7 +390,9 @@ export function StorageBrowserView() {
                   {tableItems.map((table, i) => (
                     <div key={table.name} className="anim-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
                       <button
-                        onClick={() => { setSelectedTable(table.name); setSelectedIsView(false); }}
+                        onClick={() => {
+                          setSelectedTable(table.name); setSelectedIsView(false); 
+                        }}
                         className="w-full text-left p-4 rounded-lg border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 group"
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -403,7 +424,9 @@ export function StorageBrowserView() {
                     {viewItems.map((view, i) => (
                       <div key={view.name} className="anim-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
                         <button
-                          onClick={() => { setSelectedTable(view.name); setSelectedIsView(true); }}
+                          onClick={() => {
+                            setSelectedTable(view.name); setSelectedIsView(true); 
+                          }}
                           className="w-full text-left p-4 rounded-lg border border-dashed border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 group"
                         >
                           <div className="flex items-center justify-between mb-2">
@@ -483,7 +506,9 @@ function CssAssetsSection() {
     }
   }, [platform]);
 
-  useEffect(() => { void loadAssets(); }, [loadAssets]);
+  useEffect(() => {
+    void loadAssets(); 
+  }, [loadAssets]);
 
   return (
     <div>
@@ -630,11 +655,15 @@ function TableDataView({
     }
   }, [platform, tableName, offset, limit]);
 
-  useEffect(() => { void loadData(); }, [loadData]);
+  useEffect(() => {
+    void loadData(); 
+  }, [loadData]);
 
   const handleDelete = async (row: Record<string, unknown>) => {
     const pk: Record<string, unknown> = {};
-    for (const k of primaryKeys) pk[k] = row[k];
+    for (const k of primaryKeys) {
+      pk[k] = row[k];
+    }
 
     try {
       await platform.sendMessage({
@@ -650,7 +679,10 @@ function TableDataView({
   };
 
   const handleClearTable = async () => {
-    if (!confirm(`⚠️ Delete ALL rows from "${tableName}"?`)) return;
+    if (!confirm(`⚠️ Delete ALL rows from "${tableName}"?`)) {
+      return;
+    }
+
     try {
       const resp = await platform.sendMessage<{ deleted: number }>({
         type: "STORAGE_CLEAR_TABLE",
@@ -670,26 +702,38 @@ function TableDataView({
       const v = row[col];
       vals[col] = v === null || v === undefined ? "" : String(v);
     }
+
     setEditValues(vals);
   };
 
   // eslint-disable-next-line sonarjs/cognitive-complexity -- row save with type coercion and validation
   const handleSaveEdit = async () => {
-    if (!editRow) return;
+    if (!editRow) {
+      return;
+    }
+
     const pk: Record<string, unknown> = {};
-    for (const k of primaryKeys) pk[k] = editRow[k];
+    for (const k of primaryKeys) {
+      pk[k] = editRow[k];
+    }
 
     const updates: Record<string, unknown> = {};
     for (const col of columns) {
-      if (primaryKeys.includes(col)) continue;
-      if (READ_ONLY_COLUMNS.has(col)) continue;
+      if (primaryKeys.includes(col)) {
+        continue;
+      }
+
+      if (READ_ONLY_COLUMNS.has(col)) {
+        continue;
+      }
+
       const colInfo = schema.find(s => s.name === col);
       const newVal = editValues[col] ?? "";
       const oldVal = editRow[col] === null || editRow[col] === undefined ? "" : String(editRow[col]);
       if (newVal !== oldVal) {
         updates[col] = colInfo?.type === "INTEGER" ? parseInt(newVal) || 0
           : colInfo?.type === "REAL" ? parseFloat(newVal) || 0
-          : newVal;
+            : newVal;
       }
     }
 
@@ -858,7 +902,11 @@ function TableDataView({
 
       {/* Edit Modal — not shown for views */}
       {!isView && (
-        <Dialog open={editRow !== null} onOpenChange={(open) => { if (!open) setEditRow(null); }}>
+        <Dialog open={editRow !== null} onOpenChange={(open) => {
+          if (!open) {
+            setEditRow(null);
+          } 
+        }}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="font-mono text-sm">Edit Row — {tableName}</DialogTitle>
@@ -921,9 +969,11 @@ function CellValue({ value }: { value: SqlValue }) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground/50 italic">null</span>;
   }
+
   if (typeof value === "number") {
     return <span className="text-primary">{value}</span>;
   }
+
   const raw = String(value);
   if (raw.length > 80) {
     return <span title={raw}>{raw.slice(0, 80)}…</span>;
@@ -937,7 +987,10 @@ function CellValue({ value }: { value: SqlValue }) {
 /* ------------------------------------------------------------------ */
 
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
+  if (bytes === 0) {
+    return "0 B";
+  }
+
   const units = ["B", "KB", "MB", "GB"];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
   const value = bytes / Math.pow(1024, i);

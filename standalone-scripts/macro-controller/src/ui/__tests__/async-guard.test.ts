@@ -14,6 +14,7 @@ describe('guardAsyncClick', () => {
       await new Promise((r) => setTimeout(r, 10));
       inFlight -= 1;
     };
+
     const guarded = guardAsyncClick(btn, handler);
     await Promise.all([guarded(), guarded(), guarded()]);
     expect(calls).toBe(1);
@@ -24,7 +25,9 @@ describe('guardAsyncClick', () => {
 
   it('restores state even when the handler throws', async () => {
     const btn = document.createElement('button');
-    const guarded = guardAsyncClick(btn, async () => { throw new Error('boom'); });
+    const guarded = guardAsyncClick(btn, async () => {
+      throw new Error('boom'); 
+    });
     await expect(guarded()).rejects.toThrow('boom');
     expect(isBusy(btn)).toBe(false);
     expect(btn.disabled).toBe(false);

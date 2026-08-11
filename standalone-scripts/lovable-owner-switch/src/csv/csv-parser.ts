@@ -27,76 +27,76 @@ const MAX_ROWS = 1000;
 const stripBom = (text: string): string => (text.startsWith(BOM) ? text.slice(BOM.length) : text);
 
 const buildRow = (
-    raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
-    rowIndex: number,
+  raw: ReadonlyArray<string>,
+  indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
+  rowIndex: number,
 ): OwnerSwitchCsvRow => ({
-    RowIndex: rowIndex,
-    LoginEmail: readRequired(raw, indices, OwnerSwitchCsvColumnType.LoginEmail),
-    Password: readOptional(raw, indices, OwnerSwitchCsvColumnType.Password),
-    OwnerEmail1: readRequired(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail1),
-    OwnerEmail2: readOptional(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail2),
-    Notes: readOptional(raw, indices, OwnerSwitchCsvColumnType.Notes),
+  RowIndex: rowIndex,
+  LoginEmail: readRequired(raw, indices, OwnerSwitchCsvColumnType.LoginEmail),
+  Password: readOptional(raw, indices, OwnerSwitchCsvColumnType.Password),
+  OwnerEmail1: readRequired(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail1),
+  OwnerEmail2: readOptional(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail2),
+  Notes: readOptional(raw, indices, OwnerSwitchCsvColumnType.Notes),
 });
 
 const tryBuildRow = (
-    raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
-    rowIndex: number,
-    errors: CsvParseError[],
+  raw: ReadonlyArray<string>,
+  indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
+  rowIndex: number,
+  errors: CsvParseError[],
 ): OwnerSwitchCsvRow | null => {
-    try {
-        return buildRow(raw, indices, rowIndex);
-    } catch (caught: unknown) {
-        const message = caught instanceof Error ? caught.message : String(caught);
-        errors.push({ RowIndex: rowIndex, Column: null, Message: message });
+  try {
+    return buildRow(raw, indices, rowIndex);
+  } catch (caught: unknown) {
+    const message = caught instanceof Error ? caught.message : String(caught);
+    errors.push({ RowIndex: rowIndex, Column: null, Message: message });
 
-        return null;
-    }
+    return null;
+  }
 };
 
 export const parseOwnerSwitchCsv = (text: string): OwnerSwitchCsvParseResult => {
-    const cleaned = stripBom(text);
+  const cleaned = stripBom(text);
 
-    if (cleaned.trim().length === 0) {
-        return {
-            Rows: [],
-            Errors: [{ RowIndex: 0, Column: null, Message: "CSV is empty (no header, no rows)" }],
-            Warnings: [],
-        };
+  if (cleaned.trim().length === 0) {
+    return {
+      Rows: [],
+      Errors: [{ RowIndex: 0, Column: null, Message: "CSV is empty (no header, no rows)" }],
+      Warnings: [],
+    };
+  }
+
+  const grid = splitCsv(cleaned);
+
+  if (grid.length === 0) {
+    return { Rows: [], Errors: [{ RowIndex: 0, Column: null, Message: "CSV is empty" }], Warnings: [] };
+  }
+
+  const header = resolveHeader(grid[0]);
+  const errors: CsvParseError[] = [...header.Errors];
+  const rows: OwnerSwitchCsvRow[] = [];
+
+  const dataRowCount = grid.length - 1;
+  if (dataRowCount > MAX_ROWS) {
+    errors.push({
+      RowIndex: 0,
+      Column: null,
+      Message: `Too many rows: ${dataRowCount} (max ${MAX_ROWS}). Split the CSV into smaller batches.`,
+    });
+
+    return { Rows: [], Errors: errors, Warnings: header.Warnings };
+  }
+
+  for (let i = 1; i < grid.length; i += 1) {
+    const row = tryBuildRow(grid[i], header.Indices, i, errors);
+
+    if (row !== null) {
+      rows.push(row);
+      errors.push(...validateRow(row));
     }
+  }
 
-    const grid = splitCsv(cleaned);
+  errors.push(...validateFile(rows));
 
-    if (grid.length === 0) {
-        return { Rows: [], Errors: [{ RowIndex: 0, Column: null, Message: "CSV is empty" }], Warnings: [] };
-    }
-
-    const header = resolveHeader(grid[0]);
-    const errors: CsvParseError[] = [...header.Errors];
-    const rows: OwnerSwitchCsvRow[] = [];
-
-    const dataRowCount = grid.length - 1;
-    if (dataRowCount > MAX_ROWS) {
-        errors.push({
-            RowIndex: 0,
-            Column: null,
-            Message: `Too many rows: ${dataRowCount} (max ${MAX_ROWS}). Split the CSV into smaller batches.`,
-        });
-
-        return { Rows: [], Errors: errors, Warnings: header.Warnings };
-    }
-
-    for (let i = 1; i < grid.length; i += 1) {
-        const row = tryBuildRow(grid[i], header.Indices, i, errors);
-
-        if (row !== null) {
-            rows.push(row);
-            errors.push(...validateRow(row));
-        }
-    }
-
-    errors.push(...validateFile(rows));
-
-    return { Rows: rows, Errors: errors, Warnings: header.Warnings };
+  return { Rows: rows, Errors: errors, Warnings: header.Warnings };
 };

@@ -49,6 +49,7 @@ export function StorageCard({
     if (hasDataUrl) {
       triggerDownloadLink(result.dataUrl!, result.filename);
     }
+
     setIsExporting(false);
   };
 

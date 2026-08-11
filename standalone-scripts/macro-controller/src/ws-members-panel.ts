@@ -40,9 +40,16 @@ function copyToClipboard(value: string, label: string): void {
 
     return;
   }
+
   const preview = value.length > 40 ? value.slice(0, 37) + '…' : value;
-  const onOk = function (): void { showToast('📋 ' + label + ' copied: ' + preview, 'success'); };
-  const onFail = function (msg: string): void { showToast('❌ Copy failed: ' + msg, 'error'); };
+  const onOk = function (): void {
+    showToast('📋 ' + label + ' copied: ' + preview, 'success'); 
+  };
+
+  const onFail = function (msg: string): void {
+    showToast('❌ Copy failed: ' + msg, 'error'); 
+  };
+
   const nav = navigator as Navigator & { clipboard?: { writeText: (s: string) => Promise<void> } };
   if (nav.clipboard && typeof nav.clipboard.writeText === 'function') {
     nav.clipboard.writeText(value).then(onOk).catch(function (err: unknown) {
@@ -51,6 +58,7 @@ function copyToClipboard(value: string, label: string): void {
 
     return;
   }
+
   try {
     const ta = document.createElement('textarea');
     ta.value = value;
@@ -59,7 +67,11 @@ function copyToClipboard(value: string, label: string): void {
     ta.select();
     const ok = document.execCommand('copy');
     document.body.removeChild(ta);
-    if (ok) onOk(); else onFail('execCommand returned false');
+    if (ok) {
+      onOk();
+    } else {
+      onFail('execCommand returned false');
+    }
   } catch (err: unknown) {
     logError('MacroController', 'Unknown error');
     onFail(err instanceof Error ? err.message : String(err));
@@ -69,7 +81,9 @@ function copyToClipboard(value: string, label: string): void {
 /** Escape a single CSV field per RFC 4180 (quote if needed, double inner quotes). */
 function csvField(value: string | number): string {
   const s = value == null ? '' : String(value);
-  if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  if (/[",\r\n]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
 
   return s;
 }
@@ -86,6 +100,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
 
     return;
   }
+
   const headers = [
     'rank', 'display_name', 'username', 'email', 'role',
     'total_credits_used', 'total_credits_used_in_billing_period',
@@ -120,7 +135,9 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
+    setTimeout(function () {
+      URL.revokeObjectURL(url); 
+    }, Timings.TIMEOUT_SHORT);
     showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
   } catch (err: unknown) {
     logError('MacroController', 'Unknown error');
@@ -142,8 +159,13 @@ function escHtml(s: string): string {
 }
 
 function fmtNumber(n: number): string {
-  if (!Number.isFinite(n)) return '0';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  if (!Number.isFinite(n)) {
+    return '0';
+  }
+
+  if (n >= 1000) {
+    return (n / 1000).toFixed(1) + 'k';
+  }
 
   // Show up to 2 decimals only when fractional part is non-trivial.
   return n % 1 === 0 ? String(Math.round(n)) : n.toFixed(1);
@@ -174,8 +196,13 @@ function roleBadge(role: string): string {
 function initialsFor(m: WorkspaceMember): string {
   const src = (m.display_name || m.username || m.email || m.user_id || '?').trim();
   const parts = src.split(/[\s@._-]+/).filter(Boolean);
-  if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  if (parts.length === 0) {
+    return '?';
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
 
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
@@ -184,7 +211,10 @@ function initialsFor(m: WorkspaceMember): string {
 function avatarBgFor(m: WorkspaceMember): string {
   const key = m.user_id || m.email || m.username || '';
   let h = 0;
-  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  }
+
   const hue = h % 360;
 
   return 'hsl(' + hue + ',45%,32%)';
@@ -213,9 +243,13 @@ function shareBarHtml(pct: number): string {
   const label = clamped >= 10 ? clamped.toFixed(0) + '%' : clamped.toFixed(1) + '%';
   // Color ramp: low=slate, mid=cyan, high=emerald, dominant=amber
   let fill = '#475569';
-  if (clamped >= 40) fill = '#f59e0b';
-  else if (clamped >= 20) fill = '#10b981';
-  else if (clamped >= 5) fill = '#0ea5e9';
+  if (clamped >= 40) {
+    fill = '#f59e0b';
+  } else if (clamped >= 20) {
+    fill = '#10b981';
+  } else if (clamped >= 5) {
+    fill = '#0ea5e9';
+  }
 
   return '<div title="Share of loaded members\u2019 total credits: ' + label + '" '
     + 'style="display:flex;align-items:center;gap:6px;padding-left:42px;margin-top:2px;">'
@@ -250,10 +284,10 @@ function memberRowHtml(m: WorkspaceMember, idx: number, sumLoaded: number): stri
     + '</div>'
     + '<div style="display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#94a3b8;padding-left:42px;">'
     +   (m.email
-          ? '<span data-marco-action="copy" data-marco-copy-value="' + escHtml(m.email) + '" data-marco-copy-label="Email" '
+      ? '<span data-marco-action="copy" data-marco-copy-value="' + escHtml(m.email) + '" data-marco-copy-label="Email" '
             + 'style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" '
             + 'title="Click to copy email: ' + escHtml(m.email) + '">' + escHtml(m.email) + '</span>'
-          : '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>')
+      : '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>')
     +   '<span title="Credits used this billing period">Period: ' + billingCredits + '</span>'
     + '</div>'
     + shareBarHtml(sharePct)
@@ -270,27 +304,38 @@ function buildBodyHtml(state: PanelState): string {
   if (state.kind === 'loading') {
     return '<div style="padding:14px;text-align:center;color:#94a3b8;font-size:11px;">⏳ Loading members…</div>';
   }
+
   if (state.kind === 'error') {
     return '<div style="padding:12px;color:#fca5a5;font-size:11px;line-height:1.4;">'
       + '<div style="font-weight:700;margin-bottom:4px;">❌ Failed to load members</div>'
       + '<div style="color:#cbd5e1;font-family:monospace;font-size:10px;word-break:break-word;">' + escHtml(state.error) + '</div>'
       + '</div>';
   }
+
   if (state.members.length === 0) {
     return '<div style="padding:14px;text-align:center;color:#94a3b8;font-size:11px;">No active members.</div>';
   }
+
   const sumLoaded = state.members.reduce(function (acc, m) {
     return acc + (Number.isFinite(m.total_credits_used) ? m.total_credits_used : 0);
   }, 0);
-  const rows = state.members.map(function (m, i) { return memberRowHtml(m, i, sumLoaded); }).join('');
+  const rows = state.members.map(function (m, i) {
+    return memberRowHtml(m, i, sumLoaded); 
+  }).join('');
 
   return '<div style="max-height:380px;overflow-y:auto;">' + rows + loadMoreRowHtml(state) + '</div>';
 }
 
 function loadMoreRowHtml(state: PanelStateSuccess): string {
   const nextLimit = nextPageLimit(state.limit);
-  if (nextLimit === null) return '';
-  if (state.members.length >= state.total) return '';
+  if (nextLimit === null) {
+    return '';
+  }
+
+  if (state.members.length >= state.total) {
+    return '';
+  }
+
   const label = 'Load more (top ' + nextLimit + ' of ' + state.total + ')';
 
   return '<button type="button" data-marco-action="load-more" '
@@ -303,7 +348,9 @@ function loadMoreRowHtml(state: PanelStateSuccess): string {
 
 function nextPageLimit(current: number): number | null {
   for (const step of MEMBERS_PAGE_LIMIT_STEPS) {
-    if (step > current) return step;
+    if (step > current) {
+      return step;
+    }
   }
 
   return null;
@@ -401,7 +448,10 @@ interface PanelHandlerStore {
 
 function ensurePanelEl(): HTMLDivElement {
   let el = document.getElementById(PANEL_ID) as HTMLDivElement | null;
-  if (el) return el;
+  if (el) {
+    return el;
+  }
+
   el = document.createElement('div');
   el.id = PANEL_ID;
   el.style.cssText = [
@@ -430,10 +480,22 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
   const vh = window.innerHeight;
   let left = x;
   let top = y;
-  if (left + r.width > vw - 8) left = Math.max(8, vw - r.width - 8);
-  if (top + r.height > vh - 8) top = Math.max(8, vh - r.height - 8);
-  if (left < 8) left = 8;
-  if (top < 8) top = 8;
+  if (left + r.width > vw - 8) {
+    left = Math.max(8, vw - r.width - 8);
+  }
+
+  if (top + r.height > vh - 8) {
+    top = Math.max(8, vh - r.height - 8);
+  }
+
+  if (left < 8) {
+    left = 8;
+  }
+
+  if (top < 8) {
+    top = 8;
+  }
+
   el.style.left = left + 'px';
   el.style.top = top + 'px';
   el.style.visibility = 'visible';
@@ -453,12 +515,17 @@ function render(el: HTMLElement, wsName: string, state: PanelState): void {
   const chipContainer = footer?.querySelector('#marco-chip-input-container');
   if (chipContainer) {
     const inviteBtn = footer?.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
-    if (inviteBtn) inviteBtn.disabled = true;
+    if (inviteBtn) {
+      inviteBtn.disabled = true;
+    }
 
     const chipInput = createChipInput({
       placeholder: 'Enter emails...',
       onValidEmailsChange: (emails) => {
-        if (inviteBtn) inviteBtn.disabled = emails.length === 0;
+        if (inviteBtn) {
+          inviteBtn.disabled = emails.length === 0;
+        }
+
         (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails = emails;
       }
     });
@@ -467,7 +534,9 @@ function render(el: HTMLElement, wsName: string, state: PanelState): void {
 
   // v3.30.0 — make the panel draggable by its header.
   const handle = el.querySelector('[data-marco-drag-handle="1"]') as HTMLElement | null;
-  if (handle) makeDraggable(el, handle);
+  if (handle) {
+    makeDraggable(el, handle);
+  }
 }
 
 function findFooter(el: HTMLElement): HTMLElement | null {
@@ -476,22 +545,31 @@ function findFooter(el: HTMLElement): HTMLElement | null {
 
 function swapFooter(el: HTMLElement, expanded: boolean): void {
   const footer = findFooter(el);
-  if (!footer) return;
+  if (!footer) {
+    return;
+  }
 
   footer.innerHTML = expanded ? footerFormHtml() : footerCollapsedHtml();
   if (expanded) {
     const chipContainer = footer.querySelector('#marco-chip-input-container');
     const inviteBtn = footer.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
-    if (inviteBtn) inviteBtn.disabled = true;
+    if (inviteBtn) {
+      inviteBtn.disabled = true;
+    }
 
     const chipInput = createChipInput({
       placeholder: 'Enter emails...',
       onValidEmailsChange: (emails) => {
-        if (inviteBtn) inviteBtn.disabled = emails.length === 0;
+        if (inviteBtn) {
+          inviteBtn.disabled = emails.length === 0;
+        }
+
         (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails = emails;
       }
     });
-    if (chipContainer) chipContainer.appendChild(chipInput);
+    if (chipContainer) {
+      chipContainer.appendChild(chipInput);
+    }
   }
 }
 
@@ -500,7 +578,9 @@ const MEMBER_MENU_ID = 'marco-ws-member-menu';
 
 function closeMemberActionMenu(): void {
   const existing = document.getElementById(MEMBER_MENU_ID);
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 }
 
 function buildMenuItem(label: string, color: string, onClick: () => void): HTMLButtonElement {
@@ -510,8 +590,14 @@ function buildMenuItem(label: string, color: string, onClick: () => void): HTMLB
   btn.style.cssText =
     'display:block;width:100%;text-align:left;padding:5px 10px;background:transparent;color:' + color +
     ';border:none;font-size:11px;cursor:pointer;line-height:1.3;';
-  btn.onmouseenter = function () { btn.style.background = 'rgba(148,163,184,0.15)'; };
-  btn.onmouseleave = function () { btn.style.background = 'transparent'; };
+  btn.onmouseenter = function () {
+    btn.style.background = 'rgba(148,163,184,0.15)'; 
+  };
+
+  btn.onmouseleave = function () {
+    btn.style.background = 'transparent'; 
+  };
+
   btn.onclick = function (e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -523,13 +609,17 @@ function buildMenuItem(label: string, color: string, onClick: () => void): HTMLB
 }
 
 function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userId: string, label: string): void {
-  if (!window.confirm('Remove "' + label + '" from this workspace?')) return;
+  if (!window.confirm('Remove "' + label + '" from this workspace?')) {
+    return;
+  }
+
   const row = panelEl.querySelector('[data-marco-member-row][data-marco-user-id="' + cssEscape(userId) + '"]') as HTMLElement | null;
   const prevOpacity = row ? row.style.opacity : '';
   if (row) {
     row.style.opacity = '0.4';
     row.style.pointerEvents = 'none';
   }
+
   removeMember(wsId, userId)
     .then(function () {
       showToast('🗑️ Removed ' + label, 'success');
@@ -547,7 +637,10 @@ function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userI
 
 function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string, userId: string, label: string, nextRole: MemberRoleType): void {
   const verb = nextRole === 'owner' ? 'Promote to Owner' : 'Demote to Member';
-  if (!window.confirm(verb + ': "' + label + '"?')) return;
+  if (!window.confirm(verb + ': "' + label + '"?')) {
+    return;
+  }
+
   updateMemberRole(wsId, userId, nextRole)
     .then(function () {
       showToast('👑 ' + label + ' → ' + nextRole, 'success');
@@ -562,9 +655,13 @@ function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string
 // CSS.escape polyfill (Safari/older WebView).
 function cssEscape(value: string): string {
   const css = (window as unknown as { CSS?: { escape?: (s: string) => string } }).CSS;
-  if (css && typeof css.escape === 'function') return css.escape(value);
+  if (css && typeof css.escape === 'function') {
+    return css.escape(value);
+  }
 
-  return value.replace(/[^a-zA-Z0-9_-]/g, function (ch) { return '\\' + ch; });
+  return value.replace(/[^a-zA-Z0-9_-]/g, function (ch) {
+    return '\\' + ch; 
+  });
 }
 
 function openMemberActionMenu(
@@ -577,7 +674,10 @@ function openMemberActionMenu(
   label: string,
 ): void {
   closeMemberActionMenu();
-  if (!userId) return;
+  if (!userId) {
+    return;
+  }
+
   const menu = document.createElement('div');
   menu.id = MEMBER_MENU_ID;
   const rect = anchor.getBoundingClientRect();
@@ -602,6 +702,7 @@ function openMemberActionMenu(
       performPromoteDemote(panelEl, wsId, wsName, userId, label, 'owner');
     }));
   }
+
   menu.appendChild(buildMenuItem('🗑️ Remove member', '#fca5a5', function () {
     performRemove(panelEl, wsId, wsName, userId, label);
   }));
@@ -612,17 +713,25 @@ function openMemberActionMenu(
   setTimeout(function () {
     const outside = function (e: MouseEvent): void {
       const t = e.target as Node | null;
-      if (t && menu.contains(t)) return;
+      if (t && menu.contains(t)) {
+        return;
+      }
+
       closeMemberActionMenu();
       document.removeEventListener('mousedown', outside, true);
       document.removeEventListener('keydown', key, true);
     };
+
     const key = function (e: KeyboardEvent): void {
-      if (e.key !== 'Escape') return;
+      if (e.key !== 'Escape') {
+        return;
+      }
+
       closeMemberActionMenu();
       document.removeEventListener('mousedown', outside, true);
       document.removeEventListener('keydown', key, true);
     };
+
     document.addEventListener('mousedown', outside, true);
     document.addEventListener('keydown', key, true);
   }, 10);
@@ -664,6 +773,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
     } else {
       showToast('✉️ Sent ' + results.success + ' (failed ' + results.fail + ')', 'warn');
     }
+
     swapFooter(el, false);
     loadAndRender(el, wsId, wsName);
   })();
@@ -673,7 +783,10 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
 function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): void {
   el.onclick = function (e: MouseEvent): void {
     const target = (e.target as HTMLElement | null)?.closest('[data-marco-action]') as HTMLElement | null;
-    if (!target) return;
+    if (!target) {
+      return;
+    }
+
     const action = target.getAttribute('data-marco-action');
     if (action === 'close') {
       e.stopPropagation();
@@ -687,7 +800,10 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       const store = el as HTMLElement & PanelHandlerStore;
       const current = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
       const next = nextPageLimit(current);
-      if (next === null) return;
+      if (next === null) {
+        return;
+      }
+
       store._marcoMembersLimit = next;
       loadAndRender(el, wsId, wsName);
     } else if (action === 'export-csv') {
@@ -699,6 +815,7 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
 
         return;
       }
+
       exportMembersCsv(latest.wsName, latest.members);
     } else if (action === 'add-member-toggle') {
       e.stopPropagation();
@@ -728,14 +845,22 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
   if (store._marcoMembersSubmit) {
     el.removeEventListener('submit', store._marcoMembersSubmit);
   }
+
   const submitHandler = function (e: Event): void {
     const target = e.target as HTMLElement | null;
-    if (!target) return;
-    if (target.getAttribute('data-marco-action') !== 'add-member-submit') return;
+    if (!target) {
+      return;
+    }
+
+    if (target.getAttribute('data-marco-action') !== 'add-member-submit') {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     submitInvite(el, wsId, wsName, target as HTMLFormElement);
   };
+
   store._marcoMembersSubmit = submitHandler;
   el.addEventListener('submit', submitHandler);
 }
@@ -745,18 +870,28 @@ function attachDismissHandlers(el: HTMLElement): void {
   if (store._marcoMembersOutsideClick) {
     document.removeEventListener('mousedown', store._marcoMembersOutsideClick, true);
   }
+
   if (store._marcoMembersKey) {
     document.removeEventListener('keydown', store._marcoMembersKey, true);
   }
 
   const outside = function (e: MouseEvent): void {
     const t = e.target as Node | null;
-    if (!t) return;
-    if (el.contains(t)) return;
+    if (!t) {
+      return;
+    }
+
+    if (el.contains(t)) {
+      return;
+    }
+
     hideWsMembersPanel();
   };
+
   const key = function (e: KeyboardEvent): void {
-    if (e.key === 'Escape') hideWsMembersPanel();
+    if (e.key === 'Escape') {
+      hideWsMembersPanel();
+    }
   };
 
   store._marcoMembersOutsideClick = outside;
@@ -770,12 +905,16 @@ function attachDismissHandlers(el: HTMLElement): void {
 
 function detachDismissHandlers(): void {
   const el = document.getElementById(PANEL_ID);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
+
   const store = el as HTMLElement & PanelHandlerStore;
   if (store._marcoMembersOutsideClick) {
     document.removeEventListener('mousedown', store._marcoMembersOutsideClick, true);
     delete store._marcoMembersOutsideClick;
   }
+
   if (store._marcoMembersKey) {
     document.removeEventListener('keydown', store._marcoMembersKey, true);
     delete store._marcoMembersKey;
@@ -792,12 +931,18 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
   render(el, wsName, { kind: 'loading' });
   fetchWorkspaceMembers(wsId, limit)
     .then(function (entry) {
-      if (!document.getElementById(PANEL_ID)) return; // panel was closed
+      if (!document.getElementById(PANEL_ID)) {
+        return;
+      } // panel was closed
+
       store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total, limit: limit };
       render(el, wsName, { kind: 'success', members: entry.members, total: entry.total, limit: limit });
     })
     .catch(function (err: unknown) {
-      if (!document.getElementById(PANEL_ID)) return;
+      if (!document.getElementById(PANEL_ID)) {
+        return;
+      }
+
       const msg = err instanceof Error ? err.message : String(err);
       logError('WsMembersPanel', 'Members fetch failed for ' + wsId + ': ' + msg);
       render(el, wsName, { kind: 'error', error: msg });
@@ -807,14 +952,23 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
 /** Silent refetch — used by the credit-poll subscription. Skips loading state. */
 function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
   const store = el as HTMLElement & PanelHandlerStore;
-  if (store._marcoMembersAutoBusy) return;
-  if (el.style.display === 'none') return;
+  if (store._marcoMembersAutoBusy) {
+    return;
+  }
+
+  if (el.style.display === 'none') {
+    return;
+  }
+
   const limit = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
   store._marcoMembersAutoBusy = true;
   clearMembersCache(wsId);
   fetchWorkspaceMembers(wsId, limit)
     .then(function (entry) {
-      if (!document.getElementById(PANEL_ID)) return;
+      if (!document.getElementById(PANEL_ID)) {
+        return;
+      }
+
       store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total, limit: limit };
       render(el, wsName, { kind: 'success', members: entry.members, total: entry.total, limit: limit });
     })
@@ -822,7 +976,9 @@ function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
       const msg = err instanceof Error ? err.message : String(err);
       logError('WsMembersPanel', 'Auto-refresh failed for ' + wsId + ': ' + msg);
     })
-    .finally(function () { store._marcoMembersAutoBusy = false; });
+    .finally(function () {
+      store._marcoMembersAutoBusy = false; 
+    });
 }
 
 /* ------------------------------------------------------------------ */
@@ -831,7 +987,10 @@ function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
 
 /** Open the members panel for a workspace at the given screen coords. */
 export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: number): void {
-  if (!wsId) return;
+  if (!wsId) {
+    return;
+  }
+
   const el = ensurePanelEl();
   // Reset attach state + page-size before re-rendering for a different workspace.
   detachDismissHandlers();
@@ -842,6 +1001,7 @@ export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: n
     store._marcoMembersPollUnsub();
     store._marcoMembersPollUnsub = undefined;
   }
+
   attachActionHandlers(el, wsId, wsName);
   loadAndRender(el, wsId, wsName);
   // Subscribe to credit-poll ticks so the panel stays in sync while open.
@@ -864,6 +1024,7 @@ export function hideWsMembersPanel(): void {
       store._marcoMembersPollUnsub();
       store._marcoMembersPollUnsub = undefined;
     }
+
     // v3.4.3 (task 11) — reset animation state so next open re-plays the slide
     el.style.display = 'none';
     el.style.opacity = '0';

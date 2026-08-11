@@ -10,10 +10,10 @@ import { sendMessage } from "./bridge";
 import { getLastAuthDiag } from "./http";
 import type { AuthResolutionDiag } from "./http";
 import {
-    extractAuthSourceFromBridgePayload,
-    extractBearerTokenFromBridgePayload,
-    extractBooleanFromBridgePayload,
-    extractJwtPayloadFromBridgePayload,
+  extractAuthSourceFromBridgePayload,
+  extractBearerTokenFromBridgePayload,
+  extractBooleanFromBridgePayload,
+  extractJwtPayloadFromBridgePayload,
 } from "./auth-response";
 
 export interface AuthApi {
@@ -26,33 +26,33 @@ export interface AuthApi {
 }
 
 export function createAuthApi(): AuthApi {
-    return {
-        getToken() {
-            return sendMessage<unknown>("AUTH_GET_TOKEN")
-                .then((result) => {
-                    return extractBearerTokenFromBridgePayload(result);
-                });
-        },
-        getSource() {
-            return sendMessage<unknown>("AUTH_GET_SOURCE")
-                .then((result) => extractAuthSourceFromBridgePayload(result));
-        },
-        refresh() {
-            return sendMessage<unknown>("AUTH_REFRESH")
-                .then((result) => {
-                    return extractBearerTokenFromBridgePayload(result);
-                });
-        },
-        isExpired() {
-            return sendMessage<unknown>("AUTH_IS_EXPIRED")
-                .then((result) => extractBooleanFromBridgePayload(result, "isExpired"));
-        },
-        getJwtPayload() {
-            return sendMessage<unknown>("AUTH_GET_JWT")
-                .then((result) => extractJwtPayloadFromBridgePayload(result));
-        },
-        getLastAuthDiag() {
-            return getLastAuthDiag();
-        },
-    };
+  return {
+    getToken() {
+      return sendMessage<unknown>("AUTH_GET_TOKEN")
+        .then((result) => {
+          return extractBearerTokenFromBridgePayload(result);
+        });
+    },
+    getSource() {
+      return sendMessage<unknown>("AUTH_GET_SOURCE")
+        .then((result) => extractAuthSourceFromBridgePayload(result));
+    },
+    refresh() {
+      return sendMessage<unknown>("AUTH_REFRESH")
+        .then((result) => {
+          return extractBearerTokenFromBridgePayload(result);
+        });
+    },
+    isExpired() {
+      return sendMessage<unknown>("AUTH_IS_EXPIRED")
+        .then((result) => extractBooleanFromBridgePayload(result, "isExpired"));
+    },
+    getJwtPayload() {
+      return sendMessage<unknown>("AUTH_GET_JWT")
+        .then((result) => extractJwtPayloadFromBridgePayload(result));
+    },
+    getLastAuthDiag() {
+      return getLastAuthDiag();
+    },
+  };
 }

@@ -20,6 +20,7 @@ export async function handleSetDefault(
 
       return;
     }
+
     refs.status.textContent = 'Default updated.';
     await renderAllRoles(refs);
   } catch (err) {
@@ -38,8 +39,12 @@ export async function handleDelete(
 
     return;
   }
+
   const ok = window.confirm('Delete prompt "' + row.Name + '"?');
-  if (!ok) return;
+  if (!ok) {
+    return;
+  }
+
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
@@ -48,19 +53,28 @@ export async function handleDelete(
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
       refs.status.textContent = 'Delete blocked: ' + reason;
       logError(LOG_SCOPE, 'delete blocked', res);
-      try { showToast(msgText, 'error'); } catch (err) {
+      try {
+        showToast(msgText, 'error'); 
+      } catch (err) {
         console.error();
       }
-      try { window.alert(msgText); } catch (err) {
+
+      try {
+        window.alert(msgText); 
+      } catch (err) {
         console.error();
       }
 
       return;
     }
+
     refs.status.textContent = 'Deleted.';
-    try { showToast('Deleted prompt "' + row.Slug + '"', 'success'); } catch (err) {
+    try {
+      showToast('Deleted prompt "' + row.Slug + '"', 'success'); 
+    } catch (err) {
       console.error();
     }
+
     await renderAllRoles(refs);
     void (async (): Promise<void> => {
       try {
@@ -79,10 +93,15 @@ export async function handleDelete(
 
 export function uniqueDupSlug(baseSlug: string, existing: readonly string[] = []): string {
   const base = baseSlug.endsWith('-copy') || baseSlug.includes('-copy-') ? baseSlug : baseSlug + '-copy';
-  if (!existing.includes(base)) return base;
+  if (!existing.includes(base)) {
+    return base;
+  }
+
   for (let i = 2; i < 1000; i++) {
     const candidate = baseSlug + '-copy-' + i;
-    if (!existing.includes(candidate)) return candidate;
+    if (!existing.includes(candidate)) {
+      return candidate;
+    }
   }
 
   return baseSlug + '-copy-' + Date.now();
@@ -107,6 +126,7 @@ export async function handleDuplicate(
 
       return;
     }
+
     refs.status.textContent = 'Duplicated.';
     await renderAllRoles(refs);
   } catch (err) {
@@ -127,13 +147,18 @@ export async function handleResetToDefault(
 
     return;
   }
+
   if (seedBody === row.Body) {
     refs.status.textContent = 'Already at default: ' + row.Slug;
 
     return;
   }
+
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
-  if (!ok) return;
+  if (!ok) {
+    return;
+  }
+
   refs.status.textContent = 'Resetting to default: ' + row.Slug + ' ...';
   try {
     const result = await upsertPrompt({
@@ -149,6 +174,7 @@ export async function handleResetToDefault(
 
       return;
     }
+
     log('PromptLibraryModal: reset-to-default slug=' + row.Slug, 'info');
     refs.status.textContent = 'Reset to default: ' + row.Slug;
     showToast('↺ Reset to default: ' + row.Name, 'success');

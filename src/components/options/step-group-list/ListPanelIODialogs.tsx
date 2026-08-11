@@ -40,61 +40,63 @@ interface ListPanelIODialogsProps {
 }
 
 export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
-    const {
-        exportApi,
-        importApi,
-        allGroups,
-        selectedGroups,
-        deletePreview,
-        batchRenameOpen,
-        setBatchRenameOpen,
-        batchDeleteOpen,
-        setBatchDeleteOpen,
-        onBatchRenameApply,
-        onBatchDeleteConfirm,
-    } = props;
+  const {
+    exportApi,
+    importApi,
+    allGroups,
+    selectedGroups,
+    deletePreview,
+    batchRenameOpen,
+    setBatchRenameOpen,
+    batchDeleteOpen,
+    setBatchDeleteOpen,
+    onBatchRenameApply,
+    onBatchDeleteConfirm,
+  } = props;
 
-    return (
-        <>
-            <ExportPreviewDialog
-                open={exportApi.previewState.Open}
-                onOpenChange={exportApi.setPreviewOpen}
-                preview={exportApi.previewState.Preview}
-                includeDescendants={exportApi.previewState.Pending?.IncludeDescendants ?? true}
-                onConfirm={() => { void exportApi.confirmExport(); }}
-            />
-            <ExportErrorDialog
-                open={exportApi.errorState.Open}
-                onOpenChange={exportApi.setErrorOpen}
-                explanation={exportApi.errorState.Explanation}
-            />
+  return (
+    <>
+      <ExportPreviewDialog
+        open={exportApi.previewState.Open}
+        onOpenChange={exportApi.setPreviewOpen}
+        preview={exportApi.previewState.Preview}
+        includeDescendants={exportApi.previewState.Pending?.IncludeDescendants ?? true}
+        onConfirm={() => {
+          void exportApi.confirmExport(); 
+        }}
+      />
+      <ExportErrorDialog
+        open={exportApi.errorState.Open}
+        onOpenChange={exportApi.setErrorOpen}
+        explanation={exportApi.errorState.Explanation}
+      />
 
-            <ImportSummaryDialog
-                open={importApi.summaryState.Open}
-                onOpenChange={importApi.setSummaryOpen}
-                summary={importApi.summaryState.Summary}
-                fileName={importApi.summaryState.FileName}
-            />
-            <ImportErrorDialog
-                open={importApi.errorState.Open}
-                onOpenChange={importApi.setErrorOpen}
-                explanation={importApi.errorState.Explanation}
-                fileName={importApi.errorState.FileName}
-            />
+      <ImportSummaryDialog
+        open={importApi.summaryState.Open}
+        onOpenChange={importApi.setSummaryOpen}
+        summary={importApi.summaryState.Summary}
+        fileName={importApi.summaryState.FileName}
+      />
+      <ImportErrorDialog
+        open={importApi.errorState.Open}
+        onOpenChange={importApi.setErrorOpen}
+        explanation={importApi.errorState.Explanation}
+        fileName={importApi.errorState.FileName}
+      />
 
-            <BatchRenameDialog
-                open={batchRenameOpen}
-                onOpenChange={setBatchRenameOpen}
-                targets={selectedGroups}
-                allGroups={allGroups}
-                onApply={onBatchRenameApply}
-            />
-            <BatchDeleteDialog
-                open={batchDeleteOpen}
-                onOpenChange={setBatchDeleteOpen}
-                rows={deletePreview}
-                onConfirm={onBatchDeleteConfirm}
-            />
-        </>
-    );
+      <BatchRenameDialog
+        open={batchRenameOpen}
+        onOpenChange={setBatchRenameOpen}
+        targets={selectedGroups}
+        allGroups={allGroups}
+        onApply={onBatchRenameApply}
+      />
+      <BatchDeleteDialog
+        open={batchDeleteOpen}
+        onOpenChange={setBatchDeleteOpen}
+        rows={deletePreview}
+        onConfirm={onBatchDeleteConfirm}
+      />
+    </>
+  );
 }

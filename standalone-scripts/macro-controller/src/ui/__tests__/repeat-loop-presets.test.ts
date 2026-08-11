@@ -35,7 +35,9 @@ describe('repeat-loop-ui PRESETS chip row', () => {
 
   it('parses to numeric literals only (no NaN)', () => {
     expect(values.length).toBeGreaterThan(0);
-    for (const v of values) expect(Number.isFinite(v)).toBe(true);
+    for (const v of values) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
   });
 
   it('includes the small-burst presets 1, 2, 3, 5 (v4.47.0 contract)', () => {

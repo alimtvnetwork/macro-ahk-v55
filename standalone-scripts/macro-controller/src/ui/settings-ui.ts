@@ -101,13 +101,17 @@ function switchSettingsTab(tabBtns: HTMLElement[], panels: HTMLElement[], idx: n
     b.style.borderBottom = i === idx ? '2px solid ' + cPrimary : '2px solid transparent';
     b.style.color = i === idx ? cPrimaryLight : '#64748b';
   });
-  panels.forEach(function(p, i) { p.style.display = i === idx ? '' : 'none'; });
+  panels.forEach(function(p, i) {
+    p.style.display = i === idx ? '' : 'none'; 
+  });
 }
 
 // CQ16: Extracted from showSettingsDialog closure
 function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
   const handler = function(e: KeyboardEvent) {
-    if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); }
+    if (e.key === 'Escape') {
+      overlay.remove(); document.removeEventListener('keydown', handler); 
+    }
   };
 
   return handler;
@@ -118,9 +122,11 @@ function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
 // ============================================
 export function showSettingsDialog(deps: SettingsDeps) {
   const existing = document.getElementById('macroloop-settings-dialog');
-  if (existing) { existing.remove();
+  if (existing) {
+    existing.remove();
 
- return; }
+    return; 
+  }
 
   const { btnStyle, getPromptsConfig } = deps;
   const tFontSystem = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
@@ -128,7 +134,11 @@ export function showSettingsDialog(deps: SettingsDeps) {
   const overlay = document.createElement('div');
   overlay.id = 'macroloop-settings-dialog';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = function(e) {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
 
   const dialog = _buildSettingsDialogShell(tFontSystem);
   const { tabBtns, panels, tabPanels, generalResult, timingResult } = _buildSettingsTabs(deps, getPromptsConfig);
@@ -150,7 +160,9 @@ function _buildSettingsDialogShell(tFontSystem: string): HTMLElement {
   const dialog = document.createElement('div');
   dialog.style.cssText = CssFragmentType.Background + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;padding:0;max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;color:' + cPanelText + ';font-family:' + tFontSystem + ';box-shadow:0 25px 60px rgba(0,0,0,0.5);';
   dialog.className = 'marco-enter';
-  dialog.onclick = function(e) { e.stopPropagation(); };
+  dialog.onclick = function(e) {
+    e.stopPropagation(); 
+  };
 
   return dialog;
 }
@@ -164,9 +176,18 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
   const hdrClose = document.createElement('span');
   hdrClose.style.cssText = 'font-size:18px;color:#64748b;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.15s;';
   hdrClose.textContent = '✕';
-  hdrClose.onmouseenter = function() { hdrClose.style.color = '#e2e8f0'; hdrClose.style.background = 'rgba(255,255,255,0.1)'; };
-  hdrClose.onmouseleave = function() { hdrClose.style.color = '#64748b'; hdrClose.style.background = 'none'; };
-  hdrClose.onclick = function() { overlay.remove(); };
+  hdrClose.onmouseenter = function() {
+    hdrClose.style.color = '#e2e8f0'; hdrClose.style.background = 'rgba(255,255,255,0.1)'; 
+  };
+
+  hdrClose.onmouseleave = function() {
+    hdrClose.style.color = '#64748b'; hdrClose.style.background = 'none'; 
+  };
+
+  hdrClose.onclick = function() {
+    overlay.remove(); 
+  };
+
   hdr.appendChild(hdrTitle);
   hdr.appendChild(hdrClose);
 
@@ -186,7 +207,10 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
     const btn = document.createElement('div');
     btn.style.cssText = 'padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:color 0.15s;border-bottom:2px solid transparent;color:#64748b;';
     btn.textContent = name;
-    btn.onclick = function() { switchSettingsTab(tabBtns, panels, i); };
+    btn.onclick = function() {
+      switchSettingsTab(tabBtns, panels, i); 
+    };
+
     tabBar.appendChild(btn);
     tabBtns.push(btn);
   });
@@ -201,7 +225,9 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
   panels.push(buildConfigDbPanel(deps, makeField).panel);
   panels.push(generalResult.panel);
 
-  panels.forEach(function(p) { tabPanels.appendChild(p); });
+  panels.forEach(function(p) {
+    tabPanels.appendChild(p); 
+  });
 
   return { tabBtns, panels, tabPanels: { tabBar, panelsContainer: tabPanels }, generalResult, timingResult };
 }
@@ -214,7 +240,9 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   const cancelBtn2 = document.createElement('button');
   cancelBtn2.textContent = 'Cancel';
   cancelBtn2.style.cssText = btnStyle + CssFragmentType.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 16px;font-size:12px;';
-  cancelBtn2.onclick = function() { overlay.remove(); };
+  cancelBtn2.onclick = function() {
+    overlay.remove(); 
+  };
 
   const resetBtn = document.createElement('button');
   resetBtn.textContent = '↺ Reset';
@@ -228,13 +256,17 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   exportBtn.textContent = '⬇ Export';
   exportBtn.title = 'Download current overrides as JSON';
   exportBtn.style.cssText = btnStyle + CssFragmentType.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
-  exportBtn.onclick = function() { _exportOverridesJson(showToast); };
+  exportBtn.onclick = function() {
+    _exportOverridesJson(showToast); 
+  };
 
   const importBtn = document.createElement('button');
   importBtn.textContent = '⬆ Import';
   importBtn.title = 'Load overrides from a JSON file';
   importBtn.style.cssText = btnStyle + CssFragmentType.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
-  importBtn.onclick = function() { _importOverridesJson(generalResult, showToast, overlay, deps); };
+  importBtn.onclick = function() {
+    _importOverridesJson(generalResult, showToast, overlay, deps); 
+  };
 
   const saveBtn2 = document.createElement('button');
   saveBtn2.textContent = '💾 Save';
@@ -271,7 +303,9 @@ function _exportOverridesJson(showToast: (m: string, l?: string) => void): void 
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(function() { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
+  setTimeout(function() {
+    URL.revokeObjectURL(url); 
+  }, Timings.TIMEOUT_SHORT);
   showToast('✅ Overrides exported', 'info');
 }
 
@@ -286,7 +320,10 @@ function _importOverridesJson(
   input.accept = 'application/json,.json';
   input.onchange = function() {
     const file = input.files && input.files[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
+
     file.text().then(function(text: string) {
       const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
       if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
@@ -305,6 +342,7 @@ function _importOverridesJson(
       showToast('❌ Import failed: ' + msg, 'error');
     });
   };
+
   input.click();
   void generalResult;
 }
@@ -313,16 +351,23 @@ function _applyTimingInputOverrides(inputs: NonNullable<TimingPanelResult['input
   if (inputs.nextSubmissionDelaySeconds) {
     next.nextSubmissionDelaySeconds = parseInt(inputs.nextSubmissionDelaySeconds.value, 10);
   }
+
   if (inputs.creditPollIntervalSeconds) {
     next.creditPollIntervalSeconds = parseInt(inputs.creditPollIntervalSeconds.value, 10);
   }
+
   if (inputs.maxQueueSize) {
     const v = parseInt(inputs.maxQueueSize.value, 10);
-    if (!isNaN(v) && v > 0) next.maxQueueSize = v;
+    if (!isNaN(v) && v > 0) {
+      next.maxQueueSize = v;
+    }
   }
+
   if (inputs.creditFetchDelayMs) {
     const v = parseInt(inputs.creditFetchDelayMs.value, 10);
-    if (!isNaN(v)) next.creditFetchDelayMs = Math.max(500, Math.min(15000, v));
+    if (!isNaN(v)) {
+      next.creditFetchDelayMs = Math.max(500, Math.min(15000, v));
+    }
   }
 }
 
@@ -354,18 +399,29 @@ function _applyXPathSettings(xpResult: XPathPanelResult): void {
   for (const k in xpResult.inputs) {
     CONFIG[k] = xpResult.inputs[k].value;
   }
+
   const pInp = document.getElementById('xpath-project-btn') as HTMLInputElement;
-  if (pInp) pInp.value = CONFIG.PROJECT_BUTTON_XPATH;
+  if (pInp) {
+    pInp.value = CONFIG.PROJECT_BUTTON_XPATH;
+  }
+
   const prInp = document.getElementById('xpath-progress-bar') as HTMLInputElement;
-  if (prInp) prInp.value = CONFIG.PROGRESS_XPATH;
+  if (prInp) {
+    prInp.value = CONFIG.PROGRESS_XPATH;
+  }
+
   const wInp = document.getElementById('xpath-workspace-name') as HTMLInputElement;
-  if (wInp) wInp.value = CONFIG.WORKSPACE_XPATH;
+  if (wInp) {
+    wInp.value = CONFIG.WORKSPACE_XPATH;
+  }
 }
 
 function _applyTimingSettings(tmResult: TimingPanelResult): void {
   for (const k in tmResult.inputs) {
     const numericValue = parseInt(tmResult.inputs[k].value, 10);
-    if (!isNaN(numericValue) && numericValue >= 0) TIMING[k] = numericValue;
+    if (!isNaN(numericValue) && numericValue >= 0) {
+      TIMING[k] = numericValue;
+    }
   }
 }
 
@@ -374,11 +430,14 @@ function _applyTaskNextSettings(tnResult: TaskNextPanelResult, taskNextDeps: Tas
     const isNum = k !== 'buttonXPath' && k !== 'promptSlug';
     if (isNum) {
       const v = parseInt(tnResult.inputs[k].value, 10);
-      if (!isNaN(v)) taskNextState.settings[k] = v;
+      if (!isNaN(v)) {
+        taskNextState.settings[k] = v;
+      }
     } else {
       taskNextState.settings[k] = tnResult.inputs[k].value;
     }
   }
+
   saveTaskNextSettings(taskNextDeps);
 }
 
@@ -390,7 +449,9 @@ function _applyLoggingSettings(logResult: LoggingPanelResult): void {
     activityLogUi: logResult.logToggles.activityLogUi.checked,
     levels: {},
   };
-  logResult.levelKeys.forEach(function(k: string) { logUpdate.levels![k] = logResult.levelToggles[k].checked; });
+  logResult.levelKeys.forEach(function(k: string) {
+ logUpdate.levels![k] = logResult.levelToggles[k].checked; 
+  });
   updateLogConfig(logUpdate);
 }
 

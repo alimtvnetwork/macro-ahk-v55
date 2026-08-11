@@ -16,15 +16,15 @@
 
 import { initProjectDb } from "../project-db-manager";
 import {
-    buildStepDraftFromCapture,
-    findAnchorSelectorId,
-    type XPathCapturePayload,
+  buildStepDraftFromCapture,
+  findAnchorSelectorId,
+  type XPathCapturePayload,
 } from "./capture-to-step-bridge";
 import {
-    insertStepRow,
-    listSelectorsForStep,
-    type PersistedSelector,
-    type PersistedStep,
+  insertStepRow,
+  listSelectorsForStep,
+  type PersistedSelector,
+  type PersistedStep,
 } from "./step-persistence";
 import { logFailure, type FailureReport } from "./failure-logger";
 import { logBgError } from "@/background/bg-logger";
@@ -46,48 +46,48 @@ export interface CaptureStepResult {
  * whether to surface a toast or retry.
  */
 async function persistCaptureRow(
-    projectSlug: string,
-    payload: XPathCapturePayload,
+  projectSlug: string,
+  payload: XPathCapturePayload,
 ): Promise<{ Step: PersistedStep; Selectors: PersistedSelector[] }> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
-    const anchorId = payload.AnchorXPath !== null ? findAnchorSelectorId(db, payload.AnchorXPath) : null;
-    const step = insertStepRow(db, buildStepDraftFromCapture(payload, anchorId));
-    const selectors = listSelectorsForStep(db, step.StepId);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
+  const anchorId = payload.AnchorXPath !== null ? findAnchorSelectorId(db, payload.AnchorXPath) : null;
+  const step = insertStepRow(db, buildStepDraftFromCapture(payload, anchorId));
+  const selectors = listSelectorsForStep(db, step.StepId);
+  mgr.markDirty();
 
-    return { Step: step, Selectors: selectors };
+  return { Step: step, Selectors: selectors };
 }
 
 export async function captureAndPersistStep(
-    projectSlug: string,
-    payload: XPathCapturePayload,
-    now?: () => Date,
+  projectSlug: string,
+  payload: XPathCapturePayload,
+  now?: () => Date,
 ): Promise<CaptureStepResult> {
-    const target: Element | null = typeof document !== "undefined" ? locateCaptureTarget(payload.XPathFull) : null;
-    try {
-        const { Step, Selectors } = await persistCaptureRow(projectSlug, payload);
+  const target: Element | null = typeof document !== "undefined" ? locateCaptureTarget(payload.XPathFull) : null;
+  try {
+    const { Step, Selectors } = await persistCaptureRow(projectSlug, payload);
 
-        return { Ok: true, Step, Selectors, FailureReport: null };
-    } catch (err) {
-        const report = logFailure({
-            Phase: "Record", Error: err, StepKind: payload.TagName,
-            Target: target, SourceFile: SOURCE_FILE, Now: now,
-        });
+    return { Ok: true, Step, Selectors, FailureReport: null };
+  } catch (err) {
+    const report = logFailure({
+      Phase: "Record", Error: err, StepKind: payload.TagName,
+      Target: target, SourceFile: SOURCE_FILE, Now: now,
+    });
 
-        return { Ok: false, Step: null, Selectors: [], FailureReport: report };
-    }
+    return { Ok: false, Step: null, Selectors: [], FailureReport: report };
+  }
 }
 
 function locateCaptureTarget(xpathFull: string): Element | null {
-    try {
-        const r = document.evaluate(
-            xpathFull, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null,
-        );
-        const node = r.singleNodeValue;
+  try {
+    const r = document.evaluate(
+      xpathFull, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null,
+    );
+    const node = r.singleNodeValue;
 
-        return node instanceof Element ? node : null;
-    } catch (err) { 
-        return null;
-    }
+    return node instanceof Element ? node : null;
+  } catch (err) { 
+    return null;
+  }
 }

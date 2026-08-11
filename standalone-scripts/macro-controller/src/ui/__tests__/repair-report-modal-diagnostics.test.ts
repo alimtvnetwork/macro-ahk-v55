@@ -29,7 +29,9 @@ function base(overrides: Partial<RepairReportSummary> = {}): RepairReportSummary
 }
 
 describe('repair-report-modal diagnostics (PlanTierType 26 step 14)', () => {
-  beforeEach(() => { logDiagnosticFromCode.mockReset(); });
+  beforeEach(() => {
+    logDiagnosticFromCode.mockReset(); 
+  });
 
   it('emits no diagnostics when repair is healthy', () => {
     stashRepairReport(base());

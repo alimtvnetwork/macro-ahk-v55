@@ -51,22 +51,44 @@ class WsListViewState {
     return 'none';
   }
 
-  getCompactMode(): boolean { return this.isCompactMode; }
-  setCompactMode(enabled: boolean): void { this.isCompactMode = enabled; }
+  getCompactMode(): boolean {
+    return this.isCompactMode; 
+  }
+  setCompactMode(enabled: boolean): void {
+    this.isCompactMode = enabled; 
+  }
 
-  getFreeOnly(): boolean { return this.isFreeOnly; }
-  setFreeOnly(enabled: boolean): void { this.isFreeOnly = enabled; }
+  getFreeOnly(): boolean {
+    return this.isFreeOnly; 
+  }
+  setFreeOnly(enabled: boolean): void {
+    this.isFreeOnly = enabled; 
+  }
 
-  getExpiredWithCredits(): boolean { return this.isExpiredWithCredits; }
-  setExpiredWithCredits(enabled: boolean): void { this.isExpiredWithCredits = enabled; }
+  getExpiredWithCredits(): boolean {
+    return this.isExpiredWithCredits; 
+  }
+  setExpiredWithCredits(enabled: boolean): void {
+    this.isExpiredWithCredits = enabled; 
+  }
 
-  getExpiring(): boolean { return this.isExpiring; }
-  setExpiring(enabled: boolean): void { this.isExpiring = enabled; }
+  getExpiring(): boolean {
+    return this.isExpiring; 
+  }
+  setExpiring(enabled: boolean): void {
+    this.isExpiring = enabled; 
+  }
 
-  getRefillSoon(): boolean { return this.isRefillSoon; }
-  setRefillSoon(enabled: boolean): void { this.isRefillSoon = enabled; }
+  getRefillSoon(): boolean {
+    return this.isRefillSoon; 
+  }
+  setRefillSoon(enabled: boolean): void {
+    this.isRefillSoon = enabled; 
+  }
 
-  getRefillPriority(): boolean { return this.isRefillPriority; }
+  getRefillPriority(): boolean {
+    return this.isRefillPriority; 
+  }
   setRefillPriority(enabled: boolean): void {
     this.isRefillPriority = enabled;
     try {
@@ -76,7 +98,9 @@ class WsListViewState {
     }
   }
 
-  getCreditSortMode(): CreditSortModeType { return this.creditSortMode; }
+  getCreditSortMode(): CreditSortModeType {
+    return this.creditSortMode; 
+  }
   setCreditSortMode(mode: CreditSortModeType): void {
     this.creditSortMode = mode;
     try {
@@ -91,25 +115,60 @@ export function viewState(): WsListViewState {
   return WsListViewState.getInstance();
 }
 
-export function getLoopWsCompactMode(): boolean { return viewState().getCompactMode(); }
-export function setLoopWsCompactMode(enabled: boolean): void { viewState().setCompactMode(enabled); }
+export function getLoopWsCompactMode(): boolean {
+  return viewState().getCompactMode(); 
+}
 
-export function getLoopWsFreeOnly(): boolean { return viewState().getFreeOnly(); }
-export function setLoopWsFreeOnly(enabled: boolean): void { viewState().setFreeOnly(enabled); }
+export function setLoopWsCompactMode(enabled: boolean): void {
+  viewState().setCompactMode(enabled); 
+}
+
+export function getLoopWsFreeOnly(): boolean {
+  return viewState().getFreeOnly(); 
+}
+
+export function setLoopWsFreeOnly(enabled: boolean): void {
+  viewState().setFreeOnly(enabled); 
+}
 
 export const EXPIRED_WITH_CREDITS_MIN = 5;
 
-export function getLoopWsExpiredWithCredits(): boolean { return viewState().getExpiredWithCredits(); }
-export function setLoopWsExpiredWithCredits(enabled: boolean): void { viewState().setExpiredWithCredits(enabled); }
+export function getLoopWsExpiredWithCredits(): boolean {
+  return viewState().getExpiredWithCredits(); 
+}
 
-export function getLoopWsExpiring(): boolean { return viewState().getExpiring(); }
-export function setLoopWsExpiring(enabled: boolean): void { viewState().setExpiring(enabled); }
+export function setLoopWsExpiredWithCredits(enabled: boolean): void {
+  viewState().setExpiredWithCredits(enabled); 
+}
 
-export function getLoopWsRefillSoon(): boolean { return viewState().getRefillSoon(); }
-export function setLoopWsRefillSoon(enabled: boolean): void { viewState().setRefillSoon(enabled); }
+export function getLoopWsExpiring(): boolean {
+  return viewState().getExpiring(); 
+}
 
-export function getLoopWsRefillPriority(): boolean { return viewState().getRefillPriority(); }
-export function setLoopWsRefillPriority(enabled: boolean): void { viewState().setRefillPriority(enabled); }
+export function setLoopWsExpiring(enabled: boolean): void {
+  viewState().setExpiring(enabled); 
+}
 
-export function getLoopWsCreditSortMode(): CreditSortModeType { return viewState().getCreditSortMode(); }
-export function setLoopWsCreditSortMode(mode: CreditSortModeType): void { viewState().setCreditSortMode(mode); }
+export function getLoopWsRefillSoon(): boolean {
+  return viewState().getRefillSoon(); 
+}
+
+export function setLoopWsRefillSoon(enabled: boolean): void {
+  viewState().setRefillSoon(enabled); 
+}
+
+export function getLoopWsRefillPriority(): boolean {
+  return viewState().getRefillPriority(); 
+}
+
+export function setLoopWsRefillPriority(enabled: boolean): void {
+  viewState().setRefillPriority(enabled); 
+}
+
+export function getLoopWsCreditSortMode(): CreditSortModeType {
+  return viewState().getCreditSortMode(); 
+}
+
+export function setLoopWsCreditSortMode(mode: CreditSortModeType): void {
+  viewState().setCreditSortMode(mode); 
+}

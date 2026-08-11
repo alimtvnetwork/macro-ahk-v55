@@ -48,8 +48,13 @@ interface RawError {
 
 function normalizeLevel(level: string): string {
   const lower = (level ?? "info").toLowerCase();
-  if (lower === "warning") return "warn";
-  if (lower === "fatal") return "error";
+  if (lower === "warning") {
+    return "warn";
+  }
+
+  if (lower === "fatal") {
+    return "error";
+  }
 
   return lower;
 }
@@ -103,6 +108,7 @@ export function useActivityTimeline(limit = 500) {
       setLogs([]);
       setErrors([]);
     }
+
     setLoading(false);
   }, [limit]);
 
@@ -123,9 +129,17 @@ export function useActivityTimeline(limit = 500) {
     if (severityFilter !== "all") {
       result = result.filter((e) => {
         const lvl = e.level;
-        if (severityFilter === "info") return lvl === "info" || lvl === "log" || lvl === "debug";
-        if (severityFilter === "warn") return lvl === "warn";
-        if (severityFilter === "error") return lvl === "error";
+        if (severityFilter === "info") {
+          return lvl === "info" || lvl === "log" || lvl === "debug";
+        }
+
+        if (severityFilter === "warn") {
+          return lvl === "warn";
+        }
+
+        if (severityFilter === "error") {
+          return lvl === "error";
+        }
 
         return true;
       });
@@ -155,9 +169,13 @@ export function useActivityTimeline(limit = 500) {
     let errorCount = 0;
     for (const e of merged) {
       const lvl = e.level;
-      if (lvl === "error") errorCount++;
-      else if (lvl === "warn") warnCount++;
-      else infoCount++;
+      if (lvl === "error") {
+        errorCount++;
+      } else if (lvl === "warn") {
+        warnCount++;
+      } else {
+        infoCount++;
+      }
     }
 
     return { total: merged.length, info: infoCount, warn: warnCount, error: errorCount };

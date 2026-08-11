@@ -97,19 +97,26 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
   const versionInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (editingName) nameInputRef.current?.focus();
+    if (editingName) {
+      nameInputRef.current?.focus();
+    }
   }, [editingName]);
 
   useEffect(() => {
-    if (editingVersion) versionInputRef.current?.focus();
+    if (editingVersion) {
+      versionInputRef.current?.focus();
+    }
   }, [editingVersion]);
 
   const markDirty = () => setDirty(true);
 
   const handleSaveIdentity = async () => {
-    if (!editName.trim()) { toast.error("Project name is required");
+    if (!editName.trim()) {
+      toast.error("Project name is required");
 
- return; }
+      return; 
+    }
+
     setIsSaving(true);
     await onSave({
       id: project.id,
@@ -149,23 +156,39 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
   };
 
   const handleNameBlur = () => {
-    if (!editName.trim()) setEditName(project.name);
+    if (!editName.trim()) {
+      setEditName(project.name);
+    }
+
     setEditingName(false);
   };
 
   const handleVersionBlur = () => {
-    if (!editVersion.trim()) setEditVersion(project.version);
+    if (!editVersion.trim()) {
+      setEditVersion(project.version);
+    }
+
     setEditingVersion(false);
   };
 
   const handleNameKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") { setEditingName(false); }
-    if (e.key === "Escape") { setEditName(project.name); setEditingName(false); }
+    if (e.key === "Enter") {
+      setEditingName(false); 
+    }
+
+    if (e.key === "Escape") {
+      setEditName(project.name); setEditingName(false); 
+    }
   };
 
   const handleVersionKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") { setEditingVersion(false); }
-    if (e.key === "Escape") { setEditVersion(project.version); setEditingVersion(false); }
+    if (e.key === "Enter") {
+      setEditingVersion(false); 
+    }
+
+    if (e.key === "Escape") {
+      setEditVersion(project.version); setEditingVersion(false); 
+    }
   };
 
   return (
@@ -187,7 +210,9 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
                 <Input
                   ref={nameInputRef}
                   value={editName}
-                  onChange={(e) => { setEditName(e.target.value); markDirty(); }}
+                  onChange={(e) => {
+                    setEditName(e.target.value); markDirty(); 
+                  }}
                   onBlur={handleNameBlur}
                   onKeyDown={handleNameKeyDown}
                   placeholder="Project name"
@@ -210,7 +235,9 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
                   <Input
                     ref={versionInputRef}
                     value={editVersion}
-                    onChange={(e) => { setEditVersion(e.target.value); markDirty(); }}
+                    onChange={(e) => {
+                      setEditVersion(e.target.value); markDirty(); 
+                    }}
                     onBlur={handleVersionBlur}
                     onKeyDown={handleVersionKeyDown}
                     placeholder="1.0.0"
@@ -239,7 +266,9 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
             <div className="flex items-center gap-2">
               <Input
                 value={editDesc}
-                onChange={(e) => { setEditDesc(e.target.value); markDirty(); }}
+                onChange={(e) => {
+                  setEditDesc(e.target.value); markDirty(); 
+                }}
                 placeholder="Description (optional)"
                 className="h-6 text-xs text-muted-foreground border-none shadow-none px-2 bg-transparent focus-visible:bg-muted/30 focus-visible:ring-1 transition-all flex-1"
               />

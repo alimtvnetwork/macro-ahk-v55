@@ -20,48 +20,52 @@ vi.mock('../../error-utils', () => ({ logError: mocks.logError }));
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 
 vi.mock('../prompt-cache', () => ({
-    readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
-    writeJsonCopy: vi.fn(async () => undefined),
-    clearPromptCache: vi.fn(async () => undefined),
+  readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
+  writeJsonCopy: vi.fn(async () => undefined),
+  clearPromptCache: vi.fn(async () => undefined),
 }));
 vi.mock('../prompt-io-db-bridge', () => ({
-    collectDbEntriesForExport: vi.fn(async () => []),
-    mergeDbIntoExport: vi.fn((c: unknown[]) => c),
-    partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
-    commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
+  collectDbEntriesForExport: vi.fn(async () => []),
+  mergeDbIntoExport: vi.fn((c: unknown[]) => c),
+  partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
+  commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
-    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
-    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
-    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+  setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+  deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+  upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 const io = vi.hoisted(() => {
-    let releaseFn: (() => void) | null = null;
+  let releaseFn: (() => void) | null = null;
 
-    return {
-        exportPromptsToJson: vi.fn(async () => undefined),
-        parsePromptsText: vi.fn(() => ({
-            valid: [{ name: 'p', text: 'body {{n}}' }],
-            errors: [] as string[],
-        })),
-        performPromptImport: vi.fn(
-            () => new Promise<{ added: number; updated: number; errors: string[] }>((resolve) => {
-                releaseFn = (): void => resolve({ added: 1, updated: 0, errors: [] });
-            }),
-        ),
-        release: (): void => { if (releaseFn) releaseFn(); },
-    };
+  return {
+    exportPromptsToJson: vi.fn(async () => undefined),
+    parsePromptsText: vi.fn(() => ({
+      valid: [{ name: 'p', text: 'body {{n}}' }],
+      errors: [] as string[],
+    })),
+    performPromptImport: vi.fn(
+      () => new Promise<{ added: number; updated: number; errors: string[] }>((resolve) => {
+        releaseFn = (): void => resolve({ added: 1, updated: 0, errors: [] });
+      }),
+    ),
+    release: (): void => {
+      if (releaseFn) {
+        releaseFn();
+      } 
+    },
+  };
 });
 vi.mock('../prompt-io', () => ({
-    exportPromptsToJson: io.exportPromptsToJson,
-    parsePromptsText: io.parsePromptsText,
-    performPromptImport: io.performPromptImport,
+  exportPromptsToJson: io.exportPromptsToJson,
+  parsePromptsText: io.parsePromptsText,
+  performPromptImport: io.performPromptImport,
 }));
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
@@ -69,7 +73,7 @@ import { openPromptLibraryModal } from '../prompt-library-modal';
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
 function getRoot(): HTMLElement {
-    return document.querySelector<HTMLElement>('[data-testid="prompt-library-modal"]')
+  return document.querySelector<HTMLElement>('[data-testid="prompt-library-modal"]')
         ?? (document.body.firstElementChild as HTMLElement);
 }
 
@@ -79,60 +83,62 @@ function getRoot(): HTMLElement {
  * assertions.
  */
 function fireDragOver(root: HTMLElement): { dropEffect: string } {
-    const dt: { dropEffect: string } = { dropEffect: 'copy' };
-    const ev = new Event('dragover', { bubbles: true, cancelable: true });
-    Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
-    root.dispatchEvent(ev);
+  const dt: { dropEffect: string } = { dropEffect: 'copy' };
+  const ev = new Event('dragover', { bubbles: true, cancelable: true });
+  Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
+  root.dispatchEvent(ev);
 
-    return dt;
+  return dt;
 }
 
 function fireDrop(root: HTMLElement, filename: string): void {
-    const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
-    const dt = { files: [file], dropEffect: 'copy' };
-    const ev = new Event('drop', { bubbles: true, cancelable: true });
-    Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
-    root.dispatchEvent(ev);
+  const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
+  const dt = { files: [file], dropEffect: 'copy' };
+  const ev = new Event('drop', { bubbles: true, cancelable: true });
+  Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
+  root.dispatchEvent(ev);
 }
 
 describe('prompt-library-modal - dragover dropEffect during import', () => {
-    beforeEach(() => {
-        document.body.innerHTML = '';
-        mocks.logError.mockReset();
-        mocks.showToast.mockReset();
-        io.performPromptImport.mockClear();
-        io.parsePromptsText.mockClear();
-    });
-    afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    mocks.logError.mockReset();
+    mocks.showToast.mockReset();
+    io.performPromptImport.mockClear();
+    io.parsePromptsText.mockClear();
+  });
+  afterEach(() => {
+    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+  });
 
-    it('reports dropEffect="copy" when idle, "none" while import runs, and "copy" again after it resolves', async () => {
-        await openPromptLibraryModal();
-        await tick();
-        const root = getRoot();
+  it('reports dropEffect="copy" when idle, "none" while import runs, and "copy" again after it resolves', async () => {
+    await openPromptLibraryModal();
+    await tick();
+    const root = getRoot();
 
-        // Idle: dragover advertises 'copy'.
-        expect(fireDragOver(root).dropEffect).toBe('copy');
+    // Idle: dragover advertises 'copy'.
+    expect(fireDragOver(root).dropEffect).toBe('copy');
 
-        // Kick off a deferred import via drop.
-        fireDrop(root, 'a.json');
-        await tick();
-        await tick();
+    // Kick off a deferred import via drop.
+    fireDrop(root, 'a.json');
+    await tick();
+    await tick();
 
-        // Import is in flight (spinner + aria-busy). dragover MUST advertise 'none'.
-        const btn = document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
-        expect(btn.disabled).toBe(true);
-        expect(btn.getAttribute('aria-busy')).toBe('true');
-        expect(fireDragOver(root).dropEffect).toBe('none');
+    // Import is in flight (spinner + aria-busy). dragover MUST advertise 'none'.
+    const btn = document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
+    expect(btn.disabled).toBe(true);
+    expect(btn.getAttribute('aria-busy')).toBe('true');
+    expect(fireDragOver(root).dropEffect).toBe('none');
 
-        // Resolve the pending import.
-        io.release();
-        await tick(); await tick(); await tick();
+    // Resolve the pending import.
+    io.release();
+    await tick(); await tick(); await tick();
 
-        // Controls restored; dragover advertises 'copy' again.
-        expect(btn.disabled).toBe(false);
-        expect(btn.hasAttribute('aria-busy')).toBe(false);
-        expect(fireDragOver(root).dropEffect).toBe('copy');
+    // Controls restored; dragover advertises 'copy' again.
+    expect(btn.disabled).toBe(false);
+    expect(btn.hasAttribute('aria-busy')).toBe(false);
+    expect(fireDragOver(root).dropEffect).toBe('copy');
 
-        expect(io.performPromptImport).toHaveBeenCalledTimes(1);
-    });
+    expect(io.performPromptImport).toHaveBeenCalledTimes(1);
+  });
 });

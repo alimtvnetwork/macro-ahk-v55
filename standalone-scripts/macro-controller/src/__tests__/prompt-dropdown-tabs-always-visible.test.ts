@@ -19,7 +19,9 @@ vi.mock('../shared-state', () => ({
 vi.mock('../xpath-utils', () => ({ getByXPath: () => null }));
 vi.mock('./prompt-utils', () => ({ pasteIntoEditor: vi.fn(), showPasteToast: vi.fn() }));
 vi.mock('../task-queue', () => ({ addTaskToQueue: vi.fn() }));
-vi.mock('./plan-task-ui', () => ({ renderPlanTaskSubmenu: (host: HTMLElement) => { host.textContent = 'PLAN'; } }));
+vi.mock('./plan-task-ui', () => ({ renderPlanTaskSubmenu: (host: HTMLElement) => {
+  host.textContent = 'PLAN'; 
+} }));
 vi.mock('./prompt-filter-menu', () => ({ renderFilterMenu: vi.fn() }));
 vi.mock('./prompt-injection', () => ({ openPromptCreationModal: vi.fn() }));
 vi.mock('./task-next-ui', () => ({
@@ -55,7 +57,9 @@ function makeCtx() {
 }
 
 describe('PlanTierType tab always visible in prompts dropdown', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = ''; 
+  });
 
   it('renders PlanTierType tab button on initial open and keeps Next hidden in the inline strip', () => {
     const dropdownCtx = makeCtx();

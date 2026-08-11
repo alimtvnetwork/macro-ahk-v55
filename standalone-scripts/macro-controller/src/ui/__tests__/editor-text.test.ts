@@ -28,7 +28,9 @@ function makeContentEditable(html: string): HTMLElement {
 }
 
 describe('extractEditorPlainText — newline preservation', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = ''; 
+  });
 
   it('separates <p> siblings with a single newline', () => {
     const element = makeContentEditable('<p>line 1</p><p>line 2</p><p>line 3</p>');
@@ -65,7 +67,9 @@ describe('extractEditorPlainText — newline preservation', () => {
 });
 
 describe('replaceEditorText — newline re-injection', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = ''; 
+  });
 
   it('writes text with newlines back into a textarea verbatim', () => {
     const ta = document.createElement('textarea');
@@ -83,6 +87,7 @@ describe('replaceEditorText — newline re-injection', () => {
 
       return true;
     };
+
     const original = (document as unknown as { execCommand?: unknown }).execCommand;
     (document as unknown as { execCommand: unknown }).execCommand = stub;
     try {

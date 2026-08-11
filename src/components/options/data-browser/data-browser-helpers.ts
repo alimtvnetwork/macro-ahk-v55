@@ -1,7 +1,9 @@
 /** Format a timestamp string for the data browser display. */
 export function formatDataTimestamp(ts: string): string {
   const isMissing = ts === "" || ts === undefined || ts === null;
-  if (isMissing) return "—";
+  if (isMissing) {
+    return "—";
+  }
 
   try {
     return new Date(ts).toLocaleString("en-US", {

@@ -28,10 +28,23 @@ export interface PickPromptOptions {
 type LoadStage = PromptLoadStageType;
 
 function reasonOf(err: unknown, fallback: string): string {
-  if (err === null || err === undefined) return fallback;
-  if (typeof err === 'string') return err;
-  if (err instanceof Error) return err.message || fallback;
-  try { return JSON.stringify(err); } catch { return fallback; }
+  if (err === null || err === undefined) {
+    return fallback;
+  }
+
+  if (typeof err === 'string') {
+    return err;
+  }
+
+  if (err instanceof Error) {
+    return err.message || fallback;
+  }
+
+  try {
+    return JSON.stringify(err); 
+  } catch {
+    return fallback; 
+  }
 }
 
 type ListRes = Awaited<ReturnType<typeof listPromptsByRole>>;
@@ -50,7 +63,9 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
   if (res.isFail && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
-    if (retry.isSuccess) { res = retry; initialReason = null; }
+    if (retry.isSuccess) {
+      res = retry; initialReason = null; 
+    }
   }
 
   return { res, initialReason };
@@ -62,6 +77,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   if (!isManaged || !emptyOrFailed) {
     return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
+
   let stage: LoadStage = 'auto-seed';
   let seedReason: string | null = null;
   let res = current;
@@ -72,6 +88,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
       seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
     }
+
     stage = 'post-seed-list';
     res = await listPromptsByRole(role);
   } catch (err) {
@@ -83,12 +100,17 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
 }
 
 async function retryOnContractError(role: PromptRole, state: LoadState): Promise<ListRes> {
-  if (state.res.isSuccess) return state.res;
+  if (state.res.isSuccess) {
+    return state.res;
+  }
+
   const dbReason = state.res.error ?? 'listPromptsByRole returned !ok';
   if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(state.seedReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
-    if (retry.isSuccess) return retry;
+    if (retry.isSuccess) {
+      return retry;
+    }
   }
 
   return state.res;
@@ -129,9 +151,14 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
-  if (state.res.isFail) return emitLoadFailure(opts, state);
+  if (state.res.isFail) {
+    return emitLoadFailure(opts, state);
+  }
+
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
-  if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);
+  if (rows.length === 0) {
+    return emitEmptyToast(opts, state.seedReason);
+  }
 
   return await promptPickerModal(rows, opts);
 }
@@ -152,6 +179,7 @@ function buildLoadFailureDetail(input: LoadFailureDetailInput): string {
   if (input.initialReason !== null && input.stage !== 'initial-list') {
     parts.push('initial-list=' + input.initialReason);
   }
+
   if (input.seedAttempted) {
     parts.push('auto-seed=' + (input.seedReason ?? 'ok'));
   }
@@ -179,6 +207,7 @@ function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<
       o.textContent = marker + r.Name + '  [' + r.Slug + ']';
       sel.appendChild(o);
     }
+
     dlg.appendChild(sel);
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:4px;';
@@ -196,16 +225,26 @@ function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<
     document.body.appendChild(overlay);
 
     const close = (v: PromptRow | null): void => {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+
       resolve(v);
     };
+
     cancel.onclick = () => close(null);
-    overlay.onclick = (e) => { if (e.target === overlay) close(null); };
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        close(null);
+      } 
+    };
+
     ok.onclick = () => {
       const id = Number(sel.value);
       const picked = rows.find((r) => r.Id === id) ?? null;
       close(picked);
     };
+
     sel.ondblclick = () => ok.click();
     sel.focus();
   });

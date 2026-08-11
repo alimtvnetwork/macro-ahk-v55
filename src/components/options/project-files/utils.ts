@@ -30,6 +30,7 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
         dir = { name: part, path, isDir: true, children: [] };
         current.children.push(dir);
       }
+
       // @ts-ignore - dir is guaranteed to be defined here
       current = dir;
     }
@@ -50,6 +51,7 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
       }
     });
   };
+
   sortNodes(root.children);
 
   return root.children;
@@ -58,10 +60,14 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
 export function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   const isJson = ext === "json";
-  if (isJson) return "json";
+  if (isJson) {
+    return "json";
+  }
   
   const isMarkdown = ["md", "markdown", "txt", "prompt"].includes(ext);
-  if (isMarkdown) return "markdown";
+  if (isMarkdown) {
+    return "markdown";
+  }
 
   return "javascript";
 }
@@ -100,10 +106,14 @@ export function buildDataUrl(base64: string, mimeType: string): string {
 
 export function formatSize(bytes: number): string {
   const isSmall = bytes < 1024;
-  if (isSmall) return `${bytes} B`;
+  if (isSmall) {
+    return `${bytes} B`;
+  }
   
   const isMedium = bytes < 1024 * 1024;
-  if (isMedium) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (isMedium) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
 
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
@@ -117,6 +127,7 @@ export function readFileAsBase64(file: globalThis.File): Promise<string> {
       const base64 = hasDataUrlPrefix ? result.split(",")[1] : result;
       resolve(base64);
     };
+
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });

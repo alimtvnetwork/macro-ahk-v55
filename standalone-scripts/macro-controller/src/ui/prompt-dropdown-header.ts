@@ -108,13 +108,18 @@ function buildResetOrderButton(rerender: Rerender): HTMLElement {
     const ok = typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm('Reset prompt ordering to the built-in default? Your saved drag order will be cleared.')
       : true;
-    if (!ok) return;
+    if (!ok) {
+      return;
+    }
+
     try {
       const restored = resetPromptOrderToDefault();
       log('[PromptDropdown] Prompt order reset to DEFAULT_PROMPT_ORDER (' + restored.length + ' slugs)', 'success');
       void import('../toast').then(function(mod) {
         const showToast = (mod as { showToast?: (message: string, kind?: string) => void }).showToast;
-        if (showToast) showToast('↺ Prompt order reset to default', 'success');
+        if (showToast) {
+          showToast('↺ Prompt order reset to default', 'success');
+        }
       }).catch(function() { /* toast optional */ });
       rerender();
     } catch (err) {
@@ -129,8 +134,14 @@ function buildLoadButton(rerender: Rerender): HTMLElement {
   btn.textContent = '↻ Load';
   btn.title = 'Reload prompts from database';
   btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
-  btn.onmouseover = function() { btn.style.background = cPrimaryLight; btn.style.transform = 'scale(1.05)'; };
-  btn.onmouseout = function() { btn.style.background = cPrimary; btn.style.transform = ''; };
+  btn.onmouseover = function() {
+    btn.style.background = cPrimaryLight; btn.style.transform = 'scale(1.05)'; 
+  };
+
+  btn.onmouseout = function() {
+    btn.style.background = cPrimary; btn.style.transform = ''; 
+  };
+
   btn.onclick = function(e: Event) {
     e.stopPropagation();
     handleLoadClick(btn, rerender);

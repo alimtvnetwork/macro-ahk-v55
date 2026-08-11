@@ -64,7 +64,10 @@ export function ColumnEditor({
   };
 
   const removeColumn = (index: number) => {
-    if (columns.length <= minColumns) return;
+    if (columns.length <= minColumns) {
+      return;
+    }
+
     onChange(columns.filter((_, i) => i !== index));
   };
 

@@ -24,32 +24,34 @@
  * Real `http(s)://` URLs always return false, even on the host root.
  */
 const NEW_TAB_PREFIXES = [
-    "chrome://newtab",
-    "chrome://new-tab-page",
-    "chrome-search://local-ntp",
-    "edge://newtab",
-    "brave://newtab",
-    "opera://startpage",
+  "chrome://newtab",
+  "chrome://new-tab-page",
+  "chrome-search://local-ntp",
+  "edge://newtab",
+  "brave://newtab",
+  "opera://startpage",
 ];
 
 function matchesPrefix(lower: string, prefix: string): boolean {
-    return lower === prefix
+  return lower === prefix
         || lower.startsWith(`${prefix}/`)
         || lower.startsWith(`${prefix}?`)
         || lower.startsWith(`${prefix}#`);
 }
 
 export function isNewTabOrBlankUrl(url: string | undefined | null): boolean {
-    if (url === undefined || url === null || url === "") {
-        return true;
-    }
-    const lower = url.trim().toLowerCase();
-    if (lower === "") {
-        return true;
-    }
-    if (matchesPrefix(lower, "about:blank")) {
-        return true;
-    }
+  if (url === undefined || url === null || url === "") {
+    return true;
+  }
 
-    return NEW_TAB_PREFIXES.some((prefix) => matchesPrefix(lower, prefix));
+  const lower = url.trim().toLowerCase();
+  if (lower === "") {
+    return true;
+  }
+
+  if (matchesPrefix(lower, "about:blank")) {
+    return true;
+  }
+
+  return NEW_TAB_PREFIXES.some((prefix) => matchesPrefix(lower, prefix));
 }

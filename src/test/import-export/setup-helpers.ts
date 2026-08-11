@@ -93,9 +93,11 @@ function installWasmFetchShim(): void {
         headers: { "Content-Type": "application/wasm" },
       });
     }
+
     if (originalFetch) {
       return originalFetch(input, init);
     }
+
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
 
@@ -116,8 +118,10 @@ function installWasmFetchShim(): void {
 
       return;
     }
+
     (origReadFile as unknown as (...a: unknown[]) => void)(path, ...rest);
   };
+
   (fs as unknown as { readFileSync: unknown }).readFileSync = (
     path: string, ...rest: unknown[]
   ): Buffer | string => {
@@ -139,6 +143,7 @@ function installObjectUrlCapture(): void {
 
     return `blob:fixture-${counter}`;
   };
+
   globalThis.URL.revokeObjectURL = (): void => { /* noop in tests */ };
 }
 
@@ -175,6 +180,7 @@ async function buildCachedBundle(): Promise<CachedBundle> {
       "loadCachedBundle: exportAllAsSqliteZip() did not produce a Blob via URL.createObjectURL",
     );
   }
+
   const exportBlob = capturedBlobs[capturedBlobs.length - 1];
   const zipBytes = new Uint8Array(await exportBlob.arrayBuffer());
 
@@ -186,6 +192,7 @@ async function buildCachedBundle(): Promise<CachedBundle> {
   if (!dbEntry) {
     throw new Error("loadCachedBundle: zip is missing marco-backup.db entry");
   }
+
   const dbBytes = new Uint8Array(await dbEntry.async("uint8array"));
 
   // ── Import (round-trip) ───────────────────────────────────────────

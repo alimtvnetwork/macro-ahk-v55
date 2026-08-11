@@ -11,18 +11,27 @@ import { logError } from "../error-utils";
 
 export function validateImportFile(file: File): { headline: string; hint: string } | null {
   const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
-  if (!file || !(file instanceof File)) return { headline: 'No file selected', hint: 'Please select a valid JSON file.' };
-  if (file.size === 0) return { headline: 'File is empty', hint: 'Choose a non-empty prompt library JSON file.' };
+  if (!file || !(file instanceof File)) {
+    return { headline: 'No file selected', hint: 'Please select a valid JSON file.' };
+  }
+
+  if (file.size === 0) {
+    return { headline: 'File is empty', hint: 'Choose a non-empty prompt library JSON file.' };
+  }
+
   if (file.size > IMPORT_MAX_BYTES) {
     const mb = (file.size / (1024 * 1024)).toFixed(1);
 
     return { headline: 'File is too large (' + mb + ' MB)', hint: 'Maximum allowed is 5 MB.' };
   }
+
   const name = (file.name || '').toLowerCase();
   const type = (file.type || '').toLowerCase();
   const extOk = name.endsWith('.json');
   const typeOk = type === '' || type === 'application/json' || type === 'text/json' || type.endsWith('+json');
-  if (!extOk || !typeOk) return { headline: 'Unsupported file type', hint: 'Choose a .json file.' };
+  if (!extOk || !typeOk) {
+    return { headline: 'Unsupported file type', hint: 'Choose a .json file.' };
+  }
 
   return null;
 }
@@ -41,13 +50,17 @@ function buildPreviewList(preview: PromptImportPreview, skipped: number): HTMLUL
     li.textContent = label + ': ' + String(n);
     list.appendChild(li);
   }
+
   const warnRows: [number, string][] = [
     [preview.droppedByRole, 'Skipped by role filter: '],
     [preview.orphanRevisions, 'Orphan revisions (dropped): '],
     [skipped, 'Invalid entries skipped: '],
   ];
   for (const [count, label] of warnRows) {
-    if (count <= 0) continue;
+    if (count <= 0) {
+      continue;
+    }
+
     const li = document.createElement('li');
     li.style.color = '#ffd7dc';
     li.textContent = label + String(count);
@@ -82,7 +95,9 @@ function buildPreviewButtons(onConfirm: () => void, onCancel: () => void): HTMLD
 export function hidePreviewPanel(panel: HTMLDivElement): void {
   panel.hidden = true;
   panel.style.display = 'none';
-  while (panel.firstChild) panel.removeChild(panel.firstChild);
+  while (panel.firstChild) {
+    panel.removeChild(panel.firstChild);
+  }
 }
 
 export function renderPreviewPanel(
@@ -94,7 +109,10 @@ export function renderPreviewPanel(
   onConfirm: () => void,
   onCancel: () => void,
 ): void {
-  while (panel.firstChild) panel.removeChild(panel.firstChild);
+  while (panel.firstChild) {
+    panel.removeChild(panel.firstChild);
+  }
+
   const heading = document.createElement('div');
   heading.style.cssText = 'font-weight:600;color:#c9b7ff;margin-bottom:6px;';
   heading.textContent = 'Import preview: ' + file.name;
@@ -115,18 +133,24 @@ export async function computeAndRenderPreview(
   handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: PreviewTriggerType) => Promise<void>,
 ): Promise<void> {
   const panel = refs.previewPanel;
-  if (!panel) return;
+  if (!panel) {
+    return;
+  }
+
   const invalid = validateImportFile(file);
   if (invalid) {
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
-    try { previewFileInput.value = ''; } catch (err) {
+    try {
+      previewFileInput.value = ''; 
+    } catch (err) {
       logError('MacroController', 'Unknown error');
     }
 
     return;
   }
+
   refs.status.textContent = 'Previewing ' + file.name + ' ...';
   try {
     const text = await file.text();
@@ -139,23 +163,36 @@ export async function computeAndRenderPreview(
 
       return;
     }
+
     const roleSel = refs.importRoleSelect?.value;
     const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
     const opts: Parameters<typeof previewPromptImport>[1] = {};
-    if (roleFilter) opts.roleFilter = roleFilter;
-    if (parsed.revisions && parsed.revisions.length > 0) opts.revisions = parsed.revisions;
+    if (roleFilter) {
+      opts.roleFilter = roleFilter;
+    }
+
+    if (parsed.revisions && parsed.revisions.length > 0) {
+      opts.revisions = parsed.revisions;
+    }
+
     const preview = await previewPromptImport(parsed.valid, opts);
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
-      try { previewFileInput.value = ''; } catch (err) {
+      try {
+        previewFileInput.value = ''; 
+      } catch (err) {
         logError('MacroController', 'Unknown error');
       }
+
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
-      try { previewFileInput.value = ''; } catch (err) {
+      try {
+        previewFileInput.value = ''; 
+      } catch (err) {
         logError('MacroController', 'Unknown error');
       }
+
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';

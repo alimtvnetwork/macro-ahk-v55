@@ -188,6 +188,7 @@ function FileDropZone({
           onFile(file.name.replace(/\.[^.]+$/, ""), text);
         }
       };
+
       reader.readAsText(file);
     },
     [onFile]
@@ -219,7 +220,9 @@ function FileDropZone({
           ? "border-primary bg-primary/10"
           : "border-border hover:border-primary/40 hover:bg-muted/30"
       }`}
-      onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+      onDragOver={(e) => {
+        e.preventDefault(); setIsDragOver(true); 
+      }}
       onDragLeave={() => setIsDragOver(false)}
       onDrop={handleDrop}
     >
@@ -274,7 +277,9 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveUp}
-          onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onMoveUp(); 
+          }}
         >
           <ChevronUp className="h-3 w-3" />
         </button>
@@ -282,14 +287,18 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveDown}
-          onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onMoveDown(); 
+          }}
         >
           <ChevronDown className="h-3 w-3" />
         </button>
         <button
           type="button"
           className="p-0.5 text-muted-foreground hover:text-destructive"
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onRemove(); 
+          }}
         >
           <X className="h-3 w-3" />
         </button>
@@ -431,6 +440,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 
       return;
     }
+
     if (form.jsEntries.length === 0) {
       toast.error("At least one JavaScript file is required");
 
@@ -444,6 +454,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 
         return;
       }
+
       await onSaveConfig({ id: config.id.startsWith("cfg_") ? undefined : config.id, name: config.name, json: config.json });
     }
 
@@ -518,7 +529,10 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const entries = [...f.jsEntries];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
-      if (newIdx < 0 || newIdx >= entries.length) return f;
+      if (newIdx < 0 || newIdx >= entries.length) {
+        return f;
+      }
+
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
 
       return { ...f, jsEntries: entries.map((e, i) => ({ ...e, order: i })) };
@@ -542,14 +556,21 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
   };
 
   const addExistingConfig = (configId: string) => {
-    if (configId === "__none__") return;
+    if (configId === "__none__") {
+      return;
+    }
+
     if (form.configEntries.some((c) => c.id === configId)) {
       toast.info("Config already added");
 
       return;
     }
+
     const config = configs.find((c) => c.id === configId);
-    if (!config) return;
+    if (!config) {
+      return;
+    }
+
     setForm((f) => ({
       ...f,
       configEntries: [
@@ -579,7 +600,10 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const entries = [...f.configEntries];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
-      if (newIdx < 0 || newIdx >= entries.length) return f;
+      if (newIdx < 0 || newIdx >= entries.length) {
+        return f;
+      }
+
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
 
       return { ...f, configEntries: entries.map((e, i) => ({ ...e, order: i })) };
@@ -610,6 +634,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 
       return;
     }
+
     if (!form.isOpen) {
       setForm({
         ...emptyForm,
@@ -749,9 +774,12 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
                     label="Drop JSON"
                     icon={Upload}
                     onFile={(name, content) => {
-                      if (!validateJson(content)) { toast.error("Invalid JSON");
+                      if (!validateJson(content)) {
+                        toast.error("Invalid JSON");
 
- return; }
+                        return; 
+                      }
+
                       addConfigEntry(name, content);
                     }}
                     multiple
@@ -887,19 +915,25 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
           ? rawBindingValue
           : Array.isArray(rawBindingValue)
             ? (rawBindingValue as Array<string | number | { id?: string }>)
-                .map((entry: string | number | { id?: string }) => {
-                  if (typeof entry === "string") return entry.trim();
-                  if (typeof entry === "number") return String(entry);
-                  if (typeof entry === "object" && entry !== null && "id" in entry) {
-                    const idValue = entry.id;
+              .map((entry: string | number | { id?: string }) => {
+                if (typeof entry === "string") {
+                  return entry.trim();
+                }
 
-                    return typeof idValue === "string" ? idValue.trim() : "";
-                  }
+                if (typeof entry === "number") {
+                  return String(entry);
+                }
 
-                  return "";
-                })
-                .filter(Boolean)
-                .join(",")
+                if (typeof entry === "object" && entry !== null && "id" in entry) {
+                  const idValue = entry.id;
+
+                  return typeof idValue === "string" ? idValue.trim() : "";
+                }
+
+                return "";
+              })
+              .filter(Boolean)
+              .join(",")
             : "";
 
         const script: StoredScript = {
@@ -984,19 +1018,29 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw);
+  try {
+    JSON.parse(raw);
 
- return true; } catch (err) { /* swallowed */
- return false; }
+    return true; 
+  } catch (err) { /* swallowed */
+    return false; 
+  }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { /* swallowed */
- return input; }
+    try {
+      return JSON.stringify(JSON.parse(input), null, 2); 
+    } catch (err) { /* swallowed */
+      return input; 
+    }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { /* swallowed */
- return "{}"; }
+
+  try {
+    return JSON.stringify(input ?? {}, null, 2); 
+  } catch (err) { /* swallowed */
+    return "{}"; 
+  }
 }
 
 export { RunAtSelect, RunAtLabel, RUN_AT_OPTIONS, FileDropZone };

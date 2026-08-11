@@ -192,7 +192,10 @@ function buildValidationTypeSelector(
     option.value = validationType;
     option.textContent = validationType;
     const isSelected = validationType === validation.type;
-    if (isSelected) option.selected = true;
+    if (isSelected) {
+      option.selected = true;
+    }
+
     typeSelect.appendChild(option);
   }
 
@@ -265,7 +268,9 @@ function addValField(
   const input = el('input', DomIdType.SchemaValInput) as HTMLInputElement;
   input.value = (validation[key] as string) || '';
   input.placeholder = placeholder || '';
-  input.oninput = () => { validation[key] = input.value || undefined; };
+  input.oninput = () => {
+    validation[key] = input.value || undefined; 
+  };
 
   row.appendChild(input);
   panel.appendChild(row);
@@ -285,7 +290,9 @@ function addValNumField(
   input.value = validation[key] !== undefined ? String(validation[key]) : '';
   input.placeholder = '—';
   input.style.maxWidth = '80px';
-  input.oninput = () => { validation[key] = input.value ? Number(input.value) : undefined; };
+  input.oninput = () => {
+    validation[key] = input.value ? Number(input.value) : undefined; 
+  };
 
   row.appendChild(input);
   panel.appendChild(row);
@@ -306,8 +313,12 @@ export function renderFkPanel(
 
   renderFkTableSelector(panel, foreignKey, tables);
   renderFkColumnInput(panel, foreignKey);
-  addCascadeSelect(panel, 'ON DELETE', foreignKey.onDelete, (value) => { foreignKey.onDelete = value as typeof foreignKey.onDelete; });
-  addCascadeSelect(panel, 'ON UPDATE', foreignKey.onUpdate, (value) => { foreignKey.onUpdate = value as typeof foreignKey.onUpdate; });
+  addCascadeSelect(panel, 'ON DELETE', foreignKey.onDelete, (value) => {
+    foreignKey.onDelete = value as typeof foreignKey.onDelete; 
+  });
+  addCascadeSelect(panel, 'ON UPDATE', foreignKey.onUpdate, (value) => {
+    foreignKey.onUpdate = value as typeof foreignKey.onUpdate; 
+  });
 }
 
 function renderFkTableSelector(
@@ -329,11 +340,17 @@ function renderFkTableSelector(
     option.value = table.name;
     option.textContent = table.name;
     const isSelected = table.name === foreignKey.table;
-    if (isSelected) option.selected = true;
+    if (isSelected) {
+      option.selected = true;
+    }
+
     tableSelect.appendChild(option);
   }
 
-  tableSelect.onchange = () => { foreignKey.table = tableSelect.value; };
+  tableSelect.onchange = () => {
+    foreignKey.table = tableSelect.value; 
+  };
+
   row.appendChild(tableSelect);
   panel.appendChild(row);
 }
@@ -346,7 +363,9 @@ function renderFkColumnInput(panel: HTMLElement, foreignKey: ForeignKeyDef): voi
   columnInput.value = foreignKey.column;
   columnInput.placeholder = 'Id';
   columnInput.style.maxWidth = '120px';
-  columnInput.oninput = () => { foreignKey.column = columnInput.value || 'Id'; };
+  columnInput.oninput = () => {
+    foreignKey.column = columnInput.value || 'Id'; 
+  };
 
   row.appendChild(columnInput);
   panel.appendChild(row);
@@ -368,7 +387,10 @@ function addCascadeSelect(
     option.value = cascadeOption;
     option.textContent = cascadeOption;
     const isSelected = cascadeOption === currentValue;
-    if (isSelected) option.selected = true;
+    if (isSelected) {
+      option.selected = true;
+    }
+
     select.appendChild(option);
   }
 

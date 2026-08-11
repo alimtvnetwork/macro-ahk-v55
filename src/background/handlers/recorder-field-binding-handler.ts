@@ -14,10 +14,10 @@
 
 import type { MessageRequest } from "../../shared/messages";
 import {
-    upsertFieldBinding,
-    listFieldBindings,
-    deleteFieldBinding,
-    type PersistedFieldBinding,
+  upsertFieldBinding,
+  listFieldBindings,
+  deleteFieldBinding,
+  type PersistedFieldBinding,
 } from "../recorder/field-binding-persistence";
 
 interface UpsertRequest {
@@ -41,33 +41,33 @@ interface DeleteRequest {
 /* ------------------------------------------------------------------ */
 
 export async function handleRecorderFieldBindingUpsert(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true; binding: PersistedFieldBinding }> {
-    const req = message as unknown as UpsertRequest;
-    validateUpsertRequest(req);
+  const req = message as unknown as UpsertRequest;
+  validateUpsertRequest(req);
 
-    const binding = await upsertFieldBinding(
-        req.projectSlug,
-        req.stepId,
-        req.dataSourceId,
-        req.columnName,
-    );
+  const binding = await upsertFieldBinding(
+    req.projectSlug,
+    req.stepId,
+    req.dataSourceId,
+    req.columnName,
+  );
 
-    return { isOk: true, binding };
+  return { isOk: true, binding };
 }
 
 function validateUpsertRequest(req: UpsertRequest): void {
-    const missing =
+  const missing =
         !req.projectSlug ||
         typeof req.stepId !== "number" ||
         typeof req.dataSourceId !== "number" ||
         !req.columnName;
 
-    if (missing) {
-        throw new Error(
-            "RECORDER_FIELD_BINDING_UPSERT requires projectSlug, stepId, dataSourceId, columnName",
-        );
-    }
+  if (missing) {
+    throw new Error(
+      "RECORDER_FIELD_BINDING_UPSERT requires projectSlug, stepId, dataSourceId, columnName",
+    );
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -75,15 +75,16 @@ function validateUpsertRequest(req: UpsertRequest): void {
 /* ------------------------------------------------------------------ */
 
 export async function handleRecorderFieldBindingList(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ bindings: ReadonlyArray<PersistedFieldBinding> }> {
-    const req = message as unknown as ListRequest;
-    if (!req.projectSlug) {
-        throw new Error("RECORDER_FIELD_BINDING_LIST requires projectSlug");
-    }
-    const bindings = await listFieldBindings(req.projectSlug);
+  const req = message as unknown as ListRequest;
+  if (!req.projectSlug) {
+    throw new Error("RECORDER_FIELD_BINDING_LIST requires projectSlug");
+  }
 
-    return { bindings };
+  const bindings = await listFieldBindings(req.projectSlug);
+
+  return { bindings };
 }
 
 /* ------------------------------------------------------------------ */
@@ -91,15 +92,16 @@ export async function handleRecorderFieldBindingList(
 /* ------------------------------------------------------------------ */
 
 export async function handleRecorderFieldBindingDelete(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true }> {
-    const req = message as unknown as DeleteRequest;
-    if (!req.projectSlug || typeof req.stepId !== "number") {
-        throw new Error(
-            "RECORDER_FIELD_BINDING_DELETE requires projectSlug and stepId",
-        );
-    }
-    await deleteFieldBinding(req.projectSlug, req.stepId);
+  const req = message as unknown as DeleteRequest;
+  if (!req.projectSlug || typeof req.stepId !== "number") {
+    throw new Error(
+      "RECORDER_FIELD_BINDING_DELETE requires projectSlug and stepId",
+    );
+  }
 
-    return { isOk: true };
+  await deleteFieldBinding(req.projectSlug, req.stepId);
+
+  return { isOk: true };
 }

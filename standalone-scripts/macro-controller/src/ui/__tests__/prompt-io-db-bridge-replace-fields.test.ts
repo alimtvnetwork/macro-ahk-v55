@@ -17,128 +17,134 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 const listMock = vi.hoisted(() => vi.fn());
 const upsertMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: listMock,
-    upsertPrompt: upsertMock,
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: listMock,
+  upsertPrompt: upsertMock,
 }));
 
 import {
-    collectDbEntriesForExport,
-    commitDbEntries,
+  collectDbEntriesForExport,
+  commitDbEntries,
 } from '../prompt-io-db-bridge';
 import type { CachedPromptEntry } from '../prompt-cache';
 
 beforeEach(() => {
-    listMock.mockReset();
-    upsertMock.mockReset();
-    upsertMock.mockImplementation(async () => (new DbResult(true, 1)));
+  listMock.mockReset();
+  upsertMock.mockReset();
+  upsertMock.mockImplementation(async () => (new DbResult(true, 1)));
 });
 
 describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () => {
-    it('carries replaceKey and cloned replaceValues from PromptRow into CachedPromptEntry', async () => {
-        listMock.mockImplementation(async (role: string) => {
-            if (role !== 'plan') return new DbResult(true, []);
+  it('carries replaceKey and cloned replaceValues from PromptRow into CachedPromptEntry', async () => {
+    listMock.mockImplementation(async (role: string) => {
+      if (role !== 'plan') {
+        return new DbResult(true, []);
+      }
 
-            return {
-                ok: true, isFail: false, isSuccess: true,
-                value: [{
-                    Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
-                    Body: 'P {{count}}', Role: 'plan', IsDefault: 1,
-                    ReplaceKey: 'count',
-                    ReplaceValues: ['3', '7', '11'],
-                    CreatedAt: 0, UpdatedAt: 0,
-                }],
-            };
-        });
-        const out = await collectDbEntriesForExport();
-        const plan = out.find((e) => e.slug === 'plan-default')!;
-        expect(plan.replaceKey).toBe('count');
-        expect(plan.replaceValues).toEqual(['3', '7', '11']);
+      return {
+        ok: true, isFail: false, isSuccess: true,
+        value: [{
+          Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
+          Body: 'P {{count}}', Role: 'plan', IsDefault: 1,
+          ReplaceKey: 'count',
+          ReplaceValues: ['3', '7', '11'],
+          CreatedAt: 0, UpdatedAt: 0,
+        }],
+      };
+    });
+    const out = await collectDbEntriesForExport();
+    const plan = out.find((e) => e.slug === 'plan-default')!;
+    expect(plan.replaceKey).toBe('count');
+    expect(plan.replaceValues).toEqual(['3', '7', '11']);
         // Cloned, not shared.
         plan.replaceValues!.push('99');
         const out2 = await collectDbEntriesForExport();
         expect(out2.find((e) => e.slug === 'plan-default')!.replaceValues).toEqual(['3', '7', '11']);
-    });
+  });
 
-    it('leaves replaceValues undefined when the row column is missing/non-array', async () => {
-        listMock.mockImplementation(async (role: string) => {
-            if (role !== 'next') return new DbResult(true, []);
+  it('leaves replaceValues undefined when the row column is missing/non-array', async () => {
+    listMock.mockImplementation(async (role: string) => {
+      if (role !== 'next') {
+        return new DbResult(true, []);
+      }
 
-            return {
-                ok: true, isFail: false, isSuccess: true,
-                value: [{
-                    Id: 2, Slug: 'next-default', Name: 'Next default',
-                    Body: 'N {{n}}', Role: 'next', IsDefault: 1,
-                    ReplaceKey: 'n',
-                    // ReplaceValues intentionally absent
-                    CreatedAt: 0, UpdatedAt: 0,
-                }],
-            };
-        });
-        const out = await collectDbEntriesForExport();
-        const next = out.find((e) => e.slug === 'next-default')!;
-        expect(next.replaceKey).toBe('n');
-        expect(next.replaceValues).toBeUndefined();
+      return {
+        ok: true, isFail: false, isSuccess: true,
+        value: [{
+          Id: 2, Slug: 'next-default', Name: 'Next default',
+          Body: 'N {{n}}', Role: 'next', IsDefault: 1,
+          ReplaceKey: 'n',
+          // ReplaceValues intentionally absent
+          CreatedAt: 0, UpdatedAt: 0,
+        }],
+      };
     });
+    const out = await collectDbEntriesForExport();
+    const next = out.find((e) => e.slug === 'next-default')!;
+    expect(next.replaceKey).toBe('n');
+    expect(next.replaceValues).toBeUndefined();
+  });
 });
 
 describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey', () => {
-    it('passes previousReplaceKey from the existing row so a rename passes the drift guard', async () => {
-        listMock.mockImplementation(async (role: string) => {
-            if (role !== 'plan') return new DbResult(true, []);
+  it('passes previousReplaceKey from the existing row so a rename passes the drift guard', async () => {
+    listMock.mockImplementation(async (role: string) => {
+      if (role !== 'plan') {
+        return new DbResult(true, []);
+      }
 
-            return {
-                ok: true, isFail: false, isSuccess: true,
-                value: [{
-                    Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
-                    Body: 'P {{n}}', Role: 'plan', IsDefault: 0,
-                    ReplaceKey: 'n',
-                    ReplaceValues: ['1', '2', '3', '5', '8'],
-                    CreatedAt: 0, UpdatedAt: 0,
-                }],
-            };
-        });
-        const entries: CachedPromptEntry[] = [{
-            name: 'PlanTierType default', text: 'P {{count}}', slug: 'plan-default', role: 'plan',
-            replaceKey: 'count', replaceValues: ['3', '7', '11'],
-        }];
-        const result = await commitDbEntries(entries);
-        expect(result.errors).toEqual([]);
-        expect(result.upserted).toBe(1);
-        expect(upsertMock).toHaveBeenCalledTimes(1);
-        const arg = upsertMock.mock.calls[0][0] as {
+      return {
+        ok: true, isFail: false, isSuccess: true,
+        value: [{
+          Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
+          Body: 'P {{n}}', Role: 'plan', IsDefault: 0,
+          ReplaceKey: 'n',
+          ReplaceValues: ['1', '2', '3', '5', '8'],
+          CreatedAt: 0, UpdatedAt: 0,
+        }],
+      };
+    });
+    const entries: CachedPromptEntry[] = [{
+      name: 'PlanTierType default', text: 'P {{count}}', slug: 'plan-default', role: 'plan',
+      replaceKey: 'count', replaceValues: ['3', '7', '11'],
+    }];
+    const result = await commitDbEntries(entries);
+    expect(result.errors).toEqual([]);
+    expect(result.upserted).toBe(1);
+    expect(upsertMock).toHaveBeenCalledTimes(1);
+    const arg = upsertMock.mock.calls[0][0] as {
             id?: number;
             replaceKey?: string;
             replaceValues?: string[];
             previousReplaceKey?: string;
             previousBody?: string;
         };
-        expect(arg.id).toBe(1);
-        expect(arg.replaceKey).toBe('count');
-        expect(arg.replaceValues).toEqual(['3', '7', '11']);
-        expect(arg.previousReplaceKey).toBe('n');
-        expect(arg.previousBody).toBe('P {{n}}');
-    });
+    expect(arg.id).toBe(1);
+    expect(arg.replaceKey).toBe('count');
+    expect(arg.replaceValues).toEqual(['3', '7', '11']);
+    expect(arg.previousReplaceKey).toBe('n');
+    expect(arg.previousBody).toBe('P {{n}}');
+  });
 
-    it('omits previousReplaceKey when inserting a brand-new slug', async () => {
-        listMock.mockImplementation(async () => (new DbResult(true, [])));
-        const entries: CachedPromptEntry[] = [{
-            name: 'Custom', text: 'C {{n}}', slug: 'plan-custom', role: 'plan',
-            replaceKey: 'n', replaceValues: ['2', '4', '6'],
-        }];
-        const result = await commitDbEntries(entries);
-        expect(result.upserted).toBe(1);
-        const arg = upsertMock.mock.calls[0][0] as {
+  it('omits previousReplaceKey when inserting a brand-new slug', async () => {
+    listMock.mockImplementation(async () => (new DbResult(true, [])));
+    const entries: CachedPromptEntry[] = [{
+      name: 'Custom', text: 'C {{n}}', slug: 'plan-custom', role: 'plan',
+      replaceKey: 'n', replaceValues: ['2', '4', '6'],
+    }];
+    const result = await commitDbEntries(entries);
+    expect(result.upserted).toBe(1);
+    const arg = upsertMock.mock.calls[0][0] as {
             id?: number;
             replaceKey?: string;
             replaceValues?: string[];
             previousReplaceKey?: string;
         };
-        expect(arg.id).toBeUndefined();
-        expect(arg.previousReplaceKey).toBeUndefined();
-        expect(arg.replaceKey).toBe('n');
-        expect(arg.replaceValues).toEqual(['2', '4', '6']);
-    });
+    expect(arg.id).toBeUndefined();
+    expect(arg.previousReplaceKey).toBeUndefined();
+    expect(arg.replaceKey).toBe('n');
+    expect(arg.replaceValues).toEqual(['2', '4', '6']);
+  });
 });

@@ -31,9 +31,9 @@ vi.mock('../prompt-injection', () => ({
 }));
 
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   getDefaultPromptForRole: mocks.getDefaultPromptForRole,
   getPromptBySlug: mocks.getPromptBySlug,
   listPromptsByRole: mocks.listPromptsByRole,

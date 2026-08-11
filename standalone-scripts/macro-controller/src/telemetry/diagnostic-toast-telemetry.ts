@@ -80,16 +80,43 @@ export interface EmitDiagnosticToastInput {
 }
 
 function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapshot | undefined {
-  if (!rd) return undefined;
+  if (!rd) {
+    return undefined;
+  }
+
   const snap: RequestDetailSnapshot = {};
-  if (rd.op !== undefined) snap.op = rd.op;
-  if (rd.method !== undefined) snap.method = rd.method;
-  if (rd.url !== undefined) snap.url = rd.url;
-  if (rd.status !== undefined) snap.status = rd.status;
-  if (rd.statusText !== undefined) snap.statusText = rd.statusText;
-  if (typeof rd.body === 'string') snap.bodyBytes = rd.body.length;
-  if (typeof rd.responseBody === 'string') snap.responseBodyBytes = rd.responseBody.length;
-  if (rd.headers) snap.headerNames = Object.keys(rd.headers);
+  if (rd.op !== undefined) {
+    snap.op = rd.op;
+  }
+
+  if (rd.method !== undefined) {
+    snap.method = rd.method;
+  }
+
+  if (rd.url !== undefined) {
+    snap.url = rd.url;
+  }
+
+  if (rd.status !== undefined) {
+    snap.status = rd.status;
+  }
+
+  if (rd.statusText !== undefined) {
+    snap.statusText = rd.statusText;
+  }
+
+  if (typeof rd.body === 'string') {
+    snap.bodyBytes = rd.body.length;
+  }
+
+  if (typeof rd.responseBody === 'string') {
+    snap.responseBodyBytes = rd.responseBody.length;
+  }
+
+  if (rd.headers) {
+    snap.headerNames = Object.keys(rd.headers);
+  }
+
   if (typeof rd.correlationId === 'string' && rd.correlationId.length > 0) {
     snap.correlationId = rd.correlationId;
   }
@@ -111,8 +138,11 @@ function resolveCorrelationId(input: EmitDiagnosticToastInput): string {
   if (typeof input.correlationId === 'string' && input.correlationId.length > 0) {
     return input.correlationId;
   }
+
   const rdId = input.opts?.requestDetail?.correlationId;
-  if (typeof rdId === 'string' && rdId.length > 0) return rdId;
+  if (typeof rdId === 'string' && rdId.length > 0) {
+    return rdId;
+  }
 
   return generateCorrelationId();
 }
@@ -124,22 +154,44 @@ function formatLine(evt: DiagnosticToastEvent): string {
     'level=' + evt.level,
     'cid=' + evt.correlationId,
   ];
-  if (evt.noStop) parts.push('noStop=true');
+  if (evt.noStop) {
+    parts.push('noStop=true');
+  }
+
   const rd = evt.requestDetail;
   if (rd) {
-    if (rd.op) parts.push('op=' + rd.op);
-    if (rd.method) parts.push('method=' + rd.method);
-    if (rd.status !== undefined) parts.push('status=' + String(rd.status));
-    if (rd.url) parts.push('url=' + rd.url);
+    if (rd.op) {
+      parts.push('op=' + rd.op);
+    }
+
+    if (rd.method) {
+      parts.push('method=' + rd.method);
+    }
+
+    if (rd.status !== undefined) {
+      parts.push('status=' + String(rd.status));
+    }
+
+    if (rd.url) {
+      parts.push('url=' + rd.url);
+    }
   }
-  if (evt.detail) parts.push('detail=' + evt.detail);
+
+  if (evt.detail) {
+    parts.push('detail=' + evt.detail);
+  }
 
   return '[DiagnosticToast] ' + parts.join(' ');
 }
 
 function levelToLogLevel(level: ToastLevel): StepNotifyLevelType {
-  if (level === 'error') return 'error';
-  if (level === 'warn') return 'warning';
+  if (level === 'error') {
+    return 'error';
+  }
+
+  if (level === 'warn') {
+    return 'warning';
+  }
 
   return 'info';
 }
@@ -152,7 +204,10 @@ function appendToTraceBuffer(evt: DiagnosticToastEvent): void {
       ? (parsed as DiagnosticToastEvent[])
       : [];
     buf.push(evt);
-    while (buf.length > DIAGNOSTIC_TOAST_TRACE_MAX) buf.shift();
+    while (buf.length > DIAGNOSTIC_TOAST_TRACE_MAX) {
+      buf.shift();
+    }
+
     localStorage.setItem(StorageKeyType.DiagnosticToastTrace, JSON.stringify(buf));
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'appendToTraceBuffer failed', err);
@@ -161,7 +216,10 @@ function appendToTraceBuffer(evt: DiagnosticToastEvent): void {
 
 function dispatchWindowEvent(evt: DiagnosticToastEvent): void {
   try {
-    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
+    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') {
+      return;
+    }
+
     window.dispatchEvent(new CustomEvent('marco:diagnostic-toast', { detail: evt }));
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'dispatchWindowEvent failed', err);
@@ -188,15 +246,23 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
     const isMissingCorrelationId = !rd.correlationId;
     // Ensure the snapshot always carries the same id as the event, even
     // when the caller-supplied requestDetail did not include one.
-    if (isMissingCorrelationId) rd.correlationId = correlationId;
+    if (isMissingCorrelationId) {
+      rd.correlationId = correlationId;
+    }
+
     evt.requestDetail = rd;
   }
-  if (input.detail !== undefined) evt.detail = input.detail;
+
+  if (input.detail !== undefined) {
+    evt.detail = input.detail;
+  }
+
   try {
     log(formatLine(evt), levelToLogLevel(evt.level));
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'log() emit failed', err);
   }
+
   appendToTraceBuffer(evt);
   dispatchWindowEvent(evt);
 
@@ -207,7 +273,10 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
-    if (!raw) return [];
+    if (!raw) {
+      return [];
+    }
+
     const parsed = JSON.parse(raw) as unknown;
 
     return Array.isArray(parsed) ? (parsed as DiagnosticToastEvent[]) : [];

@@ -11,10 +11,10 @@
  */
 
 import {
-    DEFAULT_KEYWORD_EVENT_TARGET,
-    type KeywordEvent,
-    type KeywordEventStep,
-    type KeywordEventTarget,
+  DEFAULT_KEYWORD_EVENT_TARGET,
+  type KeywordEvent,
+  type KeywordEventStep,
+  type KeywordEventTarget,
 } from "@/hooks/use-keyword-events";
 import { DispatchKeyType } from "../types/enums";
 
@@ -48,19 +48,25 @@ interface ParsedCombo {
 
 /** Parse a combo string like "Ctrl+Shift+Enter" into its parts. */
 export function parseCombo(combo: string): ParsedCombo {
-    const parts = combo.split("+").map(p => p.trim()).filter(Boolean);
-    let Ctrl = false, Shift = false, Alt = false, Meta = false;
-    let Key = "";
-    for (const p of parts) {
-        const lower = p.toLowerCase();
-        if (lower === "ctrl" || lower === "control") Ctrl = true;
-        else if (lower === "shift") Shift = true;
-        else if (lower === "alt" || lower === "option") Alt = true;
-        else if (lower === "meta" || lower === "cmd" || lower === "command") Meta = true;
-        else Key = p;
+  const parts = combo.split("+").map(p => p.trim()).filter(Boolean);
+  let Ctrl = false, Shift = false, Alt = false, Meta = false;
+  let Key = "";
+  for (const p of parts) {
+    const lower = p.toLowerCase();
+    if (lower === "ctrl" || lower === "control") {
+      Ctrl = true;
+    } else if (lower === "shift") {
+      Shift = true;
+    } else if (lower === "alt" || lower === "option") {
+      Alt = true;
+    } else if (lower === "meta" || lower === "cmd" || lower === "command") {
+      Meta = true;
+    } else {
+      Key = p;
     }
+  }
 
-    return { Key, Ctrl, Shift, Alt, Meta };
+  return { Key, Ctrl, Shift, Alt, Meta };
 }
 
 /**
@@ -73,75 +79,86 @@ export function parseCombo(combo: string): ParsedCombo {
  * fallback by checking the returned node identity.
  */
 export function resolveEventTarget(
-    config: KeywordEventTarget | undefined,
-    doc?: Document,
+  config: KeywordEventTarget | undefined,
+  doc?: Document,
 ): EventTarget {
-    const d: Document | undefined = doc ?? (typeof document !== "undefined" ? document : undefined);
-    if (d === undefined) {
-        throw new Error("No DOM target available for keyboard playback");
-    }
-    const fallback: EventTarget = d.body ?? d;
-    const target = config ?? DEFAULT_KEYWORD_EVENT_TARGET;
-    switch (target.Kind) {
-        case "ActiveElement":
-            return d.activeElement ?? fallback;
-        case "Body":
-            return fallback;
-        case "Selector": {
-            const sel = target.Selector.trim();
-            if (sel === "") { return fallback; }
-            try {
-                const node = d.querySelector(sel);
+  const d: Document | undefined = doc ?? (typeof document !== "undefined" ? document : undefined);
+  if (d === undefined) {
+    throw new Error("No DOM target available for keyboard playback");
+  }
 
-                return node ?? fallback;
-            } catch (err) { void 0;
+  const fallback: EventTarget = d.body ?? d;
+  const target = config ?? DEFAULT_KEYWORD_EVENT_TARGET;
+  switch (target.Kind) {
+    case "ActiveElement":
+      return d.activeElement ?? fallback;
+    case "Body":
+      return fallback;
+    case "Selector": {
+      const sel = target.Selector.trim();
+      if (sel === "") {
+        return fallback; 
+      }
 
-                // Invalid CSS selector — surface a fallback rather than throw
-                // so a typo in the panel doesn't crash playback.
-                return fallback;
-            }
-        }
+      try {
+        const node = d.querySelector(sel);
+
+        return node ?? fallback;
+      } catch (err) {
+        void 0;
+
+        // Invalid CSS selector — surface a fallback rather than throw
+        // so a typo in the panel doesn't crash playback.
+        return fallback;
+      }
     }
+  }
 }
 
 function resolveTarget(
-    explicit: EventTarget | null | undefined,
-    eventCfg: KeywordEventTarget | undefined,
+  explicit: EventTarget | null | undefined,
+  eventCfg: KeywordEventTarget | undefined,
 ): EventTarget {
-    if (explicit) { return explicit; }
+  if (explicit) {
+    return explicit; 
+  }
 
-    return resolveEventTarget(eventCfg);
+  return resolveEventTarget(eventCfg);
 }
 
 function dispatchKey(target: EventTarget, type: DispatchKeyType, parsed: ParsedCombo): void {
-    const init: KeyboardEventInit = {
-        key: parsed.Key,
-        code: parsed.Key.length === 1 ? `Key${parsed.Key.toUpperCase()}` : parsed.Key,
-        ctrlKey: parsed.Ctrl,
-        shiftKey: parsed.Shift,
-        altKey: parsed.Alt,
-        metaKey: parsed.Meta,
-        bubbles: true,
-        cancelable: true,
-    };
-    target.dispatchEvent(new KeyboardEvent(type, init));
+  const init: KeyboardEventInit = {
+    key: parsed.Key,
+    code: parsed.Key.length === 1 ? `Key${parsed.Key.toUpperCase()}` : parsed.Key,
+    ctrlKey: parsed.Ctrl,
+    shiftKey: parsed.Shift,
+    altKey: parsed.Alt,
+    metaKey: parsed.Meta,
+    bubbles: true,
+    cancelable: true,
+  };
+  target.dispatchEvent(new KeyboardEvent(type, init));
 }
 
 function wait(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError"));
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
 
- return; }
-        const timer = setTimeout(() => {
-            signal?.removeEventListener("abort", onAbort);
-            resolve();
-        }, Math.max(0, ms));
-        const onAbort = () => {
-            clearTimeout(timer);
-            reject(new DOMException("Aborted", "AbortError"));
-        };
-        signal?.addEventListener("abort", onAbort, { once: true });
-    });
+      return; 
+    }
+
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, Math.max(0, ms));
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
 /**
@@ -150,44 +167,52 @@ function wait(ms: number, signal?: AbortSignal): Promise<void> {
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity -- Enabled-skip + abort + Kind switch in one loop is intentional
 export async function runKeywordEvent(
-    event: KeywordEvent,
-    options: PlaybackOptions = {},
+  event: KeywordEvent,
+  options: PlaybackOptions = {},
 ): Promise<PlaybackResult> {
-    if (!event.Enabled) {
-        return { Completed: false, StepsRun: 0, Aborted: false };
-    }
+  if (!event.Enabled) {
+    return { Completed: false, StepsRun: 0, Aborted: false };
+  }
 
-    const target = resolveTarget(options.target, event.Target);
-    let stepsRun = 0;
+  const target = resolveTarget(options.target, event.Target);
+  let stepsRun = 0;
 
-    try {
-        for (let i = 0; i < event.Steps.length; i += 1) {
-            if (options.signal?.aborted) {
-                return { Completed: false, StepsRun: stepsRun, Aborted: true };
-            }
-            const step = event.Steps[i];
-            // Per-step Enabled flag: undefined / true = run, false = skip.
-            // The onStep notification still fires so UIs that highlight the
-            // currently-running index stay in sync with the visible list.
-            options.onStep?.(step, i);
-            if (step.Enabled === false) continue;
+  try {
+    for (let i = 0; i < event.Steps.length; i += 1) {
+      if (options.signal?.aborted) {
+        return { Completed: false, StepsRun: stepsRun, Aborted: true };
+      }
 
-            if (step.Kind === "Key") {
-                const parsed = parseCombo(step.Combo);
-                if (!parsed.Key) continue;
-                dispatchKey(target, "keydown", parsed);
-                dispatchKey(target, "keyup", parsed);
-            } else {
-                await wait(step.DurationMs, options.signal);
-            }
-            stepsRun += 1;
+      const step = event.Steps[i];
+      // Per-step Enabled flag: undefined / true = run, false = skip.
+      // The onStep notification still fires so UIs that highlight the
+      // currently-running index stay in sync with the visible list.
+      options.onStep?.(step, i);
+      if (step.Enabled === false) {
+        continue;
+      }
+
+      if (step.Kind === "Key") {
+        const parsed = parseCombo(step.Combo);
+        if (!parsed.Key) {
+          continue;
         }
 
-        return { Completed: true, StepsRun: stepsRun, Aborted: false };
-    } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") {
-            return { Completed: false, StepsRun: stepsRun, Aborted: true };
-        }
-        throw err;
+        dispatchKey(target, "keydown", parsed);
+        dispatchKey(target, "keyup", parsed);
+      } else {
+        await wait(step.DurationMs, options.signal);
+      }
+
+      stepsRun += 1;
     }
+
+    return { Completed: true, StepsRun: stepsRun, Aborted: false };
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      return { Completed: false, StepsRun: stepsRun, Aborted: true };
+    }
+
+    throw err;
+  }
 }

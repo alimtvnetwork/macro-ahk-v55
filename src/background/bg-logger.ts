@@ -97,40 +97,40 @@ export interface BgErrorContext {
  * @param context   Optional context for the errors DB row
  */
 export function logBgError(
-    tag: string,
-    errorCode: string,
-    message: string,
-    error?: CaughtError,
-    context?: BgErrorContext,
+  tag: string,
+  errorCode: string,
+  message: string,
+  error?: CaughtError,
+  context?: BgErrorContext,
 ): void {
-    const stackTrace = error instanceof Error ? error.stack : undefined;
+  const stackTrace = error instanceof Error ? error.stack : undefined;
 
-    // Step 1 + 2: Persist to DB + OPFS session (fire-and-forget, must never throw)
-    try {
-        void handleLogError({
-            type: MessageType.LOG_ERROR,
-            level: "ERROR",
-            source: "background",
-            category: tag.replace(/[[\]]/g, "").toUpperCase(),
-            errorCode,
-            message,
-            stackTrace,
-            context: context?.contextDetail,
-            scriptId: context?.scriptId,
-            projectId: context?.projectId,
-            configId: context?.configId,
-            scriptFile: context?.scriptFile,
-        } as MessageRequest).catch(() => { /* fall through to console.error */ }); // allow-swallow: DB/session not ready — console.error below preserves the error
-    } catch (err) {
+  // Step 1 + 2: Persist to DB + OPFS session (fire-and-forget, must never throw)
+  try {
+    void handleLogError({
+      type: MessageType.LOG_ERROR,
+      level: "ERROR",
+      source: "background",
+      category: tag.replace(/[[\]]/g, "").toUpperCase(),
+      errorCode,
+      message,
+      stackTrace,
+      context: context?.contextDetail,
+      scriptId: context?.scriptId,
+      projectId: context?.projectId,
+      configId: context?.configId,
+      scriptFile: context?.scriptFile,
+    } as MessageRequest).catch(() => { /* fall through to console.error */ }); // allow-swallow: DB/session not ready — console.error below preserves the error
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 
-    // Step 3: Console.error LAST — always executes, preserves full stack trace
-    if (error !== undefined) {
-        console.error(`${tag} ${message}`, error);
-    } else {
-        console.error(`${tag} ${message}`);
-    }
+  // Step 3: Console.error LAST — always executes, preserves full stack trace
+  if (error !== undefined) {
+    console.error(`${tag} ${message}`, error);
+  } else {
+    console.error(`${tag} ${message}`);
+  }
 }
 
 /**
@@ -141,17 +141,17 @@ export function logBgError(
  *   catch (err) { logCaughtError("[boot]", "Manifest seeder failed", err); }
  */
 export function logCaughtError(
-    tag: string,
-    message: string,
-    error: CaughtError,
-    context?: BgErrorContext,
+  tag: string,
+  message: string,
+  error: CaughtError,
+  context?: BgErrorContext,
 ): void {
-    const errorCode = tag
-        .replace(/[[\]:]/g, "")
-        .replace(/[^a-zA-Z0-9-]/g, "_")
-        .toUpperCase() + "_ERROR";
+  const errorCode = tag
+    .replace(/[[\]:]/g, "")
+    .replace(/[^a-zA-Z0-9-]/g, "_")
+    .toUpperCase() + "_ERROR";
 
-    logBgError(tag, errorCode, message, error, context);
+  logBgError(tag, errorCode, message, error, context);
 }
 
 /**
@@ -160,15 +160,15 @@ export function logCaughtError(
  * otherwise transient/non-fatal issues poison health/error counts.
  */
 export function logBgWarnError(
-    tag: string,
-    message: string,
-    error?: CaughtError,
+  tag: string,
+  message: string,
+  error?: CaughtError,
 ): void {
-    if (error !== undefined) {
-        console.warn(`${tag} ${message}`, error);
-    } else {
-        console.warn(`${tag} ${message}`);
-    }
+  if (error !== undefined) {
+    console.warn(`${tag} ${message}`, error);
+  } else {
+    console.warn(`${tag} ${message}`);
+  }
 }
 
 /**
@@ -203,28 +203,31 @@ const SAMPLED_WARN_BUDGET_DEFAULT = 3;
  * @param budget   Override the default per-key emission budget
  */
 export function logBgWarnSampled(
-    tag: string,
-    key: string,
-    message: string,
-    error?: CaughtError,
-    budget: number = SAMPLED_WARN_BUDGET_DEFAULT,
+  tag: string,
+  key: string,
+  message: string,
+  error?: CaughtError,
+  budget: number = SAMPLED_WARN_BUDGET_DEFAULT,
 ): void {
-    const fullKey = `${tag}::${key}`;
-    const seen = sampledWarnCounters.get(fullKey) ?? 0;
-    if (seen >= budget) return;
-    sampledWarnCounters.set(fullKey, seen + 1);
+  const fullKey = `${tag}::${key}`;
+  const seen = sampledWarnCounters.get(fullKey) ?? 0;
+  if (seen >= budget) {
+    return;
+  }
 
-    const suffix = seen === budget - 1 ? " (further occurrences suppressed)" : "";
-    if (error !== undefined) {
-        console.warn(`${tag} ${message}${suffix}`, error);
-    } else {
-        console.warn(`${tag} ${message}${suffix}`);
-    }
+  sampledWarnCounters.set(fullKey, seen + 1);
+
+  const suffix = seen === budget - 1 ? " (further occurrences suppressed)" : "";
+  if (error !== undefined) {
+    console.warn(`${tag} ${message}${suffix}`, error);
+  } else {
+    console.warn(`${tag} ${message}${suffix}`);
+  }
 }
 
 /** Test-only: clears the sampled-warn counters between unit tests. */
 export function _resetSampledWarnCountersForTest(): void {
-    sampledWarnCounters.clear();
+  sampledWarnCounters.clear();
 }
 
 /* ------------------------------------------------------------------ */
@@ -258,28 +261,31 @@ const SAMPLED_DEBUG_BUDGET = 3;
  * @param error    Optional caught error to attach
  */
 export function logSampledDebug(
-    tag: string,
-    key: string,
-    message: string,
-    error?: CaughtError,
+  tag: string,
+  key: string,
+  message: string,
+  error?: CaughtError,
 ): void {
-    const fullKey = `${tag}::${key}`;
-    const seen = sampledCounters.get(fullKey) ?? 0;
-    if (seen >= SAMPLED_DEBUG_BUDGET) return;
-    sampledCounters.set(fullKey, seen + 1);
+  const fullKey = `${tag}::${key}`;
+  const seen = sampledCounters.get(fullKey) ?? 0;
+  if (seen >= SAMPLED_DEBUG_BUDGET) {
+    return;
+  }
 
-    const suffix = seen === SAMPLED_DEBUG_BUDGET - 1
-        ? " (further occurrences suppressed)"
-        : "";
-    if (error !== undefined) {
-        console.debug(`${tag} ${message}${suffix}`, error);
-    } else {
-        console.debug(`${tag} ${message}${suffix}`);
-    }
+  sampledCounters.set(fullKey, seen + 1);
+
+  const suffix = seen === SAMPLED_DEBUG_BUDGET - 1
+    ? " (further occurrences suppressed)"
+    : "";
+  if (error !== undefined) {
+    console.debug(`${tag} ${message}${suffix}`, error);
+  } else {
+    console.debug(`${tag} ${message}${suffix}`);
+  }
 }
 
 /** Test-only: clears the sampled-debug counters between unit tests. */
 export function _resetSampledDebugCountersForTest(): void {
-    sampledCounters.clear();
+  sampledCounters.clear();
 }
 

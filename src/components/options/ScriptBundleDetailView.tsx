@@ -71,19 +71,29 @@ interface Props {
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw);
+  try {
+    JSON.parse(raw);
 
- return true; } catch (err) { /* swallowed */
- return false; }
+    return true; 
+  } catch (err) { /* swallowed */
+    return false; 
+  }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { /* swallowed */
- return input; }
+    try {
+      return JSON.stringify(JSON.parse(input), null, 2); 
+    } catch (err) { /* swallowed */
+      return input; 
+    }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { /* swallowed */
- return "{}"; }
+
+  try {
+    return JSON.stringify(input ?? {}, null, 2); 
+  } catch (err) { /* swallowed */
+    return "{}"; 
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -132,7 +142,9 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveUp}
-          onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onMoveUp(); 
+          }}
         >
           <ChevronUp className="h-3 w-3" />
         </button>
@@ -140,14 +152,18 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveDown}
-          onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onMoveDown(); 
+          }}
         >
           <ChevronDown className="h-3 w-3" />
         </button>
         <button
           type="button"
           className="p-0.5 text-muted-foreground hover:text-destructive"
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          onClick={(e) => {
+            e.stopPropagation(); onRemove(); 
+          }}
         >
           <X className="h-3 w-3" />
         </button>
@@ -206,7 +222,10 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   const removeJsEntry = (id: string) => {
     setJsEntries((prev) => prev.filter((e) => e.id !== id).map((e, i) => ({ ...e, order: i })));
-    if (editorTab === id) setEditorTab("overview");
+    if (editorTab === id) {
+      setEditorTab("overview");
+    }
+
     markDirty();
   };
 
@@ -215,7 +234,10 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const entries = [...prev];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
-      if (newIdx < 0 || newIdx >= entries.length) return prev;
+      if (newIdx < 0 || newIdx >= entries.length) {
+        return prev;
+      }
+
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
 
       return entries.map((e, i) => ({ ...e, order: i }));
@@ -232,12 +254,21 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
   };
 
   const addExistingConfig = (configId: string) => {
-    if (configId === "__none__") return;
-    if (configEntries.some((c) => c.id === configId)) { toast.info("Config already added");
+    if (configId === "__none__") {
+      return;
+    }
 
- return; }
+    if (configEntries.some((c) => c.id === configId)) {
+      toast.info("Config already added");
+
+      return; 
+    }
+
     const config = configs.find((c) => c.id === configId);
-    if (!config) return;
+    if (!config) {
+      return;
+    }
+
     setConfigEntries((prev) => [...prev, { id: config.id, name: config.name, json: formatJson(config.json), order: prev.length }]);
     markDirty();
   };
@@ -249,7 +280,10 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   const removeConfigEntry = (id: string) => {
     setConfigEntries((prev) => prev.filter((e) => e.id !== id).map((e, i) => ({ ...e, order: i })));
-    if (editorTab === id) setEditorTab("overview");
+    if (editorTab === id) {
+      setEditorTab("overview");
+    }
+
     markDirty();
   };
 
@@ -258,7 +292,10 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const entries = [...prev];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
-      if (newIdx < 0 || newIdx >= entries.length) return prev;
+      if (newIdx < 0 || newIdx >= entries.length) {
+        return prev;
+      }
+
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
 
       return entries.map((e, i) => ({ ...e, order: i }));
@@ -268,17 +305,25 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   /* -- Save -- */
   const handleSave = useCallback(async () => {
-    if (!name.trim()) { toast.error("Script name is required");
+    if (!name.trim()) {
+      toast.error("Script name is required");
 
- return; }
-    if (jsEntries.length === 0) { toast.error("At least one JavaScript file is required");
+      return; 
+    }
 
- return; }
+    if (jsEntries.length === 0) {
+      toast.error("At least one JavaScript file is required");
+
+      return; 
+    }
 
     for (const config of configEntries) {
-      if (!validateJson(config.json)) { toast.error(`Config "${config.name}" has invalid JSON`);
+      if (!validateJson(config.json)) {
+        toast.error(`Config "${config.name}" has invalid JSON`);
 
- return; }
+        return; 
+      }
+
       await onSaveConfig({ id: config.id.startsWith("cfg_") ? undefined : config.id, name: config.name, json: config.json });
     }
 
@@ -371,13 +416,17 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
               placeholder="Script name"
               value={name}
               className="flex-1"
-              onChange={(e) => { setName(e.target.value); markDirty(); }}
+              onChange={(e) => {
+                setName(e.target.value); markDirty(); 
+              }}
             />
           </div>
           <Input
             placeholder="Description (optional)"
             value={description}
-            onChange={(e) => { setDescription(e.target.value); markDirty(); }}
+            onChange={(e) => {
+              setDescription(e.target.value); markDirty(); 
+            }}
           />
 
           {/* Update URL */}
@@ -390,7 +439,9 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
               placeholder="https://example.com/script.js"
               value={updateUrl}
               className="flex-1 h-8 text-xs font-mono"
-              onChange={(e) => { setUpdateUrl(e.target.value); markDirty(); }}
+              onChange={(e) => {
+                setUpdateUrl(e.target.value); markDirty(); 
+              }}
             />
             <Button
               size="sm"
@@ -398,7 +449,10 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
               disabled={!updateUrl.trim() || isCheckingUpdate}
               className="h-8 text-xs gap-1.5 shrink-0 hover:bg-primary/10 hover:text-primary transition-all duration-200"
               onClick={async () => {
-                if (!updateUrl.trim()) return;
+                if (!updateUrl.trim()) {
+                  return;
+                }
+
                 setIsCheckingUpdate(true);
                 try {
                   const res = ServiceResult.wrapFetch(await fetch(updateUrl.trim()));
@@ -408,8 +462,11 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                       `HEFF: HTTP ${res.status} on GET ${updateUrl.trim()} — update fetch halted. Awaiting user instruction.`,
                     );
                   }
+
                   const text = await res.text();
-                  if (!text.trim()) throw new Error("Empty response");
+                  if (!text.trim()) {
+                    throw new Error("Empty response");
+                  }
 
                   // Update the primary JS entry with fetched code
                   const primaryId = jsEntries[0]?.id;
@@ -484,9 +541,12 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                   label="Drop JSON"
                   icon={Upload}
                   onFile={(entryName, content) => {
-                    if (!validateJson(content)) { toast.error("Invalid JSON");
+                    if (!validateJson(content)) {
+                      toast.error("Invalid JSON");
 
- return; }
+                      return; 
+                    }
+
                     addConfigEntry(entryName, content);
                   }}
                   multiple

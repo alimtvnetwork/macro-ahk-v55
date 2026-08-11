@@ -139,7 +139,11 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
 export function showChangelogModal(): void {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:100001;display:flex;align-items:center;justify-content:center;';
-  overlay.onclick = function(e: Event) { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = function(e: Event) {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
 
   const modal = document.createElement('div');
   modal.style.cssText = 'background:' + cPanelBg + ';border:1px solid ' + cPrimary + ';border-radius:' + lModalRadius + ';padding:20px;max-width:480px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:' + lModalShadow + ';font-family:' + tFont + ';color:' + cPanelFg + ';';
@@ -175,7 +179,10 @@ export function showChangelogModal(): void {
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
   closeBtn.style.cssText = 'margin-top:8px;padding:6px 16px;background:' + cPrimary + ';color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;';
-  closeBtn.onclick = function() { overlay.remove(); };
+  closeBtn.onclick = function() {
+    overlay.remove(); 
+  };
+
   modal.appendChild(closeBtn);
 
   overlay.appendChild(modal);

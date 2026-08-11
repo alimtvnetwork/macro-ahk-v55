@@ -24,29 +24,29 @@ import { describe, expect, it } from "vitest";
 const RELAY_PATH = resolve(__dirname, "../../content-scripts/message-relay.ts");
 
 describe("message-relay ALLOWED_TYPES allow-list", () => {
-    const source = readFileSync(RELAY_PATH, "utf8");
+  const source = readFileSync(RELAY_PATH, "utf8");
 
-    // Grab the ALLOWED_TYPES literal block.
-    const match = source.match(/const ALLOWED_TYPES = new Set\(\[([\s\S]*?)\]\);/);
+  // Grab the ALLOWED_TYPES literal block.
+  const match = source.match(/const ALLOWED_TYPES = new Set\(\[([\s\S]*?)\]\);/);
 
-    it("declares an ALLOWED_TYPES Set literal", () => {
-        expect(match).not.toBeNull();
-    });
+  it("declares an ALLOWED_TYPES Set literal", () => {
+    expect(match).not.toBeNull();
+  });
 
-    it("includes PROJECT_API so role-scoped prompt DB calls are not blocked", () => {
-        expect(match?.[1] ?? "").toContain('"PROJECT_API"');
-    });
+  it("includes PROJECT_API so role-scoped prompt DB calls are not blocked", () => {
+    expect(match?.[1] ?? "").toContain('"PROJECT_API"');
+  });
 
-    it("still includes the SDK/prompt CRUD message types the extension depends on", () => {
-        const body = match?.[1] ?? "";
-        for (const required of [
-            "GET_PROMPTS",
-            "SAVE_PROMPT",
-            "DELETE_PROMPT",
-            "KV_GET",
-            "KV_SET",
-        ]) {
-            expect(body).toContain(`"${required}"`);
-        }
-    });
+  it("still includes the SDK/prompt CRUD message types the extension depends on", () => {
+    const body = match?.[1] ?? "";
+    for (const required of [
+      "GET_PROMPTS",
+      "SAVE_PROMPT",
+      "DELETE_PROMPT",
+      "KV_GET",
+      "KV_SET",
+    ]) {
+      expect(body).toContain(`"${required}"`);
+    }
+  });
 });

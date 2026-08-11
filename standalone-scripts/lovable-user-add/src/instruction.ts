@@ -21,34 +21,34 @@ import type { EmptySettings } from "../../types/instruction/seed/empty-settings"
 import { VERSION } from "../../shared-version";
 
 const instruction: ProjectInstruction<EmptySettings> = {
-    SchemaVersion: "1.0",
-    Name: "lovable-user-add",
-    DisplayName: "Lovable User Add",
-    Version: VERSION,
-    Description: "Bulk-add Lovable workspace members from a CSV; promotes Owner rows via shared promoteToOwner.",
-    World: InjectionWorldType.Main,
-    IsGlobal: false,
-    Dependencies: ["lovable-common"],
-    LoadOrder: 61,
-    Seed: {
-        Id: "default-lovable-user-add",
-        SeedOnInstall: true,
-        IsRemovable: false,
-        AutoInject: true,
-        RunAt: InjectionRunAtType.DocumentIdle,
-        TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
-        Cookies: [],
-        Settings: {},
-    },
-    Assets: {
-        Css: [],
-        Configs: [],
-        Scripts: [
-            { File: "lovable-user-add.js", Order: 1, IsIife: true },
-        ],
-        Templates: [],
-        Prompts: [],
-    },
+  SchemaVersion: "1.0",
+  Name: "lovable-user-add",
+  DisplayName: "Lovable User Add",
+  Version: VERSION,
+  Description: "Bulk-add Lovable workspace members from a CSV; promotes Owner rows via shared promoteToOwner.",
+  World: InjectionWorldType.Main,
+  IsGlobal: false,
+  Dependencies: ["lovable-common"],
+  LoadOrder: 61,
+  Seed: {
+    Id: "default-lovable-user-add",
+    SeedOnInstall: true,
+    IsRemovable: false,
+    AutoInject: true,
+    RunAt: InjectionRunAtType.DocumentIdle,
+    TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
+    Cookies: [],
+    Settings: {},
+  },
+  Assets: {
+    Css: [],
+    Configs: [],
+    Scripts: [
+      { File: "lovable-user-add.js", Order: 1, IsIife: true },
+    ],
+    Templates: [],
+    Prompts: [],
+  },
 };
 
 export default instruction;

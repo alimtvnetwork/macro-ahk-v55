@@ -31,20 +31,20 @@ import { logError } from '../error-utils';
 import { ServiceResult } from '../utils/result-wrapper';
 
 export class SqlBridgeResp {
-    constructor(
+  constructor(
         public readonly ok: boolean,
         public readonly rows?: unknown[],
         public readonly errorMessage?: string,
         public readonly lastInsertId?: number
-    ) {}
+  ) {}
 
-    get isSuccess(): boolean {
-        return this.ok;
-    }
+  get isSuccess(): boolean {
+    return this.ok;
+  }
 
-    get isFail(): boolean {
-        return !this.ok;
-    }
+  get isFail(): boolean {
+    return !this.ok;
+  }
 }
 
 export type LegacyMethod = RunSqlMethodType;
@@ -54,9 +54,9 @@ export type Bucket = SqlBucketType;
 // the legacy names and the bridge fallbacks. The fallbacks remain for older
 // bundled backgrounds and for future API method-name churn.
 const CANDIDATES: Record<Bucket, string[]> = {
-    SELECT: ['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN'],
-    WRITE: ['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY'],
-    ALTER: ['SCHEMA'],
+  SELECT: ['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN'],
+  WRITE: ['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY'],
+  ALTER: ['SCHEMA'],
 };
 
 // Process-local cache of the winning method per bucket. A fresh page load
@@ -74,13 +74,15 @@ export interface SqlBridgeRejection {
 // session cannot grow unbounded. Consumed by the diagnostics export.
 const REJECTION_LIMIT = 10;
 const rejections: Record<Bucket, SqlBridgeRejection[]> = {
-    SELECT: [], WRITE: [], ALTER: [],
+  SELECT: [], WRITE: [], ALTER: [],
 };
 
 function recordRejection(bucket: Bucket, method: string, message: string): void {
-    const history = rejections[bucket];
-    history.push({ bucket, method, message, at: new Date().toISOString() });
-    if (history.length > REJECTION_LIMIT) history.splice(0, history.length - REJECTION_LIMIT);
+  const history = rejections[bucket];
+  history.push({ bucket, method, message, at: new Date().toISOString() });
+  if (history.length > REJECTION_LIMIT) {
+    history.splice(0, history.length - REJECTION_LIMIT);
+  }
 }
 
 export interface SqlBridgeState {
@@ -96,25 +98,25 @@ export interface SqlBridgeState {
  * downloaded diagnostics ZIP.
  */
 export function getSqlBridgeState(): SqlBridgeState {
-    const w: Record<Bucket, string | null> = {
-        SELECT: winning.SELECT ?? null,
-        WRITE: winning.WRITE ?? null,
-        ALTER: winning.ALTER ?? null,
-    };
+  const w: Record<Bucket, string | null> = {
+    SELECT: winning.SELECT ?? null,
+    WRITE: winning.WRITE ?? null,
+    ALTER: winning.ALTER ?? null,
+  };
 
-    return {
-        winning: w,
-        rejections: {
-            SELECT: [...rejections.SELECT],
-            WRITE: [...rejections.WRITE],
-            ALTER: [...rejections.ALTER],
-        },
-        candidates: {
-            SELECT: [...CANDIDATES.SELECT],
-            WRITE: [...CANDIDATES.WRITE],
-            ALTER: [...CANDIDATES.ALTER],
-        },
-    };
+  return {
+    winning: w,
+    rejections: {
+      SELECT: [...rejections.SELECT],
+      WRITE: [...rejections.WRITE],
+      ALTER: [...rejections.ALTER],
+    },
+    candidates: {
+      SELECT: [...CANDIDATES.SELECT],
+      WRITE: [...CANDIDATES.WRITE],
+      ALTER: [...CANDIDATES.ALTER],
+    },
+  };
 }
 
 /**
@@ -123,42 +125,53 @@ export function getSqlBridgeState(): SqlBridgeState {
  * retry-once path so a stale cache does not surface `PROMPT_LOAD_E001`.
  */
 export function resetSqlBridgeCache(bucket?: Bucket): void {
-    if (typeof bucket === 'string') { delete winning[bucket];
+  if (typeof bucket === 'string') {
+    delete winning[bucket];
 
- return; }
-    for (const k of Object.keys(winning)) delete winning[k as Bucket];
+    return; 
+  }
+
+  for (const k of Object.keys(winning)) {
+    delete winning[k as Bucket];
+  }
 }
 
 const CONTRACT_ERR_PATTERNS = [
-    /^unsupported method:/i,
-    /only alter table statements are allowed/i,
+  /^unsupported method:/i,
+  /only alter table statements are allowed/i,
 ];
 
 export function isSqlBridgeContractError(message: string | undefined): boolean {
-    return isContractError(message);
+  return isContractError(message);
 }
 
 function isContractError(message: string | undefined): boolean {
-    if (typeof message !== 'string' || message.length === 0) return false;
+  if (typeof message !== 'string' || message.length === 0) {
+    return false;
+  }
 
-    return CONTRACT_ERR_PATTERNS.some(function(re) { return re.test(message); });
+  return CONTRACT_ERR_PATTERNS.some(function(re) {
+    return re.test(message); 
+  });
 }
 
 function classify(legacy: LegacyMethod, sql: string): Bucket {
-    if (legacy === 'QUERY') return 'SELECT';
+  if (legacy === 'QUERY') {
+    return 'SELECT';
+  }
 
-    // legacy === 'SCHEMA'
-    return /^\s*alter\s+table\b/i.test(sql) ? 'ALTER' : 'WRITE';
+  // legacy === 'SCHEMA'
+  return /^\s*alter\s+table\b/i.test(sql) ? 'ALTER' : 'WRITE';
 }
 
 async function sendOnce(method: string, sql: string, project: string): Promise<SqlBridgeResp> {
-    const raw = await sendToExtension('PROJECT_API', {
-        project, method, endpoint: 'rawSql', params: { sql },
-    }) as Record<string, unknown>;
+  const raw = await sendToExtension('PROJECT_API', {
+    project, method, endpoint: 'rawSql', params: { sql },
+  }) as Record<string, unknown>;
 
-    const res = raw ?? { ok: false, errorMessage: 'no response' };
+  const res = raw ?? { ok: false, errorMessage: 'no response' };
 
-    return new SqlBridgeResp(Boolean(res.ok), res.rows as unknown[] | undefined, res.errorMessage as string | undefined, res.lastInsertId as number | undefined);
+  return new SqlBridgeResp(Boolean(res.ok), res.rows as unknown[] | undefined, res.errorMessage as string | undefined, res.lastInsertId as number | undefined);
 }
 
 /**
@@ -166,37 +179,42 @@ async function sendOnce(method: string, sql: string, project: string): Promise<S
  * method-name the backend currently accepts.
  */
 export async function runSql(legacy: LegacyMethod, sql: string, project: string = DB_NAME): Promise<SqlBridgeResp> {
-    const bucket = classify(legacy, sql);
-    const cached = winning[bucket];
-    if (typeof cached === 'string') {
-        const resp = await sendOnce(cached, sql, project);
-        if (resp.ok || !isContractError(resp.errorMessage)) return resp;
-        // Cached name went stale (backend rolled forward): invalidate + reprobe.
-        recordRejection(bucket, cached, resp.errorMessage ?? 'unknown');
-        delete winning[bucket];
+  const bucket = classify(legacy, sql);
+  const cached = winning[bucket];
+  if (typeof cached === 'string') {
+    const resp = await sendOnce(cached, sql, project);
+    if (resp.ok || !isContractError(resp.errorMessage)) {
+      return resp;
     }
 
-    let lastResp = new SqlBridgeResp(false, undefined, 'no candidate methods tried');
-    for (const method of CANDIDATES[bucket]) {
-        const resp = await sendOnce(method, sql, project);
-        if (resp.ok) {
-            winning[bucket] = method;
+    // Cached name went stale (backend rolled forward): invalidate + reprobe.
+    recordRejection(bucket, cached, resp.errorMessage ?? 'unknown');
+    delete winning[bucket];
+  }
 
-            return resp;
-        }
-        if (!isContractError(resp.errorMessage)) {
-            // Real SQL error: return unchanged, don't burn more probes.
-            return resp;
-        }
-        recordRejection(bucket, method, resp.errorMessage ?? 'unknown');
-        lastResp = resp;
+  let lastResp = new SqlBridgeResp(false, undefined, 'no candidate methods tried');
+  for (const method of CANDIDATES[bucket]) {
+    const resp = await sendOnce(method, sql, project);
+    if (resp.ok) {
+      winning[bucket] = method;
+
+      return resp;
     }
 
-    return new SqlBridgeResp(
-        false,
-        undefined,
-        'sql-bridge: no accepted method for ' + bucket + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')'
-    );
+    if (!isContractError(resp.errorMessage)) {
+      // Real SQL error: return unchanged, don't burn more probes.
+      return resp;
+    }
+
+    recordRejection(bucket, method, resp.errorMessage ?? 'unknown');
+    lastResp = resp;
+  }
+
+  return new SqlBridgeResp(
+    false,
+    undefined,
+    'sql-bridge: no accepted method for ' + bucket + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')'
+  );
 }
 
 /**
@@ -204,32 +222,35 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
  * Returns a uniform ServiceResult type (isSuccess/isFail) as requested.
  */
 export async function runLoggedQuery(
-    legacy: LegacyMethod,
-    sql: string,
-    contextInfo: string,
-    project: string = DB_NAME
+  legacy: LegacyMethod,
+  sql: string,
+  contextInfo: string,
+  project: string = DB_NAME
 ): Promise<SqlBridgeResp> {
-    const resp = await runSql(legacy, sql, project);
-    if (resp.isFail) {
-        logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
-
-        return resp;
-    }
+  const resp = await runSql(legacy, sql, project);
+  if (resp.isFail) {
+    logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
 
     return resp;
+  }
+
+  return resp;
 }
 
 /** Test-only: reset the winning-method cache between cases. */
 export function _resetSqlBridgeCacheForTest(): void {
-    for (const k of Object.keys(winning)) delete winning[k as Bucket];
-    rejections.SELECT.length = 0;
-    rejections.WRITE.length = 0;
-    rejections.ALTER.length = 0;
+  for (const k of Object.keys(winning)) {
+    delete winning[k as Bucket];
+  }
+
+  rejections.SELECT.length = 0;
+  rejections.WRITE.length = 0;
+  rejections.ALTER.length = 0;
 }
 
 /** Test-only: read the current cache snapshot. */
 export function _getSqlBridgeCacheForTest(): Readonly<Partial<Record<Bucket, string>>> {
-    return { ...winning };
+  return { ...winning };
 }
 
 /**
@@ -242,26 +263,27 @@ export function _getSqlBridgeCacheForTest(): Readonly<Partial<Record<Bucket, str
  * whatever `fn` returned (success or the second-attempt failure).
  */
 export async function runWithBridgeRetry<T>(
-    operation: () => Promise<T>,
-    isFailure: (v: T) => string | undefined,
+  operation: () => Promise<T>,
+  isFailure: (v: T) => string | undefined,
 ): Promise<T> {
-    try {
-        const first = await operation();
-        const message = isFailure(first);
-        if (message && isSqlBridgeContractError(message)) {
-            resetSqlBridgeCache();
+  try {
+    const first = await operation();
+    const message = isFailure(first);
+    if (message && isSqlBridgeContractError(message)) {
+      resetSqlBridgeCache();
 
-            return await operation();
-        }
-
-        return first;
-    } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (isSqlBridgeContractError(message)) {
-            resetSqlBridgeCache();
-
-            return await operation();
-        }
-        throw err;
+      return await operation();
     }
+
+    return first;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (isSqlBridgeContractError(message)) {
+      resetSqlBridgeCache();
+
+      return await operation();
+    }
+
+    throw err;
+  }
 }

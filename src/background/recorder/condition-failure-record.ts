@@ -16,9 +16,9 @@
  */
 
 import type {
-    ConditionWaitOutcome,
-    Condition,
-    PredicateEvaluation,
+  ConditionWaitOutcome,
+  Condition,
+  PredicateEvaluation,
 } from "./condition-evaluator";
 import { flattenConditionSelectors } from "./condition-failure-flatten";
 import { ConditionFailureReasonType } from "../../types/enums";
@@ -51,28 +51,30 @@ export interface BuildFailureRecordInput {
 export const MAX_LOG_TAIL = 200;
 
 export function buildConditionFailureRecord(
-    input: BuildFailureRecordInput,
+  input: BuildFailureRecordInput,
 ): ConditionFailureRecord {
-    const flat = flattenConditionSelectors(input.Condition);
+  const flat = flattenConditionSelectors(input.Condition);
 
-    return {
-        Reason: input.ReasonOverride ?? input.Outcome.Reason,
-        ConditionSerialized: serializeCondition(input.Condition),
-        LastEvaluation: input.Outcome.LastEvaluation,
-        Selectors: flat.Selectors,
-        XPath: flat.XPath,
-        Vars: input.Vars ?? {},
-        Row: input.Row ?? {},
-        LogTail: trimLogTail(input.LogTail ?? []),
-    };
+  return {
+    Reason: input.ReasonOverride ?? input.Outcome.Reason,
+    ConditionSerialized: serializeCondition(input.Condition),
+    LastEvaluation: input.Outcome.LastEvaluation,
+    Selectors: flat.Selectors,
+    XPath: flat.XPath,
+    Vars: input.Vars ?? {},
+    Row: input.Row ?? {},
+    LogTail: trimLogTail(input.LogTail ?? []),
+  };
 }
 
 function serializeCondition(c: Condition): string {
-    return JSON.stringify(c, null, 2);
+  return JSON.stringify(c, null, 2);
 }
 
 function trimLogTail(lines: ReadonlyArray<string>): ReadonlyArray<string> {
-    if (lines.length <= MAX_LOG_TAIL) return lines;
+  if (lines.length <= MAX_LOG_TAIL) {
+    return lines;
+  }
 
-    return lines.slice(lines.length - MAX_LOG_TAIL);
+  return lines.slice(lines.length - MAX_LOG_TAIL);
 }

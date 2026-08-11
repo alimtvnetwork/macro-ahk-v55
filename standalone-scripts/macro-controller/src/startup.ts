@@ -129,9 +129,14 @@ function preloadSettingsOverrides(): void {
     if (typeof overrides.creditFetchDelayMs === 'number') {
       setCreditFetchTimeoutMs(overrides.creditFetchDelayMs);
     }
+
     subscribeCreditFetchSettings();
     onSettingsChange(function () {
-      try { updateUI(); } catch (err: unknown) { logError('Startup', 'UI update failed on settings change', err); }
+      try {
+        updateUI(); 
+      } catch (err: unknown) {
+        logError('Startup', 'UI update failed on settings change', err); 
+      }
     });
   });
 }
@@ -147,11 +152,13 @@ function initializeMacroDbAndCapture(): void {
     } catch (err: unknown) {
       logError('Startup', 'first-run prompt seed threw', err);
     }
+
     const pId = extractProjectIdFromUrl();
     const pName = getProjectNameFromDom() || state.projectNameFromApi || 'Unknown';
     if (pId) {
       saveProjectMetadata(pId, pName, window.location.href);
     }
+
     setupPromptCapture(getPromptsConfig(), (xpath) => {
       const node = getByXPath(xpath);
 
@@ -207,29 +214,45 @@ function bootstrapPassiveAttach(deps: Parameters<typeof bootstrap>[0]): void {
  */
 function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): void {
   const w = window as unknown as { __MARCO_PASSIVE_SHORTCUT__?: boolean };
-  if (w.__MARCO_PASSIVE_SHORTCUT__) return;
+  if (w.__MARCO_PASSIVE_SHORTCUT__) {
+    return;
+  }
+
   w.__MARCO_PASSIVE_SHORTCUT__ = true;
 
   const handler = function (e: KeyboardEvent): void {
-    if (!e.ctrlKey || !e.altKey || e.shiftKey) return;
+    if (!e.ctrlKey || !e.altKey || e.shiftKey) {
+      return;
+    }
+
     const isNotH = e.key.toLowerCase() !== 'h';
-    if (isNotH) return;
+    if (isNotH) {
+      return;
+    }
+
     // Bail out if the full panel is already up, let the in-panel handler run.
     const hasContainer = !!document.getElementById(IDS.CONTAINER);
-    if (hasContainer) return;
+    if (hasContainer) {
+      return;
+    }
+
     e.preventDefault();
     document.removeEventListener('keydown', handler, true);
     w.__MARCO_PASSIVE_SHORTCUT__ = false;
     log('Ctrl+Alt+H pressed in passive mode → promoting to full bootstrap', 'info');
     try {
       const marker = document.getElementById(IDS.SCRIPT_MARKER);
-      if (marker) marker.remove();
+      if (marker) {
+        marker.remove();
+      }
+
       window.__MARCO_LAUNCH_SOURCE__ = 'manual';
       bootstrap(deps);
     } catch (err: unknown) {
       logError('passive-attach-shortcut', 'Promotion failed', err);
     }
   };
+
   document.addEventListener('keydown', handler, true);
 }
 
@@ -244,7 +267,9 @@ function _registerGlobals(deps: {
   nsWrite('api.loop.start', startLoop as (direction?: string) => boolean);
   nsWrite('api.loop.stop', stopLoop);
   nsWrite('api.loop.check', deps.runCheck);
-  nsWrite('api.loop.state', function () { return state; });
+  nsWrite('api.loop.state', function () {
+    return state; 
+  });
   nsWrite('api.loop.setInterval', deps.setLoopInterval);
   nsWrite('api.ui.toast', showToast);
   nsWrite('api.metrics.intervals', getIntervalSnapshot);
@@ -295,7 +320,9 @@ function _preWarmPrompts(attempt: number): void {
   // SDK not available yet, retry or fallback
   if (attempt < MAX_SDK_ATTEMPTS - 1) {
     log('Startup: SDK not available for prompt pre-warm (attempt ' + (attempt + 1) + '/' + MAX_SDK_ATTEMPTS + '), retrying in ' + SDK_RETRY_DELAY_MS + 'ms', 'info');
-    setTimeout(function() { _preWarmPrompts(attempt + 1); }, SDK_RETRY_DELAY_MS);
+    setTimeout(function() {
+      _preWarmPrompts(attempt + 1); 
+    }, SDK_RETRY_DELAY_MS);
 
     return;
   }
@@ -343,6 +370,7 @@ function createUiAndObserver(): void {
     log('Startup: UIManager missing, attempting self-heal + retry', 'warn');
     scheduleUiCreationRetry(mc, 1);
   }
+
   startWorkspaceObserver();
   _checkPendingTasksOnStartup();
 }
@@ -397,6 +425,7 @@ function _showStartupResumeDialog(count: number): void {
     await saveTaskQueue(q);
     overlay.remove();
   };
+
   actions.appendChild(ignoreBtn);
 
   const resumeBtn = document.createElement('button');
@@ -408,13 +437,18 @@ function _showStartupResumeDialog(count: number): void {
     overlay.remove();
     showToast(`🚀 Resuming ${count} tasks...`, 'success');
   };
+
   actions.appendChild(resumeBtn);
 
   overlay.appendChild(actions);
   document.body.appendChild(overlay);
 
   // Auto-remove after 15 seconds if ignored
-  setTimeout(() => { if (overlay.parentElement) overlay.remove(); }, 15000);
+  setTimeout(() => {
+    if (overlay.parentElement) {
+      overlay.remove();
+    } 
+  }, 15000);
 }
 
 function tryCreateUiNow(mc: MacroController): boolean {
@@ -508,6 +542,7 @@ function cancelTimeoutAndCreateUi(): void {
     window.clearTimeout(timeoutId);
     (state as unknown as Record<string, unknown>).__uiTimeoutId = undefined;
   }
+
   if (!document.getElementById(IDS.CONTAINER)) {
     createUiAndObserver();
   }
@@ -554,16 +589,18 @@ function handleTokenFailure(tokenResult: { waitedMs: number; reason: string }): 
 function logAuthDiag(): void {
   try {
     const authDiag = window.marco?.auth?.getLastAuthDiag?.();
-    if (!authDiag) return;
+    if (!authDiag) {
+      return;
+    }
 
     const bridgeTag = authDiag.bridgeOutcome === 'hit' ? '✅ bridge hit'
       : authDiag.bridgeOutcome === 'timeout' ? '⏱ bridge timeout'
-      : authDiag.bridgeOutcome === 'error' ? '❌ bridge error'
-      : 'bridge skipped';
+        : authDiag.bridgeOutcome === 'error' ? '❌ bridge error'
+          : 'bridge skipped';
     const detail = authDiag.source + ' · ' + bridgeTag + ' · ' + Math.round(authDiag.durationMs) + 'ms';
     const status = authDiag.source === 'none' ? 'error' as const
       : authDiag.bridgeOutcome === 'hit' ? 'ok' as const
-      : 'warn' as const;
+        : 'warn' as const;
     timingStart('auth-source', 'Auth Source (SDK)');
     timingEnd('auth-source', status, detail);
     if (authDiag.source === 'none') {
@@ -590,19 +627,23 @@ function launchCreditAndWorkspaceLoad(): void {
 
   const tier1Promise = (currentProjectId && startupToken)
     ? fetchTier1Prefetch(currentProjectId, startupToken).then(function (data) {
-        tier1Data = data;
+      tier1Data = data;
 
-        return data;
-      })
+      return data;
+    })
     : Promise.resolve(null).then(function () {
-        timingEnd(LabelType.WsPrefetch, 'warn', 'No projectId or token');
+      timingEnd(LabelType.WsPrefetch, 'warn', 'No projectId or token');
 
-        return null;
-      });
+      return null;
+    });
 
   Promise.all([creditPromise, tier1Promise])
-    .then(function () { handleCreditSuccess(tier1Data); })
-    .catch(function (err: unknown) { handleCreditError(err); });
+    .then(function () {
+      handleCreditSuccess(tier1Data); 
+    })
+    .catch(function (err: unknown) {
+      handleCreditError(err); 
+    });
 }
 
 /** Handle successful credit + workspace load. */
@@ -613,7 +654,9 @@ function handleCreditSuccess(tier1Data: MarkViewedResponse | null): void {
   timingStart('workspace', 'Workspace Detection');
 
   const isResolved = tier1Data !== null && resolveTier1Workspace(tier1Data);
-  if (isResolved) return;
+  if (isResolved) {
+    return;
+  }
 
   log('Startup: Tier 1 prefetch did not resolve workspace, falling back to autoDetect', 'info');
   const freshToken = resolveToken();
@@ -658,10 +701,12 @@ function handleCreditError(err: unknown): void {
   if (axiosStatus) {
     log('Startup: HTTP ' + (axiosStatus.status || '?') + ', check token validity, re-login, or hard refresh', 'warn');
   }
+
   const stack = err && typeof err === 'object' && 'stack' in err ? (err as Error).stack : null;
   if (stack) {
     log('Startup: Stack: ' + stack.split('\n').slice(0, 3).join(' → '), 'warn');
   }
+
   showToast('Could not load workspaces, ' + (statusDetail || errMsg) + ', click Credits to retry', 'warn', { noStop: true });
   cancelTimeoutAndCreateUi();
   updateUI();
@@ -698,6 +743,7 @@ function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknow
 
     return null;
   }
+
   timingEnd(LabelType.WsPrefetch, 'ok');
 
   return (resp.data ?? null) as MarkViewedResponse | null;
@@ -725,7 +771,9 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   }
 
   const hasNoWsId = !wsId;
-  if (hasNoWsId) return false;
+  if (hasNoWsId) {
+    return false;
+  }
 
   const wsById = loopCreditState.wsById || {};
   const perWs = loopCreditState.perWorkspace || [];
@@ -743,7 +791,9 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   }
 
   const hasNoMatch = !matched;
-  if (hasNoMatch) return false;
+  if (hasNoMatch) {
+    return false;
+  }
 
   state.workspaceName = matched!.fullName || matched!.name;
   state.workspaceFromApi = true;
@@ -866,7 +916,10 @@ function setupAuthResync(): void {
 }
 
 function tryAutoAuthResync(trigger: string): void {
-  if (authResyncState.inFlight) return;
+  if (authResyncState.inFlight) {
+    return;
+  }
+
   authResyncState.inFlight = true;
 
   log(LabelType.AuthAutoResync + trigger + '): checking bridge for restored session...', 'check');
@@ -886,7 +939,9 @@ function tryAutoAuthResync(trigger: string): void {
     updateAuthBadge(true, getLastTokenSource());
     log(LabelType.AuthAutoResync + trigger + '): ✅ token restored from ' + getLastTokenSource(), 'success');
 
-    if (state.running) return;
+    if (state.running) {
+      return;
+    }
 
     fetchLoopCreditsAsync(false)
       .then(function () {

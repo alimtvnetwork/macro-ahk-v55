@@ -2,15 +2,15 @@ import { LovableApiEndpoint } from "./lovable-api-endpoint";
 import { lovableHttpJson, type LovableHttpMethod } from "./lovable-http";
 import { MembershipRoleApiCodeType } from "./membership-role-api-code";
 import {
-    mapMembership,
-    mapMembershipArray,
-    mapWorkspaceArray,
+  mapMembership,
+  mapMembershipArray,
+  mapWorkspaceArray,
 } from "./lovable-wire-mappers";
 import type {
-    AddMembershipRequest,
-    MembershipSummary,
-    UpdateMembershipRoleRequest,
-    WorkspaceSummary,
+  AddMembershipRequest,
+  MembershipSummary,
+  UpdateMembershipRoleRequest,
+  WorkspaceSummary,
 } from "./lovable-api-types";
 
 /**
@@ -32,47 +32,47 @@ const HTTP_PUT = "PUT";
  * `LovableApiError`; callers MUST wrap with `RiseupAsiaMacroExt.Logger.error`.
  */
 export class LovableApiClient {
-    private readonly endpoint: LovableApiEndpoint;
-    private readonly tokenProvider: BearerTokenProvider;
+  private readonly endpoint: LovableApiEndpoint;
+  private readonly tokenProvider: BearerTokenProvider;
 
-    public constructor(tokenProvider: BearerTokenProvider, apiBase?: string) {
-        this.endpoint = new LovableApiEndpoint(apiBase);
-        this.tokenProvider = tokenProvider;
-    }
+  public constructor(tokenProvider: BearerTokenProvider, apiBase?: string) {
+    this.endpoint = new LovableApiEndpoint(apiBase);
+    this.tokenProvider = tokenProvider;
+  }
 
-    public async getWorkspaces(): Promise<WorkspaceSummary[]> {
-        const wire = await this.send(HTTP_GET, this.endpoint.workspaces());
+  public async getWorkspaces(): Promise<WorkspaceSummary[]> {
+    const wire = await this.send(HTTP_GET, this.endpoint.workspaces());
 
-        return mapWorkspaceArray(wire);
-    }
+    return mapWorkspaceArray(wire);
+  }
 
-    public async getMemberships(workspaceId: string): Promise<MembershipSummary[]> {
-        const wire = await this.send(HTTP_GET, this.endpoint.memberships(workspaceId));
+  public async getMemberships(workspaceId: string): Promise<MembershipSummary[]> {
+    const wire = await this.send(HTTP_GET, this.endpoint.memberships(workspaceId));
 
-        return mapMembershipArray(wire);
-    }
+    return mapMembershipArray(wire);
+  }
 
-    public async addMembership(workspaceId: string, body: AddMembershipRequest): Promise<MembershipSummary> {
-        const jsonBody = { email: body.Email, role: body.Role };
-        const wire = await this.send(HTTP_POST, this.endpoint.memberships(workspaceId), jsonBody);
+  public async addMembership(workspaceId: string, body: AddMembershipRequest): Promise<MembershipSummary> {
+    const jsonBody = { email: body.Email, role: body.Role };
+    const wire = await this.send(HTTP_POST, this.endpoint.memberships(workspaceId), jsonBody);
 
-        return mapMembership(wire);
-    }
+    return mapMembership(wire);
+  }
 
-    public async updateMembershipRole(workspaceId: string, userId: string, body: UpdateMembershipRoleRequest): Promise<MembershipSummary> {
-        const jsonBody = { role: body.Role };
-        const wire = await this.send(HTTP_PUT, this.endpoint.membership(workspaceId, userId), jsonBody);
+  public async updateMembershipRole(workspaceId: string, userId: string, body: UpdateMembershipRoleRequest): Promise<MembershipSummary> {
+    const jsonBody = { role: body.Role };
+    const wire = await this.send(HTTP_PUT, this.endpoint.membership(workspaceId, userId), jsonBody);
 
-        return mapMembership(wire);
-    }
+    return mapMembership(wire);
+  }
 
-    public async promoteToOwner(workspaceId: string, userId: string): Promise<MembershipSummary> {
-        return this.updateMembershipRole(workspaceId, userId, { Role: MembershipRoleApiCodeType.Owner });
-    }
+  public async promoteToOwner(workspaceId: string, userId: string): Promise<MembershipSummary> {
+    return this.updateMembershipRole(workspaceId, userId, { Role: MembershipRoleApiCodeType.Owner });
+  }
 
-    private async send(method: LovableHttpMethod, endpoint: string, jsonBody?: object): Promise<object> {
-        const bearerToken = await this.tokenProvider();
+  private async send(method: LovableHttpMethod, endpoint: string, jsonBody?: object): Promise<object> {
+    const bearerToken = await this.tokenProvider();
 
-        return lovableHttpJson({ method, endpoint, bearerToken, jsonBody });
-    }
+    return lovableHttpJson({ method, endpoint, bearerToken, jsonBody });
+  }
 }

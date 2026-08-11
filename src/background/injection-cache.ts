@@ -50,26 +50,28 @@ export type CacheCategory =
 let dbPromise: Promise<IDBDatabase> | null = null;
 
 function openDb(): Promise<IDBDatabase> {
-    if (dbPromise) return dbPromise;
-
-    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = () => {
-            const db = request.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: "key" });
-            }
-        };
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => {
-            logCaughtError(BgLogTag.INJECTION_CACHE, `IndexedDB open failed\n  Path: indexedDB.open("${DB_NAME}", ${DB_VERSION})\n  Missing: IDBDatabase connection\n  Reason: ${request.error?.message ?? "unknown DOMException — browser may have storage quota exceeded or IndexedDB disabled"}`, request.error);
-            reject(request.error);
-        };
-    });
-
+  if (dbPromise) {
     return dbPromise;
+  }
+
+  dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "key" });
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => {
+      logCaughtError(BgLogTag.INJECTION_CACHE, `IndexedDB open failed\n  Path: indexedDB.open("${DB_NAME}", ${DB_VERSION})\n  Missing: IDBDatabase connection\n  Reason: ${request.error?.message ?? "unknown DOMException — browser may have storage quota exceeded or IndexedDB disabled"}`, request.error);
+      reject(request.error);
+    };
+  });
+
+  return dbPromise;
 }
 
 /* ------------------------------------------------------------------ */
@@ -81,149 +83,154 @@ function openDb(): Promise<IDBDatabase> {
  * Returns null if not found or version mismatch.
  */
 export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise<T | null> {
-    try {
-        const db = await openDb();
-        const key = buildKey(category, subKey);
+  try {
+    const db = await openDb();
+    const key = buildKey(category, subKey);
 
-        return new Promise<T | null>((resolve) => {
-            const tx = db.transaction(STORE_NAME, "readonly");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.get(key);
+    return new Promise<T | null>((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.get(key);
 
-            request.onsuccess = () => {
-                const entry = request.result as CacheEntry<T> | undefined;
-                if (!entry) {
-                    resolve(null);
+      request.onsuccess = () => {
+        const entry = request.result as CacheEntry<T> | undefined;
+        if (!entry) {
+          resolve(null);
 
-                    return;
-                }
-                // Version guard — stale cache from old extension version
-                if (entry.version !== EXTENSION_VERSION) {
-                    console.log("[injection-cache] Version mismatch for %s (cached=%s, current=%s) — miss",
-                        key, entry.version, EXTENSION_VERSION);
-                    resolve(null);
+          return;
+        }
 
-                    return;
-                }
-                resolve(entry.value);
-            };
+        // Version guard — stale cache from old extension version
+        if (entry.version !== EXTENSION_VERSION) {
+          console.log("[injection-cache] Version mismatch for %s (cached=%s, current=%s) — miss",
+            key, entry.version, EXTENSION_VERSION);
+          resolve(null);
 
-            request.onerror = () => {
-                logCaughtError(BgLogTag.INJECTION_CACHE, `Get failed for cache entry\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}" → key="${key}"\n  Missing: Cached value for "${key}"\n  Reason: IDBRequest error — ${request.error?.message ?? "unknown"}`, request.error);
-                resolve(null);
-            };
-        });
-    } catch (err) { 
-        return null;
-    }
+          return;
+        }
+
+        resolve(entry.value);
+      };
+
+      request.onerror = () => {
+        logCaughtError(BgLogTag.INJECTION_CACHE, `Get failed for cache entry\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}" → key="${key}"\n  Missing: Cached value for "${key}"\n  Reason: IDBRequest error — ${request.error?.message ?? "unknown"}`, request.error);
+        resolve(null);
+      };
+    });
+  } catch (err) { 
+    return null;
+  }
 }
 
 /**
  * Set a cached value by category + optional sub-key.
  */
 export async function cacheSet<T>(category: CacheCategory, value: T, subKey = ""): Promise<void> {
-    try {
-        const db = await openDb();
-        const key = buildKey(category, subKey);
-        const entry: CacheEntry<T> = {
-            key,
-            value,
-            cachedAt: new Date().toISOString(),
-            version: EXTENSION_VERSION,
-        };
+  try {
+    const db = await openDb();
+    const key = buildKey(category, subKey);
+    const entry: CacheEntry<T> = {
+      key,
+      value,
+      cachedAt: new Date().toISOString(),
+      version: EXTENSION_VERSION,
+    };
 
-        return new Promise<void>((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.put(entry);
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.put(entry);
 
-            request.onsuccess = () => resolve();
-            request.onerror = () => {
-                logCaughtError(BgLogTag.INJECTION_CACHE, `Set failed for cache entry\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}" → key="${key}"\n  Missing: Successful write of cached entry\n  Reason: IDBRequest error — ${request.error?.message ?? "unknown, possible quota exceeded"}`, request.error);
-                reject(request.error);
-            };
-        });
-    } catch (err) {
-        logCaughtError(BgLogTag.INJECTION_CACHE, `cacheSet error\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}"\n  Missing: Successful cache write\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
-    }
+      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        logCaughtError(BgLogTag.INJECTION_CACHE, `Set failed for cache entry\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}" → key="${key}"\n  Missing: Successful write of cached entry\n  Reason: IDBRequest error — ${request.error?.message ?? "unknown, possible quota exceeded"}`, request.error);
+        reject(request.error);
+      };
+    });
+  } catch (err) {
+    logCaughtError(BgLogTag.INJECTION_CACHE, `cacheSet error\n  Path: IndexedDB → ${DB_NAME} → store="${STORE_NAME}"\n  Missing: Successful cache write\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+  }
 }
 
 /**
  * Delete a specific cache entry.
  */
 export async function cacheDelete(category: CacheCategory, subKey = ""): Promise<void> {
-    try {
-        const db = await openDb();
-        const key = buildKey(category, subKey);
+  try {
+    const db = await openDb();
+    const key = buildKey(category, subKey);
 
-        return new Promise<void>((resolve) => {
-            const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.delete(key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => resolve(); // best-effort
-        });
-    } catch (err) {
+    return new Promise<void>((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => resolve(); // best-effort
+    });
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 /**
  * Clear ALL cache entries. Used on deploy, version bump, or manual invalidation.
  */
 export async function cacheClearAll(): Promise<{ cleared: number }> {
-    try {
-        const db = await openDb();
+  try {
+    const db = await openDb();
 
-        return new Promise<{ cleared: number }>((resolve) => {
-            const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
+    return new Promise<{ cleared: number }>((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
 
-            // Count before clearing
-            const countReq = store.count();
-            countReq.onsuccess = () => {
-                const count = countReq.result;
-                const clearReq = store.clear();
-                clearReq.onsuccess = () => {
-                    console.log("[injection-cache] ✅ Cache cleared (%d entries)", count);
-                    resolve({ cleared: count });
-                };
-                clearReq.onerror = () => resolve({ cleared: 0 });
-            };
-            countReq.onerror = () => resolve({ cleared: 0 });
-        });
-    } catch (err) { 
-        return { cleared: 0 };
-    }
+      // Count before clearing
+      const countReq = store.count();
+      countReq.onsuccess = () => {
+        const count = countReq.result;
+        const clearReq = store.clear();
+        clearReq.onsuccess = () => {
+          console.log("[injection-cache] ✅ Cache cleared (%d entries)", count);
+          resolve({ cleared: count });
+        };
+
+        clearReq.onerror = () => resolve({ cleared: 0 });
+      };
+
+      countReq.onerror = () => resolve({ cleared: 0 });
+    });
+  } catch (err) { 
+    return { cleared: 0 };
+  }
 }
 
 /**
  * Get cache stats for diagnostics.
  */
 export async function cacheStats(): Promise<{ entryCount: number; categories: Record<string, number> }> {
-    try {
-        const db = await openDb();
+  try {
+    const db = await openDb();
 
-        return new Promise((resolve) => {
-            const tx = db.transaction(STORE_NAME, "readonly");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.getAll();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.getAll();
 
-            request.onsuccess = () => {
-                const entries = request.result as CacheEntry[];
-                const categories: Record<string, number> = {};
-                for (const entry of entries) {
-                    const cat = entry.key.split(":")[0] || "unknown";
-                    categories[cat] = (categories[cat] || 0) + 1;
-                }
-                resolve({ entryCount: entries.length, categories });
-            };
+      request.onsuccess = () => {
+        const entries = request.result as CacheEntry[];
+        const categories: Record<string, number> = {};
+        for (const entry of entries) {
+          const cat = entry.key.split(":")[0] || "unknown";
+          categories[cat] = (categories[cat] || 0) + 1;
+        }
 
-            request.onerror = () => resolve({ entryCount: 0, categories: {} });
-        });
-    } catch (err) { 
-        return { entryCount: 0, categories: {} };
-    }
+        resolve({ entryCount: entries.length, categories });
+      };
+
+      request.onerror = () => resolve({ entryCount: 0, categories: {} });
+    });
+  } catch (err) { 
+    return { entryCount: 0, categories: {} };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -235,9 +242,9 @@ export async function cacheStats(): Promise<{ entryCount: number; categories: Re
  * when the extension version changes (update or fresh install).
  */
 export async function invalidateCacheOnDeploy(reason: string): Promise<void> {
-    console.log("[injection-cache] Extension %s detected — invalidating cache", reason);
-    const result = await cacheClearAll();
-    console.log("[injection-cache] Deploy invalidation complete — %d entries cleared", result.cleared);
+  console.log("[injection-cache] Extension %s detected — invalidating cache", reason);
+  const result = await cacheClearAll();
+  console.log("[injection-cache] Deploy invalidation complete — %d entries cleared", result.cleared);
 }
 
 /**
@@ -247,46 +254,46 @@ export async function invalidateCacheOnDeploy(reason: string): Promise<void> {
  * extension version stays constant but the bundled macro script changed.
  */
 export async function syncCacheWithBuildId(
-    currentBuildId: string | null,
+  currentBuildId: string | null,
 ): Promise<{ changed: boolean; cleared: number }> {
-    if (typeof currentBuildId !== "string" || currentBuildId.length === 0) {
-        return { changed: false, cleared: 0 };
+  if (typeof currentBuildId !== "string" || currentBuildId.length === 0) {
+    return { changed: false, cleared: 0 };
+  }
+
+  try {
+    const result = await chrome.storage.local.get(STORAGE_KEY_LAST_BUILD_ID);
+    const previousBuildId = typeof result[STORAGE_KEY_LAST_BUILD_ID] === "string"
+      ? result[STORAGE_KEY_LAST_BUILD_ID] as string
+      : null;
+
+    if (previousBuildId === currentBuildId) {
+      return { changed: false, cleared: 0 };
     }
 
-    try {
-        const result = await chrome.storage.local.get(STORAGE_KEY_LAST_BUILD_ID);
-        const previousBuildId = typeof result[STORAGE_KEY_LAST_BUILD_ID] === "string"
-            ? result[STORAGE_KEY_LAST_BUILD_ID] as string
-            : null;
+    const clearResult = await cacheClearAll();
+    await chrome.storage.local.set({ [STORAGE_KEY_LAST_BUILD_ID]: currentBuildId });
 
-        if (previousBuildId === currentBuildId) {
-            return { changed: false, cleared: 0 };
-        }
-
-        const clearResult = await cacheClearAll();
-        await chrome.storage.local.set({ [STORAGE_KEY_LAST_BUILD_ID]: currentBuildId });
-
-        if (previousBuildId === null) {
-            console.log(
-                "[injection-cache] Initialized build cache sync (%s) — cleared %d entries",
-                currentBuildId,
-                clearResult.cleared,
-            );
-        } else {
-            console.log(
-                "[injection-cache] Build changed %s → %s — cleared %d entries",
-                previousBuildId,
-                currentBuildId,
-                clearResult.cleared,
-            );
-        }
-
-        return { changed: true, cleared: clearResult.cleared };
-    } catch (err) {
-        logCaughtError(BgLogTag.INJECTION_CACHE, `Build sync failed\n  Path: chrome.storage.local["${STORAGE_KEY_LAST_BUILD_ID}"]\n  Missing: Successful build ID comparison and cache invalidation\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
-
-        return { changed: false, cleared: 0 };
+    if (previousBuildId === null) {
+      console.log(
+        "[injection-cache] Initialized build cache sync (%s) — cleared %d entries",
+        currentBuildId,
+        clearResult.cleared,
+      );
+    } else {
+      console.log(
+        "[injection-cache] Build changed %s → %s — cleared %d entries",
+        previousBuildId,
+        currentBuildId,
+        clearResult.cleared,
+      );
     }
+
+    return { changed: true, cleared: clearResult.cleared };
+  } catch (err) {
+    logCaughtError(BgLogTag.INJECTION_CACHE, `Build sync failed\n  Path: chrome.storage.local["${STORAGE_KEY_LAST_BUILD_ID}"]\n  Missing: Successful build ID comparison and cache invalidation\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+
+    return { changed: false, cleared: 0 };
+  }
 }
 
 /**
@@ -296,36 +303,37 @@ export async function syncCacheWithBuildId(
  * version are physically deleted — not just treated as cache misses.
  */
 export async function purgeStaleEntries(): Promise<number> {
-    try {
-        const db = await openDb();
+  try {
+    const db = await openDb();
 
-        return new Promise<number>((resolve) => {
-            const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.getAll();
+    return new Promise<number>((resolve) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.getAll();
 
-            request.onsuccess = () => {
-                const entries = request.result as CacheEntry[];
-                let purged = 0;
+      request.onsuccess = () => {
+        const entries = request.result as CacheEntry[];
+        let purged = 0;
 
-                for (const entry of entries) {
-                    if (entry.version !== EXTENSION_VERSION) {
-                        store.delete(entry.key);
-                        purged++;
-                    }
-                }
+        for (const entry of entries) {
+          if (entry.version !== EXTENSION_VERSION) {
+            store.delete(entry.key);
+            purged++;
+          }
+        }
 
-                if (purged > 0) {
-                    console.log("[injection-cache] Purged %d stale entries (version ≠ %s)", purged, EXTENSION_VERSION);
-                }
-                resolve(purged);
-            };
+        if (purged > 0) {
+          console.log("[injection-cache] Purged %d stale entries (version ≠ %s)", purged, EXTENSION_VERSION);
+        }
 
-            request.onerror = () => resolve(0);
-        });
-    } catch (err) { 
-        return 0;
-    }
+        resolve(purged);
+      };
+
+      request.onerror = () => resolve(0);
+    });
+  } catch (err) { 
+    return 0;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -336,14 +344,14 @@ export async function purgeStaleEntries(): Promise<number> {
  * Cache resolved script code by filePath to avoid repeated fetch() calls.
  */
 export async function cacheScriptCode(filePath: string, code: string): Promise<void> {
-    await cacheSet("script_code", code, filePath);
+  await cacheSet("script_code", code, filePath);
 }
 
 /**
  * Retrieve cached script code by filePath.
  */
 export async function getCachedScriptCode(filePath: string): Promise<string | null> {
-    return cacheGet<string>("script_code", filePath);
+  return cacheGet<string>("script_code", filePath);
 }
 
 /* ------------------------------------------------------------------ */
@@ -351,5 +359,5 @@ export async function getCachedScriptCode(filePath: string): Promise<string | nu
 /* ------------------------------------------------------------------ */
 
 function buildKey(category: CacheCategory, subKey: string): string {
-    return subKey ? `${category}:${subKey}` : category;
+  return subKey ? `${category}:${subKey}` : category;
 }

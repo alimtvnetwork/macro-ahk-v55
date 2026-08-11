@@ -32,38 +32,38 @@ const info = JSON.parse(readFileSync(INFO, 'utf-8')) as {
 };
 
 describe('plan-steps prompt: {{n}} substitution end-to-end', () => {
-    it('canonical and mirror bodies are byte-identical', () => {
-        expect(mirrorBody).toBe(canonicalBody);
-    });
+  it('canonical and mirror bodies are byte-identical', () => {
+    expect(mirrorBody).toBe(canonicalBody);
+  });
 
-    it('canonical body contains {{n}} at least once', () => {
-        expect(canonicalBody).toMatch(/\{\{\s*n\s*\}\}/);
-        const count = (canonicalBody.match(/\{\{\s*n\s*\}\}/g) ?? []).length;
-        expect(count).toBeGreaterThan(1);
-    });
+  it('canonical body contains {{n}} at least once', () => {
+    expect(canonicalBody).toMatch(/\{\{\s*n\s*\}\}/);
+    const count = (canonicalBody.match(/\{\{\s*n\s*\}\}/g) ?? []).length;
+    expect(count).toBeGreaterThan(1);
+  });
 
-    it('info.json ReplaceKey is "n" and matches the token in the body', () => {
-        expect(info.ReplaceKey).toBe('n');
-    });
+  it('info.json ReplaceKey is "n" and matches the token in the body', () => {
+    expect(info.ReplaceKey).toBe('n');
+  });
 
-    it.each([1, 5, 10, 20, 100])(
-        'substituting {{n}} with %i replaces every occurrence with the number',
-        (n) => {
-            const rendered = substituteToken(canonicalBody, info.ReplaceKey, n);
-            expect(rendered).not.toMatch(/\{\{\s*n\s*\}\}/);
-            expect(rendered).toContain(String(n));
-            // Guard: no un-substituted ${n} either (belt + suspenders).
-            expect(rendered).not.toMatch(/\$\{\s*n\s*\}/);
-        },
-    );
+  it.each([1, 5, 10, 20, 100])(
+    'substituting {{n}} with %i replaces every occurrence with the number',
+    (n) => {
+      const rendered = substituteToken(canonicalBody, info.ReplaceKey, n);
+      expect(rendered).not.toMatch(/\{\{\s*n\s*\}\}/);
+      expect(rendered).toContain(String(n));
+      // Guard: no un-substituted ${n} either (belt + suspenders).
+      expect(rendered).not.toMatch(/\$\{\s*n\s*\}/);
+    },
+  );
 
-    it('every info.json ReplaceValue substitutes cleanly', () => {
-        for (const raw of info.ReplaceValues) {
-            const rendered = substituteToken(canonicalBody, info.ReplaceKey, raw);
-            expect(rendered, `value ${raw} left un-substituted tokens`).not.toMatch(
-                /\{\{\s*n\s*\}\}/,
-            );
-            expect(rendered).toContain(raw);
-        }
-    });
+  it('every info.json ReplaceValue substitutes cleanly', () => {
+    for (const raw of info.ReplaceValues) {
+      const rendered = substituteToken(canonicalBody, info.ReplaceKey, raw);
+      expect(rendered, `value ${raw} left un-substituted tokens`).not.toMatch(
+        /\{\{\s*n\s*\}\}/,
+      );
+      expect(rendered).toContain(raw);
+    }
+  });
 });

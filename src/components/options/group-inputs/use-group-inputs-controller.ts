@@ -7,17 +7,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useToast } from "@/hooks/use-toast";
 import {
-    parseGroupInputJson,
-    type GroupInputBag,
+  parseGroupInputJson,
+  type GroupInputBag,
 } from "@/background/recorder/step-library/group-inputs";
 
 const MAX_FILE_BYTES = 1024 * 1024; // 1 MB — input bags are tiny.
 
 export function formatBytes(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
 
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export interface UseGroupInputsControllerArgs {
@@ -31,89 +36,100 @@ export interface UseGroupInputsControllerArgs {
 }
 
 export function useGroupInputsController(args: UseGroupInputsControllerArgs) {
-    const { open, groupId, groupName, currentBag, onApply, onClear, onOpenChange } = args;
-    const { toast } = useToast();
-    const [text, setText] = useState("");
-    const [dragOver, setDragOver] = useState(false);
+  const { open, groupId, groupName, currentBag, onApply, onClear, onOpenChange } = args;
+  const { toast } = useToast();
+  const [text, setText] = useState("");
+  const [dragOver, setDragOver] = useState(false);
 
-    useEffect(() => {
-        if (open) {
-            setText(currentBag === null ? "" : JSON.stringify(currentBag, null, 2));
-            setDragOver(false);
-        }
-    }, [open, currentBag]);
+  useEffect(() => {
+    if (open) {
+      setText(currentBag === null ? "" : JSON.stringify(currentBag, null, 2));
+      setDragOver(false);
+    }
+  }, [open, currentBag]);
 
-    const parseResult = useMemo(() => parseGroupInputJson(text), [text]);
+  const parseResult = useMemo(() => parseGroupInputJson(text), [text]);
 
-    const handleLoadCurrent = useCallback(() => {
-        setText(currentBag === null ? "" : JSON.stringify(currentBag, null, 2));
-    }, [currentBag]);
+  const handleLoadCurrent = useCallback(() => {
+    setText(currentBag === null ? "" : JSON.stringify(currentBag, null, 2));
+  }, [currentBag]);
 
-    const handleFile = useCallback(async (file: File) => {
-        if (file.size > MAX_FILE_BYTES) {
-            toast({
-                variant: "destructive",
-                title: "File too large",
-                description: `Input bag files must be <= 1 MB (got ${formatBytes(file.size)}).`,
-            });
+  const handleFile = useCallback(async (file: File) => {
+    if (file.size > MAX_FILE_BYTES) {
+      toast({
+        variant: "destructive",
+        title: "File too large",
+        description: `Input bag files must be <= 1 MB (got ${formatBytes(file.size)}).`,
+      });
 
-            return;
-        }
-        try {
-            setText(await file.text());
-        } catch (err) {
-            toast({
-                variant: "destructive",
-                title: "Could not read file",
-                description: err instanceof Error ? err.message : String(err),
-            });
-        }
-    }, [toast]);
+      return;
+    }
 
-    const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] ?? null;
-        event.target.value = "";
-        if (file !== null) void handleFile(file);
-    }, [handleFile]);
+    try {
+      setText(await file.text());
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Could not read file",
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }, [toast]);
 
-    const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        setDragOver(false);
-        const file = event.dataTransfer.files[0] ?? null;
-        if (file !== null) void handleFile(file);
-    }, [handleFile]);
+  const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = "";
+    if (file !== null) {
+      void handleFile(file);
+    }
+  }, [handleFile]);
 
-    const handleApply = useCallback(() => {
-        if (groupId === null || !parseResult.Ok) return;
-        onApply(groupId, parseResult.Value);
-        toast({
-            title: "Input data applied",
-            description: `Bound ${Object.keys(parseResult.Value).length} variable(s) to "${groupName ?? "(unknown)"}".`,
-        });
-        onOpenChange(false);
-    }, [groupId, groupName, parseResult, onApply, onOpenChange, toast]);
+  const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragOver(false);
+    const file = event.dataTransfer.files[0] ?? null;
+    if (file !== null) {
+      void handleFile(file);
+    }
+  }, [handleFile]);
 
-    const handleClear = useCallback(() => {
-        if (groupId === null) return;
-        onClear(groupId);
-        setText("");
-        toast({
-            title: "Input data cleared",
-            description: `Removed input bag from "${groupName ?? "(unknown)"}".`,
-        });
-        onOpenChange(false);
-    }, [groupId, groupName, onClear, onOpenChange, toast]);
+  const handleApply = useCallback(() => {
+    if (groupId === null || !parseResult.Ok) {
+      return;
+    }
 
-    return {
-        text,
-        setText,
-        dragOver,
-        setDragOver,
-        parseResult,
-        handleLoadCurrent,
-        handleFilePick,
-        handleDrop,
-        handleApply,
-        handleClear,
-    };
+    onApply(groupId, parseResult.Value);
+    toast({
+      title: "Input data applied",
+      description: `Bound ${Object.keys(parseResult.Value).length} variable(s) to "${groupName ?? "(unknown)"}".`,
+    });
+    onOpenChange(false);
+  }, [groupId, groupName, parseResult, onApply, onOpenChange, toast]);
+
+  const handleClear = useCallback(() => {
+    if (groupId === null) {
+      return;
+    }
+
+    onClear(groupId);
+    setText("");
+    toast({
+      title: "Input data cleared",
+      description: `Removed input bag from "${groupName ?? "(unknown)"}".`,
+    });
+    onOpenChange(false);
+  }, [groupId, groupName, onClear, onOpenChange, toast]);
+
+  return {
+    text,
+    setText,
+    dragOver,
+    setDragOver,
+    parseResult,
+    handleLoadCurrent,
+    handleFilePick,
+    handleDrop,
+    handleApply,
+    handleClear,
+  };
 }

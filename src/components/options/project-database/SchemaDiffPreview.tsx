@@ -64,7 +64,10 @@ export function SchemaDiffPreview({ projectSlug, pendingTables }: SchemaDiffPrev
 
       // Created tables
       for (const pt of pendingTables) {
-        if (!pt.name) continue;
+        if (!pt.name) {
+          continue;
+        }
+
         if (!existingNames.has(pt.name)) {
           entries.push({
             table: pt.name,
@@ -84,7 +87,10 @@ export function SchemaDiffPreview({ projectSlug, pendingTables }: SchemaDiffPrev
           const added = pt.columns.filter((c) => c.name && !existColNames.has(c.name)).map((c) => c.name);
           const removed = existing.filter((c) => !pendColNames.has(c.name)).map((c) => c.name);
           const modified = pt.columns.filter((c) => {
-            if (!c.name || !existColNames.has(c.name)) return false;
+            if (!c.name || !existColNames.has(c.name)) {
+              return false;
+            }
+
             const ex = existing.find((e) => e.name === c.name);
 
             return ex && ex.type !== c.type;

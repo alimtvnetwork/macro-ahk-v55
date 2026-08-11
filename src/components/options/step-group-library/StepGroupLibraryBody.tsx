@@ -41,36 +41,36 @@ interface StepGroupLibraryBodyProps {
 }
 
 export function StepGroupLibraryBody(props: StepGroupLibraryBodyProps) {
-    const { lib, state, viewModel, mutations, exportImport, selection, importApi } = props;
-    const lastImport: LastImportSummary | null = importApi.lastImport;
+  const { lib, state, viewModel, mutations, exportImport, selection, importApi } = props;
+  const lastImport: LastImportSummary | null = importApi.lastImport;
 
-    return (
-        <div className="flex h-full min-h-[600px] w-full flex-col gap-4 p-6">
-            <Toaster />
-            <LibraryHeaderSection
-                lib={lib}
-                state={state}
-                exportImport={exportImport}
-                selection={selection}
-                lastImport={lastImport}
-                lastExport={exportImport.lastExport}
-            />
-            <LibraryTwoPaneBody
-                lib={lib}
-                state={state}
-                viewModel={viewModel}
-                mutations={mutations}
-                exportImport={exportImport}
-                selection={selection}
-            />
-            <LibraryDialogSection
-                lib={lib}
-                state={state}
-                viewModel={viewModel}
-                mutations={mutations}
-                exportImport={exportImport}
-                importApi={importApi}
-            />
-        </div>
-    );
+  return (
+    <div className="flex h-full min-h-[600px] w-full flex-col gap-4 p-6">
+      <Toaster />
+      <LibraryHeaderSection
+        lib={lib}
+        state={state}
+        exportImport={exportImport}
+        selection={selection}
+        lastImport={lastImport}
+        lastExport={exportImport.lastExport}
+      />
+      <LibraryTwoPaneBody
+        lib={lib}
+        state={state}
+        viewModel={viewModel}
+        mutations={mutations}
+        exportImport={exportImport}
+        selection={selection}
+      />
+      <LibraryDialogSection
+        lib={lib}
+        state={state}
+        viewModel={viewModel}
+        mutations={mutations}
+        exportImport={exportImport}
+        importApi={importApi}
+      />
+    </div>
+  );
 }

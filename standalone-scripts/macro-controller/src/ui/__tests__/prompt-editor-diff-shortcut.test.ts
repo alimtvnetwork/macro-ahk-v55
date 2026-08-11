@@ -17,7 +17,9 @@ import { openPromptCreationModal } from '../prompt-injection';
 import { PLAN_NEXT_SEED_ROWS } from '../../seed/plan-next-prompts';
 import { clearDiffPrefs } from './helpers/clear-diff-prefs';
 
-beforeEach(() => { document.body.innerHTML = ''; clearDiffPrefs(); });
+beforeEach(() => {
+  document.body.innerHTML = ''; clearDiffPrefs(); 
+});
 
 function dispatchCtrlD(target: EventTarget, opts?: Partial<KeyboardEventInit>): boolean {
   const ev = new KeyboardEvent('keydown', {
@@ -31,7 +33,7 @@ function openEditModalOnSeed(): {
   overlay: HTMLElement;
   diffBtn: HTMLButtonElement;
   diffHost: HTMLElement;
-} {
+  } {
   const seedRow = PLAN_NEXT_SEED_ROWS.find((r) => r.slug === 'plan-default')!;
   const editPrompt = { id: 'db-row-1', slug: seedRow.slug, name: seedRow.name, text: seedRow.body };
   openPromptCreationModal({} as never, {} as never, editPrompt as never, undefined, {

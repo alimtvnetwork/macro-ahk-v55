@@ -22,20 +22,33 @@ import { MessageType } from "@/shared/messages";
 const SCOPE_PREFIX = "Options.";
 
 function safeStack(caught: unknown): string | undefined {
-    if (caught instanceof Error && typeof caught.stack === "string") {
-        return caught.stack;
-    }
+  if (caught instanceof Error && typeof caught.stack === "string") {
+    return caught.stack;
+  }
 
-    return undefined;
+  return undefined;
 }
 
 function safeMessage(caught: unknown): string {
-    if (caught instanceof Error) { return caught.message; }
-    if (typeof caught === "string") { return caught; }
-    if (caught === undefined || caught === null) { return ""; }
-    try { return JSON.stringify(caught); } catch (err) { void 0;
+  if (caught instanceof Error) {
+    return caught.message; 
+  }
 
- return String(caught); }
+  if (typeof caught === "string") {
+    return caught; 
+  }
+
+  if (caught === undefined || caught === null) {
+    return ""; 
+  }
+
+  try {
+    return JSON.stringify(caught); 
+  } catch (err) {
+    void 0;
+
+    return String(caught); 
+  }
 }
 
 /**
@@ -46,33 +59,33 @@ function safeMessage(caught: unknown): string {
  * Drawer / Activity Log Timeline.
  */
 export function logError(scope: string, message: string, caught?: unknown): void {
-    const fullScope = `${SCOPE_PREFIX}${scope}`;
+  const fullScope = `${SCOPE_PREFIX}${scope}`;
 
-    /* Always log to console first so the dev tools surface preserves stack. */
-    if (caught !== undefined) {
-        console.error(`[${fullScope}] ${message}`, caught);
-    } else {
-        console.error(`[${fullScope}] ${message}`);
-    }
+  /* Always log to console first so the dev tools surface preserves stack. */
+  if (caught !== undefined) {
+    console.error(`[${fullScope}] ${message}`, caught);
+  } else {
+    console.error(`[${fullScope}] ${message}`);
+  }
 
-    /* Fire-and-forget forward to background Errors DB. Must never throw. */
-    try {
-        const detail = caught !== undefined ? safeMessage(caught) : "";
-        const composed = detail.length > 0 ? `${message} — ${detail}` : message;
-        void sendMessage({
-            type: MessageType.LOG_ERROR,
-            level: "ERROR",
-            source: "options",
-            category: fullScope.toUpperCase(),
-            errorCode: scope.toUpperCase().replace(/[^A-Z0-9_]+/g, "_"),
-            message: composed,
-            stackTrace: safeStack(caught),
-        } as Parameters<typeof sendMessage>[0]).catch((bgErr: unknown) => {
-            /* Background not reachable (preview / SW asleep) — already on console. Use console.warn so the dropped forward is visible without recursing back into logError. */
-            console.warn(`[${fullScope}] LOG_ERROR forward failed (background unreachable) — entry was logged to console only`, bgErr);
-        });
-    } catch (caught2) {
-        /* sendMessage threw synchronously — already on console. Surface via console.warn (cannot recurse into logError). */
-        console.warn(`[${fullScope}] sendMessage threw synchronously — LOG_ERROR forward skipped`, caught2);
-    }
+  /* Fire-and-forget forward to background Errors DB. Must never throw. */
+  try {
+    const detail = caught !== undefined ? safeMessage(caught) : "";
+    const composed = detail.length > 0 ? `${message} — ${detail}` : message;
+    void sendMessage({
+      type: MessageType.LOG_ERROR,
+      level: "ERROR",
+      source: "options",
+      category: fullScope.toUpperCase(),
+      errorCode: scope.toUpperCase().replace(/[^A-Z0-9_]+/g, "_"),
+      message: composed,
+      stackTrace: safeStack(caught),
+    } as Parameters<typeof sendMessage>[0]).catch((bgErr: unknown) => {
+      /* Background not reachable (preview / SW asleep) — already on console. Use console.warn so the dropped forward is visible without recursing back into logError. */
+      console.warn(`[${fullScope}] LOG_ERROR forward failed (background unreachable) — entry was logged to console only`, bgErr);
+    });
+  } catch (caught2) {
+    /* sendMessage threw synchronously — already on console. Surface via console.warn (cannot recurse into logError). */
+    console.warn(`[${fullScope}] sendMessage threw synchronously — LOG_ERROR forward skipped`, caught2);
+  }
 }

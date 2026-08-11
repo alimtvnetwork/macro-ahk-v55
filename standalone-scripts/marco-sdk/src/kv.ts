@@ -23,20 +23,20 @@ export interface KvApi {
 const SDK_PROJECT_ID = "RiseupMacroSdk";
 
 export function createKvApi(projectId: string = SDK_PROJECT_ID): KvApi {
-    const pid = projectId && projectId.length > 0 ? projectId : SDK_PROJECT_ID;
+  const pid = projectId && projectId.length > 0 ? projectId : SDK_PROJECT_ID;
 
-    return {
-        get(key: string) {
-            return sendMessage<string | null>("KV_GET", { projectId: pid, key });
-        },
-        async set(key: string, value: string) {
-            await sendMessage<void>("KV_SET", { projectId: pid, key, value });
-        },
-        async delete(key: string) {
-            await sendMessage<void>("KV_DELETE", { projectId: pid, key });
-        },
-        list() {
-            return sendMessage<Array<{ key: string; value: string }>>("KV_LIST", { projectId: pid });
-        },
-    };
+  return {
+    get(key: string) {
+      return sendMessage<string | null>("KV_GET", { projectId: pid, key });
+    },
+    async set(key: string, value: string) {
+      await sendMessage<void>("KV_SET", { projectId: pid, key, value });
+    },
+    async delete(key: string) {
+      await sendMessage<void>("KV_DELETE", { projectId: pid, key });
+    },
+    list() {
+      return sendMessage<Array<{ key: string; value: string }>>("KV_LIST", { projectId: pid });
+    },
+  };
 }

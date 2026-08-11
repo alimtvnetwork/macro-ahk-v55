@@ -25,12 +25,12 @@
  */
 
 import {
-    WEBHOOK_RESULT_SCHEMA_VERSION,
-    type WebhookDeliveryFailure,
-    type WebhookDeliveryResult,
-    type WebhookDeliverySkipped,
-    type WebhookDeliverySuccess,
-    type WebhookEventKind,
+  WEBHOOK_RESULT_SCHEMA_VERSION,
+  type WebhookDeliveryFailure,
+  type WebhookDeliveryResult,
+  type WebhookDeliverySkipped,
+  type WebhookDeliverySuccess,
+  type WebhookEventKind,
 } from "../result-webhook";
 
 /* ------------------------------------------------------------------ */
@@ -46,58 +46,58 @@ const DEFAULT_DURATION_MS = 42;
 /* ------------------------------------------------------------------ */
 
 export function makeWebhookSuccess(
-    overrides: Partial<WebhookDeliverySuccess> = {},
+  overrides: Partial<WebhookDeliverySuccess> = {},
 ): WebhookDeliverySuccess {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "success",
-        Ok: true,
-        Skipped: false,
-        Event: "GroupRunSucceeded" satisfies WebhookEventKind,
-        Url: DEFAULT_URL,
-        Status: 200,
-        DurationMs: DEFAULT_DURATION_MS,
-        EmittedAt: DEFAULT_EMITTED_AT,
-        Payload: null,
-        ...overrides,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "success",
+    Ok: true,
+    Skipped: false,
+    Event: "GroupRunSucceeded" satisfies WebhookEventKind,
+    Url: DEFAULT_URL,
+    Status: 200,
+    DurationMs: DEFAULT_DURATION_MS,
+    EmittedAt: DEFAULT_EMITTED_AT,
+    Payload: null,
+    ...overrides,
+  };
 }
 
 export function makeWebhookSkipped(
-    overrides: Partial<WebhookDeliverySkipped> = {},
+  overrides: Partial<WebhookDeliverySkipped> = {},
 ): WebhookDeliverySkipped {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "skipped",
-        Ok: true,
-        Skipped: true,
-        Event: "GroupRunFailed" satisfies WebhookEventKind,
-        Url: null,
-        SkipReason: "Webhook disabled",
-        DurationMs: 0,
-        EmittedAt: DEFAULT_EMITTED_AT,
-        Payload: null,
-        ...overrides,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "skipped",
+    Ok: true,
+    Skipped: true,
+    Event: "GroupRunFailed" satisfies WebhookEventKind,
+    Url: null,
+    SkipReason: "Webhook disabled",
+    DurationMs: 0,
+    EmittedAt: DEFAULT_EMITTED_AT,
+    Payload: null,
+    ...overrides,
+  };
 }
 
 export function makeWebhookFailure(
-    overrides: Partial<WebhookDeliveryFailure> = {},
+  overrides: Partial<WebhookDeliveryFailure> = {},
 ): WebhookDeliveryFailure {
-    return {
-        SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
-        Kind: "failure",
-        Ok: false,
-        Skipped: false,
-        Event: "BatchComplete" satisfies WebhookEventKind,
-        Url: DEFAULT_URL,
-        Status: 500,
-        Error: "HTTP 500 Internal Server Error",
-        DurationMs: DEFAULT_DURATION_MS,
-        EmittedAt: DEFAULT_EMITTED_AT,
-        Payload: null,
-        ...overrides,
-    };
+  return {
+    SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
+    Kind: "failure",
+    Ok: false,
+    Skipped: false,
+    Event: "BatchComplete" satisfies WebhookEventKind,
+    Url: DEFAULT_URL,
+    Status: 500,
+    Error: "HTTP 500 Internal Server Error",
+    DurationMs: DEFAULT_DURATION_MS,
+    EmittedAt: DEFAULT_EMITTED_AT,
+    Payload: null,
+    ...overrides,
+  };
 }
 
 /**
@@ -110,10 +110,10 @@ export function makeWebhookFixtureSet(): {
     skipped: WebhookDeliverySkipped;
     failure: WebhookDeliveryFailure;
     all: ReadonlyArray<WebhookDeliveryResult>;
-} {
-    const success = makeWebhookSuccess();
-    const skipped = makeWebhookSkipped();
-    const failure = makeWebhookFailure();
+    } {
+  const success = makeWebhookSuccess();
+  const skipped = makeWebhookSkipped();
+  const failure = makeWebhookFailure();
 
-    return { success, skipped, failure, all: [success, skipped, failure] };
+  return { success, skipped, failure, all: [success, skipped, failure] };
 }

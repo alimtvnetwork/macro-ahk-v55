@@ -10,11 +10,11 @@
 import { XPathKeyCodeType } from "../../../lovable-common/src/xpath/xpath-key-code";
 import { LoginStepCodeType } from "./login-types";
 import {
-    stepAwaitWorkspace,
-    stepClick,
-    stepFillEmail,
-    stepFillPassword,
-    stepNavigate,
+  stepAwaitWorkspace,
+  stepClick,
+  stepFillEmail,
+  stepFillPassword,
+  stepNavigate,
 } from "./login-steps";
 import type { LoginFlowOptions, LoginStepOutcome } from "./login-types";
 import type { XPathSettingSeed } from "../migrations/xpath-setting-seed";
@@ -26,35 +26,35 @@ export interface LoginRunResult {
 }
 
 const runChain = async (
-    options: LoginFlowOptions,
-    overrides: ReadonlyArray<XPathSettingSeed>,
+  options: LoginFlowOptions,
+  overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginStepOutcome[]> => {
-    const out: LoginStepOutcome[] = [];
-    out.push(await stepNavigate(options.LoginUrl));
-    out.push(await stepFillEmail(options.Credentials, overrides));
-    out.push(await stepClick(XPathKeyCodeType.ContinueButton, LoginStepCodeType.ClickContinue, overrides));
-    out.push(await stepFillPassword(options.Credentials, overrides));
-    out.push(await stepClick(XPathKeyCodeType.LoginButton, LoginStepCodeType.ClickLogin, overrides));
-    out.push(await stepAwaitWorkspace(overrides));
+  const out: LoginStepOutcome[] = [];
+  out.push(await stepNavigate(options.LoginUrl));
+  out.push(await stepFillEmail(options.Credentials, overrides));
+  out.push(await stepClick(XPathKeyCodeType.ContinueButton, LoginStepCodeType.ClickContinue, overrides));
+  out.push(await stepFillPassword(options.Credentials, overrides));
+  out.push(await stepClick(XPathKeyCodeType.LoginButton, LoginStepCodeType.ClickLogin, overrides));
+  out.push(await stepAwaitWorkspace(overrides));
 
-    return out;
+  return out;
 };
 
 const failureFrom = (caught: unknown, lastStep: LoginStepCodeType | null): LoginRunResult => ({
-    Outcomes: [],
-    FailedStep: lastStep,
-    Error: caught instanceof Error ? caught.message : String(caught),
+  Outcomes: [],
+  FailedStep: lastStep,
+  Error: caught instanceof Error ? caught.message : String(caught),
 });
 
 export const runLogin = async (
-    options: LoginFlowOptions,
-    overrides: ReadonlyArray<XPathSettingSeed>,
+  options: LoginFlowOptions,
+  overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginRunResult> => {
-    try {
-        const outcomes = await runChain(options, overrides);
+  try {
+    const outcomes = await runChain(options, overrides);
 
-        return { Outcomes: outcomes, FailedStep: null, Error: null };
-    } catch (caught: unknown) {
-        return failureFrom(caught, null);
-    }
+    return { Outcomes: outcomes, FailedStep: null, Error: null };
+  } catch (caught: unknown) {
+    return failureFrom(caught, null);
+  }
 };

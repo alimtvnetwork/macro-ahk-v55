@@ -89,7 +89,10 @@ function applyHiddenState(hidden: boolean): void {
   const chevron = document.getElementById(FRAME_CHEVRON_ID);
   const remove = document.getElementById(FRAME_REMOVE_ID);
   const restore = document.getElementById(FRAME_RESTORE_ID);
-  if (!frame || !body || !chevron || !remove || !restore) return;
+  if (!frame || !body || !chevron || !remove || !restore) {
+    return;
+  }
+
   if (hidden) {
     frame.dataset.hidden = '1';
     body.style.display = 'none';
@@ -130,6 +133,7 @@ function buildHeader(): HTMLDivElement {
     applyHiddenState(false);
     log('InlineStripsFrame: user restored strips via header button', 'info');
   };
+
   actions.appendChild(restore);
 
   const chevron = document.createElement('button');
@@ -141,6 +145,7 @@ function buildHeader(): HTMLDivElement {
   chevron.onclick = function (): void {
     toggleInlineStripGroupCollapsed();
   };
+
   actions.appendChild(chevron);
 
   // × hides the body and swaps the header to show a Restore button.
@@ -156,6 +161,7 @@ function buildHeader(): HTMLDivElement {
     applyHiddenState(true);
     log('InlineStripsFrame: user hid strips via ×; Restore button now visible', 'info');
   };
+
   actions.appendChild(remove);
 
   header.appendChild(actions);
@@ -212,7 +218,10 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
     subscribeInlineStripGroupCollapse(function (): void {
       applyInlineStripGroupCollapse();
       const chevron = document.getElementById(FRAME_CHEVRON_ID);
-      if (chevron) chevron.textContent = getInlineStripGroupCollapsed() ? '+' : '−';
+      if (chevron) {
+        chevron.textContent = getInlineStripGroupCollapsed() ? '+' : '−';
+      }
+
       const body = document.getElementById(FRAME_BODY_ID);
       if (body && frame && frame.dataset.hidden !== '1') {
         body.style.display = getInlineStripGroupCollapsed() ? 'none' : 'flex';

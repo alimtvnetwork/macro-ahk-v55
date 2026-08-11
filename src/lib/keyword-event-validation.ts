@@ -19,10 +19,10 @@ import { ComboInvalidReasonType, WaitInvalidReasonType } from "../types/enums";
 /* ------------------------------------------------------------------ */
 
 const MODIFIER_TOKENS: ReadonlySet<string> = new Set([
-    "ctrl", "control",
-    "shift",
-    "alt", "option",
-    "meta", "cmd", "command",
+  "ctrl", "control",
+  "shift",
+  "alt", "option",
+  "meta", "cmd", "command",
 ]);
 
 /**
@@ -32,33 +32,38 @@ const MODIFIER_TOKENS: ReadonlySet<string> = new Set([
  * accepts is exactly what the dispatcher can fire.
  */
 const NAMED_KEYS: ReadonlySet<string> = new Set([
-    "enter", "return",
-    "tab",
-    "escape", "esc",
-    "space", "spacebar",
-    "backspace",
-    "delete", "del",
-    "insert", "ins",
-    "home", "end",
-    "pageup", "pagedown",
-    "arrowup", "arrowdown", "arrowleft", "arrowright",
-    "up", "down", "left", "right",
-    "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
-    "capslock",
-    "numlock",
-    "scrolllock",
-    "printscreen",
-    "pause",
-    "contextmenu",
+  "enter", "return",
+  "tab",
+  "escape", "esc",
+  "space", "spacebar",
+  "backspace",
+  "delete", "del",
+  "insert", "ins",
+  "home", "end",
+  "pageup", "pagedown",
+  "arrowup", "arrowdown", "arrowleft", "arrowright",
+  "up", "down", "left", "right",
+  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
+  "capslock",
+  "numlock",
+  "scrolllock",
+  "printscreen",
+  "pause",
+  "contextmenu",
 ]);
 
 function isKnownKey(token: string): boolean {
-    const t = token.trim();
-    if (t === "") { return false; }
-    // Single character — printable ASCII / unicode letter, digit, or symbol.
-    if (t.length === 1) { return true; }
+  const t = token.trim();
+  if (t === "") {
+    return false; 
+  }
 
-    return NAMED_KEYS.has(t.toLowerCase());
+  // Single character — printable ASCII / unicode letter, digit, or symbol.
+  if (t.length === 1) {
+    return true; 
+  }
+
+  return NAMED_KEYS.has(t.toLowerCase());
 }
 
 /* ------------------------------------------------------------------ */
@@ -80,41 +85,43 @@ export type ComboInvalidReason =
  *   non-modifier (the key), and the key must be known.
  */
 export function validateCombo(raw: string): ComboValidation {
-    const trimmed = raw.trim();
-    if (trimmed === "") {
-        return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
-    }
+  const trimmed = raw.trim();
+  if (trimmed === "") {
+    return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
+  }
 
-    const tokens = trimmed.split("+").map(t => t.trim()).filter(t => t !== "");
-    if (tokens.length === 0) {
-        return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
-    }
+  const tokens = trimmed.split("+").map(t => t.trim()).filter(t => t !== "");
+  if (tokens.length === 0) {
+    return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
+  }
 
-    const nonModifier = tokens.filter(t => !MODIFIER_TOKENS.has(t.toLowerCase()));
-    if (nonModifier.length === 0) {
-        return {
-            Valid: false,
-            Reason: "ModifiersOnly",
-            Message: "Combo must include a key, not only modifiers (Ctrl/Shift/Alt/Meta).",
-        };
-    }
-    if (nonModifier.length > 1) {
-        return {
-            Valid: false,
-            Reason: "MultipleKeys",
-            Message: `Combo can only have one key — found: ${nonModifier.join(", ")}.`,
-        };
-    }
-    const key = nonModifier[0];
-    if (!isKnownKey(key)) {
-        return {
-            Valid: false,
-            Reason: "UnknownKey",
-            Message: `Unknown key "${key}". Use a single character or a named key like Enter, Tab, F5.`,
-        };
-    }
+  const nonModifier = tokens.filter(t => !MODIFIER_TOKENS.has(t.toLowerCase()));
+  if (nonModifier.length === 0) {
+    return {
+      Valid: false,
+      Reason: "ModifiersOnly",
+      Message: "Combo must include a key, not only modifiers (Ctrl/Shift/Alt/Meta).",
+    };
+  }
 
-    return { Valid: true };
+  if (nonModifier.length > 1) {
+    return {
+      Valid: false,
+      Reason: "MultipleKeys",
+      Message: `Combo can only have one key — found: ${nonModifier.join(", ")}.`,
+    };
+  }
+
+  const key = nonModifier[0];
+  if (!isKnownKey(key)) {
+    return {
+      Valid: false,
+      Reason: "UnknownKey",
+      Message: `Unknown key "${key}". Use a single character or a named key like Enter, Tab, F5.`,
+    };
+  }
+
+  return { Valid: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -135,29 +142,33 @@ const MAX_WAIT_MS = 600_000; // 10 minutes — generous upper bound
  * integer milliseconds in the closed range [0, {@link MAX_WAIT_MS}].
  */
 export function validateWait(raw: string): WaitValidation {
-    const trimmed = raw.trim();
-    if (trimmed === "") {
-        return { Valid: false, Reason: "Empty", Message: "Wait duration is required." };
-    }
-    const n = Number(trimmed);
-    if (Number.isNaN(n)) {
-        return { Valid: false, Reason: "NotANumber", Message: "Wait duration must be a number." };
-    }
-    if (!Number.isFinite(n)) {
-        return { Valid: false, Reason: "NotFinite", Message: "Wait duration must be a finite number." };
-    }
-    if (n < 0) {
-        return { Valid: false, Reason: "Negative", Message: "Wait duration cannot be negative." };
-    }
-    if (n > MAX_WAIT_MS) {
-        return {
-            Valid: false,
-            Reason: "TooLarge",
-            Message: `Wait duration is too large (max ${MAX_WAIT_MS} ms).`,
-        };
-    }
+  const trimmed = raw.trim();
+  if (trimmed === "") {
+    return { Valid: false, Reason: "Empty", Message: "Wait duration is required." };
+  }
 
-    return { Valid: true, Ms: Math.floor(n) };
+  const n = Number(trimmed);
+  if (Number.isNaN(n)) {
+    return { Valid: false, Reason: "NotANumber", Message: "Wait duration must be a number." };
+  }
+
+  if (!Number.isFinite(n)) {
+    return { Valid: false, Reason: "NotFinite", Message: "Wait duration must be a finite number." };
+  }
+
+  if (n < 0) {
+    return { Valid: false, Reason: "Negative", Message: "Wait duration cannot be negative." };
+  }
+
+  if (n > MAX_WAIT_MS) {
+    return {
+      Valid: false,
+      Reason: "TooLarge",
+      Message: `Wait duration is too large (max ${MAX_WAIT_MS} ms).`,
+    };
+  }
+
+  return { Valid: true, Ms: Math.floor(n) };
 }
 
 /* ------------------------------------------------------------------ */
@@ -176,39 +187,44 @@ export interface StepIssue {
  * be rejected by the editor today (empty/invalid combos, bad wait values).
  */
 export function validateEventSteps(event: KeywordEvent): readonly StepIssue[] {
-    const issues: StepIssue[] = [];
-    event.Steps.forEach((step, index) => {
-        if (step.Kind === "Key") {
-            const v = validateCombo(step.Combo);
-            if (!v.Valid) {
-                issues.push({ StepId: step.Id, Index: index, Kind: "Key", Message: v.Message });
-            }
-        } else {
-            // Wait steps are stored as numbers — re-run the same checks.
-            const ms = step.DurationMs;
-            if (typeof ms !== "number" || Number.isNaN(ms)) {
-                issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration must be a number." });
-            } else if (!Number.isFinite(ms)) {
-                issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration must be a finite number." });
-            } else if (ms < 0) {
-                issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration cannot be negative." });
-            } else if (ms > MAX_WAIT_MS) {
-                issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: `Wait duration is too large (max ${MAX_WAIT_MS} ms).` });
-            }
-        }
-    });
+  const issues: StepIssue[] = [];
+  event.Steps.forEach((step, index) => {
+    if (step.Kind === "Key") {
+      const v = validateCombo(step.Combo);
+      if (!v.Valid) {
+        issues.push({ StepId: step.Id, Index: index, Kind: "Key", Message: v.Message });
+      }
+    } else {
+      // Wait steps are stored as numbers — re-run the same checks.
+      const ms = step.DurationMs;
+      if (typeof ms !== "number" || Number.isNaN(ms)) {
+        issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration must be a number." });
+      } else if (!Number.isFinite(ms)) {
+        issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration must be a finite number." });
+      } else if (ms < 0) {
+        issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration cannot be negative." });
+      } else if (ms > MAX_WAIT_MS) {
+        issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: `Wait duration is too large (max ${MAX_WAIT_MS} ms).` });
+      }
+    }
+  });
 
-    return issues;
+  return issues;
 }
 
 /** Convenience — true when an event has zero validation issues across all steps. */
 export function isEventRunnable(event: KeywordEvent): boolean {
-    if (!event.Enabled) { return false; }
-    if (event.Steps.length === 0) { return false; }
+  if (!event.Enabled) {
+    return false; 
+  }
 
-    return validateEventSteps(event).length === 0;
+  if (event.Steps.length === 0) {
+    return false; 
+  }
+
+  return validateEventSteps(event).length === 0;
 }
 
 export const KEYWORD_EVENT_VALIDATION_LIMITS = {
-    MaxWaitMs: MAX_WAIT_MS,
+  MaxWaitMs: MAX_WAIT_MS,
 } as const;

@@ -36,11 +36,15 @@ interface RelayCtx {
 }
 
 function finishRelay(relay: RelayCtx, resp: ExtensionResponse): void {
-  if (relay.settled) return;
+  if (relay.settled) {
+    return;
+  }
+
   relay.settled = true;
   if (relay._onResponse) {
     window.removeEventListener('message', relay._onResponse);
   }
+
   clearTimeout(relay.timeout);
   relay.resolve(resp);
 }
@@ -68,6 +72,7 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
 
             return;
           }
+
           resolve(resp);
         });
 
@@ -90,7 +95,9 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
       resolve,
     };
 
-    relay._onResponse = function(event: MessageEvent) { handleRelayResponse(relay, event); };
+    relay._onResponse = function(event: MessageEvent) {
+      handleRelayResponse(relay, event); 
+    };
 
     window.addEventListener('message', relay._onResponse);
     window.postMessage({ source: 'marco-controller', requestId: requestId, ...(payload || {}), type: type }, '*');

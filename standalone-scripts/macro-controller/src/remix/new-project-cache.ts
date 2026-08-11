@@ -55,13 +55,13 @@ interface KvBridge {
 /* ------------------------------------------------------------------ */
 
 function getKv(): KvBridge['kv'] | null {
-    const sdk = (window as unknown as { marco?: KvBridge }).marco;
+  const sdk = (window as unknown as { marco?: KvBridge }).marco;
 
-    return sdk && sdk.kv ? sdk.kv : null;
+  return sdk && sdk.kv ? sdk.kv : null;
 }
 
 function buildKey(sourceProjectId: string): string {
-    return KEY_PREFIX + sourceProjectId;
+  return KEY_PREFIX + sourceProjectId;
 }
 
 /* ------------------------------------------------------------------ */
@@ -78,17 +78,17 @@ export interface PersistRemixInput {
 
 /** Build a row from a fresh remix outcome (pure — no I/O). */
 export function buildRemixRow(
-    input: PersistRemixInput,
-    nowMs: number = Date.now(),
+  input: PersistRemixInput,
+  nowMs: number = Date.now(),
 ): RemixNewProjectRow {
-    return {
-        SourceProjectId: input.sourceProjectId,
-        NewProjectId: input.newProjectId,
-        RedirectUrl: input.redirectUrl,
-        WorkspaceId: input.workspaceId,
-        ProjectName: input.projectName,
-        RemixedAtMs: nowMs,
-    };
+  return {
+    SourceProjectId: input.sourceProjectId,
+    NewProjectId: input.newProjectId,
+    RedirectUrl: input.redirectUrl,
+    WorkspaceId: input.workspaceId,
+    ProjectName: input.projectName,
+    RemixedAtMs: nowMs,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -101,35 +101,37 @@ export function buildRemixRow(
  * Never throws — caller may continue without the cache.
  */
 export async function persistRemixNewProject(input: PersistRemixInput): Promise<boolean> {
-    if (!input.sourceProjectId || !input.newProjectId || !input.redirectUrl) {
-        logError('RemixNewProjectCache',
-            'persist refused: missing sourceProjectId/newProjectId/redirectUrl'
+  if (!input.sourceProjectId || !input.newProjectId || !input.redirectUrl) {
+    logError('RemixNewProjectCache',
+      'persist refused: missing sourceProjectId/newProjectId/redirectUrl'
             + ' (sourceProjectId=' + input.sourceProjectId
             + ', newProjectId=' + input.newProjectId
             + ', redirectUrl=' + input.redirectUrl + ')');
 
-        return false;
-    }
-    const kv = getKv();
-    if (!kv) {
-        logError('RemixNewProjectCache',
-            'marco.kv unavailable — skipping cache for sourceProjectId=' + input.sourceProjectId);
+    return false;
+  }
 
-        return false;
-    }
-    const row = buildRemixRow(input);
-    try {
-        await kv.set(buildKey(input.sourceProjectId), JSON.stringify(row));
-        log('[RemixNewProjectCache] persisted source=' + input.sourceProjectId
+  const kv = getKv();
+  if (!kv) {
+    logError('RemixNewProjectCache',
+      'marco.kv unavailable — skipping cache for sourceProjectId=' + input.sourceProjectId);
+
+    return false;
+  }
+
+  const row = buildRemixRow(input);
+  try {
+    await kv.set(buildKey(input.sourceProjectId), JSON.stringify(row));
+    log('[RemixNewProjectCache] persisted source=' + input.sourceProjectId
             + ' → new=' + input.newProjectId, 'info');
 
-        return true;
-    } catch (err: unknown) {
-        logError('RemixNewProjectCache',
-            'kv.set failed for sourceProjectId=' + input.sourceProjectId, err);
+    return true;
+  } catch (err: unknown) {
+    logError('RemixNewProjectCache',
+      'kv.set failed for sourceProjectId=' + input.sourceProjectId, err);
 
-        return false;
-    }
+    return false;
+  }
 }
 
 /**
@@ -137,33 +139,47 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
  * source project, or `null` if none exists / parse fails.
  */
 export async function readRemixNewProject(
-    sourceProjectId: string,
+  sourceProjectId: string,
 ): Promise<RemixNewProjectRow | null> {
-    if (!sourceProjectId) return null;
-    const kv = getKv();
-    if (!kv) return null;
-    try {
-        const raw = await kv.get(buildKey(sourceProjectId));
-        if (!raw) return null;
+  if (!sourceProjectId) {
+    return null;
+  }
 
-        return JSON.parse(raw) as RemixNewProjectRow;
-    } catch (err: unknown) {
-        logError('RemixNewProjectCache',
-            'read failed for sourceProjectId=' + sourceProjectId, err);
+  const kv = getKv();
+  if (!kv) {
+    return null;
+  }
 
-        return null;
+  try {
+    const raw = await kv.get(buildKey(sourceProjectId));
+    if (!raw) {
+      return null;
     }
+
+    return JSON.parse(raw) as RemixNewProjectRow;
+  } catch (err: unknown) {
+    logError('RemixNewProjectCache',
+      'read failed for sourceProjectId=' + sourceProjectId, err);
+
+    return null;
+  }
 }
 
 /** Drop a cached pointer (used after the new tab has loaded). */
 export async function clearRemixNewProject(sourceProjectId: string): Promise<void> {
-    if (!sourceProjectId) return;
-    const kv = getKv();
-    if (!kv) return;
-    try {
-        await kv.delete(buildKey(sourceProjectId));
-    } catch (err: unknown) {
-        logError('RemixNewProjectCache',
-            'delete failed for sourceProjectId=' + sourceProjectId, err);
-    }
+  if (!sourceProjectId) {
+    return;
+  }
+
+  const kv = getKv();
+  if (!kv) {
+    return;
+  }
+
+  try {
+    await kv.delete(buildKey(sourceProjectId));
+  } catch (err: unknown) {
+    logError('RemixNewProjectCache',
+      'delete failed for sourceProjectId=' + sourceProjectId, err);
+  }
 }

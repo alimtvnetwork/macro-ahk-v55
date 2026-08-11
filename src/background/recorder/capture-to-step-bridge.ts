@@ -20,18 +20,18 @@
 
 import type { Database as SqlJsDatabase } from "sql.js";
 import {
-    SelectorKindId,
-    StepKindId,
+  SelectorKindId,
+  StepKindId,
 } from "../recorder-db-schema";
 import type {
-    SelectorDraft,
-    StepDraft,
+  SelectorDraft,
+  StepDraft,
 } from "./step-persistence";
 import {
-    deriveGlobPattern,
-    shouldRecordAsUrlTabClick,
-    type CaptureClickContext,
-    type UrlTabClickParams,
+  deriveGlobPattern,
+  shouldRecordAsUrlTabClick,
+  type CaptureClickContext,
+  type UrlTabClickParams,
 } from "./url-tab-click";
 
 /** Subset of the Phase 06 `XPATH_CAPTURED` payload the bridge consumes. */
@@ -61,13 +61,18 @@ const SELECT_TAGS = new Set(["select"]);
 
 /** Infers a StepKind from the captured tag name. Defaults to Click. */
 export function inferStepKind(
-    tagName: string,
+  tagName: string,
 ): (typeof StepKindId)[keyof typeof StepKindId] {
-    const lower = tagName.toLowerCase();
-    if (SELECT_TAGS.has(lower)) return StepKindId.Select;
-    if (TYPE_TAGS.has(lower)) return StepKindId.Type;
+  const lower = tagName.toLowerCase();
+  if (SELECT_TAGS.has(lower)) {
+    return StepKindId.Select;
+  }
 
-    return StepKindId.Click;
+  if (TYPE_TAGS.has(lower)) {
+    return StepKindId.Type;
+  }
+
+  return StepKindId.Click;
 }
 
 /* ------------------------------------------------------------------ */
@@ -82,23 +87,25 @@ export function inferStepKind(
  * Pure DB-layer — accepts a `SqlJsDatabase` so it is unit-testable.
  */
 export function findAnchorSelectorId(
-    db: SqlJsDatabase,
-    anchorXPath: string,
+  db: SqlJsDatabase,
+  anchorXPath: string,
 ): number | null {
-    const result = db.exec(
-        `SELECT SelectorId
+  const result = db.exec(
+    `SELECT SelectorId
          FROM Selector
          WHERE SelectorKindId = ?
            AND Expression = ?
            AND IsPrimary = 1
          ORDER BY SelectorId DESC
          LIMIT 1`,
-        [SelectorKindId.XPathFull, anchorXPath],
-    );
-    const row = result[0]?.values[0];
-    if (row === undefined) return null;
+    [SelectorKindId.XPathFull, anchorXPath],
+  );
+  const row = result[0]?.values[0];
+  if (row === undefined) {
+    return null;
+  }
 
-    return row[0] as number;
+  return row[0] as number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -107,12 +114,15 @@ export function findAnchorSelectorId(
 
 /** Builds a human-readable LabelType from the capture, capped at 80 chars. */
 export function buildLabel(payload: XPathCapturePayload): string {
-    const trimmed = payload.Text.trim();
-    const tag = payload.TagName.toLowerCase();
-    if (trimmed.length === 0) return `<${tag}>`;
-    const head = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+  const trimmed = payload.Text.trim();
+  const tag = payload.TagName.toLowerCase();
+  if (trimmed.length === 0) {
+    return `<${tag}>`;
+  }
 
-    return `<${tag}> ${head}`;
+  const head = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+
+  return `<${tag}> ${head}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -129,60 +139,61 @@ export function buildLabel(payload: XPathCapturePayload): string {
  * deterministically.
  */
 function assertCapturePayload(payload: XPathCapturePayload): void {
-    if (!payload.XPathFull || payload.XPathFull.length === 0) {
-        throw new Error("Capture payload missing XPathFull");
-    }
-    if (!payload.SuggestedVariableName) {
-        throw new Error("Capture payload missing SuggestedVariableName");
-    }
+  if (!payload.XPathFull || payload.XPathFull.length === 0) {
+    throw new Error("Capture payload missing XPathFull");
+  }
+
+  if (!payload.SuggestedVariableName) {
+    throw new Error("Capture payload missing SuggestedVariableName");
+  }
 }
 
 function buildCaptureSelectors(
-    payload: XPathCapturePayload,
-    anchorSelectorId: number | null,
+  payload: XPathCapturePayload,
+  anchorSelectorId: number | null,
 ): SelectorDraft[] {
-    const selectors: SelectorDraft[] = [{
-        SelectorKindId: SelectorKindId.XPathFull,
-        Expression: payload.XPathFull,
-        AnchorSelectorId: null,
-        IsPrimary: true,
-    }];
-    if (payload.XPathRelative !== null && anchorSelectorId !== null) {
-        selectors.push({
-            SelectorKindId: SelectorKindId.XPathRelative,
-            Expression: payload.XPathRelative,
-            AnchorSelectorId: anchorSelectorId,
-            IsPrimary: false,
-        });
-    }
+  const selectors: SelectorDraft[] = [{
+    SelectorKindId: SelectorKindId.XPathFull,
+    Expression: payload.XPathFull,
+    AnchorSelectorId: null,
+    IsPrimary: true,
+  }];
+  if (payload.XPathRelative !== null && anchorSelectorId !== null) {
+    selectors.push({
+      SelectorKindId: SelectorKindId.XPathRelative,
+      Expression: payload.XPathRelative,
+      AnchorSelectorId: anchorSelectorId,
+      IsPrimary: false,
+    });
+  }
 
-    return selectors;
+  return selectors;
 }
 
 export function buildStepDraftFromCapture(
-    payload: XPathCapturePayload,
-    anchorSelectorId: number | null,
+  payload: XPathCapturePayload,
+  anchorSelectorId: number | null,
 ): StepDraft {
-    assertCapturePayload(payload);
-    const selectors = buildCaptureSelectors(payload, anchorSelectorId);
-    const urlTabParams = deriveUrlTabClickParams(payload);
+  assertCapturePayload(payload);
+  const selectors = buildCaptureSelectors(payload, anchorSelectorId);
+  const urlTabParams = deriveUrlTabClickParams(payload);
     
-    const stepKind = urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick;
-    let paramsJson = urlTabParams === null ? null : JSON.stringify(urlTabParams);
+  const stepKind = urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick;
+  let paramsJson = urlTabParams === null ? null : JSON.stringify(urlTabParams);
 
-    if (urlTabParams === null && (stepKind === StepKindId.Type || stepKind === StepKindId.Select) && payload.Value !== undefined) {
-        paramsJson = JSON.stringify({ Value: payload.Value });
-    }
+  if (urlTabParams === null && (stepKind === StepKindId.Type || stepKind === StepKindId.Select) && payload.Value !== undefined) {
+    paramsJson = JSON.stringify({ Value: payload.Value });
+  }
 
-    return {
-        StepKindId: stepKind,
-        VariableName: payload.SuggestedVariableName,
-        LabelType: buildLabel(payload),
-        InlineJs: null,
-        ParamsJson: paramsJson,
-        IsBreakpoint: false,
-        Selectors: selectors,
-    };
+  return {
+    StepKindId: stepKind,
+    VariableName: payload.SuggestedVariableName,
+    LabelType: buildLabel(payload),
+    InlineJs: null,
+    ParamsJson: paramsJson,
+    IsBreakpoint: false,
+    Selectors: selectors,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -195,20 +206,27 @@ export function buildStepDraftFromCapture(
  * back to the standard `Click`/`Type`/`Select` path.
  */
 export function deriveUrlTabClickParams(
-    payload: XPathCapturePayload,
+  payload: XPathCapturePayload,
 ): UrlTabClickParams | null {
-    const hint = payload.UrlTabClickHint;
-    if (hint === undefined) return null;
-    if (!shouldRecordAsUrlTabClick(hint)) return null;
+  const hint = payload.UrlTabClickHint;
+  if (hint === undefined) {
+    return null;
+  }
 
-    const observedUrl = hint.OpenedTabUrl ?? hint.Href ?? "";
-    if (observedUrl === "") return null;
+  if (!shouldRecordAsUrlTabClick(hint)) {
+    return null;
+  }
 
-    return {
-        UrlPattern: deriveGlobPattern(observedUrl),
-        UrlMatch: "Glob",
-        OperationModeType: "OpenNew",
-        Selector: payload.XPathFull,
-        SelectorKind: "XPath",
-    };
+  const observedUrl = hint.OpenedTabUrl ?? hint.Href ?? "";
+  if (observedUrl === "") {
+    return null;
+  }
+
+  return {
+    UrlPattern: deriveGlobPattern(observedUrl),
+    UrlMatch: "Glob",
+    OperationModeType: "OpenNew",
+    Selector: payload.XPathFull,
+    SelectorKind: "XPath",
+  };
 }

@@ -21,11 +21,15 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
   const totalWs = perWs.length;
 
   for (const wsResult of perWs) {
-    if (wsResult.error) continue;
+    if (wsResult.error) {
+      continue;
+    }
     
     for (const m of wsResult.members) {
       const userId = m.user_id || m.id || m.email; // Fallback to email if no ID
-      if (!userId) continue;
+      if (!userId) {
+        continue;
+      }
 
       let agg = unionMap.get(userId);
       if (!agg) {
@@ -39,6 +43,7 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
         };
         unionMap.set(userId, agg);
       }
+
       agg!.presenceCount++;
       agg!.workspaces.push(wsResult.wsName);
     }

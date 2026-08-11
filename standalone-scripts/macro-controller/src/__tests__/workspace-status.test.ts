@@ -71,10 +71,18 @@ describe('daysBetween / daysUntil', () => {
 });
 
 describe('formatDayCount', () => {
-  it('handles small days', () => { expect(formatDayCount(3)).toBe('3d'); });
-  it('handles months', () => { expect(formatDayCount(64)).toBe('2mo 4d'); });
-  it('handles whole months', () => { expect(formatDayCount(60)).toBe('2mo'); });
-  it('handles years', () => { expect(formatDayCount(400)).toBe('1y 1mo'); });
+  it('handles small days', () => {
+    expect(formatDayCount(3)).toBe('3d'); 
+  });
+  it('handles months', () => {
+    expect(formatDayCount(64)).toBe('2mo 4d'); 
+  });
+  it('handles whole months', () => {
+    expect(formatDayCount(60)).toBe('2mo'); 
+  });
+  it('handles years', () => {
+    expect(formatDayCount(400)).toBe('1y 1mo'); 
+  });
 });
 
 describe('getEffectiveStatus', () => {

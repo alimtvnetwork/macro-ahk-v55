@@ -47,14 +47,26 @@ class CreditBalanceState {
   private _resolvedWorkspaceId: string | null = null;
   private _resolvedWorkspaceName: string | null = null;
 
-  get lastBalanceCallAt(): number { return this._lastBalanceCallAt; }
-  set lastBalanceCallAt(value: number) { this._lastBalanceCallAt = value; }
+  get lastBalanceCallAt(): number {
+    return this._lastBalanceCallAt; 
+  }
+  set lastBalanceCallAt(value: number) {
+    this._lastBalanceCallAt = value; 
+  }
 
-  get resolvedWorkspaceId(): string | null { return this._resolvedWorkspaceId; }
-  set resolvedWorkspaceId(value: string | null) { this._resolvedWorkspaceId = value; }
+  get resolvedWorkspaceId(): string | null {
+    return this._resolvedWorkspaceId; 
+  }
+  set resolvedWorkspaceId(value: string | null) {
+    this._resolvedWorkspaceId = value; 
+  }
 
-  get resolvedWorkspaceName(): string | null { return this._resolvedWorkspaceName; }
-  set resolvedWorkspaceName(value: string | null) { this._resolvedWorkspaceName = value; }
+  get resolvedWorkspaceName(): string | null {
+    return this._resolvedWorkspaceName; 
+  }
+  set resolvedWorkspaceName(value: string | null) {
+    this._resolvedWorkspaceName = value; 
+  }
 
   clear(): void {
     this._resolvedWorkspaceId = null;
@@ -64,8 +76,14 @@ class CreditBalanceState {
 
 const creditBalanceState = new CreditBalanceState();
 
-export function getResolvedWorkspaceId(): string | null { return creditBalanceState.resolvedWorkspaceId; }
-export function getResolvedWorkspaceName(): string | null { return creditBalanceState.resolvedWorkspaceName; }
+export function getResolvedWorkspaceId(): string | null {
+  return creditBalanceState.resolvedWorkspaceId; 
+}
+
+export function getResolvedWorkspaceName(): string | null {
+  return creditBalanceState.resolvedWorkspaceName; 
+}
+
 export function clearResolvedWorkspace(): void {
   creditBalanceState.clear();
 }

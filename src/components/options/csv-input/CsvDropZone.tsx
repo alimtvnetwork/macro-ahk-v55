@@ -16,36 +16,40 @@ export interface CsvDropZoneProps {
 }
 
 export function CsvDropZone(props: CsvDropZoneProps): JSX.Element {
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    return (
-        <div
-            onDragOver={(event) => { event.preventDefault(); if (!props.dragOver) props.onDragOverChange(true); }}
-            onDragLeave={() => props.onDragOverChange(false)}
-            onDrop={props.onDropFile}
-            className={[
-                "flex items-center justify-between gap-3 rounded border-2 border-dashed px-3 py-2 text-xs transition-colors",
-                props.dragOver ? "border-primary bg-primary/5" : "border-border bg-muted/30",
-            ].join(" ")}
-        >
-            <div className="flex items-center gap-2 text-muted-foreground">
-                <Upload className="h-4 w-4" />
-                <span>
-                    {props.loadedFileName !== null
-                        ? `Loaded: ${props.loadedFileName}`
-                        : "Drop a .csv file here, or paste below"}
-                </span>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+  return (
+    <div
+      onDragOver={(event) => {
+        event.preventDefault(); if (!props.dragOver) {
+          props.onDragOverChange(true);
+        } 
+      }}
+      onDragLeave={() => props.onDragOverChange(false)}
+      onDrop={props.onDropFile}
+      className={[
+        "flex items-center justify-between gap-3 rounded border-2 border-dashed px-3 py-2 text-xs transition-colors",
+        props.dragOver ? "border-primary bg-primary/5" : "border-border bg-muted/30",
+      ].join(" ")}
+    >
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Upload className="h-4 w-4" />
+        <span>
+          {props.loadedFileName !== null
+            ? `Loaded: ${props.loadedFileName}`
+            : "Drop a .csv file here, or paste below"}
+        </span>
+      </div>
+      <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                 Choose file
-            </Button>
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,text/csv,application/csv,text/plain"
-                className="hidden"
-                onChange={props.onPickFile}
-            />
-        </div>
-    );
+      </Button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,text/csv,application/csv,text/plain"
+        className="hidden"
+        onChange={props.onPickFile}
+      />
+    </div>
+  );
 }

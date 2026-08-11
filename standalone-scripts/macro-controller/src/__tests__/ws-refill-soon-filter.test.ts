@@ -40,7 +40,9 @@ function openMenu(deps: WsFilterMenuDeps): HTMLElement {
 }
 
 describe('Refill-Soon filter chip', () => {
-  beforeEach(() => { document.body.innerHTML = ''; });
+  beforeEach(() => {
+    document.body.innerHTML = ''; 
+  });
 
   it('renders the refill-soon chip with the canonical DOM id', () => {
     const deps = makeDeps(false);

@@ -50,46 +50,46 @@ let lastFetchError: string | null = null;
 
 /** Resolves config using the 3-tier cascade. */
 export async function resolveConfigCascade(
-    bundledDefaults: Record<string, unknown>,
+  bundledDefaults: Record<string, unknown>,
 ): Promise<ConfigCascadeResult> {
-    const settings = await readRemoteSettings();
-    const localOverrides = await readLocalOverrides();
+  const settings = await readRemoteSettings();
+  const localOverrides = await readLocalOverrides();
 
-    const isRemoteEnabled = settings !== null && settings.isEnabled;
+  const isRemoteEnabled = settings !== null && settings.isEnabled;
 
-    if (isRemoteEnabled) {
-        const remoteConfig = await fetchRemoteConfig(settings!);
-        const hasRemote = remoteConfig !== null;
+  if (isRemoteEnabled) {
+    const remoteConfig = await fetchRemoteConfig(settings!);
+    const hasRemote = remoteConfig !== null;
 
-        if (hasRemote) {
-            const merged = mergeConfigs(
-                bundledDefaults,
-                localOverrides,
+    if (hasRemote) {
+      const merged = mergeConfigs(
+        bundledDefaults,
+        localOverrides,
                 remoteConfig!,
                 settings!.mergeStrategy,
-            );
+      );
 
-            return buildResult(merged, "remote");
-        }
+      return buildResult(merged, "remote");
     }
+  }
 
-    const hasLocal = Object.keys(localOverrides).length > 0;
+  const hasLocal = Object.keys(localOverrides).length > 0;
 
-    if (hasLocal) {
-        const merged = { ...bundledDefaults, ...localOverrides };
+  if (hasLocal) {
+    const merged = { ...bundledDefaults, ...localOverrides };
 
-        return buildResult(merged, "local");
-    }
+    return buildResult(merged, "local");
+  }
 
-    return buildResult(bundledDefaults, "hardcoded");
+  return buildResult(bundledDefaults, "hardcoded");
 }
 
 /** Returns the last fetch status for display. */
 export function getRemoteFetchStatus(): {
     lastFetchedAt: string | null;
     lastFetchError: string | null;
-} {
-    return { lastFetchedAt, lastFetchError };
+    } {
+  return { lastFetchedAt, lastFetchError };
 }
 
 /* ------------------------------------------------------------------ */
@@ -98,95 +98,95 @@ export function getRemoteFetchStatus(): {
 
 /** Fetches config from the remote endpoint. */
 async function fetchRemoteConfig(
-    settings: RemoteConfigSettings,
+  settings: RemoteConfigSettings,
 ): Promise<Record<string, unknown> | null> {
-    const isUrlMissing = settings.endpointUrl === "";
+  const isUrlMissing = settings.endpointUrl === "";
 
-    if (isUrlMissing) {
-        return getCachedConfig();
+  if (isUrlMissing) {
+    return getCachedConfig();
+  }
+
+  try {
+    const headers = buildFetchHeaders(settings.authHeader);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      DEFAULT_TIMEOUT_MS,
+    );
+
+    const response = ServiceResult.wrapFetch(await fetch(settings.endpointUrl, {
+      method: "GET",
+      headers,
+      signal: controller.signal,
+    }));
+
+    clearTimeout(timeoutId);
+
+    const isResponseOk = response.isSuccess;
+
+    if (isResponseOk) {
+      return handleSuccessfulFetch(response);
     }
 
-    try {
-        const headers = buildFetchHeaders(settings.authHeader);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(
-            () => controller.abort(),
-            DEFAULT_TIMEOUT_MS,
-        );
-
-        const response = ServiceResult.wrapFetch(await fetch(settings.endpointUrl, {
-            method: "GET",
-            headers,
-            signal: controller.signal,
-        }));
-
-        clearTimeout(timeoutId);
-
-        const isResponseOk = response.isSuccess;
-
-        if (isResponseOk) {
-            return handleSuccessfulFetch(response);
-        }
-
-        return handleFailedFetch(response.status);
-    } catch (fetchError) {
-        return handleFetchException(fetchError);
-    }
+    return handleFailedFetch(response.status);
+  } catch (fetchError) {
+    return handleFetchException(fetchError);
+  }
 }
 
 /** Handles a successful remote config response. */
 async function handleSuccessfulFetch(
-    response: Response,
+  response: Response,
 ): Promise<Record<string, unknown>> {
-    const json = (await response.json()) as Record<string, unknown>;
+  const json = (await response.json()) as Record<string, unknown>;
 
-    cachedRemoteConfig = json;
-    lastFetchedAt = new Date().toISOString();
-    lastFetchError = null;
+  cachedRemoteConfig = json;
+  lastFetchedAt = new Date().toISOString();
+  lastFetchError = null;
 
-    await persistCache(json);
-    logFetchSuccess();
+  await persistCache(json);
+  logFetchSuccess();
 
-    return json;
+  return json;
 }
 
 /** Handles a non-OK HTTP response. HEFF: single attempt, log and fall back to cache. */
 function handleFailedFetch(
-    status: number,
+  status: number,
 ): Record<string, unknown> | null {
-    lastFetchError = `HTTP ${status}`;
-    logBgWarnError(
-        BgLogTag.REMOTE_CONFIG,
-        `HEFF: HTTP ${status} on GET <remote-config endpoint> — do NOT retry. ` +
+  lastFetchError = `HTTP ${status}`;
+  logBgWarnError(
+    BgLogTag.REMOTE_CONFIG,
+    `HEFF: HTTP ${status} on GET <remote-config endpoint> — do NOT retry. ` +
         `Falling back to cached config. Loop halted. Awaiting user instruction.`,
-    );
+  );
 
-    return getCachedConfig();
+  return getCachedConfig();
 }
 
 /** Handles a fetch exception (network error, timeout). */
 function handleFetchException(
-    error: unknown,
+  error: unknown,
 ): Record<string, unknown> | null {
-    const errorMessage = error instanceof Error
-        ? error.message
-        : String(error);
+  const errorMessage = error instanceof Error
+    ? error.message
+    : String(error);
 
-    lastFetchError = errorMessage;
-    logCaughtError(BgLogTag.REMOTE_CONFIG, "Fetch error", error);
+  lastFetchError = errorMessage;
+  logCaughtError(BgLogTag.REMOTE_CONFIG, "Fetch error", error);
 
-    return getCachedConfig();
+  return getCachedConfig();
 }
 
 /** Returns the cached remote config, or null. */
 function getCachedConfig(): Record<string, unknown> | null {
-    const hasCached = cachedRemoteConfig !== null;
+  const hasCached = cachedRemoteConfig !== null;
 
-    if (hasCached) {
-        console.log("[remote-config] Using cached config");
-    }
+  if (hasCached) {
+    console.log("[remote-config] Using cached config");
+  }
 
-    return cachedRemoteConfig;
+  return cachedRemoteConfig;
 }
 
 /* ------------------------------------------------------------------ */
@@ -195,48 +195,48 @@ function getCachedConfig(): Record<string, unknown> | null {
 
 /** Merges configs using the 3-tier cascade. */
 function mergeConfigs(
-    defaults: Record<string, unknown>,
-    local: Record<string, unknown>,
-    remote: Record<string, unknown>,
-    strategy: MergeStrategyType,
+  defaults: Record<string, unknown>,
+  local: Record<string, unknown>,
+  remote: Record<string, unknown>,
+  strategy: MergeStrategyType,
 ): Record<string, unknown> {
-    const isReplace = strategy === "replace";
+  const isReplace = strategy === "replace";
 
-    if (isReplace) {
-        return { ...defaults, ...remote };
-    }
+  if (isReplace) {
+    return { ...defaults, ...remote };
+  }
 
-    return deepMerge(deepMerge(defaults, local), remote);
+  return deepMerge(deepMerge(defaults, local), remote);
 }
 
 /** Deep-merges two objects. */
 function deepMerge(
-    base: Record<string, unknown>,
-    overlay: Record<string, unknown>,
+  base: Record<string, unknown>,
+  overlay: Record<string, unknown>,
 ): Record<string, unknown> {
-    const result = { ...base };
+  const result = { ...base };
 
-    for (const key of Object.keys(overlay)) {
-        const baseValue = base[key];
-        const overlayValue = overlay[key];
-        const isBothObject = isPlainObject(baseValue) && isPlainObject(overlayValue);
+  for (const key of Object.keys(overlay)) {
+    const baseValue = base[key];
+    const overlayValue = overlay[key];
+    const isBothObject = isPlainObject(baseValue) && isPlainObject(overlayValue);
 
-        if (isBothObject) {
-            result[key] = deepMerge(
+    if (isBothObject) {
+      result[key] = deepMerge(
                 baseValue as Record<string, unknown>,
                 overlayValue as Record<string, unknown>,
-            );
-        } else {
-            result[key] = overlayValue;
-        }
+      );
+    } else {
+      result[key] = overlayValue;
     }
+  }
 
-    return result;
+  return result;
 }
 
 /** Checks if a value is a plain object. */
 function isPlainObject(value: unknown): boolean {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,47 +245,47 @@ function isPlainObject(value: unknown): boolean {
 
 /** Reads remote config settings from storage. */
 async function readRemoteSettings(): Promise<RemoteConfigSettings | null> {
-    const stored = await chrome.storage.local.get(REMOTE_CONFIG_KEY);
-    const settings = stored[REMOTE_CONFIG_KEY];
-    const hasSettings = settings !== undefined && settings !== null;
+  const stored = await chrome.storage.local.get(REMOTE_CONFIG_KEY);
+  const settings = stored[REMOTE_CONFIG_KEY];
+  const hasSettings = settings !== undefined && settings !== null;
 
-    return hasSettings ? (settings as RemoteConfigSettings) : null;
+  return hasSettings ? (settings as RemoteConfigSettings) : null;
 }
 
 /** Reads local config overrides from storage. */
 async function readLocalOverrides(): Promise<Record<string, unknown>> {
-    const stored = await chrome.storage.local.get("marco_config_overrides");
-    const overrides = stored["marco_config_overrides"];
-    const hasOverrides = overrides !== undefined && overrides !== null;
+  const stored = await chrome.storage.local.get("marco_config_overrides");
+  const overrides = stored["marco_config_overrides"];
+  const hasOverrides = overrides !== undefined && overrides !== null;
 
-    return hasOverrides ? (overrides as Record<string, unknown>) : {};
+  return hasOverrides ? (overrides as Record<string, unknown>) : {};
 }
 
 /** Persists fetched remote config to storage as a cache. */
 async function persistCache(
-    config: Record<string, unknown>,
+  config: Record<string, unknown>,
 ): Promise<void> {
-    await chrome.storage.local.set({
-        [REMOTE_CACHE_KEY]: {
-            config,
-            fetchedAt: new Date().toISOString(),
-        },
-    });
+  await chrome.storage.local.set({
+    [REMOTE_CACHE_KEY]: {
+      config,
+      fetchedAt: new Date().toISOString(),
+    },
+  });
 }
 
 /** Builds fetch headers with optional auth. */
 function buildFetchHeaders(authHeader: string): Record<string, string> {
-    const headers: Record<string, string> = {
-        "Accept": "application/json",
-    };
+  const headers: Record<string, string> = {
+    "Accept": "application/json",
+  };
 
-    const hasAuth = authHeader !== "";
+  const hasAuth = authHeader !== "";
 
-    if (hasAuth) {
-        headers["Authorization"] = authHeader;
-    }
+  if (hasAuth) {
+    headers["Authorization"] = authHeader;
+  }
 
-    return headers;
+  return headers;
 }
 
 /* ------------------------------------------------------------------ */
@@ -294,15 +294,15 @@ function buildFetchHeaders(authHeader: string): Record<string, string> {
 
 /** Builds a ConfigCascadeResult. */
 function buildResult(
-    config: Record<string, unknown>,
-    source: ConfigCascadeResult["source"],
+  config: Record<string, unknown>,
+  source: ConfigCascadeResult["source"],
 ): ConfigCascadeResult {
-    return {
-        config,
-        source,
-        lastFetchedAt,
-        lastFetchError,
-    };
+  return {
+    config,
+    source,
+    lastFetchedAt,
+    lastFetchError,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -311,5 +311,5 @@ function buildResult(
 
 /** Logs a successful fetch. */
 function logFetchSuccess(): void {
-    console.log("[remote-config] Remote config fetched successfully");
+  console.log("[remote-config] Remote config fetched successfully");
 }

@@ -15,10 +15,10 @@ export interface RoleOption {
 }
 
 export const DEFAULT_ROLE_OPTIONS: ReadonlyArray<RoleOption> = Object.freeze([
-    { Value: UserAddMembershipRoleCodeType.Owner, LabelType: "Owner (triggers Step B promotion)" },
-    { Value: UserAddMembershipRoleCodeType.Admin, LabelType: "Admin" },
-    { Value: UserAddMembershipRoleCodeType.Member, LabelType: "Member" },
-    { Value: "Editor", LabelType: "Editor (normalized to Member)" },
+  { Value: UserAddMembershipRoleCodeType.Owner, LabelType: "Owner (triggers Step B promotion)" },
+  { Value: UserAddMembershipRoleCodeType.Admin, LabelType: "Admin" },
+  { Value: UserAddMembershipRoleCodeType.Member, LabelType: "Member" },
+  { Value: "Editor", LabelType: "Editor (normalized to Member)" },
 ]);
 
 export const DEFAULT_ROLE_VALUE: string = UserAddMembershipRoleCodeType.Member;

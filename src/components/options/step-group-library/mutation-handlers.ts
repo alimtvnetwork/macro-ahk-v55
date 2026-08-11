@@ -17,11 +17,11 @@ import type { useStepLibrary } from "@/hooks/use-step-library";
 import type { BatchRenameChange } from "../BatchRenameDialog";
 
 import type {
-    CreateDialogState,
-    DeleteStepDialogState,
-    GroupTargetDialogState,
-    RenameDialogState,
-    StepEditorDialogState,
+  CreateDialogState,
+  DeleteStepDialogState,
+  GroupTargetDialogState,
+  RenameDialogState,
+  StepEditorDialogState,
 } from "./dialog-state";
 import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
@@ -63,271 +63,324 @@ export interface MutationDeps {
 }
 
 function undoBatchRename(outcome: ReturnType<BatchActions["applyBatchRename"]>): void {
-    const undone = outcome.undo();
-    if (undone.Error !== null && undone.Applied === 0) {
-        toast.error("Undo failed", { description: undone.Error });
+  const undone = outcome.undo();
+  if (undone.Error !== null && undone.Applied === 0) {
+    toast.error("Undo failed", { description: undone.Error });
 
-        return;
-    }
-    toast.success(`Reverted ${undone.Applied} rename${undone.Applied === 1 ? "" : "s"}`);
+    return;
+  }
+
+  toast.success(`Reverted ${undone.Applied} rename${undone.Applied === 1 ? "" : "s"}`);
 }
 
 export function doBatchRenameApply(
-    deps: MutationDeps,
-    changes: ReadonlyArray<BatchRenameChange>,
+  deps: MutationDeps,
+  changes: ReadonlyArray<BatchRenameChange>,
 ): void {
-    const outcome = deps.batchActions.applyBatchRename(changes);
-    if (outcome.Error !== null && outcome.Applied === 0) {
-        toast.error("Batch rename failed", { description: outcome.Error });
+  const outcome = deps.batchActions.applyBatchRename(changes);
+  if (outcome.Error !== null && outcome.Applied === 0) {
+    toast.error("Batch rename failed", { description: outcome.Error });
 
-        return;
-    }
-    const verb = outcome.Error === null ? "Renamed" : "Partially renamed";
-    toast.success(`${verb} ${outcome.Applied} group${outcome.Applied === 1 ? "" : "s"}`, {
-        description: outcome.Error ?? "Click Undo to revert.",
-        action: { label: "Undo", onClick: () => undoBatchRename(outcome) },
-        duration: 8000,
-    });
+    return;
+  }
+
+  const verb = outcome.Error === null ? "Renamed" : "Partially renamed";
+  toast.success(`${verb} ${outcome.Applied} group${outcome.Applied === 1 ? "" : "s"}`, {
+    description: outcome.Error ?? "Click Undo to revert.",
+    action: { label: "Undo", onClick: () => undoBatchRename(outcome) },
+    duration: 8000,
+  });
 }
 
 function deleteGroupsSequentially(
-    lib: StepLibrary,
-    ids: ReadonlyArray<number>,
+  lib: StepLibrary,
+  ids: ReadonlyArray<number>,
 ): { deleted: number; firstError: string | null } {
-    let deleted = 0;
-    let firstError: string | null = null;
-    for (const id of ids) {
-        try {
-            lib.deleteGroup(id);
-            deleted += 1;
-        } catch (caught) {
-            firstError = caught instanceof Error ? caught.message : String(caught);
-            break;
-        }
+  let deleted = 0;
+  let firstError: string | null = null;
+  for (const id of ids) {
+    try {
+      lib.deleteGroup(id);
+      deleted += 1;
+    } catch (caught) {
+      firstError = caught instanceof Error ? caught.message : String(caught);
+      break;
     }
+  }
 
-    return { deleted, firstError };
+  return { deleted, firstError };
 }
 
 export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<number>): void {
-    const { deleted, firstError } = deleteGroupsSequentially(deps.lib, ids);
-    deps.setSelected((prev) => {
-        const next = new Set(prev);
-        for (const id of ids) next.delete(id);
-
-        return next;
-    });
-    deps.setSelectionOrder((prev) => prev.filter((sid) => !ids.includes(sid)));
-    if (deps.activeGroupId !== null && ids.includes(deps.activeGroupId)) {
-        deps.setActiveGroupId(null);
+  const { deleted, firstError } = deleteGroupsSequentially(deps.lib, ids);
+  deps.setSelected((prev) => {
+    const next = new Set(prev);
+    for (const id of ids) {
+      next.delete(id);
     }
-    if (firstError !== null && deleted === 0) {
-        toast.error("Batch delete failed", { description: firstError });
 
-        return;
-    }
-    toast.success(`Deleted ${deleted} group${deleted === 1 ? "" : "s"}`, {
-        description: firstError ?? "This action cannot be undone.",
-    });
+    return next;
+  });
+  deps.setSelectionOrder((prev) => prev.filter((sid) => !ids.includes(sid)));
+  if (deps.activeGroupId !== null && ids.includes(deps.activeGroupId)) {
+    deps.setActiveGroupId(null);
+  }
+
+  if (firstError !== null && deleted === 0) {
+    toast.error("Batch delete failed", { description: firstError });
+
+    return;
+  }
+
+  toast.success(`Deleted ${deleted} group${deleted === 1 ? "" : "s"}`, {
+    description: firstError ?? "This action cannot be undone.",
+  });
 }
 
 export function doCreate(deps: MutationDeps): void {
-    const name = deps.createDialog.name.trim();
-    if (name === "") { toast.error("Group name is required");
+  const name = deps.createDialog.name.trim();
+  if (name === "") {
+    toast.error("Group name is required");
 
- return; }
-    try {
-        const newId = deps.lib.createGroup({ Name: name, ParentStepGroupId: deps.createDialog.parent });
-        deps.setCreateDialog({ open: false, parent: null, name: "" });
-        deps.setActiveGroupId(newId);
-        if (deps.createDialog.parent !== null) {
-            deps.setExpanded((p) => new Set(p).add(deps.createDialog.parent as number));
-        }
-        toast.success(`Created “${name}”`);
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Create failed");
+    return; 
+  }
+
+  try {
+    const newId = deps.lib.createGroup({ Name: name, ParentStepGroupId: deps.createDialog.parent });
+    deps.setCreateDialog({ open: false, parent: null, name: "" });
+    deps.setActiveGroupId(newId);
+    if (deps.createDialog.parent !== null) {
+      deps.setExpanded((p) => new Set(p).add(deps.createDialog.parent as number));
     }
+
+    toast.success(`Created “${name}”`);
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Create failed");
+  }
 }
 
 export function doRename(deps: MutationDeps): void {
-    if (deps.renameDialog.group === null) return;
-    const name = deps.renameDialog.name.trim();
-    if (name === "") { toast.error("Group name is required");
+  if (deps.renameDialog.group === null) {
+    return;
+  }
 
- return; }
-    try {
-        deps.lib.renameGroup(deps.renameDialog.group.StepGroupId, name);
-        toast.success(`Renamed to “${name}”`);
-        deps.setRenameDialog({ open: false, group: null, name: "" });
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Rename failed");
-    }
+  const name = deps.renameDialog.name.trim();
+  if (name === "") {
+    toast.error("Group name is required");
+
+    return; 
+  }
+
+  try {
+    deps.lib.renameGroup(deps.renameDialog.group.StepGroupId, name);
+    toast.success(`Renamed to “${name}”`);
+    deps.setRenameDialog({ open: false, group: null, name: "" });
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Rename failed");
+  }
 }
 
 export function doDelete(deps: MutationDeps): void {
-    if (deps.deleteDialog.group === null) return;
-    const id = deps.deleteDialog.group.StepGroupId;
-    try {
-        deps.lib.deleteGroup(id);
-        deps.setSelected((prev) => {
-            const next = new Set(prev);
-            next.delete(id);
+  if (deps.deleteDialog.group === null) {
+    return;
+  }
 
-            return next;
-        });
-        deps.setSelectionOrder((prev) => prev.filter((sid) => sid !== id));
-        if (deps.activeGroupId === id) deps.setActiveGroupId(null);
-        toast.success(`Deleted “${deps.deleteDialog.group.Name}”`);
-        deps.setDeleteDialog({ open: false, group: null });
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Delete failed");
+  const id = deps.deleteDialog.group.StepGroupId;
+  try {
+    deps.lib.deleteGroup(id);
+    deps.setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+
+      return next;
+    });
+    deps.setSelectionOrder((prev) => prev.filter((sid) => sid !== id));
+    if (deps.activeGroupId === id) {
+      deps.setActiveGroupId(null);
     }
+
+    toast.success(`Deleted “${deps.deleteDialog.group.Name}”`);
+    deps.setDeleteDialog({ open: false, group: null });
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Delete failed");
+  }
 }
 
 export function doMove(deps: MutationDeps, id: number, direction: DirectionType): void {
-    try { deps.lib.moveGroupWithinParent(id, direction); }
-    catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
+  try {
+    deps.lib.moveGroupWithinParent(id, direction); 
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Move failed"); 
+  }
 }
 
 export function doArchiveToggle(deps: MutationDeps, group: StepGroupRow): void {
-    const next = !group.IsArchived;
-    try {
-        deps.lib.setGroupArchived(group.StepGroupId, next);
-        toast.success(next ? `Archived “${group.Name}”` : `Restored “${group.Name}”`);
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Archive failed");
-    }
+  const next = !group.IsArchived;
+  try {
+    deps.lib.setGroupArchived(group.StepGroupId, next);
+    toast.success(next ? `Archived “${group.Name}”` : `Restored “${group.Name}”`);
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Archive failed");
+  }
 }
 
 function runStepEditorCreate(
-    lib: StepLibrary,
-    mode: Extract<NonNullable<StepEditorDialogState["mode"]>, { Kind: "create" }>,
-    input: StepEditorSubmitInput,
+  lib: StepLibrary,
+  mode: Extract<NonNullable<StepEditorDialogState["mode"]>, { Kind: "create" }>,
+  input: StepEditorSubmitInput,
 ): void {
-    lib.appendStep({
-        StepGroupId: mode.StepGroupId,
-        StepKindId: input.StepKindId,
-        LabelType: input.LabelType,
-        PayloadJson: input.PayloadJson,
-        TargetStepGroupId: input.TargetStepGroupId,
-    });
-    toast.success("Step added");
+  lib.appendStep({
+    StepGroupId: mode.StepGroupId,
+    StepKindId: input.StepKindId,
+    LabelType: input.LabelType,
+    PayloadJson: input.PayloadJson,
+    TargetStepGroupId: input.TargetStepGroupId,
+  });
+  toast.success("Step added");
 }
 
 function runStepEditorUpdate(
-    lib: StepLibrary,
-    mode: Extract<NonNullable<StepEditorDialogState["mode"]>, { Kind: "edit" }>,
-    input: StepEditorSubmitInput,
+  lib: StepLibrary,
+  mode: Extract<NonNullable<StepEditorDialogState["mode"]>, { Kind: "edit" }>,
+  input: StepEditorSubmitInput,
 ): void {
-    lib.updateStep({
-        StepId: mode.Step.StepId,
-        StepKindId: input.StepKindId,
-        LabelType: input.LabelType,
-        PayloadJson: input.PayloadJson,
-        TargetStepGroupId: input.TargetStepGroupId,
-    });
-    toast.success("Step updated");
+  lib.updateStep({
+    StepId: mode.Step.StepId,
+    StepKindId: input.StepKindId,
+    LabelType: input.LabelType,
+    PayloadJson: input.PayloadJson,
+    TargetStepGroupId: input.TargetStepGroupId,
+  });
+  toast.success("Step updated");
 }
 
 export function doStepEditorSubmit(deps: MutationDeps, input: StepEditorSubmitInput): void {
-    const mode = deps.stepEditor.mode;
-    if (mode === null) return;
-    try {
-        if (mode.Kind === "create") runStepEditorCreate(deps.lib, mode, input);
-        else runStepEditorUpdate(deps.lib, mode, input);
-        deps.setStepEditor({ open: false, mode: null });
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Save failed");
+  const mode = deps.stepEditor.mode;
+  if (mode === null) {
+    return;
+  }
+
+  try {
+    if (mode.Kind === "create") {
+      runStepEditorCreate(deps.lib, mode, input);
+    } else {
+      runStepEditorUpdate(deps.lib, mode, input);
     }
+
+    deps.setStepEditor({ open: false, mode: null });
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Save failed");
+  }
 }
 
 export function doStepMove(deps: MutationDeps, stepId: number, direction: DirectionType): void {
-    try { deps.lib.moveStepWithinGroup(stepId, direction); }
-    catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
+  try {
+    deps.lib.moveStepWithinGroup(stepId, direction); 
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Move failed"); 
+  }
 }
 
 export function doStepDeleteConfirm(deps: MutationDeps): void {
-    const target = deps.deleteStepDialog.step;
-    if (target === null) return;
-    try {
-        deps.lib.deleteStep(target.StepId);
-        toast.success(`Deleted step “${target.LabelType ?? target.StepId}”`);
-        deps.setDeleteStepDialog({ open: false, step: null });
-    } catch (caught) {
-        toast.error(caught instanceof Error ? caught.message : "Delete failed");
-    }
+  const target = deps.deleteStepDialog.step;
+  if (target === null) {
+    return;
+  }
+
+  try {
+    deps.lib.deleteStep(target.StepId);
+    toast.success(`Deleted step “${target.LabelType ?? target.StepId}”`);
+    deps.setDeleteStepDialog({ open: false, step: null });
+  } catch (caught) {
+    toast.error(caught instanceof Error ? caught.message : "Delete failed");
+  }
 }
 
 function computeSiblingOrder(
-    lib: StepLibrary,
-    parentId: number | null,
-    showArchived: boolean,
+  lib: StepLibrary,
+  parentId: number | null,
+  showArchived: boolean,
 ): ReadonlyArray<number> {
-    return lib.Groups
-        .filter((g) => !g.IsArchived || showArchived)
-        .filter((g) => (g.ParentStepGroupId ?? null) === parentId)
-        .sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name))
-        .map((g) => g.StepGroupId);
+  return lib.Groups
+    .filter((g) => !g.IsArchived || showArchived)
+    .filter((g) => (g.ParentStepGroupId ?? null) === parentId)
+    .sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name))
+    .map((g) => g.StepGroupId);
 }
 
 function reorderList(
-    siblings: ReadonlyArray<number>,
-    sourceId: number,
-    targetId: number,
+  siblings: ReadonlyArray<number>,
+  sourceId: number,
+  targetId: number,
 ): ReadonlyArray<number> | null {
-    const fromIdx = siblings.indexOf(sourceId);
-    const toIdx = siblings.indexOf(targetId);
-    if (fromIdx === -1 || toIdx === -1) return null;
-    const next = siblings.slice();
-    next.splice(fromIdx, 1);
-    next.splice(toIdx, 0, sourceId);
+  const fromIdx = siblings.indexOf(sourceId);
+  const toIdx = siblings.indexOf(targetId);
+  if (fromIdx === -1 || toIdx === -1) {
+    return null;
+  }
 
-    return next;
+  const next = siblings.slice();
+  next.splice(fromIdx, 1);
+  next.splice(toIdx, 0, sourceId);
+
+  return next;
 }
 
 export function doDropReorder(
-    deps: MutationDeps,
-    parentId: number | null,
-    sourceId: number,
-    targetId: number,
+  deps: MutationDeps,
+  parentId: number | null,
+  sourceId: number,
+  targetId: number,
 ): void {
-    if (sourceId === targetId) return;
-    const siblings = computeSiblingOrder(deps.lib, parentId, deps.showArchived);
-    const next = reorderList(siblings, sourceId, targetId);
-    if (next === null) return;
-    const parentKey = (parentId ?? "root") as number | "root";
-    deps.setPendingGroupOrder((prev) => new Map(prev).set(parentKey, next));
-    try {
-        deps.lib.reorderSiblings(parentId, next);
-    } catch (caught) {
-        deps.setPendingGroupOrder((prev) => {
-            const m = new Map(prev); m.delete(parentKey);
+  if (sourceId === targetId) {
+    return;
+  }
 
- return m;
-        });
-        toast.error(caught instanceof Error ? caught.message : "Reorder failed");
-    }
+  const siblings = computeSiblingOrder(deps.lib, parentId, deps.showArchived);
+  const next = reorderList(siblings, sourceId, targetId);
+  if (next === null) {
+    return;
+  }
+
+  const parentKey = (parentId ?? "root") as number | "root";
+  deps.setPendingGroupOrder((prev) => new Map(prev).set(parentKey, next));
+  try {
+    deps.lib.reorderSiblings(parentId, next);
+  } catch (caught) {
+    deps.setPendingGroupOrder((prev) => {
+      const m = new Map(prev); m.delete(parentKey);
+
+      return m;
+    });
+    toast.error(caught instanceof Error ? caught.message : "Reorder failed");
+  }
 }
 
 export function doStepDropReorder(
-    deps: MutationDeps,
-    stepGroupId: number,
-    sourceStepId: number,
-    targetStepId: number,
+  deps: MutationDeps,
+  stepGroupId: number,
+  sourceStepId: number,
+  targetStepId: number,
 ): void {
-    if (sourceStepId === targetStepId) return;
-    const ordered = (deps.lib.StepsByGroup.get(stepGroupId) ?? []).map((s: StepRow) => s.StepId);
-    const next = reorderList(ordered, sourceStepId, targetStepId);
-    if (next === null) return;
-    deps.setPendingStepOrder((prev) => new Map(prev).set(stepGroupId, next));
-    try {
-        deps.lib.reorderSteps(stepGroupId, next);
-    } catch (caught) {
-        deps.setPendingStepOrder((prev) => {
-            const m = new Map(prev); m.delete(stepGroupId);
+  if (sourceStepId === targetStepId) {
+    return;
+  }
 
- return m;
-        });
-        toast.error(caught instanceof Error ? caught.message : "Reorder failed");
-    }
+  const ordered = (deps.lib.StepsByGroup.get(stepGroupId) ?? []).map((s: StepRow) => s.StepId);
+  const next = reorderList(ordered, sourceStepId, targetStepId);
+  if (next === null) {
+    return;
+  }
+
+  deps.setPendingStepOrder((prev) => new Map(prev).set(stepGroupId, next));
+  try {
+    deps.lib.reorderSteps(stepGroupId, next);
+  } catch (caught) {
+    deps.setPendingStepOrder((prev) => {
+      const m = new Map(prev); m.delete(stepGroupId);
+
+      return m;
+    });
+    toast.error(caught instanceof Error ? caught.message : "Reorder failed");
+  }
 }

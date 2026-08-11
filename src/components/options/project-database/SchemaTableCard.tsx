@@ -94,7 +94,9 @@ function ColumnValidationSection({
   onUpdate: (index: number, patch: Partial<TableDefinition>) => void;
 }) {
   const namedCols = table.columns.filter((c) => c.name.trim());
-  if (namedCols.length === 0) return null;
+  if (namedCols.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-1.5">

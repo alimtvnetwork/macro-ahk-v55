@@ -42,9 +42,14 @@ export function makeDraggable(
 
   function onMouseDown(e: MouseEvent): void {
     // Ignore non-primary buttons (right-click, middle-click).
-    if (e.button !== 0) return;
+    if (e.button !== 0) {
+      return;
+    }
+
     const target = e.target as HTMLElement | null;
-    if (target && target.closest(INTERACTIVE_SELECTOR)) return;
+    if (target && target.closest(INTERACTIVE_SELECTOR)) {
+      return;
+    }
 
     e.preventDefault();
     const rect = panel.getBoundingClientRect();

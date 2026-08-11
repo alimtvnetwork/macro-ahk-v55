@@ -79,7 +79,9 @@ export function ScriptBundlesListView({
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
-          if (e.dataTransfer.files.length > 0) onFileDrop(e.dataTransfer.files);
+          if (e.dataTransfer.files.length > 0) {
+            onFileDrop(e.dataTransfer.files);
+          }
         }}
       >
         <Upload className="h-4 w-4 text-muted-foreground" />

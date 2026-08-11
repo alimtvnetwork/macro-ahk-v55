@@ -39,33 +39,39 @@ const CASTLE_TIMEOUT_MS = 2_000;
  * throws.
  */
 export async function getCastleRequestToken(): Promise<string> {
-    const w = window as unknown as CastleGlobal;
-    const castle = typeof w._castle === 'function' ? w._castle : null;
-    if (!castle) {
-        log('Castle: window._castle missing — request will go without x-castle-request-token', 'warn');
+  const w = window as unknown as CastleGlobal;
+  const castle = typeof w._castle === 'function' ? w._castle : null;
+  if (!castle) {
+    log('Castle: window._castle missing — request will go without x-castle-request-token', 'warn');
 
-        return '';
-    }
-    try {
-        const tokenPromise: Promise<string | null> = Promise.resolve(
+    return '';
+  }
+
+  try {
+    const tokenPromise: Promise<string | null> = Promise.resolve(
             castle('createRequestToken') as Promise<string> | string | undefined,
-        ).then(function (v) { return typeof v === 'string' ? v : ''; });
-        const timeoutPromise: Promise<string | null> = new Promise(function (resolve) {
-            setTimeout(function () { resolve(null); }, CASTLE_TIMEOUT_MS);
-        });
-        const raced = await Promise.race<Promise<string | null>>([tokenPromise, timeoutPromise]);
-        if (raced == null) {
-            log('Castle: createRequestToken timed out after ' + CASTLE_TIMEOUT_MS + 'ms', 'warn');
+    ).then(function (v) {
+      return typeof v === 'string' ? v : ''; 
+    });
+    const timeoutPromise: Promise<string | null> = new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve(null); 
+      }, CASTLE_TIMEOUT_MS);
+    });
+    const raced = await Promise.race<Promise<string | null>>([tokenPromise, timeoutPromise]);
+    if (raced == null) {
+      log('Castle: createRequestToken timed out after ' + CASTLE_TIMEOUT_MS + 'ms', 'warn');
 
-            return '';
-        }
-        const token = String(raced);
-        log('Castle: request token resolved (len=' + token.length + ')', 'info');
-
-        return token;
-    } catch (err: unknown) {
-        logError('Castle.createRequestToken', 'SDK threw while creating request token', err);
-
-        return '';
+      return '';
     }
+
+    const token = String(raced);
+    log('Castle: request token resolved (len=' + token.length + ')', 'info');
+
+    return token;
+  } catch (err: unknown) {
+    logError('Castle.createRequestToken', 'SDK threw while creating request token', err);
+
+    return '';
+  }
 }

@@ -55,12 +55,12 @@ CREATE TABLE IF NOT EXISTS ProjectConfigMeta (
 /* ------------------------------------------------------------------ */
 
 async function sha256(text: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
 
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 /* ------------------------------------------------------------------ */
@@ -75,36 +75,36 @@ interface ConfigRow {
 }
 
 function flattenConfig(record: Record<string, unknown>, parentSection = ""): ConfigRow[] {
-    const rows: ConfigRow[] = [];
+  const rows: ConfigRow[] = [];
 
-    for (const [key, configValue] of Object.entries(record)) {
-        if (configValue !== null && typeof configValue === "object" && !Array.isArray(configValue)) {
-            // Nested section — recurse with section prefix
-            const section = parentSection ? `${parentSection}.${key}` : key;
-            rows.push(...flattenConfig(configValue as Record<string, unknown>, section));
-        } else {
-            const section = parentSection || "_root";
-            let valueType = typeof configValue;
-            let serialized: string;
+  for (const [key, configValue] of Object.entries(record)) {
+    if (configValue !== null && typeof configValue === "object" && !Array.isArray(configValue)) {
+      // Nested section — recurse with section prefix
+      const section = parentSection ? `${parentSection}.${key}` : key;
+      rows.push(...flattenConfig(configValue as Record<string, unknown>, section));
+    } else {
+      const section = parentSection || "_root";
+      let valueType = typeof configValue;
+      let serialized: string;
 
-            if (configValue === null || configValue === undefined) {
-                serialized = "";
-                valueType = "null";
-            } else if (Array.isArray(configValue)) {
-                serialized = JSON.stringify(configValue);
-                valueType = "array";
-            } else if (typeof configValue === "object") {
-                serialized = JSON.stringify(configValue);
-                valueType = "object";
-            } else {
-                serialized = String(configValue);
-            }
+      if (configValue === null || configValue === undefined) {
+        serialized = "";
+        valueType = "null";
+      } else if (Array.isArray(configValue)) {
+        serialized = JSON.stringify(configValue);
+        valueType = "array";
+      } else if (typeof configValue === "object") {
+        serialized = JSON.stringify(configValue);
+        valueType = "object";
+      } else {
+        serialized = String(configValue);
+      }
 
-            rows.push({ section, key, value: serialized, valueType });
-        }
+      rows.push({ section, key, value: serialized, valueType });
     }
+  }
 
-    return rows;
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -117,75 +117,77 @@ function flattenConfig(record: Record<string, unknown>, parentSection = ""): Con
  */
 // eslint-disable-next-line max-lines-per-function
 export async function seedConfigToDb(
-    manager: ProjectDbManager,
-    configName: string,
-    configJson: string,
+  manager: ProjectDbManager,
+  configName: string,
+  configJson: string,
 ): Promise<boolean> {
-    const db = manager.getDb();
+  const db = manager.getDb();
 
-    // Ensure tables exist
-    db.run(CONFIG_TABLES_SCHEMA);
+  // Ensure tables exist
+  db.run(CONFIG_TABLES_SCHEMA);
 
-    // Compute hash of source config
-    const sourceHash = await sha256(configJson);
+  // Compute hash of source config
+  const sourceHash = await sha256(configJson);
 
-    // Check existing hash
-    const existing = db.exec(
-        "SELECT SourceHash FROM ProjectConfigMeta WHERE ConfigName = ?",
-        [configName],
-    );
+  // Check existing hash
+  const existing = db.exec(
+    "SELECT SourceHash FROM ProjectConfigMeta WHERE ConfigName = ?",
+    [configName],
+  );
 
-    if (existing.length > 0 && existing[0].values.length > 0) {
-        const storedHash = String(existing[0].values[0][0]);
-        if (storedHash === sourceHash) {
-            console.log(`[config-seeder] Hash match for "${configName}" — skipping (user edits preserved)`);
+  if (existing.length > 0 && existing[0].values.length > 0) {
+    const storedHash = String(existing[0].values[0][0]);
+    if (storedHash === sourceHash) {
+      console.log(`[config-seeder] Hash match for "${configName}" — skipping (user edits preserved)`);
 
-            return false;
-        }
-        console.log(`[config-seeder] Hash mismatch for "${configName}" — re-seeding`);
-    } else {
-        console.log(`[config-seeder] First seed for "${configName}"`);
+      return false;
     }
 
-    // Parse config
-    let parsed: Record<string, unknown>;
-    try {
-        parsed = JSON.parse(configJson);
-    } catch (e) {
-        logCaughtError(BgLogTag.CONFIG_SEEDER, `Invalid JSON for "${configName}"`, e);
+    console.log(`[config-seeder] Hash mismatch for "${configName}" — re-seeding`);
+  } else {
+    console.log(`[config-seeder] First seed for "${configName}"`);
+  }
 
-        return false;
-    }
+  // Parse config
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(configJson);
+  } catch (e) {
+    logCaughtError(BgLogTag.CONFIG_SEEDER, `Invalid JSON for "${configName}"`, e);
 
-    // Flatten to rows
-    const rows = flattenConfig(parsed);
-    const now = new Date().toISOString();
+    return false;
+  }
 
-    // Upsert rows using INSERT OR REPLACE
-    const stmt = db.prepare(
-        `INSERT OR REPLACE INTO ProjectConfig (Section, Key, Value, ValueType, CreatedAt, UpdatedAt)
+  // Flatten to rows
+  const rows = flattenConfig(parsed);
+  const now = new Date().toISOString();
+
+  // Upsert rows using INSERT OR REPLACE
+  const stmt = db.prepare(
+    `INSERT OR REPLACE INTO ProjectConfig (Section, Key, Value, ValueType, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?)`,
-    );
+  );
 
-    for (const row of rows) {
-        stmt.run([row.section, row.key, row.value, row.valueType, now, now]);
-    }
-    stmt.free();
+  for (const row of rows) {
+    stmt.run([row.section, row.key, row.value, row.valueType, now, now]);
+  }
 
-    // Upsert meta
-    db.run(
-        `INSERT INTO ProjectConfigMeta (ConfigName, SourceHash, SeededAt, UpdatedAt)
+  stmt.free();
+
+  // Upsert meta
+  db.run(
+    `INSERT INTO ProjectConfigMeta (ConfigName, SourceHash, SeededAt, UpdatedAt)
          VALUES (?, ?, ?, ?)
          ON CONFLICT(ConfigName) DO UPDATE SET
              SourceHash = excluded.SourceHash,
              UpdatedAt = excluded.UpdatedAt`,
-        [configName, sourceHash, now, now],
-    );
+    [configName, sourceHash, now, now],
+  );
 
-    manager.markDirty();
-    console.log(`[config-seeder] Seeded ${rows.length} config rows for "${configName}"`);
+  manager.markDirty();
+  console.log(`[config-seeder] Seeded ${rows.length} config rows for "${configName}"`);
 
-    return true;
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -205,98 +207,106 @@ export interface StoredConfigRow {
  * Reads all config rows from the project DB.
  */
 export function readConfigFromDb(manager: ProjectDbManager): StoredConfigRow[] {
-    const db = manager.getDb();
+  const db = manager.getDb();
 
-    try {
-        const result = db.exec(
-            "SELECT Id, Section, Key, Value, ValueType, UpdatedAt FROM ProjectConfig ORDER BY Section, Key",
-        );
-        if (result.length === 0) return [];
-
-        return result[0].values.map(row => ({
-            id: Number(row[0]),
-            section: String(row[1]),
-            key: String(row[2]),
-            value: String(row[3]),
-            valueType: String(row[4]),
-            updatedAt: String(row[5]),
-        }));
-    } catch (err) { 
-        return [];
+  try {
+    const result = db.exec(
+      "SELECT Id, Section, Key, Value, ValueType, UpdatedAt FROM ProjectConfig ORDER BY Section, Key",
+    );
+    if (result.length === 0) {
+      return [];
     }
+
+    return result[0].values.map(row => ({
+      id: Number(row[0]),
+      section: String(row[1]),
+      key: String(row[2]),
+      value: String(row[3]),
+      valueType: String(row[4]),
+      updatedAt: String(row[5]),
+    }));
+  } catch (err) { 
+    return [];
+  }
 }
 
 /**
  * Updates a single config value in the project DB (from Settings UI).
  */
 export function updateConfigValue(
-    manager: ProjectDbManager,
-    section: string,
-    key: string,
-    value: string,
-    valueType?: string,
+  manager: ProjectDbManager,
+  section: string,
+  key: string,
+  value: string,
+  valueType?: string,
 ): boolean {
-    const db = manager.getDb();
-    const now = new Date().toISOString();
+  const db = manager.getDb();
+  const now = new Date().toISOString();
 
-    try {
-        if (valueType) {
-            db.run(
-                "UPDATE ProjectConfig SET Value = ?, ValueType = ?, UpdatedAt = ? WHERE Section = ? AND Key = ?",
-                [value, valueType, now, section, key],
-            );
-        } else {
-            db.run(
-                "UPDATE ProjectConfig SET Value = ?, UpdatedAt = ? WHERE Section = ? AND Key = ?",
-                [value, now, section, key],
-            );
-        }
-        manager.markDirty();
-
-        return true;
-    } catch (e) {
-        logCaughtError(BgLogTag.CONFIG_SEEDER, "Update failed", e);
-
-        return false;
+  try {
+    if (valueType) {
+      db.run(
+        "UPDATE ProjectConfig SET Value = ?, ValueType = ?, UpdatedAt = ? WHERE Section = ? AND Key = ?",
+        [value, valueType, now, section, key],
+      );
+    } else {
+      db.run(
+        "UPDATE ProjectConfig SET Value = ?, UpdatedAt = ? WHERE Section = ? AND Key = ?",
+        [value, now, section, key],
+      );
     }
+
+    manager.markDirty();
+
+    return true;
+  } catch (e) {
+    logCaughtError(BgLogTag.CONFIG_SEEDER, "Update failed", e);
+
+    return false;
+  }
 }
 
 /**
  * Reconstructs the full config object from DB rows.
  */
 export function reconstructConfigFromDb(manager: ProjectDbManager): Record<string, unknown> {
-    const rows = readConfigFromDb(manager);
-    const result: Record<string, unknown> = {};
+  const rows = readConfigFromDb(manager);
+  const result: Record<string, unknown> = {};
 
-    for (const row of rows) {
-        const path = row.section === "_root"
-            ? [row.key]
-            : [...row.section.split("."), row.key];
+  for (const row of rows) {
+    const path = row.section === "_root"
+      ? [row.key]
+      : [...row.section.split("."), row.key];
 
-        let target: Record<string, unknown> = result;
-        for (let i = 0; i < path.length - 1; i++) {
-            if (!target[path[i]] || typeof target[path[i]] !== "object") {
-                target[path[i]] = {};
-            }
-            target = target[path[i]] as Record<string, unknown>;
-        }
+    let target: Record<string, unknown> = result;
+    for (let i = 0; i < path.length - 1; i++) {
+      if (!target[path[i]] || typeof target[path[i]] !== "object") {
+        target[path[i]] = {};
+      }
 
-        const leafKey = path[path.length - 1];
-        target[leafKey] = deserializeValue(row.value, row.valueType);
+      target = target[path[i]] as Record<string, unknown>;
     }
 
-    return result;
+    const leafKey = path[path.length - 1];
+    target[leafKey] = deserializeValue(row.value, row.valueType);
+  }
+
+  return result;
 }
 
 function deserializeValue(value: string, valueType: string): JsonValue {
-    switch (valueType) {
-        case "number": return Number(value);
-        case "boolean": return value === "true";
-        case "null": return null;
-        case "array":
-        case "object":
-            try { return JSON.parse(value); } catch (err) { 
- return value; }
-        default: return value;
-    }
+  switch (valueType) {
+    case "number": return Number(value);
+    case "boolean": return value === "true";
+    case "null": return null;
+    case "array":
+    case "object":
+      try {
+        return JSON.parse(value); 
+      } catch (err) { 
+        return value; 
+      }
+
+    default: return value;
+  }
 }

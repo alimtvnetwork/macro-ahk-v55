@@ -14,14 +14,14 @@ import { Events } from "@/constants/events";
  */
 
 import {
-    tryIdStrategy,
-    tryTestIdStrategy,
-    tryRoleTextStrategy,
-    buildPositionalXPath,
+  tryIdStrategy,
+  tryTestIdStrategy,
+  tryRoleTextStrategy,
+  buildPositionalXPath,
 } from "./xpath-strategies";
 import {
-    findAutoAnchor,
-    buildRelativeXPath,
+  findAutoAnchor,
+  buildRelativeXPath,
 } from "./xpath-anchor-strategies";
 import { suggestVariableName } from "./xpath-label-suggester";
 import { enqueueCapture, flushNow } from "./xpath-capture-coalescer";
@@ -51,16 +51,22 @@ interface FullCapture {
 
 /** Generates an XPath for the given element using priority strategy. */
 function generateXPath(element: Element): FullCapture {
-    const byId = tryIdStrategy(element);
-    if (byId !== null) return byId;
+  const byId = tryIdStrategy(element);
+  if (byId !== null) {
+    return byId;
+  }
 
-    const byTestId = tryTestIdStrategy(element);
-    if (byTestId !== null) return byTestId;
+  const byTestId = tryTestIdStrategy(element);
+  if (byTestId !== null) {
+    return byTestId;
+  }
 
-    const byRole = tryRoleTextStrategy(element);
-    if (byRole !== null) return byRole;
+  const byRole = tryRoleTextStrategy(element);
+  if (byRole !== null) {
+    return byRole;
+  }
 
-    return buildPositionalXPath(element);
+  return buildPositionalXPath(element);
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,11 +75,11 @@ function generateXPath(element: Element): FullCapture {
 
 /** Returns true if the element should be excluded from recording. */
 function isExcludedElement(element: Element): boolean {
-    const isIframe = element.tagName === "IFRAME";
-    const isSvg = element instanceof SVGElement;
-    const isInShadowDom = element.getRootNode() instanceof ShadowRoot;
+  const isIframe = element.tagName === "IFRAME";
+  const isSvg = element instanceof SVGElement;
+  const isInShadowDom = element.getRootNode() instanceof ShadowRoot;
 
-    return isIframe || isSvg || isInShadowDom;
+  return isIframe || isSvg || isInShadowDom;
 }
 
 /* ------------------------------------------------------------------ */
@@ -93,32 +99,32 @@ export function buildCapturePayload(target: Element, value?: string): {
     Value?: string;
     CapturedAt: string;
 } {
-    const generated = generateXPath(target);
-    const anchor = findAutoAnchor(target);
-    const relative = anchor === null ? null : buildRelativeXPath(target, anchor);
-    const anchorXPath = anchor === null ? null : generateXPath(anchor).xpath;
+  const generated = generateXPath(target);
+  const anchor = findAutoAnchor(target);
+  const relative = anchor === null ? null : buildRelativeXPath(target, anchor);
+  const anchorXPath = anchor === null ? null : generateXPath(anchor).xpath;
 
-    const urlTabClickHint = {
-        Tag: target.tagName.toLowerCase(),
-        Target: target.getAttribute("target") ?? undefined,
-        Href: (target as HTMLAnchorElement).href ?? undefined,
-        LocationOrigin: window.location.origin,
-        WindowOpenCalled: false,
-    };
+  const urlTabClickHint = {
+    Tag: target.tagName.toLowerCase(),
+    Target: target.getAttribute("target") ?? undefined,
+    Href: (target as HTMLAnchorElement).href ?? undefined,
+    LocationOrigin: window.location.origin,
+    WindowOpenCalled: false,
+  };
 
-    return {
-        type: "XPATH_CAPTURED",
-        XPathFull: generated.xpath,
-        XPathRelative: relative,
-        AnchorXPath: anchorXPath,
-        Strategy: generated.strategy,
-        SuggestedVariableName: suggestVariableName(target),
-        TagName: target.tagName.toLowerCase(),
-        Text: target.textContent?.trim().slice(0, 100) ?? "",
-        Value: value,
-        UrlTabClickHint: urlTabClickHint,
-        CapturedAt: new Date().toISOString(),
-    };
+  return {
+    type: "XPATH_CAPTURED",
+    XPathFull: generated.xpath,
+    XPathRelative: relative,
+    AnchorXPath: anchorXPath,
+    Strategy: generated.strategy,
+    SuggestedVariableName: suggestVariableName(target),
+    TagName: target.tagName.toLowerCase(),
+    Text: target.textContent?.trim().slice(0, 100) ?? "",
+    Value: value,
+    UrlTabClickHint: urlTabClickHint,
+    CapturedAt: new Date().toISOString(),
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -127,75 +133,98 @@ export function buildCapturePayload(target: Element, value?: string): {
 
 /** Handles click events to record XPaths. */
 function onElementClick(event: MouseEvent): void {
-    if (isActive === false) return;
+  if (isActive === false) {
+    return;
+  }
 
-    const target = event.target as Element;
-    if (isExcludedElement(target)) return;
+  const target = event.target as Element;
+  if (isExcludedElement(target)) {
+    return;
+  }
     
-    // Do not preventDefault or stopPropagation here, otherwise the user
-    // cannot interact with the page normally while recording.
+  // Do not preventDefault or stopPropagation here, otherwise the user
+  // cannot interact with the page normally while recording.
 
-    const payload = buildCapturePayload(target);
-    enqueueCapture(payload);
+  const payload = buildCapturePayload(target);
+  enqueueCapture(payload);
 
-    highlightElement(target);
+  highlightElement(target);
 }
 
 const inputDebounceMap = new WeakMap<Element, number>();
 
 function onElementInput(event: Event): void {
-    if (isActive === false) return;
-    const target = event.target as Element;
-    if (isExcludedElement(target)) return;
+  if (isActive === false) {
+    return;
+  }
 
-    const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
-    if (value === undefined) return;
+  const target = event.target as Element;
+  if (isExcludedElement(target)) {
+    return;
+  }
 
-    // Debounce input events to avoid spamming the backend on every keystroke.
-    const existingTimer = inputDebounceMap.get(target);
-    if (existingTimer !== undefined) {
-        window.clearTimeout(existingTimer);
-    }
+  const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
+  if (value === undefined) {
+    return;
+  }
 
-    const timerId = window.setTimeout(() => {
-        inputDebounceMap.delete(target);
-        const payload = buildCapturePayload(target, (target as HTMLInputElement).value);
-        enqueueCapture(payload);
-        highlightElement(target);
-    }, 500);
+  // Debounce input events to avoid spamming the backend on every keystroke.
+  const existingTimer = inputDebounceMap.get(target);
+  if (existingTimer !== undefined) {
+    window.clearTimeout(existingTimer);
+  }
 
-    inputDebounceMap.set(target, timerId);
+  const timerId = window.setTimeout(() => {
+    inputDebounceMap.delete(target);
+    const payload = buildCapturePayload(target, (target as HTMLInputElement).value);
+    enqueueCapture(payload);
+    highlightElement(target);
+  }, 500);
+
+  inputDebounceMap.set(target, timerId);
 }
 
 function onElementChange(event: Event): void {
-    if (isActive === false) return;
-    const target = event.target as Element;
-    if (isExcludedElement(target)) return;
+  if (isActive === false) {
+    return;
+  }
 
-    const value = (target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
-    if (value === undefined) return;
+  const target = event.target as Element;
+  if (isExcludedElement(target)) {
+    return;
+  }
 
-    const existingTimer = inputDebounceMap.get(target);
-    if (existingTimer !== undefined) {
-        window.clearTimeout(existingTimer);
-        inputDebounceMap.delete(target);
-    }
+  const value = (target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+  if (value === undefined) {
+    return;
+  }
 
-    const payload = buildCapturePayload(target, value);
-    enqueueCapture(payload);
-    highlightElement(target);
+  const existingTimer = inputDebounceMap.get(target);
+  if (existingTimer !== undefined) {
+    window.clearTimeout(existingTimer);
+    inputDebounceMap.delete(target);
+  }
+
+  const payload = buildCapturePayload(target, value);
+  enqueueCapture(payload);
+  highlightElement(target);
 }
 
 function onElementKeydown(event: KeyboardEvent): void {
-    if (isActive === false) return;
-    const target = event.target as Element;
-    if (isExcludedElement(target)) return;
+  if (isActive === false) {
+    return;
+  }
 
-    if (event.key === "Enter") {
-        const payload = buildCapturePayload(target, "{Enter}");
-        enqueueCapture(payload);
-        highlightElement(target);
-    }
+  const target = event.target as Element;
+  if (isExcludedElement(target)) {
+    return;
+  }
+
+  if (event.key === "Enter") {
+    const payload = buildCapturePayload(target, "{Enter}");
+    enqueueCapture(payload);
+    highlightElement(target);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -210,42 +239,53 @@ const activeHighlights = new Map<HTMLElement, { timerId: number; originalOutline
 
 /** Clears a single element's highlight and restores its outline. */
 function clearHighlight(htmlElement: HTMLElement): void {
-    const entry = activeHighlights.get(htmlElement);
-    if (entry === undefined) return;
-    window.clearTimeout(entry.timerId);
-    htmlElement.style.outline = entry.originalOutline;
-    activeHighlights.delete(htmlElement);
+  const entry = activeHighlights.get(htmlElement);
+  if (entry === undefined) {
+    return;
+  }
+
+  window.clearTimeout(entry.timerId);
+  htmlElement.style.outline = entry.originalOutline;
+  activeHighlights.delete(htmlElement);
 }
 
 /** Clears every active highlight (called on stop / pagehide). */
 function clearAllHighlights(): void {
-    Array.from(activeHighlights.keys()).forEach((el) => clearHighlight(el));
+  Array.from(activeHighlights.keys()).forEach((el) => clearHighlight(el));
 }
 
 /** Drops the oldest highlight if the bound is exceeded. */
 function trimHighlightStack(): void {
-    if (activeHighlights.size < MAX_CONCURRENT_HIGHLIGHTS) return;
-    const oldest = activeHighlights.keys().next().value;
-    if (oldest !== undefined) clearHighlight(oldest);
+  if (activeHighlights.size < MAX_CONCURRENT_HIGHLIGHTS) {
+    return;
+  }
+
+  const oldest = activeHighlights.keys().next().value;
+  if (oldest !== undefined) {
+    clearHighlight(oldest);
+  }
 }
 
 /** Briefly highlights the clicked element. Bounded + per-element idempotent. */
 function highlightElement(element: Element): void {
-    const htmlElement = element as HTMLElement;
-    clearHighlight(htmlElement);
-    trimHighlightStack();
+  const htmlElement = element as HTMLElement;
+  clearHighlight(htmlElement);
+  trimHighlightStack();
 
-    const originalOutline = htmlElement.style.outline;
-    htmlElement.style.outline = "2px solid #ff6b35";
+  const originalOutline = htmlElement.style.outline;
+  htmlElement.style.outline = "2px solid #ff6b35";
 
-    const timerId = window.setTimeout(() => {
-        const entry = activeHighlights.get(htmlElement);
-        if (entry === undefined) return;
-        htmlElement.style.outline = entry.originalOutline;
-        activeHighlights.delete(htmlElement);
-    }, HIGHLIGHT_DURATION_MS);
+  const timerId = window.setTimeout(() => {
+    const entry = activeHighlights.get(htmlElement);
+    if (entry === undefined) {
+      return;
+    }
 
-    activeHighlights.set(htmlElement, { timerId, originalOutline });
+    htmlElement.style.outline = entry.originalOutline;
+    activeHighlights.delete(htmlElement);
+  }, HIGHLIGHT_DURATION_MS);
+
+  activeHighlights.set(htmlElement, { timerId, originalOutline });
 }
 
 /* ------------------------------------------------------------------ */
@@ -254,83 +294,85 @@ function highlightElement(element: Element): void {
 
 /** Starts the XPath recorder. */
 function startRecorder(): void {
-    document.addEventListener(Events.CLICK, onElementClick, true);
-    document.addEventListener(Events.INPUT, onElementInput, true);
-    document.addEventListener(Events.CHANGE, onElementChange, true);
-    document.addEventListener(Events.KEYDOWN, onElementKeydown, true);
-    console.log("[Marco] XPath recorder started");
+  document.addEventListener(Events.CLICK, onElementClick, true);
+  document.addEventListener(Events.INPUT, onElementInput, true);
+  document.addEventListener(Events.CHANGE, onElementChange, true);
+  document.addEventListener(Events.KEYDOWN, onElementKeydown, true);
+  console.log("[Marco] XPath recorder started");
 
-    if (typeof chrome !== "undefined" && chrome.storage) {
-        chrome.storage.local.get("marco.recorder.session", (data) => {
-            const session = data["marco.recorder.session"] as RecordingSession | undefined;
-            const projectSlug = session?.ProjectSlug || "default";
+  if (typeof chrome !== "undefined" && chrome.storage) {
+    chrome.storage.local.get("marco.recorder.session", (data) => {
+      const session = data["marco.recorder.session"] as RecordingSession | undefined;
+      const projectSlug = session?.ProjectSlug || "default";
             
-            toolbarHandle = mountRecorderToolbar({
-                ProjectSlug: projectSlug,
-                NewSessionId: () => `sess-${Date.now().toString(36)}`,
-                Now: () => new Date().toISOString(),
-                OnPhaseChange: (phase, nextSession) => {
-                    // Sync back to background
-                    chrome.storage.local.set({ "marco.recorder.session": nextSession });
-                }
-            });
+      toolbarHandle = mountRecorderToolbar({
+        ProjectSlug: projectSlug,
+        NewSessionId: () => `sess-${Date.now().toString(36)}`,
+        Now: () => new Date().toISOString(),
+        OnPhaseChange: (phase, nextSession) => {
+          // Sync back to background
+          chrome.storage.local.set({ "marco.recorder.session": nextSession });
+        }
+      });
             
-            // Sync the toolbar to the current session state
-            if (session) {
-                if (session.Phase === "Recording") toolbarHandle.Start();
-                else if (session.Phase === "Paused") {
-                    toolbarHandle.Start();
-                    toolbarHandle.Pause();
-                }
-            }
+      // Sync the toolbar to the current session state
+      if (session) {
+        if (session.Phase === "Recording") {
+          toolbarHandle.Start();
+        } else if (session.Phase === "Paused") {
+          toolbarHandle.Start();
+          toolbarHandle.Pause();
+        }
+      }
 
-            dropzoneHandle = mountDropZoneOverlay({
-                OnFileDropped: (file) => {
-                    chrome.runtime.sendMessage({
-                        type: "RECORDER_DATA_SOURCE_ADD",
-                        projectSlug: session?.ProjectSlug || "default",
-                        filePath: file.FileName,
-                        mimeKind: file.MimeKind,
-                        rawText: file.RawText
-                    });
-                }
-            });
-        });
-    }
+      dropzoneHandle = mountDropZoneOverlay({
+        OnFileDropped: (file) => {
+          chrome.runtime.sendMessage({
+            type: "RECORDER_DATA_SOURCE_ADD",
+            projectSlug: session?.ProjectSlug || "default",
+            filePath: file.FileName,
+            mimeKind: file.MimeKind,
+            rawText: file.RawText
+          });
+        }
+      });
+    });
+  }
 }
 
 /** Stops the XPath recorder. Tears down listeners + outstanding timers. */
 function stopRecorder(): void {
-    isActive = false;
-    document.removeEventListener(Events.CLICK, onElementClick, true);
-    document.removeEventListener(Events.INPUT, onElementInput, true);
-    document.removeEventListener(Events.CHANGE, onElementChange, true);
-    document.removeEventListener(Events.KEYDOWN, onElementKeydown, true);
-    clearAllHighlights();
-    window.removeEventListener("pagehide", onPageHide);
-    // PERF-R6: drain any queued captures before teardown.
-    void flushNow();
+  isActive = false;
+  document.removeEventListener(Events.CLICK, onElementClick, true);
+  document.removeEventListener(Events.INPUT, onElementInput, true);
+  document.removeEventListener(Events.CHANGE, onElementChange, true);
+  document.removeEventListener(Events.KEYDOWN, onElementKeydown, true);
+  clearAllHighlights();
+  window.removeEventListener("pagehide", onPageHide);
+  // PERF-R6: drain any queued captures before teardown.
+  void flushNow();
     
-    if (toolbarHandle) {
-        toolbarHandle.Destroy();
-        toolbarHandle = null;
-    }
-    if (dropzoneHandle) {
-        dropzoneHandle.Destroy();
-        dropzoneHandle = null;
-    }
+  if (toolbarHandle) {
+    toolbarHandle.Destroy();
+    toolbarHandle = null;
+  }
+
+  if (dropzoneHandle) {
+    dropzoneHandle.Destroy();
+    dropzoneHandle = null;
+  }
     
-    console.log("[Marco] XPath recorder stopped");
+  console.log("[Marco] XPath recorder stopped");
 }
 
 /** Pagehide teardown — mem://standards/timer-and-observer-teardown. */
 function onPageHide(): void {
-    stopRecorder();
+  stopRecorder();
 }
 
 /** Listens for the stop event from the background handler. */
 window.addEventListener("marco-xpath-stop", () => {
-    stopRecorder();
+  stopRecorder();
 });
 
 window.addEventListener("pagehide", onPageHide);

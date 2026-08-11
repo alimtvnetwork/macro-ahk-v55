@@ -66,27 +66,41 @@ const lastKnownName = new Map<string, string | null>();
 export function subscribeProjectNameChange(callback: ProjectNameChangeListener): () => void {
   listeners.add(callback);
 
-  return () => { listeners.delete(callback); };
+  return () => {
+    listeners.delete(callback); 
+  };
 }
 
 /** Explicit poll hook — call after project navigation or name-refresh events. */
 export function notifyIfProjectRenamed(): void {
   const { projectId, projectName } = resolveProjectIdentity();
-  if (!projectId) return;
-  const isFirstSeen = !lastKnownName.has(projectId);
-  if (isFirstSeen) { lastKnownName.set(projectId, projectName);
+  if (!projectId) {
+    return;
+  }
 
- return; }
+  const isFirstSeen = !lastKnownName.has(projectId);
+  if (isFirstSeen) {
+    lastKnownName.set(projectId, projectName);
+
+    return; 
+  }
+
   const prev = lastKnownName.get(projectId) ?? null;
-  if (prev === projectName) return;
+  if (prev === projectName) {
+    return;
+  }
+
   lastKnownName.set(projectId, projectName);
   fireListeners(projectId, prev, projectName);
 }
 
 function fireListeners(projectId: string, prev: string | null, next: string | null): void {
   for (const callback of listeners) {
-    try { callback(projectId, prev, next); }
-    catch (e) { logError(SCOPE, `listener threw for projectId=${projectId}`, e); }
+    try {
+      callback(projectId, prev, next); 
+    } catch (e) {
+      logError(SCOPE, `listener threw for projectId=${projectId}`, e); 
+    }
   }
 }
 

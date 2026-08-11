@@ -9,66 +9,66 @@ import type { MembershipSummary, WorkspaceSummary } from "./lovable-api-types";
  */
 
 const ROLE_BY_WIRE: Readonly<Record<string, MembershipRoleApiCodeType>> = Object.freeze({
-    owner: MembershipRoleApiCodeType.Owner,
-    admin: MembershipRoleApiCodeType.Admin,
-    member: MembershipRoleApiCodeType.Member,
+  owner: MembershipRoleApiCodeType.Owner,
+  admin: MembershipRoleApiCodeType.Admin,
+  member: MembershipRoleApiCodeType.Member,
 });
 
 const collectStringFields = (source: object): Record<string, string> => {
-    const out: Record<string, string> = {};
+  const out: Record<string, string> = {};
 
-    for (const [key, value] of Object.entries(source)) {
-        if (typeof value === "string") {
-            out[key] = value;
-        }
+  for (const [key, value] of Object.entries(source)) {
+    if (typeof value === "string") {
+      out[key] = value;
     }
+  }
 
-    return out;
+  return out;
 };
 
 const requireString = (fields: Record<string, string>, key: string): string => {
-    const value = fields[key];
+  const value = fields[key];
 
-    if (value === undefined) {
-        throw new Error(`Lovable wire response missing string field: ${key}`);
-    }
+  if (value === undefined) {
+    throw new Error(`Lovable wire response missing string field: ${key}`);
+  }
 
-    return value;
+  return value;
 };
 
 const requireRole = (fields: Record<string, string>): MembershipRoleApiCodeType => {
-    const raw = requireString(fields, "role");
-    const role = ROLE_BY_WIRE[raw];
+  const raw = requireString(fields, "role");
+  const role = ROLE_BY_WIRE[raw];
 
-    if (role === undefined) {
-        throw new Error(`Lovable wire response has unknown role: ${raw}`);
-    }
+  if (role === undefined) {
+    throw new Error(`Lovable wire response has unknown role: ${raw}`);
+  }
 
-    return role;
+  return role;
 };
 
 export const mapWorkspace = (wire: object): WorkspaceSummary => {
-    const fields = collectStringFields(wire);
+  const fields = collectStringFields(wire);
 
-    return { Id: requireString(fields, "id"), Name: requireString(fields, "name") };
+  return { Id: requireString(fields, "id"), Name: requireString(fields, "name") };
 };
 
 export const mapMembership = (wire: object): MembershipSummary => {
-    const fields = collectStringFields(wire);
+  const fields = collectStringFields(wire);
 
-    return {
-        UserId: requireString(fields, "user_id"),
-        Email: requireString(fields, "email"),
-        Role: requireRole(fields),
-    };
+  return {
+    UserId: requireString(fields, "user_id"),
+    Email: requireString(fields, "email"),
+    Role: requireRole(fields),
+  };
 };
 
 const requireArray = (wire: object): object[] => {
-    if (!Array.isArray(wire)) {
-        throw new Error("Lovable wire response expected an array");
-    }
+  if (!Array.isArray(wire)) {
+    throw new Error("Lovable wire response expected an array");
+  }
 
-    return wire;
+  return wire;
 };
 
 export const mapWorkspaceArray = (wire: object): WorkspaceSummary[] => requireArray(wire).map(mapWorkspace);

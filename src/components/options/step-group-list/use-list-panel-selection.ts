@@ -10,56 +10,66 @@ import { useMemo, useState } from "react";
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
 
 export function useListPanelSelection(
-    filtered: ReadonlyArray<StepGroupRow>,
-    allGroups: ReadonlyArray<StepGroupRow>,
+  filtered: ReadonlyArray<StepGroupRow>,
+  allGroups: ReadonlyArray<StepGroupRow>,
 ) {
-    const [selected, setSelected] = useState<ReadonlySet<number>>(new Set());
+  const [selected, setSelected] = useState<ReadonlySet<number>>(new Set());
 
-    const visibleIds = useMemo(
-        () => filtered.map((g) => g.StepGroupId),
-        [filtered],
-    );
-    const allVisibleSelected =
+  const visibleIds = useMemo(
+    () => filtered.map((g) => g.StepGroupId),
+    [filtered],
+  );
+  const allVisibleSelected =
         visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
-    const someVisibleSelected =
+  const someVisibleSelected =
         !allVisibleSelected && visibleIds.some((id) => selected.has(id));
 
-    const toggleOne = (id: number, on: boolean) => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            if (on) next.add(id);
-            else next.delete(id);
+  const toggleOne = (id: number, on: boolean) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (on) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
 
-            return next;
-        });
-    };
+      return next;
+    });
+  };
 
-    const toggleAllVisible = (on: boolean) => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            if (on) for (const id of visibleIds) next.add(id);
-            else for (const id of visibleIds) next.delete(id);
+  const toggleAllVisible = (on: boolean) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (on) {
+        for (const id of visibleIds) {
+          next.add(id);
+        }
+      } else {
+        for (const id of visibleIds) {
+          next.delete(id);
+        }
+      }
 
-            return next;
-        });
-    };
+      return next;
+    });
+  };
 
-    const clearSelection = () => setSelected(new Set());
+  const clearSelection = () => setSelected(new Set());
 
-    const selectedGroups = useMemo(
-        () => allGroups.filter((g) => selected.has(g.StepGroupId)),
-        [allGroups, selected],
-    );
+  const selectedGroups = useMemo(
+    () => allGroups.filter((g) => selected.has(g.StepGroupId)),
+    [allGroups, selected],
+  );
 
-    return {
-        selected,
-        setSelected,
-        visibleIds,
-        allVisibleSelected,
-        someVisibleSelected,
-        toggleOne,
-        toggleAllVisible,
-        clearSelection,
-        selectedGroups,
-    };
+  return {
+    selected,
+    setSelected,
+    visibleIds,
+    allVisibleSelected,
+    someVisibleSelected,
+    toggleOne,
+    toggleAllVisible,
+    clearSelection,
+    selectedGroups,
+  };
 }

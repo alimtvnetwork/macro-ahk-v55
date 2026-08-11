@@ -38,7 +38,9 @@ export function ErrorModal({ error, open, onOpenChange }: ErrorModalProps) {
   const [showStack, setShowStack] = useState(false);
   const [showContext, setShowContext] = useState(false);
 
-  if (!error) return null;
+  if (!error) {
+    return null;
+  }
 
   const handleCopy = async () => {
     try {

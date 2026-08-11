@@ -28,18 +28,18 @@ export interface FilesApi {
 }
 
 export function createFilesApi(): FilesApi {
-    return {
-        async save(path: string, content: string, mime?: string) {
-            await sendMessage<void>("FILE_SAVE", { path, content, mime });
-        },
-        read(path: string) {
-            return sendMessage<FileContent>("FILE_READ", { path });
-        },
-        async delete(path: string) {
-            await sendMessage<void>("FILE_DELETE", { path });
-        },
-        list() {
-            return sendMessage<FileEntry[]>("FILE_LIST");
-        },
-    };
+  return {
+    async save(path: string, content: string, mime?: string) {
+      await sendMessage<void>("FILE_SAVE", { path, content, mime });
+    },
+    read(path: string) {
+      return sendMessage<FileContent>("FILE_READ", { path });
+    },
+    async delete(path: string) {
+      await sendMessage<void>("FILE_DELETE", { path });
+    },
+    list() {
+      return sendMessage<FileEntry[]>("FILE_LIST");
+    },
+  };
 }

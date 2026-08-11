@@ -30,7 +30,9 @@ export function isPrimitive(jsonValue: JsonValue): jsonValue is string | number 
 /** Format a primitive value for display. */
 export function formatPrimitive(jsonValue: JsonValue): string {
   const isNull = jsonValue === null;
-  if (isNull) return "null";
+  if (isNull) {
+    return "null";
+  }
 
   const isString = typeof jsonValue === "string";
   if (isString) {
@@ -47,19 +49,27 @@ export function parseInputValue(input: string): JsonValue {
   const trimmed = input.trim();
 
   const isTrue = trimmed === "true";
-  if (isTrue) return true;
+  if (isTrue) {
+    return true;
+  }
 
   const isFalse = trimmed === "false";
-  if (isFalse) return false;
+  if (isFalse) {
+    return false;
+  }
 
   const isNullLiteral = trimmed === "null";
-  if (isNullLiteral) return null;
+  if (isNullLiteral) {
+    return null;
+  }
 
   const asNum = Number(trimmed);
   const isNonEmpty = trimmed !== "";
   const isValidNumber = !isNaN(asNum);
   const isNumeric = isNonEmpty && isValidNumber;
-  if (isNumeric) return asNum;
+  if (isNumeric) {
+    return asNum;
+  }
 
   return parseAsJsonOrString(trimmed);
 }
@@ -69,7 +79,9 @@ function parseAsJsonOrString(trimmed: string): JsonValue {
   try {
     const parsed = JSON.parse(trimmed);
     const isComplex = typeof parsed === "object";
-    if (isComplex) return parsed;
+    if (isComplex) {
+      return parsed;
+    }
   } catch (jsonParseError: unknown) {
     logError("jsonTreeHelpers.parseAsJsonOrString", "JSON.parse failed — treating value as plain string (expected for non-JSON cell values)", jsonParseError);
   }
@@ -246,7 +258,9 @@ function renameTopLevelKey(
 /** Generate a unique key name within an object by appending a counter. */
 export function generateUniqueKey(obj: JsonObject, base: string): string {
   const isKeyAvailable = !(base in obj);
-  if (isKeyAvailable) return base;
+  if (isKeyAvailable) {
+    return base;
+  }
 
   let counter = 1;
   let candidate = `${base}${counter}`;

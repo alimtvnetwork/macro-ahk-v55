@@ -8,40 +8,40 @@ import { useEffect, useRef } from "react";
  * @param setState Callback to update the local state when a remote update arrives.
  */
 export function useCrossTabSync<T>(
-    channelName: string,
-    state: T,
-    setState: (next: T) => void,
+  channelName: string,
+  state: T,
+  setState: (next: T) => void,
 ) {
-    const isRemoteUpdate = useRef(false);
-    const channelRef = useRef<BroadcastChannel | null>(null);
+  const isRemoteUpdate = useRef(false);
+  const channelRef = useRef<BroadcastChannel | null>(null);
 
-    // Initialize channel once
-    useEffect(() => {
-        const channel = new BroadcastChannel(channelName);
-        channelRef.current = channel;
+  // Initialize channel once
+  useEffect(() => {
+    const channel = new BroadcastChannel(channelName);
+    channelRef.current = channel;
 
-        channel.onmessage = (event) => {
-            isRemoteUpdate.current = true;
-            setState(event.data as T);
-        };
+    channel.onmessage = (event) => {
+      isRemoteUpdate.current = true;
+      setState(event.data as T);
+    };
 
-        return () => {
-            channel.close();
-            channelRef.current = null;
-        };
-    }, [channelName, setState]);
+    return () => {
+      channel.close();
+      channelRef.current = null;
+    };
+  }, [channelName, setState]);
 
-    // Send updates to other tabs whenever the local state changes,
-    // but only if the change didn't originate from a remote update.
-    useEffect(() => {
-        if (isRemoteUpdate.current) {
-            isRemoteUpdate.current = false;
+  // Send updates to other tabs whenever the local state changes,
+  // but only if the change didn't originate from a remote update.
+  useEffect(() => {
+    if (isRemoteUpdate.current) {
+      isRemoteUpdate.current = false;
 
-            return;
-        }
+      return;
+    }
 
-        if (channelRef.current) {
-            channelRef.current.postMessage(state);
-        }
-    }, [state]);
+    if (channelRef.current) {
+      channelRef.current.postMessage(state);
+    }
+  }, [state]);
 }

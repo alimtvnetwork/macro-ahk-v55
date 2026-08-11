@@ -45,119 +45,119 @@ type Classified =
 /** Resolves popup-provided scripts into executable injection inputs. */
 // eslint-disable-next-line max-lines-per-function -- resolver with diagnostics logging
 export async function resolveInjectionRequestScripts(
-    scripts: RawEntry[],
+  scripts: RawEntry[],
 ): Promise<InjectionResolveResult> {
-    const classified = scripts.map((entry, index) => classifyEntry(entry, index));
-    const skipped: SkippedScript[] = [];
+  const classified = scripts.map((entry, index) => classifyEntry(entry, index));
+  const skipped: SkippedScript[] = [];
 
-    const projectEntries: ScriptEntry[] = [];
-    const injectables: InjectableScript[] = [];
+  const projectEntries: ScriptEntry[] = [];
+  const injectables: InjectableScript[] = [];
 
-    for (const item of classified) {
-        if (item.kind === "project-entry") {
-            projectEntries.push(item.value);
-        } else if (item.kind === "injectable") {
-            injectables.push(item.value);
-        } else if (item.kind === "empty-code") {
-            logBgWarnError(
-                BgLogTag.INJECTION_RESOLVE,
-                `Script '${item.name}' (id=${item.id}) has empty code — skipping (empty_code).`,
-            );
-            void persistInjectionWarn(
-                "REQUEST_RESOLVER_EMPTY_CODE",
-                `[injection:resolve] Inline script '${item.name}' (id=${item.id}) had empty code and was skipped`,
-            );
-            skipped.push({
-                scriptId: item.id,
-                scriptName: item.name,
-                reason: "empty_code" as SkipReason,
-            });
-        } else {
-            logBgWarnError(
-                BgLogTag.INJECTION_RESOLVE,
-                `Malformed script entry id=${item.id} name=${item.name} — missing required field(s): ${item.missing}. Skipping (resolver_mismatch).`,
-            );
-            void persistInjectionWarn(
-                "REQUEST_RESOLVER_MISMATCH",
-                `[injection:resolve] Malformed entry '${item.name}' (id=${item.id}) missing ${item.missing}, skipped`,
-            );
-            skipped.push({
-                scriptId: item.id,
-                scriptName: item.name,
-                reason: "resolver_mismatch" as SkipReason,
-            });
-        }
+  for (const item of classified) {
+    if (item.kind === "project-entry") {
+      projectEntries.push(item.value);
+    } else if (item.kind === "injectable") {
+      injectables.push(item.value);
+    } else if (item.kind === "empty-code") {
+      logBgWarnError(
+        BgLogTag.INJECTION_RESOLVE,
+        `Script '${item.name}' (id=${item.id}) has empty code — skipping (empty_code).`,
+      );
+      void persistInjectionWarn(
+        "REQUEST_RESOLVER_EMPTY_CODE",
+        `[injection:resolve] Inline script '${item.name}' (id=${item.id}) had empty code and was skipped`,
+      );
+      skipped.push({
+        scriptId: item.id,
+        scriptName: item.name,
+        reason: "empty_code" as SkipReason,
+      });
+    } else {
+      logBgWarnError(
+        BgLogTag.INJECTION_RESOLVE,
+        `Malformed script entry id=${item.id} name=${item.name} — missing required field(s): ${item.missing}. Skipping (resolver_mismatch).`,
+      );
+      void persistInjectionWarn(
+        "REQUEST_RESOLVER_MISMATCH",
+        `[injection:resolve] Malformed entry '${item.name}' (id=${item.id}) missing ${item.missing}, skipped`,
+      );
+      skipped.push({
+        scriptId: item.id,
+        scriptName: item.name,
+        reason: "resolver_mismatch" as SkipReason,
+      });
     }
+  }
 
-    const hasOnlyProjectEntries = projectEntries.length > 0 && injectables.length === 0;
+  const hasOnlyProjectEntries = projectEntries.length > 0 && injectables.length === 0;
 
-    console.log(
-        "[injection:resolve] Input: %d scripts → %d project-entries, %d injectables, %d skipped (mode=%s)",
-        scripts.length,
-        projectEntries.length,
-        injectables.length,
-        skipped.length,
-        hasOnlyProjectEntries ? "project-store" : "passthrough",
-    );
+  console.log(
+    "[injection:resolve] Input: %d scripts → %d project-entries, %d injectables, %d skipped (mode=%s)",
+    scripts.length,
+    projectEntries.length,
+    injectables.length,
+    skipped.length,
+    hasOnlyProjectEntries ? "project-store" : "passthrough",
+  );
 
-    if (hasOnlyProjectEntries) {
-        const result = await resolveProjectEntryScripts(projectEntries);
-
-        return {
-            prepared: result.prepared,
-            skipped: [...skipped, ...result.skipped],
-        };
-    }
+  if (hasOnlyProjectEntries) {
+    const result = await resolveProjectEntryScripts(projectEntries);
 
     return {
-        prepared: sortPreparedScripts(
-            injectables.map((injectable) => ({
-                injectable,
-                configJson: null,
-                themeJson: null,
-                codeSource: null,
-            })),
-        ),
-        skipped,
+      prepared: result.prepared,
+      skipped: [...skipped, ...result.skipped],
     };
+  }
+
+  return {
+    prepared: sortPreparedScripts(
+      injectables.map((injectable) => ({
+        injectable,
+        configJson: null,
+        themeJson: null,
+        codeSource: null,
+      })),
+    ),
+    skipped,
+  };
 }
 
 /** Resolves stored project script entries through the script store. */
 async function resolveProjectEntryScripts(
-    entries: ScriptEntry[],
+  entries: ScriptEntry[],
 ): Promise<InjectionResolveResult> {
-    // ✅ Self-heal: reseed missing built-in scripts before resolving
-    // Without this, the popup "Run Scripts" path skips the guard that
-    // the auto-injector applies, causing "script not found in store".
-    // See: spec/22-app-issues/check-button/11-popup-injection-missing-guard.md
-    const projects = await readAllProjects();
-    await ensureBuiltinScriptsExist(projects);
+  // ✅ Self-heal: reseed missing built-in scripts before resolving
+  // Without this, the popup "Run Scripts" path skips the guard that
+  // the auto-injector applies, causing "script not found in store".
+  // See: spec/22-app-issues/check-button/11-popup-injection-missing-guard.md
+  const projects = await readAllProjects();
+  await ensureBuiltinScriptsExist(projects);
 
-    const bindings = buildScriptBindings(entries);
-    const { resolved, skipped } = await resolveScriptBindings(bindings);
+  const bindings = buildScriptBindings(entries);
+  const { resolved, skipped } = await resolveScriptBindings(bindings);
 
-    return {
-        prepared: sortPreparedScripts(
-            resolved.map(({ injectable, configJson, themeJson, codeSource }) => ({
-                injectable,
-                configJson,
-                themeJson,
-                codeSource: codeSource ?? null,
-            })),
-        ),
-        skipped,
-    };
+  return {
+    prepared: sortPreparedScripts(
+      resolved.map(({ injectable, configJson, themeJson, codeSource }) => ({
+        injectable,
+        configJson,
+        themeJson,
+        codeSource: codeSource ?? null,
+      })),
+    ),
+    skipped,
+  };
 }
 
 /** Converts project script entries into background script bindings. */
 function buildScriptBindings(entries: ScriptEntry[]): ScriptBindingResolved[] {
-    return entries.map((script) => ({
-        scriptId: script.path,
-        configId: script.configBinding ?? null,
-        order: script.order,
-        world: "MAIN",
-        runAt: script.runAt ?? "document_idle",
-    }));
+  return entries.map((script) => ({
+    scriptId: script.path,
+    configId: script.configBinding ?? null,
+    order: script.order,
+    world: "MAIN",
+    runAt: script.runAt ?? "document_idle",
+  }));
 }
 
 interface CandidateFields {
@@ -172,58 +172,69 @@ interface CandidateFields {
 
 /** Reads and normalizes fields from a raw entry object. */
 function readCandidateFields(candidate: Record<string, unknown>, index: number): CandidateFields {
-    const rawId = typeof candidate.id === "string" ? candidate.id : null;
-    const rawPath = typeof candidate.path === "string" ? candidate.path : null;
-    const rawName = typeof candidate.name === "string" ? candidate.name : null;
-    const rawCode = typeof candidate.code === "string" ? candidate.code : null;
-    const rawOrder = typeof candidate.order === "number" ? candidate.order : null;
-    const displayId = rawId ?? rawPath ?? `unknown-${index}`;
+  const rawId = typeof candidate.id === "string" ? candidate.id : null;
+  const rawPath = typeof candidate.path === "string" ? candidate.path : null;
+  const rawName = typeof candidate.name === "string" ? candidate.name : null;
+  const rawCode = typeof candidate.code === "string" ? candidate.code : null;
+  const rawOrder = typeof candidate.order === "number" ? candidate.order : null;
+  const displayId = rawId ?? rawPath ?? `unknown-${index}`;
 
-    return {
-        rawId, rawPath, rawCode, rawOrder,
-        hasCodeKey: "code" in candidate,
-        displayId,
-        displayName: rawName ?? rawPath ?? displayId,
-    };
+  return {
+    rawId, rawPath, rawCode, rawOrder,
+    hasCodeKey: "code" in candidate,
+    displayId,
+    displayName: rawName ?? rawPath ?? displayId,
+  };
 }
 
 /** Classifies a raw entry into one of four buckets — never throws. */
 function classifyEntry(entry: RawEntry, index: number): Classified {
-    if (typeof entry !== "object" || entry === null) {
-        return { kind: "malformed", id: `unknown-${index}`, name: `script-${index}`, missing: "entry is not an object" };
-    }
-    const fields = readCandidateFields(entry as Record<string, unknown>, index);
+  if (typeof entry !== "object" || entry === null) {
+    return { kind: "malformed", id: `unknown-${index}`, name: `script-${index}`, missing: "entry is not an object" };
+  }
 
-    // Project store entry shape: has `path` + `order`, no inline `code`.
-    if (fields.rawPath !== null && fields.rawOrder !== null && !fields.hasCodeKey) {
-        return { kind: "project-entry", value: entry as ScriptEntry };
-    }
+  const fields = readCandidateFields(entry as Record<string, unknown>, index);
 
-    // Inline injectable shape: needs id + code + order.
-    const missing: string[] = [];
-    if (fields.rawId === null) missing.push("id");
-    if (!fields.hasCodeKey) missing.push("code");
-    if (fields.rawOrder === null) missing.push("order");
-    if (missing.length > 0) {
-        return { kind: "malformed", id: fields.displayId, name: fields.displayName, missing: missing.join(", ") };
-    }
+  // Project store entry shape: has `path` + `order`, no inline `code`.
+  if (fields.rawPath !== null && fields.rawOrder !== null && !fields.hasCodeKey) {
+    return { kind: "project-entry", value: entry as ScriptEntry };
+  }
 
-    // id, code key, and order are all present — but code might be empty/non-string.
-    if (fields.rawCode === null) {
-        return { kind: "malformed", id: fields.displayId, name: fields.displayName, missing: "code (must be a string)" };
-    }
-    if (fields.rawCode.trim().length === 0) {
-        return { kind: "empty-code", id: fields.displayId, name: fields.displayName };
-    }
+  // Inline injectable shape: needs id + code + order.
+  const missing: string[] = [];
+  if (fields.rawId === null) {
+    missing.push("id");
+  }
 
-    return { kind: "injectable", value: entry as InjectableScript };
+  if (!fields.hasCodeKey) {
+    missing.push("code");
+  }
+
+  if (fields.rawOrder === null) {
+    missing.push("order");
+  }
+
+  if (missing.length > 0) {
+    return { kind: "malformed", id: fields.displayId, name: fields.displayName, missing: missing.join(", ") };
+  }
+
+  // id, code key, and order are all present — but code might be empty/non-string.
+  if (fields.rawCode === null) {
+    return { kind: "malformed", id: fields.displayId, name: fields.displayName, missing: "code (must be a string)" };
+  }
+
+  if (fields.rawCode.trim().length === 0) {
+    return { kind: "empty-code", id: fields.displayId, name: fields.displayName };
+  }
+
+  return { kind: "injectable", value: entry as InjectableScript };
 }
 
 /** Sorts prepared scripts by execution order. */
 function sortPreparedScripts(
-    scripts: PreparedInjectionScript[],
+  scripts: PreparedInjectionScript[],
 ): PreparedInjectionScript[] {
-    return [...scripts].sort(
-        (a, b) => a.injectable.order - b.injectable.order,
-    );
+  return [...scripts].sort(
+    (a, b) => a.injectable.order - b.injectable.order,
+  );
 }

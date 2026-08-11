@@ -34,119 +34,124 @@ interface ActiveProjectResponse {
 
 /** Registers chrome.commands listeners. */
 export function registerShortcutCommands(): void {
-    chrome.commands.onCommand.addListener((command) => {
-        console.log("[Marco] Shortcut command received: %s at %s", command, new Date().toISOString());
+  chrome.commands.onCommand.addListener((command) => {
+    console.log("[Marco] Shortcut command received: %s at %s", command, new Date().toISOString());
 
-        if (command === RUN_SCRIPTS_COMMAND) {
-            void runScriptsFromShortcut(false);
-        } else if (command === FORCE_RUN_SCRIPTS_COMMAND) {
-            void runScriptsFromShortcut(true);
-        } else if (command === TOGGLE_RECORDING_COMMAND) {
-            void toggleRecordingFromShortcut();
-        }
-    });
+    if (command === RUN_SCRIPTS_COMMAND) {
+      void runScriptsFromShortcut(false);
+    } else if (command === FORCE_RUN_SCRIPTS_COMMAND) {
+      void runScriptsFromShortcut(true);
+    } else if (command === TOGGLE_RECORDING_COMMAND) {
+      void toggleRecordingFromShortcut();
+    }
+  });
 
-    // Log registered commands for debugging — verify shortcut is actually assigned
-    chrome.commands.getAll((commands) => {
-        const runCmd = commands.find((c) => c.name === RUN_SCRIPTS_COMMAND);
-        if (runCmd) {
-            const shortcut = runCmd.shortcut || "";
-            if (shortcut) {
-                console.log("[Marco] ✅ Shortcut registered: %s → %s", RUN_SCRIPTS_COMMAND, shortcut);
-            } else {
-                logBgWarnError(BgLogTag.SHORTCUT, `Shortcut '${RUN_SCRIPTS_COMMAND}' exists but has NO key binding assigned! Go to chrome://extensions/shortcuts to assign one.`);
-            }
-        } else {
-            logBgWarnError(BgLogTag.SHORTCUT, `Shortcut '${RUN_SCRIPTS_COMMAND}' not found in manifest commands — check manifest.json`);
-        }
+  // Log registered commands for debugging — verify shortcut is actually assigned
+  chrome.commands.getAll((commands) => {
+    const runCmd = commands.find((c) => c.name === RUN_SCRIPTS_COMMAND);
+    if (runCmd) {
+      const shortcut = runCmd.shortcut || "";
+      if (shortcut) {
+        console.log("[Marco] ✅ Shortcut registered: %s → %s", RUN_SCRIPTS_COMMAND, shortcut);
+      } else {
+        logBgWarnError(BgLogTag.SHORTCUT, `Shortcut '${RUN_SCRIPTS_COMMAND}' exists but has NO key binding assigned! Go to chrome://extensions/shortcuts to assign one.`);
+      }
+    } else {
+      logBgWarnError(BgLogTag.SHORTCUT, `Shortcut '${RUN_SCRIPTS_COMMAND}' not found in manifest commands — check manifest.json`);
+    }
 
-        // Log all registered commands for cross-reference
-        console.log("[Marco] All registered commands: %s",
-            commands.map(c => `${c.name}=${c.shortcut || "(none)"}`).join(", "));
-    });
+    // Log all registered commands for cross-reference
+    console.log("[Marco] All registered commands: %s",
+      commands.map(c => `${c.name}=${c.shortcut || "(none)"}`).join(", "));
+  });
 }
 
 /** Resolves the active tab and its URL; logs + returns null on any abort condition. */
 async function resolveShortcutTarget(): Promise<{ tabId: number; url: string } | null> {
-    const tab = await getActiveTab();
-    if (tab === null || typeof tab.id !== "number") {
-        logBgWarnError(BgLogTag.SHORTCUT, "Aborting: no active tab found (reason=no-active-tab)");
+  const tab = await getActiveTab();
+  if (tab === null || typeof tab.id !== "number") {
+    logBgWarnError(BgLogTag.SHORTCUT, "Aborting: no active tab found (reason=no-active-tab)");
 
-        return null;
-    }
-    const url = tab.url ?? "";
-    if (isNewTabOrBlankUrl(url)) {
-        logBgWarnError(BgLogTag.SHORTCUT, `Aborting: active tab is a new-tab/blank page (tabId=${tab.id}, url='${url}', reason=new-tab-blank-url)`);
+    return null;
+  }
 
-        return null;
-    }
+  const url = tab.url ?? "";
+  if (isNewTabOrBlankUrl(url)) {
+    logBgWarnError(BgLogTag.SHORTCUT, `Aborting: active tab is a new-tab/blank page (tabId=${tab.id}, url='${url}', reason=new-tab-blank-url)`);
 
-    return { tabId: tab.id, url };
+    return null;
+  }
+
+  return { tabId: tab.id, url };
 }
 
 /** Dispatches INJECT_SCRIPTS through the internal router and logs the outcome. */
 async function dispatchShortcutInjection(
-    tabId: number,
-    scripts: ScriptEntry[],
-    projectLabel: string,
-    source: string,
-    t0: number,
+  tabId: number,
+  scripts: ScriptEntry[],
+  projectLabel: string,
+  source: string,
+  t0: number,
 ): Promise<void> {
-    console.log("[Marco] Shortcut: injecting %d scripts into tab %d (project=%s, source=%s)", scripts.length, tabId, projectLabel, source);
-    const rawResponse = await sendInternalMessage<InjectScriptsResponse>({
-        type: MessageType.INJECT_SCRIPTS,
-        tabId,
-        scripts,
-        launchSource: "manual",
-        // v3.20.0: manual shortcut launches force reload so per-page body-marker
-        // dedup never silently absorbs a deliberate re-run (mirrors popup Run).
-        forceReload: true,
-    });
-    const response = normalizeInjectScriptsResponse(rawResponse);
-    if (response.inlineSyntaxFlagSource === "legacy-default") {
-        console.warn("[Marco] Shortcut: response missing inlineSyntaxErrorDetected — older background build, defaulting to false");
-    }
-    const elapsed = Math.round(performance.now() - t0);
-    console.log("[Marco] Shortcut: injection complete — %d results in %dms (inlineSyntaxErrorDetected=%s, source=%s)",
-        response.results.length, elapsed, response.inlineSyntaxErrorDetected, response.inlineSyntaxFlagSource);
+  console.log("[Marco] Shortcut: injecting %d scripts into tab %d (project=%s, source=%s)", scripts.length, tabId, projectLabel, source);
+  const rawResponse = await sendInternalMessage<InjectScriptsResponse>({
+    type: MessageType.INJECT_SCRIPTS,
+    tabId,
+    scripts,
+    launchSource: "manual",
+    // v3.20.0: manual shortcut launches force reload so per-page body-marker
+    // dedup never silently absorbs a deliberate re-run (mirrors popup Run).
+    forceReload: true,
+  });
+  const response = normalizeInjectScriptsResponse(rawResponse);
+  if (response.inlineSyntaxFlagSource === "legacy-default") {
+    console.warn("[Marco] Shortcut: response missing inlineSyntaxErrorDetected — older background build, defaulting to false");
+  }
+
+  const elapsed = Math.round(performance.now() - t0);
+  console.log("[Marco] Shortcut: injection complete — %d results in %dms (inlineSyntaxErrorDetected=%s, source=%s)",
+    response.results.length, elapsed, response.inlineSyntaxErrorDetected, response.inlineSyntaxFlagSource);
 }
 
 /** Runs active project scripts in the currently active tab. */
 async function runScriptsFromShortcut(forceReload: boolean): Promise<void> {
-    const t0 = performance.now();
-    try {
-        const target = await resolveShortcutTarget();
-        if (target === null) return;
-
-        console.log("[Marco] Shortcut: active tab=%d url='%s', fetching project scripts...%s", target.tabId, target.url, forceReload ? " (FORCE RUN)" : "");
-        const { scripts, source, projectLabel } = await resolveScriptsForShortcut(target.url);
-
-        if (scripts.length === 0) {
-            logBgWarnError(
-                BgLogTag.SHORTCUT,
-                `Aborting: no scripts to inject (tabId=${target.tabId}, url='${target.url}', project=${projectLabel}, source=${source}, reason=empty-script-set). ` +
-                `Hint: open the popup to confirm an active project is set and has enabled scripts, or add a URL rule so auto-attach can resolve scripts for this page.`,
-            );
-
-            return;
-        }
-        await dispatchShortcutInjection(target.tabId, scripts, projectLabel, source, t0);
-    } catch (runError) {
-        logCaughtError(BgLogTag.SHORTCUT, "Shortcut run failed", runError);
+  const t0 = performance.now();
+  try {
+    const target = await resolveShortcutTarget();
+    if (target === null) {
+      return;
     }
+
+    console.log("[Marco] Shortcut: active tab=%d url='%s', fetching project scripts...%s", target.tabId, target.url, forceReload ? " (FORCE RUN)" : "");
+    const { scripts, source, projectLabel } = await resolveScriptsForShortcut(target.url);
+
+    if (scripts.length === 0) {
+      logBgWarnError(
+        BgLogTag.SHORTCUT,
+        `Aborting: no scripts to inject (tabId=${target.tabId}, url='${target.url}', project=${projectLabel}, source=${source}, reason=empty-script-set). ` +
+                `Hint: open the popup to confirm an active project is set and has enabled scripts, or add a URL rule so auto-attach can resolve scripts for this page.`,
+      );
+
+      return;
+    }
+
+    await dispatchShortcutInjection(target.tabId, scripts, projectLabel, source, t0);
+  } catch (runError) {
+    logCaughtError(BgLogTag.SHORTCUT, "Shortcut run failed", runError);
+  }
 }
 
 /** Returns the active tab (with url), or null if unavailable. */
 async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-        return tab ?? null;
-    } catch (err) {
-        logCaughtError(BgLogTag.SHORTCUT, "chrome.tabs.query failed", err);
+    return tab ?? null;
+  } catch (err) {
+    logCaughtError(BgLogTag.SHORTCUT, "chrome.tabs.query failed", err);
 
-        return null;
-    }
+    return null;
+  }
 }
 
 interface ResolvedShortcutScripts {
@@ -165,38 +170,38 @@ interface ResolvedShortcutScripts {
  * abort can name the missing binding / matched project candidates.
  */
 export async function resolveScriptsForShortcut(tabUrl: string): Promise<ResolvedShortcutScripts> {
-    const response = await sendInternalMessage<ActiveProjectResponse>({
-        type: MessageType.GET_ACTIVE_PROJECT,
-    });
+  const response = await sendInternalMessage<ActiveProjectResponse>({
+    type: MessageType.GET_ACTIVE_PROJECT,
+  });
 
-    const project = response?.activeProject ?? null;
-    const projectLabel = project
-        ? `"${project.name ?? "?"}" (id=${project.id ?? "?"})`
-        : "none";
+  const project = response?.activeProject ?? null;
+  const projectLabel = project
+    ? `"${project.name ?? "?"}" (id=${project.id ?? "?"})`
+    : "none";
 
-    const projectScripts = Array.isArray(project?.scripts) ? project.scripts : [];
+  const projectScripts = Array.isArray(project?.scripts) ? project.scripts : [];
 
-    if (project && projectScripts.length > 0) {
-        console.log("[Marco] Shortcut: using active project=%s with %d scripts", projectLabel, projectScripts.length);
+  if (project && projectScripts.length > 0) {
+    console.log("[Marco] Shortcut: using active project=%s with %d scripts", projectLabel, projectScripts.length);
 
-        return { scripts: projectScripts, source: "active-project", projectLabel };
-    }
+    return { scripts: projectScripts, source: "active-project", projectLabel };
+  }
 
-    // Diagnostic-only probe: surface what auto-attach would have matched so
-    // the empty-set warn explains *why* nothing ran.
-    const reason = project ? "active-project-has-no-scripts" : "no-active-project-set";
-    try {
-        const matches = await evaluateUrlMatches(tabUrl);
-        const matchedProjectIds = matches.map((m) => m.projectId).filter(Boolean);
-        console.log(
-            "[Marco] Shortcut: active-project resolution empty (reason=%s, project=%s); URL '%s' would auto-attach to %d project(s): [%s]",
-            reason, projectLabel, tabUrl, matchedProjectIds.length, matchedProjectIds.join(", "),
-        );
-    } catch (probeErr) {
-        logCaughtError(BgLogTag.SHORTCUT, "URL auto-attach probe failed", probeErr);
-    }
+  // Diagnostic-only probe: surface what auto-attach would have matched so
+  // the empty-set warn explains *why* nothing ran.
+  const reason = project ? "active-project-has-no-scripts" : "no-active-project-set";
+  try {
+    const matches = await evaluateUrlMatches(tabUrl);
+    const matchedProjectIds = matches.map((m) => m.projectId).filter(Boolean);
+    console.log(
+      "[Marco] Shortcut: active-project resolution empty (reason=%s, project=%s); URL '%s' would auto-attach to %d project(s): [%s]",
+      reason, projectLabel, tabUrl, matchedProjectIds.length, matchedProjectIds.join(", "),
+    );
+  } catch (probeErr) {
+    logCaughtError(BgLogTag.SHORTCUT, "URL auto-attach probe failed", probeErr);
+  }
 
-    return { scripts: [], source: "none", projectLabel };
+  return { scripts: [], source: "none", projectLabel };
 }
 
 /**
@@ -204,17 +209,17 @@ export async function resolveScriptsForShortcut(tabUrl: string): Promise<Resolve
  * Uses a properly resolved promise pattern compatible with service workers.
  */
 function sendInternalMessage<T>(message: Record<string, unknown>): Promise<T> {
-    return new Promise((resolve, reject) => {
-        const sender = {} as chrome.runtime.MessageSender;
+  return new Promise((resolve, reject) => {
+    const sender = {} as chrome.runtime.MessageSender;
 
-        // handleMessage is async — it calls sendResponse when done
-        handleMessage(message, sender, (response: unknown) => {
-            resolve(response as T);
-        }).catch((err: unknown) => {
-            logCaughtError(BgLogTag.SHORTCUT, "Internal message dispatch error", err);
-            reject(err);
-        });
+    // handleMessage is async — it calls sendResponse when done
+    handleMessage(message, sender, (response: unknown) => {
+      resolve(response as T);
+    }).catch((err: unknown) => {
+      logCaughtError(BgLogTag.SHORTCUT, "Internal message dispatch error", err);
+      reject(err);
     });
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -232,63 +237,66 @@ function sendInternalMessage<T>(message: Record<string, unknown>): Promise<T> {
  * `spec/26-chrome-extension-generic/06-ui-and-design-system/10-toolbar-recording-ux.md`.
  */
 async function toggleRecordingFromShortcut(): Promise<void> {
-    try {
-        const current = (await loadSession()) ?? IDLE_SESSION;
-        const projectSlug = await getActiveProjectSlug();
-        if (current.Phase === "Idle" && projectSlug === null) {
-            logBgWarnError(BgLogTag.SHORTCUT, "Toggle-recording: no active project — aborting Start");
+  try {
+    const current = (await loadSession()) ?? IDLE_SESSION;
+    const projectSlug = await getActiveProjectSlug();
+    if (current.Phase === "Idle" && projectSlug === null) {
+      logBgWarnError(BgLogTag.SHORTCUT, "Toggle-recording: no active project — aborting Start");
 
-            return;
-        }
-
-        const action = chooseToggleAction(current.Phase, projectSlug ?? current.ProjectSlug);
-        const next = recorderReducer(current, action);
-        await persistSession(next);
-        console.log("[Marco] Recorder phase: %s → %s (session=%s)", current.Phase, next.Phase, next.SessionId || "(cleared)");
-
-        // Phase 1: Inject the recorder script into the active tab when starting
-        if (next.Phase === "Recording" && current.Phase === "Idle") {
-            const target = await getActiveTab();
-            if (target && target.id) {
-                await chrome.scripting.executeScript({
-                    target: { tabId: target.id },
-                    files: ["content-scripts/xpath-recorder.js"]
-                });
-                console.log("[Marco] Injected xpath-recorder.js into tab %d", target.id);
-            }
-        }
-    } catch (err) {
-        logCaughtError(BgLogTag.SHORTCUT, "Toggle-recording shortcut failed", err);
+      return;
     }
+
+    const action = chooseToggleAction(current.Phase, projectSlug ?? current.ProjectSlug);
+    const next = recorderReducer(current, action);
+    await persistSession(next);
+    console.log("[Marco] Recorder phase: %s → %s (session=%s)", current.Phase, next.Phase, next.SessionId || "(cleared)");
+
+    // Phase 1: Inject the recorder script into the active tab when starting
+    if (next.Phase === "Recording" && current.Phase === "Idle") {
+      const target = await getActiveTab();
+      if (target && target.id) {
+        await chrome.scripting.executeScript({
+          target: { tabId: target.id },
+          files: ["content-scripts/xpath-recorder.js"]
+        });
+        console.log("[Marco] Injected xpath-recorder.js into tab %d", target.id);
+      }
+    }
+  } catch (err) {
+    logCaughtError(BgLogTag.SHORTCUT, "Toggle-recording shortcut failed", err);
+  }
 }
 
 /** Returns the recorder action that the primary toolbar button maps to. */
 function chooseToggleAction(
-    phase: PhaseType,
-    projectSlug: string,
+  phase: PhaseType,
+  projectSlug: string,
 ): import("./recorder/recorder-store").RecorderAction {
-    if (phase === "Idle") {
-        return { Kind: "Start", ProjectSlug: projectSlug, SessionId: generateSessionId(), StartedAt: new Date().toISOString() };
-    }
-    if (phase === "Recording") { return { Kind: "Pause" }; }
+  if (phase === "Idle") {
+    return { Kind: "Start", ProjectSlug: projectSlug, SessionId: generateSessionId(), StartedAt: new Date().toISOString() };
+  }
 
-    return { Kind: "Resume" };
+  if (phase === "Recording") {
+    return { Kind: "Pause" }; 
+  }
+
+  return { Kind: "Resume" };
 }
 
 function generateSessionId(): string {
-    // ULID-ish: timestamp + 8 random hex chars. Sortable + collision-safe enough
-    // for one-session-at-a-time recorder use.
-    const ts = Date.now().toString(36);
-    const rand = Math.random().toString(16).slice(2, 10).padStart(8, "0");
+  // ULID-ish: timestamp + 8 random hex chars. Sortable + collision-safe enough
+  // for one-session-at-a-time recorder use.
+  const ts = Date.now().toString(36);
+  const rand = Math.random().toString(16).slice(2, 10).padStart(8, "0");
 
-    return `${ts}-${rand}`;
+  return `${ts}-${rand}`;
 }
 
 async function getActiveProjectSlug(): Promise<string | null> {
-    const response = await sendInternalMessage<ActiveProjectResponse>({
-        type: MessageType.GET_ACTIVE_PROJECT,
-    });
-    const slug = response?.activeProject?.slug;
+  const response = await sendInternalMessage<ActiveProjectResponse>({
+    type: MessageType.GET_ACTIVE_PROJECT,
+  });
+  const slug = response?.activeProject?.slug;
 
-    return typeof slug === "string" && slug.length > 0 ? slug : null;
+  return typeof slug === "string" && slug.length > 0 ? slug : null;
 }

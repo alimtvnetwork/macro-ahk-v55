@@ -59,9 +59,11 @@ const SNAPSHOT: ReadonlyArray<WorkspaceCredit> = [
 function dialog(): HTMLElement | null {
   return document.getElementById('marco-credit-totals-modal');
 }
+
 function visibleRowCount(): number {
   return dialog()?.querySelectorAll('[data-credit-totals-row]').length || 0;
 }
+
 function rowNames(): string[] {
   const rows = dialog()?.querySelectorAll<HTMLElement>('[data-credit-totals-row]') || [];
 
@@ -117,8 +119,12 @@ describe('Credit Totals E2E — sort & reorder', () => {
     const rows = dialog()!.querySelectorAll<HTMLElement>('[data-credit-totals-row]');
     const dt = {
       effectAllowed: '', dropEffect: '', _data: '',
-      setData(_t: string, v: string) { this._data = v; },
-      getData(_t: string) { return this._data; },
+      setData(_t: string, v: string) {
+        this._data = v; 
+      },
+      getData(_t: string) {
+        return this._data; 
+      },
     };
     rows[0].dispatchEvent(Object.assign(new Event('dragstart', { bubbles: true }), { dataTransfer: dt }));
     rows[3].dispatchEvent(Object.assign(new Event('drop', { bubbles: true }), { dataTransfer: dt, preventDefault: () => {} }));

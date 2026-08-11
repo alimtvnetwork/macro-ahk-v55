@@ -26,40 +26,40 @@ const store = new Map<string, boolean>();
  * default to verbose; the user must opt in).
  */
 export function resolveVerboseLogging(projectId: string | null | undefined): boolean {
-    const key = normalizeId(projectId);
+  const key = normalizeId(projectId);
 
-    return store.get(key) === true;
+  return store.get(key) === true;
 }
 
 /** Mutate the toggle for a project. Idempotent; safe to call repeatedly. */
 export function setVerboseLogging(projectId: string | null | undefined, on: boolean): void {
-    const key = normalizeId(projectId);
-    if (on) {
-        store.set(key, true);
-    } else {
-        store.delete(key);
-    }
+  const key = normalizeId(projectId);
+  if (on) {
+    store.set(key, true);
+  } else {
+    store.delete(key);
+  }
 }
 
 /** Test seam — clears the entire store. Production callers do not use this. */
 export function _resetVerboseLoggingStore(): void {
-    store.clear();
+  store.clear();
 }
 
 /** Snapshot of the current toggle map, for diagnostics export. */
 export function snapshotVerboseLoggingStore(): ReadonlyArray<{ ProjectId: string; Verbose: boolean }> {
-    const out: Array<{ ProjectId: string; Verbose: boolean }> = [];
-    for (const [k, v] of store.entries()) {
-        out.push({ ProjectId: k, Verbose: v });
-    }
+  const out: Array<{ ProjectId: string; Verbose: boolean }> = [];
+  for (const [k, v] of store.entries()) {
+    out.push({ ProjectId: k, Verbose: v });
+  }
 
-    return out;
+  return out;
 }
 
 function normalizeId(projectId: string | null | undefined): string {
-    if (projectId === null || projectId === undefined || projectId.length === 0) {
-        return FALLBACK_PROJECT_ID;
-    }
+  if (projectId === null || projectId === undefined || projectId.length === 0) {
+    return FALLBACK_PROJECT_ID;
+  }
 
-    return projectId;
+  return projectId;
 }

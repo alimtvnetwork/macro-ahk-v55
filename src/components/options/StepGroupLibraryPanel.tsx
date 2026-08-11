@@ -21,8 +21,8 @@ import { useStepGroupImport } from "@/hooks/use-step-group-import";
 import StepLibraryErrorState from "./StepLibraryErrorState";
 import { StepGroupLibraryBody } from "./step-group-library/StepGroupLibraryBody";
 import {
-    useLibraryPanelState,
-    useLibraryStatePrune,
+  useLibraryPanelState,
+  useLibraryStatePrune,
 } from "./step-group-library/use-library-panel-state";
 import { useLibrarySelection } from "./step-group-library/use-library-selection";
 import { useStepGroupExportImport } from "./step-group-library/use-export-import";
@@ -32,117 +32,119 @@ import { useStepGroupMutations } from "./step-group-library/use-step-group-mutat
 import type { TreeNode } from "./step-group-library/tree";
 
 function buildTree(groups: ReadonlyArray<StepGroupRow>): TreeNode[] {
-    const byParent = new Map<number | null, StepGroupRow[]>();
-    for (const g of groups) {
-        const key = g.ParentStepGroupId ?? null;
-        const entries = byParent.get(key) ?? [];
-        entries.push(g);
-        byParent.set(key, entries);
-    }
-    const visit = (parentId: number | null): TreeNode[] => {
-        const kids = byParent.get(parentId) ?? [];
-        kids.sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name));
+  const byParent = new Map<number | null, StepGroupRow[]>();
+  for (const g of groups) {
+    const key = g.ParentStepGroupId ?? null;
+    const entries = byParent.get(key) ?? [];
+    entries.push(g);
+    byParent.set(key, entries);
+  }
 
-        return kids.map((g) => ({ Group: g, Children: visit(g.StepGroupId) }));
-    };
+  const visit = (parentId: number | null): TreeNode[] => {
+    const kids = byParent.get(parentId) ?? [];
+    kids.sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name));
 
-    return visit(null);
+    return kids.map((g) => ({ Group: g, Children: visit(g.StepGroupId) }));
+  };
+
+  return visit(null);
 }
 
 export default function StepGroupLibraryPanel() {
-    const lib = useStepLibrary();
+  const lib = useStepLibrary();
 
-    const state = useLibraryPanelState({ projectRow: lib.Project ?? null });
-    const {
-        setSelected, setSelectionOrder,
-        activeGroupId, setActiveGroupId,
-        expanded, setExpanded,
-        showArchived,
-        createDialog, setCreateDialog,
-        renameDialog, setRenameDialog,
-        deleteDialog, setDeleteDialog,
-        stepEditor, setStepEditor,
-        deleteStepDialog, setDeleteStepDialog,
-        fileInputRef,
-        pendingGroupOrder, setPendingGroupOrder,
-        pendingStepOrder, setPendingStepOrder,
-        selected,
-    } = state;
+  const state = useLibraryPanelState({ projectRow: lib.Project ?? null });
+  const {
+    setSelected, setSelectionOrder,
+    activeGroupId, setActiveGroupId,
+    expanded, setExpanded,
+    showArchived,
+    createDialog, setCreateDialog,
+    renameDialog, setRenameDialog,
+    deleteDialog, setDeleteDialog,
+    stepEditor, setStepEditor,
+    deleteStepDialog, setDeleteStepDialog,
+    fileInputRef,
+    pendingGroupOrder, setPendingGroupOrder,
+    pendingStepOrder, setPendingStepOrder,
+    selected,
+  } = state;
 
-    const importApi = useStepGroupImport({
-        lib: { Lib: lib.Lib, Project: lib.Project, SqlJs: lib.SqlJs },
-        onAfterImport: lib.refresh,
-    });
+  const importApi = useStepGroupImport({
+    lib: { Lib: lib.Lib, Project: lib.Project, SqlJs: lib.SqlJs },
+    onAfterImport: lib.refresh,
+  });
 
-    const viewModel = useStepGroupLibraryViewModel({
-        lib,
-        showArchived,
-        pendingGroupOrder,
-        setPendingGroupOrder,
-        pendingStepOrder,
-        setPendingStepOrder,
-        expanded,
-        activeGroupId,
-        selected,
-        buildTree,
-    });
+  const viewModel = useStepGroupLibraryViewModel({
+    lib,
+    showArchived,
+    pendingGroupOrder,
+    setPendingGroupOrder,
+    pendingStepOrder,
+    setPendingStepOrder,
+    expanded,
+    activeGroupId,
+    selected,
+    buildTree,
+  });
 
-    useLibraryStatePrune({
-        libProjectReady: lib.Project !== null,
-        groupsById: viewModel.groupsById,
-        activeGroupId, setActiveGroupId,
-        expanded, setExpanded,
-    });
+  useLibraryStatePrune({
+    libProjectReady: lib.Project !== null,
+    groupsById: viewModel.groupsById,
+    activeGroupId, setActiveGroupId,
+    expanded, setExpanded,
+  });
 
-    const selection = useLibrarySelection({ setSelected, setSelectionOrder, setExpanded });
+  const selection = useLibrarySelection({ setSelected, setSelectionOrder, setExpanded });
 
-    const mutations = useStepGroupMutations({
-        lib,
-        showArchived,
-        activeGroupId,
-        setActiveGroupId,
-        setSelected,
-        setSelectionOrder,
-        setExpanded,
-        createDialog, setCreateDialog,
-        renameDialog, setRenameDialog,
-        deleteDialog, setDeleteDialog,
-        stepEditor, setStepEditor,
-        deleteStepDialog, setDeleteStepDialog,
-        setPendingGroupOrder,
-        setPendingStepOrder,
-    });
+  const mutations = useStepGroupMutations({
+    lib,
+    showArchived,
+    activeGroupId,
+    setActiveGroupId,
+    setSelected,
+    setSelectionOrder,
+    setExpanded,
+    createDialog, setCreateDialog,
+    renameDialog, setRenameDialog,
+    deleteDialog, setDeleteDialog,
+    stepEditor, setStepEditor,
+    deleteStepDialog, setDeleteStepDialog,
+    setPendingGroupOrder,
+    setPendingStepOrder,
+  });
 
-    const exportImport = useStepGroupExportImport({
-        lib, selected, importApi, fileInputRef,
-    });
+  const exportImport = useStepGroupExportImport({
+    lib, selected, importApi, fileInputRef,
+  });
 
-    if (lib.Loading) {
-        return (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-                Loading step library…
-            </div>
-        );
-    }
-    if (lib.LoadError !== null) {
-        return (
-            <StepLibraryErrorState
-                error={lib.LoadError}
-                onRetry={lib.retryLoad}
-                onReset={lib.resetAll}
-            />
-        );
-    }
-
+  if (lib.Loading) {
     return (
-        <StepGroupLibraryBody
-            lib={lib}
-            state={state}
-            viewModel={viewModel}
-            mutations={mutations}
-            exportImport={exportImport}
-            selection={selection}
-            importApi={importApi}
-        />
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+                Loading step library…
+      </div>
     );
+  }
+
+  if (lib.LoadError !== null) {
+    return (
+      <StepLibraryErrorState
+        error={lib.LoadError}
+        onRetry={lib.retryLoad}
+        onReset={lib.resetAll}
+      />
+    );
+  }
+
+  return (
+    <StepGroupLibraryBody
+      lib={lib}
+      state={state}
+      viewModel={viewModel}
+      mutations={mutations}
+      exportImport={exportImport}
+      selection={selection}
+      importApi={importApi}
+    />
+  );
 }

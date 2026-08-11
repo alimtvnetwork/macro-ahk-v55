@@ -75,11 +75,25 @@ interface ValidationRuleEditorProps {
 /* ------------------------------------------------------------------ */
 
 function testStringValidation(value: string, v: StringValidation): boolean {
-  if (v.startsWith && !value.startsWith(v.startsWith)) return false;
-  if (v.endsWith && !value.endsWith(v.endsWith)) return false;
-  if (v.contains && !value.includes(v.contains)) return false;
-  if (v.minLength !== undefined && value.length < v.minLength) return false;
-  if (v.maxLength !== undefined && value.length > v.maxLength) return false;
+  if (v.startsWith && !value.startsWith(v.startsWith)) {
+    return false;
+  }
+
+  if (v.endsWith && !value.endsWith(v.endsWith)) {
+    return false;
+  }
+
+  if (v.contains && !value.includes(v.contains)) {
+    return false;
+  }
+
+  if (v.minLength !== undefined && value.length < v.minLength) {
+    return false;
+  }
+
+  if (v.maxLength !== undefined && value.length > v.maxLength) {
+    return false;
+  }
 
   return true;
 }
@@ -88,6 +102,7 @@ function testDateValidation(value: string, v: DateValidation): boolean {
   if (v.format === "ISO8601") {
     return !isNaN(Date.parse(value));
   }
+
   // Simple YYYY-MM-DD pattern
   if (v.format === "YYYY-MM-DD") {
     return /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(Date.parse(value));
@@ -113,10 +128,21 @@ function testEnumValidation(value: string, v: EnumValidation): boolean {
 
 function testNumberValidation(value: string, v: NumberValidation): boolean {
   const count = Number(value);
-  if (isNaN(count)) return false;
-  if (v.integer && !Number.isInteger(count)) return false;
-  if (v.min !== undefined && count < v.min) return false;
-  if (v.max !== undefined && count > v.max) return false;
+  if (isNaN(count)) {
+    return false;
+  }
+
+  if (v.integer && !Number.isInteger(count)) {
+    return false;
+  }
+
+  if (v.min !== undefined && count < v.min) {
+    return false;
+  }
+
+  if (v.max !== undefined && count > v.max) {
+    return false;
+  }
 
   return true;
 }
@@ -145,18 +171,35 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
   const strategy = rule?.strategy ?? "string";
 
   const testResult = useMemo(() => {
-    if (!rule || !testValue) return null;
+    if (!rule || !testValue) {
+      return null;
+    }
 
     return testValidation(testValue, rule);
   }, [rule, testValue]);
 
   const setStrategy = (s: ValidationStrategy) => {
     const base: ValidationRule = { strategy: s };
-    if (s === "string") base.string = {};
-    if (s === "date") base.date = { format: "YYYY-MM-DD" };
-    if (s === "regex") base.regex = { pattern: "", flags: "" };
-    if (s === "enum") base.enum = { values: [] };
-    if (s === "number") base.number = {};
+    if (s === "string") {
+      base.string = {};
+    }
+
+    if (s === "date") {
+      base.date = { format: "YYYY-MM-DD" };
+    }
+
+    if (s === "regex") {
+      base.regex = { pattern: "", flags: "" };
+    }
+
+    if (s === "enum") {
+      base.enum = { values: [] };
+    }
+
+    if (s === "number") {
+      base.number = {};
+    }
+
     onChange(base);
   };
 

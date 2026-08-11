@@ -19,92 +19,92 @@ let responsesQueue: QueuedResponse[] = [];
 const clearPromptCacheSpy = vi.fn(async () => { /* void */ });
 
 vi.mock('../extension-bridge', () => ({
-    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
+  }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
+  }),
 }));
 vi.mock('../../ui/prompt-cache', () => ({
-    clearPromptCache: clearPromptCacheSpy,
+  clearPromptCache: clearPromptCacheSpy,
 }));
 vi.mock('../../error-utils', async () => {
-    const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+  const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
 
-    return { ...actual, logDiagnosticFromCode: vi.fn() };
+  return { ...actual, logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 
 import {
-    validateAndDisableReadMemoryDuplicates,
-    READ_MEMORY_CANONICAL_SLUG_FOR_TEST,
-    READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST,
+  validateAndDisableReadMemoryDuplicates,
+  READ_MEMORY_CANONICAL_SLUG_FOR_TEST,
+  READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST,
 } from '../validate-read-memory-duplicates';
 
 beforeEach(() => {
-    captured.length = 0;
-    responsesQueue = [];
-    clearPromptCacheSpy.mockClear();
+  captured.length = 0;
+  responsesQueue = [];
+  clearPromptCacheSpy.mockClear();
 });
 
 describe('validateAndDisableReadMemoryDuplicates', () => {
-    it('is a no-op when no duplicate rows are found', async () => {
-        responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [] }];
-        const report = await validateAndDisableReadMemoryDuplicates();
-        expect(report).toEqual({ detected: 0, disabled: 0, slugs: [] });
-        expect(captured).toHaveLength(1);
-        expect(captured[0]?.method).toBe('QUERY');
-        expect(clearPromptCacheSpy).not.toHaveBeenCalled();
-    });
+  it('is a no-op when no duplicate rows are found', async () => {
+    responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [] }];
+    const report = await validateAndDisableReadMemoryDuplicates();
+    expect(report).toEqual({ detected: 0, disabled: 0, slugs: [] });
+    expect(captured).toHaveLength(1);
+    expect(captured[0]?.method).toBe('QUERY');
+    expect(clearPromptCacheSpy).not.toHaveBeenCalled();
+  });
 
-    it('demotes duplicates, prefixes Name, and clears the cache', async () => {
-        responsesQueue = [
-            {
-                ok: true, isFail: false, isSuccess: true,
-                rows: [
-                    { Id: 11, Slug: 'read-memory-v2', Name: 'Read Memory v2' },
-                    { Id: 22, Slug: 'rejog-the-memory-v1', Name: 'Rejog the Memory v1' },
-                ],
-            },
-            { ok: true, isFail: false, isSuccess: true },
-        ];
-        const report = await validateAndDisableReadMemoryDuplicates();
-        expect(report.detected).toBe(2);
-        expect(report.disabled).toBe(2);
-        expect(report.slugs).toEqual(['read-memory-v2', 'rejog-the-memory-v1']);
-        expect(captured).toHaveLength(2);
-        const updateSql = captured[1]?.sql ?? '';
-        expect(captured[1]?.method).toBe('SCHEMA');
-        expect(updateSql).toContain('UPDATE Prompt');
-        expect(updateSql).toContain('IsDefault = 0');
-        expect(updateSql).toContain(READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST);
-        expect(updateSql).toContain('Id IN (11, 22)');
-        expect(clearPromptCacheSpy).toHaveBeenCalledOnce();
-    });
+  it('demotes duplicates, prefixes Name, and clears the cache', async () => {
+    responsesQueue = [
+      {
+        ok: true, isFail: false, isSuccess: true,
+        rows: [
+          { Id: 11, Slug: 'read-memory-v2', Name: 'Read Memory v2' },
+          { Id: 22, Slug: 'rejog-the-memory-v1', Name: 'Rejog the Memory v1' },
+        ],
+      },
+      { ok: true, isFail: false, isSuccess: true },
+    ];
+    const report = await validateAndDisableReadMemoryDuplicates();
+    expect(report.detected).toBe(2);
+    expect(report.disabled).toBe(2);
+    expect(report.slugs).toEqual(['read-memory-v2', 'rejog-the-memory-v1']);
+    expect(captured).toHaveLength(2);
+    const updateSql = captured[1]?.sql ?? '';
+    expect(captured[1]?.method).toBe('SCHEMA');
+    expect(updateSql).toContain('UPDATE Prompt');
+    expect(updateSql).toContain('IsDefault = 0');
+    expect(updateSql).toContain(READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST);
+    expect(updateSql).toContain('Id IN (11, 22)');
+    expect(clearPromptCacheSpy).toHaveBeenCalledOnce();
+  });
 
-    it('excludes the canonical slug and already-prefixed rows from the match', async () => {
-        responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [] }];
-        await validateAndDisableReadMemoryDuplicates();
-        const querySql = captured[0]?.sql ?? '';
-        expect(querySql).toContain("Slug <> '" + READ_MEMORY_CANONICAL_SLUG_FOR_TEST + "'");
-        expect(querySql).toContain("Name NOT LIKE '" + READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST + "%'");
-    });
+  it('excludes the canonical slug and already-prefixed rows from the match', async () => {
+    responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [] }];
+    await validateAndDisableReadMemoryDuplicates();
+    const querySql = captured[0]?.sql ?? '';
+    expect(querySql).toContain("Slug <> '" + READ_MEMORY_CANONICAL_SLUG_FOR_TEST + "'");
+    expect(querySql).toContain("Name NOT LIKE '" + READ_MEMORY_DUPLICATE_PREFIX_FOR_TEST + "%'");
+  });
 
-    it('reports partial disable when the UPDATE fails', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 5, Slug: 'read-memory-old', Name: 'Read Memory Old' }] },
-            { ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' },
-        ];
-        const report = await validateAndDisableReadMemoryDuplicates();
-        expect(report.detected).toBe(1);
-        expect(report.disabled).toBe(0);
-        expect(clearPromptCacheSpy).not.toHaveBeenCalled();
-    });
+  it('reports partial disable when the UPDATE fails', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 5, Slug: 'read-memory-old', Name: 'Read Memory Old' }] },
+      { ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' },
+    ];
+    const report = await validateAndDisableReadMemoryDuplicates();
+    expect(report.detected).toBe(1);
+    expect(report.disabled).toBe(0);
+    expect(clearPromptCacheSpy).not.toHaveBeenCalled();
+  });
 });

@@ -17,7 +17,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SRC = join(HERE, '..', 'ui', 'prompt-dropdown.ts');
 
 let source = '';
-beforeAll(() => { source = readFileSync(SRC, 'utf-8'); });
+beforeAll(() => {
+  source = readFileSync(SRC, 'utf-8'); 
+});
 
 describe('Prompts dropdown — synchronous paint (Issue 129 Step 2)', () => {
   it('declares the in-memory snapshot mirror', () => {

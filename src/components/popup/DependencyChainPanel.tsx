@@ -118,6 +118,7 @@ export function DependencyChainPanel() {
         lines.push(`     ⚠ ${e.error}`);
       }
     }
+
     lines.push("");
     const allOk = snap.chain.every(c => c.resolved && c.fetched && c.executed);
     lines.push(`  Status: ${allOk ? "✓ ALL OK" : "✗ ISSUES DETECTED"}`);
@@ -127,7 +128,10 @@ export function DependencyChainPanel() {
   }, []);
 
   const copyToClipboard = useCallback(async () => {
-    if (!snapshot) return;
+    if (!snapshot) {
+      return;
+    }
+
     const text = formatChainText(snapshot);
     try {
       await navigator.clipboard.writeText(text);

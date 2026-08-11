@@ -13,23 +13,25 @@ let _cache: { hash: string; script: string } | null = null;
 
 /** Simple deterministic hash of settings + guide key for cache comparison. */
 export function hashSettingsKey(settings: Record<string, unknown>, guideKey: string): string {
-    return JSON.stringify({ ...settings, guideKey });
+  return JSON.stringify({ ...settings, guideKey });
 }
 
 /** Returns cached script if hash matches, or null for a miss. */
 export function getSettingsNsCache(hash: string): string | null {
-    if (_cache && _cache.hash === hash) return _cache.script;
+  if (_cache && _cache.hash === hash) {
+    return _cache.script;
+  }
 
-    return null;
+  return null;
 }
 
 /** Stores the built script in the cache. */
 export function setSettingsNsCache(hash: string, script: string): void {
-    _cache = { hash, script };
+  _cache = { hash, script };
 }
 
 /** Invalidate the settings namespace cache (called on SAVE_SETTINGS). */
 export function invalidateSettingsNsCache(): void {
-    _cache = null;
-    console.log("[injection:settings] Phase 10: settings namespace cache invalidated");
+  _cache = null;
+  console.log("[injection:settings] Phase 10: settings namespace cache invalidated");
 }

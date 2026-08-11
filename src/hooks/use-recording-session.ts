@@ -15,14 +15,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-    recorderReducer,
-    type RecorderAction,
+  recorderReducer,
+  type RecorderAction,
 } from "@/background/recorder/recorder-store";
 import type { RecordingSession } from "@/background/recorder/recorder-session-types";
 import {
-    readSession,
-    subscribeRecorderSession,
-    writeSession,
+  readSession,
+  subscribeRecorderSession,
+  writeSession,
 } from "@/lib/recorder-session-sync";
 
 export interface UseRecordingSessionResult {
@@ -37,72 +37,85 @@ export interface UseRecordingSessionResult {
 }
 
 function newSessionId(): string {
-    const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
-    if (c?.randomUUID !== undefined) { return c.randomUUID(); }
+  const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+  if (c?.randomUUID !== undefined) {
+    return c.randomUUID(); 
+  }
 
-    return `sess-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `sess-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function useSessionSubscription(
-    setSession: (s: RecordingSession | null) => void,
-    setLoading: (v: boolean) => void,
+  setSession: (s: RecordingSession | null) => void,
+  setLoading: (v: boolean) => void,
 ): void {
-    useEffect(() => {
-        let cancelled = false;
-        const unsubscribe = subscribeRecorderSession((next) => {
-            if (cancelled) { return; }
-            setSession(next);
-            setLoading(false);
-        });
+  useEffect(() => {
+    let cancelled = false;
+    const unsubscribe = subscribeRecorderSession((next) => {
+      if (cancelled) {
+        return; 
+      }
 
-        return () => { cancelled = true; unsubscribe(); };
+      setSession(next);
+      setLoading(false);
+    });
+
+    return () => {
+      cancelled = true; unsubscribe(); 
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  }, []);
 }
 
 async function dispatchAction(
-    action: RecorderAction,
-    setSession: (s: RecordingSession | null) => void,
+  action: RecorderAction,
+  setSession: (s: RecordingSession | null) => void,
 ): Promise<void> {
-    const current = await readSession();
-    if (current === null) { return; }
-    const next = recorderReducer(current, action);
-    await writeSession(next);
-    setSession(next.Phase === "Idle" ? null : next);
+  const current = await readSession();
+  if (current === null) {
+    return; 
+  }
+
+  const next = recorderReducer(current, action);
+  await writeSession(next);
+  setSession(next.Phase === "Idle" ? null : next);
 }
 
 async function startSession(
-    projectSlug: string | undefined,
-    setSession: (s: RecordingSession) => void,
+  projectSlug: string | undefined,
+  setSession: (s: RecordingSession) => void,
 ): Promise<void> {
-    const current = await readSession();
-    if (current !== null && current.Phase !== "Idle") { return; }
-    const seed: RecordingSession = {
-        SessionId: "", ProjectSlug: projectSlug ?? "default",
-        StartedAt: "", Phase: "Idle", Steps: [],
-    };
-    const next = recorderReducer(seed, {
-        Kind: "Start",
-        ProjectSlug: projectSlug ?? "default",
-        SessionId: newSessionId(),
-        StartedAt: new Date().toISOString(),
-    });
-    await writeSession(next);
-    setSession(next);
+  const current = await readSession();
+  if (current !== null && current.Phase !== "Idle") {
+    return; 
+  }
+
+  const seed: RecordingSession = {
+    SessionId: "", ProjectSlug: projectSlug ?? "default",
+    StartedAt: "", Phase: "Idle", Steps: [],
+  };
+  const next = recorderReducer(seed, {
+    Kind: "Start",
+    ProjectSlug: projectSlug ?? "default",
+    SessionId: newSessionId(),
+    StartedAt: new Date().toISOString(),
+  });
+  await writeSession(next);
+  setSession(next);
 }
 
 export function useRecordingSession(): UseRecordingSessionResult {
-    const [session, setSession] = useState<RecordingSession | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+  const [session, setSession] = useState<RecordingSession | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-    useSessionSubscription(setSession, setLoading);
+  useSessionSubscription(setSession, setLoading);
 
-    const dispatch = useCallback((a: RecorderAction) => dispatchAction(a, setSession), []);
-    const start = useCallback((projectSlug?: string) => startSession(projectSlug, setSession), []);
-    const pause = useCallback(() => dispatch({ Kind: "Pause" }), [dispatch]);
-    const resume = useCallback(() => dispatch({ Kind: "Resume" }), [dispatch]);
-    const stop = useCallback(() => dispatch({ Kind: "Stop" }), [dispatch]);
+  const dispatch = useCallback((a: RecorderAction) => dispatchAction(a, setSession), []);
+  const start = useCallback((projectSlug?: string) => startSession(projectSlug, setSession), []);
+  const pause = useCallback(() => dispatch({ Kind: "Pause" }), [dispatch]);
+  const resume = useCallback(() => dispatch({ Kind: "Resume" }), [dispatch]);
+  const stop = useCallback(() => dispatch({ Kind: "Stop" }), [dispatch]);
 
-    return { session, loading, start, pause, resume, stop };
+  return { session, loading, start, pause, resume, stop };
 }
 

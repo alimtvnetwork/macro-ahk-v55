@@ -21,9 +21,9 @@ interface ChromeRuntime {
 
 /** Detects whether we are running inside a Chrome extension context. */
 function isExtensionContext(): boolean {
-    const win = globalThis as ChromeRuntime;
+  const win = globalThis as ChromeRuntime;
 
-    return win.chrome !== undefined
+  return win.chrome !== undefined
         && win.chrome.runtime !== undefined
         && win.chrome.runtime.id !== undefined;
 }
@@ -33,15 +33,15 @@ let resolvedAdapter: PlatformAdapter | null = null;
 
 /** Returns the platform adapter for the current environment. */
 export function getPlatform(): PlatformAdapter {
-    if (resolvedAdapter !== null) {
-        return resolvedAdapter;
-    }
-
-    resolvedAdapter = isExtensionContext()
-        ? chromeAdapter
-        : previewAdapter;
-
+  if (resolvedAdapter !== null) {
     return resolvedAdapter;
+  }
+
+  resolvedAdapter = isExtensionContext()
+    ? chromeAdapter
+    : previewAdapter;
+
+  return resolvedAdapter;
 }
 
 /** Convenience re-exports. */

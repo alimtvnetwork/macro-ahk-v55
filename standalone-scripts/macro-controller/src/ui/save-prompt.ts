@@ -68,7 +68,9 @@ export function onSavePromptClick(deps: SavePromptDeps): void {
 }
 
 function extractTitleFromMarkdown(markdown: string): string {
-  const lines = markdown.split('\n').filter(function (line) { return line.trim(); });
+  const lines = markdown.split('\n').filter(function (line) {
+    return line.trim(); 
+  });
   let rawTitle = (lines[0] || 'Untitled Prompt').trim();
   rawTitle = rawTitle.replace(/^#{1,6}\s+/, '').replace(/^[-*]\s+/, '').replace(/^\d+\.\s+/, '').trim();
 
@@ -156,8 +158,12 @@ function findContainerViaCssFallback(): Element | null {
       const result = fallbackIndex === 2
         ? tryToolbarButtonFallback(fallbackSelector, fallbackIndex)
         : tryDirectFallback(fallbackSelector, fallbackIndex);
-      if (result) return result;
-    } catch (_e: unknown) { log('Save Prompt: CSS selector error at fallback #' + (fallbackIndex + 1) + ': ' + (_e instanceof Error ? _e.message : String(_e)), 'warn'); }
+      if (result) {
+        return result;
+      }
+    } catch (_e: unknown) {
+      log('Save Prompt: CSS selector error at fallback #' + (fallbackIndex + 1) + ': ' + (_e instanceof Error ? _e.message : String(_e)), 'warn'); 
+    }
   }
 
   return null;
@@ -174,8 +180,12 @@ const SAVE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height
 const PROMPTS_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 size-4" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>';
 
 function addHoverEffect(button: HTMLElement): void {
-  button.addEventListener('mouseover', function () { button.style.filter = 'brightness(0.8)'; });
-  button.addEventListener('mouseout', function () { button.style.filter = ''; });
+  button.addEventListener('mouseover', function () {
+    button.style.filter = 'brightness(0.8)'; 
+  });
+  button.addEventListener('mouseout', function () {
+    button.style.filter = ''; 
+  });
 }
 
 // CQ16: Extracted from injectSavePromptButton closure
@@ -201,7 +211,10 @@ export function insertBeforeFirstButton(container: Element, ...wrappers: HTMLEle
   const directChildren = Array.from(container.children) as HTMLElement[];
   const firstButton = directChildren.find(function (child) {
     const isOurs = child.id === 'marco-save-prompt-btn' || child.id === 'marco-chatbox-prompts-btn';
-    if (isOurs) return false;
+    if (isOurs) {
+      return false;
+    }
+
     const isButton = child.tagName === 'BUTTON';
     const wrapsButton = child.querySelector(':scope > button') !== null;
 
@@ -224,7 +237,9 @@ export function insertBeforeFirstButton(container: Element, ...wrappers: HTMLEle
 }
 
 function tryInjectSavePrompt(ctx: InjectCtx): boolean {
-  if (ctx.injected) return true;
+  if (ctx.injected) {
+    return true;
+  }
 
   const isAlreadyPresent = document.getElementById('marco-save-prompt-btn') !== null;
 
@@ -238,7 +253,9 @@ function tryInjectSavePrompt(ctx: InjectCtx): boolean {
     const container = findSavePromptContainer();
     const isContainerMissing = container === null;
 
-    if (isContainerMissing) return false;
+    if (isContainerMissing) {
+      return false;
+    }
 
     const promptsWrapper = buildPromptsButton(ctx.deps);
     const saveWrapper = buildSaveButton(ctx.deps);
@@ -264,7 +281,9 @@ function tryInjectSavePrompt(ctx: InjectCtx): boolean {
 export function injectSavePromptButton(deps: SavePromptDeps): void {
   const ctx: InjectCtx = { injected: false, deps };
 
-  pollUntil(function() { return tryInjectSavePrompt(ctx); }, {
+  pollUntil(function() {
+    return tryInjectSavePrompt(ctx); 
+  }, {
     intervalMs: 2000,
     timeoutMs: 30000,
   });

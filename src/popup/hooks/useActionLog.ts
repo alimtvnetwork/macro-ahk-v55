@@ -29,37 +29,37 @@ const MAX_LOG_ENTRIES = 8;
 
 // eslint-disable-next-line max-lines-per-function
 export function useActionLog() {
-    const [entries, setEntries] = useState<ActionLogEntry[]>([]);
+  const [entries, setEntries] = useState<ActionLogEntry[]>([]);
 
-    const addEntry = useCallback(
-        (action: string, status: ActionStatus, detail: string) => {
-            setEntries((prev) => {
-                const next = [
-                    { action, status, detail, timestamp: new Date() },
-                    ...prev,
-                ];
-                const isOverLimit = next.length > MAX_LOG_ENTRIES;
+  const addEntry = useCallback(
+    (action: string, status: ActionStatus, detail: string) => {
+      setEntries((prev) => {
+        const next = [
+          { action, status, detail, timestamp: new Date() },
+          ...prev,
+        ];
+        const isOverLimit = next.length > MAX_LOG_ENTRIES;
 
-                return isOverLimit ? next.slice(0, MAX_LOG_ENTRIES) : next;
-            });
-        },
-        [],
-    );
+        return isOverLimit ? next.slice(0, MAX_LOG_ENTRIES) : next;
+      });
+    },
+    [],
+  );
 
-    const logSuccess = useCallback(
-        (action: string, detail: string) => addEntry(action, "success", detail),
-        [addEntry],
-    );
+  const logSuccess = useCallback(
+    (action: string, detail: string) => addEntry(action, "success", detail),
+    [addEntry],
+  );
 
-    const logError = useCallback(
-        (action: string, detail: string) => addEntry(action, "error", detail),
-        [addEntry],
-    );
+  const logError = useCallback(
+    (action: string, detail: string) => addEntry(action, "error", detail),
+    [addEntry],
+  );
 
-    const logInfo = useCallback(
-        (action: string, detail: string) => addEntry(action, "info", detail),
-        [addEntry],
-    );
+  const logInfo = useCallback(
+    (action: string, detail: string) => addEntry(action, "info", detail),
+    [addEntry],
+  );
 
-    return { entries, logSuccess, logError, logInfo };
+  return { entries, logSuccess, logError, logInfo };
 }

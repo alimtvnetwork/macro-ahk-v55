@@ -23,7 +23,9 @@ vi.mock('../../../src/credit-balance/throttle', () => ({ INTER_WS_GAP_MS: 0 }));
 
 const logSpy = vi.fn();
 vi.mock('../../../src/logging', () => ({
-  log: (message: string, level?: string) => { logSpy(message, level); },
+  log: (message: string, level?: string) => {
+    logSpy(message, level); 
+  },
 }));
 
 import { fetchAndPersist } from '../../../src/credit-balance/fetcher';

@@ -1337,7 +1337,9 @@ export function extractTemplatePlaceholders(template: string): readonly string[]
   let match: RegExpExecArray | null;
   while ((match = re.exec(template)) !== null) {
     const name = match[2];
-    if (name && !out.includes(name)) out.push(name);
+    if (name && !out.includes(name)) {
+      out.push(name);
+    }
   }
 
   return out;

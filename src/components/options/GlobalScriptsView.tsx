@@ -59,6 +59,7 @@ export function GlobalScriptsView({
         } as Partial<StoredScript>);
       }
     }
+
     toast.success(`Processed ${files.length} file(s)`);
   };
 

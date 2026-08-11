@@ -24,10 +24,14 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "PROMPT_INJECT_RESPONSE" && event.data?.requestId === id) {
         window.removeEventListener(Events.MESSAGE, handler);
-        if (event.data.success) resolve();
-        else reject(new Error(event.data.error ?? "Prompt injection failed"));
+        if (event.data.success) {
+          resolve();
+        } else {
+          reject(new Error(event.data.error ?? "Prompt injection failed"));
+        }
       }
     };
+
     window.addEventListener(Events.MESSAGE, handler);
     window.postMessage({ type: "INJECT_PROMPT_BY_SLUG", slug: step.slug, requestId: id }, "*");
     setTimeout(() => {
@@ -43,8 +47,14 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
 
 export async function executeClickButton(step: StepClickButton): Promise<void> {
   const el = document.querySelector(step.selector) as HTMLElement | null;
-  if (!el) throw new Error(`Element not found: ${step.selector}`);
-  if (el instanceof HTMLButtonElement && el.disabled) throw new Error(`Button is disabled: ${step.selector}`);
+  if (!el) {
+    throw new Error(`Element not found: ${step.selector}`);
+  }
+
+  if (el instanceof HTMLButtonElement && el.disabled) {
+    throw new Error(`Button is disabled: ${step.selector}`);
+  }
+
   el.click();
 }
 
@@ -73,20 +83,28 @@ export async function executeWaitForElement(step: StepWaitForElement, signal?: A
 
   return new Promise((resolve, reject) => {
     const check = () => {
-      if (signal?.aborted) { reject(new Error("Cancelled"));
+      if (signal?.aborted) {
+        reject(new Error("Cancelled"));
 
- return; }
+        return; 
+      }
+
       const exists = !!document.querySelector(step.selector);
-      if ((appear && exists) || (!appear && !exists)) { resolve();
+      if ((appear && exists) || (!appear && !exists)) {
+        resolve();
 
- return; }
+        return; 
+      }
+
       if (Date.now() - start > timeout) {
         reject(new Error(`Timeout waiting for element ${appear ? "to appear" : "to disappear"}: ${step.selector}`));
 
         return;
       }
+
       setTimeout(check, Timings.POLL_INTERVAL_NORMAL);
     };
+
     check();
   });
 }
@@ -101,19 +119,27 @@ export async function executeWaitForText(step: StepWaitForText, signal?: AbortSi
 
   return new Promise((resolve, reject) => {
     const check = () => {
-      if (signal?.aborted) { reject(new Error("Cancelled"));
+      if (signal?.aborted) {
+        reject(new Error("Cancelled"));
 
- return; }
-      if (document.body.innerText.includes(step.text)) { resolve();
+        return; 
+      }
 
- return; }
+      if (document.body.innerText.includes(step.text)) {
+        resolve();
+
+        return; 
+      }
+
       if (Date.now() - start > timeout) {
         reject(new Error(`Timeout waiting for text: "${step.text}"`));
 
         return;
       }
+
       setTimeout(check, Timings.TIMEOUT_SHORT);
     };
+
     check();
   });
 }
@@ -128,10 +154,14 @@ export async function executeRunScript(step: StepRunScript): Promise<void> {
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "RUN_SCRIPT_RESPONSE" && event.data?.requestId === id) {
         window.removeEventListener(Events.MESSAGE, handler);
-        if (event.data.success) resolve();
-        else reject(new Error(event.data.error ?? "Script execution failed"));
+        if (event.data.success) {
+          resolve();
+        } else {
+          reject(new Error(event.data.error ?? "Script execution failed"));
+        }
       }
     };
+
     window.addEventListener(Events.MESSAGE, handler);
     window.postMessage({ type: "RUN_SCRIPT_BY_SLUG", slug: step.slug, requestId: id }, "*");
     setTimeout(() => {

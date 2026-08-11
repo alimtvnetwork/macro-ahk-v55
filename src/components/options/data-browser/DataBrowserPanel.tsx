@@ -18,8 +18,13 @@ import { DatabaseType } from "../../../../standalone-scripts/macro-controller/sr
 type ActiveView = ActiveViewType;
 
 function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
 
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
@@ -77,7 +82,9 @@ export function DataBrowserPanel() {
     <div className="space-y-4">
       <StorageCategoryCards
         active={activeCategory}
-        onSelect={(cat) => { setActiveCategory(cat); setGlobalSearch(""); }}
+        onSelect={(cat) => {
+          setActiveCategory(cat); setGlobalSearch(""); 
+        }}
         dbStats={dbStats}
         sessionStats={{ count: session.count, sizeFormatted: formatSize(session.totalSize), loading: session.loading }}
         cookieStats={{ count: cookies.count, sizeFormatted: formatSize(cookies.totalSize), loading: cookies.loading }}

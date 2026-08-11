@@ -35,7 +35,10 @@ function groupEntriesByFolder(entries: LoaderPromptEntry[]): FolderGroups {
     const cat = p.category || '';
     if (cat.includes('/')) {
       const folderName = cat.split('/')[0];
-      if (!folders[folderName]) folders[folderName] = [];
+      if (!folders[folderName]) {
+        folders[folderName] = [];
+      }
+
       folders[folderName].push(p);
     } else {
       rootItems.push(p);
@@ -80,7 +83,9 @@ function buildFolderNode(
     const isOpen = folderBody.style.display !== 'none';
     folderBody.style.display = isOpen ? 'none' : 'block';
     const icon = folderHeader.querySelector('span');
-    if (icon) icon.textContent = isOpen ? '📁' : '📂';
+    if (icon) {
+      icon.textContent = isOpen ? '📁' : '📂';
+    }
   };
 
   bucket.forEach((p, idx) => {

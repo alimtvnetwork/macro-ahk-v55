@@ -41,6 +41,7 @@ export function ActivityLogSection({ projectId, projectSlug }: { projectId: stri
         setLoading(false);
       }
     };
+
     void loadLogs();
   }, [projectId]);
 

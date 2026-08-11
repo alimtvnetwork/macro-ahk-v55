@@ -19,11 +19,11 @@ import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import type { MessageRequest } from "../../shared/messages";
 import {
-    bindOpt,
-    missingFieldError,
-    requireField,
-    requireProjectId,
-    type HandlerErrorResponse,
+  bindOpt,
+  missingFieldError,
+  requireField,
+  requireProjectId,
+  type HandlerErrorResponse,
 } from "./handler-guards";
 
 let dbManager: DbManager | null = null;
@@ -34,21 +34,23 @@ let onFilesChanged: ((projectId: string) => void) | null = null;
  * Used by namespace-cache to invalidate without a circular import.
  */
 export function onFileStorageChange(callback: (projectId: string) => void): void {
-    onFilesChanged = callback;
+  onFilesChanged = callback;
 }
 
 export function bindFileStorageDbManager(manager: DbManager): void {
-    dbManager = manager;
+  dbManager = manager;
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[file-storage] DbManager not bound");
+  if (!dbManager) {
+    throw new Error("[file-storage] DbManager not bound");
+  }
 
-    return dbManager.getLogsDb();
+  return dbManager.getLogsDb();
 }
 
 function markDirty(): void {
-    dbManager?.markDirty();
+  dbManager?.markDirty();
 }
 
 export interface FileEntry {
@@ -61,110 +63,125 @@ export interface FileEntry {
 }
 
 export async function handleFileSave(
-    request: MessageRequest,
+  request: MessageRequest,
 ): Promise<{ isOk: true; id: string } | HandlerErrorResponse> {
-    const raw = request as MessageRequest & {
+  const raw = request as MessageRequest & {
         projectId?: unknown;
         filename?: unknown;
         mimeType?: unknown;
         dataBase64?: unknown;
     };
-    const projectId = requireProjectId(raw.projectId);
-    const filename = requireField(raw.filename);
-    const dataBase64 = typeof raw.dataBase64 === "string" ? raw.dataBase64 : null;
-    if (!projectId) return missingFieldError("projectId", "file:save");
-    if (!filename) return missingFieldError("filename", "file:save");
-    if (dataBase64 === null) return missingFieldError("dataBase64", "file:save");
+  const projectId = requireProjectId(raw.projectId);
+  const filename = requireField(raw.filename);
+  const dataBase64 = typeof raw.dataBase64 === "string" ? raw.dataBase64 : null;
+  if (!projectId) {
+    return missingFieldError("projectId", "file:save");
+  }
 
-    const db = getDb();
-    const size = Math.round((dataBase64.length * 3) / 4);
+  if (!filename) {
+    return missingFieldError("filename", "file:save");
+  }
 
-    db.run(
-        `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
+  if (dataBase64 === null) {
+    return missingFieldError("dataBase64", "file:save");
+  }
+
+  const db = getDb();
+  const size = Math.round((dataBase64.length * 3) / 4);
+
+  db.run(
+    `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
          VALUES (?, ?, ?, ?, ?, datetime('now'))`,
-        [projectId, filename, bindOpt(raw.mimeType), dataBase64, size],
-    );
-    const result = db.exec("SELECT last_insert_rowid()");
-    const id = String(result[0].values[0][0]);
-    markDirty();
-    onFilesChanged?.(projectId);
+    [projectId, filename, bindOpt(raw.mimeType), dataBase64, size],
+  );
+  const result = db.exec("SELECT last_insert_rowid()");
+  const id = String(result[0].values[0][0]);
+  markDirty();
+  onFilesChanged?.(projectId);
 
-    return { isOk: true, id };
+  return { isOk: true, id };
 }
 
 export async function handleFileGet(
-    request: MessageRequest,
+  request: MessageRequest,
 ): Promise<{ file: (FileEntry & { dataBase64: string }) | null } | HandlerErrorResponse> {
-    const raw = request as MessageRequest & { fileId?: unknown };
-    const fileId = requireField(raw.fileId);
-    if (!fileId) return missingFieldError("fileId", "file:get");
+  const raw = request as MessageRequest & { fileId?: unknown };
+  const fileId = requireField(raw.fileId);
+  if (!fileId) {
+    return missingFieldError("fileId", "file:get");
+  }
 
-    const db = getDb();
-    const result = db.exec(
-        "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
-        [fileId],
-    );
+  const db = getDb();
+  const result = db.exec(
+    "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
+    [fileId],
+  );
 
-    if (result.length === 0 || result[0].values.length === 0) {
-        return { file: null };
-    }
+  if (result.length === 0 || result[0].values.length === 0) {
+    return { file: null };
+  }
 
-    const row = result[0].values[0];
+  const row = result[0].values[0];
 
-    return {
-        file: {
-            id: String(row[0]),
-            projectId: String(row[1]),
-            filename: String(row[2]),
-            mimeType: row[3] ? String(row[3]) : null,
-            dataBase64: String(row[4]),
-            size: Number(row[5]),
-            createdAt: String(row[6]),
-        },
-    };
+  return {
+    file: {
+      id: String(row[0]),
+      projectId: String(row[1]),
+      filename: String(row[2]),
+      mimeType: row[3] ? String(row[3]) : null,
+      dataBase64: String(row[4]),
+      size: Number(row[5]),
+      createdAt: String(row[6]),
+    },
+  };
 }
 
 export async function handleFileList(
-    request: MessageRequest,
+  request: MessageRequest,
 ): Promise<{ files: FileEntry[] } | HandlerErrorResponse> {
-    const raw = request as MessageRequest & { projectId?: unknown };
-    const projectId = requireProjectId(raw.projectId);
-    if (!projectId) return missingFieldError("projectId", "file:list");
+  const raw = request as MessageRequest & { projectId?: unknown };
+  const projectId = requireProjectId(raw.projectId);
+  if (!projectId) {
+    return missingFieldError("projectId", "file:list");
+  }
 
-    const db = getDb();
-    const stmt = db.prepare(
-        "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
-    );
-    stmt.bind([projectId]);
-    const files: FileEntry[] = [];
-    while (stmt.step()) {
-        const row = stmt.getAsObject();
-        files.push({
-            id: String(row.Id),
-            projectId: String(row.ProjectId),
-            filename: String(row.Filename),
-            mimeType: row.MimeType ? String(row.MimeType) : null,
-            size: Number(row.Size),
-            createdAt: String(row.CreatedAt),
-        });
-    }
-    stmt.free();
+  const db = getDb();
+  const stmt = db.prepare(
+    "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
+  );
+  stmt.bind([projectId]);
+  const files: FileEntry[] = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    files.push({
+      id: String(row.Id),
+      projectId: String(row.ProjectId),
+      filename: String(row.Filename),
+      mimeType: row.MimeType ? String(row.MimeType) : null,
+      size: Number(row.Size),
+      createdAt: String(row.CreatedAt),
+    });
+  }
 
-    return { files };
+  stmt.free();
+
+  return { files };
 }
 
 export async function handleFileDelete(
-    request: MessageRequest,
+  request: MessageRequest,
 ): Promise<{ isOk: true } | HandlerErrorResponse> {
-    const raw = request as MessageRequest & { fileId?: unknown };
-    const fileId = requireField(raw.fileId);
-    if (!fileId) return missingFieldError("fileId", "file:delete");
+  const raw = request as MessageRequest & { fileId?: unknown };
+  const fileId = requireField(raw.fileId);
+  if (!fileId) {
+    return missingFieldError("fileId", "file:delete");
+  }
 
-    const db = getDb();
-    db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);
-    markDirty();
+  const db = getDb();
+  db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);
+  markDirty();
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 /**
@@ -174,25 +191,29 @@ export async function handleFileDelete(
  * callers must pass a validated projectId (UI/handler layer guards on entry).
  */
 export function getFilesByProject(
-    projectId: string,
-    limit: number = 50,
+  projectId: string,
+  limit: number = 50,
 ): Array<{ name: string; data: string }> {
-    if (!projectId || typeof projectId !== "string") return [];
-    const db = getDb();
-    const stmt = db.prepare(
-        "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
-    );
-    stmt.bind([projectId, Math.max(1, Math.min(1000, limit))]);
-    const files: Array<{ name: string; data: string }> = [];
-    while (stmt.step()) {
-        const row = stmt.getAsObject();
-        const base64 = row.Data ? String(row.Data) : "";
-        files.push({
-            name: String(row.Filename),
-            data: base64 ? atob(base64) : "",
-        });
-    }
-    stmt.free();
+  if (!projectId || typeof projectId !== "string") {
+    return [];
+  }
 
-    return files;
+  const db = getDb();
+  const stmt = db.prepare(
+    "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
+  );
+  stmt.bind([projectId, Math.max(1, Math.min(1000, limit))]);
+  const files: Array<{ name: string; data: string }> = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    const base64 = row.Data ? String(row.Data) : "";
+    files.push({
+      name: String(row.Filename),
+      data: base64 ? atob(base64) : "",
+    });
+  }
+
+  stmt.free();
+
+  return files;
 }

@@ -20,14 +20,18 @@ vi.mock('../throttle', () => ({ INTER_WS_GAP_MS: 0 }));
 
 const logSpy = vi.fn();
 vi.mock('../../logging', () => ({
-  log: (message: string, level?: string) => { logSpy(message, level); },
+  log: (message: string, level?: string) => {
+    logSpy(message, level); 
+  },
 }));
 
 import { batchRefreshFromWire } from '../batch-refresh-from-wire';
 import { WIRE_CANONICAL_SET } from '../__fixtures__/wire-workspaces';
 
 describe('batchRefreshFromWire log signal (PlanTierType-10)', () => {
-  beforeEach(() => { logSpy.mockClear(); });
+  beforeEach(() => {
+    logSpy.mockClear(); 
+  });
 
   it('emits CreditBalance.batchFromWire funnel line with raw/typed/enrichable counts', async () => {
     await batchRefreshFromWire(WIRE_CANONICAL_SET, () => false);

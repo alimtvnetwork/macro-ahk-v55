@@ -30,102 +30,110 @@ export interface SelectorTestResult {
 
 /** Detect the selector kind from the expression's leading character. */
 export function detectSelectorKind(expression: string): PredicateEvaluationKindType {
-    const trimmed = expression.trimStart();
-    if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
-        return "XPath";
-    }
+  const trimmed = expression.trimStart();
+  if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
+    return "XPath";
+  }
 
-    return "Css";
+  return "Css";
 }
 
 /** Run the selector against `doc` and report the outcome. */
 export function testSelector(
-    expression: string,
-    doc: Document,
-    kind: SelectorTestKind = "Auto",
+  expression: string,
+  doc: Document,
+  kind: SelectorTestKind = "Auto",
 ): SelectorTestResult {
-    const trimmed = expression.trim();
-    if (trimmed.length === 0) { return emptyExpressionResult(expression, kind); }
-    const useKind = resolveKind(kind, trimmed);
-    try { return runSelectorLookup(trimmed, doc, useKind); }
-    catch (err) { return selectorErrorResult(trimmed, useKind, err); }
+  const trimmed = expression.trim();
+  if (trimmed.length === 0) {
+    return emptyExpressionResult(expression, kind); 
+  }
+
+  const useKind = resolveKind(kind, trimmed);
+  try {
+    return runSelectorLookup(trimmed, doc, useKind); 
+  } catch (err) {
+    return selectorErrorResult(trimmed, useKind, err); 
+  }
 }
 
 function resolveKind(kind: SelectorTestKind, trimmed: string): PredicateEvaluationKindType {
-    return kind === "Auto" ? detectSelectorKind(trimmed) : kind;
+  return kind === "Auto" ? detectSelectorKind(trimmed) : kind;
 }
 
 function emptyExpressionResult(expression: string, kind: SelectorTestKind): SelectorTestResult {
-    return {
-        Expression: expression,
-        Kind: kind === "XPath" ? "XPath" : "Css",
-        MatchCount: 0,
-        FirstMatch: null,
-        Error: "Selector is empty",
-    };
+  return {
+    Expression: expression,
+    Kind: kind === "XPath" ? "XPath" : "Css",
+    MatchCount: 0,
+    FirstMatch: null,
+    Error: "Selector is empty",
+  };
 }
 
 function runSelectorLookup(
-    trimmed: string, doc: Document, useKind: PredicateEvaluationKindType,
+  trimmed: string, doc: Document, useKind: PredicateEvaluationKindType,
 ): SelectorTestResult {
-    if (useKind === "XPath") { return runXPathLookup(trimmed, doc); }
+  if (useKind === "XPath") {
+    return runXPathLookup(trimmed, doc); 
+  }
 
-    return runCssLookup(trimmed, doc);
+  return runCssLookup(trimmed, doc);
 }
 
 function runXPathLookup(trimmed: string, doc: Document): SelectorTestResult {
-    const snapshot = doc.evaluate(
-        trimmed, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
-    );
-    const count = snapshot.snapshotLength;
-    const first = count > 0 ? snapshot.snapshotItem(0) : null;
+  const snapshot = doc.evaluate(
+    trimmed, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
+  );
+  const count = snapshot.snapshotLength;
+  const first = count > 0 ? snapshot.snapshotItem(0) : null;
 
-    return {
-        Expression: trimmed,
-        Kind: "XPath",
-        MatchCount: count,
-        FirstMatch: first instanceof Element ? readDomContext(first) : null,
-        Error: null,
-    };
+  return {
+    Expression: trimmed,
+    Kind: "XPath",
+    MatchCount: count,
+    FirstMatch: first instanceof Element ? readDomContext(first) : null,
+    Error: null,
+  };
 }
 
 function runCssLookup(trimmed: string, doc: Document): SelectorTestResult {
-    const list = doc.querySelectorAll(trimmed);
+  const list = doc.querySelectorAll(trimmed);
 
-    return {
-        Expression: trimmed,
-        Kind: "Css",
-        MatchCount: list.length,
-        FirstMatch: list.length > 0 ? readDomContext(list[0]) : null,
-        Error: null,
-    };
+  return {
+    Expression: trimmed,
+    Kind: "Css",
+    MatchCount: list.length,
+    FirstMatch: list.length > 0 ? readDomContext(list[0]) : null,
+    Error: null,
+  };
 }
 
 function selectorErrorResult(
-    trimmed: string, useKind: PredicateEvaluationKindType, err: unknown,
+  trimmed: string, useKind: PredicateEvaluationKindType, err: unknown,
 ): SelectorTestResult {
-    return {
-        Expression: trimmed,
-        Kind: useKind,
-        MatchCount: 0,
-        FirstMatch: null,
-        Error: err instanceof Error ? err.message : String(err),
-    };
+  return {
+    Expression: trimmed,
+    Kind: useKind,
+    MatchCount: 0,
+    FirstMatch: null,
+    Error: err instanceof Error ? err.message : String(err),
+  };
 }
 
 function readDomContext(element: Element): DomContext {
-    const attrs = readContextAttributes(element);
+  const attrs = readContextAttributes(element);
 
-    return {
-        TagName: element.tagName.toLowerCase(),
-        Id: attrs.id,
-        ClassName: attrs.className,
-        AriaLabel: attrs.ariaLabel,
-        Name: attrs.name,
-        Type: attrs.type,
-        TextSnippet: (element.textContent ?? "").trim().slice(0, 120),
-        OuterHtmlSnippet: element.outerHTML?.slice(0, 240) ?? "",
-    };
+  return {
+    TagName: element.tagName.toLowerCase(),
+    Id: attrs.id,
+    ClassName: attrs.className,
+    AriaLabel: attrs.ariaLabel,
+    Name: attrs.name,
+    Type: attrs.type,
+    TextSnippet: (element.textContent ?? "").trim().slice(0, 120),
+    OuterHtmlSnippet: element.outerHTML?.slice(0, 240) ?? "",
+  };
 }
 
 interface ContextAttrs {
@@ -134,17 +142,17 @@ interface ContextAttrs {
 }
 
 function readContextAttributes(element: Element): ContextAttrs {
-    return {
-        id:        nonEmptyAttr(element, "id"),
-        className: nonEmptyAttr(element, "class"),
-        ariaLabel: nonEmptyAttr(element, "aria-label"),
-        name:      nonEmptyAttr(element, "name"),
-        type:      nonEmptyAttr(element, "type"),
-    };
+  return {
+    id:        nonEmptyAttr(element, "id"),
+    className: nonEmptyAttr(element, "class"),
+    ariaLabel: nonEmptyAttr(element, "aria-label"),
+    name:      nonEmptyAttr(element, "name"),
+    type:      nonEmptyAttr(element, "type"),
+  };
 }
 
 function nonEmptyAttr(element: Element, name: string): string | null {
-    const value = element.getAttribute(name);
+  const value = element.getAttribute(name);
 
-    return value !== null && value.length > 0 ? value : null;
+  return value !== null && value.length > 0 ? value : null;
 }

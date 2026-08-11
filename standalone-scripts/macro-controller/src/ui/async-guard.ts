@@ -22,7 +22,10 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
   const prevText = opts.spinner ? element.textContent : null;
   element.setAttribute(BUSY_ATTR, '1');
   element.setAttribute('aria-busy', 'true');
-  if ('disabled' in element) (element as HTMLButtonElement).disabled = true;
+  if ('disabled' in element) {
+    (element as HTMLButtonElement).disabled = true;
+  }
+
   element.style.opacity = '0.6';
   element.style.pointerEvents = 'none';
   if (opts.spinner && prevText !== null) {
@@ -32,11 +35,21 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
   return {
     restore(): void {
       element.removeAttribute(BUSY_ATTR);
-      if (prevAria === null) element.removeAttribute('aria-busy'); else element.setAttribute('aria-busy', prevAria);
-      if ('disabled' in element) (element as HTMLButtonElement).disabled = prevDisabled;
+      if (prevAria === null) {
+        element.removeAttribute('aria-busy');
+      } else {
+        element.setAttribute('aria-busy', prevAria);
+      }
+
+      if ('disabled' in element) {
+        (element as HTMLButtonElement).disabled = prevDisabled;
+      }
+
       element.style.opacity = '';
       element.style.pointerEvents = '';
-      if (opts.spinner && prevText !== null) element.textContent = prevText;
+      if (opts.spinner && prevText !== null) {
+        element.textContent = prevText;
+      }
     },
   };
 }
@@ -51,7 +64,10 @@ export function guardAsyncClick(
   opts: GuardOptions = {},
 ): () => Promise<void> {
   return async function guarded(): Promise<void> {
-    if (element.getAttribute(BUSY_ATTR) === '1') return;
+    if (element.getAttribute(BUSY_ATTR) === '1') {
+      return;
+    }
+
     const { restore } = markBusy(element, opts);
     try {
       await handler();

@@ -52,9 +52,9 @@ export interface WaitConfig {
 }
 
 export const DEFAULT_WAIT_CONFIG: Readonly<Omit<WaitConfig, "Selector">> = Object.freeze({
-    Kind: "Css",
-    Condition: "Appears",
-    TimeoutMs: DEFAULT_TIMEOUT_MS,
+  Kind: "Css",
+  Condition: "Appears",
+  TimeoutMs: DEFAULT_TIMEOUT_MS,
 });
 
 /* ------------------------------------------------------------------ */
@@ -70,12 +70,20 @@ const XPATH_LEADING_RE = /^\s*(?:\(\s*)?\.?\//;
  * the user thinking about it.
  */
 export function detectSelectorKind(raw: string): SelectorKind {
-    const s = raw.trim();
-    if (s.length === 0) return "Css";
-    if (XPATH_LEADING_RE.test(s)) return "XPath";
-    if (s.includes("//")) return "XPath";
-
+  const s = raw.trim();
+  if (s.length === 0) {
     return "Css";
+  }
+
+  if (XPATH_LEADING_RE.test(s)) {
+    return "XPath";
+  }
+
+  if (s.includes("//")) {
+    return "XPath";
+  }
+
+  return "Css";
 }
 
 /* ------------------------------------------------------------------ */
@@ -101,52 +109,58 @@ export interface ValidationDeps {
  * structural check.
  */
 export function validateSelector(
-    raw: string,
-    kind: SelectorKind,
-    deps: ValidationDeps = {},
+  raw: string,
+  kind: SelectorKind,
+  deps: ValidationDeps = {},
 ): ValidationResult {
-    const s = raw.trim();
-    if (s.length === 0) return { Ok: false, Reason: "Selector is empty." };
-    const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
-    const useLive = doc !== null && deps.skipLiveCheck !== true;
+  const s = raw.trim();
+  if (s.length === 0) {
+    return { Ok: false, Reason: "Selector is empty." };
+  }
 
-    return kind === "Css"
-        ? validateCssSelector(s, useLive ? doc : null)
-        : validateXPathSelector(s, useLive ? doc : null);
+  const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
+  const useLive = doc !== null && deps.skipLiveCheck !== true;
+
+  return kind === "Css"
+    ? validateCssSelector(s, useLive ? doc : null)
+    : validateXPathSelector(s, useLive ? doc : null);
 }
 
 function validateCssSelector(s: string, doc: Document | null): ValidationResult {
-    if (doc !== null) {
-        try { doc.querySelector(s); }
-        catch (e) {
-            const detail = e instanceof Error ? e.message : "Unknown CSS parse error";
+  if (doc !== null) {
+    try {
+      doc.querySelector(s); 
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : "Unknown CSS parse error";
 
-            return { Ok: false, Reason: `Invalid CSS selector: ${detail}` };
-        }
-    } else if (/[<>]{2,}/.test(s)) {
-        return { Ok: false, Reason: "Invalid CSS selector (suspicious characters)." };
+      return { Ok: false, Reason: `Invalid CSS selector: ${detail}` };
     }
+  } else if (/[<>]{2,}/.test(s)) {
+    return { Ok: false, Reason: "Invalid CSS selector (suspicious characters)." };
+  }
 
-    return { Ok: true, Kind: "Css" };
+  return { Ok: true, Kind: "Css" };
 }
 
 function validateXPathSelector(s: string, doc: Document | null): ValidationResult {
-    if (!XPATH_LEADING_RE.test(s) && !s.includes("//")) {
-        return {
-            Ok: false,
-            Reason: "XPath should start with '/', './', '(/', '(./' or contain '//'.",
-        };
-    }
-    if (doc !== null && typeof doc.evaluate === "function") {
-        try { doc.evaluate(s, doc, null, /* ANY_TYPE */ 0, null); }
-        catch (e) {
-            const detail = e instanceof Error ? e.message : "Unknown XPath parse error";
+  if (!XPATH_LEADING_RE.test(s) && !s.includes("//")) {
+    return {
+      Ok: false,
+      Reason: "XPath should start with '/', './', '(/', '(./' or contain '//'.",
+    };
+  }
 
-            return { Ok: false, Reason: `Invalid XPath: ${detail}` };
-        }
-    }
+  if (doc !== null && typeof doc.evaluate === "function") {
+    try {
+      doc.evaluate(s, doc, null, /* ANY_TYPE */ 0, null); 
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : "Unknown XPath parse error";
 
-    return { Ok: true, Kind: "XPath" };
+      return { Ok: false, Reason: `Invalid XPath: ${detail}` };
+    }
+  }
+
+  return { Ok: true, Kind: "XPath" };
 }
 
 /* ------------------------------------------------------------------ */
@@ -156,113 +170,135 @@ function validateXPathSelector(s: string, doc: Document | null): ValidationResul
 interface RawStore { readonly [stepId: string]: WaitConfig }
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
-    return typeof v === "object" && v !== null && !Array.isArray(v);
+  return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
 function clampTimeout(raw: unknown): number {
-    const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
+  const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
 
-    return Math.min(MAX_TIMEOUT_MS, Math.max(MIN_TIMEOUT_MS, Math.round(n)));
+  return Math.min(MAX_TIMEOUT_MS, Math.max(MIN_TIMEOUT_MS, Math.round(n)));
 }
 
 function sanitiseRow(raw: unknown): WaitConfig | null {
-    if (!isPlainObject(raw)) return null;
-    const sel = typeof raw.Selector === "string" ? raw.Selector.trim() : "";
-    if (sel.length === 0) return null;
-    const kind: SelectorKind = raw.Kind === "XPath" ? "XPath" : raw.Kind === "Css" ? "Css" : detectSelectorKind(sel);
-    const condition: WaitCondition =
-        raw.Condition === "Disappears" ? "Disappears"
-            : raw.Condition === "Visible" ? "Visible"
-                : "Appears";
+  if (!isPlainObject(raw)) {
+    return null;
+  }
 
-    return {
-        Selector: sel,
-        Kind: kind,
-        Condition: condition,
-        TimeoutMs: clampTimeout(raw.TimeoutMs),
-    };
+  const sel = typeof raw.Selector === "string" ? raw.Selector.trim() : "";
+  if (sel.length === 0) {
+    return null;
+  }
+
+  const kind: SelectorKind = raw.Kind === "XPath" ? "XPath" : raw.Kind === "Css" ? "Css" : detectSelectorKind(sel);
+  const condition: WaitCondition =
+        raw.Condition === "Disappears" ? "Disappears"
+          : raw.Condition === "Visible" ? "Visible"
+            : "Appears";
+
+  return {
+    Selector: sel,
+    Kind: kind,
+    Condition: condition,
+    TimeoutMs: clampTimeout(raw.TimeoutMs),
+  };
 }
 
 function safeReadStore(): RawStore {
-    if (typeof localStorage === "undefined") return {};
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw === null) return {};
-        const parsed: unknown = JSON.parse(raw);
-        if (!isPlainObject(parsed)) return {};
-        const out: Record<string, WaitConfig> = {};
-        for (const [k, v] of Object.entries(parsed)) {
-            const sanitised = sanitiseRow(v);
-            if (sanitised !== null && /^\d+$/.test(k)) {
-                out[k] = sanitised;
-            }
-        }
+  if (typeof localStorage === "undefined") {
+    return {};
+  }
 
-        return out;
-    } catch (err) { 
-        return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === null) {
+      return {};
     }
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPlainObject(parsed)) {
+      return {};
+    }
+
+    const out: Record<string, WaitConfig> = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      const sanitised = sanitiseRow(v);
+      if (sanitised !== null && /^\d+$/.test(k)) {
+        out[k] = sanitised;
+      }
+    }
+
+    return out;
+  } catch (err) { 
+    return {};
+  }
 }
 
 function safeWriteStore(store: RawStore): void {
-    if (typeof localStorage === "undefined") return;
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-    } catch (err) {
-        console.warn("step-wait: localStorage write failed", err);
-    }
+  if (typeof localStorage === "undefined") {
+    return;
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  } catch (err) {
+    console.warn("step-wait: localStorage write failed", err);
+  }
 }
 
 export function readAllStepWaits(): ReadonlyMap<number, WaitConfig> {
-    const store = safeReadStore();
-    const map = new Map<number, WaitConfig>();
-    for (const [k, v] of Object.entries(store)) {
-        const id = Number(k);
-        if (Number.isInteger(id) && id > 0) map.set(id, v);
+  const store = safeReadStore();
+  const map = new Map<number, WaitConfig>();
+  for (const [k, v] of Object.entries(store)) {
+    const id = Number(k);
+    if (Number.isInteger(id) && id > 0) {
+      map.set(id, v);
     }
+  }
 
-    return map;
+  return map;
 }
 
 export function readStepWait(stepId: number): WaitConfig | null {
-    const store = safeReadStore();
-    const v = store[String(stepId)];
+  const store = safeReadStore();
+  const v = store[String(stepId)];
 
-    return v === undefined ? null : v;
+  return v === undefined ? null : v;
 }
 
 export function writeStepWait(stepId: number, config: WaitConfig): WaitConfig {
-    if (!Number.isInteger(stepId) || stepId <= 0) {
-        throw new Error(
-            `writeStepWait: stepId must be a positive integer, got ${String(stepId)}.`,
-        );
-    }
-    const sanitised = sanitiseRow({
-        Selector: config.Selector,
-        Kind: config.Kind,
-        Condition: config.Condition,
-        TimeoutMs: config.TimeoutMs,
-    });
-    if (sanitised === null) {
-        throw new Error("writeStepWait: selector is required and must be non-empty.");
-    }
-    const store = { ...safeReadStore() };
-    store[String(stepId)] = sanitised;
-    safeWriteStore(store);
+  if (!Number.isInteger(stepId) || stepId <= 0) {
+    throw new Error(
+      `writeStepWait: stepId must be a positive integer, got ${String(stepId)}.`,
+    );
+  }
 
-    return sanitised;
+  const sanitised = sanitiseRow({
+    Selector: config.Selector,
+    Kind: config.Kind,
+    Condition: config.Condition,
+    TimeoutMs: config.TimeoutMs,
+  });
+  if (sanitised === null) {
+    throw new Error("writeStepWait: selector is required and must be non-empty.");
+  }
+
+  const store = { ...safeReadStore() };
+  store[String(stepId)] = sanitised;
+  safeWriteStore(store);
+
+  return sanitised;
 }
 
 export function clearStepWait(stepId: number): void {
-    const store = { ...safeReadStore() };
-    if (Object.prototype.hasOwnProperty.call(store, String(stepId))) {
-        delete store[String(stepId)];
-        safeWriteStore(store);
-    }
+  const store = { ...safeReadStore() };
+  if (Object.prototype.hasOwnProperty.call(store, String(stepId))) {
+    delete store[String(stepId)];
+    safeWriteStore(store);
+  }
 }
 
 export function clearAllStepWaits(): void {
-    safeWriteStore({});
+  safeWriteStore({});
 }
 
 /* ------------------------------------------------------------------ */
@@ -282,77 +318,90 @@ export interface EvaluateDeps {
 }
 
 function evaluateXPath(
-    expr: string,
-    doc: Document,
-    root: ParentNode,
+  expr: string,
+  doc: Document,
+  root: ParentNode,
 ): ReadonlyArray<ElementLike> {
-    if (typeof doc.evaluate !== "function") return [];
-    const it = doc.evaluate(
-        expr,
+  if (typeof doc.evaluate !== "function") {
+    return [];
+  }
+
+  const it = doc.evaluate(
+    expr,
         root as Node,
         null,
         /* ORDERED_NODE_SNAPSHOT_TYPE */ 7,
         null,
-    );
-    const out: ElementLike[] = [];
-    for (let i = 0; i < it.snapshotLength; i++) {
-        const node = it.snapshotItem(i);
-        if (node !== null) out.push(node as unknown as ElementLike);
+  );
+  const out: ElementLike[] = [];
+  for (let i = 0; i < it.snapshotLength; i++) {
+    const node = it.snapshotItem(i);
+    if (node !== null) {
+      out.push(node as unknown as ElementLike);
     }
+  }
 
-    return out;
+  return out;
 }
 
 function evaluateCss(
-    expr: string,
-    root: ParentNode,
+  expr: string,
+  root: ParentNode,
 ): ReadonlyArray<ElementLike> {
-    const list = root.querySelectorAll(expr);
-    const out: ElementLike[] = [];
-    list.forEach((el) => out.push(el as unknown as ElementLike));
+  const list = root.querySelectorAll(expr);
+  const out: ElementLike[] = [];
+  list.forEach((el) => out.push(el as unknown as ElementLike));
 
-    return out;
+  return out;
 }
 
 /** Returns the matching elements for a config in the current document. */
 export function evaluateSelector(
-    config: Pick<WaitConfig, EvaluateSelectorConfigType>,
-    deps: EvaluateDeps = {},
+  config: Pick<WaitConfig, EvaluateSelectorConfigType>,
+  deps: EvaluateDeps = {},
 ): ReadonlyArray<ElementLike> {
-    const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
-    const root = deps.root ?? doc;
-    if (doc === null || root === null) return [];
-    if (config.Kind === "XPath") return evaluateXPath(config.Selector, doc, root);
+  const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
+  const root = deps.root ?? doc;
+  if (doc === null || root === null) {
+    return [];
+  }
 
-    return evaluateCss(config.Selector, root);
+  if (config.Kind === "XPath") {
+    return evaluateXPath(config.Selector, doc, root);
+  }
+
+  return evaluateCss(config.Selector, root);
 }
 
 function isElementVisible(el: ElementLike): boolean {
-    if (
-        typeof el.offsetWidth === "number"
+  if (
+    typeof el.offsetWidth === "number"
         && typeof el.offsetHeight === "number"
         && (el.offsetWidth > 0 || el.offsetHeight > 0)
-    ) {
-        return true;
-    }
-    if (typeof el.getClientRects === "function") {
-        const rects = el.getClientRects();
-        if (rects.length > 0) return true;
-    }
+  ) {
+    return true;
+  }
 
-    return false;
+  if (typeof el.getClientRects === "function") {
+    const rects = el.getClientRects();
+    if (rects.length > 0) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /** Returns `true` when the predicate for the configured condition holds. */
 export function isConditionSatisfied(
-    config: Pick<WaitConfig, "Condition">,
-    matches: ReadonlyArray<ElementLike>,
+  config: Pick<WaitConfig, "Condition">,
+  matches: ReadonlyArray<ElementLike>,
 ): boolean {
-    switch (config.Condition) {
-        case "Appears":     return matches.length > 0;
-        case "Disappears":  return matches.length === 0;
-        case "Visible":     return matches.some(isElementVisible);
-    }
+  switch (config.Condition) {
+    case "Appears":     return matches.length > 0;
+    case "Disappears":  return matches.length === 0;
+    case "Visible":     return matches.some(isElementVisible);
+  }
 }
 
 /* -------------------- Wait loop -------------------- */
@@ -380,66 +429,70 @@ export type WaitOutcome =
     };
 
 const defaultSleep = (ms: number): Promise<void> =>
-    new Promise<void>((resolve) => {
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        timeoutId = setTimeout(() => {
-            if (timeoutId !== null) {
-                clearTimeout(timeoutId);
-                timeoutId = null;
-            }
-            resolve();
-        }, ms);
-    });
+  new Promise<void>((resolve) => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    timeoutId = setTimeout(() => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+
+      resolve();
+    }, ms);
+  });
 
 /**
  * Polls until the configured condition is satisfied or the timeout
  * elapses. Always resolves — never throws.
  */
 export async function waitForSelector(
-    config: WaitConfig,
-    deps: WaitDeps = {},
+  config: WaitConfig,
+  deps: WaitDeps = {},
 ): Promise<WaitOutcome> {
-    const now = deps.now ?? (() => Date.now());
-    const sleep = deps.sleep ?? defaultSleep;
-    const pollMs = Math.max(10, deps.pollIntervalMs ?? POLL_INTERVAL_MS);
+  const now = deps.now ?? (() => Date.now());
+  const sleep = deps.sleep ?? defaultSleep;
+  const pollMs = Math.max(10, deps.pollIntervalMs ?? POLL_INTERVAL_MS);
 
-    const validation = validateSelector(config.Selector, config.Kind, { doc: deps.doc ?? null });
-    if (!validation.Ok) {
-        return { Ok: false, Reason: "InvalidSelector", DurationMs: 0, Detail: validation.Reason };
-    }
+  const validation = validateSelector(config.Selector, config.Kind, { doc: deps.doc ?? null });
+  if (!validation.Ok) {
+    return { Ok: false, Reason: "InvalidSelector", DurationMs: 0, Detail: validation.Reason };
+  }
 
-    return pollUntilSatisfied(config, deps, now, sleep, pollMs);
+  return pollUntilSatisfied(config, deps, now, sleep, pollMs);
 }
 
 async function pollUntilSatisfied(
-    config: WaitConfig,
-    deps: WaitDeps,
-    now: () => number,
-    sleep: (ms: number) => Promise<void>,
-    pollMs: number,
+  config: WaitConfig,
+  deps: WaitDeps,
+  now: () => number,
+  sleep: (ms: number) => Promise<void>,
+  pollMs: number,
 ): Promise<WaitOutcome> {
-    const startedAt = now();
-    let matches: ReadonlyArray<ElementLike> = [];
-    while (true) {
-        try {
-            matches = evaluateSelector(config, deps);
-        } catch (e) {
-            const detail = e instanceof Error ? e.message : "Unknown evaluation error";
+  const startedAt = now();
+  let matches: ReadonlyArray<ElementLike> = [];
+  while (true) {
+    try {
+      matches = evaluateSelector(config, deps);
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : "Unknown evaluation error";
 
-            return { Ok: false, Reason: "InvalidSelector", DurationMs: now() - startedAt, Detail: detail };
-        }
-        if (isConditionSatisfied(config, matches)) {
-            return { Ok: true, DurationMs: now() - startedAt, MatchCount: matches.length };
-        }
-        const elapsed = now() - startedAt;
-        if (elapsed >= config.TimeoutMs) {
-            return {
-                Ok: false, Reason: "Timeout", DurationMs: elapsed,
-                Detail: `Condition "${config.Condition}" not met within ${config.TimeoutMs} ms `
-                    + `(${matches.length} match${matches.length === 1 ? "" : "es"}).`,
-            };
-        }
-        await sleep(Math.min(pollMs, config.TimeoutMs - elapsed));
+      return { Ok: false, Reason: "InvalidSelector", DurationMs: now() - startedAt, Detail: detail };
     }
+
+    if (isConditionSatisfied(config, matches)) {
+      return { Ok: true, DurationMs: now() - startedAt, MatchCount: matches.length };
+    }
+
+    const elapsed = now() - startedAt;
+    if (elapsed >= config.TimeoutMs) {
+      return {
+        Ok: false, Reason: "Timeout", DurationMs: elapsed,
+        Detail: `Condition "${config.Condition}" not met within ${config.TimeoutMs} ms `
+                    + `(${matches.length} match${matches.length === 1 ? "" : "es"}).`,
+      };
+    }
+
+    await sleep(Math.min(pollMs, config.TimeoutMs - elapsed));
+  }
 }
 

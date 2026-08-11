@@ -184,7 +184,9 @@ export function usePopupData() {
     await sendMessage({ type: "TOGGLE_SCRIPT", id: scriptId });
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   // Effective values: prefer live status; fall back to persisted payload when
   // the SW has restarted and bootStep/bootError are not yet populated again.

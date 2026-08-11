@@ -107,8 +107,12 @@ export function getRenamePresetStore(): RenamePresetStore {
       try {
         const items = await kv.list(SECTION);
         const names = items
-          .map(function (i) { return i.key; })
-          .filter(function (k) { return k !== ACTIVE_KEY; });
+          .map(function (i) {
+            return i.key; 
+          })
+          .filter(function (k) {
+            return k !== ACTIVE_KEY; 
+          });
         if (names.length === 0) {
           // Seed default
           await kv.set(SECTION, DEFAULT_PRESET_NAME, createDefaultPreset());
@@ -143,7 +147,10 @@ export function getRenamePresetStore(): RenamePresetStore {
     async loadPreset(name: string): Promise<RenamePreset | null> {
       try {
         const preset = await kv.get<RenamePreset>(SECTION, name);
-        if (!preset) { return null; }
+        if (!preset) {
+          return null; 
+        }
+
         // Validate shape
         if (typeof preset.template !== 'string') {
           logDebug(FN, 'Corrupted preset "' + name + '" — returning default');
@@ -174,12 +181,14 @@ export function getRenamePresetStore(): RenamePresetStore {
       if (name === DEFAULT_PRESET_NAME) {
         return;
       }
+
       await kv.delete(SECTION, name);
       // Reset active if deleted
       const active = await kv.get<string>(SECTION, ACTIVE_KEY);
       if (active === name) {
         await kv.set(SECTION, ACTIVE_KEY, DEFAULT_PRESET_NAME);
       }
+
       // Ensure Default exists
       const def = await kv.get<RenamePreset>(SECTION, DEFAULT_PRESET_NAME);
       if (!def) {

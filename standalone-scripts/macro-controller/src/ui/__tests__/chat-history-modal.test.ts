@@ -29,7 +29,9 @@ const projectIdMock = ws.extractProjectIdFromUrl as unknown as ReturnType<typeof
 const MODAL_ID = 'macroloop-chat-history-modal';
 
 async function flush(): Promise<void> {
-  for (let i = 0; i < 4; i += 1) await Promise.resolve();
+  for (let i = 0; i < 4; i += 1) {
+    await Promise.resolve();
+  }
 }
 
 beforeEach(() => {

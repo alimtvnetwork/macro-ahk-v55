@@ -38,23 +38,35 @@ export type DispatchPreview = KeyDispatchPreview | WaitDispatchPreview;
  * regardless of the order the user typed them.
  */
 export function buildDispatchPreview(step: KeywordEventStep): DispatchPreview {
-    if (step.Kind === "Wait") {
-        return { Kind: "Wait", DurationMs: step.DurationMs };
-    }
-    const parsed = parseCombo(step.Combo);
-    const modifiers: string[] = [];
-    if (parsed.Ctrl) { modifiers.push("Ctrl"); }
-    if (parsed.Shift) { modifiers.push("Shift"); }
-    if (parsed.Alt) { modifiers.push("Alt"); }
-    if (parsed.Meta) { modifiers.push("Meta"); }
+  if (step.Kind === "Wait") {
+    return { Kind: "Wait", DurationMs: step.DurationMs };
+  }
 
-    return {
-        Kind: "Key",
-        Modifiers: modifiers,
-        Key: formatKeyLabel(parsed.Key),
-        HasKey: parsed.Key.length > 0,
-        Raw: step.Combo,
-    };
+  const parsed = parseCombo(step.Combo);
+  const modifiers: string[] = [];
+  if (parsed.Ctrl) {
+    modifiers.push("Ctrl"); 
+  }
+
+  if (parsed.Shift) {
+    modifiers.push("Shift"); 
+  }
+
+  if (parsed.Alt) {
+    modifiers.push("Alt"); 
+  }
+
+  if (parsed.Meta) {
+    modifiers.push("Meta"); 
+  }
+
+  return {
+    Kind: "Key",
+    Modifiers: modifiers,
+    Key: formatKeyLabel(parsed.Key),
+    HasKey: parsed.Key.length > 0,
+    Raw: step.Combo,
+  };
 }
 
 /**
@@ -63,13 +75,18 @@ export function buildDispatchPreview(step: KeywordEventStep): DispatchPreview {
  * not read from or write to any DOM.
  */
 function formatKeyLabel(raw: string): string {
-    const k = raw.trim();
-    if (k === "") { return ""; }
-    if (k.length === 1) { return k.toUpperCase(); }
+  const k = raw.trim();
+  if (k === "") {
+    return ""; 
+  }
 
-    // Capitalise the first letter for named keys ("enter" -> "Enter") so the
-    // preview matches the editor's placeholder text style.
-    return k.charAt(0).toUpperCase() + k.slice(1);
+  if (k.length === 1) {
+    return k.toUpperCase(); 
+  }
+
+  // Capitalise the first letter for named keys ("enter" -> "Enter") so the
+  // preview matches the editor's placeholder text style.
+  return k.charAt(0).toUpperCase() + k.slice(1);
 }
 
 /**
@@ -78,12 +95,13 @@ function formatKeyLabel(raw: string): string {
  * structured chip layout is not available.
  */
 export function previewToString(preview: DispatchPreview): string {
-    if (preview.Kind === "Wait") {
-        return `Wait ${preview.DurationMs} ms`;
-    }
-    if (!preview.HasKey && preview.Modifiers.length === 0) {
-        return "(empty combo)";
-    }
+  if (preview.Kind === "Wait") {
+    return `Wait ${preview.DurationMs} ms`;
+  }
 
-    return [...preview.Modifiers, preview.Key].filter(Boolean).join(" + ");
+  if (!preview.HasKey && preview.Modifiers.length === 0) {
+    return "(empty combo)";
+  }
+
+  return [...preview.Modifiers, preview.Key].filter(Boolean).join(" + ");
 }

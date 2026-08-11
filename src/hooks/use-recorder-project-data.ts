@@ -111,61 +111,61 @@ interface HookResult {
 const EMPTY_DATA: RecorderProjectData = { steps: [], dataSources: [], bindings: [] };
 
 async function fetchProjectData(projectSlug: string): Promise<RecorderProjectData> {
-    const [stepsRes, dsRes, fbRes] = await Promise.all([
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as any, projectSlug }),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as any, projectSlug }),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as any, projectSlug }),
-    ]);
+  const [stepsRes, dsRes, fbRes] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as any, projectSlug }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as any, projectSlug }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as any, projectSlug }),
+  ]);
 
-    return {
-        steps: stepsRes.steps ?? [],
-        dataSources: dsRes.dataSources ?? [],
-        bindings: fbRes.bindings ?? [],
-    };
+  return {
+    steps: stepsRes.steps ?? [],
+    dataSources: dsRes.dataSources ?? [],
+    bindings: fbRes.bindings ?? [],
+  };
 }
 
 async function fetchSelectors(projectSlug: string, stepId: number): Promise<ReadonlyArray<SelectorRow>> {
-    const list = await sendMessage<{ selectors: ReadonlyArray<SelectorRow> }>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_SELECTORS_LIST" as any,
-        projectSlug,
-        stepId,
-    }).catch(() => ({ selectors: [] as ReadonlyArray<SelectorRow> }));
+  const list = await sendMessage<{ selectors: ReadonlyArray<SelectorRow> }>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: "RECORDER_STEP_SELECTORS_LIST" as any,
+    projectSlug,
+    stepId,
+  }).catch(() => ({ selectors: [] as ReadonlyArray<SelectorRow> }));
 
-    return list.selectors;
+  return list.selectors;
 }
 
 async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: StepMetaPatch): Promise<StepRow> {
-    const res = await sendMessage<{ isOk: true; step: StepRow }>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_UPDATE_META" as any,
-        projectSlug, stepId, patch,
-    });
+  const res = await sendMessage<{ isOk: true; step: StepRow }>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: "RECORDER_STEP_UPDATE_META" as any,
+    projectSlug, stepId, patch,
+  });
 
-    return res.step;
+  return res.step;
 }
 
 async function sendSetStepTags(projectSlug: string, stepId: number, tags: ReadonlyArray<string>): Promise<ReadonlyArray<string>> {
-    const res = await sendMessage<{ isOk: true; tags: ReadonlyArray<string> }>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_TAGS_SET" as any,
-        projectSlug, stepId, tags,
-    });
+  const res = await sendMessage<{ isOk: true; tags: ReadonlyArray<string> }>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: "RECORDER_STEP_TAGS_SET" as any,
+    projectSlug, stepId, tags,
+  });
 
-    return res.tags;
+  return res.tags;
 }
 
 async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null): Promise<StepRow> {
-    const res = await sendMessage<{ isOk: true; step: StepRow }>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_LINK_SET" as any,
-        projectSlug, stepId, slot, targetProjectSlug,
-    });
+  const res = await sendMessage<{ isOk: true; step: StepRow }>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: "RECORDER_STEP_LINK_SET" as any,
+    projectSlug, stepId, slot, targetProjectSlug,
+  });
 
-    return res.step;
+  return res.step;
 }
 
 /* ------------------------------------------------------------------ */
@@ -173,48 +173,58 @@ async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLi
 /* ------------------------------------------------------------------ */
 
 export function useRecorderProjectData(projectSlug: string): HookResult {
-    const [data, setData] = useState<RecorderProjectData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [tagsByStep, setTagsByStep] = useState<ReadonlyMap<number, ReadonlyArray<string>>>(new Map());
+  const [data, setData] = useState<RecorderProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [tagsByStep, setTagsByStep] = useState<ReadonlyMap<number, ReadonlyArray<string>>>(new Map());
 
-    const reload = useCallback(async () => {
-        if (!projectSlug) return;
-        setLoading(true);
-        setError(null);
-        try { setData(await fetchProjectData(projectSlug)); }
-        catch (err) {
-            setError(err instanceof Error ? err.message : String(err));
-            setData(EMPTY_DATA);
-        } finally { setLoading(false); }
-    }, [projectSlug]);
+  const reload = useCallback(async () => {
+    if (!projectSlug) {
+      return;
+    }
 
-    const loadSelectors = useCallback((stepId: number) => fetchSelectors(projectSlug, stepId), [projectSlug]);
+    setLoading(true);
+    setError(null);
+    try {
+      setData(await fetchProjectData(projectSlug)); 
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setData(EMPTY_DATA);
+    } finally {
+      setLoading(false); 
+    }
+  }, [projectSlug]);
 
-    const spliceStep = useCallback((updated: StepRow) => {
-        setData((prev) => prev === null ? prev : {
-            ...prev,
-            steps: prev.steps.map((s) => (s.StepId === updated.StepId ? updated : s)),
-        });
-    }, []);
+  const loadSelectors = useCallback((stepId: number) => fetchSelectors(projectSlug, stepId), [projectSlug]);
 
-    const updateStepMeta = useCallback(async (stepId: number, patch: StepMetaPatch) => {
-        spliceStep(await sendUpdateStepMeta(projectSlug, stepId, patch));
-    }, [projectSlug, spliceStep]);
+  const spliceStep = useCallback((updated: StepRow) => {
+    setData((prev) => prev === null ? prev : {
+      ...prev,
+      steps: prev.steps.map((s) => (s.StepId === updated.StepId ? updated : s)),
+    });
+  }, []);
 
-    const setStepTags = useCallback(async (stepId: number, tags: ReadonlyArray<string>) => {
-        const next = await sendSetStepTags(projectSlug, stepId, tags);
-        setTagsByStep((prev) => { const m = new Map(prev); m.set(stepId, next);
+  const updateStepMeta = useCallback(async (stepId: number, patch: StepMetaPatch) => {
+    spliceStep(await sendUpdateStepMeta(projectSlug, stepId, patch));
+  }, [projectSlug, spliceStep]);
 
- return m; });
-    }, [projectSlug]);
+  const setStepTags = useCallback(async (stepId: number, tags: ReadonlyArray<string>) => {
+    const next = await sendSetStepTags(projectSlug, stepId, tags);
+    setTagsByStep((prev) => {
+      const m = new Map(prev); m.set(stepId, next);
 
-    const setStepLink = useCallback(async (stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null) => {
-        spliceStep(await sendSetStepLink(projectSlug, stepId, slot, targetProjectSlug));
-    }, [projectSlug, spliceStep]);
+      return m; 
+    });
+  }, [projectSlug]);
 
-    useEffect(() => { void reload(); }, [reload]);
+  const setStepLink = useCallback(async (stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null) => {
+    spliceStep(await sendSetStepLink(projectSlug, stepId, slot, targetProjectSlug));
+  }, [projectSlug, spliceStep]);
 
-    return { data, loading, error, reload, loadSelectors, tagsByStep, updateStepMeta, setStepTags, setStepLink };
+  useEffect(() => {
+    void reload(); 
+  }, [reload]);
+
+  return { data, loading, error, reload, loadSelectors, tagsByStep, updateStepMeta, setStepTags, setStepLink };
 }
 

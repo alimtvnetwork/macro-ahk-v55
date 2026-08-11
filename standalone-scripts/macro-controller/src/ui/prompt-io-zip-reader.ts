@@ -45,8 +45,11 @@ function locateEocd(view: DataView): number {
   const max = view.byteLength;
   const scanFrom = Math.max(0, max - 65557);
   for (let i = max - 22; i >= scanFrom; i--) {
-    if (readUint32LE(view, i) === SIG_EOCD) return i;
+    if (readUint32LE(view, i) === SIG_EOCD) {
+      return i;
+    }
   }
+
   throwDiagnostic('PROMPT_IO_ZIP_E001', { byteLength: max });
 }
 
@@ -60,7 +63,10 @@ interface CentralEntry {
 
 function readCentralEntry(view: DataView, bytes: Uint8Array, offset: number): { entry: CentralEntry; next: number } {
   const sig = readUint32LE(view, offset);
-  if (sig !== SIG_CENTRAL) throwDiagnostic('PROMPT_IO_ZIP_E002', { offset, signatureHex: sig.toString(16).padStart(8, '0') });
+  if (sig !== SIG_CENTRAL) {
+    throwDiagnostic('PROMPT_IO_ZIP_E002', { offset, signatureHex: sig.toString(16).padStart(8, '0') });
+  }
+
   const method = readUint16LE(view, offset + 10);
   const compressedSize = readUint32LE(view, offset + 20);
   const uncompressedSize = readUint32LE(view, offset + 24);
@@ -77,10 +83,14 @@ function readCentralEntry(view: DataView, bytes: Uint8Array, offset: number): { 
 
 function extractStoredPayload(view: DataView, bytes: Uint8Array, entry: CentralEntry): Uint8Array {
   const sig = readUint32LE(view, entry.localOffset);
-  if (sig !== SIG_LOCAL) throwDiagnostic('PROMPT_IO_ZIP_E003', { entryName: entry.name, offset: entry.localOffset });
+  if (sig !== SIG_LOCAL) {
+    throwDiagnostic('PROMPT_IO_ZIP_E003', { entryName: entry.name, offset: entry.localOffset });
+  }
+
   if (entry.method !== 0) {
     throwDiagnostic('PROMPT_IO_ZIP_E004', { entryName: entry.name, compressionMethod: entry.method });
   }
+
   const nameLen = readUint16LE(view, entry.localOffset + 26);
   const extraLen = readUint16LE(view, entry.localOffset + 28);
   const dataStart = entry.localOffset + 30 + nameLen + extraLen;
@@ -114,15 +124,21 @@ function decodeUtf8(bytes: Uint8Array): string {
 
 function parseManifest(map: ZipFileMap): PromptsBundleV1 {
   const manifestBytes = map.files.get('manifest.json');
-  if (!manifestBytes) throwDiagnostic('PROMPT_IO_ZIP_E005', { entryCount: map.files.size });
+  if (!manifestBytes) {
+    throwDiagnostic('PROMPT_IO_ZIP_E005', { entryCount: map.files.size });
+  }
+
   const raw = JSON.parse(decodeUtf8(manifestBytes)) as unknown;
   // Manifest entries have their bodies stripped: inject empty text
   // placeholders so validatePromptsBundle passes, then we rehydrate.
   if (raw && typeof raw === 'object' && Array.isArray((raw as { entries?: unknown[] }).entries)) {
     (raw as { entries: Record<string, unknown>[] }).entries.forEach((e) => {
-      if (typeof e.text !== 'string') e.text = '';
+      if (typeof e.text !== 'string') {
+        e.text = '';
+      }
     });
   }
+
   const result: BundleValidationResult = validatePromptsBundle(raw);
   if (!result.isValid || !result.bundle) {
     throwDiagnostic('PROMPT_IO_ZIP_E006', { errorList: result.errors.join('; ') });
@@ -136,7 +152,9 @@ function rehydrateBody(entry: PromptEntry, index: number, map: ZipFileMap): Prom
   const slug = sanitizeSlug(slugSource, index + 1);
   const bodyBytes = map.files.get(`entries/${slug}.md`);
   const hasBody = bodyBytes !== undefined;
-  if (!hasBody) throwDiagnostic('PROMPT_IO_ZIP_E007', { slug, promptName: entry.name });
+  if (!hasBody) {
+    throwDiagnostic('PROMPT_IO_ZIP_E007', { slug, promptName: entry.name });
+  }
 
   return { ...entry, text: decodeUtf8(bodyBytes as Uint8Array) };
 }

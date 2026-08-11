@@ -29,6 +29,7 @@ export function clearDiffPrefs(): void {
       doomed.push(key);
     }
   }
+
   for (const key of doomed) {
     storage.removeItem(key);
   }

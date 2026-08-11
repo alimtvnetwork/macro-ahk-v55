@@ -119,9 +119,9 @@ export function UpdaterEntryCard({
             )}
             <span className={`text-[10px] font-medium ${
               u.status === STATUS_UP_TO_DATE ? "text-primary" :
-              u.status === STATUS_UPDATE_AVAILABLE ? "text-accent" :
-              u.status === "error" ? "text-destructive" :
-              "text-muted-foreground"
+                u.status === STATUS_UPDATE_AVAILABLE ? "text-accent" :
+                  u.status === "error" ? "text-destructive" :
+                    "text-muted-foreground"
             }`}>
               {statusLabelText()}
             </span>

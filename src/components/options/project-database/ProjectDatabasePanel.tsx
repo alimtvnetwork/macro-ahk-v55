@@ -88,7 +88,10 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
   }, [projectSlug]);
 
   const fetchUserDbCount = useCallback(async () => {
-    if (!projectSlug) return;
+    if (!projectSlug) {
+      return;
+    }
+
     try {
       const result = await sendMessage<{ isOk: boolean; rows?: Array<{ IsDefault?: number }> }>({
         type: "PROJECT_API",
@@ -114,6 +117,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
 
       return;
     }
+
     setLoading(true);
     try {
       const result = await sendMessage<{ isOk: boolean; tables?: TableInfo[] }>({
@@ -132,6 +136,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     } finally {
       setLoading(false);
     }
+
     // Also refresh the user DB count
     void fetchUserDbCount();
   }, [sendMessage, projectSlug, fetchUserDbCount]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -147,6 +152,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
 
       return;
     }
+
     const validColumns = newColumns.filter((c) => c.name.trim()).map((c) => ({
       Name: c.name, Type: c.type, Nullable: c.nullable, Unique: c.unique, Default: c.defaultValue,
     }));
@@ -180,7 +186,10 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
   };
 
   const handleDropTable = async (tableName: string) => {
-    if (!confirm(`Drop table "${tableName}"? This cannot be undone.`)) return;
+    if (!confirm(`Drop table "${tableName}"? This cannot be undone.`)) {
+      return;
+    }
+
     try {
       await sendMessage({
         type: "PROJECT_DB_DROP_TABLE",
@@ -226,9 +235,11 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
       if ((format === "markdown" || format === "both") && result.markdown) {
         downloadFile(result.markdown, `${projectSlug}-schema.md`);
       }
+
       if ((format === "prisma" || format === "both") && result.prisma) {
         downloadFile(result.prisma, `${projectSlug}-schema.prisma`);
       }
+
       toast.success(format === "both" ? "Schema docs downloaded" : `${format === "markdown" ? "Markdown" : "Prisma"} schema downloaded`);
     } catch (err) {
       toast.error(String(err));
@@ -320,10 +331,14 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
             <Button variant="ghost" size="sm" onClick={() => void refreshTables()} className="h-7 text-xs">
               <RefreshCw className="h-3 w-3 mr-1" /> Refresh
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { setShowCreateDbForm(!showCreateDbForm); setShowCreateForm(false); }} className="h-7 text-xs">
+            <Button variant="outline" size="sm" onClick={() => {
+              setShowCreateDbForm(!showCreateDbForm); setShowCreateForm(false); 
+            }} className="h-7 text-xs">
               <Database className="h-3 w-3 mr-1" /> Create Database
             </Button>
-            <Button size="sm" onClick={() => { setShowCreateForm(!showCreateForm); setShowCreateDbForm(false); }} className="h-7 text-xs">
+            <Button size="sm" onClick={() => {
+              setShowCreateForm(!showCreateForm); setShowCreateDbForm(false); 
+            }} className="h-7 text-xs">
               <Plus className="h-3 w-3 mr-1" /> Create Table
             </Button>
           </div>
@@ -333,7 +348,9 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
             <CreateDatabaseForm
               projectSlug={projectSlug}
               userDbCount={userDbCount}
-              onCreated={() => { setShowCreateDbForm(false); void refreshTables(); }}
+              onCreated={() => {
+                setShowCreateDbForm(false); void refreshTables(); 
+              }}
               onCancel={() => setShowCreateDbForm(false)}
             />
           )}
@@ -390,8 +407,11 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
               <TableBody>
                 {tables.map((t) => {
                   const cols: ColumnDef[] = (() => {
-                    try { return JSON.parse(t.ColumnDefs); } catch (err) { /* swallowed */
- return []; }
+                    try {
+                      return JSON.parse(t.ColumnDefs); 
+                    } catch (err) { /* swallowed */
+                      return []; 
+                    }
                   })();
 
                   return (

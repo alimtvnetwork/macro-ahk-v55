@@ -41,7 +41,15 @@ export default tseslint.config(
       "@typescript-eslint/no-restricted-types": "off",
       "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1, "maxBOF": 0 }],
       "padded-blocks": ["error", "never"],
-      "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
+      "padding-line-between-statements": [
+        "error",
+        { "blankLine": "always", "prev": "*", "next": "return" },
+        { "blankLine": "always", "prev": ["if", "multiline-block-like"], "next": "*" }
+      ],
+      "curly": ["error", "all"],
+      "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
+      "indent": ["error", 2, { "SwitchCase": 1 }],
+      "max-statements-per-line": ["error", { "max": 1 }],
 
       // ── Namespace Logger mandate (Batch C step 24 / audit S13) ──────
       // Ban bare `console.error(...)` in production source. Use the

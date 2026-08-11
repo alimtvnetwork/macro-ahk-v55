@@ -24,124 +24,124 @@ import * as stepAModule from "../run-step-a";
 import * as stepBModule from "../run-step-b";
 
 const collectingSink = (): { sink: UserAddLogSink; entries: UserAddLogEntry[] } => {
-    const entries: UserAddLogEntry[] = [];
+  const entries: UserAddLogEntry[] = [];
 
-    return { sink: { write: (e) => entries.push(e) }, entries };
+  return { sink: { write: (e) => entries.push(e) }, entries };
 };
 
 const collectingStore = (): { store: UserAddRowStateStore; updates: UserAddRowStateUpdate[] } => {
-    const updates: UserAddRowStateUpdate[] = [];
+  const updates: UserAddRowStateUpdate[] = [];
 
-    return { store: { update: (u) => updates.push(u) }, updates };
+  return { store: { update: (u) => updates.push(u) }, updates };
 };
 
 const buildRow = (roleCode: UserAddMembershipRoleCodeType): UserAddCsvRow => ({
-    RowIndex: 1,
-    WorkspaceUrl: "https://lovable.dev/projects/abc",
-    MemberEmail: "[email protected]",
-    RawRole: roleCode,
-    RoleCode: roleCode,
-    WasEditorNormalized: false,
-    Notes: null,
+  RowIndex: 1,
+  WorkspaceUrl: "https://lovable.dev/projects/abc",
+  MemberEmail: "[email protected]",
+  RawRole: roleCode,
+  RoleCode: roleCode,
+  WasEditorNormalized: false,
+  Notes: null,
 });
 
 const buildCtx = (roleCode: UserAddMembershipRoleCodeType): UserAddRowContext => ({
-    Task: { TaskId: "task-1", DefaultRoleCode: UserAddMembershipRoleCodeType.Member },
-    Row: buildRow(roleCode),
-    Api: {} as UserAddRowContext["Api"],
+  Task: { TaskId: "task-1", DefaultRoleCode: UserAddMembershipRoleCodeType.Member },
+  Row: buildRow(roleCode),
+  Api: {} as UserAddRowContext["Api"],
 });
 
 describe("runUserAddRow — failure marking, no rollback", () => {
-    it("Step A ok + Step B fail → StepBFailedMemberAdded + warn + persisted IDs", async () => {
-        const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
-            Outcomes: [], Error: null,
-            WorkspaceId: "ws-123",
-            Membership: {
-                UserId: "u-456", Email: "[email protected]",
-                Role: MembershipRoleApiCodeType.Member,
-            },
-        });
-        const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
-            Outcomes: [], Membership: null, Error: "PUT 500 server error",
-        });
-
-        const { sink, entries } = collectingSink();
-        const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
-
-        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepBFailedMemberAdded);
-        expect(result.StepASucceeded).toBe(true);
-        expect(result.WorkspaceId).toBe("ws-123");
-        expect(result.UserId).toBe("u-456");
-        expect(result.HasError).toBe(true);
-
-        const warnEntry = entries.find(
-            (e) => e.Phase === UserAddLogPhaseType.StepB && e.Severity === UserAddLogSeverityType.Warn,
-        );
-        expect(warnEntry).toBeDefined();
-        expect(warnEntry?.Message).toMatch(/No rollback performed/);
-        expect(warnEntry?.Message).toMatch(/u-456/);
-        expect(warnEntry?.Message).toMatch(/SKIP Step A/);
-
-        expect(updates).toHaveLength(1);
-        expect(updates[0]).toMatchObject({
-            Outcome: UserAddRowOutcomeCodeType.StepBFailedMemberAdded,
-            StepASucceeded: true, WorkspaceId: "ws-123", UserId: "u-456",
-            IsDone: false, HasError: true,
-        });
-
-        stepASpy.mockRestore();
-        stepBSpy.mockRestore();
+  it("Step A ok + Step B fail → StepBFailedMemberAdded + warn + persisted IDs", async () => {
+    const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
+      Outcomes: [], Error: null,
+      WorkspaceId: "ws-123",
+      Membership: {
+        UserId: "u-456", Email: "[email protected]",
+        Role: MembershipRoleApiCodeType.Member,
+      },
+    });
+    const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
+      Outcomes: [], Membership: null, Error: "PUT 500 server error",
     });
 
-    it("Step A fails → StepAFailed, no warn, IDs null", async () => {
-        const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
-            Outcomes: [], Error: "POST 409 conflict", WorkspaceId: null, Membership: null,
-        });
+    const { sink, entries } = collectingSink();
+    const { store, updates } = collectingStore();
+    const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
 
-        const { sink, entries } = collectingSink();
-        const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Member), sink, store);
+    expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepBFailedMemberAdded);
+    expect(result.StepASucceeded).toBe(true);
+    expect(result.WorkspaceId).toBe("ws-123");
+    expect(result.UserId).toBe("u-456");
+    expect(result.HasError).toBe(true);
 
-        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepAFailed);
-        expect(result.StepASucceeded).toBe(false);
-        expect(result.WorkspaceId).toBeNull();
-        expect(result.UserId).toBeNull();
+    const warnEntry = entries.find(
+      (e) => e.Phase === UserAddLogPhaseType.StepB && e.Severity === UserAddLogSeverityType.Warn,
+    );
+    expect(warnEntry).toBeDefined();
+    expect(warnEntry?.Message).toMatch(/No rollback performed/);
+    expect(warnEntry?.Message).toMatch(/u-456/);
+    expect(warnEntry?.Message).toMatch(/SKIP Step A/);
 
-        const warnEntries = entries.filter((e) => e.Severity === UserAddLogSeverityType.Warn);
-        expect(warnEntries).toHaveLength(0);
-
-        expect(updates[0].StepASucceeded).toBe(false);
-        expect(updates[0].UserId).toBeNull();
-
-        stepASpy.mockRestore();
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toMatchObject({
+      Outcome: UserAddRowOutcomeCodeType.StepBFailedMemberAdded,
+      StepASucceeded: true, WorkspaceId: "ws-123", UserId: "u-456",
+      IsDone: false, HasError: true,
     });
 
-    it("happy path Owner: both steps succeed → IDs persisted, no warn", async () => {
-        const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
-            Outcomes: [], Error: null,
-            WorkspaceId: "ws-9",
-            Membership: {
-                UserId: "u-9", Email: "[email protected]",
-                Role: MembershipRoleApiCodeType.Member,
-            },
-        });
-        const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
-            Outcomes: [], Membership: null, Error: null,
-        });
+    stepASpy.mockRestore();
+    stepBSpy.mockRestore();
+  });
 
-        const { sink } = collectingSink();
-        const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
-
-        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.Succeeded);
-        expect(result.StepASucceeded).toBe(true);
-        expect(result.StepBRan).toBe(true);
-        expect(updates[0].WorkspaceId).toBe("ws-9");
-        expect(updates[0].UserId).toBe("u-9");
-        expect(updates[0].IsDone).toBe(true);
-
-        stepASpy.mockRestore();
-        stepBSpy.mockRestore();
+  it("Step A fails → StepAFailed, no warn, IDs null", async () => {
+    const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
+      Outcomes: [], Error: "POST 409 conflict", WorkspaceId: null, Membership: null,
     });
+
+    const { sink, entries } = collectingSink();
+    const { store, updates } = collectingStore();
+    const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Member), sink, store);
+
+    expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepAFailed);
+    expect(result.StepASucceeded).toBe(false);
+    expect(result.WorkspaceId).toBeNull();
+    expect(result.UserId).toBeNull();
+
+    const warnEntries = entries.filter((e) => e.Severity === UserAddLogSeverityType.Warn);
+    expect(warnEntries).toHaveLength(0);
+
+    expect(updates[0].StepASucceeded).toBe(false);
+    expect(updates[0].UserId).toBeNull();
+
+    stepASpy.mockRestore();
+  });
+
+  it("happy path Owner: both steps succeed → IDs persisted, no warn", async () => {
+    const stepASpy = vi.spyOn(stepAModule, "runStepA").mockResolvedValue({
+      Outcomes: [], Error: null,
+      WorkspaceId: "ws-9",
+      Membership: {
+        UserId: "u-9", Email: "[email protected]",
+        Role: MembershipRoleApiCodeType.Member,
+      },
+    });
+    const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
+      Outcomes: [], Membership: null, Error: null,
+    });
+
+    const { sink } = collectingSink();
+    const { store, updates } = collectingStore();
+    const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
+
+    expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.Succeeded);
+    expect(result.StepASucceeded).toBe(true);
+    expect(result.StepBRan).toBe(true);
+    expect(updates[0].WorkspaceId).toBe("ws-9");
+    expect(updates[0].UserId).toBe("u-9");
+    expect(updates[0].IsDone).toBe(true);
+
+    stepASpy.mockRestore();
+    stepBSpy.mockRestore();
+  });
 });

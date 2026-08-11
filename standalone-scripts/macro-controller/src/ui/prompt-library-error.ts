@@ -24,6 +24,7 @@ export function logLibraryImportFailure(key: string, detail: string, cause?: unk
 
     return;
   }
+
   const suffix = prev && prev.suppressed > 0
     ? ' [dedup: ' + String(prev.suppressed) + ' identical entr' + (prev.suppressed === 1 ? 'y' : 'ies') + ' suppressed in prior 60s window]'
     : '';
@@ -32,12 +33,18 @@ export function logLibraryImportFailure(key: string, detail: string, cause?: unk
   } else {
     logError(LOG_SCOPE, 'handleImportFile[' + key + ']: ' + detail + suffix, cause);
   }
+
   _libraryImportFailureDedupe.set(key, { lastAt: now, suppressed: 0 });
 }
 
 export function extractImportErrorReason(err: unknown): string {
-  if (err instanceof Error && err.message) return err.message.split('\n')[0]!.slice(0, 240);
-  if (typeof err === 'string' && err.length > 0) return err.split('\n')[0]!.slice(0, 240);
+  if (err instanceof Error && err.message) {
+    return err.message.split('\n')[0]!.slice(0, 240);
+  }
+
+  if (typeof err === 'string' && err.length > 0) {
+    return err.split('\n')[0]!.slice(0, 240);
+  }
 
   return 'Unknown error';
 }
@@ -92,10 +99,18 @@ export function clearImportErrorBanner(refs: ModalRefs): void {
 }
 
 export function focusErrorBanner(refs: ModalRefs): void {
-  if (!refs.root.isConnected) return;
+  if (!refs.root.isConnected) {
+    return;
+  }
+
   const banner = refs.errorBanner;
-  if (!banner || banner.hidden) return;
-  try { banner.focus(); } catch (err) {
+  if (!banner || banner.hidden) {
+    return;
+  }
+
+  try {
+    banner.focus(); 
+  } catch (err) {
     logError('MacroController', 'Unknown error');
   }
 }

@@ -315,7 +315,9 @@ export function clearAllLogs(): void {
 function readSeedTelemetryBlock(): string[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
-    if (!raw) return ['Seed Telemetry: (not run this session)', '---'];
+    if (!raw) {
+      return ['Seed Telemetry: (not run this session)', '---'];
+    }
 
     return ['=== Seed Telemetry ===', raw, '---'];
   } catch (e) {
@@ -333,7 +335,9 @@ export function formatLogsForExport(): string {
   lines.push('Exported at: ' + new Date().toISOString());
   lines.push('Total entries: ' + logs.length);
   lines.push('---');
-  for (const l of readSeedTelemetryBlock()) lines.push(l);
+  for (const l of readSeedTelemetryBlock()) {
+    lines.push(l);
+  }
 
   for (const entry of logs) {
     lines.push('[' + entry.t + '] [' + entry.l + '] ' + entry.m);

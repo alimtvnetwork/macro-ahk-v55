@@ -49,8 +49,13 @@ export interface StatusExplanation {
 }
 
 function pickRefillIso(ws: WorkspaceCredit): string {
-  if (ws.nextRefillAt) return ws.nextRefillAt;
-  if (ws.billingPeriodEndAt) return ws.billingPeriodEndAt;
+  if (ws.nextRefillAt) {
+    return ws.nextRefillAt;
+  }
+
+  if (ws.billingPeriodEndAt) {
+    return ws.billingPeriodEndAt;
+  }
 
   return '';
 }

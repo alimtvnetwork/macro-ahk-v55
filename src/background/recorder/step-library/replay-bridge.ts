@@ -41,9 +41,9 @@
  */
 
 import {
-    executeReplay,
-    type ReplayOptions,
-    type ReplayStepInput,
+  executeReplay,
+  type ReplayOptions,
+  type ReplayStepInput,
 } from "../live-dom-replay";
 import type { PersistedSelector } from "../step-persistence";
 import { logFailure, type FailureReport } from "../failure-logger";
@@ -81,118 +81,124 @@ export interface ReplayBridgeOptions {
  * executor — the runner handles them itself before delegating.
  */
 export function createLiveReplayExecutor(opts: ReplayBridgeOptions): LeafStepExecutor {
-    return async (step, ctx) => executeLeaf(step, ctx, opts);
+  return async (step, ctx) => executeLeaf(step, ctx, opts);
 }
 
 async function executeLeaf(
-    step: StepRow, _ctx: LeafStepContext, opts: ReplayBridgeOptions,
+  step: StepRow, _ctx: LeafStepContext, opts: ReplayBridgeOptions,
 ): Promise<FailureReport | null> {
-    if (step.StepKindId === StepKindId.UrlTabClick) {
-        return executeUrlTabClickLeaf(step, opts);
-    }
+  if (step.StepKindId === StepKindId.UrlTabClick) {
+    return executeUrlTabClickLeaf(step, opts);
+  }
 
-    let input: ReplayStepInput;
-    try {
-        input = stepRowToReplayInput(step);
-    } catch (err) {
-        return logTranslationFailure(step, err, opts);
-    }
-    const replayOpts: ReplayOptions = {
-        Doc: opts.Doc, Row: opts.Row, Sleep: opts.Sleep, Now: opts.Now, Verbose: opts.Verbose,
-    };
-    const outcome = await executeReplay([input], replayOpts);
-    const result = outcome.Results[0];
-    if (result === undefined) return logEmptyResultsFailure(step, opts);
-    if (result.Ok) return null;
+  let input: ReplayStepInput;
+  try {
+    input = stepRowToReplayInput(step);
+  } catch (err) {
+    return logTranslationFailure(step, err, opts);
+  }
 
-    return result.FailureReport ?? logMissingReportFailure(step, result.Error, opts);
+  const replayOpts: ReplayOptions = {
+    Doc: opts.Doc, Row: opts.Row, Sleep: opts.Sleep, Now: opts.Now, Verbose: opts.Verbose,
+  };
+  const outcome = await executeReplay([input], replayOpts);
+  const result = outcome.Results[0];
+  if (result === undefined) {
+    return logEmptyResultsFailure(step, opts);
+  }
+
+  if (result.Ok) {
+    return null;
+  }
+
+  return result.FailureReport ?? logMissingReportFailure(step, result.Error, opts);
 }
 
 async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions): Promise<FailureReport | null> {
-    if (!step.PayloadJson) {
-        return logFailure({
-            Phase: "Replay", Error: new Error("Missing PayloadJson for UrlTabClick"),
-            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
-            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-            ReasonDetail: `UrlTabClick step #${step.StepId} has no PayloadJson.`,
-            Verbose: opts.Verbose ?? false, Now: opts.Now,
-        });
+  if (!step.PayloadJson) {
+    return logFailure({
+      Phase: "Replay", Error: new Error("Missing PayloadJson for UrlTabClick"),
+      StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+      Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+      ReasonDetail: `UrlTabClick step #${step.StepId} has no PayloadJson.`,
+      Verbose: opts.Verbose ?? false, Now: opts.Now,
+    });
+  }
+
+  let params: Record<string, unknown>;
+  try {
+    params = JSON.parse(step.PayloadJson);
+  } catch (err) {
+    return logFailure({
+      Phase: "Replay", Error: err,
+      StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+      Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+      ReasonDetail: `UrlTabClick step #${step.StepId} has invalid PayloadJson.`,
+      Verbose: opts.Verbose ?? false, Now: opts.Now,
+    });
+  }
+
+  try {
+    const result = await executeUrlTabClick({
+      Params: params,
+      Tabs: new ChromeTabsAdapter(),
+      NowMs: () => opts.Now ? opts.Now().getTime() : Date.now(),
+    });
+
+    if (result.Reason !== "Ok") {
+      return logFailure({
+        Phase: "Replay", Error: new Error(result.Detail || result.Reason),
+        StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+        Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+        ReasonDetail: result.Detail || result.Reason,
+        Verbose: opts.Verbose ?? false, Now: opts.Now,
+      });
     }
 
-    let params: Record<string, unknown>;
-    try {
-        params = JSON.parse(step.PayloadJson);
-    } catch (err) {
-        return logFailure({
-            Phase: "Replay", Error: err,
-            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
-            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-            ReasonDetail: `UrlTabClick step #${step.StepId} has invalid PayloadJson.`,
-            Verbose: opts.Verbose ?? false, Now: opts.Now,
-        });
-    }
-
-    try {
-        const result = await executeUrlTabClick({
-            Params: params,
-            Tabs: new ChromeTabsAdapter(),
-            NowMs: () => opts.Now ? opts.Now().getTime() : Date.now(),
-        });
-
-        if (result.Reason !== "Ok") {
-            return logFailure({
-                Phase: "Replay", Error: new Error(result.Detail || result.Reason),
-                StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
-                Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-                ReasonDetail: result.Detail || result.Reason,
-                Verbose: opts.Verbose ?? false, Now: opts.Now,
-            });
-        }
-
-        return null;
-    } catch (err) {
-        return logFailure({
-            Phase: "Replay", Error: err,
-            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
-            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-            ReasonDetail: `executeUrlTabClick threw: ${(err as Error).message}`,
-            Verbose: opts.Verbose ?? false, Now: opts.Now,
-        });
-    }
+    return null;
+  } catch (err) {
+    return logFailure({
+      Phase: "Replay", Error: err,
+      StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+      Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+      ReasonDetail: `executeUrlTabClick threw: ${(err as Error).message}`,
+      Verbose: opts.Verbose ?? false, Now: opts.Now,
+    });
+  }
 }
 
 function logTranslationFailure(step: StepRow, err: unknown, opts: ReplayBridgeOptions): FailureReport {
-    return logFailure({
-        Phase: "Replay", Error: err,
-        StepId: step.StepId, Index: step.OrderIndex,
-        StepKind: stepKindLabel(step.StepKindId),
-        Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-        ReasonDetail: `Step #${step.StepId} (kind=${stepKindLabel(step.StepKindId)}) `
+  return logFailure({
+    Phase: "Replay", Error: err,
+    StepId: step.StepId, Index: step.OrderIndex,
+    StepKind: stepKindLabel(step.StepKindId),
+    Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+    ReasonDetail: `Step #${step.StepId} (kind=${stepKindLabel(step.StepKindId)}) `
             + `could not be translated for live replay: ${(err as Error).message}`,
-        Verbose: opts.Verbose ?? false, Now: opts.Now,
-    });
+    Verbose: opts.Verbose ?? false, Now: opts.Now,
+  });
 }
 
 function logEmptyResultsFailure(step: StepRow, opts: ReplayBridgeOptions): FailureReport {
-    return logFailure({
-        Phase: "Replay", Error: new Error("executeReplay returned no result"),
-        StepId: step.StepId, Index: step.OrderIndex,
-        StepKind: stepKindLabel(step.StepKindId),
-        Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-        ReasonDetail: `executeReplay produced an empty Results array for step #${step.StepId}.`,
-        Verbose: opts.Verbose ?? false, Now: opts.Now,
-    });
+  return logFailure({
+    Phase: "Replay", Error: new Error("executeReplay returned no result"),
+    StepId: step.StepId, Index: step.OrderIndex,
+    StepKind: stepKindLabel(step.StepKindId),
+    Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+    ReasonDetail: `executeReplay produced an empty Results array for step #${step.StepId}.`,
+    Verbose: opts.Verbose ?? false, Now: opts.Now,
+  });
 }
 
 function logMissingReportFailure(step: StepRow, resultError: string | undefined, opts: ReplayBridgeOptions): FailureReport {
-    return logFailure({
-        Phase: "Replay", Error: new Error(resultError ?? "Unknown replay failure"),
-        StepId: step.StepId, Index: step.OrderIndex,
-        StepKind: stepKindLabel(step.StepKindId),
-        Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-        ReasonDetail: resultError ?? `Step #${step.StepId} failed without a FailureReport.`,
-        Verbose: opts.Verbose ?? false, Now: opts.Now,
-    });
+  return logFailure({
+    Phase: "Replay", Error: new Error(resultError ?? "Unknown replay failure"),
+    StepId: step.StepId, Index: step.OrderIndex,
+    StepKind: stepKindLabel(step.StepKindId),
+    Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+    ReasonDetail: resultError ?? `Step #${step.StepId} failed without a FailureReport.`,
+    Verbose: opts.Verbose ?? false, Now: opts.Now,
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -222,117 +228,121 @@ interface StepPayload {
  * keeps inference in one place.
  */
 export function stepRowToReplayInput(step: StepRow): ReplayStepInput {
-    const payload = parsePayload(step);
-    switch (step.StepKindId) {
-        case StepKindId.Wait:     return buildWait(step, payload);
-        case StepKindId.Click:    return buildSelectorStep(step, payload, "Click");
-        case StepKindId.Type:     return buildValueStep(step, payload, "Type");
-        case StepKindId.Select:   return buildValueStep(step, payload, "Select");
-        case StepKindId.JsInline: throw new Error(
-            `JsInline step #${step.StepId} is not yet supported by the live `
+  const payload = parsePayload(step);
+  switch (step.StepKindId) {
+    case StepKindId.Wait:     return buildWait(step, payload);
+    case StepKindId.Click:    return buildSelectorStep(step, payload, "Click");
+    case StepKindId.Type:     return buildValueStep(step, payload, "Type");
+    case StepKindId.Select:   return buildValueStep(step, payload, "Select");
+    case StepKindId.JsInline: throw new Error(
+      `JsInline step #${step.StepId} is not yet supported by the live `
             + `replay bridge, JS steps run through buildJsStepFailureReport, `
             + `not executeReplay.`);
 
-        case StepKindId.RunGroup: throw new Error(
-            `RunGroup step #${step.StepId} reached the leaf executor; `
+    case StepKindId.RunGroup: throw new Error(
+      `RunGroup step #${step.StepId} reached the leaf executor; `
             + `this should be handled by runGroup() recursion, not the bridge.`);
-        case StepKindId.UrlTabClick: throw unsupportedKind(step, "UrlTabClick",
-            "it is dispatched by executeUrlTabClick against the tabs adapter.");
-        case StepKindId.Hotkey:   throw unsupportedKind(step, "Hotkey",
-            "it is dispatched by the dedicated hotkey executor (see executeHotkeyStep).");
-        default: {
-            const exhaustive: never = step.StepKindId;
-            throw new Error(`Unknown StepKindId for step #${step.StepId}: ${String(exhaustive)}`);
-        }
+    case StepKindId.UrlTabClick: throw unsupportedKind(step, "UrlTabClick",
+      "it is dispatched by executeUrlTabClick against the tabs adapter.");
+    case StepKindId.Hotkey:   throw unsupportedKind(step, "Hotkey",
+      "it is dispatched by the dedicated hotkey executor (see executeHotkeyStep).");
+    default: {
+      const exhaustive: never = step.StepKindId;
+      throw new Error(`Unknown StepKindId for step #${step.StepId}: ${String(exhaustive)}`);
     }
+  }
 }
 
 function buildWait(step: StepRow, payload: StepPayload): ReplayStepInput {
-    const ms = payload.WaitMs;
-    if (typeof ms !== "number" || !Number.isFinite(ms) || ms < 0) {
-        throw new Error(
-            `Wait step #${step.StepId} has invalid PayloadJson.WaitMs `
+  const ms = payload.WaitMs;
+  if (typeof ms !== "number" || !Number.isFinite(ms) || ms < 0) {
+    throw new Error(
+      `Wait step #${step.StepId} has invalid PayloadJson.WaitMs `
             + `(${JSON.stringify(payload.WaitMs)}). Expected a non-negative number.`,
-        );
-    }
+    );
+  }
 
-    return { StepId: step.StepId, Index: step.OrderIndex, Kind: "Wait", Selectors: [], WaitMs: ms };
+  return { StepId: step.StepId, Index: step.OrderIndex, Kind: "Wait", Selectors: [], WaitMs: ms };
 }
 
 function buildSelectorStep(step: StepRow, payload: StepPayload, kind: "Click"): ReplayStepInput {
-    return {
-        StepId: step.StepId, Index: step.OrderIndex, Kind: kind,
-        Selectors: [requireSelector(step, payload)],
-    };
+  return {
+    StepId: step.StepId, Index: step.OrderIndex, Kind: kind,
+    Selectors: [requireSelector(step, payload)],
+  };
 }
 
 function buildValueStep(step: StepRow, payload: StepPayload, kind: BuildValueStepKindType): ReplayStepInput {
-    return {
-        StepId: step.StepId, Index: step.OrderIndex, Kind: kind,
-        Selectors: [requireSelector(step, payload)],
-        Value: payload.Value ?? "",
-    };
+  return {
+    StepId: step.StepId, Index: step.OrderIndex, Kind: kind,
+    Selectors: [requireSelector(step, payload)],
+    Value: payload.Value ?? "",
+  };
 }
 
 function unsupportedKind(step: StepRow, kindLabel: string, reason: string): Error {
-    return new Error(
-        `${kindLabel} step #${step.StepId} is not handled by the live replay bridge, ${reason}`,
-    );
+  return new Error(
+    `${kindLabel} step #${step.StepId} is not handled by the live replay bridge, ${reason}`,
+  );
 }
 
 function parsePayload(step: StepRow): StepPayload {
-    if (step.PayloadJson === null || step.PayloadJson === "") return {};
-    try {
-        const parsed: unknown = JSON.parse(step.PayloadJson);
-        if (parsed === null || typeof parsed !== "object") {
-            throw new Error(`PayloadJson must be a JSON object, got ${typeof parsed}`);
-        }
+  if (step.PayloadJson === null || step.PayloadJson === "") {
+    return {};
+  }
 
-        return parsed as StepPayload;
-    } catch (err) {
-        throw new Error(
-            `Step #${step.StepId} has invalid PayloadJson: ${(err as Error).message}`,
-        );
+  try {
+    const parsed: unknown = JSON.parse(step.PayloadJson);
+    if (parsed === null || typeof parsed !== "object") {
+      throw new Error(`PayloadJson must be a JSON object, got ${typeof parsed}`);
     }
+
+    return parsed as StepPayload;
+  } catch (err) {
+    throw new Error(
+      `Step #${step.StepId} has invalid PayloadJson: ${(err as Error).message}`,
+    );
+  }
 }
 
 function requireSelector(step: StepRow, payload: StepPayload): PersistedSelector {
-    const expr = payload.Selector;
-    if (typeof expr !== "string" || expr.trim() === "") {
-        throw new Error(
-            `Step #${step.StepId} (kind=${stepKindLabel(step.StepKindId)}) `
+  const expr = payload.Selector;
+  if (typeof expr !== "string" || expr.trim() === "") {
+    throw new Error(
+      `Step #${step.StepId} (kind=${stepKindLabel(step.StepKindId)}) `
             + `requires PayloadJson.Selector — got ${JSON.stringify(payload.Selector)}.`,
-        );
-    }
-    const trimmed = expr.trim();
-    // Mirror the kind-detection in replay-resolver.ts so the same
-    // expression resolves the same way in both code paths.
-    const selectorKindId = trimmed.startsWith("/") || trimmed.startsWith("(")
-        ? SelectorKindId.XPathFull
-        : SelectorKindId.Css;
+    );
+  }
 
-    return {
-        // Synthetic IDs: the step-library schema doesn't persist
-        // Selector rows. Negative numbers stay clearly distinct from
-        // any real Selector.SelectorId in the legacy per-project DB
-        // so log diffs / persistence layers can tell them apart.
-        SelectorId: -step.StepId,
-        StepId: step.StepId,
-        SelectorKindId: selectorKindId,
-        Expression: trimmed,
-        AnchorSelectorId: null,
-        IsPrimary: 1,
-    };
+  const trimmed = expr.trim();
+  // Mirror the kind-detection in replay-resolver.ts so the same
+  // expression resolves the same way in both code paths.
+  const selectorKindId = trimmed.startsWith("/") || trimmed.startsWith("(")
+    ? SelectorKindId.XPathFull
+    : SelectorKindId.Css;
+
+  return {
+    // Synthetic IDs: the step-library schema doesn't persist
+    // Selector rows. Negative numbers stay clearly distinct from
+    // any real Selector.SelectorId in the legacy per-project DB
+    // so log diffs / persistence layers can tell them apart.
+    SelectorId: -step.StepId,
+    StepId: step.StepId,
+    SelectorKindId: selectorKindId,
+    Expression: trimmed,
+    AnchorSelectorId: null,
+    IsPrimary: 1,
+  };
 }
 
 function stepKindLabel(id: StepKindId): string {
-    switch (id) {
-        case StepKindId.Click:    return "Click";
-        case StepKindId.Type:     return "Type";
-        case StepKindId.Select:   return "Select";
-        case StepKindId.JsInline: return "JsInline";
-        case StepKindId.Wait:     return "Wait";
-        case StepKindId.RunGroup: return "RunGroup";
-        default:                  return `Unknown(${String(id)})`;
-    }
+  switch (id) {
+    case StepKindId.Click:    return "Click";
+    case StepKindId.Type:     return "Type";
+    case StepKindId.Select:   return "Select";
+    case StepKindId.JsInline: return "JsInline";
+    case StepKindId.Wait:     return "Wait";
+    case StepKindId.RunGroup: return "RunGroup";
+    default:                  return `Unknown(${String(id)})`;
+  }
 }

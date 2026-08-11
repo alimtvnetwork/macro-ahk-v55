@@ -72,9 +72,9 @@ export interface BatchRefreshSummary {
 
 /** Sleep helper, sequential, no recursion, single pending timer. */
 function delay(ms: number): Promise<void> {
-    return new Promise(function (resolve) {
-        setTimeout(resolve, ms);
-    });
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
 }
 
 interface BatchCounters {
@@ -86,28 +86,32 @@ interface BatchCounters {
 }
 
 async function runOneWorkspace(
-    candidate: BatchWorkspaceCandidate,
-    counters: BatchCounters,
-    results: BatchRefreshIterationResult[],
-    force: boolean,
-    source: BatchRefreshSourceType,
+  candidate: BatchWorkspaceCandidate,
+  counters: BatchCounters,
+  results: BatchRefreshIterationResult[],
+  force: boolean,
+  source: BatchRefreshSourceType,
 ): Promise<void> {
-    counters.attempted += 1;
-    try {
-        const result = await fetchAndPersist(candidate.workspaceId, { force, source });
-        results.push({ workspaceId: candidate.workspaceId, outcome: result.outcome });
-        if (result.outcome === 'fetched') { counters.fetched += 1; }
-        else if (result.outcome === 'throttled') { counters.throttled += 1; }
-        else { counters.failed += 1; }
-    } catch (caughtError: unknown) {
-        counters.failed += 1;
-        results.push({ workspaceId: candidate.workspaceId, outcome: 'failed' });
-        logError(
-            'CreditBalance.batchRefresh',
-            'fetchAndPersist threw for workspaceId=' + candidate.workspaceId,
-            caughtError,
-        );
+  counters.attempted += 1;
+  try {
+    const result = await fetchAndPersist(candidate.workspaceId, { force, source });
+    results.push({ workspaceId: candidate.workspaceId, outcome: result.outcome });
+    if (result.outcome === 'fetched') {
+      counters.fetched += 1; 
+    } else if (result.outcome === 'throttled') {
+      counters.throttled += 1; 
+    } else {
+      counters.failed += 1; 
     }
+  } catch (caughtError: unknown) {
+    counters.failed += 1;
+    results.push({ workspaceId: candidate.workspaceId, outcome: 'failed' });
+    logError(
+      'CreditBalance.batchRefresh',
+      'fetchAndPersist threw for workspaceId=' + candidate.workspaceId,
+      caughtError,
+    );
+  }
 }
 
 /**
@@ -118,48 +122,53 @@ async function runOneWorkspace(
  * in `eslint.config.js`.
  */
 export async function batchRefreshProOneCreditBalances(
-    candidates: ReadonlyArray<BatchWorkspaceCandidate>,
-    options?: BatchRefreshOptions,
+  candidates: ReadonlyArray<BatchWorkspaceCandidate>,
+  options?: BatchRefreshOptions,
 ): Promise<BatchRefreshSummary> {
-    const results: BatchRefreshIterationResult[] = [];
-    const counters: BatchCounters = { fetched: 0, throttled: 0, failed: 0, skipped: 0, attempted: 0 };
-    const force = options?.force === true;
-    const source: BatchRefreshSourceType = options?.source ?? 'batch';
+  const results: BatchRefreshIterationResult[] = [];
+  const counters: BatchCounters = { fetched: 0, throttled: 0, failed: 0, skipped: 0, attempted: 0 };
+  const force = options?.force === true;
+  const source: BatchRefreshSourceType = options?.source ?? 'batch';
 
-    const dispatchable = candidates.filter(function (c) { return c.dispatchable === true; });
+  const dispatchable = candidates.filter(function (c) {
+    return c.dispatchable === true; 
+  });
 
-    log('CreditBalance.batchRefresh: starting (candidates=' + String(candidates.length)
+  log('CreditBalance.batchRefresh: starting (candidates=' + String(candidates.length)
         + ', dispatchable=' + String(dispatchable.length)
         + ', gapMs=' + String(INTER_WS_GAP_MS)
         + ', force=' + String(force) + ', source=' + source + ')', 'info');
 
-    for (const c of candidates) {
-        if (c.dispatchable !== true) {
-            counters.skipped += 1;
-            results.push({ workspaceId: c.workspaceId, outcome: 'skipped', reason: 'plan-not-eligible' });
-        }
+  for (const c of candidates) {
+    if (c.dispatchable !== true) {
+      counters.skipped += 1;
+      results.push({ workspaceId: c.workspaceId, outcome: 'skipped', reason: 'plan-not-eligible' });
+    }
+  }
+
+  for (let i = 0; i < dispatchable.length; i += 1) {
+    if (i > 0) {
+      await delay(INTER_WS_GAP_MS); 
     }
 
-    for (let i = 0; i < dispatchable.length; i += 1) {
-        if (i > 0) { await delay(INTER_WS_GAP_MS); }
-        await runOneWorkspace(dispatchable[i], counters, results, force, source);
-    }
+    await runOneWorkspace(dispatchable[i], counters, results, force, source);
+  }
 
-    const summary: BatchRefreshSummary = {
-        total: candidates.length,
-        attempted: counters.attempted,
-        fetched: counters.fetched,
-        throttled: counters.throttled,
-        failed: counters.failed,
-        skipped: counters.skipped,
-        results,
-    };
+  const summary: BatchRefreshSummary = {
+    total: candidates.length,
+    attempted: counters.attempted,
+    fetched: counters.fetched,
+    throttled: counters.throttled,
+    failed: counters.failed,
+    skipped: counters.skipped,
+    results,
+  };
 
-    log('CreditBalance.batchRefresh: done (attempted=' + String(counters.attempted)
+  log('CreditBalance.batchRefresh: done (attempted=' + String(counters.attempted)
         + ', fetched=' + String(counters.fetched)
         + ', throttled=' + String(counters.throttled)
         + ', failed=' + String(counters.failed)
         + ', skipped=' + String(counters.skipped) + ')', 'success');
 
-    return summary;
+  return summary;
 }

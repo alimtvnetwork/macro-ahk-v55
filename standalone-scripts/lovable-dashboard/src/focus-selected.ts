@@ -8,22 +8,23 @@ import { getSelected } from "./workspace-dictionary";
 import type { WorkspaceDictionary } from "./types";
 
 export function focusSelectedWorkspace(dict: WorkspaceDictionary): void {
-    try {
-        const selected = getSelected(dict);
-        if (selected) {
-            scrollWorkspaceIntoView(selected.fullXPath);
+  try {
+    const selected = getSelected(dict);
+    if (selected) {
+      scrollWorkspaceIntoView(selected.fullXPath);
 
-            return;
-        }
-        logWarn("focusSelected", "no selected workspace detected");
-    } catch (caught) {
-        logError("focusSelected", caught);
+      return;
     }
+
+    logWarn("focusSelected", "no selected workspace detected");
+  } catch (caught) {
+    logError("focusSelected", caught);
+  }
 }
 
 function scrollWorkspaceIntoView(fullXPath: string): void {
-    const el = resolveElement(fullXPath);
-    if (el) {
-        el.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
+  const el = resolveElement(fullXPath);
+  if (el) {
+    el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
 }

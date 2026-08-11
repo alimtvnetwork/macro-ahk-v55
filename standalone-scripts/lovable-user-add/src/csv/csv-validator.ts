@@ -30,65 +30,65 @@ interface WorkspaceUrlCheck {
 }
 
 const checkWorkspaceUrl = (value: string): WorkspaceUrlCheck => {
-    if (value.length > MAX_WORKSPACE_URL_LENGTH) {
-        return { Ok: false, Reason: `URL exceeds max length ${MAX_WORKSPACE_URL_LENGTH}` };
-    }
+  if (value.length > MAX_WORKSPACE_URL_LENGTH) {
+    return { Ok: false, Reason: `URL exceeds max length ${MAX_WORKSPACE_URL_LENGTH}` };
+  }
 
-    let parsed: URL;
-    try {
-        parsed = new URL(value);
-    } catch {
-        return { Ok: false, Reason: "URL is not parseable" };
-    }
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return { Ok: false, Reason: "URL is not parseable" };
+  }
 
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-        return { Ok: false, Reason: `Unsupported protocol: ${parsed.protocol}` };
-    }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    return { Ok: false, Reason: `Unsupported protocol: ${parsed.protocol}` };
+  }
 
-    const hostOk = parsed.host === LOVABLE_HOST || parsed.host.endsWith(`.${LOVABLE_HOST}`);
-    if (!hostOk) {
-        return { Ok: false, Reason: `Host is not a Lovable domain: ${parsed.host}` };
-    }
+  const hostOk = parsed.host === LOVABLE_HOST || parsed.host.endsWith(`.${LOVABLE_HOST}`);
+  if (!hostOk) {
+    return { Ok: false, Reason: `Host is not a Lovable domain: ${parsed.host}` };
+  }
 
-    // Reject bare `lovable.dev/` or `lovable.dev` — every workspace URL
-    // includes at least one path segment (slug, project id, or `/projects/...`).
-    const trimmedPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
-    if (trimmedPath.length === 0) {
-        return { Ok: false, Reason: "URL is missing a workspace path segment" };
-    }
+  // Reject bare `lovable.dev/` or `lovable.dev` — every workspace URL
+  // includes at least one path segment (slug, project id, or `/projects/...`).
+  const trimmedPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
+  if (trimmedPath.length === 0) {
+    return { Ok: false, Reason: "URL is missing a workspace path segment" };
+  }
 
-    return { Ok: true, Reason: null };
+  return { Ok: true, Reason: null };
 };
 
 export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> => {
-    const errors: CsvParseError[] = [];
+  const errors: CsvParseError[] = [];
 
-    if (!isValidEmail(row.MemberEmail)) {
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: UserAddCsvColumnType.MemberEmail,
-            Message: `Invalid email in MemberEmail: ${row.MemberEmail}`,
-        });
-    }
+  if (!isValidEmail(row.MemberEmail)) {
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: UserAddCsvColumnType.MemberEmail,
+      Message: `Invalid email in MemberEmail: ${row.MemberEmail}`,
+    });
+  }
 
-    const urlCheck = checkWorkspaceUrl(row.WorkspaceUrl);
-    if (!urlCheck.Ok) {
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: UserAddCsvColumnType.WorkspaceUrl,
-            Message: `Invalid Lovable workspace URL: ${row.WorkspaceUrl} (${urlCheck.Reason})`,
-        });
-    }
+  const urlCheck = checkWorkspaceUrl(row.WorkspaceUrl);
+  if (!urlCheck.Ok) {
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: UserAddCsvColumnType.WorkspaceUrl,
+      Message: `Invalid Lovable workspace URL: ${row.WorkspaceUrl} (${urlCheck.Reason})`,
+    });
+  }
 
-    if (row.Notes !== null && row.Notes.length > MAX_NOTES_LENGTH) {
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: UserAddCsvColumnType.Notes,
-            Message: `Notes exceeds max length ${MAX_NOTES_LENGTH} (got ${row.Notes.length})`,
-        });
-    }
+  if (row.Notes !== null && row.Notes.length > MAX_NOTES_LENGTH) {
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: UserAddCsvColumnType.Notes,
+      Message: `Notes exceeds max length ${MAX_NOTES_LENGTH} (got ${row.Notes.length})`,
+    });
+  }
 
-    return errors;
+  return errors;
 };
 
 /**
@@ -96,26 +96,26 @@ export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> =>
  * Each duplicate row gets its own error so every offender surfaces.
  */
 export const validateFile = (
-    rows: ReadonlyArray<UserAddCsvRow>,
+  rows: ReadonlyArray<UserAddCsvRow>,
 ): ReadonlyArray<CsvParseError> => {
-    const errors: CsvParseError[] = [];
-    const seenAt = new Map<string, number>();
+  const errors: CsvParseError[] = [];
+  const seenAt = new Map<string, number>();
 
-    for (const row of rows) {
-        const key = `${row.WorkspaceUrl.trim().toLowerCase()}|${row.MemberEmail.trim().toLowerCase()}`;
-        const firstSeen = seenAt.get(key);
+  for (const row of rows) {
+    const key = `${row.WorkspaceUrl.trim().toLowerCase()}|${row.MemberEmail.trim().toLowerCase()}`;
+    const firstSeen = seenAt.get(key);
 
-        if (firstSeen === undefined) {
-            seenAt.set(key, row.RowIndex);
-            continue;
-        }
-
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: UserAddCsvColumnType.MemberEmail,
-            Message: `Duplicate (WorkspaceUrl, MemberEmail) pair — first seen on row ${firstSeen}`,
-        });
+    if (firstSeen === undefined) {
+      seenAt.set(key, row.RowIndex);
+      continue;
     }
 
-    return errors;
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: UserAddCsvColumnType.MemberEmail,
+      Message: `Duplicate (WorkspaceUrl, MemberEmail) pair — first seen on row ${firstSeen}`,
+    });
+  }
+
+  return errors;
 };

@@ -33,11 +33,13 @@ function populateLoopWorkspaceDropdown(): void {
     .then((m) => m.populateLoopWorkspaceDropdown())
     .catch((e: unknown) => logError('wsContextMenu', 'populateLoopWorkspaceDropdown import failed', e));
 }
+
 function fetchLoopCreditsWithDetect(force: boolean): void {
   import('./ws-list-renderer')
     .then((m) => m.fetchLoopCreditsWithDetect(force))
     .catch((e: unknown) => logError('wsContextMenu', 'fetchLoopCreditsWithDetect import failed', e));
 }
+
 import { showWsMembersPanel } from './ws-members-panel';
 import { showWsMembersBulkPanel } from './ws-members-bulk-panel';
 import { getSelectedWsIds } from './selected-workspaces-store';
@@ -77,9 +79,11 @@ function buildCtxMenuItem(label: string, onClick: () => void): HTMLElement {
   item.onmouseover = function () {
     (this as HTMLElement).style.background = 'rgba(139,92,246,0.3)';
   };
+
   item.onmouseout = function () {
     (this as HTMLElement).style.background = 'transparent';
   };
+
   item.onclick = onClick;
 
   return item;
@@ -100,42 +104,42 @@ function isProOnePlan(ws: import('./types').WorkspaceCredit): boolean {
 }
 
 async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Promise<string> {
-    const rawWire = toWireWorkspaceRaw(ws.rawApi);
-    const workspaceJson = JSON.stringify(rawWire ?? {}, null, 2);
+  const rawWire = toWireWorkspaceRaw(ws.rawApi);
+  const workspaceJson = JSON.stringify(rawWire ?? {}, null, 2);
 
-    // PRO_ZERO: append the verbatim /credit-balance JSON captured during enrichment.
-    const balanceRaw = ws[PRO_ZERO_BALANCE_JSON_FIELD];
-    const source = ws[PRO_ZERO_SOURCE_FIELD];
-    const isBalanceSource = source === MacroCreditSourceType.CREDIT_BALANCE;
-    const hasBalanceRaw = typeof balanceRaw === 'string';
-    const isBalanceNonEmpty = hasBalanceRaw && balanceRaw.length > 0;
-    if (isBalanceSource && isBalanceNonEmpty) {
+  // PRO_ZERO: append the verbatim /credit-balance JSON captured during enrichment.
+  const balanceRaw = ws[PRO_ZERO_BALANCE_JSON_FIELD];
+  const source = ws[PRO_ZERO_SOURCE_FIELD];
+  const isBalanceSource = source === MacroCreditSourceType.CREDIT_BALANCE;
+  const hasBalanceRaw = typeof balanceRaw === 'string';
+  const isBalanceNonEmpty = hasBalanceRaw && balanceRaw.length > 0;
+  if (isBalanceSource && isBalanceNonEmpty) {
+    return JSON.stringify({
+      Source: MacroCreditSourceType.CREDIT_BALANCE,
+      Workspace: JSON.parse(workspaceJson) as unknown,
+      CreditBalance: JSON.parse(balanceRaw as string) as unknown,
+    }, null, 2);
+  }
+
+  // PRO_ONE: pull cached /credit-balance row from SQLite (populated by fetcher.ts).
+  if (isProOnePlan(ws) && ws.id) {
+    const row = await readCreditBalanceCache(ws.id);
+    if (row && row.RawJson) {
+      try {
         return JSON.stringify({
-            Source: MacroCreditSourceType.CREDIT_BALANCE,
-            Workspace: JSON.parse(workspaceJson) as unknown,
-            CreditBalance: JSON.parse(balanceRaw as string) as unknown,
+          Source: 'credit_balance_cache',
+          PlanTierType: 'pro_1',
+          Workspace: JSON.parse(workspaceJson) as unknown,
+          CreditBalance: JSON.parse(row.RawJson) as unknown,
+          CreditBalanceCacheRow: row,
         }, null, 2);
+      } catch (caught: unknown) {
+        logError('wsContextMenu.buildCopyJsonPayload', 'failed to merge pro_1 credit-balance JSON for ws=' + ws.id, caught);
+      }
     }
+  }
 
-    // PRO_ONE: pull cached /credit-balance row from SQLite (populated by fetcher.ts).
-    if (isProOnePlan(ws) && ws.id) {
-        const row = await readCreditBalanceCache(ws.id);
-        if (row && row.RawJson) {
-            try {
-                return JSON.stringify({
-                    Source: 'credit_balance_cache',
-                    PlanTierType: 'pro_1',
-                    Workspace: JSON.parse(workspaceJson) as unknown,
-                    CreditBalance: JSON.parse(row.RawJson) as unknown,
-                    CreditBalanceCacheRow: row,
-                }, null, 2);
-            } catch (caught: unknown) {
-                logError('wsContextMenu.buildCopyJsonPayload', 'failed to merge pro_1 credit-balance JSON for ws=' + ws.id, caught);
-            }
-        }
-    }
-
-    return workspaceJson;
+  return workspaceJson;
 }
 
 /**
@@ -144,7 +148,9 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
  */
 function copyWorkspaceJson(wsId: string, wsName: string): void {
   const perWs = loopCreditState.perWorkspace || [];
-  const ws = perWs.find(function (w) { return w.id === wsId; });
+  const ws = perWs.find(function (w) {
+    return w.id === wsId; 
+  });
   const rawWire = ws ? toWireWorkspaceRaw(ws.rawApi) : null;
   if (!ws || !rawWire) {
     showToast('❌ No JSON data for "' + wsName + '"', 'error');
@@ -152,6 +158,7 @@ function copyWorkspaceJson(wsId: string, wsName: string): void {
 
     return;
   }
+
   buildCopyJsonPayload(ws)
     .then(function (json) {
       return navigator.clipboard.writeText(json).then(function () {
@@ -178,7 +185,9 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
     // `allowPlan0: true` lets pro_0 workspaces reach `fetchAndPersist` for
     // manual refreshes (batch path still excludes them by default).
     const perWs = loopCreditState.perWorkspace || [];
-    const ws = perWs.find(function (w) { return w.id === wsId; });
+    const ws = perWs.find(function (w) {
+      return w.id === wsId; 
+    });
     const wireRaw = ws ? toWireWorkspaceRaw(ws.rawApi) : null;
     const rawRow: unknown = wireRaw ?? { id: wsId, plan: ws ? ws.plan : 'pro_1' };
     batchRefreshFromWire([rawRow], hasFreshCreditBalanceCache, {
@@ -194,11 +203,13 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 
           return;
         }
+
         if (outcome === 'throttled') {
           showToast('💰 Credit refresh throttled for "' + wsName + '"', 'info');
 
           return;
         }
+
         if (outcome === 'skipped') {
           const reason = summary.results[0]?.reason;
           const suffix = reason === 'plan-not-eligible' ? ' (plan not eligible)' : '';
@@ -206,6 +217,7 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 
           return;
         }
+
         showToast('💰 Credit refresh failed for "' + wsName + '", kept last cached value', 'warn');
       })
       .catch(function (err: unknown) {
@@ -218,7 +230,10 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 function appendRemixAndGithubItems(menu: HTMLElement, wsId: string): void {
   const projectId = extractProjectIdFromUrl();
   const projectName = getDisplayProjectName();
-  if (!projectId) { return; }
+  if (!projectId) {
+    return; 
+  }
+
   menu.appendChild(buildCtxMenuItem('🔀 Remix Project…', function () {
     removeWsContextMenu();
     actionRemixManual({ projectId, workspaceId: wsId, currentProjectName: projectName });
@@ -264,6 +279,7 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
 
         return;
       }
+
       const state = await resolveConnection(wsId, '', projectId);
       if (state.connected) {
         setGitsyncCache(wsId, projectId, 'found', state.repoUrl);
@@ -271,11 +287,13 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
 
         return;
       }
+
       if (state.reason === 'deadline') {
         applySyncing(item);
 
         return;
       }
+
       applyConnect(item, wsId, projectId);
     } catch (err: unknown) {
       logError('wsContextMenu', 'GitHub menu probe failed ws=' + wsId + ' pid=' + projectId, err);
@@ -348,9 +366,9 @@ export function showWsContextMenu(
   menu.appendChild(buildCtxMenuItem(label, function () {
     removeWsContextMenu();
     if (isBulk) {
-        showWsMembersBulkPanel(Array.from(selected), x, y);
+      showWsMembersBulkPanel(Array.from(selected), x, y);
     } else {
-        showWsMembersPanel(wsId, wsName, x, y);
+      showWsMembersPanel(wsId, wsName, x, y);
     }
   }));
   menu.appendChild(buildCreditRefreshItem(wsId, wsName));
@@ -365,7 +383,9 @@ export function showWsContextMenu(
 
 export function removeWsContextMenu(): void {
   const existing = document.getElementById(ID_CTX_MENU);
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 }
 
 /**
@@ -387,7 +407,9 @@ async function openGithubRepoFlow(
   pid: string,
   forceRefresh: boolean,
 ): Promise<void> {
-  if (forceRefresh) invalidateGitsyncCache(wsId, pid);
+  if (forceRefresh) {
+    invalidateGitsyncCache(wsId, pid);
+  }
 
   const cached = forceRefresh ? null : await getGitsyncCache(wsId, pid);
   const hasCachedEntry = cached !== null && cached !== undefined;
@@ -398,6 +420,7 @@ async function openGithubRepoFlow(
 
     return;
   }
+
   const isCachedNotLinked = hasCachedEntry && cached!.Status === 'not_linked';
   if (isCachedNotLinked) {
     showToast('🐙 No GitHub repo linked (cached). Use Refresh gitsync to re-check.', 'warn');
@@ -412,12 +435,14 @@ async function openGithubRepoFlow(
 
     return;
   }
+
   if (outcome.status === 'not_linked') {
     setGitsyncCache(wsId, pid, 'not_linked');
     showToast('🐙 No GitHub repo linked to this project.', 'warn');
 
     return;
   }
+
   setGitsyncCache(wsId, pid, 'error');
   showToast('❌ Failed to fetch GitHub repo: ' + outcome.message, 'error');
 }
@@ -440,8 +465,14 @@ function buildIconButton(
     'background:' + bg + ';color:' + fg +
     ';border:1px solid ' + cPrimary +
     ';border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;';
-  btn.onmouseover = function () { btn.style.filter = 'brightness(1.25)'; };
-  btn.onmouseout = function () { btn.style.filter = ''; };
+  btn.onmouseover = function () {
+    btn.style.filter = 'brightness(1.25)'; 
+  };
+
+  btn.onmouseout = function () {
+    btn.style.filter = ''; 
+  };
+
   btn.onclick = function (e: MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -471,11 +502,13 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 
     return;
   }
+
   if (newName === currentName) {
     populateLoopWorkspaceDropdown();
 
     return;
   }
+
   renameWorkspace(wsId, newName)
     .then(function () {
       const perWs = loopCreditState.perWorkspace || [];
@@ -486,6 +519,7 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
           break;
         }
       }
+
       showToast('✏️ Renamed to "' + newName + '"', 'success');
       populateLoopWorkspaceDropdown();
       fetchLoopCreditsWithDetect(false);
@@ -499,10 +533,15 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 
 function findNameDiv(wsId: string): HTMLElement | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return null;
+  if (!listEl) {
+    return null;
+  }
+
   const items = listEl.querySelectorAll(CSS_WS_ITEM);
   for (const item of Array.from(items)) {
-    if (item.getAttribute(DataAttrType.WsId) !== wsId) continue;
+    if (item.getAttribute(DataAttrType.WsId) !== wsId) {
+      continue;
+    }
 
     return item.querySelector(CSS_WS_NAME);
   }
@@ -516,7 +555,9 @@ function findNameDiv(wsId: string): HTMLElement | null {
  */
 export function startInlineRename(wsId: string, currentName: string): void {
   const nameDiv = findNameDiv(wsId);
-  if (!nameDiv) return;
+  if (!nameDiv) {
+    return;
+  }
 
   const wrap = document.createElement('div');
   wrap.style.cssText = 'display:flex;align-items:center;gap:3px;width:100%;';
@@ -525,12 +566,19 @@ export function startInlineRename(wsId: string, currentName: string): void {
   let committed = false;
 
   const doCommit = function (): void {
-    if (committed) return;
+    if (committed) {
+      return;
+    }
+
     committed = true;
     commitRename(wsId, currentName, input.value.trim());
   };
+
   const doCancel = function (): void {
-    if (committed) return;
+    if (committed) {
+      return;
+    }
+
     const typed = input.value.trim();
     const hasUnsaved = typed.length > 0 && typed !== currentName;
     if (hasUnsaved) {
@@ -543,15 +591,22 @@ export function startInlineRename(wsId: string, currentName: string): void {
         return;
       }
     }
+
     committed = true;
     populateLoopWorkspaceDropdown();
   };
 
   input.onkeydown = function (e: KeyboardEvent) {
-    if (e.key === 'Enter') { e.preventDefault(); doCommit(); }
-    else if (e.key === 'Escape') { e.preventDefault(); doCancel(); }
+    if (e.key === 'Enter') {
+      e.preventDefault(); doCommit(); 
+    } else if (e.key === 'Escape') {
+      e.preventDefault(); doCancel(); 
+    }
   };
-  wrap.onclick = function (e: MouseEvent) { e.stopPropagation(); };
+
+  wrap.onclick = function (e: MouseEvent) {
+    e.stopPropagation(); 
+  };
 
   wrap.appendChild(input);
   wrap.appendChild(buildIconButton('✓', 'Confirm rename (Enter)', '#059669', '#fff', doCommit));

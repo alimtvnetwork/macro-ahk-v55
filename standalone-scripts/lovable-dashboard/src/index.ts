@@ -23,76 +23,95 @@ interface MountState {
 let state: MountState | null = null;
 
 export function activateHomeScreen(): void {
-    if (shouldActivateHomeScreen()) {
-        void mountHomeScreenFeatures();
+  if (shouldActivateHomeScreen()) {
+    void mountHomeScreenFeatures();
 
-        return;
-    }
-    unmountHomeScreenFeatures();
+    return;
+  }
+
+  unmountHomeScreenFeatures();
 }
 
 export async function mountHomeScreenFeatures(): Promise<void> {
-    if (state) {
-        return;
-    }
-    try {
-        state = await doMount();
-    } catch (caught) {
-        logError("mount", caught);
-    }
+  if (state) {
+    return;
+  }
+
+  try {
+    state = await doMount();
+  } catch (caught) {
+    logError("mount", caught);
+  }
 }
 
 async function doMount(): Promise<MountState> {
-    const dict = await buildWorkspaceDictionary();
-    const teardowns: (() => void)[] = [];
-    teardowns.push(mountSearchBar(() => state?.dict ?? dict));
-    teardowns.push(mountNavControls(() => state?.dict ?? dict));
-    teardowns.push(installRebuildObserver());
-    runPostBuild(dict);
+  const dict = await buildWorkspaceDictionary();
+  const teardowns: (() => void)[] = [];
+  teardowns.push(mountSearchBar(() => state?.dict ?? dict));
+  teardowns.push(mountNavControls(() => state?.dict ?? dict));
+  teardowns.push(installRebuildObserver());
+  runPostBuild(dict);
 
-    return { dict, teardowns };
+  return { dict, teardowns };
 }
 
 function runPostBuild(dict: WorkspaceDictionary): void {
-    appendCreditsForAll(dict.byIndex);
-    focusSelectedWorkspace(dict);
-    syncWithMacroController(dict);
+  appendCreditsForAll(dict.byIndex);
+  focusSelectedWorkspace(dict);
+  syncWithMacroController(dict);
 }
 
 function installRebuildObserver(): () => void {
-    const list = resolveElement(HomepageDashboardVariables.WorkspacesList.full);
-    if (!list) {
-        return () => undefined;
-    }
-    let timer: number | null = null;
-    const obs = new MutationObserver(() => scheduleRebuild(timer, (t) => { timer = t; }));
-    obs.observe(list, { childList: true, subtree: false });
+  const list = resolveElement(HomepageDashboardVariables.WorkspacesList.full);
+  if (!list) {
+    return () => undefined;
+  }
 
-    return () => obs.disconnect();
+  let timer: number | null = null;
+  const obs = new MutationObserver(() => scheduleRebuild(timer, (t) => {
+    timer = t; 
+  }));
+  obs.observe(list, { childList: true, subtree: false });
+
+  return () => obs.disconnect();
 }
 
 function scheduleRebuild(existing: number | null, setTimer: (t: number) => void): void {
-    if (existing !== null) window.clearTimeout(existing);
-    setTimer(window.setTimeout(rebuild, REBUILD_DEBOUNCE_MS));
+  if (existing !== null) {
+    window.clearTimeout(existing);
+  }
+
+  setTimer(window.setTimeout(rebuild, REBUILD_DEBOUNCE_MS));
 }
 
 async function rebuild(): Promise<void> {
-    if (!state) return;
-    const dict = await buildWorkspaceDictionary();
-    state.dict = dict;
-    runPostBuild(dict);
+  if (!state) {
+    return;
+  }
+
+  const dict = await buildWorkspaceDictionary();
+  state.dict = dict;
+  runPostBuild(dict);
 }
 
 export function unmountHomeScreenFeatures(): void {
-    if (!state) return;
-    for (const fn of state.teardowns) {
-        try { fn(); } catch (caught) { logError("unmount", caught); }
+  if (!state) {
+    return;
+  }
+
+  for (const fn of state.teardowns) {
+    try {
+      fn(); 
+    } catch (caught) {
+      logError("unmount", caught); 
     }
-    state = null;
+  }
+
+  state = null;
 }
 
 export function bootHomeScreen(): () => void {
-    activateHomeScreen();
+  activateHomeScreen();
 
-    return watchSpaNavigation(activateHomeScreen);
+  return watchSpaNavigation(activateHomeScreen);
 }

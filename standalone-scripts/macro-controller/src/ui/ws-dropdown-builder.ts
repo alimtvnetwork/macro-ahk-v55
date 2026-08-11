@@ -59,12 +59,18 @@ export interface WsDropdownResult {
 /** Scroll to and highlight the current workspace item in the list. */
 function scrollToCurrentItem(setLoopWsNavIndex: (v: number) => void, label: string): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
+
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
     const idx = parseInt(currentItem.getAttribute('data-ws-idx') || '', 10);
-    if (!isNaN(idx)) setLoopWsNavIndex(idx);
+    if (!isNaN(idx)) {
+      setLoopWsNavIndex(idx);
+    }
+
     log('✅ Focused & selected: ' + label, 'success');
   } else {
     log('Focus Current: name "' + label + '" not found in rendered list', 'warn');
@@ -186,12 +192,16 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
     } else {
       setLoopWsCheckedIds({});
       for (const ws of perWs) {
-        if (ws.id) { getLoopWsCheckedIds()[ws.id] = true; }
+        if (ws.id) {
+          getLoopWsCheckedIds()[ws.id] = true; 
+        }
       }
     }
+
     setLoopWsLastCheckedIdx(-1);
     updateWsSelectionUI();
   };
+
   header.appendChild(wsSelectAllBtn);
 
   const wsRenameBtn = document.createElement('button');
@@ -199,11 +209,16 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   wsRenameBtn.textContent = '✏️ Rename';
   wsRenameBtn.title = 'Bulk rename selected workspaces';
   wsRenameBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(234,179,8,0.2);color:#facc15;border:1px solid rgba(234,179,8,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
-  wsRenameBtn.onclick = function(e: Event) { e.preventDefault(); e.stopPropagation(); renderBulkRenameDialog(); };
+  wsRenameBtn.onclick = function(e: Event) {
+    e.preventDefault(); e.stopPropagation(); renderBulkRenameDialog(); 
+  };
+
   header.appendChild(wsRenameBtn);
 
   header.appendChild(_buildUndoBtn(getRenameHistory, undoLastRename, populateLoopWorkspaceDropdown));
-  setTimeout(function() { updateUndoBtnVisibility(); }, Timings.POLL_INTERVAL_FAST);
+  setTimeout(function() {
+    updateUndoBtnVisibility(); 
+  }, Timings.POLL_INTERVAL_FAST);
 
   const wsFocusBtn = document.createElement('button');
   wsFocusBtn.textContent = '📍 Focus Current';
@@ -213,6 +228,7 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
     e.preventDefault(); e.stopPropagation();
     handleFocusCurrent(populateLoopWorkspaceDropdown, setLoopWsNavIndex, fetchLoopCreditsWithDetect, autoDetectLoopCurrentWorkspace);
   };
+
   header.appendChild(wsFocusBtn);
 }
 
@@ -229,9 +245,12 @@ function _buildUndoBtn(
   wsUndoBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsUndoBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
-    if (getRenameHistory().length === 0) { log('[Rename] Nothing to undo', 'warn');
+    if (getRenameHistory().length === 0) {
+      log('[Rename] Nothing to undo', 'warn');
 
- return; }
+      return; 
+    }
+
     const last = getRenameHistory()[getRenameHistory().length - 1];
     const count = last.entries.length;
     wsUndoBtn.disabled = true;
@@ -267,14 +286,29 @@ function _buildWsSearchInput(
   wsSearchInput.id = 'loop-ws-search';
   wsSearchInput.placeholder = '🔍 Search...';
   wsSearchInput.style.cssText = 'width:100%;padding:3px 5px;border:1px solid ' + cInputBorder + ';border-radius:3px;background:' + cInputBg + ';color:' + cInputFg + ';font-size:9px;outline:none;box-sizing:border-box;margin-bottom:4px;';
-  wsSearchInput.onfocus = function() { (this as HTMLElement).style.borderColor = '#a78bfa'; };
-  wsSearchInput.onblur = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  wsSearchInput.oninput = function() { populateLoopWorkspaceDropdown(); };
+  wsSearchInput.onfocus = function() {
+    (this as HTMLElement).style.borderColor = '#a78bfa'; 
+  };
+
+  wsSearchInput.onblur = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  wsSearchInput.oninput = function() {
+    populateLoopWorkspaceDropdown(); 
+  };
+
   wsSearchInput.onkeydown = function(e: KeyboardEvent) {
     const listEl = document.getElementById(DomIdType.LoopWsList);
-    if (!listEl) return;
+    if (!listEl) {
+      return;
+    }
+
     const items = listEl.querySelectorAll('.loop-ws-item');
-    if (items.length === 0) return;
+    if (items.length === 0) {
+      return;
+    }
+
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setLoopWsNavIndex(getLoopWsNavIndex() < items.length - 1 ? getLoopWsNavIndex() + 1 : 0);
@@ -299,9 +333,17 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
   moveBtn.textContent = '🚀 Move';
   moveBtn.title = 'Move project to selected workspace';
   moveBtn.style.cssText = 'flex:1;padding:4px 8px;background:#059669;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;';
-  moveBtn.onmouseover = function() { (this as HTMLElement).style.background = '#047857'; };
-  moveBtn.onmouseout = function() { (this as HTMLElement).style.background = '#059669'; };
-  moveBtn.onclick = function(e: Event) { e.preventDefault(); e.stopPropagation(); triggerLoopMoveFromSelection(); };
+  moveBtn.onmouseover = function() {
+    (this as HTMLElement).style.background = '#047857'; 
+  };
+
+  moveBtn.onmouseout = function() {
+    (this as HTMLElement).style.background = '#059669'; 
+  };
+
+  moveBtn.onclick = function(e: Event) {
+    e.preventDefault(); e.stopPropagation(); triggerLoopMoveFromSelection(); 
+  };
 
   const moveStatus = document.createElement('div');
   moveStatus.id = 'loop-move-status';

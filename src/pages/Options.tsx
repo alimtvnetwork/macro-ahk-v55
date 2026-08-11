@@ -153,6 +153,7 @@ const OptionsPage = () => {
       if (import.meta.env.MODE !== "test") {
         console.log("[Options] ── INTERACTIVE ── mount-to-interactive=%.1fms (budget=%dms)", ms, budget);
       }
+
       if (ms > budget) {
         console.warn(
           "[Options] ⚠ PERF BUDGET EXCEEDED ── mount-to-interactive %.1fms > %dms budget. " +
@@ -189,12 +190,14 @@ const OptionsPage = () => {
     if (hash === HASH_STEP_GROUPS_LIST) {
       return { section: SECTION_STEP_GROUPS, stepGroupView: "list" };
     }
+
     if (hash !== "" && validSections.includes(hash as SidebarSection)) {
       return { section: hash as SidebarSection, stepGroupView: "tree" };
     }
 
     return { section: "projects", stepGroupView: "tree" };
   };
+
   const initialHash = parseHash();
 
   const [selection, setSelection] = useState<SidebarSelection>({
@@ -228,6 +231,7 @@ const OptionsPage = () => {
       setSelection({ type: "section", section: next.section });
       setStepGroupView(next.stepGroupView);
     };
+
     window.addEventListener("hashchange", onHashChange);
 
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -246,8 +250,8 @@ const OptionsPage = () => {
   useEffect(() => {
     const branch =
       onboardingLoading ? "loading"
-      : isComplete !== true ? "onboarding-flow"
-      : "ready";
+        : isComplete !== true ? "onboarding-flow"
+          : "ready";
     if (import.meta.env.MODE !== "test") {
       console.log("[Options] render branch", {
         branch,
@@ -258,6 +262,7 @@ const OptionsPage = () => {
         cLoading,
       });
     }
+
     // Mirror onto window for tests that prefer a JS handle over DOM scraping.
     (globalThis as unknown as { __MARCO_OPTIONS_STATE__?: unknown }).__MARCO_OPTIONS_STATE__ = {
       branch,
@@ -372,6 +377,7 @@ const OptionsPage = () => {
         toast.error("Failed to parse JSON file");
       }
     };
+
     reader.readAsText(file);
   };
 
@@ -457,138 +463,146 @@ const OptionsPage = () => {
               key={selection.type === "project" ? selection.projectId : selection.type === "script" ? selection.scriptId : (isCreating ? "__creating__" : selection.section)}
             >
               <Suspense fallback={<LazyFallback />}>
-              <ErrorBoundary section={selection.type === "project" ? "Project Detail" : selection.type === "script" ? "Script Detail" : selection.section}>
-              {isCreating ? (
-              <ProjectCreateForm
-                  availableScripts={scripts}
-                  availableConfigs={configs}
-                  onSave={handleProjectCreated}
-                  onCancel={() => setIsCreating(false)}
-                />
-              ) : selection.type === "script" ? (
-                (() => {
-                  const scriptObj = scripts.find((s) => s.id === selection.scriptId);
-                  if (!scriptObj) return <div className="text-sm text-muted-foreground">Script not found</div>;
-
-                  return (
-                    <ScriptBundleDetailView
-                      script={scriptObj}
-                      configs={configs}
-                      onSave={sSave}
-                      onSaveConfig={cSave}
-                      onDelete={handleDeleteScript}
-                      onBack={() => { setViewDirection("back"); setSelection({ type: "section", section: "scripts" }); }}
-                    />
-                  );
-                })()
-              ) : selection.type === "project" ? (
-                (() => {
-                  const proj = projects.find((p) => p.id === selection.projectId);
-                  if (!proj) return <div className="text-sm text-muted-foreground">Project not found</div>;
-
-                  return (
-                    <ProjectDetailView
-                      project={proj}
-                      allProjects={projects}
+                <ErrorBoundary section={selection.type === "project" ? "Project Detail" : selection.type === "script" ? "Script Detail" : selection.section}>
+                  {isCreating ? (
+                    <ProjectCreateForm
                       availableScripts={scripts}
                       availableConfigs={configs}
-                      onSave={pSave}
-                      onDelete={handleDeleteProject}
-                      onBack={() => { setViewDirection("back"); setSelection({ type: "section", section: "projects" }); }}
+                      onSave={handleProjectCreated}
+                      onCancel={() => setIsCreating(false)}
                     />
-                  );
-                })()
-              ) : selection.section === "projects" ? (
-                <ProjectsListView
-                  projects={projects}
-                  onEdit={handleEditProject}
-                  onNewProject={handleNewProject}
-                  onDuplicate={handleDuplicateProject}
-                  onDelete={handleDeleteProject}
-                  onImport={handleImportProject}
-                />
-              ) : selection.section === "scripts" ? (
-                <GlobalScriptsView
-                  scripts={scripts}
-                  scriptsLoading={sLoading}
-                  onSaveScript={sSave}
-                  onDeleteScript={handleDeleteScript}
-                  configs={configs}
-                  configsLoading={cLoading}
-                  onSaveConfig={cSave}
-                  onDeleteConfig={cRemove}
-                  onNewScript={handleNewScript}
-                  onEditScript={handleEditScript}
-                />
-              ) : selection.section === "prompts" ? (
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h2 className="text-lg font-bold tracking-tight">Prompts</h2>
-                    <p className="text-xs text-muted-foreground">
+                  ) : selection.type === "script" ? (
+                    (() => {
+                      const scriptObj = scripts.find((s) => s.id === selection.scriptId);
+                      if (!scriptObj) {
+                        return <div className="text-sm text-muted-foreground">Script not found</div>;
+                      }
+
+                      return (
+                        <ScriptBundleDetailView
+                          script={scriptObj}
+                          configs={configs}
+                          onSave={sSave}
+                          onSaveConfig={cSave}
+                          onDelete={handleDeleteScript}
+                          onBack={() => {
+                            setViewDirection("back"); setSelection({ type: "section", section: "scripts" }); 
+                          }}
+                        />
+                      );
+                    })()
+                  ) : selection.type === "project" ? (
+                    (() => {
+                      const proj = projects.find((p) => p.id === selection.projectId);
+                      if (!proj) {
+                        return <div className="text-sm text-muted-foreground">Project not found</div>;
+                      }
+
+                      return (
+                        <ProjectDetailView
+                          project={proj}
+                          allProjects={projects}
+                          availableScripts={scripts}
+                          availableConfigs={configs}
+                          onSave={pSave}
+                          onDelete={handleDeleteProject}
+                          onBack={() => {
+                            setViewDirection("back"); setSelection({ type: "section", section: "projects" }); 
+                          }}
+                        />
+                      );
+                    })()
+                  ) : selection.section === "projects" ? (
+                    <ProjectsListView
+                      projects={projects}
+                      onEdit={handleEditProject}
+                      onNewProject={handleNewProject}
+                      onDuplicate={handleDuplicateProject}
+                      onDelete={handleDeleteProject}
+                      onImport={handleImportProject}
+                    />
+                  ) : selection.section === "scripts" ? (
+                    <GlobalScriptsView
+                      scripts={scripts}
+                      scriptsLoading={sLoading}
+                      onSaveScript={sSave}
+                      onDeleteScript={handleDeleteScript}
+                      configs={configs}
+                      configsLoading={cLoading}
+                      onSaveConfig={cSave}
+                      onDeleteConfig={cRemove}
+                      onNewScript={handleNewScript}
+                      onEditScript={handleEditScript}
+                    />
+                  ) : selection.section === "prompts" ? (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <h2 className="text-lg font-bold tracking-tight">Prompts</h2>
+                        <p className="text-xs text-muted-foreground">
                       Manage prompts for macro injection. Custom prompts sync across Chrome instances.
-                    </p>
-                    <PromptManagerPanel />
-                  </div>
-                  <div className="space-y-4">
-                    <h2 className="text-lg font-bold tracking-tight">Prompt Chains</h2>
-                    <p className="text-xs text-muted-foreground">
+                        </p>
+                        <PromptManagerPanel />
+                      </div>
+                      <div className="space-y-4">
+                        <h2 className="text-lg font-bold tracking-tight">Prompt Chains</h2>
+                        <p className="text-xs text-muted-foreground">
                       Create chains to run multiple prompts in sequence with idle detection between steps.
-                    </p>
-                    <PromptChainPanel />
-                  </div>
-                </div>
-              ) : selection.section === "activity" ? (
-                <ActivityLogTimeline />
-              ) : selection.section === "logging" ? (
-                <GlobalDiagnosticsView />
-              ) : selection.section === "automation" ? (
-                <AutomationView />
-              ) : selection.section === "updaters" ? (
-                <UpdaterManagementView />
-              ) : selection.section === "timing" ? (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-bold tracking-tight">Timing</h2>
-                  <p className="text-xs text-muted-foreground">Performance timing and cycle metrics.</p>
-                  <GlobalDiagnosticsView />
-                </div>
-              ) : selection.section === "data" ? (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-bold tracking-tight">Data</h2>
-                  <p className="text-xs text-muted-foreground">Data flow inspection and payload viewer.</p>
-                  <StorageBrowserView />
-                </div>
-              ) : selection.section === "network" ? (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-bold tracking-tight">Network</h2>
-                  <p className="text-xs text-muted-foreground">Network request logs and API call history.</p>
-                  <GlobalDiagnosticsView />
-                </div>
-              ) : selection.section === "storage" ? (
-                <StorageBrowserView />
-              ) : selection.section === "library" ? (
-                <LibraryView />
-              ) : selection.section === SECTION_STEP_GROUPS ? (
-                <StepGroupsSection
-                  view={stepGroupView}
-                  onViewChange={(v: StepGroupViewType) => {
-                    setStepGroupView(v);
-                    // Keep the URL in sync so refresh / share preserves the sub-view.
-                    const nextHash = v === "list" ? HASH_STEP_GROUPS_LIST : SECTION_STEP_GROUPS;
-                    if (window.location.hash !== `#${nextHash}`) {
-                      history.replaceState(null, "", `#${nextHash}`);
-                    }
-                  }}
-                />
-              ) : selection.section === "api" ? (
-                <ApiExplorerView />
-              ) : selection.section === "settings" ? (
-                <SettingsView />
-              ) : selection.section === "about" ? (
-                <GlobalAboutView />
-              ) : selection.section === "audit" ? (
-                <ErrorSwallowAuditView />
-              ) : null}
-              </ErrorBoundary>
+                        </p>
+                        <PromptChainPanel />
+                      </div>
+                    </div>
+                  ) : selection.section === "activity" ? (
+                    <ActivityLogTimeline />
+                  ) : selection.section === "logging" ? (
+                    <GlobalDiagnosticsView />
+                  ) : selection.section === "automation" ? (
+                    <AutomationView />
+                  ) : selection.section === "updaters" ? (
+                    <UpdaterManagementView />
+                  ) : selection.section === "timing" ? (
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-bold tracking-tight">Timing</h2>
+                      <p className="text-xs text-muted-foreground">Performance timing and cycle metrics.</p>
+                      <GlobalDiagnosticsView />
+                    </div>
+                  ) : selection.section === "data" ? (
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-bold tracking-tight">Data</h2>
+                      <p className="text-xs text-muted-foreground">Data flow inspection and payload viewer.</p>
+                      <StorageBrowserView />
+                    </div>
+                  ) : selection.section === "network" ? (
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-bold tracking-tight">Network</h2>
+                      <p className="text-xs text-muted-foreground">Network request logs and API call history.</p>
+                      <GlobalDiagnosticsView />
+                    </div>
+                  ) : selection.section === "storage" ? (
+                    <StorageBrowserView />
+                  ) : selection.section === "library" ? (
+                    <LibraryView />
+                  ) : selection.section === SECTION_STEP_GROUPS ? (
+                    <StepGroupsSection
+                      view={stepGroupView}
+                      onViewChange={(v: StepGroupViewType) => {
+                        setStepGroupView(v);
+                        // Keep the URL in sync so refresh / share preserves the sub-view.
+                        const nextHash = v === "list" ? HASH_STEP_GROUPS_LIST : SECTION_STEP_GROUPS;
+                        if (window.location.hash !== `#${nextHash}`) {
+                          history.replaceState(null, "", `#${nextHash}`);
+                        }
+                      }}
+                    />
+                  ) : selection.section === "api" ? (
+                    <ApiExplorerView />
+                  ) : selection.section === "settings" ? (
+                    <SettingsView />
+                  ) : selection.section === "about" ? (
+                    <GlobalAboutView />
+                  ) : selection.section === "audit" ? (
+                    <ErrorSwallowAuditView />
+                  ) : null}
+                </ErrorBoundary>
               </Suspense>
             </div>
           </main>

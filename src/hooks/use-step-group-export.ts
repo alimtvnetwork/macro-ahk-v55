@@ -32,13 +32,13 @@ import JSZip from "jszip";
 import { toast } from "sonner";
 
 import {
-    previewStepGroupExport,
-    runStepGroupExport,
-    type StepGroupExportPreview,
+  previewStepGroupExport,
+  runStepGroupExport,
+  type StepGroupExportPreview,
 } from "@/background/recorder/step-library/export-bundle";
 import {
-    explainExportFailure,
-    type ExportErrorExplanation,
+  explainExportFailure,
+  type ExportErrorExplanation,
 } from "@/background/recorder/step-library/export-error-explainer";
 import type { LastExportSummary } from "@/components/options/BundleExchangePanel";
 import type { useStepLibrary } from "@/hooks/use-step-library";
@@ -105,122 +105,140 @@ const INITIAL_PREVIEW: ExportPreviewState = { Open: false, Preview: null, Pendin
 const INITIAL_ERROR: ExportErrorState = { Open: false, Explanation: null };
 
 function triggerZipDownload(bytes: Uint8Array, fileName: string): void {
-    const blob = new Blob([bytes as BlobPart], { type: "application/zip" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
+  const blob = new Blob([bytes as BlobPart], { type: "application/zip" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
 }
 
 function isLibraryReady(lib: StepLibrarySliceForExport): boolean {
-    return lib.Lib !== null && lib.Project !== null && lib.SqlJs !== null;
+  return lib.Lib !== null && lib.Project !== null && lib.SqlJs !== null;
 }
 
 function useExportDialogState() {
-    const [previewState, setPreviewState] = useState<ExportPreviewState>(INITIAL_PREVIEW);
-    const [errorState, setErrorState] = useState<ExportErrorState>(INITIAL_ERROR);
+  const [previewState, setPreviewState] = useState<ExportPreviewState>(INITIAL_PREVIEW);
+  const [errorState, setErrorState] = useState<ExportErrorState>(INITIAL_ERROR);
 
-    const showError = useCallback((explanation: ExportErrorExplanation) => {
-        setErrorState({ Open: true, Explanation: explanation });
-        toast.error(explanation.Title, { description: "See dialog for details" });
-    }, []);
+  const showError = useCallback((explanation: ExportErrorExplanation) => {
+    setErrorState({ Open: true, Explanation: explanation });
+    toast.error(explanation.Title, { description: "See dialog for details" });
+  }, []);
 
-    const setPreviewOpen = useCallback((open: boolean) => {
-        setPreviewState((p) => (open ? { ...p, Open: true } : INITIAL_PREVIEW));
-    }, []);
+  const setPreviewOpen = useCallback((open: boolean) => {
+    setPreviewState((p) => (open ? { ...p, Open: true } : INITIAL_PREVIEW));
+  }, []);
 
-    const setErrorOpen = useCallback((open: boolean) => {
-        setErrorState((p) => (open ? { ...p, Open: true } : INITIAL_ERROR));
-    }, []);
+  const setErrorOpen = useCallback((open: boolean) => {
+    setErrorState((p) => (open ? { ...p, Open: true } : INITIAL_ERROR));
+  }, []);
 
-    return { previewState, setPreviewState, errorState, showError, setPreviewOpen, setErrorOpen };
+  return { previewState, setPreviewState, errorState, showError, setPreviewOpen, setErrorOpen };
 }
 
 function useRequestExport(
-    lib: StepLibrarySliceForExport,
-    setPreviewState: React.Dispatch<React.SetStateAction<ExportPreviewState>>,
-    showError: (e: ExportErrorExplanation) => void,
+  lib: StepLibrarySliceForExport,
+  setPreviewState: React.Dispatch<React.SetStateAction<ExportPreviewState>>,
+  showError: (e: ExportErrorExplanation) => void,
 ) {
-    return useCallback(
-        (ids: ReadonlyArray<number>, includeDescendants: boolean = true) => {
-            if (!isLibraryReady(lib)) { toast.error("Library not ready");
+  return useCallback(
+    (ids: ReadonlyArray<number>, includeDescendants: boolean = true) => {
+      if (!isLibraryReady(lib)) {
+        toast.error("Library not ready");
 
- return; }
-            if (ids.length === 0) { toast.error("Select at least one group to export");
+        return; 
+      }
 
- return; }
-            const preview = previewStepGroupExport({
-                Source: lib.Lib!,
-                ProjectId: lib.Project!.ProjectId,
-                SelectedStepGroupIds: ids,
-                IncludeDescendants: includeDescendants,
-            });
-            if (preview.Reason !== "Ok") { showError(explainExportFailure(preview));
+      if (ids.length === 0) {
+        toast.error("Select at least one group to export");
 
- return; }
-            setPreviewState({
-                Open: true,
-                Preview: preview,
-                Pending: { Ids: ids, IncludeDescendants: includeDescendants },
-            });
-        },
-        [lib, showError, setPreviewState],
-    );
+        return; 
+      }
+
+      const preview = previewStepGroupExport({
+        Source: lib.Lib!,
+        ProjectId: lib.Project!.ProjectId,
+        SelectedStepGroupIds: ids,
+        IncludeDescendants: includeDescendants,
+      });
+      if (preview.Reason !== "Ok") {
+        showError(explainExportFailure(preview));
+
+        return; 
+      }
+
+      setPreviewState({
+        Open: true,
+        Preview: preview,
+        Pending: { Ids: ids, IncludeDescendants: includeDescendants },
+      });
+    },
+    [lib, showError, setPreviewState],
+  );
 }
 
 function useConfirmExport(
-    lib: StepLibrarySliceForExport,
-    previewState: ExportPreviewState,
-    setPreviewState: React.Dispatch<React.SetStateAction<ExportPreviewState>>,
-    setLastExport: React.Dispatch<React.SetStateAction<LastExportSummary | null>>,
-    showError: (e: ExportErrorExplanation) => void,
+  lib: StepLibrarySliceForExport,
+  previewState: ExportPreviewState,
+  setPreviewState: React.Dispatch<React.SetStateAction<ExportPreviewState>>,
+  setLastExport: React.Dispatch<React.SetStateAction<LastExportSummary | null>>,
+  showError: (e: ExportErrorExplanation) => void,
 ) {
-    return useCallback(async () => {
-        const pending = previewState.Pending;
-        setPreviewState(INITIAL_PREVIEW);
-        if (pending === null) return;
-        if (!isLibraryReady(lib)) { toast.error("Library not ready");
+  return useCallback(async () => {
+    const pending = previewState.Pending;
+    setPreviewState(INITIAL_PREVIEW);
+    if (pending === null) {
+      return;
+    }
 
- return; }
-        const result = await runStepGroupExport({
-            Source: lib.Lib!,
-            ProjectId: lib.Project!.ProjectId,
-            SelectedStepGroupIds: pending.Ids,
-            IncludeDescendants: pending.IncludeDescendants,
-            BundleName: `${lib.Project!.Name}, ${pending.Ids.length} group(s)`,
-            SqlJs: lib.SqlJs!,
-            JsZip: JSZip,
-        });
-        if (result.Reason !== "Ok") { showError(explainExportFailure(result));
+    if (!isLibraryReady(lib)) {
+      toast.error("Library not ready");
 
- return; }
-        triggerZipDownload(result.ZipBytes, result.ZipFileName);
-        setLastExport({
-            FileName: result.ZipFileName,
-            GroupCount: result.Manifest.Counts.StepGroups,
-            StepCount: result.Manifest.Counts.Steps,
-            At: new Date().toISOString(),
-        });
-        toast.success(
-            `Exported ${result.Manifest.Counts.StepGroups} group(s)`,
-            { description: `${result.Manifest.Counts.Steps} steps, ${result.ZipFileName}` },
-        );
-    }, [previewState.Pending, lib, showError, setPreviewState, setLastExport]);
+      return; 
+    }
+
+    const result = await runStepGroupExport({
+      Source: lib.Lib!,
+      ProjectId: lib.Project!.ProjectId,
+      SelectedStepGroupIds: pending.Ids,
+      IncludeDescendants: pending.IncludeDescendants,
+      BundleName: `${lib.Project!.Name}, ${pending.Ids.length} group(s)`,
+      SqlJs: lib.SqlJs!,
+      JsZip: JSZip,
+    });
+    if (result.Reason !== "Ok") {
+      showError(explainExportFailure(result));
+
+      return; 
+    }
+
+    triggerZipDownload(result.ZipBytes, result.ZipFileName);
+    setLastExport({
+      FileName: result.ZipFileName,
+      GroupCount: result.Manifest.Counts.StepGroups,
+      StepCount: result.Manifest.Counts.Steps,
+      At: new Date().toISOString(),
+    });
+    toast.success(
+      `Exported ${result.Manifest.Counts.StepGroups} group(s)`,
+      { description: `${result.Manifest.Counts.Steps} steps, ${result.ZipFileName}` },
+    );
+  }, [previewState.Pending, lib, showError, setPreviewState, setLastExport]);
 }
 
 export function useStepGroupExport(lib: StepLibrarySliceForExport): UseStepGroupExportApi {
-    const { previewState, setPreviewState, errorState, showError, setPreviewOpen, setErrorOpen } =
+  const { previewState, setPreviewState, errorState, showError, setPreviewOpen, setErrorOpen } =
         useExportDialogState();
-    const [lastExport, setLastExport] = useState<LastExportSummary | null>(null);
-    const requestExport = useRequestExport(lib, setPreviewState, showError);
-    const confirmExport = useConfirmExport(lib, previewState, setPreviewState, setLastExport, showError);
+  const [lastExport, setLastExport] = useState<LastExportSummary | null>(null);
+  const requestExport = useRequestExport(lib, setPreviewState, showError);
+  const confirmExport = useConfirmExport(lib, previewState, setPreviewState, setLastExport, showError);
 
-    return {
-        requestExport, confirmExport, lastExport,
-        previewState, setPreviewOpen, errorState, setErrorOpen,
-    };
+  return {
+    requestExport, confirmExport, lastExport,
+    previewState, setPreviewOpen, errorState, setErrorOpen,
+  };
 }

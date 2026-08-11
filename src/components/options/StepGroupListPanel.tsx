@@ -11,30 +11,31 @@ import { useListPanelMutations } from "./step-group-list/use-list-panel-mutation
 import { useListPanelState } from "./step-group-list/use-list-panel-state";
 
 export default function StepGroupListPanel() {
-    const state = useListPanelState();
-    const mutations = useListPanelMutations({
-        lib: state.lib,
-        activeGroupId: state.activeGroupId,
-        setActiveGroupId: state.setActiveGroupId,
-        setSelected: state.setSelected,
-    });
+  const state = useListPanelState();
+  const mutations = useListPanelMutations({
+    lib: state.lib,
+    activeGroupId: state.activeGroupId,
+    setActiveGroupId: state.setActiveGroupId,
+    setSelected: state.setSelected,
+  });
 
-    if (state.lib.Loading) {
-        return (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
+  if (state.lib.Loading) {
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
                 Loading step library…
-            </div>
-        );
-    }
-    if (state.lib.LoadError !== null) {
-        return (
-            <StepLibraryErrorState
-                error={state.lib.LoadError}
-                onRetry={state.lib.retryLoad}
-                onReset={state.lib.resetAll}
-            />
-        );
-    }
+      </div>
+    );
+  }
 
-    return <ListPanelBody state={state} mutations={mutations} />;
+  if (state.lib.LoadError !== null) {
+    return (
+      <StepLibraryErrorState
+        error={state.lib.LoadError}
+        onRetry={state.lib.retryLoad}
+        onReset={state.lib.resetAll}
+      />
+    );
+  }
+
+  return <ListPanelBody state={state} mutations={mutations} />;
 }

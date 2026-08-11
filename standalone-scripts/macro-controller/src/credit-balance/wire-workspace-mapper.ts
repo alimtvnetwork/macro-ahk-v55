@@ -47,7 +47,9 @@ async function toCandidate(wire: WireWorkspace, hasCache: FreshCacheProbe): Prom
 }
 
 function narrowRow(row: unknown): WireWorkspace | null {
-  if (!isWireWorkspace(row)) return null;
+  if (!isWireWorkspace(row)) {
+    return null;
+  }
 
   return toWireWorkspace(row as unknown as Record<string, unknown>);
 }
@@ -66,7 +68,10 @@ export async function mapWireToEnrichmentCandidates(
   const results: EnrichmentCandidate[] = [];
   for (const row of rawRows) {
     const wire = narrowRow(row);
-    if (wire === null) continue;
+    if (wire === null) {
+      continue;
+    }
+
     results.push(await toCandidate(wire, hasFreshCache));
   }
 

@@ -21,26 +21,26 @@ vi.mock('../../error-utils', () => ({ logError: mocks.logError }));
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 
 const cache = vi.hoisted(() => ({
-    readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
-    writeJsonCopy: vi.fn(async () => undefined),
-    clearPromptCache: vi.fn(async () => undefined),
+  readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
+  writeJsonCopy: vi.fn(async () => undefined),
+  clearPromptCache: vi.fn(async () => undefined),
 }));
 vi.mock('../prompt-cache', () => cache);
 vi.mock('../prompt-io-db-bridge', () => ({
-    collectDbEntriesForExport: vi.fn(async () => []),
-    mergeDbIntoExport: vi.fn((c: unknown[]) => c),
-    partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
-    commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
+  collectDbEntriesForExport: vi.fn(async () => []),
+  mergeDbIntoExport: vi.fn((c: unknown[]) => c),
+  partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
+  commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
-    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
-    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
-    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+  setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+  deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+  upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 // Mock prompt-io: parsePromptsText returns a single valid row so the flow
@@ -51,21 +51,22 @@ type Deferred = {
     resolve: () => void;
 };
 function defer(): Deferred {
-    let resolveFn!: () => void;
-    const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
-        resolveFn = () => res({ added: 1, updated: 0, errors: [] });
-    });
+  let resolveFn!: () => void;
+  const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
+    resolveFn = () => res({ added: 1, updated: 0, errors: [] });
+  });
 
-    return { promise, resolve: resolveFn };
+  return { promise, resolve: resolveFn };
 }
+
 const importDeferred = defer();
 const io = vi.hoisted(() => ({
-    exportPromptsToJson: vi.fn(async () => undefined),
-    parsePromptsText: vi.fn(() => ({
-        valid: [{ name: 'p', text: 'body {{n}}' }],
-        errors: [] as string[],
-    })),
-    performPromptImport: vi.fn(() => importDeferred.promise),
+  exportPromptsToJson: vi.fn(async () => undefined),
+  parsePromptsText: vi.fn(() => ({
+    valid: [{ name: 'p', text: 'body {{n}}' }],
+    errors: [] as string[],
+  })),
+  performPromptImport: vi.fn(() => importDeferred.promise),
 }));
 vi.mock('../prompt-io', () => io);
 
@@ -74,70 +75,73 @@ import { openPromptLibraryModal } from '../prompt-library-modal';
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
 function getImportBtn(): HTMLButtonElement {
-    return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
+  return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
 }
+
 function getFileInput(): HTMLInputElement {
-    return document.querySelector<HTMLInputElement>('[data-testid="library-import-file"]')!;
+  return document.querySelector<HTMLInputElement>('[data-testid="library-import-file"]')!;
 }
 
 function fireFileChange(filename: string): void {
-    const fileInput = getFileInput();
-    const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
-    fileInput.dispatchEvent(new Event('change'));
+  const fileInput = getFileInput();
+  const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
+  Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+  fileInput.dispatchEvent(new Event('change'));
 }
 
 describe('prompt-library-modal - Import disabled while an import is in progress', () => {
-    beforeEach(() => {
-        document.body.innerHTML = '';
-        mocks.logError.mockReset();
-        mocks.showToast.mockReset();
-        io.performPromptImport.mockClear();
-        io.parsePromptsText.mockClear();
-    });
-    afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    mocks.logError.mockReset();
+    mocks.showToast.mockReset();
+    io.performPromptImport.mockClear();
+    io.parsePromptsText.mockClear();
+  });
+  afterEach(() => {
+    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+  });
 
-    it('disables Import + file input mid-flight and only calls performPromptImport once', async () => {
-        await openPromptLibraryModal();
-        await tick();
+  it('disables Import + file input mid-flight and only calls performPromptImport once', async () => {
+    await openPromptLibraryModal();
+    await tick();
 
-        const btn = getImportBtn();
-        const fileInput = getFileInput();
-        expect(btn.disabled).toBe(false);
+    const btn = getImportBtn();
+    const fileInput = getFileInput();
+    expect(btn.disabled).toBe(false);
 
-        // First selection: kicks off the (deferred) import.
-        fireFileChange('first.json');
-        // Give the async handler a chance to reach the disable step.
-        await tick();
-        await tick();
+    // First selection: kicks off the (deferred) import.
+    fireFileChange('first.json');
+    // Give the async handler a chance to reach the disable step.
+    await tick();
+    await tick();
 
-        expect(btn.disabled).toBe(true);
-        expect(btn.getAttribute('aria-busy')).toBe('true');
-        expect(fileInput.disabled).toBe(true);
+    expect(btn.disabled).toBe(true);
+    expect(btn.getAttribute('aria-busy')).toBe('true');
+    expect(fileInput.disabled).toBe(true);
 
-        // Second selection arrives before the first finishes. The change
-        // handler still runs, but the concurrency guard must short-circuit
-        // and NOT call performPromptImport again.
-        fireFileChange('second.json');
-        await tick();
-        await tick();
+    // Second selection arrives before the first finishes. The change
+    // handler still runs, but the concurrency guard must short-circuit
+    // and NOT call performPromptImport again.
+    fireFileChange('second.json');
+    await tick();
+    await tick();
 
-        expect(io.performPromptImport).toHaveBeenCalledTimes(1);
+    expect(io.performPromptImport).toHaveBeenCalledTimes(1);
 
-        // Clicking Import while disabled must not re-open the picker.
-        const clickSpy = vi.spyOn(fileInput, 'click');
-        btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        expect(clickSpy).not.toHaveBeenCalled();
+    // Clicking Import while disabled must not re-open the picker.
+    const clickSpy = vi.spyOn(fileInput, 'click');
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(clickSpy).not.toHaveBeenCalled();
 
-        // Resolve the deferred import; controls re-enable.
-        importDeferred.resolve();
-        await tick();
-        await tick();
-        await tick();
+    // Resolve the deferred import; controls re-enable.
+    importDeferred.resolve();
+    await tick();
+    await tick();
+    await tick();
 
-        expect(io.performPromptImport).toHaveBeenCalledTimes(1);
-        expect(btn.disabled).toBe(false);
-        expect(btn.hasAttribute('aria-busy')).toBe(false);
-        expect(fileInput.disabled).toBe(false);
-    });
+    expect(io.performPromptImport).toHaveBeenCalledTimes(1);
+    expect(btn.disabled).toBe(false);
+    expect(btn.hasAttribute('aria-busy')).toBe(false);
+    expect(fileInput.disabled).toBe(false);
+  });
 });

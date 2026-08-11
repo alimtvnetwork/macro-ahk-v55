@@ -13,10 +13,10 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-    getSelection,
-    setSelection as busSet,
-    subscribeSelection,
-    type RecorderSelection,
+  getSelection,
+  setSelection as busSet,
+  subscribeSelection,
+  type RecorderSelection,
 } from "@/background/recorder/recorder-selection-bus";
 import { RecorderSelectionSourceType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
@@ -27,21 +27,24 @@ export interface UseRecorderSelectionResult {
 }
 
 export function useRecorderSelection(source: RecorderSelectionSourceType): UseRecorderSelectionResult {
-    const [selection, setLocal] = useState<RecorderSelection>(() => getSelection());
+  const [selection, setLocal] = useState<RecorderSelection>(() => getSelection());
 
-    useEffect(() => {
-        return subscribeSelection((next) => {
-            // Echo-suppression: don't re-render on our own dispatch.
-            if (next.Source === source) { return; }
-            setLocal(next);
-        });
-    }, [source]);
+  useEffect(() => {
+    return subscribeSelection((next) => {
+      // Echo-suppression: don't re-render on our own dispatch.
+      if (next.Source === source) {
+        return; 
+      }
 
-    const select = useCallback((next: { StepGroupId: number | null; StepId: number | null }) => {
-        const payload: RecorderSelection = { ...next, Source: source };
-        setLocal(payload);
-        busSet(payload);
-    }, [source]);
+      setLocal(next);
+    });
+  }, [source]);
 
-    return { selection, select };
+  const select = useCallback((next: { StepGroupId: number | null; StepId: number | null }) => {
+    const payload: RecorderSelection = { ...next, Source: source };
+    setLocal(payload);
+    busSet(payload);
+  }, [source]);
+
+  return { selection, select };
 }

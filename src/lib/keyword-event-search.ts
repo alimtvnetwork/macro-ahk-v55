@@ -23,21 +23,30 @@ import type { KeywordEvent } from "@/hooks/use-keyword-events";
 /** Splits the raw search text into trimmed, lower-cased tokens.
  *  Exported for unit tests and for callers that need to highlight matches. */
 export function tokenizeSearch(raw: string): readonly string[] {
-    return raw
-        .toLowerCase()
-        .split(/\s+/u)
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
+  return raw
+    .toLowerCase()
+    .split(/\s+/u)
+    .map(t => t.trim())
+    .filter(t => t.length > 0);
 }
 
 /** True when a single token matches at least one searchable field. */
 function matchesToken(event: KeywordEvent, token: string): boolean {
-    if ((event.Keyword ?? "").toLowerCase().includes(token)) return true;
-    if ((event.Description ?? "").toLowerCase().includes(token)) return true;
-    if ((event.Category ?? "").toLowerCase().includes(token)) return true;
-    const tags = event.Tags ?? [];
+  if ((event.Keyword ?? "").toLowerCase().includes(token)) {
+    return true;
+  }
 
-    return tags.some(t => t.toLowerCase().includes(token));
+  if ((event.Description ?? "").toLowerCase().includes(token)) {
+    return true;
+  }
+
+  if ((event.Category ?? "").toLowerCase().includes(token)) {
+    return true;
+  }
+
+  const tags = event.Tags ?? [];
+
+  return tags.some(t => t.toLowerCase().includes(token));
 }
 
 /**
@@ -46,11 +55,13 @@ function matchesToken(event: KeywordEvent, token: string): boolean {
  * React.memo / useMemo consumers can rely on referential equality.
  */
 export function filterKeywordEvents(
-    events: readonly KeywordEvent[],
-    search: string,
+  events: readonly KeywordEvent[],
+  search: string,
 ): readonly KeywordEvent[] {
-    const tokens = tokenizeSearch(search);
-    if (tokens.length === 0) return events;
+  const tokens = tokenizeSearch(search);
+  if (tokens.length === 0) {
+    return events;
+  }
 
-    return events.filter(ev => tokens.every(t => matchesToken(ev, t)));
+  return events.filter(ev => tokens.every(t => matchesToken(ev, t)));
 }

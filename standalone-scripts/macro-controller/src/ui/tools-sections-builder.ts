@@ -83,7 +83,10 @@ function _buildXPathSection(deps: ToolsSectionsDeps): HTMLElement {
     inp.id = f.id;
     inp.value = f.value;
     inp.style.cssText = inputStyle + (f.extraStyle || '');
-    inp.onchange = function() { f.onChange((this as HTMLInputElement).value || ''); };
+    inp.onchange = function() {
+      f.onChange((this as HTMLInputElement).value || ''); 
+    };
+
     xpathBody.appendChild(lbl);
     xpathBody.appendChild(inp);
   }
@@ -107,16 +110,24 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   jsTextbox.spellcheck = false;
   jsTextbox.onkeydown = function(e: KeyboardEvent) {
     const isCtrlEnter = e.ctrlKey && e.key === 'Enter';
-    if (isCtrlEnter) { e.preventDefault(); executeJs();
+    if (isCtrlEnter) {
+      e.preventDefault(); executeJs();
 
- return; }
+      return; 
+    }
+
     const isSingleLine = (jsTextbox.value || '').indexOf('\n') === -1;
-    if (e.key === 'ArrowUp' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('up');
+    if (e.key === 'ArrowUp' && isSingleLine) {
+      e.preventDefault(); navigateLoopJsHistory('up');
 
- return; }
-    if (e.key === 'ArrowDown' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('down');
+      return; 
+    }
 
- return; }
+    if (e.key === 'ArrowDown' && isSingleLine) {
+      e.preventDefault(); navigateLoopJsHistory('down');
+
+      return; 
+    }
   };
 
   const jsBtn = document.createElement('button');
@@ -151,8 +162,14 @@ function _buildActivityLogSection(): HTMLElement {
   activityDownloadBtn.textContent = '📥';
   activityDownloadBtn.title = 'Download activity log as text file';
   activityDownloadBtn.style.cssText = 'font-size:11px;cursor:pointer;margin-left:auto;padding:0 4px;opacity:0.7;transition:opacity ' + trFast + ';';
-  activityDownloadBtn.onmouseover = function() { (this as HTMLElement).style.opacity = '1'; };
-  activityDownloadBtn.onmouseout = function() { (this as HTMLElement).style.opacity = '0.7'; };
+  activityDownloadBtn.onmouseover = function() {
+    (this as HTMLElement).style.opacity = '1'; 
+  };
+
+  activityDownloadBtn.onmouseout = function() {
+    (this as HTMLElement).style.opacity = '0.7'; 
+  };
+
   activityDownloadBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const logContent = activityContent.innerText || activityContent.textContent || '';
@@ -161,6 +178,7 @@ function _buildActivityLogSection(): HTMLElement {
 
       return;
     }
+
     const now = new Date();
     const timestamp = now.toISOString().replace(/[:.]/g, '-').substring(0, 19);
     const header = '# MacroLoop Activity Log Export\n'
@@ -179,6 +197,7 @@ function _buildActivityLogSection(): HTMLElement {
     log('Activity log exported (' + logContent.length + ' chars)', 'success');
     showToast('Activity log downloaded ✓', 'success');
   };
+
   activityCol.header.appendChild(activityDownloadBtn);
 
   const activityPanel = document.createElement('div');
@@ -214,9 +233,14 @@ function _buildJsLogsSection(): HTMLElement {
     e.preventDefault(); e.stopPropagation();
     copyLogsToClipboard();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
-    if (countEl) countEl.textContent = 'Copied! (' + getAllLogs().length + ' entries)';
+    if (countEl) {
+      countEl.textContent = 'Copied! (' + getAllLogs().length + ' entries)';
+    }
+
     setTimeout(function() {
-      if (countEl) countEl.textContent = 'JS Logs (' + getAllLogs().length + ' entries)';
+      if (countEl) {
+        countEl.textContent = 'JS Logs (' + getAllLogs().length + ' entries)';
+      }
     }, Timings.TIMEOUT_NORMAL);
   };
 
@@ -224,7 +248,9 @@ function _buildJsLogsSection(): HTMLElement {
   downloadLogBtn.textContent = 'DL';
   downloadLogBtn.title = 'Download logs';
   downloadLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
-  downloadLogBtn.onclick = function(e: Event) { e.preventDefault(); e.stopPropagation(); downloadLogs(); };
+  downloadLogBtn.onclick = function(e: Event) {
+    e.preventDefault(); e.stopPropagation(); downloadLogs(); 
+  };
 
   const clearLogBtn = document.createElement('button');
   clearLogBtn.textContent = 'Clr';
@@ -234,7 +260,9 @@ function _buildJsLogsSection(): HTMLElement {
     e.preventDefault(); e.stopPropagation();
     clearAllLogs();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
-    if (countEl) countEl.textContent = 'JS Logs (0 entries)';
+    if (countEl) {
+      countEl.textContent = 'JS Logs (0 entries)';
+    }
   };
 
   logExportRow.appendChild(logLabel);
@@ -260,23 +288,39 @@ function _buildRecentErrorsSection(): HTMLElement {
   copyAllErrBtn.textContent = '📋';
   copyAllErrBtn.title = 'Copy All Errors';
   copyAllErrBtn.style.cssText = _errBtnStyle;
-  copyAllErrBtn.onmouseenter = function() { copyAllErrBtn.style.filter = CssFragmentType.Brightness13; };
-  copyAllErrBtn.onmouseleave = function() { copyAllErrBtn.style.filter = ''; };
+  copyAllErrBtn.onmouseenter = function() {
+    copyAllErrBtn.style.filter = CssFragmentType.Brightness13; 
+  };
+
+  copyAllErrBtn.onmouseleave = function() {
+    copyAllErrBtn.style.filter = ''; 
+  };
+
   copyAllErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
     const text = _formatAllRecentErrors();
     navigator.clipboard.writeText(text).then(function() {
       copyAllErrBtn.textContent = '✓';
-      setTimeout(function() { copyAllErrBtn.textContent = '📋'; }, Timings.TIMEOUT_NORMAL);
-    }).catch(function(e: unknown) { log('Clipboard write failed for error copy: ' + (e instanceof Error ? e.message : String(e)), 'warn'); });
+      setTimeout(function() {
+        copyAllErrBtn.textContent = '📋'; 
+      }, Timings.TIMEOUT_NORMAL);
+    }).catch(function(e: unknown) {
+      log('Clipboard write failed for error copy: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+    });
   };
 
   const dlErrBtn = document.createElement('button');
   dlErrBtn.textContent = '⬇';
   dlErrBtn.title = 'Download Errors';
   dlErrBtn.style.cssText = _errBtnStyle;
-  dlErrBtn.onmouseenter = function() { dlErrBtn.style.filter = CssFragmentType.Brightness13; };
-  dlErrBtn.onmouseleave = function() { dlErrBtn.style.filter = ''; };
+  dlErrBtn.onmouseenter = function() {
+    dlErrBtn.style.filter = CssFragmentType.Brightness13; 
+  };
+
+  dlErrBtn.onmouseleave = function() {
+    dlErrBtn.style.filter = ''; 
+  };
+
   dlErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
     const text = _formatAllRecentErrors();
@@ -296,14 +340,22 @@ function _buildRecentErrorsSection(): HTMLElement {
   clearErrBtn.textContent = '🗑';
   clearErrBtn.title = 'Clear Errors';
   clearErrBtn.style.cssText = _errBtnStyle + 'color:#fca5a5;';
-  clearErrBtn.onmouseenter = function() { clearErrBtn.style.filter = CssFragmentType.Brightness13; };
-  clearErrBtn.onmouseleave = function() { clearErrBtn.style.filter = ''; };
+  clearErrBtn.onmouseenter = function() {
+    clearErrBtn.style.filter = CssFragmentType.Brightness13; 
+  };
+
+  clearErrBtn.onmouseleave = function() {
+    clearErrBtn.style.filter = ''; 
+  };
+
   clearErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
     recentErrors.length = 0;
     _renderRecentErrorsList(errListContainer);
     const countEl = document.getElementById('loop-recent-errors-count');
-    if (countEl) countEl.textContent = '0 error(s)';
+    if (countEl) {
+      countEl.textContent = '0 error(s)';
+    }
   };
 
   errHeaderBtns.appendChild(copyAllErrBtn);
@@ -320,7 +372,9 @@ function _buildRecentErrorsSection(): HTMLElement {
   onRecentErrorsChange(function() {
     _renderRecentErrorsList(errListContainer);
     const countEl = document.getElementById('loop-recent-errors-count');
-    if (countEl) countEl.textContent = recentErrors.length + ' error(s)';
+    if (countEl) {
+      countEl.textContent = recentErrors.length + ' error(s)';
+    }
   });
 
   return errCol.section;
@@ -331,9 +385,18 @@ function _buildRecentErrorsSection(): HTMLElement {
 // ============================================
 function _renderRequestDetail(detail: { method?: string; url?: string; status?: number }): string {
   let h = '<div style="font-size:9px;color:#94a3b8;margin-top:1px;margin-left:12px;">';
-  if (detail.method) { h += detail.method + ' '; }
-  if (detail.url) { h += _escHtml(detail.url.substring(0, 80)); }
-  if (detail.status != null) { h += ' → HTTP ' + detail.status; }
+  if (detail.method) {
+    h += detail.method + ' '; 
+  }
+
+  if (detail.url) {
+    h += _escHtml(detail.url.substring(0, 80)); 
+  }
+
+  if (detail.status != null) {
+    h += ' → HTTP ' + detail.status; 
+  }
+
   h += '</div>';
 
   return h;
@@ -345,15 +408,20 @@ function _renderRecentErrorsList(container: HTMLElement): void {
 
     return;
   }
+
   let html = '';
   for (const err of recentErrors) {
     const color = err.level === 'error' ? '#fca5a5' : '#fde68a';
     const icon = err.level === 'error' ? '❌' : '⚠️';
     html += '<div style="font-size:10px;font-family:monospace;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:' + color + ';">';
     html += '<span style="color:#64748b;">[' + err.timestamp + ']</span> ' + icon + ' ' + _escHtml(err.message);
-    if (err.requestDetail) { html += _renderRequestDetail(err.requestDetail); }
+    if (err.requestDetail) {
+      html += _renderRequestDetail(err.requestDetail); 
+    }
+
     html += '</div>';
   }
+
   container.innerHTML = html;
 }
 

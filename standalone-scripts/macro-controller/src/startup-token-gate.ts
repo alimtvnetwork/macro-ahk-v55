@@ -33,17 +33,28 @@ interface TokenGateCtx {
 }
 
 function finishTokenGate(ctx: TokenGateCtx, result: TokenReadyResult): void {
-  if (ctx.settled) return;
+  if (ctx.settled) {
+    return;
+  }
+
   ctx.settled = true;
-  if (ctx.timer !== null) { trackedClearInterval(ctx.timer); }
+  if (ctx.timer !== null) {
+    trackedClearInterval(ctx.timer); 
+  }
+
   ctx.resolve(result);
 }
 
 function maybeRefreshFromExtension(ctx: TokenGateCtx): void {
-  if (ctx.refreshInFlight) return;
+  if (ctx.refreshInFlight) {
+    return;
+  }
+
   const now = Date.now();
   const isTooSoon = (now - ctx.lastRefreshAt) < REFRESH_RETRY_MS;
-  if (isTooSoon) return;
+  if (isTooSoon) {
+    return;
+  }
 
   ctx.refreshInFlight = true;
   ctx.lastRefreshAt = now;

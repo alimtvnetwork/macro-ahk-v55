@@ -5,11 +5,11 @@
 
 import { LabelType } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
 
@@ -20,31 +20,31 @@ export interface RunGroupTargetFieldProps {
 }
 
 export function RunGroupTargetField(props: RunGroupTargetFieldProps): JSX.Element {
-    const { value, candidates, onChange } = props;
+  const { value, candidates, onChange } = props;
 
-    return (
-        <div className="space-y-1">
-            <LabelType htmlFor="step-target">Target group</LabelType>
-            <Select
-                value={value === null ? "" : String(value)}
-                onValueChange={(next) => onChange(next === "" ? null : Number(next))}
-            >
-                <SelectTrigger id="step-target">
-                    <SelectValue placeholder="Select a group to invoke" />
-                </SelectTrigger>
-                <SelectContent>
-                    {candidates.length === 0 ? (
-                        <div className="px-2 py-1.5 text-xs text-muted-foreground">
+  return (
+    <div className="space-y-1">
+      <LabelType htmlFor="step-target">Target group</LabelType>
+      <Select
+        value={value === null ? "" : String(value)}
+        onValueChange={(next) => onChange(next === "" ? null : Number(next))}
+      >
+        <SelectTrigger id="step-target">
+          <SelectValue placeholder="Select a group to invoke" />
+        </SelectTrigger>
+        <SelectContent>
+          {candidates.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">
                             No eligible groups (a RunGroup step cannot reference its
                             own group or descendants).
-                        </div>
-                    ) : candidates.map((group) => (
-                        <SelectItem key={group.StepGroupId} value={String(group.StepGroupId)}>
-                            {group.Name} (#{group.StepGroupId})
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        </div>
-    );
+            </div>
+          ) : candidates.map((group) => (
+            <SelectItem key={group.StepGroupId} value={String(group.StepGroupId)}>
+              {group.Name} (#{group.StepGroupId})
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }

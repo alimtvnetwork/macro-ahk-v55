@@ -46,6 +46,7 @@ export function PromptVariablesCard() {
         logError("PromptVariablesCard.load", "GET_PROMPT_VARIABLES failed — card will render with empty custom vars list", caught);
       }
     };
+
     void load();
   }, []);
 
@@ -54,8 +55,11 @@ export function PromptVariablesCard() {
     try {
       const variables: Record<string, string> = {};
       for (const { key, value } of customVars) {
-        if (key.trim()) variables[key.trim()] = value;
+        if (key.trim()) {
+          variables[key.trim()] = value;
+        }
       }
+
       await sendMessage({ type: "SAVE_PROMPT_VARIABLES", variables });
       toast.success("Template variables saved");
     } catch (err) { /* swallowed */
@@ -67,12 +71,16 @@ export function PromptVariablesCard() {
 
   const addVariable = () => {
     const key = newKey.trim();
-    if (!key) return;
+    if (!key) {
+      return;
+    }
+
     if (customVars.some((v) => v.key === key) || data?.builtIn.includes(key)) {
       toast.error(`Variable "{{${key}}}" already exists`);
 
       return;
     }
+
     setCustomVars((prev) => [...prev, { key, value: newValue }]);
     setNewKey("");
     setNewValue("");

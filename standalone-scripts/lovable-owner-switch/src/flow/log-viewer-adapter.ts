@@ -15,25 +15,25 @@ import { LogSeverityType } from "./log-sink";
 import type { LogEntry } from "./log-sink";
 
 const mapSeverity = (severity: LogSeverityType): LogViewerSeverityCodeType => {
-    if (severity === LogSeverityType.Error) {
-        return LogViewerSeverityCodeType.Error;
-    }
+  if (severity === LogSeverityType.Error) {
+    return LogViewerSeverityCodeType.Error;
+  }
 
-    if (severity === LogSeverityType.Warn) {
-        return LogViewerSeverityCodeType.Warn;
-    }
+  if (severity === LogSeverityType.Warn) {
+    return LogViewerSeverityCodeType.Warn;
+  }
 
-    return LogViewerSeverityCodeType.Info;
+  return LogViewerSeverityCodeType.Info;
 };
 
 export const toLogViewerEntries = (
-    entries: ReadonlyArray<LogEntry>,
+  entries: ReadonlyArray<LogEntry>,
 ): ReadonlyArray<LogViewerEntry> => {
-    return entries.map((e) => ({
-        TimestampUtc: e.TimestampUtc,
-        Phase: e.Phase,
-        RowIndex: e.RowIndex,
-        Severity: mapSeverity(e.Severity),
-        Message: e.Message,
-    }));
+  return entries.map((e) => ({
+    TimestampUtc: e.TimestampUtc,
+    Phase: e.Phase,
+    RowIndex: e.RowIndex,
+    Severity: mapSeverity(e.Severity),
+    Message: e.Message,
+  }));
 };

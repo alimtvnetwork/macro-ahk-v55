@@ -37,21 +37,22 @@ interface MaybeChromeGlobal {
 
 /** Returns the `chrome` global if a real extension context is present. */
 export function getExtensionChrome(): ChromeLike | null {
-    const maybe = globalThis as MaybeChromeGlobal;
-    const candidate = maybe.chrome;
-    if (candidate === undefined) {
-        return null;
-    }
-    if (candidate.runtime === undefined || candidate.runtime.id === undefined) {
-        return null;
-    }
+  const maybe = globalThis as MaybeChromeGlobal;
+  const candidate = maybe.chrome;
+  if (candidate === undefined) {
+    return null;
+  }
 
-    return candidate;
+  if (candidate.runtime === undefined || candidate.runtime.id === undefined) {
+    return null;
+  }
+
+  return candidate;
 }
 
 /** True when running inside a real Chrome extension popup. */
 export function isExtensionPopup(): boolean {
-    return getExtensionChrome() !== null;
+  return getExtensionChrome() !== null;
 }
 
 /**
@@ -68,18 +69,19 @@ export const extensionChrome: ChromeLike | null = getExtensionChrome();
  * on miss — never throws, so the React tree stays mounted.
  */
 export function requireExtension(scope: string): ChromeLike | null {
-    const chrome = getExtensionChrome();
-    if (chrome !== null) {
-        return chrome;
-    }
-    logError(
-        scope,
-        "Extension context unavailable\n"
+  const chrome = getExtensionChrome();
+  if (chrome !== null) {
+    return chrome;
+  }
+
+  logError(
+    scope,
+    "Extension context unavailable\n"
             + "  Path: globalThis.chrome.runtime.id\n"
             + "  Missing: chrome.runtime.id (no extension host attached)\n"
             + "  Reason: Popup is running in Lovable web preview, not as a Chrome extension popup. "
             + "Side-load the extension via chrome://extensions to exercise this code path.",
-    );
+  );
 
-    return null;
+  return null;
 }

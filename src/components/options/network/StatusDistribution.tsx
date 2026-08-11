@@ -12,7 +12,9 @@ export function StatusDistribution({ byStatus }: StatusDistributionProps) {
   const buckets = Object.entries(byStatus);
   const isEmpty = buckets.length === 0;
 
-  if (isEmpty) return null;
+  if (isEmpty) {
+    return null;
+  }
 
   return (
     <Card>

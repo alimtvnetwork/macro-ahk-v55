@@ -29,17 +29,17 @@ interface MeasuredString {
 }
 
 const measureString = async (run: () => Promise<string>): Promise<MeasuredString> => {
-    const startedAt = Date.now();
-    const value = await run();
+  const startedAt = Date.now();
+  const value = await run();
 
-    return { DurationMs: Date.now() - startedAt, Value: value };
+  return { DurationMs: Date.now() - startedAt, Value: value };
 };
 
 const measureVoid = async (run: () => Promise<unknown>): Promise<number> => {
-    const startedAt = Date.now();
-    await run();
+  const startedAt = Date.now();
+  await run();
 
-    return Date.now() - startedAt;
+  return Date.now() - startedAt;
 };
 
 interface ChainState {
@@ -53,84 +53,84 @@ interface StepTaggedError extends Error {
 }
 
 const failingStep = (caught: unknown, fallback: PromoteStepCodeType): PromoteStepCodeType => {
-    if (caught instanceof Error && "step" in caught && typeof (caught as { step?: unknown }).step === "string") {
-        return (caught as { step: PromoteStepCodeType }).step;
-    }
+  if (caught instanceof Error && "step" in caught && typeof (caught as { step?: unknown }).step === "string") {
+    return (caught as { step: PromoteStepCodeType }).step;
+  }
 
-    return fallback;
+  return fallback;
 };
 
 const tagAndThrow = (caught: unknown, fallback: PromoteStepCodeType): never => {
-    throw Object.assign(
-        new Error(caught instanceof Error ? caught.message : String(caught)),
-        { step: failingStep(caught, fallback) },
-    ) as StepTaggedError;
+  throw Object.assign(
+    new Error(caught instanceof Error ? caught.message : String(caught)),
+    { step: failingStep(caught, fallback) },
+  ) as StepTaggedError;
 };
 
 const runChain = async (
-    api: LovableApiClient,
-    caches: PromoteCaches,
-    request: PromoteRowRequest,
+  api: LovableApiClient,
+  caches: PromoteCaches,
+  request: PromoteRowRequest,
 ): Promise<ChainState> => {
-    let ws: MeasuredString;
+  let ws: MeasuredString;
 
-    try {
-        ws = await measureString(() =>
-            resolveWorkspaceId(api, caches.WorkspaceByLoginEmail, request.LoginEmail));
-    } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCodeType.ResolveWorkspace);
-    }
+  try {
+    ws = await measureString(() =>
+      resolveWorkspaceId(api, caches.WorkspaceByLoginEmail, request.LoginEmail));
+  } catch (caught: unknown) {
+    return tagAndThrow(caught, PromoteStepCodeType.ResolveWorkspace);
+  }
 
-    let uid: MeasuredString;
+  let uid: MeasuredString;
 
-    try {
-        uid = await measureString(() =>
-            resolveUserId(api, caches.UserIdByEmail, ws.Value, request.OwnerEmail));
-    } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCodeType.ResolveUserId);
-    }
+  try {
+    uid = await measureString(() =>
+      resolveUserId(api, caches.UserIdByEmail, ws.Value, request.OwnerEmail));
+  } catch (caught: unknown) {
+    return tagAndThrow(caught, PromoteStepCodeType.ResolveUserId);
+  }
 
-    let promoMs: number;
+  let promoMs: number;
 
-    try {
-        promoMs = await measureVoid(() => api.promoteToOwner(ws.Value, uid.Value));
-    } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCodeType.PromoteToOwner);
-    }
+  try {
+    promoMs = await measureVoid(() => api.promoteToOwner(ws.Value, uid.Value));
+  } catch (caught: unknown) {
+    return tagAndThrow(caught, PromoteStepCodeType.PromoteToOwner);
+  }
 
-    return {
-        Outcomes: [
-            { Step: PromoteStepCodeType.ResolveWorkspace, DurationMs: ws.DurationMs, WorkspaceId: ws.Value, UserId: null },
-            { Step: PromoteStepCodeType.ResolveUserId, DurationMs: uid.DurationMs, WorkspaceId: ws.Value, UserId: uid.Value },
-            { Step: PromoteStepCodeType.PromoteToOwner, DurationMs: promoMs, WorkspaceId: ws.Value, UserId: uid.Value },
-        ],
-        WorkspaceId: ws.Value,
-        UserId: uid.Value,
-    };
+  return {
+    Outcomes: [
+      { Step: PromoteStepCodeType.ResolveWorkspace, DurationMs: ws.DurationMs, WorkspaceId: ws.Value, UserId: null },
+      { Step: PromoteStepCodeType.ResolveUserId, DurationMs: uid.DurationMs, WorkspaceId: ws.Value, UserId: uid.Value },
+      { Step: PromoteStepCodeType.PromoteToOwner, DurationMs: promoMs, WorkspaceId: ws.Value, UserId: uid.Value },
+    ],
+    WorkspaceId: ws.Value,
+    UserId: uid.Value,
+  };
 };
 
 const failureFrom = (caught: unknown): PromoteRowResult => {
-    const step = caught instanceof Error && "step" in caught
-        ? (caught as { step: PromoteStepCodeType }).step
-        : null;
+  const step = caught instanceof Error && "step" in caught
+    ? (caught as { step: PromoteStepCodeType }).step
+    : null;
 
-    return {
-        Outcomes: [],
-        FailedStep: step,
-        Error: caught instanceof Error ? caught.message : String(caught),
-    };
+  return {
+    Outcomes: [],
+    FailedStep: step,
+    Error: caught instanceof Error ? caught.message : String(caught),
+  };
 };
 
 export const runPromote = async (
-    api: LovableApiClient,
-    caches: PromoteCaches,
-    request: PromoteRowRequest,
+  api: LovableApiClient,
+  caches: PromoteCaches,
+  request: PromoteRowRequest,
 ): Promise<PromoteRowResult> => {
-    try {
-        const chain = await runChain(api, caches, request);
+  try {
+    const chain = await runChain(api, caches, request);
 
-        return { Outcomes: chain.Outcomes, FailedStep: null, Error: null };
-    } catch (caught: unknown) {
-        return failureFrom(caught);
-    }
+    return { Outcomes: chain.Outcomes, FailedStep: null, Error: null };
+  } catch (caught: unknown) {
+    return failureFrom(caught);
+  }
 };

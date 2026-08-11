@@ -25,8 +25,8 @@
  */
 
 import {
-    RECORDER_SESSION_STORAGE_KEY,
-    type RecordingSession,
+  RECORDER_SESSION_STORAGE_KEY,
+  type RecordingSession,
 } from "@/background/recorder/recorder-session-types";
 import { logError } from "./lib-logger";
 import { RecorderSyncTransportType } from "../types/enums";
@@ -65,21 +65,28 @@ interface ChromeApiLike {
 }
 
 function getChrome(): ChromeApiLike | null {
-    const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
-    if (api === undefined) { return null; }
-    if (api.runtime?.id === undefined) { return null; } // Excludes preview where chrome may be partly polyfilled.
+  const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
+  if (api === undefined) {
+    return null; 
+  }
 
-    return api;
+  if (api.runtime?.id === undefined) {
+    return null; 
+  } // Excludes preview where chrome may be partly polyfilled.
+
+  return api;
 }
 
 export function detectTransport(): RecorderSyncTransport {
-/* eslint-disable-next-line sonarjs/no-duplicate-string */
-    if (getChrome()?.storage?.local !== undefined) { return "chrome.storage"; }
-    if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
-        return "localStorage";
-    }
+  if (getChrome()?.storage?.local !== undefined) {
+    return "chrome.storage"; 
+  }
 
-    return "memory";
+  if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+    return "localStorage";
+  }
+
+  return "memory";
 }
 
 /* ------------------------------------------------------------------ */
@@ -87,20 +94,23 @@ export function detectTransport(): RecorderSyncTransport {
 /* ------------------------------------------------------------------ */
 
 export function parseSession(value: unknown): RecordingSession | null {
-    if (typeof value !== "object" || value === null) { return null; }
-    const v = value as Record<string, unknown>;
-    const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
-    if (
-        typeof v.SessionId !== "string" ||
+  if (typeof value !== "object" || value === null) {
+    return null; 
+  }
+
+  const v = value as Record<string, unknown>;
+  const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
+  if (
+    typeof v.SessionId !== "string" ||
         typeof v.ProjectSlug !== "string" ||
         typeof v.StartedAt !== "string" ||
         !Array.isArray(v.Steps) ||
         !phaseOk
-    ) {
-        return null;
-    }
+  ) {
+    return null;
+  }
 
-    return value as RecordingSession;
+  return value as RecordingSession;
 }
 
 /* ------------------------------------------------------------------ */
@@ -111,60 +121,72 @@ const LOCAL_CHANGE_EVENT = "marco:recorder-session-changed";
 const memoryStore = { current: null as RecordingSession | null };
 
 export async function readSession(): Promise<RecordingSession | null> {
-    const transport = detectTransport();
-    if (transport === "chrome.storage") {
-        const local = getChrome()!.storage!.local!;
-        const result = await local.get(RECORDER_SESSION_STORAGE_KEY);
+  const transport = detectTransport();
+  if (transport === "chrome.storage") {
+    const local = getChrome()!.storage!.local!;
+    const result = await local.get(RECORDER_SESSION_STORAGE_KEY);
 
-        return parseSession(result[RECORDER_SESSION_STORAGE_KEY]);
+    return parseSession(result[RECORDER_SESSION_STORAGE_KEY]);
+  }
+
+  if (transport === "localStorage") {
+    try {
+      const raw = window.localStorage.getItem(RECORDER_SESSION_STORAGE_KEY);
+      if (raw === null) {
+        return null; 
+      }
+
+      return parseSession(JSON.parse(raw));
+    } catch (err) {
+      void 0;
+
+      return null; 
     }
-    if (transport === "localStorage") {
-        try {
-            const raw = window.localStorage.getItem(RECORDER_SESSION_STORAGE_KEY);
-            if (raw === null) { return null; }
+  }
 
-            return parseSession(JSON.parse(raw));
-        } catch (err) { void 0;
-
- return null; }
-    }
-
-    return memoryStore.current;
+  return memoryStore.current;
 }
 
 export async function writeSession(session: RecordingSession): Promise<void> {
-    const transport = detectTransport();
-    if (transport === "chrome.storage") {
-        const local = getChrome()!.storage!.local!;
-        if (session.Phase === "Idle") {
-            await local.remove(RECORDER_SESSION_STORAGE_KEY);
-        } else {
-            await local.set({ [RECORDER_SESSION_STORAGE_KEY]: session });
-        }
-        // chrome.storage.onChanged covers cross-context. Fire same-tab
-        // bus too in case React surfaces are colocated with the writer
-        // (e.g. popup) and want sub-tick updates.
-        emitLocalChange(session);
-
-        return;
+  const transport = detectTransport();
+  if (transport === "chrome.storage") {
+    const local = getChrome()!.storage!.local!;
+    if (session.Phase === "Idle") {
+      await local.remove(RECORDER_SESSION_STORAGE_KEY);
+    } else {
+      await local.set({ [RECORDER_SESSION_STORAGE_KEY]: session });
     }
-    if (transport === "localStorage") {
-        if (session.Phase === "Idle") {
-            window.localStorage.removeItem(RECORDER_SESSION_STORAGE_KEY);
-        } else {
-            window.localStorage.setItem(RECORDER_SESSION_STORAGE_KEY, JSON.stringify(session));
-        }
-        emitLocalChange(session);
 
-        return;
-    }
-    memoryStore.current = session.Phase === "Idle" ? null : session;
+    // chrome.storage.onChanged covers cross-context. Fire same-tab
+    // bus too in case React surfaces are colocated with the writer
+    // (e.g. popup) and want sub-tick updates.
     emitLocalChange(session);
+
+    return;
+  }
+
+  if (transport === "localStorage") {
+    if (session.Phase === "Idle") {
+      window.localStorage.removeItem(RECORDER_SESSION_STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(RECORDER_SESSION_STORAGE_KEY, JSON.stringify(session));
+    }
+
+    emitLocalChange(session);
+
+    return;
+  }
+
+  memoryStore.current = session.Phase === "Idle" ? null : session;
+  emitLocalChange(session);
 }
 
 function emitLocalChange(session: RecordingSession): void {
-    if (typeof window === "undefined") { return; }
-    window.dispatchEvent(new CustomEvent<RecordingSession>(LOCAL_CHANGE_EVENT, { detail: session }));
+  if (typeof window === "undefined") {
+    return; 
+  }
+
+  window.dispatchEvent(new CustomEvent<RecordingSession>(LOCAL_CHANGE_EVENT, { detail: session }));
 }
 
 /* ------------------------------------------------------------------ */
@@ -178,71 +200,94 @@ let domStorageListener: ((e: StorageEvent) => void) | null = null;
 let localBusListener: ((e: Event) => void) | null = null;
 
 function dispatch(session: RecordingSession | null): void {
-    // Iterate a snapshot — listeners may unsubscribe during dispatch.
-    for (const subscriber of [...subscribers]) {
-        try { subscriber(session); } catch (err) {
-            logError(
-                "recorder-session-sync.dispatch",
-                `Subscriber callback threw\n  Path: subscribers Set (${subscribers.size} listener(s)) — RecorderSessionListener invocation\n  Missing: Clean callback execution for session=${session?.SessionId ?? "null"}\n  Reason: ${err instanceof Error ? err.message : String(err)} — listener body threw; remaining subscribers still dispatched`,
-                err,
-            );
-        }
+  // Iterate a snapshot — listeners may unsubscribe during dispatch.
+  for (const subscriber of [...subscribers]) {
+    try {
+      subscriber(session); 
+    } catch (err) {
+      logError(
+        "recorder-session-sync.dispatch",
+        `Subscriber callback threw\n  Path: subscribers Set (${subscribers.size} listener(s)) — RecorderSessionListener invocation\n  Missing: Clean callback execution for session=${session?.SessionId ?? "null"}\n  Reason: ${err instanceof Error ? err.message : String(err)} — listener body threw; remaining subscribers still dispatched`,
+        err,
+      );
     }
+  }
 }
 
 function installTransport(): void {
-    if (installedTransport !== null) { return; }
-    const transport = detectTransport();
-    installedTransport = transport;
+  if (installedTransport !== null) {
+    return; 
+  }
 
-    if (transport === "chrome.storage") {
-        const onChanged = getChrome()?.storage?.onChanged;
-        if (onChanged !== undefined) {
-            chromeListener = (changes, area) => {
-                if (area !== "local") { return; }
-                const change = changes[RECORDER_SESSION_STORAGE_KEY];
-                if (change === undefined) { return; }
-                dispatch(parseSession(change.newValue));
-            };
-            onChanged.addListener(chromeListener);
+  const transport = detectTransport();
+  installedTransport = transport;
+
+  if (transport === "chrome.storage") {
+    const onChanged = getChrome()?.storage?.onChanged;
+    if (onChanged !== undefined) {
+      chromeListener = (changes, area) => {
+        if (area !== "local") {
+          return; 
         }
-    }
 
-    if (typeof window !== "undefined") {
-        domStorageListener = (e: StorageEvent) => {
-            if (e.key !== RECORDER_SESSION_STORAGE_KEY) { return; }
-            try {
-                dispatch(e.newValue === null ? null : parseSession(JSON.parse(e.newValue)));
-            } catch (err) {
-                dispatch(null);
-            }
-        };
-        localBusListener = (e: Event) => {
-            const detail = (e as CustomEvent<RecordingSession>).detail;
-            dispatch(detail.Phase === "Idle" ? null : detail);
-        };
-        window.addEventListener("storage", domStorageListener);
-        window.addEventListener(LOCAL_CHANGE_EVENT, localBusListener);
+        const change = changes[RECORDER_SESSION_STORAGE_KEY];
+        if (change === undefined) {
+          return; 
+        }
+
+        dispatch(parseSession(change.newValue));
+      };
+
+      onChanged.addListener(chromeListener);
     }
+  }
+
+  if (typeof window !== "undefined") {
+    domStorageListener = (e: StorageEvent) => {
+      if (e.key !== RECORDER_SESSION_STORAGE_KEY) {
+        return; 
+      }
+
+      try {
+        dispatch(e.newValue === null ? null : parseSession(JSON.parse(e.newValue)));
+      } catch (err) {
+        dispatch(null);
+      }
+    };
+
+    localBusListener = (e: Event) => {
+      const detail = (e as CustomEvent<RecordingSession>).detail;
+      dispatch(detail.Phase === "Idle" ? null : detail);
+    };
+
+    window.addEventListener("storage", domStorageListener);
+    window.addEventListener(LOCAL_CHANGE_EVENT, localBusListener);
+  }
 }
 
 function teardownTransport(): void {
-    if (installedTransport === null) { return; }
-    if (chromeListener !== null) {
-        getChrome()?.storage?.onChanged?.removeListener(chromeListener);
-        chromeListener = null;
+  if (installedTransport === null) {
+    return; 
+  }
+
+  if (chromeListener !== null) {
+    getChrome()?.storage?.onChanged?.removeListener(chromeListener);
+    chromeListener = null;
+  }
+
+  if (typeof window !== "undefined") {
+    if (domStorageListener !== null) {
+      window.removeEventListener("storage", domStorageListener);
+      domStorageListener = null;
     }
-    if (typeof window !== "undefined") {
-        if (domStorageListener !== null) {
-            window.removeEventListener("storage", domStorageListener);
-            domStorageListener = null;
-        }
-        if (localBusListener !== null) {
-            window.removeEventListener(LOCAL_CHANGE_EVENT, localBusListener);
-            localBusListener = null;
-        }
+
+    if (localBusListener !== null) {
+      window.removeEventListener(LOCAL_CHANGE_EVENT, localBusListener);
+      localBusListener = null;
     }
-    installedTransport = null;
+  }
+
+  installedTransport = null;
 }
 
 /**
@@ -251,24 +296,28 @@ function teardownTransport(): void {
  * unsubscribe function.
  */
 export function subscribeRecorderSession(listener: RecorderSessionListener): () => void {
-    subscribers.add(listener);
-    installTransport();
+  subscribers.add(listener);
+  installTransport();
 
-    // Push current state immediately so subscribers don't render an empty
-    // frame while waiting for the first storage hit.
-    void readSession().then((s) => {
-        if (subscribers.has(listener)) { listener(s); }
-    });
+  // Push current state immediately so subscribers don't render an empty
+  // frame while waiting for the first storage hit.
+  void readSession().then((s) => {
+    if (subscribers.has(listener)) {
+      listener(s); 
+    }
+  });
 
-    return () => {
-        subscribers.delete(listener);
-        if (subscribers.size === 0) { teardownTransport(); }
-    };
+  return () => {
+    subscribers.delete(listener);
+    if (subscribers.size === 0) {
+      teardownTransport(); 
+    }
+  };
 }
 
 /** Test-only helper to fully reset module-level state between tests. */
 export function __resetRecorderSessionSyncForTests(): void {
-    subscribers.clear();
-    teardownTransport();
-    memoryStore.current = null;
+  subscribers.clear();
+  teardownTransport();
+  memoryStore.current = null;
 }

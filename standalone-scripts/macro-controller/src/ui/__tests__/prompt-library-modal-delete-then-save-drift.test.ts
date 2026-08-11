@@ -29,121 +29,128 @@ interface Row {
 
 // Mutable store so renderAllRoles reflects post-delete state.
 const store: Record<string, Row[]> = {
-    plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-    ],
-    next: [],
-    generic: [],
+  plan: [
+    { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+    { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+    { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+  ],
+  next: [],
+  generic: [],
 };
 
 const mocks = vi.hoisted(() => ({
-    listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
-    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
-    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
+  listPromptsByRole: vi.fn(),
+  setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+  deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+  upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
 
 async function flush(): Promise<void> {
-    for (let i = 0; i < 4; i += 1) await new Promise((r) => setTimeout(r, 0));
+  for (let i = 0; i < 4; i += 1) {
+    await new Promise((r) => setTimeout(r, 0));
+  }
 }
 
 function findRow(slug: string): HTMLElement | null {
-    return document.querySelector('[data-prompt-slug="' + slug + '"]');
+  return document.querySelector('[data-prompt-slug="' + slug + '"]');
 }
 
 function clickButton(scope: ParentNode, label: string): void {
-    const btn = Array.from(scope.querySelectorAll('button')).find((b) => b.textContent === label);
-    if (!btn) throw new Error('button not found: ' + label);
-    btn.click();
+  const btn = Array.from(scope.querySelectorAll('button')).find((b) => b.textContent === label);
+  if (!btn) {
+    throw new Error('button not found: ' + label);
+  }
+
+  btn.click();
 }
 
 beforeEach(() => {
-    document.body.innerHTML = '';
-    // Reset store to a known baseline for each test.
-    store.plan = [
-        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-    ];
-    mocks.listPromptsByRole.mockReset();
-    mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, store[role] ?? [])));
-    mocks.deletePromptById.mockReset();
-    mocks.deletePromptById.mockImplementation(async (id: number) => {
-        store.plan = store.plan.filter((r) => r.Id !== id);
+  document.body.innerHTML = '';
+  // Reset store to a known baseline for each test.
+  store.plan = [
+    { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+    { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+    { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+  ];
+  mocks.listPromptsByRole.mockReset();
+  mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, store[role] ?? [])));
+  mocks.deletePromptById.mockReset();
+  mocks.deletePromptById.mockImplementation(async (id: number) => {
+    store.plan = store.plan.filter((r) => r.Id !== id);
 
-        return new DbResult(true, undefined);
-    });
-    mocks.upsertPrompt.mockReset();
-    mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 99)));
+    return new DbResult(true, undefined);
+  });
+  mocks.upsertPrompt.mockReset();
+  mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 99)));
 });
-afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
+afterEach(() => {
+  document.body.innerHTML = ''; vi.restoreAllMocks(); 
+});
 
 describe('prompt-library-modal — delete removes row + drift guard persists on next Save', () => {
-    it('confirmed delete: DOM row disappears and listPromptsByRole is re-invoked with shrunken set', async () => {
-        vi.spyOn(window, 'confirm').mockReturnValue(true);
-        await openPromptLibraryModal();
+  it('confirmed delete: DOM row disappears and listPromptsByRole is re-invoked with shrunken set', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    await openPromptLibraryModal();
 
-        expect(findRow('plan-concise')).not.toBeNull();
-        const initialListCalls = mocks.listPromptsByRole.mock.calls.length;
+    expect(findRow('plan-concise')).not.toBeNull();
+    const initialListCalls = mocks.listPromptsByRole.mock.calls.length;
 
-        clickButton(findRow('plan-concise')!, 'Delete');
-        await flush();
+    clickButton(findRow('plan-concise')!, 'Delete');
+    await flush();
 
-        expect(mocks.deletePromptById).toHaveBeenCalledWith(2);
-        expect(findRow('plan-concise')).toBeNull();
-        // Surviving rows still present.
-        expect(findRow('plan-default')).not.toBeNull();
-        expect(findRow('plan-verbose')).not.toBeNull();
-        // Re-render fetched the shrunken data set.
-        expect(mocks.listPromptsByRole.mock.calls.length).toBeGreaterThan(initialListCalls);
-        // Status line does not report a block.
-        const modal = document.getElementById('macro-prompt-library-modal')!;
-        expect(modal.textContent).not.toContain('Delete blocked');
-    });
+    expect(mocks.deletePromptById).toHaveBeenCalledWith(2);
+    expect(findRow('plan-concise')).toBeNull();
+    // Surviving rows still present.
+    expect(findRow('plan-default')).not.toBeNull();
+    expect(findRow('plan-verbose')).not.toBeNull();
+    // Re-render fetched the shrunken data set.
+    expect(mocks.listPromptsByRole.mock.calls.length).toBeGreaterThan(initialListCalls);
+    // Status line does not report a block.
+    const modal = document.getElementById('macro-prompt-library-modal')!;
+    expect(modal.textContent).not.toContain('Delete blocked');
+  });
 
-    it('after successful delete, editing a survivor to drop {{n}} is rejected and the modal stays open with unchanged body', async () => {
-        vi.spyOn(window, 'confirm').mockReturnValue(true);
-        // Arm token-drift rejection for the subsequent upsertPrompt call.
-        mocks.upsertPrompt.mockImplementation(async () => (new DbResult(false, undefined, 'token drift: {{n}} missing')));
+  it('after successful delete, editing a survivor to drop {{n}} is rejected and the modal stays open with unchanged body', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    // Arm token-drift rejection for the subsequent upsertPrompt call.
+    mocks.upsertPrompt.mockImplementation(async () => (new DbResult(false, undefined, 'token drift: {{n}} missing')));
 
-        await openPromptLibraryModal();
+    await openPromptLibraryModal();
 
-        // Step 1: delete plan-concise.
-        clickButton(findRow('plan-concise')!, 'Delete');
-        await flush();
-        expect(findRow('plan-concise')).toBeNull();
+    // Step 1: delete plan-concise.
+    clickButton(findRow('plan-concise')!, 'Delete');
+    await flush();
+    expect(findRow('plan-concise')).toBeNull();
 
-        // Step 2: edit a survivor (plan-verbose), remove the {{n}} token, click Save.
-        clickButton(findRow('plan-verbose')!, 'Edit');
-        const ta = document.querySelector('textarea') as HTMLTextAreaElement;
-        expect(ta).not.toBeNull();
-        ta.value = 'no token here';
-        clickButton(document, 'Save');
-        await flush();
+    // Step 2: edit a survivor (plan-verbose), remove the {{n}} token, click Save.
+    clickButton(findRow('plan-verbose')!, 'Edit');
+    const ta = document.querySelector('textarea') as HTMLTextAreaElement;
+    expect(ta).not.toBeNull();
+    ta.value = 'no token here';
+    clickButton(document, 'Save');
+    await flush();
 
-        // upsertPrompt was called exactly once (for the survivor edit).
-        expect(mocks.upsertPrompt).toHaveBeenCalledTimes(1);
-        // Modal is still mounted with a drift error surfaced.
-        const modal = document.getElementById('macro-prompt-library-modal');
-        expect(modal).not.toBeNull();
-        expect(modal!.textContent).toContain('Save failed');
-        expect(modal!.textContent).toContain('token drift');
-        // The persistent store was NOT mutated: survivor Body still contains {{n}}.
-        const survivor = store.plan.find((r) => r.Slug === 'plan-verbose')!;
-        expect(survivor.Body).toContain('{{n}}');
-    });
+    // upsertPrompt was called exactly once (for the survivor edit).
+    expect(mocks.upsertPrompt).toHaveBeenCalledTimes(1);
+    // Modal is still mounted with a drift error surfaced.
+    const modal = document.getElementById('macro-prompt-library-modal');
+    expect(modal).not.toBeNull();
+    expect(modal!.textContent).toContain('Save failed');
+    expect(modal!.textContent).toContain('token drift');
+    // The persistent store was NOT mutated: survivor Body still contains {{n}}.
+    const survivor = store.plan.find((r) => r.Slug === 'plan-verbose')!;
+    expect(survivor.Body).toContain('{{n}}');
+  });
 
-    it('cancelled delete leaves DOM row intact and does not call deletePromptById', async () => {
-        vi.spyOn(window, 'confirm').mockReturnValue(false);
-        await openPromptLibraryModal();
-        clickButton(findRow('plan-concise')!, 'Delete');
-        await flush();
-        expect(mocks.deletePromptById).not.toHaveBeenCalled();
-        expect(findRow('plan-concise')).not.toBeNull();
-    });
+  it('cancelled delete leaves DOM row intact and does not call deletePromptById', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    await openPromptLibraryModal();
+    clickButton(findRow('plan-concise')!, 'Delete');
+    await flush();
+    expect(mocks.deletePromptById).not.toHaveBeenCalled();
+    expect(findRow('plan-concise')).not.toBeNull();
+  });
 });

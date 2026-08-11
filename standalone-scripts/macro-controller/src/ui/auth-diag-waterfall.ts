@@ -34,8 +34,13 @@ export function buildWaterfallSection(): { waterfallContainer: HTMLElement; rend
   refreshWfBtn.style.cssText = 'padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;font-size:9px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;color:' + cPanelFgDim + ';';
   refreshWfBtn.textContent = '🔄';
   refreshWfBtn.title = 'Refresh waterfall';
-  refreshWfBtn.onmouseenter = function () { refreshWfBtn.style.opacity = '1'; };
-  refreshWfBtn.onmouseleave = function () { refreshWfBtn.style.opacity = '0.7'; };
+  refreshWfBtn.onmouseenter = function () {
+    refreshWfBtn.style.opacity = '1'; 
+  };
+
+  refreshWfBtn.onmouseleave = function () {
+    refreshWfBtn.style.opacity = '0.7'; 
+  };
 
   waterfallHeader.appendChild(waterfallTitle);
   waterfallHeader.appendChild(refreshWfBtn);
@@ -59,7 +64,9 @@ export function buildWaterfallSection(): { waterfallContainer: HTMLElement; rend
     renderWaterfallEntries(waterfallBody, entries, totalMs);
   };
 
-  refreshWfBtn.onclick = function (e: MouseEvent) { e.stopPropagation(); renderWaterfall(); };
+  refreshWfBtn.onclick = function (e: MouseEvent) {
+    e.stopPropagation(); renderWaterfall(); 
+  };
 
   return { waterfallContainer, renderWaterfall };
 }
@@ -118,7 +125,9 @@ function renderWaterfallEntries(
   }
 
   const isMaxTooSmall = maxEnd < 100;
-  if (isMaxTooSmall) maxEnd = 100;
+  if (isMaxTooSmall) {
+    maxEnd = 100;
+  }
 
   waterfallBody.innerHTML = '';
 
@@ -141,7 +150,9 @@ function buildWaterfallRow(
 ): HTMLElement {
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:4px;height:16px;opacity:0;transition:opacity 0.35s ease-in;';
-  setTimeout(function () { row.style.opacity = '1'; }, 60 * index);
+  setTimeout(function () {
+    row.style.opacity = '1'; 
+  }, 60 * index);
 
   const label = document.createElement('span');
   label.style.cssText = CssFragmentType.FontSize9pxColor + cPanelFgDim + ';min-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';

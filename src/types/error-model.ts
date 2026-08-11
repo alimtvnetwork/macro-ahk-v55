@@ -77,12 +77,29 @@ export function createErrorModel(
 /** Derives a machine-readable error code from the message. */
 function deriveErrorCode(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes("missing") && lower.includes("project")) return "MISSING_PROJECT_SLUG";
-  if (lower.includes("missing") && lower.includes("slug")) return "MISSING_PROJECT_SLUG";
-  if (lower.includes("db") || lower.includes("database")) return "DB_ERROR";
-  if (lower.includes("schema")) return "SCHEMA_ERROR";
-  if (lower.includes("timeout")) return "TIMEOUT";
-  if (lower.includes("network")) return "NETWORK_ERROR";
+  if (lower.includes("missing") && lower.includes("project")) {
+    return "MISSING_PROJECT_SLUG";
+  }
+
+  if (lower.includes("missing") && lower.includes("slug")) {
+    return "MISSING_PROJECT_SLUG";
+  }
+
+  if (lower.includes("db") || lower.includes("database")) {
+    return "DB_ERROR";
+  }
+
+  if (lower.includes("schema")) {
+    return "SCHEMA_ERROR";
+  }
+
+  if (lower.includes("timeout")) {
+    return "TIMEOUT";
+  }
+
+  if (lower.includes("network")) {
+    return "NETWORK_ERROR";
+  }
 
   return "UNKNOWN_ERROR";
 }
@@ -105,15 +122,19 @@ export function formatErrorForClipboard(error: ErrorModel): string {
   if (error.innerError) {
     lines.push(`**Inner Error:** ${error.innerError}`);
   }
+
   if (error.suggestedAction) {
     lines.push("", `**Suggested Action:** ${error.suggestedAction}`);
   }
+
   if (error.contextJson) {
     lines.push("", "### Context", "```json", tryPrettyJson(error.contextJson), "```");
   }
+
   if (error.resolvedStackTrace) {
     lines.push("", "### Stack Trace (Source Mapped)", "```", error.resolvedStackTrace, "```");
   }
+
   if (error.stackTrace) {
     lines.push("", error.resolvedStackTrace ? "### Raw Stack Trace" : "### Stack Trace", "```", error.stackTrace, "```");
   }
@@ -125,7 +146,8 @@ export function formatErrorForClipboard(error: ErrorModel): string {
 function tryPrettyJson(value: string): string {
   try {
     return JSON.stringify(JSON.parse(value), null, 2);
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     return value;
   }

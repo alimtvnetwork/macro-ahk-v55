@@ -55,16 +55,19 @@ export interface UseShiftClickSelectionApi<Id extends SelectionId> {
  * Order of `from`/`to` does not matter. Unknown ids return an empty array.
  */
 export function computeRange<Id extends SelectionId>(
-    orderedIds: ReadonlyArray<Id>,
-    from: Id,
-    to: Id,
+  orderedIds: ReadonlyArray<Id>,
+  from: Id,
+  to: Id,
 ): Id[] {
-    const fromIdx = orderedIds.indexOf(from);
-    const toIdx = orderedIds.indexOf(to);
-    if (fromIdx < 0 || toIdx < 0) return [];
-    const [lo, hi] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+  const fromIdx = orderedIds.indexOf(from);
+  const toIdx = orderedIds.indexOf(to);
+  if (fromIdx < 0 || toIdx < 0) {
+    return [];
+  }
 
-    return orderedIds.slice(lo, hi + 1);
+  const [lo, hi] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+
+  return orderedIds.slice(lo, hi + 1);
 }
 
 /**
@@ -72,82 +75,96 @@ export function computeRange<Id extends SelectionId>(
  * full transition table without spinning up React.
  */
 export function reduceSelectionClick<Id extends SelectionId>(
-    current: ReadonlySet<Id>,
-    anchor: Id | null,
-    orderedIds: ReadonlyArray<Id>,
-    clickedId: Id,
-    mods: ShiftClickModifiers,
+  current: ReadonlySet<Id>,
+  anchor: Id | null,
+  orderedIds: ReadonlyArray<Id>,
+  clickedId: Id,
+  mods: ShiftClickModifiers,
 ): { next: Set<Id>; nextAnchor: Id | null } {
-    if (mods.shiftKey && anchor !== null && anchor !== clickedId) {
-        const range = computeRange(orderedIds, anchor, clickedId);
-        if (range.length > 0) {
-            return { next: new Set(range), nextAnchor: anchor };
-        }
-        // Range failed (anchor pruned) — treat as a plain click.
+  if (mods.shiftKey && anchor !== null && anchor !== clickedId) {
+    const range = computeRange(orderedIds, anchor, clickedId);
+    if (range.length > 0) {
+      return { next: new Set(range), nextAnchor: anchor };
+    }
+    // Range failed (anchor pruned) — treat as a plain click.
+  }
+
+  if (mods.toggleKey) {
+    const next = new Set(current);
+    if (next.has(clickedId)) {
+      next.delete(clickedId);
+    } else {
+      next.add(clickedId);
     }
 
-    if (mods.toggleKey) {
-        const next = new Set(current);
-        if (next.has(clickedId)) {
-            next.delete(clickedId);
-        } else {
-            next.add(clickedId);
-        }
+    return { next, nextAnchor: clickedId };
+  }
 
-        return { next, nextAnchor: clickedId };
-    }
-
-    return { next: new Set<Id>([clickedId]), nextAnchor: clickedId };
+  return { next: new Set<Id>([clickedId]), nextAnchor: clickedId };
 }
 
 function usePruneOnListChange<Id extends SelectionId>(
-    orderedIds: ReadonlyArray<Id>,
-    selected: ReadonlySet<Id>,
-    anchor: Id | null,
-    setSelected: (s: ReadonlySet<Id>) => void,
-    setAnchor: (a: Id | null) => void,
+  orderedIds: ReadonlyArray<Id>,
+  selected: ReadonlySet<Id>,
+  anchor: Id | null,
+  setSelected: (s: ReadonlySet<Id>) => void,
+  setAnchor: (a: Id | null) => void,
 ): void {
-    useEffect(() => {
-        const known = new Set(orderedIds);
-        const pruned = new Set<Id>();
-        let mutated = false;
-        for (const id of selected) {
-            if (known.has(id)) { pruned.add(id); } else { mutated = true; }
-        }
-        if (mutated) setSelected(pruned);
-        if (anchor !== null && !known.has(anchor)) setAnchor(null);
-    }, [orderedIds, selected, anchor, setSelected, setAnchor]);
+  useEffect(() => {
+    const known = new Set(orderedIds);
+    const pruned = new Set<Id>();
+    let mutated = false;
+    for (const id of selected) {
+      if (known.has(id)) {
+        pruned.add(id); 
+      } else {
+        mutated = true; 
+      }
+    }
+
+    if (mutated) {
+      setSelected(pruned);
+    }
+
+    if (anchor !== null && !known.has(anchor)) {
+      setAnchor(null);
+    }
+  }, [orderedIds, selected, anchor, setSelected, setAnchor]);
 }
 
 export function useShiftClickSelection<Id extends SelectionId>(
-    orderedIds: ReadonlyArray<Id>,
+  orderedIds: ReadonlyArray<Id>,
 ): UseShiftClickSelectionApi<Id> {
-    const [selected, setSelected] = useState<ReadonlySet<Id>>(() => new Set<Id>());
-    const [anchor, setAnchor] = useState<Id | null>(null);
+  const [selected, setSelected] = useState<ReadonlySet<Id>>(() => new Set<Id>());
+  const [anchor, setAnchor] = useState<Id | null>(null);
 
-    const stateRef = useRef({ selected, anchor, orderedIds });
-    stateRef.current = { selected, anchor, orderedIds };
+  const stateRef = useRef({ selected, anchor, orderedIds });
+  stateRef.current = { selected, anchor, orderedIds };
 
-    usePruneOnListChange(orderedIds, selected, anchor, setSelected, setAnchor);
+  usePruneOnListChange(orderedIds, selected, anchor, setSelected, setAnchor);
 
-    const handleClick = useCallback((id: Id, mods: ShiftClickModifiers): ReadonlySet<Id> => {
-        const snap = stateRef.current;
-        const { next, nextAnchor } = reduceSelectionClick(
-            snap.selected, snap.anchor, snap.orderedIds, id, mods,
-        );
-        setSelected(next);
-        setAnchor(nextAnchor);
+  const handleClick = useCallback((id: Id, mods: ShiftClickModifiers): ReadonlySet<Id> => {
+    const snap = stateRef.current;
+    const { next, nextAnchor } = reduceSelectionClick(
+      snap.selected, snap.anchor, snap.orderedIds, id, mods,
+    );
+    setSelected(next);
+    setAnchor(nextAnchor);
 
-        return next;
-    }, []);
+    return next;
+  }, []);
 
-    const setSelection = useCallback((ids: Iterable<Id>) => { setSelected(new Set(ids)); }, []);
-    const clear = useCallback(() => { setSelected(new Set<Id>()); setAnchor(null); }, []);
-    const isSelected = useCallback((id: Id) => selected.has(id), [selected]);
+  const setSelection = useCallback((ids: Iterable<Id>) => {
+    setSelected(new Set(ids)); 
+  }, []);
+  const clear = useCallback(() => {
+    setSelected(new Set<Id>()); setAnchor(null); 
+  }, []);
+  const isSelected = useCallback((id: Id) => selected.has(id), [selected]);
 
-    return useMemo(() => ({
-        selected, anchor, isSelected, handleClick, setSelection, clear,
-    }), [selected, anchor, isSelected, handleClick, setSelection, clear]);
+  return useMemo(() => ({
+    selected, anchor, isSelected, handleClick, setSelection, clear,
+  }), [selected, anchor, isSelected, handleClick, setSelection, clear]);
 }
 
 /**
@@ -155,11 +172,11 @@ export function useShiftClickSelection<Id extends SelectionId>(
  * the platform (Cmd on macOS, Ctrl elsewhere).
  */
 export function modifiersFromMouseEvent(
-    event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean },
-    isMac: boolean,
+  event: { shiftKey: boolean; ctrlKey: boolean; metaKey: boolean },
+  isMac: boolean,
 ): ShiftClickModifiers {
-    return {
-        shiftKey: event.shiftKey,
-        toggleKey: isMac ? event.metaKey : event.ctrlKey,
-    };
+  return {
+    shiftKey: event.shiftKey,
+    toggleKey: isMac ? event.metaKey : event.ctrlKey,
+  };
 }

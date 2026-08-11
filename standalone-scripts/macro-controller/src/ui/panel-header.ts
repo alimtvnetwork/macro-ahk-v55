@@ -78,14 +78,18 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   versionSpan.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cPrimaryLight + ';margin-right:4px;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;';
   versionSpan.textContent = 'v' + VERSION;
   versionSpan.title = 'Click to see About info';
-  versionSpan.onclick = function(e: Event) { e.stopPropagation(); showAboutModal(); };
+  versionSpan.onclick = function(e: Event) {
+    e.stopPropagation(); showAboutModal(); 
+  };
 
   const authBadge = buildAuthBadge();
 
   const remixSplit = buildHeaderRemixSplitButton(function () {
     const projectId = extractProjectIdFromUrl();
     const wsId = loopCreditState.currentWs ? loopCreditState.currentWs.id : '';
-    if (!projectId || !wsId) return null;
+    if (!projectId || !wsId) {
+      return null;
+    }
 
     return {
       projectId,
@@ -101,14 +105,19 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   panelToggleSpan.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;margin-right:4px;white-space:nowrap;flex-shrink:0;';
   panelToggleSpan.textContent = plCtx.panelState === 'minimized' ? '[ + ]' : '[ - ]';
   panelToggleSpan.title = 'Minimize / Expand panel';
-  panelToggleSpan.onclick = function(e: Event) { e.stopPropagation(); toggleMinimize(plCtx); };
+  panelToggleSpan.onclick = function(e: Event) {
+    e.stopPropagation(); toggleMinimize(plCtx); 
+  };
+
   plCtx.panelToggleSpan = panelToggleSpan;
 
   const hideBtn = document.createElement('span');
   hideBtn.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;white-space:nowrap;flex-shrink:0;';
   hideBtn.textContent = '[ x ]';
   hideBtn.title = 'Close and fully remove controller (re-inject to restore)';
-  hideBtn.onclick = function(e: Event) { e.stopPropagation(); destroyPanel(); };
+  hideBtn.onclick = function(e: Event) {
+    e.stopPropagation(); destroyPanel(); 
+  };
 
   return {
     elements: { title, wsNameEl, versionSpan, remixSplit, authBadge, panelToggleSpan, hideBtn },
@@ -118,9 +127,13 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
 
 function _setupTitleDragHandlers(titleRow: HTMLElement, plCtx: PanelLayoutCtx, hideBtn: HTMLElement, panelToggleSpan: HTMLElement): void {
   titleRow.onpointerdown = function(e: PointerEvent) {
-    if (e.target === hideBtn || e.target === panelToggleSpan) return;
+    if (e.target === hideBtn || e.target === panelToggleSpan) {
+      return;
+    }
+
     startDragHandler(plCtx, e);
   };
+
   // v4.401.0: click-to-toggle removed from the title row. The `[-]/[+]`
   // span owns the sole toggle path so a single click can never fire the
   // handler twice (title-row pointerup + span onclick used to race on
@@ -165,8 +178,14 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
     wsNameEl.appendChild(wsShimmer);
   }
 
-  wsNameEl.onmouseenter = function() { wsNameEl.style.color = '#fde68a'; };
-  wsNameEl.onmouseleave = function() { wsNameEl.style.color = '#fbbf24'; };
+  wsNameEl.onmouseenter = function() {
+    wsNameEl.style.color = '#fde68a'; 
+  };
+
+  wsNameEl.onmouseleave = function() {
+    wsNameEl.style.color = '#fbbf24'; 
+  };
+
   wsNameEl.onclick = function(e: Event) {
     e.stopPropagation();
     wsNameEl.textContent = '⏳ detecting…';
@@ -186,6 +205,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
         log('Title bar: ✅ Workspace re-detected: "' + ws + '"', 'success');
         showToast('Workspace: ' + ws, 'success');
       }
+
       updateUI();
     }).catch(function(e: unknown) {
       logError('switchWorkspace', 'Workspace switch failed', e);

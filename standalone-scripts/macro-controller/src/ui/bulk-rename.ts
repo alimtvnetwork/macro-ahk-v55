@@ -70,7 +70,9 @@ export function renderBulkRenameDialog(): void {
   const perWs = loopCreditState.perWorkspace || [];
   const selected: WorkspaceCredit[] = [];
   for (const ws of perWs) {
-    if (getLoopWsCheckedIds()[ws.id]) { selected.push(ws); }
+    if (getLoopWsCheckedIds()[ws.id]) {
+      selected.push(ws); 
+    }
   }
 
   const panel = _createRenamePanel();
@@ -119,9 +121,15 @@ function _readUiToPreset(inputs: RenameInputsResult): RenamePreset {
 function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult): void {
   inputs.tmplRow.input.value = preset.template || '';
   inputs.prefixRow.input.value = preset.prefix || '';
-  if (inputs.prefixRow.checkbox) { inputs.prefixRow.checkbox.checked = !!preset.prefixEnabled; }
+  if (inputs.prefixRow.checkbox) {
+    inputs.prefixRow.checkbox.checked = !!preset.prefixEnabled; 
+  }
+
   inputs.suffixRow.input.value = preset.suffix || '';
-  if (inputs.suffixRow.checkbox) { inputs.suffixRow.checkbox.checked = !!preset.suffixEnabled; }
+  if (inputs.suffixRow.checkbox) {
+    inputs.suffixRow.checkbox.checked = !!preset.suffixEnabled; 
+  }
+
   if (preset.delayMs > 0) {
     setRenameDelayMs(preset.delayMs);
     const slider = document.querySelector('#ahk-loop-rename-dialog input[type="range"]') as HTMLInputElement | null;
@@ -130,6 +138,7 @@ function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult)
       slider.dispatchEvent(new Event('input'));
     }
   }
+
   // v2.189.0: hydrate per-variable start numbers from IndexedDB BEFORE
   // updatePreview() so the variable-detection re-render uses the loaded
   // values instead of falling back to 1,1,1.
@@ -143,7 +152,10 @@ function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult)
   // first updatePreview() tick and overwrites the freshly hydrated values
   // with whatever the previous preset's inputs still display.
   const staleStartNums = document.getElementById('rename-start-nums');
-  if (staleStartNums) { staleStartNums.innerHTML = ''; }
+  if (staleStartNums) {
+    staleStartNums.innerHTML = ''; 
+  }
+
   inputs.updatePreview();
   inputs.updateStaticEta();
 }
@@ -170,7 +182,10 @@ function _cloneActivePreset(
 ): void {
   const suggested = sourceName + ' (copy)';
   const rawName = prompt('Clone "' + sourceName + '" as:', suggested);
-  if (!rawName || !rawName.trim()) { return; }
+  if (!rawName || !rawName.trim()) {
+    return; 
+  }
+
   const newName = rawName.trim();
   if (newName === sourceName) {
     showToast('Pick a different name to clone', 'warn');
@@ -184,6 +199,7 @@ function _cloneActivePreset(
 
       return;
     }
+
     const cloned: RenamePreset = { ...src, name: newName, createdAt: 0, updatedAt: Date.now() };
 
     return store.savePreset(newName, cloned).then(function () {
@@ -234,14 +250,19 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
           _activePresetName = name;
           store.setActivePresetName(name);
           store.loadPreset(name).then(function (p) {
-            if (p) { _populateUiFromPreset(p, inputs); }
+            if (p) {
+              _populateUiFromPreset(p, inputs); 
+            }
           });
         });
     },
     // onNew
     function () {
       const name = prompt('Enter preset name:');
-      if (!name || !name.trim()) { return; }
+      if (!name || !name.trim()) {
+        return; 
+      }
+
       const trimmed = name.trim();
       _activePresetName = trimmed;
       const newPreset = createDefaultPreset();
@@ -266,15 +287,24 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
 
         return;
       }
-      if (!confirm('Delete preset "' + name + '"?')) { return; }
+
+      if (!confirm('Delete preset "' + name + '"?')) {
+        return; 
+      }
+
       store.deletePreset(name).then(function () {
         // Remove from dropdown
         const opt = presetRow.select.querySelector('option[value="' + name.replace(/"/g, '\\"') + '"]');
-        if (opt) { opt.remove(); }
+        if (opt) {
+          opt.remove(); 
+        }
+
         _activePresetName = 'Default';
         presetRow.select.value = 'Default';
         store.loadPreset('Default').then(function (p) {
-          if (p) { _populateUiFromPreset(p, inputs); }
+          if (p) {
+            _populateUiFromPreset(p, inputs); 
+          }
         });
         showToast('Deleted preset "' + name + '"', 'info');
       });
@@ -323,26 +353,44 @@ function _createRenameTitleBar(panel: HTMLElement, count: number): HTMLElement {
   const closeBtnTitle = document.createElement('span');
   closeBtnTitle.style.cssText = 'cursor:pointer;color:#94a3b8;font-size:14px;padding:0 4px;';
   closeBtnTitle.textContent = '✕';
-  closeBtnTitle.onclick = function () { if (_currentInputs) { _autoSave(_currentInputs); } removeBulkRenameDialog(); };
+  closeBtnTitle.onclick = function () {
+    if (_currentInputs) {
+      _autoSave(_currentInputs); 
+    }
+
+    removeBulkRenameDialog(); 
+  };
+
   titleBar.appendChild(titleText);
   titleBar.appendChild(closeBtnTitle);
 
   let isDragging = false, dragOffX = 0, dragOffY = 0;
   const onDragMouseDown = function(e: MouseEvent) {
-    if (e.target === closeBtnTitle) return;
+    if (e.target === closeBtnTitle) {
+      return;
+    }
+
     isDragging = true;
     dragOffX = e.clientX - panel.getBoundingClientRect().left;
     dragOffY = e.clientY - panel.getBoundingClientRect().top;
     titleBar.style.cursor = 'grabbing';
     e.preventDefault();
   };
+
   const onDragMouseMove = function(e: MouseEvent) {
-    if (!isDragging) return;
+    if (!isDragging) {
+      return;
+    }
+
     panel.style.left = (e.clientX - dragOffX) + 'px';
     panel.style.top = (e.clientY - dragOffY) + 'px';
     panel.style.right = 'auto';
   };
-  const onDragMouseUp = function() { isDragging = false; titleBar.style.cursor = 'grab'; };
+
+  const onDragMouseUp = function() {
+    isDragging = false; titleBar.style.cursor = 'grab'; 
+  };
+
   titleBar.addEventListener('mousedown', onDragMouseDown);
   document.addEventListener('mousemove', onDragMouseMove);
   document.addEventListener('mouseup', onDragMouseUp);
@@ -392,13 +440,16 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
   const getStartNums = function (): StartNums {
     return { dollar: startNums.dollar, hash: startNums.hash, star: startNums.star };
   };
+
   const setStartNums = function (partial: Partial<StartNums>): void {
     if (typeof partial.dollar === 'number' && Number.isFinite(partial.dollar)) {
       startNums.dollar = Math.max(0, Math.floor(partial.dollar));
     }
+
     if (typeof partial.hash === 'number' && Number.isFinite(partial.hash)) {
       startNums.hash = Math.max(0, Math.floor(partial.hash));
     }
+
     if (typeof partial.star === 'number' && Number.isFinite(partial.star)) {
       startNums.star = Math.max(0, Math.floor(partial.star));
     }
@@ -407,7 +458,9 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
   const previewList = _appendPreviewSection(body);
 
   const updatePreview = function (): void {
-    _detectVarsAndRenderStarts(startNumsContainer, tmplRow, prefixRow, suffixRow, startNums, function () { updatePreview(); });
+    _detectVarsAndRenderStarts(startNumsContainer, tmplRow, prefixRow, suffixRow, startNums, function () {
+      updatePreview(); 
+    });
     const template = tmplRow.input.value;
     const prefix = prefixRow.checkbox!.checked ? prefixRow.input.value : '';
     const suffix = suffixRow.checkbox!.checked ? suffixRow.input.value : '';
@@ -418,6 +471,7 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
       const newName = applyRenameTemplate(template, prefix, suffix, starts, j, origName);
       html += '<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);"><span style="color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + origName.replace(/"/g, '&quot;') + '">' + origName + '</span><span style="color:#64748b;">→</span><span style="color:#67e8f9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;" title="' + newName.replace(/"/g, '&quot;') + '">' + newName + '</span></div>';
     }
+
     previewList.innerHTML = html || '<div style="color:#64748b;">No changes</div>';
   };
 
@@ -487,11 +541,21 @@ function _detectVarsAndRenderStarts(
   let html = '';
   if (hasDollar || hasHash || hasStar) {
     html += '<div style="font-size:8px;color:#94a3b8;margin-bottom:3px;">Start Numbers:</div><div style="display:flex;gap:8px;flex-wrap:wrap;">';
-    if (hasDollar) html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, '#facc15');
-    if (hasHash) html += buildStartNumInput('#', 'rename-start-hash', startNums.hash, cPrimaryLight);
-    if (hasStar) html += buildStartNumInput('**', 'rename-start-star', startNums.star, '#34d399');
+    if (hasDollar) {
+      html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, '#facc15');
+    }
+
+    if (hasHash) {
+      html += buildStartNumInput('#', 'rename-start-hash', startNums.hash, cPrimaryLight);
+    }
+
+    if (hasStar) {
+      html += buildStartNumInput('**', 'rename-start-star', startNums.star, '#34d399');
+    }
+
     html += '</div>';
   }
+
   container.innerHTML = html;
 
   // 2. Re-attach live handlers (innerHTML wiped them).
@@ -506,15 +570,23 @@ function _snapshotStartNumInputsInto(startNums: StartNums): void {
   const starEl = document.getElementById('rename-start-star') as HTMLInputElement | null;
   if (dollarEl) {
     const n = parseInt(dollarEl.value, 10);
-    if (Number.isFinite(n) && n >= 0) { startNums.dollar = n; }
+    if (Number.isFinite(n) && n >= 0) {
+      startNums.dollar = n; 
+    }
   }
+
   if (hashEl) {
     const n = parseInt(hashEl.value, 10);
-    if (Number.isFinite(n) && n >= 0) { startNums.hash = n; }
+    if (Number.isFinite(n) && n >= 0) {
+      startNums.hash = n; 
+    }
   }
+
   if (starEl) {
     const n = parseInt(starEl.value, 10);
-    if (Number.isFinite(n) && n >= 0) { startNums.star = n; }
+    if (Number.isFinite(n) && n >= 0) {
+      startNums.star = n; 
+    }
   }
 }
 
@@ -525,7 +597,10 @@ function _wireStartNumInput(
   updatePreview: () => void,
 ): void {
   const el = document.getElementById(id) as HTMLInputElement | null;
-  if (!el) { return; }
+  if (!el) {
+    return; 
+  }
+
   // v2.192.0: clamp on every keystroke so preview + persistence never see
   // NaN, negatives, or decimals. Empty string is treated as 0 in-memory but
   // not echoed back during typing — the user keeps typing freely. On blur
@@ -536,6 +611,7 @@ function _wireStartNumInput(
     startNums[key] = clamped;
     updatePreview();
   };
+
   el.onblur = function () {
     const raw = parseInt(el.value, 10);
     const clamped = Number.isFinite(raw) && raw >= 0 ? Math.floor(raw) : 0;
@@ -580,10 +656,12 @@ function _appendDelayAndEta(body: HTMLElement, count: number): { delaySlider: HT
     delayVal.textContent = getRenameDelayMs() + 'ms';
     updateStaticEta();
   };
+
   updateStaticEta();
 
   return { delaySlider, etaRow, updateStaticEta };
 }
+
 // ── Module-scoped inputs ref for auto-save on close ──
 let _currentInputs: RenameInputsResult | null = null;
 
@@ -600,13 +678,17 @@ function _buildRenameButtons(
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = 'padding:4px 12px;background:rgba(100,116,139,0.3);color:#94a3b8;border:1px solid #475569;border-radius:4px;font-size:10px;cursor:pointer;';
-  cancelBtn.onclick = function () { _autoSave(inputs); removeBulkRenameDialog(); };
+  cancelBtn.onclick = function () {
+    _autoSave(inputs); removeBulkRenameDialog(); 
+  };
 
   const stopBtn = document.createElement('button');
   stopBtn.textContent = '⏹ Stop';
   stopBtn.id = 'rename-stop-btn';
   stopBtn.style.cssText = 'display:none;padding:4px 12px;background:rgba(239,68,68,0.3);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
-  stopBtn.onclick = function () { cancelRename(); log('[Rename] Stop requested by user', 'warn'); };
+  stopBtn.onclick = function () {
+    cancelRename(); log('[Rename] Stop requested by user', 'warn'); 
+  };
 
   const applyBtn = document.createElement('button');
   applyBtn.id = 'ahk-loop-rename-apply';
@@ -634,19 +716,29 @@ function _executeRenameApply(
   const prefix = prefixRow.checkbox!.checked ? prefixRow.input.value : '';
   const suffix = suffixRow.checkbox!.checked ? suffixRow.input.value : '';
   const starts = getStartNums();
-  if (!template && !prefix && !suffix) { log('[Rename] Nothing to rename — provide template, prefix, or suffix', 'warn');
+  if (!template && !prefix && !suffix) {
+    log('[Rename] Nothing to rename — provide template, prefix, or suffix', 'warn');
 
- return; }
+    return; 
+  }
+
   const entries: Array<{ wsId: string; oldName: string; newName: string }> = [];
   for (const [j, ws] of selected.entries()) {
     const origName = ws.fullName || ws.name || '';
     const newName = applyRenameTemplate(template, prefix, suffix, starts, j, origName);
-    if (!newName.trim()) { continue; }
+    if (!newName.trim()) {
+      continue; 
+    }
+
     entries.push({ wsId: ws.id, oldName: origName, newName });
   }
-  if (entries.length === 0) { log('[Rename] All names empty — cancelled', 'warn');
 
- return; }
+  if (entries.length === 0) {
+    log('[Rename] All names empty — cancelled', 'warn');
+
+    return; 
+  }
+
   (applyBtn as HTMLButtonElement).disabled = true;
   applyBtn.textContent = 'Renaming... 0/' + entries.length;
   applyBtn.style.background = '#64748b';
@@ -655,9 +747,12 @@ function _executeRenameApply(
 
   const updateEta = function(completed: number, total: number): void {
     const remaining = total - completed;
-    if (remaining <= 0) { etaRow.style.display = 'none';
+    if (remaining <= 0) {
+      etaRow.style.display = 'none';
 
- return; }
+      return; 
+    }
+
     const perOpMs = getRenameAvgOpMs() > 0 ? getRenameAvgOpMs() : getRenameDelayMs();
     const etaMs = remaining * perOpMs;
     const avgLabel = getRenameAvgOpMs() > 0 ? ' (avg ' + getRenameAvgOpMs() + 'ms/op)' : ' (est. ' + getRenameDelayMs() + 'ms/op)';
@@ -718,6 +813,7 @@ export function removeBulkRenameDialog(): void {
     if (typeof (d as DraggableElement).__cleanupDrag === 'function') {
       (d as DraggableElement).__cleanupDrag!();
     }
+
     d.remove();
   }
 }

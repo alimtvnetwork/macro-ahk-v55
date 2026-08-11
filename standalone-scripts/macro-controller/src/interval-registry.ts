@@ -76,14 +76,21 @@ export function trackedSetInterval(
  * to native clearInterval in that case.
  */
 export function trackedClearInterval(handle: Handle | null | undefined): void {
-  if (handle === null || handle === undefined) { return; }
+  if (handle === null || handle === undefined) {
+    return; 
+  }
+
   const entry = entries.get(handle);
   if (entry !== undefined) {
     entries.delete(handle);
     const next = (labelCounts.get(entry.label) ?? 1) - 1;
-    if (next <= 0) { labelCounts.delete(entry.label); }
-    else { labelCounts.set(entry.label, next); }
+    if (next <= 0) {
+      labelCounts.delete(entry.label); 
+    } else {
+      labelCounts.set(entry.label, next); 
+    }
   }
+
   clearInterval(handle);
 }
 
@@ -93,10 +100,15 @@ export function getIntervalSnapshot(): IntervalSnapshot {
   let oldestAgeMs = 0;
   for (const entry of entries.values()) {
     const age = now - entry.startedAt;
-    if (age > oldestAgeMs) { oldestAgeMs = age; }
+    if (age > oldestAgeMs) {
+      oldestAgeMs = age; 
+    }
   }
+
   const byLabel: Record<string, number> = {};
-  for (const [label, count] of labelCounts) { byLabel[label] = count; }
+  for (const [label, count] of labelCounts) {
+    byLabel[label] = count; 
+  }
 
   return { total: entries.size, byLabel, oldestAgeMs, capturedAt: now };
 }
@@ -106,7 +118,10 @@ export function getIntervalSnapshot(): IntervalSnapshot {
 /* ------------------------------------------------------------------ */
 
 function ensureHeartbeat(): void {
-  if (heartbeatStarted) { return; }
+  if (heartbeatStarted) {
+    return; 
+  }
+
   heartbeatStarted = true;
   // Use native setInterval here (NOT trackedSetInterval) to avoid
   // counting the heartbeat itself in user-facing metrics.
@@ -116,10 +131,15 @@ function ensureHeartbeat(): void {
 function emitHeartbeat(): void {
   // User-visible metric only fires when something is actually running;
   // a quiet system stays quiet in the logs.
-  if (entries.size === 0) { return; }
+  if (entries.size === 0) {
+    return; 
+  }
+
   const snap = getIntervalSnapshot();
   const labelSummary = Object.entries(snap.byLabel)
-    .map(function ([label, count]) { return label + '=' + count; })
+    .map(function ([label, count]) {
+      return label + '=' + count; 
+    })
     .join(', ');
   log(
     'IntervalRegistry: ' + snap.total + ' active interval(s) — ' +
@@ -134,12 +154,16 @@ export function stopHeartbeat(): void {
     clearInterval(heartbeatTimer);
     heartbeatTimer = null;
   }
+
   heartbeatStarted = false;
 }
 
 /** Clear all tracked intervals. Test-only helper. */
 export function resetIntervalRegistry(): void {
-  for (const handle of entries.keys()) { clearInterval(handle); }
+  for (const handle of entries.keys()) {
+    clearInterval(handle); 
+  }
+
   entries.clear();
   labelCounts.clear();
   stopHeartbeat();

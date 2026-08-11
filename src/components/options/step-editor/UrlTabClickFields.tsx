@@ -15,13 +15,13 @@ export interface UrlTabClickFieldsProps {
 }
 
 export function UrlTabClickFields(props: UrlTabClickFieldsProps): JSX.Element {
-    const { value, onPatch } = props;
+  const { value, onPatch } = props;
 
-    return (
-        <div className="space-y-3">
-            <UrlTabClickPatternRow value={value} onPatch={onPatch} />
-            <UrlTabClickTargetSection value={value} onPatch={onPatch} />
-            <UrlTabClickAdvancedSection value={value} onPatch={onPatch} />
-        </div>
-    );
+  return (
+    <div className="space-y-3">
+      <UrlTabClickPatternRow value={value} onPatch={onPatch} />
+      <UrlTabClickTargetSection value={value} onPatch={onPatch} />
+      <UrlTabClickAdvancedSection value={value} onPatch={onPatch} />
+    </div>
+  );
 }

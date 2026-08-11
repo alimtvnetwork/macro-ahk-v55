@@ -21,12 +21,23 @@ if (typeof globalThis !== "undefined" && !("__marcoActRatchetInstalled" in globa
 
         return;
       }
-      const detail = args.map((a) => {
-        if (typeof a === "string") return a;
-        if (a instanceof Error) return a.stack ?? a.message;
-        try { return JSON.stringify(a); } catch (err) { void 0;
 
- return String(a); }
+      const detail = args.map((a) => {
+        if (typeof a === "string") {
+          return a;
+        }
+
+        if (a instanceof Error) {
+          return a.stack ?? a.message;
+        }
+
+        try {
+          return JSON.stringify(a); 
+        } catch (err) {
+          void 0;
+
+          return String(a); 
+        }
       }).join(" ");
       throw new Error(
         `[act-ratchet] React state update not wrapped in act(...). `
@@ -34,6 +45,7 @@ if (typeof globalThis !== "undefined" && !("__marcoActRatchetInstalled" in globa
         + `Details: ${detail}`,
       );
     }
+
     originalError(...args);
   };
 }
@@ -81,8 +93,13 @@ try {
   const wasmBytes = fs.readFileSync(wasmPath);
 
   const isWasm = (p: unknown): boolean => {
-    if (typeof p === "string") return p.includes("sql-wasm.wasm");
-    if (p instanceof URL) return p.href.includes("sql-wasm.wasm");
+    if (typeof p === "string") {
+      return p.includes("sql-wasm.wasm");
+    }
+
+    if (p instanceof URL) {
+      return p.href.includes("sql-wasm.wasm");
+    }
 
     return false;
   };
@@ -99,12 +116,16 @@ try {
 
       return;
     }
+
     (origReadFile as unknown as (...a: unknown[]) => void)(p, ...rest);
   };
+
   (fs as unknown as { readFileSync: unknown }).readFileSync = (
     p: string, ...rest: unknown[]
   ): Buffer | string => {
-    if (isWasm(p)) return wasmBytes;
+    if (isWasm(p)) {
+      return wasmBytes;
+    }
 
     return (origReadFileSync as unknown as (...a: unknown[]) => Buffer | string)(p, ...rest);
   };
@@ -120,9 +141,13 @@ try {
         headers: { "Content-Type": "application/wasm" },
       });
     }
-    if (originalFetch) return originalFetch(input, init);
+
+    if (originalFetch) {
+      return originalFetch(input, init);
+    }
+
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
 } catch (err) {
-    void 0; 
+  void 0; 
 }

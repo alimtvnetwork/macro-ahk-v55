@@ -19,54 +19,67 @@ interface UseLibrarySelectionArgs {
 }
 
 function collectDescendantIds(node: TreeNode, out: Set<number>): void {
-    out.add(node.Group.StepGroupId);
-    for (const c of node.Children) collectDescendantIds(c, out);
+  out.add(node.Group.StepGroupId);
+  for (const c of node.Children) {
+    collectDescendantIds(c, out);
+  }
 }
 
 export function useLibrarySelection(args: UseLibrarySelectionArgs) {
-    const { setSelected, setSelectionOrder, setExpanded } = args;
+  const { setSelected, setSelectionOrder, setExpanded } = args;
 
-    const applySelection = (on: boolean, ids: ReadonlyArray<number>) => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            for (const id of ids) {
-                if (on) next.add(id); else next.delete(id);
-            }
+  const applySelection = (on: boolean, ids: ReadonlyArray<number>) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) {
+        if (on) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+      }
 
-            return next;
-        });
-        setSelectionOrder((prev) => {
-            if (!on) return prev.filter((id) => !ids.includes(id));
-            const seen = new Set(prev);
-            const additions = ids.filter((id) => !seen.has(id));
+      return next;
+    });
+    setSelectionOrder((prev) => {
+      if (!on) {
+        return prev.filter((id) => !ids.includes(id));
+      }
 
-            return additions.length === 0 ? prev : [...prev, ...additions];
-        });
-    };
+      const seen = new Set(prev);
+      const additions = ids.filter((id) => !seen.has(id));
 
-    const toggleOne = (id: number, on: boolean) => {
-        applySelection(on, [id]);
-    };
+      return additions.length === 0 ? prev : [...prev, ...additions];
+    });
+  };
 
-    const toggleSubtree = (node: TreeNode, on: boolean) => {
-        const ids = new Set<number>();
-        collectDescendantIds(node, ids);
-        applySelection(on, Array.from(ids));
-    };
+  const toggleOne = (id: number, on: boolean) => {
+    applySelection(on, [id]);
+  };
 
-    const clearSelection = () => {
-        setSelected(() => new Set<number>());
-        setSelectionOrder(() => []);
-    };
+  const toggleSubtree = (node: TreeNode, on: boolean) => {
+    const ids = new Set<number>();
+    collectDescendantIds(node, ids);
+    applySelection(on, Array.from(ids));
+  };
 
-    const toggleExpanded = (id: number) => {
-        setExpanded((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id); else next.add(id);
+  const clearSelection = () => {
+    setSelected(() => new Set<number>());
+    setSelectionOrder(() => []);
+  };
 
-            return next;
-        });
-    };
+  const toggleExpanded = (id: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
 
-    return { toggleOne, toggleSubtree, clearSelection, toggleExpanded };
+      return next;
+    });
+  };
+
+  return { toggleOne, toggleSubtree, clearSelection, toggleExpanded };
 }

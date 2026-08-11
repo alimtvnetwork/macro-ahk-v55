@@ -237,12 +237,12 @@ type MigrationDb = {
  * SQLite has no `IF NOT EXISTS` clause for `ADD COLUMN`.
  */
 export function applyParamsJsonMigration(db: MigrationDb): void {
-    const info = db.exec("PRAGMA table_info(Step)");
-    const cols = info[0]?.values ?? [];
-    const hasParamsJson = cols.some((row) => row[1] === "ParamsJson");
-    if (!hasParamsJson) {
-        db.run("ALTER TABLE Step ADD COLUMN ParamsJson TEXT");
-    }
+  const info = db.exec("PRAGMA table_info(Step)");
+  const cols = info[0]?.values ?? [];
+  const hasParamsJson = cols.some((row) => row[1] === "ParamsJson");
+  if (!hasParamsJson) {
+    db.run("ALTER TABLE Step ADD COLUMN ParamsJson TEXT");
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -250,12 +250,12 @@ export function applyParamsJsonMigration(db: MigrationDb): void {
 /* ------------------------------------------------------------------ */
 
 const STEP_CHAIN_COLUMNS: ReadonlyArray<readonly [name: string, ddl: string]> = [
-    ["Description", "ALTER TABLE Step ADD COLUMN Description TEXT"],
-    ["IsDisabled", "ALTER TABLE Step ADD COLUMN IsDisabled INTEGER NOT NULL DEFAULT 0"],
-    ["RetryCount", "ALTER TABLE Step ADD COLUMN RetryCount INTEGER NOT NULL DEFAULT 0"],
-    ["TimeoutMs", "ALTER TABLE Step ADD COLUMN TimeoutMs INTEGER"],
-    ["OnSuccessProjectId", "ALTER TABLE Step ADD COLUMN OnSuccessProjectId TEXT"],
-    ["OnFailureProjectId", "ALTER TABLE Step ADD COLUMN OnFailureProjectId TEXT"],
+  ["Description", "ALTER TABLE Step ADD COLUMN Description TEXT"],
+  ["IsDisabled", "ALTER TABLE Step ADD COLUMN IsDisabled INTEGER NOT NULL DEFAULT 0"],
+  ["RetryCount", "ALTER TABLE Step ADD COLUMN RetryCount INTEGER NOT NULL DEFAULT 0"],
+  ["TimeoutMs", "ALTER TABLE Step ADD COLUMN TimeoutMs INTEGER"],
+  ["OnSuccessProjectId", "ALTER TABLE Step ADD COLUMN OnSuccessProjectId TEXT"],
+  ["OnFailureProjectId", "ALTER TABLE Step ADD COLUMN OnFailureProjectId TEXT"],
 ];
 
 /**
@@ -268,12 +268,15 @@ const STEP_CHAIN_COLUMNS: ReadonlyArray<readonly [name: string, ddl: string]> = 
  * Caller (`initProjectDb`) MUST run this AFTER `RECORDER_DB_SCHEMA`.
  */
 export function applyChainColumnsMigration(db: MigrationDb): void {
-    const info = db.exec("PRAGMA table_info(Step)");
-    const present = new Set((info[0]?.values ?? []).map((row) => row[1] as string));
-    for (const [name, ddl] of STEP_CHAIN_COLUMNS) {
-        if (!present.has(name)) db.run(ddl);
+  const info = db.exec("PRAGMA table_info(Step)");
+  const present = new Set((info[0]?.values ?? []).map((row) => row[1] as string));
+  for (const [name, ddl] of STEP_CHAIN_COLUMNS) {
+    if (!present.has(name)) {
+      db.run(ddl);
     }
-    db.run(STEP_TAG_TABLE_DDL);
+  }
+
+  db.run(STEP_TAG_TABLE_DDL);
 }
 
 /* ------------------------------------------------------------------ */
@@ -281,28 +284,28 @@ export function applyChainColumnsMigration(db: MigrationDb): void {
 /* ------------------------------------------------------------------ */
 
 export const SelectorKindId = {
-    XPathFull: 1,
-    XPathRelative: 2,
-    Css: 3,
-    Aria: 4,
+  XPathFull: 1,
+  XPathRelative: 2,
+  Css: 3,
+  Aria: 4,
 } as const;
 
 export const StepKindId = {
-    Click: 1,
-    Type: 2,
-    Select: 3,
-    JsInline: 4,
-    Wait: 5,
-    UrlTabClick: 9,
+  Click: 1,
+  Type: 2,
+  Select: 3,
+  JsInline: 4,
+  Wait: 5,
+  UrlTabClick: 9,
 } as const;
 
 export const StepStatusId = {
-    Draft: 1,
-    Active: 2,
-    Disabled: 3,
+  Draft: 1,
+  Active: 2,
+  Disabled: 3,
 } as const;
 
 export const DataSourceKindId = {
-    Csv: 1,
-    Json: 2,
+  Csv: 1,
+  Json: 2,
 } as const;

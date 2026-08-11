@@ -66,7 +66,9 @@ export const RED_PALETTE_FRAGMENTS: readonly string[] = [
 export function styleContainsRedPalette(style: BadgeStyle): boolean {
   const haystack = (style.bg + '|' + style.fg + '|' + style.border).toLowerCase();
   for (const frag of RED_PALETTE_FRAGMENTS) {
-    if (haystack.includes(frag.toLowerCase())) return true;
+    if (haystack.includes(frag.toLowerCase())) {
+      return true;
+    }
   }
 
   return false;
@@ -82,9 +84,15 @@ export function styleContainsRedPalette(style: BadgeStyle): boolean {
  * (e.g. danger `rgba(127,29,29,0.85)` stayed opaque).
  */
 export function diluteBadgeBg(bg: string, factor: number): string {
-  if (bg === 'transparent') return 'transparent';
+  if (bg === 'transparent') {
+    return 'transparent';
+  }
+
   const m = bg.match(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/);
-  if (!m) return bg;
+  if (!m) {
+    return bg;
+  }
+
   const a = Math.max(0.05, parseFloat(m[4]) * factor);
 
   return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a.toFixed(2) + ')';

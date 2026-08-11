@@ -18,27 +18,27 @@ export interface WaitOptions {
 }
 
 const sleepMs = (ms: number): Promise<void> => {
-    return new Promise<void>((resolve) => globalThis.setTimeout(resolve, ms));
+  return new Promise<void>((resolve) => globalThis.setTimeout(resolve, ms));
 };
 
 const resolveWaitConfig = (options: WaitOptions): { interval: number; timeout: number } => ({
-    interval: options.PollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS,
-    timeout: options.TimeoutMs ?? DEFAULT_TIMEOUT_MS,
+  interval: options.PollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS,
+  timeout: options.TimeoutMs ?? DEFAULT_TIMEOUT_MS,
 });
 
 export const waitForXPath = async (xpath: string, options: WaitOptions = {}): Promise<Element> => {
-    const { interval, timeout } = resolveWaitConfig(options);
-    const deadline = Date.now() + timeout;
+  const { interval, timeout } = resolveWaitConfig(options);
+  const deadline = Date.now() + timeout;
 
-    while (Date.now() < deadline) {
-        const found = queryByXPath(xpath);
+  while (Date.now() < deadline) {
+    const found = queryByXPath(xpath);
 
-        if (found !== null) {
-            return found;
-        }
-
-        await sleepMs(interval);
+    if (found !== null) {
+      return found;
     }
 
-    throw new Error(`Timeout waiting for XPath after ${timeout}ms: ${xpath}`);
+    await sleepMs(interval);
+  }
+
+  throw new Error(`Timeout waiting for XPath after ${timeout}ms: ${xpath}`);
 };

@@ -72,68 +72,68 @@ export interface PersistedReplayStepResult {
 /* ------------------------------------------------------------------ */
 
 function insertRunHeader(db: SqlJsDatabase, draft: ReplayRunDraft): number {
-    const total = draft.StepResults.length;
-    const ok = draft.StepResults.filter((r) => r.IsOk).length;
-    db.run(
-        `INSERT INTO ReplayRun
+  const total = draft.StepResults.length;
+  const ok = draft.StepResults.filter((r) => r.IsOk).length;
+  db.run(
+    `INSERT INTO ReplayRun
             (StartedAt, FinishedAt, TotalSteps, OkSteps, FailedSteps, Notes)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [draft.StartedAt, draft.FinishedAt, total, ok, total - ok, draft.Notes],
-    );
+    [draft.StartedAt, draft.FinishedAt, total, ok, total - ok, draft.Notes],
+  );
 
-    return lastInsertId(db);
+  return lastInsertId(db);
 }
 
 function insertStepResultRow(db: SqlJsDatabase, runId: number, r: ReplayRunDraft["StepResults"][number]): void {
-    db.run(
-        `INSERT INTO ReplayStepResult
+  db.run(
+    `INSERT INTO ReplayStepResult
             (ReplayRunId, StepId, OrderIndex, IsOk, ErrorMessage, ResolvedXPath,
              StartedAt, FinishedAt, DurationMs)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [runId, r.StepId, r.OrderIndex, r.IsOk ? 1 : 0, r.ErrorMessage, r.ResolvedXPath, r.StartedAt, r.FinishedAt, r.DurationMs],
-    );
+    [runId, r.StepId, r.OrderIndex, r.IsOk ? 1 : 0, r.ErrorMessage, r.ResolvedXPath, r.StartedAt, r.FinishedAt, r.DurationMs],
+  );
 }
 
 export function insertReplayRunRow(
-    db: SqlJsDatabase,
-    draft: ReplayRunDraft,
+  db: SqlJsDatabase,
+  draft: ReplayRunDraft,
 ): PersistedReplayRun {
-    const runId = insertRunHeader(db, draft);
-    for (const r of draft.StepResults) {
-        insertStepResultRow(db, runId, r);
-    }
+  const runId = insertRunHeader(db, draft);
+  for (const r of draft.StepResults) {
+    insertStepResultRow(db, runId, r);
+  }
 
-    return readReplayRun(db, runId);
+  return readReplayRun(db, runId);
 }
 
 export function listReplayRunRows(
-    db: SqlJsDatabase,
+  db: SqlJsDatabase,
 ): ReadonlyArray<PersistedReplayRun> {
-    const result = db.exec(
-        `SELECT ReplayRunId, StartedAt, FinishedAt, TotalSteps, OkSteps, FailedSteps, Notes
+  const result = db.exec(
+    `SELECT ReplayRunId, StartedAt, FinishedAt, TotalSteps, OkSteps, FailedSteps, Notes
          FROM ReplayRun
          ORDER BY StartedAt DESC, ReplayRunId DESC`,
-    );
-    const values = result[0]?.values ?? [];
+  );
+  const values = result[0]?.values ?? [];
 
-    return values.map(rowToRun);
+  return values.map(rowToRun);
 }
 
 export function listStepResultsForRun(
-    db: SqlJsDatabase,
-    replayRunId: number,
+  db: SqlJsDatabase,
+  replayRunId: number,
 ): ReadonlyArray<PersistedReplayStepResult> {
-    const result = db.exec(
-        `SELECT ReplayStepResultId, ReplayRunId, StepId, OrderIndex, IsOk,
+  const result = db.exec(
+    `SELECT ReplayStepResultId, ReplayRunId, StepId, OrderIndex, IsOk,
                 ErrorMessage, ResolvedXPath, StartedAt, FinishedAt, DurationMs
          FROM ReplayStepResult
          WHERE ReplayRunId = ?
          ORDER BY OrderIndex ASC, ReplayStepResultId ASC`,
-        [replayRunId],
-    );
-    const values = result[0]?.values ?? [];
+    [replayRunId],
+  );
+  const values = result[0]?.values ?? [];
 
-    return values.map(rowToStepResult);
+  return values.map(rowToStepResult);
 }
 
 /**
@@ -142,28 +142,28 @@ export function listStepResultsForRun(
  * can show when a selector started failing.
  */
 export function listStepResultsForStep(
-    db: SqlJsDatabase,
-    stepId: number,
+  db: SqlJsDatabase,
+  stepId: number,
 ): ReadonlyArray<PersistedReplayStepResult> {
-    const result = db.exec(
-        `SELECT ReplayStepResultId, ReplayRunId, StepId, OrderIndex, IsOk,
+  const result = db.exec(
+    `SELECT ReplayStepResultId, ReplayRunId, StepId, OrderIndex, IsOk,
                 ErrorMessage, ResolvedXPath, StartedAt, FinishedAt, DurationMs
          FROM ReplayStepResult
          WHERE StepId = ?
          ORDER BY StartedAt ASC, ReplayStepResultId ASC`,
-        [stepId],
-    );
-    const values = result[0]?.values ?? [];
+    [stepId],
+  );
+  const values = result[0]?.values ?? [];
 
-    return values.map(rowToStepResult);
+  return values.map(rowToStepResult);
 }
 
 export function deleteReplayRunRow(
-    db: SqlJsDatabase,
-    replayRunId: number,
+  db: SqlJsDatabase,
+  replayRunId: number,
 ): void {
-    // ReplayStepResult rows cascade via FK ON DELETE CASCADE.
-    db.run("DELETE FROM ReplayRun WHERE ReplayRunId = ?", [replayRunId]);
+  // ReplayStepResult rows cascade via FK ON DELETE CASCADE.
+  db.run("DELETE FROM ReplayRun WHERE ReplayRunId = ?", [replayRunId]);
 }
 
 /* ------------------------------------------------------------------ */
@@ -171,31 +171,31 @@ export function deleteReplayRunRow(
 /* ------------------------------------------------------------------ */
 
 export async function saveReplayRun(
-    projectSlug: string,
-    draft: ReplayRunDraft,
+  projectSlug: string,
+  draft: ReplayRunDraft,
 ): Promise<PersistedReplayRun> {
-    const mgr = await initProjectDb(projectSlug);
-    const run = insertReplayRunRow(mgr.getDb(), draft);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const run = insertReplayRunRow(mgr.getDb(), draft);
+  mgr.markDirty();
 
-    return run;
+  return run;
 }
 
 export async function listReplayRuns(
-    projectSlug: string,
+  projectSlug: string,
 ): Promise<ReadonlyArray<PersistedReplayRun>> {
-    const mgr = await initProjectDb(projectSlug);
+  const mgr = await initProjectDb(projectSlug);
 
-    return listReplayRunRows(mgr.getDb());
+  return listReplayRunRows(mgr.getDb());
 }
 
 export async function listReplayStepResults(
-    projectSlug: string,
-    replayRunId: number,
+  projectSlug: string,
+  replayRunId: number,
 ): Promise<ReadonlyArray<PersistedReplayStepResult>> {
-    const mgr = await initProjectDb(projectSlug);
+  const mgr = await initProjectDb(projectSlug);
 
-    return listStepResultsForRun(mgr.getDb(), replayRunId);
+  return listStepResultsForRun(mgr.getDb(), replayRunId);
 }
 
 /**
@@ -203,21 +203,21 @@ export async function listReplayStepResults(
  * to render the per-selector "when did it start failing?" timeline.
  */
 export async function listReplayStepResultsForStep(
-    projectSlug: string,
-    stepId: number,
+  projectSlug: string,
+  stepId: number,
 ): Promise<ReadonlyArray<PersistedReplayStepResult>> {
-    const mgr = await initProjectDb(projectSlug);
+  const mgr = await initProjectDb(projectSlug);
 
-    return listStepResultsForStep(mgr.getDb(), stepId);
+  return listStepResultsForStep(mgr.getDb(), stepId);
 }
 
 export async function deleteReplayRun(
-    projectSlug: string,
-    replayRunId: number,
+  projectSlug: string,
+  replayRunId: number,
 ): Promise<void> {
-    const mgr = await initProjectDb(projectSlug);
-    deleteReplayRunRow(mgr.getDb(), replayRunId);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  deleteReplayRunRow(mgr.getDb(), replayRunId);
+  mgr.markDirty();
 }
 
 /* ------------------------------------------------------------------ */
@@ -225,48 +225,48 @@ export async function deleteReplayRun(
 /* ------------------------------------------------------------------ */
 
 function lastInsertId(db: SqlJsDatabase): number {
-    const result = db.exec("SELECT last_insert_rowid()");
+  const result = db.exec("SELECT last_insert_rowid()");
 
-    return result[0].values[0][0] as number;
+  return result[0].values[0][0] as number;
 }
 
 function readReplayRun(db: SqlJsDatabase, runId: number): PersistedReplayRun {
-    const result = db.exec(
-        `SELECT ReplayRunId, StartedAt, FinishedAt, TotalSteps, OkSteps, FailedSteps, Notes
+  const result = db.exec(
+    `SELECT ReplayRunId, StartedAt, FinishedAt, TotalSteps, OkSteps, FailedSteps, Notes
          FROM ReplayRun WHERE ReplayRunId = ?`,
-        [runId],
-    );
-    const row = result[0]?.values[0];
-    if (row === undefined) {
-        throw new Error(`ReplayRun row missing for ReplayRunId ${runId} after insert`);
-    }
+    [runId],
+  );
+  const row = result[0]?.values[0];
+  if (row === undefined) {
+    throw new Error(`ReplayRun row missing for ReplayRunId ${runId} after insert`);
+  }
 
-    return rowToRun(row);
+  return rowToRun(row);
 }
 
 function rowToRun(row: ReadonlyArray<unknown>): PersistedReplayRun {
-    return {
-        ReplayRunId: row[0] as number,
-        StartedAt: row[1] as string,
-        FinishedAt: (row[2] as string | null) ?? null,
-        TotalSteps: row[3] as number,
-        OkSteps: row[4] as number,
-        FailedSteps: row[5] as number,
-        Notes: (row[6] as string | null) ?? "",
-    };
+  return {
+    ReplayRunId: row[0] as number,
+    StartedAt: row[1] as string,
+    FinishedAt: (row[2] as string | null) ?? null,
+    TotalSteps: row[3] as number,
+    OkSteps: row[4] as number,
+    FailedSteps: row[5] as number,
+    Notes: (row[6] as string | null) ?? "",
+  };
 }
 
 function rowToStepResult(row: ReadonlyArray<unknown>): PersistedReplayStepResult {
-    return {
-        ReplayStepResultId: row[0] as number,
-        ReplayRunId: row[1] as number,
-        StepId: row[2] as number,
-        OrderIndex: row[3] as number,
-        IsOk: row[4] as number,
-        ErrorMessage: (row[5] as string | null) ?? null,
-        ResolvedXPath: (row[6] as string | null) ?? null,
-        StartedAt: row[7] as string,
-        FinishedAt: row[8] as string,
-        DurationMs: row[9] as number,
-    };
+  return {
+    ReplayStepResultId: row[0] as number,
+    ReplayRunId: row[1] as number,
+    StepId: row[2] as number,
+    OrderIndex: row[3] as number,
+    IsOk: row[4] as number,
+    ErrorMessage: (row[5] as string | null) ?? null,
+    ResolvedXPath: (row[6] as string | null) ?? null,
+    StartedAt: row[7] as string,
+    FinishedAt: row[8] as string,
+    DurationMs: row[9] as number,
+  };
 }

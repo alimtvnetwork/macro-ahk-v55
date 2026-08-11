@@ -56,18 +56,27 @@ export function resolveWsTier(plan: string, subStatus: string, billingLimit: num
   const s = normalizeSubscriptionStatus(subStatus);
 
   // Lite / ktlo plan (incl. tiered variants like `ktlo_2`, `ktlo_3`)
-  if (p === PlanNameType.KTLO || p === PlanNameType.LITE || p.startsWith('ktlo_')) return WsTierValueType.LITE;
+  if (p === PlanNameType.KTLO || p === PlanNameType.LITE || p.startsWith('ktlo_')) {
+    return WsTierValueType.LITE;
+  }
 
   // Has billing = was/is pro
   if (billingLimit > 0 || (p && p !== PlanNameType.FREE)) {
-    if (s === SubscriptionStatusType.ACTIVE) return WsTierValueType.PRO;
-    if (isCanceledStatus(s) || s === SubscriptionStatusType.PAST_DUE) return WsTierValueType.EXPIRED;
+    if (s === SubscriptionStatusType.ACTIVE) {
+      return WsTierValueType.PRO;
+    }
+
+    if (isCanceledStatus(s) || s === SubscriptionStatusType.PAST_DUE) {
+      return WsTierValueType.EXPIRED;
+    }
 
     return WsTierValueType.PRO; // default if billing exists
   }
 
   // Free plan + canceled sub = expired trial/pro
-  if (isCanceledStatus(s)) return WsTierValueType.EXPIRED;
+  if (isCanceledStatus(s)) {
+    return WsTierValueType.EXPIRED;
+  }
 
   return WsTierValueType.FREE;
 }
@@ -92,11 +101,19 @@ export function isExpiredWs(ws: import('./types').WorkspaceCredit): boolean {
  */
 export function expiredDays(ws: import('./types').WorkspaceCredit): number | null {
   const iso = ws.subscriptionStatusChangedAt;
-  if (!iso) return null;
+  if (!iso) {
+    return null;
+  }
+
   const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return null;
+  if (!Number.isFinite(t)) {
+    return null;
+  }
+
   const ms = Date.now() - t;
-  if (ms < 0) return 0;
+  if (ms < 0) {
+    return 0;
+  }
 
   return Math.floor(ms / 86400000);
 }
@@ -108,9 +125,15 @@ export function expiredDays(ws: import('./types').WorkspaceCredit): number | nul
  */
 export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): string | null {
   const iso = ws.subscriptionStatusChangedAt;
-  if (!iso) return null;
+  if (!iso) {
+    return null;
+  }
+
   const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return null;
+  if (!Number.isFinite(t)) {
+    return null;
+  }
+
   const d = new Date(t);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dayPart = String(d.getDate()).padStart(2, '0');
@@ -126,15 +149,25 @@ export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): st
  */
 export function formatExpiredDuration(ws: import('./types').WorkspaceCredit): string | null {
   const days = expiredDays(ws);
-  if (days === null) return null;
-  if (days < 1) return '<1d';
-  if (days < 30) return days + 'd';
+  if (days === null) {
+    return null;
+  }
+
+  if (days < 1) {
+    return '<1d';
+  }
+
+  if (days < 30) {
+    return days + 'd';
+  }
+
   if (days < 365) {
     const months = Math.floor(days / 30);
     const remDays = days % 30;
 
     return remDays > 0 ? months + 'mo ' + remDays + 'd' : months + 'mo';
   }
+
   const years = Math.floor(days / 365);
   const remMonths = Math.floor((days % 365) / 30);
 
@@ -279,12 +312,16 @@ function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): vo
 
     return;
   }
+
   let overridden = 0;
   for (const ws of perWs) {
     // Per-workspace override (grace/refill) trumps global config for this row.
     const wsCfg = getWorkspaceLifecycleConfigFor(ws.id);
     const status = getEffectiveStatus(ws, wsCfg);
-    if (!shouldApplyCanceledOverride(status)) continue;
+    if (!shouldApplyCanceledOverride(status)) {
+      continue;
+    }
+
     const beforeAvail = ws.available || 0;
     const beforeBilling = ws.billingAvailable || 0;
     const beforeRollover = ws.rollover || 0;
@@ -297,6 +334,7 @@ function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): vo
       2,
     );
   }
+
   if (overridden > 0) {
     log('Lifecycle overrides applied to ' + overridden + ' workspace(s)', 'info');
   }
@@ -313,6 +351,7 @@ function aggregateCreditTotals(perWs: import('./types').WorkspaceCredit[]): void
     ta += ws.available;
     tba += ws.billingAvailable;
   }
+
   loopCreditState.totalDailyFree = tdf;
   loopCreditState.totalRollover = tr;
   loopCreditState.totalAvailable = ta;
@@ -323,7 +362,10 @@ function aggregateCreditTotals(perWs: import('./types').WorkspaceCredit[]): void
 // matchCurrentWorkspace — find current ws by name
 // ============================================
 function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void {
-  if (!state.workspaceName || perWs.length === 0) return;
+  if (!state.workspaceName || perWs.length === 0) {
+    return;
+  }
+
   for (const ws of perWs) {
     if (ws.fullName === state.workspaceName || ws.name === state.workspaceName) {
       loopCreditState.currentWs = ws;
@@ -339,7 +381,9 @@ function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void
 function buildWsByIdIndex(perWs: import('./types').WorkspaceCredit[]): void {
   loopCreditState.wsById = {};
   for (const ws of perWs) {
-    if (ws.id) loopCreditState.wsById[ws.id] = ws;
+    if (ws.id) {
+      loopCreditState.wsById[ws.id] = ws;
+    }
   }
 }
 
@@ -382,9 +426,14 @@ export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
  */
 export async function applyProZeroEnrichment(): Promise<number> {
   const perWs = loopCreditState.perWorkspace || [];
-  if (perWs.length === 0) return 0;
+  if (perWs.length === 0) {
+    return 0;
+  }
+
   const mutated = await enrichProZeroWorkspaces(perWs);
-  if (mutated === 0) return 0;
+  if (mutated === 0) {
+    return 0;
+  }
 
   // Re-run dependent passes so totals + currentWs reflect enriched values.
   applyLifecycleOverrides(perWs);
@@ -405,9 +454,14 @@ export async function applyProZeroEnrichment(): Promise<number> {
  */
 export async function applyProOneEnrichment(): Promise<number> {
   const perWs = loopCreditState.perWorkspace || [];
-  if (perWs.length === 0) return 0;
+  if (perWs.length === 0) {
+    return 0;
+  }
+
   const mutated = await enrichProOneWorkspaces(perWs);
-  if (mutated === 0) return 0;
+  if (mutated === 0) {
+    return 0;
+  }
 
   applyLifecycleOverrides(perWs);
   aggregateCreditTotals(perWs);
@@ -428,6 +482,7 @@ export function syncCreditStateFromApi(): void {
 
     return;
   }
+
   const dailyFree = cws.dailyFree || 0;
   const hasCredit = dailyFree > 0;
   state.hasFreeCredit = hasCredit;

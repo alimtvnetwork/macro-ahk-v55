@@ -18,27 +18,27 @@ import type { useStepLibrary } from "@/hooks/use-step-library";
 import type { BatchRenameChange } from "../BatchRenameDialog";
 
 import type {
-    CreateDialogState,
-    DeleteStepDialogState,
-    GroupTargetDialogState,
-    RenameDialogState,
-    StepEditorDialogState,
+  CreateDialogState,
+  DeleteStepDialogState,
+  GroupTargetDialogState,
+  RenameDialogState,
+  StepEditorDialogState,
 } from "./dialog-state";
 import {
-    doArchiveToggle,
-    doBatchDeleteConfirm,
-    doBatchRenameApply,
-    doCreate,
-    doDelete,
-    doDropReorder,
-    doMove,
-    doRename,
-    doStepDeleteConfirm,
-    doStepDropReorder,
-    doStepEditorSubmit,
-    doStepMove,
-    type MutationDeps,
-    type StepEditorSubmitInput,
+  doArchiveToggle,
+  doBatchDeleteConfirm,
+  doBatchRenameApply,
+  doCreate,
+  doDelete,
+  doDropReorder,
+  doMove,
+  doRename,
+  doStepDeleteConfirm,
+  doStepDropReorder,
+  doStepEditorSubmit,
+  doStepMove,
+  type MutationDeps,
+  type StepEditorSubmitInput,
 } from "./mutation-handlers";
 import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
@@ -71,30 +71,30 @@ interface UseStepGroupMutationsParams {
 }
 
 function bindHandlers(deps: MutationDeps) {
-    return {
-        handleBatchRenameApply: (changes: ReadonlyArray<BatchRenameChange>) =>
-            doBatchRenameApply(deps, changes),
-        handleBatchDeleteConfirm: (ids: ReadonlyArray<number>) =>
-            doBatchDeleteConfirm(deps, ids),
-        handleCreate: () => doCreate(deps),
-        handleRename: () => doRename(deps),
-        handleDelete: () => doDelete(deps),
-        handleMove: (id: number, direction: DirectionType) => doMove(deps, id, direction),
-        handleArchiveToggle: (group: StepGroupRow) => doArchiveToggle(deps, group),
-        handleStepEditorSubmit: (input: StepEditorSubmitInput) =>
-            doStepEditorSubmit(deps, input),
-        handleStepMove: (stepId: number, direction: DirectionType) =>
-            doStepMove(deps, stepId, direction),
-        handleStepDeleteConfirm: () => doStepDeleteConfirm(deps),
-        handleDropReorder: (parentId: number | null, sourceId: number, targetId: number) =>
-            doDropReorder(deps, parentId, sourceId, targetId),
-        handleStepDropReorder: (stepGroupId: number, sourceStepId: number, targetStepId: number) =>
-            doStepDropReorder(deps, stepGroupId, sourceStepId, targetStepId),
-    };
+  return {
+    handleBatchRenameApply: (changes: ReadonlyArray<BatchRenameChange>) =>
+      doBatchRenameApply(deps, changes),
+    handleBatchDeleteConfirm: (ids: ReadonlyArray<number>) =>
+      doBatchDeleteConfirm(deps, ids),
+    handleCreate: () => doCreate(deps),
+    handleRename: () => doRename(deps),
+    handleDelete: () => doDelete(deps),
+    handleMove: (id: number, direction: DirectionType) => doMove(deps, id, direction),
+    handleArchiveToggle: (group: StepGroupRow) => doArchiveToggle(deps, group),
+    handleStepEditorSubmit: (input: StepEditorSubmitInput) =>
+      doStepEditorSubmit(deps, input),
+    handleStepMove: (stepId: number, direction: DirectionType) =>
+      doStepMove(deps, stepId, direction),
+    handleStepDeleteConfirm: () => doStepDeleteConfirm(deps),
+    handleDropReorder: (parentId: number | null, sourceId: number, targetId: number) =>
+      doDropReorder(deps, parentId, sourceId, targetId),
+    handleStepDropReorder: (stepGroupId: number, sourceStepId: number, targetStepId: number) =>
+      doStepDropReorder(deps, stepGroupId, sourceStepId, targetStepId),
+  };
 }
 
 export function useStepGroupMutations(params: UseStepGroupMutationsParams) {
-    const batchActions = useStepGroupBatchActions(params.lib);
+  const batchActions = useStepGroupBatchActions(params.lib);
 
-    return bindHandlers({ ...params, batchActions });
+  return bindHandlers({ ...params, batchActions });
 }

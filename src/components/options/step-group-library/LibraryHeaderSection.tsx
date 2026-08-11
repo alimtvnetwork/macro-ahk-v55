@@ -10,8 +10,8 @@
 import { Separator } from "@/components/ui/separator";
 
 import BundleExchangePanel, {
-    type LastExportSummary,
-    type LastImportSummary,
+  type LastExportSummary,
+  type LastImportSummary,
 } from "../BundleExchangePanel";
 import { LibraryToolbar } from "./LibraryToolbar";
 
@@ -35,45 +35,45 @@ interface Props {
 }
 
 export function LibraryHeaderSection(props: Props) {
-    const { lib, state, exportImport, selection, lastImport, lastExport } = props;
-    const {
-        showArchived, setShowArchived,
-        setCreateDialog, setInputSourceOpen, setWebhookOpen,
-        setBatchOpen, setBatchRenameOpen, setBatchDeleteOpen,
-        fileInputRef, selected,
-    } = state;
-    const { handleExport, handleImportClick, handleImportFile } = exportImport;
-    const { clearSelection } = selection;
-    const selectedCount = selected.size;
+  const { lib, state, exportImport, selection, lastImport, lastExport } = props;
+  const {
+    showArchived, setShowArchived,
+    setCreateDialog, setInputSourceOpen, setWebhookOpen,
+    setBatchOpen, setBatchRenameOpen, setBatchDeleteOpen,
+    fileInputRef, selected,
+  } = state;
+  const { handleExport, handleImportClick, handleImportFile } = exportImport;
+  const { clearSelection } = selection;
+  const selectedCount = selected.size;
 
-    return (
-        <>
-            <LibraryToolbar
-                projectName={lib.Project?.Name ?? null}
-                showArchived={showArchived}
-                setShowArchived={setShowArchived}
-                selectedCount={selectedCount}
-                clearSelection={clearSelection}
-                setCreateDialog={setCreateDialog}
-                onImportClick={handleImportClick}
-                setInputSourceOpen={setInputSourceOpen}
-                setWebhookOpen={setWebhookOpen}
-                setBatchOpen={setBatchOpen}
-                setBatchRenameOpen={setBatchRenameOpen}
-                setBatchDeleteOpen={setBatchDeleteOpen}
-                onExportSelected={() => handleExport()}
-                fileInputRef={fileInputRef}
-                onImportFile={handleImportFile}
-            />
-            <Separator />
-            <BundleExchangePanel
-                selectedCount={selectedCount}
-                onExport={(includeDescendants) => handleExport(undefined, includeDescendants)}
-                onImportFile={handleImportFile}
-                lastExport={lastExport}
-                lastImport={lastImport}
-                disabled={lib.Lib === null || lib.Project === null || lib.SqlJs === null}
-            />
-        </>
-    );
+  return (
+    <>
+      <LibraryToolbar
+        projectName={lib.Project?.Name ?? null}
+        showArchived={showArchived}
+        setShowArchived={setShowArchived}
+        selectedCount={selectedCount}
+        clearSelection={clearSelection}
+        setCreateDialog={setCreateDialog}
+        onImportClick={handleImportClick}
+        setInputSourceOpen={setInputSourceOpen}
+        setWebhookOpen={setWebhookOpen}
+        setBatchOpen={setBatchOpen}
+        setBatchRenameOpen={setBatchRenameOpen}
+        setBatchDeleteOpen={setBatchDeleteOpen}
+        onExportSelected={() => handleExport()}
+        fileInputRef={fileInputRef}
+        onImportFile={handleImportFile}
+      />
+      <Separator />
+      <BundleExchangePanel
+        selectedCount={selectedCount}
+        onExport={(includeDescendants) => handleExport(undefined, includeDescendants)}
+        onImportFile={handleImportFile}
+        lastExport={lastExport}
+        lastImport={lastImport}
+        disabled={lib.Lib === null || lib.Project === null || lib.SqlJs === null}
+      />
+    </>
+  );
 }

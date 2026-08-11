@@ -35,14 +35,19 @@ export function isExpiringWs(ws: WorkspaceCredit): boolean {
 export function isProExpiringWs(ws: WorkspaceCredit): boolean {
   try {
     const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
-    if (tier === WsTierValueType.FREE) return false;
+    if (tier === WsTierValueType.FREE) {
+      return false;
+    }
+
     const config = getWorkspaceLifecycleConfig();
     const source = getEffectiveStatus(ws, config);
     const display = classifyFromStatus(source, ws);
     
     if (display.kind === 'past-due-expiring'
       || display.kind === 'expired-hard'
-      || display.kind === 'expire-soon') return true;
+      || display.kind === 'expire-soon') {
+      return true;
+    }
       
     if (display.kind === 'canceled') {
       const sub = (ws.subscriptionStatus || '').toLowerCase().trim();

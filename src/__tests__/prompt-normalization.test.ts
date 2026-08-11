@@ -20,7 +20,10 @@ interface PromptEntry {
 }
 
 function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number }>[]): PromptEntry[] { // eslint-disable-line sonarjs/cognitive-complexity -- mirrors production logic for regression coverage
-  if (!Array.isArray(entries)) return [];
+  if (!Array.isArray(entries)) {
+    return [];
+  }
+
   const out: PromptEntry[] = [];
   for (const p of entries) {
     const raw = p || {};
@@ -28,11 +31,26 @@ function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number 
     const text = typeof raw.text === 'string' ? raw.text : '';
     if (name && text) {
       const entry: PromptEntry = { name, text };
-      if (raw.id) { entry.id = raw.id; }
-      if (raw.slug) { entry.slug = raw.slug; }
-      if (raw.category) { entry.category = raw.category; }
-      if (raw.isFavorite) { entry.isFavorite = true; }
-      if (raw.isDefault !== undefined) { entry.isDefault = raw.isDefault; }
+      if (raw.id) {
+        entry.id = raw.id; 
+      }
+
+      if (raw.slug) {
+        entry.slug = raw.slug; 
+      }
+
+      if (raw.category) {
+        entry.category = raw.category; 
+      }
+
+      if (raw.isFavorite) {
+        entry.isFavorite = true; 
+      }
+
+      if (raw.isDefault !== undefined) {
+        entry.isDefault = raw.isDefault; 
+      }
+
       out.push(entry);
     }
   }
@@ -55,22 +73,33 @@ function normalizeNewlines(text: string): string {
 function findNextTasksPrompt(entries: PromptEntry[], targetSlug = 'next-tasks'): PromptEntry | null {
   // Priority 1: Exact slug match
   for (const entry of entries) {
-    if ((entry.slug || '').toLowerCase() === targetSlug) return entry;
+    if ((entry.slug || '').toLowerCase() === targetSlug) {
+      return entry;
+    }
   }
+
   // Priority 2: id match
   for (const entry of entries) {
     const id = (entry.id || '').toLowerCase();
-    if (id === targetSlug || id === 'default-' + targetSlug || id.indexOf(targetSlug) !== -1) return entry;
+    if (id === targetSlug || id === 'default-' + targetSlug || id.indexOf(targetSlug) !== -1) {
+      return entry;
+    }
   }
+
   // Priority 3: Derived slug from name
   for (const entry of entries) {
     const derived = (entry.name || '').toLowerCase().replace(/\s+/g, '-');
-    if (derived === targetSlug) return entry;
+    if (derived === targetSlug) {
+      return entry;
+    }
   }
+
   // Priority 4: Name contains both 'next' and 'task'
   for (const entry of entries) {
     const name = (entry.name || '').toLowerCase();
-    if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) return entry;
+    if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) {
+      return entry;
+    }
   }
 
   // NO FALLBACK to entries[0], return null

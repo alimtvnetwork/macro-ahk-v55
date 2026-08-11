@@ -79,22 +79,30 @@ export function parseDeclaredStepCount(body: string):
     | { kind: 'literal'; value: number }
     | { kind: 'template' }
     | { kind: 'none' } {
-    const candidates: Array<RegExpMatchArray | null> = [
-        body.match(RE_FRONTMATTER_STEPS),
-        body.match(RE_EXACTLY_STEPS),
-        body.match(RE_HEADER_STEPS),
-    ];
-    for (const m of candidates) {
-        if (!m) continue;
-        const raw = (m[1] ?? '').trim();
-        if (raw === '{{n}}') return { kind: 'template' };
-        if (/^\d+$/.test(raw)) {
-            const n = Number(raw);
-            if (Number.isInteger(n) && n >= 0) return { kind: 'literal', value: n };
-        }
+  const candidates: Array<RegExpMatchArray | null> = [
+    body.match(RE_FRONTMATTER_STEPS),
+    body.match(RE_EXACTLY_STEPS),
+    body.match(RE_HEADER_STEPS),
+  ];
+  for (const m of candidates) {
+    if (!m) {
+      continue;
     }
 
-    return { kind: 'none' };
+    const raw = (m[1] ?? '').trim();
+    if (raw === '{{n}}') {
+      return { kind: 'template' };
+    }
+
+    if (/^\d+$/.test(raw)) {
+      const n = Number(raw);
+      if (Number.isInteger(n) && n >= 0) {
+        return { kind: 'literal', value: n };
+      }
+    }
+  }
+
+  return { kind: 'none' };
 }
 
 /**
@@ -107,34 +115,46 @@ export function parseDeclaredStepCount(body: string):
  * indented enumerations are ignored so sub-lists don't inflate the count.
  */
 export function countTopLevelSteps(body: string): number {
-    const lines = body.split(/\r?\n/);
-    let inFence = false;
-    let inStepsSection = false;
-    let sawStepsHeading = false;
-    let count = 0;
-    let fallbackCount = 0;
+  const lines = body.split(/\r?\n/);
+  let inFence = false;
+  let inStepsSection = false;
+  let sawStepsHeading = false;
+  let count = 0;
+  let fallbackCount = 0;
 
-    for (const line of lines) {
-        if (RE_FENCE.test(line)) { inFence = !inFence; continue; }
-        if (inFence) continue;
-
-        if (RE_STEPS_HEADING.test(line)) {
-            sawStepsHeading = true;
-            inStepsSection = true;
-            count = 0;
-            continue;
-        }
-        if (inStepsSection && RE_NEXT_HEADING.test(line) && !RE_STEPS_HEADING.test(line)) {
-            inStepsSection = false;
-        }
-
-        const m = line.match(RE_TOP_LEVEL_NUMBERED);
-        if (!m) continue;
-        if (inStepsSection) count += 1;
-        fallbackCount += 1;
+  for (const line of lines) {
+    if (RE_FENCE.test(line)) {
+      inFence = !inFence; continue; 
     }
 
-    return sawStepsHeading ? count : fallbackCount;
+    if (inFence) {
+      continue;
+    }
+
+    if (RE_STEPS_HEADING.test(line)) {
+      sawStepsHeading = true;
+      inStepsSection = true;
+      count = 0;
+      continue;
+    }
+
+    if (inStepsSection && RE_NEXT_HEADING.test(line) && !RE_STEPS_HEADING.test(line)) {
+      inStepsSection = false;
+    }
+
+    const m = line.match(RE_TOP_LEVEL_NUMBERED);
+    if (!m) {
+      continue;
+    }
+
+    if (inStepsSection) {
+      count += 1;
+    }
+
+    fallbackCount += 1;
+  }
+
+  return sawStepsHeading ? count : fallbackCount;
 }
 
 /**
@@ -143,48 +163,50 @@ export function countTopLevelSteps(body: string): number {
  * @param body The plan prompt / plan document text being saved.
  */
 export function validateRuleZero(body: string): RuleZeroCheck {
-    if (typeof body !== 'string' || body.length === 0) {
-        return {
-            ok: true, expectedN: null, actualN: null, code: 'no-declaration',
-            reason: 'Rule 0: empty body, nothing to validate',
-        };
-    }
+  if (typeof body !== 'string' || body.length === 0) {
+    return {
+      ok: true, expectedN: null, actualN: null, code: 'no-declaration',
+      reason: 'Rule 0: empty body, nothing to validate',
+    };
+  }
 
-    const decl = parseDeclaredStepCount(body);
-    if (decl.kind === 'template') {
-        return {
-            ok: true, expectedN: null, actualN: null, code: 'template',
-            reason: 'Rule 0: template mode ({{n}} placeholder, deferred to inject-time)',
-        };
-    }
-    if (decl.kind === 'none') {
-        return {
-            ok: true, expectedN: null, actualN: null, code: 'no-declaration',
-            reason: 'Rule 0: no declared step count, nothing to enforce',
-        };
-    }
+  const decl = parseDeclaredStepCount(body);
+  if (decl.kind === 'template') {
+    return {
+      ok: true, expectedN: null, actualN: null, code: 'template',
+      reason: 'Rule 0: template mode ({{n}} placeholder, deferred to inject-time)',
+    };
+  }
 
-    const expected = decl.value;
-    const actual = countTopLevelSteps(body);
-    if (actual === 0) {
-        return {
-            ok: false, expectedN: expected, actualN: 0, code: 'no-steps',
-            reason: 'Rule 0 violated: declared Steps=' + expected
+  if (decl.kind === 'none') {
+    return {
+      ok: true, expectedN: null, actualN: null, code: 'no-declaration',
+      reason: 'Rule 0: no declared step count, nothing to enforce',
+    };
+  }
+
+  const expected = decl.value;
+  const actual = countTopLevelSteps(body);
+  if (actual === 0) {
+    return {
+      ok: false, expectedN: expected, actualN: 0, code: 'no-steps',
+      reason: 'Rule 0 violated: declared Steps=' + expected
                 + ' but body has no numbered steps (expected exactly '
                 + expected + ')',
-        };
-    }
-    if (actual !== expected) {
-        return {
-            ok: false, expectedN: expected, actualN: actual, code: 'mismatch',
-            reason: 'Rule 0 violated: declared Steps=' + expected
+    };
+  }
+
+  if (actual !== expected) {
+    return {
+      ok: false, expectedN: expected, actualN: actual, code: 'mismatch',
+      reason: 'Rule 0 violated: declared Steps=' + expected
                 + ' but body has ' + actual + ' numbered step(s). '
                 + 'Step count is law — write EXACTLY ' + expected + ' steps.',
-        };
-    }
-
-    return {
-        ok: true, expectedN: expected, actualN: actual, code: 'match',
-        reason: 'Rule 0: step count matches declared N=' + expected,
     };
+  }
+
+  return {
+    ok: true, expectedN: expected, actualN: actual, code: 'match',
+    reason: 'Rule 0: step count matches declared N=' + expected,
+  };
 }

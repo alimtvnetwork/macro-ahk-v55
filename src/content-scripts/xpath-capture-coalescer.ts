@@ -40,36 +40,37 @@ interface CoalescerState {
 }
 
 const state: CoalescerState = {
-    queue: [],
-    timerId: null,
-    flushing: null,
+  queue: [],
+  timerId: null,
+  flushing: null,
 };
 
 /** Default sender — chrome.runtime.sendMessage wrapped in a Promise. */
 function defaultSend(message: unknown): Promise<unknown> {
-    return chrome.runtime.sendMessage(message);
+  return chrome.runtime.sendMessage(message);
 }
 
 let sendImpl: SendFn = defaultSend;
 
 /** Test seam — swap the underlying transport. */
 export function __setSendForTests(sender: SendFn | null): void {
-    sendImpl = sender ?? defaultSend;
+  sendImpl = sender ?? defaultSend;
 }
 
 /** Test seam — reset all internal state. */
 export function __resetForTests(): void {
-    if (state.timerId !== null) {
-        clearTimeout(state.timerId);
-    }
-    state.queue = [];
-    state.timerId = null;
-    state.flushing = null;
+  if (state.timerId !== null) {
+    clearTimeout(state.timerId);
+  }
+
+  state.queue = [];
+  state.timerId = null;
+  state.flushing = null;
 }
 
 /** Returns the current queue length (test-only inspection). */
 export function __queueLength(): number {
-    return state.queue.length;
+  return state.queue.length;
 }
 
 /**
@@ -77,21 +78,21 @@ export function __queueLength(): number {
  * when the queue reaches MAX_BATCH; otherwise schedules a debounced flush.
  */
 export function enqueueCapture(payload: CapturePayload): void {
-    state.queue.push(payload);
+  state.queue.push(payload);
 
-    if (state.queue.length >= MAX_BATCH) {
-        cancelTimer();
-        void flushNow();
+  if (state.queue.length >= MAX_BATCH) {
+    cancelTimer();
+    void flushNow();
 
-        return;
-    }
+    return;
+  }
 
-    if (state.timerId === null) {
-        state.timerId = (globalThis.setTimeout as typeof setTimeout)(() => {
-            state.timerId = null;
-            void flushNow();
-        }, DEBOUNCE_MS) as unknown as number;
-    }
+  if (state.timerId === null) {
+    state.timerId = (globalThis.setTimeout as typeof setTimeout)(() => {
+      state.timerId = null;
+      void flushNow();
+    }, DEBOUNCE_MS) as unknown as number;
+  }
 }
 
 /**
@@ -99,50 +100,53 @@ export function enqueueCapture(payload: CapturePayload): void {
  * the in-flight send settles. Sequential — never starts a parallel flush.
  */
 export async function flushNow(): Promise<void> {
-    cancelTimer();
-    if (state.flushing !== null) {
-        await state.flushing;
-    }
-    if (state.queue.length === 0) return;
-
-    const batch = state.queue.splice(0, state.queue.length);
-    const send = sendImpl;
-
-    state.flushing = (async () => {
-        try {
-            if (batch.length === 1) {
-                // Single-capture path stays compatible with the original
-                // RECORDER_CAPTURE_PERSIST handler so existing callers/tests
-                // continue to work.
-                await send({
-                    type: "RECORDER_CAPTURE_PERSIST",
-                    payload: batch[0],
-                });
-            } else {
-                await send({
-                    type: "RECORDER_CAPTURE_PERSIST_BATCH",
-                    payloads: batch,
-                });
-            }
-        } catch (err) {
-            // Fail-fast: log once, drop the batch, no retry.
-            console.warn(
-                "[Marco] xpath capture batch flush failed — dropping",
-                batch.length,
-                "captures",
-                err,
-            );
-        } finally {
-            state.flushing = null;
-        }
-    })();
-
+  cancelTimer();
+  if (state.flushing !== null) {
     await state.flushing;
+  }
+
+  if (state.queue.length === 0) {
+    return;
+  }
+
+  const batch = state.queue.splice(0, state.queue.length);
+  const send = sendImpl;
+
+  state.flushing = (async () => {
+    try {
+      if (batch.length === 1) {
+        // Single-capture path stays compatible with the original
+        // RECORDER_CAPTURE_PERSIST handler so existing callers/tests
+        // continue to work.
+        await send({
+          type: "RECORDER_CAPTURE_PERSIST",
+          payload: batch[0],
+        });
+      } else {
+        await send({
+          type: "RECORDER_CAPTURE_PERSIST_BATCH",
+          payloads: batch,
+        });
+      }
+    } catch (err) {
+      // Fail-fast: log once, drop the batch, no retry.
+      console.warn(
+        "[Marco] xpath capture batch flush failed — dropping",
+        batch.length,
+        "captures",
+        err,
+      );
+    } finally {
+      state.flushing = null;
+    }
+  })();
+
+  await state.flushing;
 }
 
 function cancelTimer(): void {
-    if (state.timerId !== null) {
-        clearTimeout(state.timerId);
-        state.timerId = null;
-    }
+  if (state.timerId !== null) {
+    clearTimeout(state.timerId);
+    state.timerId = null;
+  }
 }

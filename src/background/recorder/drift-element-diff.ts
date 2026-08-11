@@ -56,14 +56,14 @@ export interface DriftElementDiff {
 }
 
 const DIFF_FIELDS: ReadonlyArray<DriftFieldName> = [
-    "TagName",
-    "Id",
-    "ClassName",
-    "AriaLabel",
-    "Name",
-    "Type",
-    "TextSnippet",
-    "OuterHtmlSnippet",
+  "TagName",
+  "Id",
+  "ClassName",
+  "AriaLabel",
+  "Name",
+  "Type",
+  "TextSnippet",
+  "OuterHtmlSnippet",
 ];
 
 /**
@@ -73,131 +73,163 @@ const DIFF_FIELDS: ReadonlyArray<DriftFieldName> = [
  * that.
  */
 export function diffDriftElements(
-    primary: DomContext | null,
-    fallback: DomContext | null,
+  primary: DomContext | null,
+  fallback: DomContext | null,
 ): DriftElementDiff {
-    if (primary === null && fallback === null) return emptyDiff("PrimaryMissing");
-    if (primary === null) return oneSidedDiff(fallback as DomContext, "PrimaryMissing", true);
-    if (fallback === null) return oneSidedDiff(primary, "FallbackMissing", false);
+  if (primary === null && fallback === null) {
+    return emptyDiff("PrimaryMissing");
+  }
 
-    return buildTwoSidedDiff(primary, fallback);
+  if (primary === null) {
+    return oneSidedDiff(fallback as DomContext, "PrimaryMissing", true);
+  }
+
+  if (fallback === null) {
+    return oneSidedDiff(primary, "FallbackMissing", false);
+  }
+
+  return buildTwoSidedDiff(primary, fallback);
 }
 
 function pairFieldDiffs(primary: DomContext, fallback: DomContext): DriftFieldDiff[] {
-    return DIFF_FIELDS.map((field) => {
-        const a = readField(primary, field);
-        const b = readField(fallback, field);
+  return DIFF_FIELDS.map((field) => {
+    const a = readField(primary, field);
+    const b = readField(fallback, field);
 
-        return { Field: field, Primary: a, Fallback: b, Change: classifyChange(a, b) };
-    });
+    return { Field: field, Primary: a, Fallback: b, Change: classifyChange(a, b) };
+  });
 }
 
 function buildTwoSidedDiff(primary: DomContext, fallback: DomContext): DriftElementDiff {
-    const fields = pairFieldDiffs(primary, fallback);
-    const classList = diffClassList(primary.ClassName, fallback.ClassName);
-    const hasChanges = fields.some((f) => f.Change !== "Unchanged");
+  const fields = pairFieldDiffs(primary, fallback);
+  const classList = diffClassList(primary.ClassName, fallback.ClassName);
+  const hasChanges = fields.some((f) => f.Change !== "Unchanged");
 
-    return {
-        Verdict: classifyVerdict(primary, fallback, fields, hasChanges),
-        Fields: fields, ClassList: classList, HasChanges: hasChanges,
-    };
+  return {
+    Verdict: classifyVerdict(primary, fallback, fields, hasChanges),
+    Fields: fields, ClassList: classList, HasChanges: hasChanges,
+  };
 }
 
 function classifyChange(a: string | null, b: string | null): DriftChangeKind {
-    if (a === b) return "Unchanged";
-    if (a === null || a === "") return "Added";
-    if (b === null || b === "") return "Removed";
+  if (a === b) {
+    return "Unchanged";
+  }
 
-    return "Modified";
+  if (a === null || a === "") {
+    return "Added";
+  }
+
+  if (b === null || b === "") {
+    return "Removed";
+  }
+
+  return "Modified";
 }
 
 function classifyVerdict(
-    primary: DomContext,
-    fallback: DomContext,
-    fields: ReadonlyArray<DriftFieldDiff>,
-    hasChanges: boolean,
+  primary: DomContext,
+  fallback: DomContext,
+  fields: ReadonlyArray<DriftFieldDiff>,
+  hasChanges: boolean,
 ): DriftVerdict {
-    if (!hasChanges) return "Identical";
-    if (primary.TagName !== fallback.TagName) return "DifferentElement";
+  if (!hasChanges) {
+    return "Identical";
+  }
 
-    const idChanged = fields.find((f) => f.Field === "Id")?.Change !== "Unchanged";
-    const ariaChanged = fields.find((f) => f.Field === "AriaLabel")?.Change !== "Unchanged";
-    if (idChanged || ariaChanged) return "RenamedIdentity";
+  if (primary.TagName !== fallback.TagName) {
+    return "DifferentElement";
+  }
 
-    return "AttributeDrift";
+  const idChanged = fields.find((f) => f.Field === "Id")?.Change !== "Unchanged";
+  const ariaChanged = fields.find((f) => f.Field === "AriaLabel")?.Change !== "Unchanged";
+  if (idChanged || ariaChanged) {
+    return "RenamedIdentity";
+  }
+
+  return "AttributeDrift";
 }
 
 function diffClassList(a: string | null, b: string | null): DriftClassListDiff {
-    const aSet = toClassSet(a);
-    const bSet = toClassSet(b);
-    const removed: string[] = [];
-    const added: string[] = [];
-    const shared: string[] = [];
-    for (const c of aSet) {
-        if (bSet.has(c)) shared.push(c);
-        else removed.push(c);
+  const aSet = toClassSet(a);
+  const bSet = toClassSet(b);
+  const removed: string[] = [];
+  const added: string[] = [];
+  const shared: string[] = [];
+  for (const c of aSet) {
+    if (bSet.has(c)) {
+      shared.push(c);
+    } else {
+      removed.push(c);
     }
-    for (const c of bSet) {
-        if (!aSet.has(c)) added.push(c);
-    }
-    removed.sort();
-    added.sort();
-    shared.sort();
+  }
 
-    return { Removed: removed, Added: added, Shared: shared };
+  for (const c of bSet) {
+    if (!aSet.has(c)) {
+      added.push(c);
+    }
+  }
+
+  removed.sort();
+  added.sort();
+  shared.sort();
+
+  return { Removed: removed, Added: added, Shared: shared };
 }
 
 function toClassSet(value: string | null): Set<string> {
-    if (value === null || value.trim() === "") return new Set();
+  if (value === null || value.trim() === "") {
+    return new Set();
+  }
 
-    return new Set(value.trim().split(/\s+/));
+  return new Set(value.trim().split(/\s+/));
 }
 
 function readField(ctx: DomContext, field: DriftFieldName): string | null {
-    switch (field) {
-        case "TagName": return ctx.TagName;
-        case "Id": return ctx.Id;
-        case "ClassName": return ctx.ClassName;
-        case "AriaLabel": return ctx.AriaLabel;
-        case "Name": return ctx.Name;
-        case "Type": return ctx.Type;
-        case "TextSnippet": return ctx.TextSnippet;
-        case "OuterHtmlSnippet": return ctx.OuterHtmlSnippet;
-    }
+  switch (field) {
+    case "TagName": return ctx.TagName;
+    case "Id": return ctx.Id;
+    case "ClassName": return ctx.ClassName;
+    case "AriaLabel": return ctx.AriaLabel;
+    case "Name": return ctx.Name;
+    case "Type": return ctx.Type;
+    case "TextSnippet": return ctx.TextSnippet;
+    case "OuterHtmlSnippet": return ctx.OuterHtmlSnippet;
+  }
 }
 
 function emptyDiff(verdict: DriftVerdict): DriftElementDiff {
-    return {
-        Verdict: verdict,
-        Fields: [],
-        ClassList: { Removed: [], Added: [], Shared: [] },
-        HasChanges: false,
-    };
+  return {
+    Verdict: verdict,
+    Fields: [],
+    ClassList: { Removed: [], Added: [], Shared: [] },
+    HasChanges: false,
+  };
 }
 
 function oneSidedDiff(
-    present: DomContext,
-    verdict: DriftVerdict,
-    fallbackSide: boolean,
+  present: DomContext,
+  verdict: DriftVerdict,
+  fallbackSide: boolean,
 ): DriftElementDiff {
-    const fields: DriftFieldDiff[] = DIFF_FIELDS.map((field) => {
-        const value = readField(present, field);
-
-        return {
-            Field: field,
-            Primary: fallbackSide ? null : value,
-            Fallback: fallbackSide ? value : null,
-            Change: value === null || value === "" ? "Unchanged" : (fallbackSide ? "Added" : "Removed"),
-        };
-    });
-    const classList = fallbackSide
-        ? diffClassList(null, present.ClassName)
-        : diffClassList(present.ClassName, null);
+  const fields: DriftFieldDiff[] = DIFF_FIELDS.map((field) => {
+    const value = readField(present, field);
 
     return {
-        Verdict: verdict,
-        Fields: fields,
-        ClassList: classList,
-        HasChanges: fields.some((f) => f.Change !== "Unchanged"),
+      Field: field,
+      Primary: fallbackSide ? null : value,
+      Fallback: fallbackSide ? value : null,
+      Change: value === null || value === "" ? "Unchanged" : (fallbackSide ? "Added" : "Removed"),
     };
+  });
+  const classList = fallbackSide
+    ? diffClassList(null, present.ClassName)
+    : diffClassList(present.ClassName, null);
+
+  return {
+    Verdict: verdict,
+    Fields: fields,
+    ClassList: classList,
+    HasChanges: fields.some((f) => f.Change !== "Unchanged"),
+  };
 }

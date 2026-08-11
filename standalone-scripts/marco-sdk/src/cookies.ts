@@ -26,15 +26,15 @@ export interface CookiesApi {
 }
 
 export function createCookiesApi(): CookiesApi {
-    return {
-        get(name: string) {
-            return sendMessage<string | null>("COOKIES_GET", { name });
-        },
-        getDetail(name: string) {
-            return sendMessage<CookieDetail | null>("COOKIES_GET_DETAIL", { name });
-        },
-        getAll() {
-            return sendMessage<CookieDetail[]>("COOKIES_GET_ALL");
-        },
-    };
+  return {
+    get(name: string) {
+      return sendMessage<string | null>("COOKIES_GET", { name });
+    },
+    getDetail(name: string) {
+      return sendMessage<CookieDetail | null>("COOKIES_GET_DETAIL", { name });
+    },
+    getAll() {
+      return sendMessage<CookieDetail[]>("COOKIES_GET_ALL");
+    },
+  };
 }

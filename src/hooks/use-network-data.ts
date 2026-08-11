@@ -49,14 +49,18 @@ export function useNetworkData() {
     setStats({ totalCaptured: 0, byType: { xhr: 0, fetch: 0 }, byStatus: {}, averageDurationMs: 0 });
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   // Auto-refresh polling — visibility-paused (PERF-11). The hook fires an
   // immediate tick on mount + every visibilitychange→visible, so we no
   // longer need the standalone `useEffect` initial-fetch above to also
   // double as a poll seed.
   useVisibilityPausedInterval(
-    () => { void refresh(); },
+    () => {
+      void refresh(); 
+    },
     AUTO_REFRESH_INTERVAL,
     autoRefresh,
   );

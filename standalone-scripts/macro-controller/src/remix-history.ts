@@ -50,7 +50,9 @@ export function clearRemixHistory(): void {
 
 function removeHistoryPanel(): void {
   const old = document.getElementById(HISTORY_PANEL_ID);
-  if (old) old.remove();
+  if (old) {
+    old.remove();
+  }
 }
 
 function formatTimestamp(ts: number): string {
@@ -69,10 +71,21 @@ function formatTimestamp(ts: number): string {
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, function (ch) {
-    if (ch === '&') return '&amp;';
-    if (ch === '<') return '&lt;';
-    if (ch === '>') return '&gt;';
-    if (ch === '"') return '&quot;';
+    if (ch === '&') {
+      return '&amp;';
+    }
+
+    if (ch === '<') {
+      return '&lt;';
+    }
+
+    if (ch === '>') {
+      return '&gt;';
+    }
+
+    if (ch === '"') {
+      return '&quot;';
+    }
 
     return '&#39;';
   });
@@ -130,6 +143,7 @@ export function showRemixHistoryPanel(anchorEl: HTMLElement): void {
     showToast('🧹 Remix history cleared', 'info');
     removeHistoryPanel();
   };
+
   header.appendChild(clearBtn);
   panel.appendChild(header);
 
@@ -143,8 +157,11 @@ export function showRemixHistoryPanel(anchorEl: HTMLElement): void {
     for (const e of entries) {
       panel.appendChild(buildEntryRow(e));
     }
+
     const lastRow = panel.lastElementChild as HTMLElement | null;
-    if (lastRow) lastRow.style.borderBottom = 'none';
+    if (lastRow) {
+      lastRow.style.borderBottom = 'none';
+    }
   }
 
   document.body.appendChild(panel);

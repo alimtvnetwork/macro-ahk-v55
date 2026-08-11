@@ -82,7 +82,10 @@ function toPrettyJson(value: JsonValue): string {
 
 function parseEditorValue(raw: string): string | number | boolean | null | object {
   const trimmed = raw.trim();
-  if (!trimmed) return "";
+  if (!trimmed) {
+    return "";
+  }
+
   try {
     return JSON.parse(trimmed);
   } catch (err) { /* swallowed */
@@ -91,7 +94,10 @@ function parseEditorValue(raw: string): string | number | boolean | null | objec
 }
 
 function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return "0 B";
+  }
+
   const units = ["B", "KB", "MB", "GB"];
   const idx = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
   const value = bytes / Math.pow(1024, idx);
@@ -110,9 +116,17 @@ function downloadJson(filename: string, payload: string | number | boolean | nul
 }
 
 function keyToLabel(key: IDBValidKey): string {
-  if (typeof key === "string") return key;
-  if (typeof key === "number" || typeof key === "bigint") return String(key);
-  if (key instanceof Date) return key.toISOString();
+  if (typeof key === "string") {
+    return key;
+  }
+
+  if (typeof key === "number" || typeof key === "bigint") {
+    return String(key);
+  }
+
+  if (key instanceof Date) {
+    return key.toISOString();
+  }
 
   return toPrettyJson(key as unknown as JsonValue);
 }
@@ -146,6 +160,7 @@ function readStoreRecords(store: IDBObjectStore, limit = 100): Promise<IndexedRe
 
         return;
       }
+
       rows.push({ key: cursor.key, value: cursor.value });
       cursor.continue();
     };
@@ -201,6 +216,7 @@ async function saveIndexedRecord(
     } else {
       store.put(value as IDBValidKey);
     }
+
     await createTxDonePromise(tx);
   } finally {
     db.close();
@@ -302,6 +318,7 @@ function SessionPanel() {
 
       return;
     }
+
     try {
       await platform.sendMessage({
         type: "STORAGE_SESSION_SET",
@@ -317,7 +334,10 @@ function SessionPanel() {
   };
 
   const handleDelete = async (key: string) => {
-    if (!confirm(`Delete session key "${key}"?`)) return;
+    if (!confirm(`Delete session key "${key}"?`)) {
+      return;
+    }
+
     try {
       await platform.sendMessage({ type: "STORAGE_SESSION_DELETE", key });
       toast.success("Session entry deleted");
@@ -332,7 +352,9 @@ function SessionPanel() {
     const warning = scoped
       ? `Clear all session keys with prefix "${scoped}"?`
       : "Clear all session storage keys?";
-    if (!confirm(warning)) return;
+    if (!confirm(warning)) {
+      return;
+    }
 
     try {
       const response = await platform.sendMessage<{ cleared?: number }>({
@@ -547,7 +569,10 @@ function CookiesPanel() {
   };
 
   const handleDelete = async (cookie: CookieEntry) => {
-    if (!confirm(`Delete cookie "${cookie.name}"?`)) return;
+    if (!confirm(`Delete cookie "${cookie.name}"?`)) {
+      return;
+    }
+
     try {
       const protocol = cookie.secure ? "https" : "http";
       const normalizedDomain = cookie.domain.startsWith(".") ? cookie.domain.slice(1) : cookie.domain;
@@ -568,7 +593,9 @@ function CookiesPanel() {
   const handleClear = async () => {
     const domainSuffix = domain.trim() ? ` for domain ${domain.trim()}` : "";
     const warning = `Clear cookies${domainSuffix}?`;
-    if (!confirm(warning)) return;
+    if (!confirm(warning)) {
+      return;
+    }
 
     try {
       const response = await platform.sendMessage<{ cleared?: number }>({
@@ -814,7 +841,10 @@ function IndexedDbPanel() {
   };
 
   const handleSaveRecord = async () => {
-    if (!selectedDatabase || !selectedStore || !editorRecord) return;
+    if (!selectedDatabase || !selectedStore || !editorRecord) {
+      return;
+    }
+
     try {
       await saveIndexedRecord(selectedDatabase, selectedStore, editorRecord.key, parseEditorValue(editorValue) as JsonValue);
       toast.success("IndexedDB record updated");
@@ -826,8 +856,14 @@ function IndexedDbPanel() {
   };
 
   const handleDeleteRecord = async (record: IndexedRecord) => {
-    if (!selectedDatabase || !selectedStore) return;
-    if (!confirm(`Delete record key "${keyToLabel(record.key)}"?`)) return;
+    if (!selectedDatabase || !selectedStore) {
+      return;
+    }
+
+    if (!confirm(`Delete record key "${keyToLabel(record.key)}"?`)) {
+      return;
+    }
+
     try {
       await deleteIndexedRecord(selectedDatabase, selectedStore, record.key);
       toast.success("IndexedDB record deleted");
@@ -838,8 +874,13 @@ function IndexedDbPanel() {
   };
 
   const handleClearStore = async () => {
-    if (!selectedDatabase || !selectedStore) return;
-    if (!confirm(`Clear all records from store "${selectedStore}"?`)) return;
+    if (!selectedDatabase || !selectedStore) {
+      return;
+    }
+
+    if (!confirm(`Clear all records from store "${selectedStore}"?`)) {
+      return;
+    }
 
     try {
       await clearIndexedStore(selectedDatabase, selectedStore);
@@ -851,8 +892,14 @@ function IndexedDbPanel() {
   };
 
   const handleDeleteDatabase = async () => {
-    if (!selectedDatabase) return;
-    if (!confirm(`Delete IndexedDB database "${selectedDatabase}"?`)) return;
+    if (!selectedDatabase) {
+      return;
+    }
+
+    if (!confirm(`Delete IndexedDB database "${selectedDatabase}"?`)) {
+      return;
+    }
+
     try {
       await deleteIndexedDatabase(selectedDatabase);
       toast.success("IndexedDB database deleted");

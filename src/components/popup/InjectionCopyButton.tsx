@@ -58,7 +58,9 @@ function cleanStackTrace(raw: string): string {
   const lines = raw.split("\n");
   const useful = lines.filter((line) => !CHUNK_STACK_PATTERN.test(line));
   // If all lines were chunks, keep original first line for minimal context
-  if (useful.length === 0 && lines.length > 0) return lines[0];
+  if (useful.length === 0 && lines.length > 0) {
+    return lines[0];
+  }
 
   return useful.join("\n");
 }
@@ -203,11 +205,19 @@ export function InjectionCopyButton() {
     let pollTimerId: ReturnType<typeof setInterval> | null = null;
 
     const applyCount = (newCount: number): void => {
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
+
       if (newCount > prevCount && prevCount >= 0) {
         setIsPulsing(true);
-        setTimeout(() => { if (!cancelled) setIsPulsing(false); }, 3000);
+        setTimeout(() => {
+          if (!cancelled) {
+            setIsPulsing(false);
+          } 
+        }, 3000);
       }
+
       prevCount = newCount;
       setErrorCount(newCount);
     };
@@ -217,8 +227,9 @@ export function InjectionCopyButton() {
         const res = await sendMessage<{ errors: ErrorEntry[] }>({ type: "GET_ACTIVE_ERRORS" });
         applyCount(res.errors?.length ?? 0);
       } catch (err) { 
- /* silent */
-        logError("AutoCatch", "Automatically caught swallowed error", err); } // allow-swallow: poll failure is non-critical; next tick retries
+        /* silent */
+        logError("AutoCatch", "Automatically caught swallowed error", err); 
+      } // allow-swallow: poll failure is non-critical; next tick retries
     };
 
     // Real-time listener — same broadcast use-error-count.ts subscribes to.
@@ -240,26 +251,41 @@ export function InjectionCopyButton() {
         runtime!.onMessage!.addListener(handleBroadcast);
         listenerAttached = true;
       } catch (err) { 
- /* extension context invalidated */
-        logError("AutoCatch", "Automatically caught swallowed error", err); } // allow-swallow: extension context invalidated during teardown
+        /* extension context invalidated */
+        logError("AutoCatch", "Automatically caught swallowed error", err); 
+      } // allow-swallow: extension context invalidated during teardown
     }
 
     // PERF-7-style visibility pause: only poll while visible.
     const startPoll = (): void => {
-      if (pollTimerId !== null) return;
+      if (pollTimerId !== null) {
+        return;
+      }
+
       // 60s when the broadcast is wired (fallback only); 15s otherwise.
       const intervalMs = listenerAttached ? 60_000 : 15_000;
       pollTimerId = setInterval(() => void poll(), intervalMs);
     };
+
     const stopPoll = (): void => {
-      if (pollTimerId !== null) { clearInterval(pollTimerId); pollTimerId = null; }
+      if (pollTimerId !== null) {
+        clearInterval(pollTimerId); pollTimerId = null; 
+      }
     };
+
     const onVisChange = (): void => {
-      if (document.hidden) stopPoll(); else startPoll();
+      if (document.hidden) {
+        stopPoll();
+      } else {
+        startPoll();
+      }
     };
 
     void poll();
-    if (!document.hidden) startPoll();
+    if (!document.hidden) {
+      startPoll();
+    }
+
     document.addEventListener("visibilitychange", onVisChange);
 
     return () => {
@@ -267,9 +293,12 @@ export function InjectionCopyButton() {
       stopPoll();
       document.removeEventListener("visibilitychange", onVisChange);
       if (listenerAttached) {
-        try { runtime!.onMessage!.removeListener(handleBroadcast); } catch (err) { 
- /* ignore */
-          logError("AutoCatch", "Automatically caught swallowed error", err); } // allow-swallow: extension context already torn down
+        try {
+ runtime!.onMessage!.removeListener(handleBroadcast); 
+        } catch (err) { 
+          /* ignore */
+          logError("AutoCatch", "Automatically caught swallowed error", err); 
+        } // allow-swallow: extension context already torn down
       }
     };
   }, []);
@@ -286,7 +315,10 @@ export function InjectionCopyButton() {
         // Fetch verification from active tab's injection record
         (async () => {
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-          if (!tab?.id) return null;
+          if (!tab?.id) {
+            return null;
+          }
+
           const res = await sendMessage<{ injections: Record<number, unknown> }>({ type: "GET_TAB_INJECTIONS", tabId: tab.id });
           const record = res?.injections?.[tab.id] as { verification?: VerificationResult } | null;
 

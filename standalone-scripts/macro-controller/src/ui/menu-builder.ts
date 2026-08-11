@@ -52,7 +52,9 @@ function createForceMoveInFlightTracker(): { isInFlight: () => boolean; set: () 
     isInFlight: () => inFlight,
     set: () => {
       inFlight = true;
-      setTimeout(function() { inFlight = false; }, 8000);
+      setTimeout(function() {
+        inFlight = false; 
+      }, 8000);
     },
   };
 }
@@ -84,17 +86,31 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
   _addReadSubmenu(menuCtx, menuDropdown);
 
   menuDropdown.appendChild(createMenuSep());
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📜', 'Changelog', 'View version history and recent changes', function() { showChangelogModal(); }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '🗄️', 'Database', 'Browse project database tables and rows', function() { showDatabaseModal(); }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📂', 'Projects', 'Show open Lovable projects grouped by workspace', function() { showProjectsModal(); }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '💰', 'Credit Totals', 'Show aggregated credit usage across workspaces', function() { showCreditTotalsModal(); }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📋', 'Task Queue', 'View pending and active prompt tasks', function() { showTaskQueueModal(); }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📖', 'Chat History', 'Browse and export chat submissions for this project', function() { showChatHistoryModal(); }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📜', 'Changelog', 'View version history and recent changes', function() {
+    showChangelogModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '🗄️', 'Database', 'Browse project database tables and rows', function() {
+    showDatabaseModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📂', 'Projects', 'Show open Lovable projects grouped by workspace', function() {
+    showProjectsModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '💰', 'Credit Totals', 'Show aggregated credit usage across workspaces', function() {
+    showCreditTotalsModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📋', 'Task Queue', 'View pending and active prompt tasks', function() {
+    showTaskQueueModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📖', 'Chat History', 'Browse and export chat submissions for this project', function() {
+    showChatHistoryModal(); 
+  }));
 
   _addAutoAttachSection(menuCtx, menuDropdown);
 
   menuDropdown.appendChild(createMenuSep());
-  menuDropdown.appendChild(createMenuItem(menuCtx, 'ℹ️', 'About', 'About MacroLoop Controller', function() { showAboutModal(); }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, 'ℹ️', 'About', 'About MacroLoop Controller', function() {
+    showAboutModal(); 
+  }));
 
   // Menu button click handler
   menuBtn.onclick = function(e: Event) {
@@ -110,10 +126,13 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
       menuDropdown.style.display = 'block';
     }
   };
+
   document.addEventListener('click', function() {
     menuDropdown.style.display = 'none';
     const subs = document.querySelectorAll('[data-marco-submenu]');
-    for (const sub of Array.from(subs)) { (sub as HTMLElement).style.display = 'none'; }
+    for (const sub of Array.from(subs)) {
+      (sub as HTMLElement).style.display = 'none'; 
+    }
   });
   menuContainer.appendChild(menuBtn);
   document.body.appendChild(menuDropdown);
@@ -143,15 +162,21 @@ function _addLoopSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
 function _addForceSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement, forceMoveTracker: { isInFlight: () => boolean; set: () => void }): void {
   const forceMenu = createSubmenu(menuCtx, '⚡', 'Force');
   forceMenu.panel.appendChild(createMenuItem(menuCtx, '⏫', 'Force Move Up', 'Force move project to previous workspace via API (Ctrl+Up)', function() {
-    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn');
+    if (forceMoveTracker.isInFlight()) {
+      log('Force move: cooldown active', 'warn');
 
- return; }
+      return; 
+    }
+
     forceMoveTracker.set(); moveToAdjacentWorkspace('up');
   }));
   forceMenu.panel.appendChild(createMenuItem(menuCtx, '⏬', 'Force Move Down', 'Force move project to next workspace via API (Ctrl+Down)', function() {
-    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn');
+    if (forceMoveTracker.isInFlight()) {
+      log('Force move: cooldown active', 'warn');
 
- return; }
+      return; 
+    }
+
     forceMoveTracker.set(); moveToAdjacentWorkspace('down');
   }));
   menuDropdown.appendChild(forceMenu.el);
@@ -184,7 +209,9 @@ function downloadTextFile(fileName: string, content: string, mimeType: string): 
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
-  setTimeout(function() { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
+  setTimeout(function() {
+    URL.revokeObjectURL(url); 
+  }, Timings.TIMEOUT_SHORT);
 }
 
 async function fetchBundledMacroControllerSource(): Promise<ExtensionResponse> {
@@ -219,10 +246,15 @@ function formatDiagnosticDump(diag: DiagnosticDump): string {
 
 function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement): void {
   const exportMenu = createSubmenu(menuCtx, '📦', 'Export');
-  exportMenu.panel.appendChild(createMenuItem(menuCtx, '📋', 'Export CSV', 'Export all workspaces + credits as CSV', function() { exportWorkspacesAsCsv(); }));
+  exportMenu.panel.appendChild(createMenuItem(menuCtx, '📋', 'Export CSV', 'Export all workspaces + credits as CSV', function() {
+    exportWorkspacesAsCsv(); 
+  }));
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '📥', 'Download Bundle', 'Download bundle (xpath-utils + macro-looping) as .js file', function() {
     void fetchBundleSource().then(function(bundle) {
-      if (!bundle) return;
+      if (!bundle) {
+        return;
+      }
+
       const now = new Date();
       const fullExport = buildBundleHeader(bundle, now) + bundle;
       downloadTextFile('automator-bundle-v' + VERSION + '-' + now.toISOString().replace(/[:.]/g, '-').substring(0, 19) + '.js', fullExport, 'application/javascript');
@@ -232,7 +264,10 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
   }));
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '📋', 'JS Bundle', 'Copy bundle to clipboard', function() {
     void fetchBundleSource().then(function(bundle) {
-      if (!bundle) return;
+      if (!bundle) {
+        return;
+      }
+
       navigator.clipboard.writeText(bundle).then(function() {
         log('Copy JS: Copied to clipboard (' + bundle.length + ' chars)', 'success');
         showToast('JS bundle copied ✓', 'success');
@@ -250,6 +285,7 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
 
       return;
     }
+
     const now = new Date();
     const text = formatDiagnosticDump(result);
     downloadTextFile('macroloop-diagnostic-dump-' + now.toISOString().replace(/[:.]/g, '-').substring(0, 19) + '.txt', text, 'text/plain');
@@ -277,7 +313,7 @@ function _addReadSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
     const s = getAuthDebugSnapshot();
     const bridge = !s.bridgeOutcome.hasAttempted ? 'not attempted'
       : s.bridgeOutcome.isSuccess ? 'OK via ' + s.bridgeOutcome.source
-      : 'FAIL: ' + (s.bridgeOutcome.error || 'unknown');
+        : 'FAIL: ' + (s.bridgeOutcome.error || 'unknown');
     const lines = [
       '=== Auth Trace @ ' + new Date().toISOString() + ' ===',
       'Token Source:    ' + s.tokenSource,
@@ -289,14 +325,18 @@ function _addReadSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
     ];
     navigator.clipboard.writeText(lines.join('\n')).then(function() {
       showToast('✅ Auth trace copied to clipboard', 'success');
-    }).catch(function() { showToast('❌ Failed to copy auth trace', 'error'); });
+    }).catch(function() {
+      showToast('❌ Failed to copy auth trace', 'error'); 
+    });
   }));
   menuDropdown.appendChild(readMenu.el);
 }
 
 // ── Auto Attach Section ──
 function _addAutoAttachSection(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement): void {
-  nsWrite('api.autoAttach.runGroup', function(group: AutoAttachGroupRuntime) { runAutoAttachGroup(group, autoAttachCfg as Record<string, unknown>, showToast); });
+  nsWrite('api.autoAttach.runGroup', function(group: AutoAttachGroupRuntime) {
+    runAutoAttachGroup(group, autoAttachCfg as Record<string, unknown>, showToast); 
+  });
   menuDropdown.appendChild(createMenuSep());
 
   const aaHeader = document.createElement('div');

@@ -26,11 +26,11 @@ import { log } from '../logger';
 import { CREDIT_API_BASE } from '../shared-state';
 import { setGitsyncCache, invalidateGitsyncCache } from '../gitsync-cache';
 import {
-    resolveConnection,
-    probeProgress,
-    wellKnownJobId,
-    PROBE_POLL_INTERVAL_MS,
-    type GitsyncProgressBody,
+  resolveConnection,
+  probeProgress,
+  wellKnownJobId,
+  PROBE_POLL_INTERVAL_MS,
+  type GitsyncProgressBody,
 } from './progress-probe';
 
 /* ------------------------------------------------------------------ */
@@ -79,20 +79,24 @@ export const DEFAULT_ENSURE_DEADLINE_MS = 30_000;
 /* ------------------------------------------------------------------ */
 
 function getSdk(): SdkBridge | null {
-    const sdk = (window as unknown as { marco?: SdkBridge }).marco;
-    if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+  const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
+    return null;
+  }
 
-    return sdk;
+  return sdk;
 }
 
 function pickJobId(body: SyncPostBody | null): string | null {
-    if (!body) return null;
+  if (!body) {
+    return null;
+  }
 
-    return body.job_id ?? body.jobId ?? body.id ?? null;
+  return body.job_id ?? body.jobId ?? body.id ?? null;
 }
 
 function sleep(ms: number): Promise<void> {
-    return new Promise((r) => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 /* ------------------------------------------------------------------ */
@@ -107,50 +111,50 @@ interface PostSyncResult {
 }
 
 async function postSync(
-    wsId: string,
-    connId: string,
-    projectId: string,
+  wsId: string,
+  connId: string,
+  projectId: string,
 ): Promise<PostSyncResult> {
-    const sdk = getSdk();
-    if (!sdk) {
-        const reason = 'sdk_unavailable';
-        logError('EnsureRepo', 'postSync: marco.api.call unavailable'
+  const sdk = getSdk();
+  if (!sdk) {
+    const reason = 'sdk_unavailable';
+    logError('EnsureRepo', 'postSync: marco.api.call unavailable'
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']');
 
-        return { ok: false, jobId: null, httpStatus: 0, reason };
-    }
+    return { ok: false, jobId: null, httpStatus: 0, reason };
+  }
 
-    let resp: SdkApiResponse;
-    try {
-        resp = await sdk.api.call('gitsync.syncProject', {
-            params: { wsId, connId, projectId },
-            baseUrl: CREDIT_API_BASE,
-        });
-    } catch (err: unknown) {
-        logError('EnsureRepo', 'postSync sdk.api.call threw'
+  let resp: SdkApiResponse;
+  try {
+    resp = await sdk.api.call('gitsync.syncProject', {
+      params: { wsId, connId, projectId },
+      baseUrl: CREDIT_API_BASE,
+    });
+  } catch (err: unknown) {
+    logError('EnsureRepo', 'postSync sdk.api.call threw'
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']', err);
 
-        return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
-    }
+    return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
+  }
 
-    if (!resp.ok) {
-        const preview = JSON.stringify(resp.data).substring(0, 200);
-        logError('EnsureRepo', 'postSync HTTP ' + resp.status
+  if (!resp.ok) {
+    const preview = JSON.stringify(resp.data).substring(0, 200);
+    logError('EnsureRepo', 'postSync HTTP ' + resp.status
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']'
             + ' bodyPreview=' + preview);
 
-        return { ok: false, jobId: null, httpStatus: resp.status, reason: 'http_' + resp.status };
-    }
+    return { ok: false, jobId: null, httpStatus: resp.status, reason: 'http_' + resp.status };
+  }
 
-    const jobId = pickJobId(resp.data as SyncPostBody);
-    if (!jobId) {
-        // Server may key job by the well-known id even when not returned.
-        log('[EnsureRepo] postSync ok but no job_id in body → using well-known id', 'info');
+  const jobId = pickJobId(resp.data as SyncPostBody);
+  if (!jobId) {
+    // Server may key job by the well-known id even when not returned.
+    log('[EnsureRepo] postSync ok but no job_id in body → using well-known id', 'info');
 
-        return { ok: true, jobId: wellKnownJobId(projectId), httpStatus: resp.status, reason: 'ok' };
-    }
+    return { ok: true, jobId: wellKnownJobId(projectId), httpStatus: resp.status, reason: 'ok' };
+  }
 
-    return { ok: true, jobId, httpStatus: resp.status, reason: 'ok' };
+  return { ok: true, jobId, httpStatus: resp.status, reason: 'ok' };
 }
 
 /* ------------------------------------------------------------------ */
@@ -158,35 +162,42 @@ async function postSync(
 /* ------------------------------------------------------------------ */
 
 function isTerminal(body: GitsyncProgressBody | null): boolean {
-    if (!body) return false;
-    const s = body.status;
+  if (!body) {
+    return false;
+  }
 
-    return s === 'completed' || s === 'failed';
+  const s = body.status;
+
+  return s === 'completed' || s === 'failed';
 }
 
 async function pollUntilTerminal(
-    wsId: string,
-    projectId: string,
-    jobId: string,
-    deadlineMs: number,
+  wsId: string,
+  projectId: string,
+  jobId: string,
+  deadlineMs: number,
 ): Promise<GitsyncProgressBody | null | 'deadline'> {
-    const start = Date.now();
+  const start = Date.now();
 
-    while (Date.now() - start < deadlineMs) {
-        let body: GitsyncProgressBody | null;
-        try {
-            body = await probeProgress(wsId, projectId, jobId);
-        } catch (err: unknown) {
-            logError('EnsureRepo', 'pollUntilTerminal probe failed'
+  while (Date.now() - start < deadlineMs) {
+    let body: GitsyncProgressBody | null;
+    try {
+      body = await probeProgress(wsId, projectId, jobId);
+    } catch (err: unknown) {
+      logError('EnsureRepo', 'pollUntilTerminal probe failed'
                 + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']', err);
 
-            return null;
-        }
-        if (isTerminal(body)) return body;
-        await sleep(PROBE_POLL_INTERVAL_MS);
+      return null;
     }
 
-    return 'deadline';
+    if (isTerminal(body)) {
+      return body;
+    }
+
+    await sleep(PROBE_POLL_INTERVAL_MS);
+  }
+
+  return 'deadline';
 }
 
 /* ------------------------------------------------------------------ */
@@ -201,62 +212,69 @@ async function pollUntilTerminal(
  * the gitsync-cache so subsequent right-clicks open offline.
  */
 export async function ensureGithubRepo(
-    wsId: string,
-    connId: string,
-    projectId: string,
-    options: EnsureRepoOptions = {},
+  wsId: string,
+  connId: string,
+  projectId: string,
+  options: EnsureRepoOptions = {},
 ): Promise<EnsureRepoOutcome> {
-    if (!wsId || !connId || !projectId) {
-        logError('EnsureRepo', 'missing required arg(s) ws=' + wsId
+  if (!wsId || !connId || !projectId) {
+    logError('EnsureRepo', 'missing required arg(s) ws=' + wsId
             + ' conn=' + connId + ' pid=' + projectId);
 
-        return { status: 'failed', reason: 'missing_args' };
-    }
-    const deadlineMs = options.deadlineMs ?? DEFAULT_ENSURE_DEADLINE_MS;
+    return { status: 'failed', reason: 'missing_args' };
+  }
 
-    if (options.forceRefresh) invalidateGitsyncCache(wsId, projectId);
+  const deadlineMs = options.deadlineMs ?? DEFAULT_ENSURE_DEADLINE_MS;
 
-    // ── 1) Probe first — never POST /sync for already-connected projects.
-    const probed = await resolveConnection(wsId, connId, projectId);
-    if (probed.connected) {
-        setGitsyncCache(wsId, projectId, 'found', probed.repoUrl);
+  if (options.forceRefresh) {
+    invalidateGitsyncCache(wsId, projectId);
+  }
 
-        return { status: 'connected', repoUrl: probed.repoUrl, created: false };
-    }
+  // ── 1) Probe first — never POST /sync for already-connected projects.
+  const probed = await resolveConnection(wsId, connId, projectId);
+  if (probed.connected) {
+    setGitsyncCache(wsId, projectId, 'found', probed.repoUrl);
 
-    // ── 2) POST /sync once (no retry).
-    const posted = await postSync(wsId, connId, projectId);
-    if (posted.isFail || !posted.jobId) {
-        setGitsyncCache(wsId, projectId, 'error');
+    return { status: 'connected', repoUrl: probed.repoUrl, created: false };
+  }
 
-        return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };
-    }
-
-    // ── 3) Poll the returned job_id until terminal or deadline.
-    const terminal = await pollUntilTerminal(wsId, projectId, posted.jobId, deadlineMs);
-    if (terminal === 'deadline') {
-        log('[EnsureRepo] deadline ws=' + wsId + ' pid=' + projectId
-            + ' job=' + posted.jobId + ' after ' + deadlineMs + 'ms', 'info');
-
-        return { status: 'syncing', jobId: posted.jobId, reason: 'deadline' };
-    }
-    if (terminal === null) {
-        setGitsyncCache(wsId, projectId, 'error');
-
-        return { status: 'failed', reason: 'poll_error' };
-    }
-    if (terminal.status === 'failed') {
-        setGitsyncCache(wsId, projectId, 'error');
-
-        return { status: 'failed', reason: 'sync_failed' };
-    }
-    const url = terminal.result?.repo_url;
-    if (typeof url === 'string' && url.length > 0) {
-        setGitsyncCache(wsId, projectId, 'found', url);
-
-        return { status: 'connected', repoUrl: url, created: true };
-    }
+  // ── 2) POST /sync once (no retry).
+  const posted = await postSync(wsId, connId, projectId);
+  if (posted.isFail || !posted.jobId) {
     setGitsyncCache(wsId, projectId, 'error');
 
-    return { status: 'failed', reason: 'no_repo_url' };
+    return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };
+  }
+
+  // ── 3) Poll the returned job_id until terminal or deadline.
+  const terminal = await pollUntilTerminal(wsId, projectId, posted.jobId, deadlineMs);
+  if (terminal === 'deadline') {
+    log('[EnsureRepo] deadline ws=' + wsId + ' pid=' + projectId
+            + ' job=' + posted.jobId + ' after ' + deadlineMs + 'ms', 'info');
+
+    return { status: 'syncing', jobId: posted.jobId, reason: 'deadline' };
+  }
+
+  if (terminal === null) {
+    setGitsyncCache(wsId, projectId, 'error');
+
+    return { status: 'failed', reason: 'poll_error' };
+  }
+
+  if (terminal.status === 'failed') {
+    setGitsyncCache(wsId, projectId, 'error');
+
+    return { status: 'failed', reason: 'sync_failed' };
+  }
+
+  const url = terminal.result?.repo_url;
+  if (typeof url === 'string' && url.length > 0) {
+    setGitsyncCache(wsId, projectId, 'found', url);
+
+    return { status: 'connected', repoUrl: url, created: true };
+  }
+
+  setGitsyncCache(wsId, projectId, 'error');
+
+  return { status: 'failed', reason: 'no_repo_url' };
 }

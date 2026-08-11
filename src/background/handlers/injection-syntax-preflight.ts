@@ -40,26 +40,26 @@ export interface InlineSyntaxCheckScript {
  * are loaded later from disk) during the preflight pass.
  */
 export function getInlineSyntaxCheckScript(
-    value: InjectionRequestScript,
+  value: InjectionRequestScript,
 ): InlineSyntaxCheckScript | null {
-    if (typeof value !== "object" || value === null) {
-        return null;
-    }
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
 
-    const candidate = value as Partial<InjectableScript> & {
+  const candidate = value as Partial<InjectableScript> & {
         id?: string;
         code?: string;
         name?: string;
     };
-    if (typeof candidate.id !== "string" || typeof candidate.code !== "string") {
-        return null;
-    }
+  if (typeof candidate.id !== "string" || typeof candidate.code !== "string") {
+    return null;
+  }
 
-    return {
-        id: candidate.id,
-        name: typeof candidate.name === "string" ? candidate.name : candidate.id,
-        code: candidate.code,
-    };
+  return {
+    id: candidate.id,
+    name: typeof candidate.name === "string" ? candidate.name : candidate.id,
+    code: candidate.code,
+  };
 }
 
 /**
@@ -68,24 +68,24 @@ export function getInlineSyntaxCheckScript(
  * cleanly. Never throws.
  */
 export function detectSyntaxError(code: string): string | null {
-    try {
-        parse(`(function(){\n${code}\n});`, {
-            ecmaVersion: "latest",
-            sourceType: "script",
-            allowReturnOutsideFunction: false,
-        });
+  try {
+    parse(`(function(){\n${code}\n});`, {
+      ecmaVersion: "latest",
+      sourceType: "script",
+      allowReturnOutsideFunction: false,
+    });
 
-        return null;
-    } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        console.debug(
-            "[injection:syntax-preflight] detectSyntaxError caught parse error (codeLen=%d): %s",
-            code.length,
-            message,
-        );
+    return null;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.debug(
+      "[injection:syntax-preflight] detectSyntaxError caught parse error (codeLen=%d): %s",
+      code.length,
+      message,
+    );
 
-        return message;
-    }
+    return message;
+  }
 }
 
 /**
@@ -95,57 +95,57 @@ export function detectSyntaxError(code: string): string | null {
  */
 // eslint-disable-next-line max-lines-per-function
 export function requestHasInlineSyntaxError(
-    scripts: InjectionRequestScript[],
+  scripts: InjectionRequestScript[],
 ): boolean {
-    let inlineCandidateCount = 0;
-    let firstFailureId: string | null = null;
-    let firstFailureMessage: string | null = null;
+  let inlineCandidateCount = 0;
+  let firstFailureId: string | null = null;
+  let firstFailureMessage: string | null = null;
 
-    const triggered = scripts.some((script, index) => {
-        const inlineScript = getInlineSyntaxCheckScript(script);
-        if (inlineScript === null) {
-            return false;
-        }
+  const triggered = scripts.some((script, index) => {
+    const inlineScript = getInlineSyntaxCheckScript(script);
+    if (inlineScript === null) {
+      return false;
+    }
 
-        inlineCandidateCount += 1;
-        const syntaxError = detectSyntaxError(inlineScript.code);
-        if (syntaxError === null) {
-            console.debug(
-                "[injection:syntax-preflight] script #%d id=%s name=%s parsed cleanly (codeLen=%d)",
-                index,
-                inlineScript.id,
-                inlineScript.name ?? inlineScript.id,
-                inlineScript.code.length,
-            );
+    inlineCandidateCount += 1;
+    const syntaxError = detectSyntaxError(inlineScript.code);
+    if (syntaxError === null) {
+      console.debug(
+        "[injection:syntax-preflight] script #%d id=%s name=%s parsed cleanly (codeLen=%d)",
+        index,
+        inlineScript.id,
+        inlineScript.name ?? inlineScript.id,
+        inlineScript.code.length,
+      );
 
-            return false;
-        }
+      return false;
+    }
 
-        firstFailureId = inlineScript.id;
-        firstFailureMessage = syntaxError;
-        console.warn(
-            "[injection:syntax-preflight] FAIL — script #%d id=%s name=%s codeLen=%d → %s",
-            index,
-            inlineScript.id,
-            inlineScript.name ?? inlineScript.id,
-            inlineScript.code.length,
-            syntaxError,
-        );
-
-        return true;
-    });
-
-    console.log(
-        "[injection:syntax-preflight] requestHasInlineSyntaxError → %s (inline candidates=%d/%d, total scripts=%d, firstFailure=%s%s)",
-        triggered,
-        inlineCandidateCount,
-        scripts.length,
-        scripts.length,
-        firstFailureId ?? "none",
-        firstFailureMessage !== null ? ` "${firstFailureMessage}"` : "",
+    firstFailureId = inlineScript.id;
+    firstFailureMessage = syntaxError;
+    console.warn(
+      "[injection:syntax-preflight] FAIL — script #%d id=%s name=%s codeLen=%d → %s",
+      index,
+      inlineScript.id,
+      inlineScript.name ?? inlineScript.id,
+      inlineScript.code.length,
+      syntaxError,
     );
 
-    return triggered;
+    return true;
+  });
+
+  console.log(
+    "[injection:syntax-preflight] requestHasInlineSyntaxError → %s (inline candidates=%d/%d, total scripts=%d, firstFailure=%s%s)",
+    triggered,
+    inlineCandidateCount,
+    scripts.length,
+    scripts.length,
+    firstFailureId ?? "none",
+    firstFailureMessage !== null ? ` "${firstFailureMessage}"` : "",
+  );
+
+  return triggered;
 }
 
 /**
@@ -154,43 +154,43 @@ export function requestHasInlineSyntaxError(
  * without re-parsing. Always returns an empty array when nothing fails.
  */
 export function collectInlineSyntaxFailures(
-    scripts: InjectionRequestScript[],
+  scripts: InjectionRequestScript[],
 ): InjectionResult[] {
-    const failures: InjectionResult[] = [];
+  const failures: InjectionResult[] = [];
 
-    for (const script of scripts) {
-        const inlineScript = getInlineSyntaxCheckScript(script);
-        if (inlineScript === null) {
-            continue;
-        }
-
-        const syntaxError = detectSyntaxError(inlineScript.code);
-        if (syntaxError === null) {
-            continue;
-        }
-
-        const scriptName = inlineScript.name ?? inlineScript.id;
-        console.warn(
-            "[injection:syntax-preflight] collectInlineSyntaxFailures recorded id=%s name=%s message=%s",
-            inlineScript.id,
-            scriptName,
-            syntaxError,
-        );
-        failures.push({
-            scriptId: inlineScript.id,
-            scriptName,
-            isSuccess: false,
-            errorMessage: `Script "${scriptName}" has a syntax error: ${syntaxError}`,
-            durationMs: 0,
-        });
+  for (const script of scripts) {
+    const inlineScript = getInlineSyntaxCheckScript(script);
+    if (inlineScript === null) {
+      continue;
     }
 
-    console.log(
-        "[injection:syntax-preflight] collectInlineSyntaxFailures → %d failure(s) of %d total script(s): [%s]",
-        failures.length,
-        scripts.length,
-        failures.map((f) => f.scriptId).join(", ") || "none",
-    );
+    const syntaxError = detectSyntaxError(inlineScript.code);
+    if (syntaxError === null) {
+      continue;
+    }
 
-    return failures;
+    const scriptName = inlineScript.name ?? inlineScript.id;
+    console.warn(
+      "[injection:syntax-preflight] collectInlineSyntaxFailures recorded id=%s name=%s message=%s",
+      inlineScript.id,
+      scriptName,
+      syntaxError,
+    );
+    failures.push({
+      scriptId: inlineScript.id,
+      scriptName,
+      isSuccess: false,
+      errorMessage: `Script "${scriptName}" has a syntax error: ${syntaxError}`,
+      durationMs: 0,
+    });
+  }
+
+  console.log(
+    "[injection:syntax-preflight] collectInlineSyntaxFailures → %d failure(s) of %d total script(s): [%s]",
+    failures.length,
+    scripts.length,
+    failures.map((f) => f.scriptId).join(", ") || "none",
+  );
+
+  return failures;
 }

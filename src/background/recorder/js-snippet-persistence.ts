@@ -36,71 +36,72 @@ export interface JsSnippetDraft {
 }
 
 function rowToSnippet(values: ReadonlyArray<unknown>): JsSnippetRow {
-    return {
-        JsSnippetId: values[0] as number,
-        Name: values[1] as string,
-        Description: values[2] as string,
-        Body: values[3] as string,
-        CreatedAt: values[4] as string,
-        UpdatedAt: values[5] as string,
-    };
+  return {
+    JsSnippetId: values[0] as number,
+    Name: values[1] as string,
+    Description: values[2] as string,
+    Body: values[3] as string,
+    CreatedAt: values[4] as string,
+    UpdatedAt: values[5] as string,
+  };
 }
 
 function readSnippetByName(
-    db: SqlJsDatabase,
-    name: string,
+  db: SqlJsDatabase,
+  name: string,
 ): JsSnippetRow {
-    const result = db.exec(
-        `SELECT JsSnippetId, Name, Description, Body, CreatedAt, UpdatedAt
+  const result = db.exec(
+    `SELECT JsSnippetId, Name, Description, Body, CreatedAt, UpdatedAt
          FROM JsSnippet WHERE Name = ?`,
-        [name],
-    );
-    const values = result[0]?.values[0];
-    if (!values) {
-        throw new Error(`JsSnippet "${name}" not found after upsert`);
-    }
+    [name],
+  );
+  const values = result[0]?.values[0];
+  if (!values) {
+    throw new Error(`JsSnippet "${name}" not found after upsert`);
+  }
 
-    return rowToSnippet(values);
+  return rowToSnippet(values);
 }
 
 export function upsertJsSnippetRow(
-    db: SqlJsDatabase,
-    draft: JsSnippetDraft,
+  db: SqlJsDatabase,
+  draft: JsSnippetDraft,
 ): JsSnippetRow {
-    if (!draft.Name || draft.Name.trim().length === 0) {
-        throw new Error("JsSnippet Name cannot be empty");
-    }
-    validateJsBody(draft.Body);
+  if (!draft.Name || draft.Name.trim().length === 0) {
+    throw new Error("JsSnippet Name cannot be empty");
+  }
 
-    db.run(
-        `INSERT INTO JsSnippet (Name, Description, Body)
+  validateJsBody(draft.Body);
+
+  db.run(
+    `INSERT INTO JsSnippet (Name, Description, Body)
          VALUES (?, ?, ?)
          ON CONFLICT(Name) DO UPDATE SET
              Description = excluded.Description,
              Body        = excluded.Body,
              UpdatedAt   = datetime('now')`,
-        [draft.Name, draft.Description, draft.Body],
-    );
+    [draft.Name, draft.Description, draft.Body],
+  );
 
-    return readSnippetByName(db, draft.Name);
+  return readSnippetByName(db, draft.Name);
 }
 
 export function listJsSnippetRows(
-    db: SqlJsDatabase,
+  db: SqlJsDatabase,
 ): ReadonlyArray<JsSnippetRow> {
-    const result = db.exec(
-        `SELECT JsSnippetId, Name, Description, Body, CreatedAt, UpdatedAt
+  const result = db.exec(
+    `SELECT JsSnippetId, Name, Description, Body, CreatedAt, UpdatedAt
          FROM JsSnippet ORDER BY Name ASC`,
-    );
+  );
 
-    return (result[0]?.values ?? []).map(rowToSnippet);
+  return (result[0]?.values ?? []).map(rowToSnippet);
 }
 
 export function deleteJsSnippetRow(
-    db: SqlJsDatabase,
-    jsSnippetId: number,
+  db: SqlJsDatabase,
+  jsSnippetId: number,
 ): void {
-    db.run("DELETE FROM JsSnippet WHERE JsSnippetId = ?", [jsSnippetId]);
+  db.run("DELETE FROM JsSnippet WHERE JsSnippetId = ?", [jsSnippetId]);
 }
 
 /* ------------------------------------------------------------------ */
@@ -108,29 +109,29 @@ export function deleteJsSnippetRow(
 /* ------------------------------------------------------------------ */
 
 export async function upsertJsSnippet(
-    projectSlug: string,
-    draft: JsSnippetDraft,
+  projectSlug: string,
+  draft: JsSnippetDraft,
 ): Promise<JsSnippetRow> {
-    const mgr = await initProjectDb(projectSlug);
-    const row = upsertJsSnippetRow(mgr.getDb(), draft);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const row = upsertJsSnippetRow(mgr.getDb(), draft);
+  mgr.markDirty();
 
-    return row;
+  return row;
 }
 
 export async function listJsSnippets(
-    projectSlug: string,
+  projectSlug: string,
 ): Promise<ReadonlyArray<JsSnippetRow>> {
-    const mgr = await initProjectDb(projectSlug);
+  const mgr = await initProjectDb(projectSlug);
 
-    return listJsSnippetRows(mgr.getDb());
+  return listJsSnippetRows(mgr.getDb());
 }
 
 export async function deleteJsSnippet(
-    projectSlug: string,
-    jsSnippetId: number,
+  projectSlug: string,
+  jsSnippetId: number,
 ): Promise<void> {
-    const mgr = await initProjectDb(projectSlug);
-    deleteJsSnippetRow(mgr.getDb(), jsSnippetId);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  deleteJsSnippetRow(mgr.getDb(), jsSnippetId);
+  mgr.markDirty();
 }

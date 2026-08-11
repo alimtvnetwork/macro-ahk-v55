@@ -20,7 +20,7 @@ import { logCaughtError, BgLogTag} from "./bg-logger";
 const NS_CACHE_PREFIX = "ns_cache_";
 
 export function nsCacheKey(projectId: string): string {
-    return `${NS_CACHE_PREFIX}${projectId}`;
+  return `${NS_CACHE_PREFIX}${projectId}`;
 }
 
 export interface NsCacheEntry {
@@ -33,58 +33,58 @@ export interface NsCacheEntry {
  * Called on project save, file save/delete, config save.
  */
 export async function rebuildNamespaceCache(project: StoredProject): Promise<void> {
+  try {
+    const projectSlug = project.slug || slugify(project.name);
+    const codeName = project.codeName || toCodeName(projectSlug);
+
+    let fileCache: Array<{ name: string; data: string }> = [];
     try {
-        const projectSlug = project.slug || slugify(project.name);
-        const codeName = project.codeName || toCodeName(projectSlug);
-
-        let fileCache: Array<{ name: string; data: string }> = [];
-        try {
-            fileCache = getFilesByProject(project.id, 50);
-        } catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
-        } // allow-swallow: db not bound yet at cache rebuild time
-
-        const nsScript = buildProjectNamespaceScript({
-            codeName,
-            slug: projectSlug,
-            projectName: project.name,
-            projectVersion: project.version,
-            projectId: project.id,
-            description: project.description,
-            dependencies: (project.dependencies ?? []).map((d) => ({
-                projectId: d.projectId,
-                version: d.version,
-            })),
-            scripts: (project.scripts ?? []).map((s, i) => ({
-                name: s.path.split("/").pop() ?? s.path,
-                order: s.order ?? i,
-                isEnabled: true,
-            })),
-            fileCache,
-            cookieBindings: (project.cookies ?? []).map((c) => ({
-                cookieName: c.cookieName,
-                url: c.url,
-                role: c.role,
-            })),
-        });
-
-        const entry: NsCacheEntry = { script: nsScript, builtAt: Date.now() };
-        await chrome.storage.local.set({ [nsCacheKey(project.id)]: entry });
-        console.log("[ns-cache] Rebuilt namespace cache for \"%s\" (%d chars)", project.name, nsScript.length);
+      fileCache = getFilesByProject(project.id, 50);
     } catch (err) {
-        logCaughtError(BgLogTag.NS_CACHE, `Failed to rebuild cache for ${project.id}`, err);
-    }
+      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
+    } // allow-swallow: db not bound yet at cache rebuild time
+
+    const nsScript = buildProjectNamespaceScript({
+      codeName,
+      slug: projectSlug,
+      projectName: project.name,
+      projectVersion: project.version,
+      projectId: project.id,
+      description: project.description,
+      dependencies: (project.dependencies ?? []).map((d) => ({
+        projectId: d.projectId,
+        version: d.version,
+      })),
+      scripts: (project.scripts ?? []).map((s, i) => ({
+        name: s.path.split("/").pop() ?? s.path,
+        order: s.order ?? i,
+        isEnabled: true,
+      })),
+      fileCache,
+      cookieBindings: (project.cookies ?? []).map((c) => ({
+        cookieName: c.cookieName,
+        url: c.url,
+        role: c.role,
+      })),
+    });
+
+    const entry: NsCacheEntry = { script: nsScript, builtAt: Date.now() };
+    await chrome.storage.local.set({ [nsCacheKey(project.id)]: entry });
+    console.log("[ns-cache] Rebuilt namespace cache for \"%s\" (%d chars)", project.name, nsScript.length);
+  } catch (err) {
+    logCaughtError(BgLogTag.NS_CACHE, `Failed to rebuild cache for ${project.id}`, err);
+  }
 }
 
 /**
  * Invalidates (removes) the namespace cache for a project.
  */
 export async function invalidateNamespaceCache(projectId: string): Promise<void> {
-    try {
-        await chrome.storage.local.remove(nsCacheKey(projectId));
-    } catch (err) {
+  try {
+    await chrome.storage.local.remove(nsCacheKey(projectId));
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
-    } // allow-swallow: cache invalidation is best-effort; storage failure is benign
+  } // allow-swallow: cache invalidation is best-effort; storage failure is benign
 }
 
 /**
@@ -92,17 +92,17 @@ export async function invalidateNamespaceCache(projectId: string): Promise<void>
  * Returns a Map of projectId → cached script string (or undefined for cache misses).
  */
 export async function readNamespaceCaches(
-    projectIds: string[],
+  projectIds: string[],
 ): Promise<Map<string, string>> {
-    const keys = projectIds.map(nsCacheKey);
-    const result = await chrome.storage.local.get(keys);
-    const map = new Map<string, string>();
-    for (const pid of projectIds) {
-        const entry = result[nsCacheKey(pid)] as NsCacheEntry | undefined;
-        if (entry?.script) {
-            map.set(pid, entry.script);
-        }
+  const keys = projectIds.map(nsCacheKey);
+  const result = await chrome.storage.local.get(keys);
+  const map = new Map<string, string>();
+  for (const pid of projectIds) {
+    const entry = result[nsCacheKey(pid)] as NsCacheEntry | undefined;
+    if (entry?.script) {
+      map.set(pid, entry.script);
     }
+  }
 
-    return map;
+  return map;
 }

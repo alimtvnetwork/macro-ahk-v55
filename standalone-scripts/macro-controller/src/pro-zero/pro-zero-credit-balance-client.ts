@@ -17,39 +17,45 @@ import { logRequested, logReceived, logFailed } from './pro-zero-logger';
 import { toErrorMessage } from '../error-utils';
 
 function buildHttpError(status: number): CreditBalanceFetchResult {
-    logFailed(CreditBalanceFetchStatusType.HTTP_ERROR, 'httpStatus=' + status);
+  logFailed(CreditBalanceFetchStatusType.HTTP_ERROR, 'httpStatus=' + status);
 
-    return { status: CreditBalanceFetchStatusType.HTTP_ERROR, httpStatus: status };
+  return { status: CreditBalanceFetchStatusType.HTTP_ERROR, httpStatus: status };
 }
 
 function buildParseError(reason: string): CreditBalanceFetchResult {
-    logFailed(CreditBalanceFetchStatusType.PARSE_ERROR, 'reason=' + reason);
+  logFailed(CreditBalanceFetchStatusType.PARSE_ERROR, 'reason=' + reason);
 
-    return { status: CreditBalanceFetchStatusType.PARSE_ERROR, reason };
+  return { status: CreditBalanceFetchStatusType.PARSE_ERROR, reason };
 }
 
 function buildNetworkError(reason: string): CreditBalanceFetchResult {
-    logFailed(CreditBalanceFetchStatusType.NETWORK_ERROR, 'reason=' + reason);
+  logFailed(CreditBalanceFetchStatusType.NETWORK_ERROR, 'reason=' + reason);
 
-    return { status: CreditBalanceFetchStatusType.NETWORK_ERROR, reason };
+  return { status: CreditBalanceFetchStatusType.NETWORK_ERROR, reason };
 }
 
 function handleResponse(resp: SdkBalanceResponse): CreditBalanceFetchResult {
-    if (resp.isFail) return buildHttpError(resp.status);
-    const parsed = parseCreditBalanceResponse(resp.data);
-    if (!parsed.isOk) return buildParseError(parsed.reason);
-    logReceived(parsed.data.total_granted, parsed.data.total_remaining, parsed.data.total_billing_period_used);
+  if (resp.isFail) {
+    return buildHttpError(resp.status);
+  }
 
-    return { status: CreditBalanceFetchStatusType.SUCCESS, data: parsed.data };
+  const parsed = parseCreditBalanceResponse(resp.data);
+  if (!parsed.isOk) {
+    return buildParseError(parsed.reason);
+  }
+
+  logReceived(parsed.data.total_granted, parsed.data.total_remaining, parsed.data.total_billing_period_used);
+
+  return { status: CreditBalanceFetchStatusType.SUCCESS, data: parsed.data };
 }
 
 export async function fetchProZeroCreditBalance(workspaceId: string): Promise<CreditBalanceFetchResult> {
-    logRequested(workspaceId);
-    try {
-        const resp = await callFetchBalance(workspaceId);
+  logRequested(workspaceId);
+  try {
+    const resp = await callFetchBalance(workspaceId);
 
-        return handleResponse(resp);
-    } catch (caught: unknown) {
-        return buildNetworkError(toErrorMessage(caught));
-    }
+    return handleResponse(resp);
+  } catch (caught: unknown) {
+    return buildNetworkError(toErrorMessage(caught));
+  }
 }

@@ -18,18 +18,18 @@ import type { ExtensionSettings } from "./handlers/settings-handler";
 
 // eslint-disable-next-line max-lines-per-function
 export function buildSettingsNamespaceScript(
-    settings: ExtensionSettings,
-    llmGuide?: string,
+  settings: ExtensionSettings,
+  llmGuide?: string,
 ): string {
-    const safe = (v: string) =>
-        v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
+  const safe = (v: string) =>
+    v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
 
-    // Escape the LLM guide for embedding as a JS string literal
-    const guideStr = llmGuide
-        ? `"${safe(llmGuide)}"`
-        : '""';
+  // Escape the LLM guide for embedding as a JS string literal
+  const guideStr = llmGuide
+    ? `"${safe(llmGuide)}"`
+    : '""';
 
-    return `;(function(){
+  return `;(function(){
 /* RiseupAsiaMacroExt.Settings + docs — read-only extension settings */
 var root = window.RiseupAsiaMacroExt;
 if (!root) { root = { Projects: {} }; window.RiseupAsiaMacroExt = root; }

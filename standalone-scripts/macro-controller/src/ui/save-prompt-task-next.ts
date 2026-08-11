@@ -31,8 +31,13 @@ export function buildTaskNextSubmenu(
   submenu.style.cssText = 'display:none;position:fixed;min-width:180px;max-height:80vh;overflow-y:auto;background:#1e1e2e;border:1px solid #7c3aed;border-radius:8px;z-index:100010;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
   document.body.appendChild(submenu);
 
-  submenu.onmouseover = function () { submenu.style.display = 'block'; };
-  submenu.onmouseout = function () { submenu.style.display = 'none'; };
+  submenu.onmouseover = function () {
+    submenu.style.display = 'block'; 
+  };
+
+  submenu.onmouseout = function () {
+    submenu.style.display = 'none'; 
+  };
 
   const positionSubmenu = function(): void {
     const rect = taskNextItem.getBoundingClientRect();
@@ -93,14 +98,21 @@ function buildPresetCountItems(
     const item = document.createElement('div');
     item.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#e0e0e0;';
     item.textContent = 'Next ' + count + ' task' + (count > 1 ? 's' : '');
-    item.onmouseover = function () { (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; };
-    item.onmouseout = function () { (this as HTMLElement).style.background = 'transparent'; };
+    item.onmouseover = function () {
+      (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; 
+    };
+
+    item.onmouseout = function () {
+      (this as HTMLElement).style.background = 'transparent'; 
+    };
+
     item.onclick = function (event) {
       event.stopPropagation();
       dropdown.style.display = 'none';
       submenu.style.display = 'none';
       runTaskNextLoop(taskNextDeps, count);
     };
+
     submenu.appendChild(item);
   }
 }
@@ -126,7 +138,10 @@ function buildCustomCountRow(
   input.max = '999';
   input.placeholder = '#';
   input.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:#e0e0e0;font-size:10px;';
-  input.onclick = function (event) { event.stopPropagation(); };
+  input.onclick = function (event) {
+    event.stopPropagation(); 
+  };
+
   customRow.appendChild(input);
 
   const goButton = document.createElement('span');
@@ -137,9 +152,12 @@ function buildCustomCountRow(
     event.stopPropagation();
     const count = parseInt(input.value);
     const isInvalidCount = !count || count < 1 || count > 999;
-    if (isInvalidCount) { showPasteToast('⚠️ Enter 1–999', true);
+    if (isInvalidCount) {
+      showPasteToast('⚠️ Enter 1–999', true);
 
- return; }
+      return; 
+    }
+
     dropdown.style.display = 'none';
     submenu.style.display = 'none';
     runTaskNextLoop(taskNextDeps, count);
@@ -147,7 +165,9 @@ function buildCustomCountRow(
 
   input.onkeydown = function (event: KeyboardEvent) {
     const isEnter = event.key === 'Enter';
-    if (isEnter) { event.stopPropagation(); goButton.click(); }
+    if (isEnter) {
+      event.stopPropagation(); goButton.click(); 
+    }
   };
 
   customRow.appendChild(goButton);
@@ -164,13 +184,20 @@ function buildSettingsItem(
   const settingsItem = document.createElement('div');
   settingsItem.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#a78bfa;border-top:1px solid rgba(124,58,237,0.2);';
   settingsItem.textContent = '⚙ Settings';
-  settingsItem.onmouseover = function () { (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; };
-  settingsItem.onmouseout = function () { (this as HTMLElement).style.background = 'transparent'; };
+  settingsItem.onmouseover = function () {
+    (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; 
+  };
+
+  settingsItem.onmouseout = function () {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   settingsItem.onclick = function (event) {
     event.stopPropagation();
     dropdown.style.display = 'none';
     submenu.style.display = 'none';
     openTaskNextSettingsModal(taskNextDeps);
   };
+
   submenu.appendChild(settingsItem);
 }

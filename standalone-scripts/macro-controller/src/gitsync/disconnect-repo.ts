@@ -47,7 +47,9 @@ interface SdkBridge {
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
-  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
+    return null;
+  }
 
   return sdk;
 }
@@ -67,6 +69,7 @@ export async function disconnectGithubRepo(
   if (!wsId || !pid) {
     return { status: 'error', message: 'missing wsId or projectId' };
   }
+
   const sdk = getSdk();
   if (!sdk) {
     logError('GitsyncDisconnect', 'marco.api.call unavailable for ws=' + wsId + ' pid=' + pid);
@@ -93,6 +96,7 @@ export async function disconnectGithubRepo(
 
     return { status: 'not_linked' };
   }
+
   if (resp.isFail) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
@@ -129,6 +133,7 @@ export async function confirmAndDisconnectGithubRepo(
 
     return { status: 'error', message: 'confirm_unavailable' };
   }
+
   const ok = askFn(message);
   if (!ok) {
     log('[GitsyncDisconnect] user cancelled ws=' + wsId + ' pid=' + pid, 'info');

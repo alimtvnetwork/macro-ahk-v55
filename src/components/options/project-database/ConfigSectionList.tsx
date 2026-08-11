@@ -28,7 +28,11 @@ export function ConfigSectionList({ sections, edits, saving, editKey, onEditChan
   const toggleSection = (s: string) => {
     setOpenSections((prev) => {
       const next = new Set(prev);
-      if (next.has(s)) next.delete(s); else next.add(s);
+      if (next.has(s)) {
+        next.delete(s);
+      } else {
+        next.add(s);
+      }
 
       return next;
     });

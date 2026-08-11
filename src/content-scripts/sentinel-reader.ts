@@ -30,33 +30,35 @@ export interface SentinelSnapshot {
 
 /** Reads the sentinel synchronously. Returns null when absent or malformed. */
 export function readSentinel(): SentinelSnapshot | null {
-    try {
-        const sentinelEl = document.getElementById(SENTINEL_ID);
-        const isMissing = sentinelEl === null;
-        if (isMissing) {
-            return null;
-        }
-        const fingerprint = sentinelEl.getAttribute(ATTR_FP) ?? "";
-        const projectsCsv = sentinelEl.getAttribute(ATTR_PROJECTS) ?? "";
-        const canRunRaw = sentinelEl.getAttribute(ATTR_CAN_RUN) ?? "false";
-        const trigger = sentinelEl.getAttribute(ATTR_TRIGGER) ?? "";
-        const projectIds = projectsCsv.length > 0
-            ? projectsCsv.split(",").filter((s) => s.length > 0)
-            : [];
-
-        return {
-            fingerprint,
-            projectIds,
-            canRun: canRunRaw === "true",
-            trigger,
-        };
-    } catch (err) { void 0;
-
-        return null;
+  try {
+    const sentinelEl = document.getElementById(SENTINEL_ID);
+    const isMissing = sentinelEl === null;
+    if (isMissing) {
+      return null;
     }
+
+    const fingerprint = sentinelEl.getAttribute(ATTR_FP) ?? "";
+    const projectsCsv = sentinelEl.getAttribute(ATTR_PROJECTS) ?? "";
+    const canRunRaw = sentinelEl.getAttribute(ATTR_CAN_RUN) ?? "false";
+    const trigger = sentinelEl.getAttribute(ATTR_TRIGGER) ?? "";
+    const projectIds = projectsCsv.length > 0
+      ? projectsCsv.split(",").filter((s) => s.length > 0)
+      : [];
+
+    return {
+      fingerprint,
+      projectIds,
+      canRun: canRunRaw === "true",
+      trigger,
+    };
+  } catch (err) {
+    void 0;
+
+    return null;
+  }
 }
 
 /** Convenience: true iff the sentinel says at least one project applies. */
 export function isExtensionApplicableHere(): boolean {
-    return readSentinel()?.canRun === true;
+  return readSentinel()?.canRun === true;
 }

@@ -7,8 +7,8 @@
 import { useEffect } from "react";
 
 import {
-    useRecorderProjectData,
-    type SelectorRow,
+  useRecorderProjectData,
+  type SelectorRow,
 } from "@/hooks/use-recorder-project-data";
 
 import { logError } from "../options-logger";
@@ -44,20 +44,23 @@ export interface RecorderVisualisationController {
 }
 
 export function useRecorderVisualisationController(projectSlug: string): RecorderVisualisationController {
-    const projectData = useRecorderProjectData(projectSlug);
-    const { data, loading, error, reload, loadSelectors, tagsByStep } = projectData;
-    const selection = useRecorderStepSelection(data, loadSelectors);
-    const mutations = useRecorderStepMutations(projectSlug, projectData);
-    const selfTestExport = useRecorderSelfTestExport(projectSlug, reload, data, tagsByStep);
-    useLoadErrorLogger(projectSlug, error);
+  const projectData = useRecorderProjectData(projectSlug);
+  const { data, loading, error, reload, loadSelectors, tagsByStep } = projectData;
+  const selection = useRecorderStepSelection(data, loadSelectors);
+  const mutations = useRecorderStepMutations(projectSlug, projectData);
+  const selfTestExport = useRecorderSelfTestExport(projectSlug, reload, data, tagsByStep);
+  useLoadErrorLogger(projectSlug, error);
 
-    return { projectSlug, data, loading, error, reload, tagsByStep, ...selection, ...mutations, ...selfTestExport };
+  return { projectSlug, data, loading, error, reload, tagsByStep, ...selection, ...mutations, ...selfTestExport };
 }
 
 function useLoadErrorLogger(projectSlug: string, error: string | null): void {
-    useEffect(() => {
-        if (error === null) return;
-        logError("RecorderVisualisationPanel.load",
-            `useRecorderProjectData failed for project='${projectSlug}': ${error}`);
-    }, [error, projectSlug]);
+  useEffect(() => {
+    if (error === null) {
+      return;
+    }
+
+    logError("RecorderVisualisationPanel.load",
+      `useRecorderProjectData failed for project='${projectSlug}': ${error}`);
+  }, [error, projectSlug]);
 }

@@ -45,46 +45,47 @@ export interface PromptRevisionRow {
     Reason: string;
 }
 
-
 type RawSqlOk = SqlBridgeResp;
 
 async function runSql(method: RunSqlMethodType, sql: string): Promise<RawSqlOk> {
-    void DB_NAME;
+  void DB_NAME;
 
-    return runLoggedQuery(method, sql, 'context');
+  return runLoggedQuery(method, sql, 'context');
 }
 
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
-    const slug = extractSlugFromContext(context);
-    logDiagnosticFromCode('DB_REVISION_E001', { where, slug, reason: message }, context);
+  const slug = extractSlugFromContext(context);
+  logDiagnosticFromCode('DB_REVISION_E001', { where, slug, reason: message }, context);
 
-    return new DbResult<T>(false, undefined, message);
+  return new DbResult<T>(false, undefined, message);
 }
 
 function extractSlugFromContext(context: unknown): string {
-    if (context && typeof context === 'object' && 'slug' in context) {
-        const s = (context as { slug: unknown }).slug;
-        if (typeof s === 'string') return s;
+  if (context && typeof context === 'object' && 'slug' in context) {
+    const s = (context as { slug: unknown }).slug;
+    if (typeof s === 'string') {
+      return s;
     }
+  }
 
-    return 'unknown';
+  return 'unknown';
 }
 
 function rowToRevision(r: unknown): PromptRevisionRow {
-    const o = r as Record<string, unknown>;
+  const o = r as Record<string, unknown>;
 
-    return {
-        Id: Number(o.Id),
-        PromptId: Number(o.PromptId),
-        Slug: String(o.Slug),
-        Name: String(o.Name),
-        Body: String(o.Body),
-        Role: String(o.Role) as PromptRole,
-        ReplaceKey: String(o.ReplaceKey ?? ''),
-        ReplaceValues: String(o.ReplaceValues ?? '[]'),
-        CreatedAt: Number(o.CreatedAt),
-        Reason: String(o.Reason ?? ''),
-    };
+  return {
+    Id: Number(o.Id),
+    PromptId: Number(o.PromptId),
+    Slug: String(o.Slug),
+    Name: String(o.Name),
+    Body: String(o.Body),
+    Role: String(o.Role) as PromptRole,
+    ReplaceKey: String(o.ReplaceKey ?? ''),
+    ReplaceValues: String(o.ReplaceValues ?? '[]'),
+    CreatedAt: Number(o.CreatedAt),
+    Reason: String(o.Reason ?? ''),
+  };
 }
 
 export interface RecordRevisionInput {
@@ -99,53 +100,56 @@ export interface RecordRevisionInput {
  * `PROMPT_REVISION_LIMIT_PER_SLUG` rows for that Slug.
  */
 export async function recordPromptRevision(input: RecordRevisionInput): Promise<DbResult<number>> {
-    const { previous, reason } = input;
-    if (!Number.isInteger(previous.Id) || previous.Id <= 0) {
-        return fail('recordPromptRevision', 'previous.Id must be a positive integer');
-    }
-    if (!isPromptRole(previous.Role)) {
-        return fail('recordPromptRevision', 'invalid role ' + String(previous.Role));
-    }
-    if (typeof previous.Slug !== 'string' || previous.Slug.trim() === '') {
-        return fail('recordPromptRevision', 'previous.Slug must be a non-empty string');
-    }
+  const { previous, reason } = input;
+  if (!Number.isInteger(previous.Id) || previous.Id <= 0) {
+    return fail('recordPromptRevision', 'previous.Id must be a positive integer');
+  }
 
-    const replaceValuesJson = Array.isArray(previous.ReplaceValues)
-        ? JSON.stringify(previous.ReplaceValues)
-        : '[]';
-    const now = Date.now();
-    const cols = 'PromptId, Slug, Name, Body, Role, ReplaceKey, ReplaceValues, CreatedAt, Reason';
-    const vals = [
-        String(previous.Id),
-        sqlLit(previous.Slug),
-        sqlLit(previous.Name),
-        sqlLit(previous.Body),
-        sqlLit(previous.Role),
-        sqlLit(previous.ReplaceKey),
-        sqlLit(replaceValuesJson),
-        String(now),
-        sqlLit(reason),
-    ].join(', ');
-    const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
-    const insertResp = await runSql('SCHEMA', insertSql);
-    if (insertResp.isFail) {
-        return fail('recordPromptRevision', insertResp.errorMessage ?? 'insert failed');
-    }
-    const insertedId = Number(insertResp.lastInsertId ?? 0);
+  if (!isPromptRole(previous.Role)) {
+    return fail('recordPromptRevision', 'invalid role ' + String(previous.Role));
+  }
 
-    // Trim to newest PROMPT_REVISION_LIMIT_PER_SLUG entries per slug.
-    const trimSql =
+  if (typeof previous.Slug !== 'string' || previous.Slug.trim() === '') {
+    return fail('recordPromptRevision', 'previous.Slug must be a non-empty string');
+  }
+
+  const replaceValuesJson = Array.isArray(previous.ReplaceValues)
+    ? JSON.stringify(previous.ReplaceValues)
+    : '[]';
+  const now = Date.now();
+  const cols = 'PromptId, Slug, Name, Body, Role, ReplaceKey, ReplaceValues, CreatedAt, Reason';
+  const vals = [
+    String(previous.Id),
+    sqlLit(previous.Slug),
+    sqlLit(previous.Name),
+    sqlLit(previous.Body),
+    sqlLit(previous.Role),
+    sqlLit(previous.ReplaceKey),
+    sqlLit(replaceValuesJson),
+    String(now),
+    sqlLit(reason),
+  ].join(', ');
+  const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
+  const insertResp = await runSql('SCHEMA', insertSql);
+  if (insertResp.isFail) {
+    return fail('recordPromptRevision', insertResp.errorMessage ?? 'insert failed');
+  }
+
+  const insertedId = Number(insertResp.lastInsertId ?? 0);
+
+  // Trim to newest PROMPT_REVISION_LIMIT_PER_SLUG entries per slug.
+  const trimSql =
         'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(previous.Slug) +
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(previous.Slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
-    const trimResp = await runSql('SCHEMA', trimSql);
-    if (trimResp.isFail) {
-        // Trim failure is not fatal: the insert succeeded, history is preserved
-        // (just over-cap). Log so we notice recurring cases.
-        logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'record', slug: previous.Slug, reason: trimResp.errorMessage ?? 'unknown error' });
-    }
+  const trimResp = await runSql('SCHEMA', trimSql);
+  if (trimResp.isFail) {
+    // Trim failure is not fatal: the insert succeeded, history is preserved
+    // (just over-cap). Log so we notice recurring cases.
+    logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'record', slug: previous.Slug, reason: trimResp.errorMessage ?? 'unknown error' });
+  }
 
-    return new DbResult(true, insertedId);
+  return new DbResult(true, insertedId);
 }
 
 /**
@@ -153,31 +157,41 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
  * history yet or if the row was created but never edited.
  */
 export async function listPromptRevisions(slug: string): Promise<DbResult<PromptRevisionRow[]>> {
-    if (typeof slug !== 'string' || slug.trim() === '') {
-        return fail('listPromptRevisions', 'slug must be a non-empty string');
-    }
-    const sql =
+  if (typeof slug !== 'string' || slug.trim() === '') {
+    return fail('listPromptRevisions', 'slug must be a non-empty string');
+  }
+
+  const sql =
         'SELECT * FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC';
-    const resp = await runSql('QUERY', sql);
-    if (resp.isFail) return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
-    const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToRevision) : [];
+  const resp = await runSql('QUERY', sql);
+  if (resp.isFail) {
+    return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
+  }
 
-    return new DbResult(true, rows);
+  const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToRevision) : [];
+
+  return new DbResult(true, rows);
 }
 
 /** Fetch one revision by Id (used by the future restore UI). */
 export async function getPromptRevisionById(id: number): Promise<DbResult<PromptRevisionRow | undefined>> {
-    if (!Number.isInteger(id) || id <= 0) {
-        return fail('getPromptRevisionById', 'id must be a positive integer');
-    }
-    const sql = 'SELECT * FROM PromptRevision WHERE Id = ' + String(id) + ' LIMIT 1';
-    const resp = await runSql('QUERY', sql);
-    if (resp.isFail) return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
-    const rows = Array.isArray(resp.rows) ? resp.rows : [];
-    if (rows.length === 0) return new DbResult(true, undefined);
+  if (!Number.isInteger(id) || id <= 0) {
+    return fail('getPromptRevisionById', 'id must be a positive integer');
+  }
 
-    return new DbResult(true, rowToRevision(rows[0]));
+  const sql = 'SELECT * FROM PromptRevision WHERE Id = ' + String(id) + ' LIMIT 1';
+  const resp = await runSql('QUERY', sql);
+  if (resp.isFail) {
+    return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
+  }
+
+  const rows = Array.isArray(resp.rows) ? resp.rows : [];
+  if (rows.length === 0) {
+    return new DbResult(true, undefined);
+  }
+
+  return new DbResult(true, rowToRevision(rows[0]));
 }
 
 /**
@@ -202,53 +216,59 @@ export interface ImportedRevisionInput {
 }
 
 export async function insertImportedRevisions(
-    slug: string,
-    rows: readonly ImportedRevisionInput[],
+  slug: string,
+  rows: readonly ImportedRevisionInput[],
 ): Promise<DbResult<number>> {
-    if (typeof slug !== 'string' || slug.trim() === '') {
-        return fail('insertImportedRevisions', 'slug must be a non-empty string');
+  if (typeof slug !== 'string' || slug.trim() === '') {
+    return fail('insertImportedRevisions', 'slug must be a non-empty string');
+  }
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return new DbResult(true, 0);
+  }
+
+  let inserted = 0;
+  for (const r of rows) {
+    if (r.Slug !== slug) {
+      return fail('insertImportedRevisions', 'row slug ' + r.Slug + ' does not match target ' + slug);
     }
-    if (!Array.isArray(rows) || rows.length === 0) {
-        return new DbResult(true, 0);
+
+    if (!isPromptRole(r.Role)) {
+      return fail('insertImportedRevisions', 'invalid role ' + String(r.Role));
     }
-    let inserted = 0;
-    for (const r of rows) {
-        if (r.Slug !== slug) {
-            return fail('insertImportedRevisions', 'row slug ' + r.Slug + ' does not match target ' + slug);
-        }
-        if (!isPromptRole(r.Role)) {
-            return fail('insertImportedRevisions', 'invalid role ' + String(r.Role));
-        }
-        const cols = 'PromptId, Slug, Name, Body, Role, ReplaceKey, ReplaceValues, CreatedAt, Reason';
-        const vals = [
-            '0',
-            sqlLit(r.Slug),
-            sqlLit(r.Name),
-            sqlLit(r.Body),
-            sqlLit(r.Role),
-            sqlLit(r.ReplaceKey),
-            sqlLit(r.ReplaceValues),
-            String(Number.isFinite(r.CreatedAt) ? r.CreatedAt : Date.now()),
-            sqlLit(r.Reason || 'import'),
-        ].join(', ');
-        const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
-        const resp = await runSql('SCHEMA', insertSql);
-        if (resp.isFail) {
-            return fail('insertImportedRevisions', resp.errorMessage ?? 'insert failed');
-        }
-        inserted += 1;
+
+    const cols = 'PromptId, Slug, Name, Body, Role, ReplaceKey, ReplaceValues, CreatedAt, Reason';
+    const vals = [
+      '0',
+      sqlLit(r.Slug),
+      sqlLit(r.Name),
+      sqlLit(r.Body),
+      sqlLit(r.Role),
+      sqlLit(r.ReplaceKey),
+      sqlLit(r.ReplaceValues),
+      String(Number.isFinite(r.CreatedAt) ? r.CreatedAt : Date.now()),
+      sqlLit(r.Reason || 'import'),
+    ].join(', ');
+    const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
+    const resp = await runSql('SCHEMA', insertSql);
+    if (resp.isFail) {
+      return fail('insertImportedRevisions', resp.errorMessage ?? 'insert failed');
     }
-    // Trim per-slug to newest N.
-    const trimSql =
+
+    inserted += 1;
+  }
+
+  // Trim per-slug to newest N.
+  const trimSql =
         'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
-    const trimResp = await runSql('SCHEMA', trimSql);
-    if (trimResp.isFail) {
-        logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'import', slug, reason: trimResp.errorMessage ?? 'unknown error' });
-    }
+  const trimResp = await runSql('SCHEMA', trimSql);
+  if (trimResp.isFail) {
+    logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'import', slug, reason: trimResp.errorMessage ?? 'unknown error' });
+  }
 
-    return new DbResult(true, inserted);
+  return new DbResult(true, inserted);
 }
 
 /**
@@ -259,14 +279,17 @@ export async function insertImportedRevisions(
  * Introduced in v4.186.0 to back the Undo affordance on Import JSON.
  */
 export async function getMaxRevisionId(): Promise<DbResult<number>> {
-    const resp = await runSql('QUERY', 'SELECT MAX(Id) AS MaxId FROM PromptRevision');
-    if (resp.isFail) return fail('getMaxRevisionId', resp.errorMessage ?? 'query failed');
-    const rows = Array.isArray(resp.rows) ? resp.rows : [];
-    const first = rows.length > 0 ? (rows[0] as Record<string, unknown>) : {};
-    const raw = first.MaxId;
-    const n = typeof raw === 'number' ? raw : Number(raw);
+  const resp = await runSql('QUERY', 'SELECT MAX(Id) AS MaxId FROM PromptRevision');
+  if (resp.isFail) {
+    return fail('getMaxRevisionId', resp.errorMessage ?? 'query failed');
+  }
 
-    return new DbResult(true, Number.isFinite(n) ? n : 0);
+  const rows = Array.isArray(resp.rows) ? resp.rows : [];
+  const first = rows.length > 0 ? (rows[0] as Record<string, unknown>) : {};
+  const raw = first.MaxId;
+  const n = typeof raw === 'number' ? raw : Number(raw);
+
+  return new DbResult(true, Number.isFinite(n) ? n : 0);
 }
 
 /**
@@ -280,23 +303,27 @@ export async function getMaxRevisionId(): Promise<DbResult<number>> {
  * Introduced in v4.186.0.
  */
 export async function deleteImportedRevisionsAfter(
-    slug: string,
-    sinceId: number,
+  slug: string,
+  sinceId: number,
 ): Promise<DbResult<number>> {
-    if (typeof slug !== 'string' || slug.trim() === '') {
-        return fail('deleteImportedRevisionsAfter', 'slug must be a non-empty string');
-    }
-    if (!Number.isFinite(sinceId) || sinceId < 0) {
-        return fail('deleteImportedRevisionsAfter', 'sinceId must be a non-negative finite number');
-    }
-    const sql = 'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(slug)
-        + ' AND PromptId = 0 AND Id > ' + String(Math.floor(sinceId));
-    const resp = await runSql('SCHEMA', sql);
-    if (resp.isFail) return fail('deleteImportedRevisionsAfter', resp.errorMessage ?? 'delete failed');
+  if (typeof slug !== 'string' || slug.trim() === '') {
+    return fail('deleteImportedRevisionsAfter', 'slug must be a non-empty string');
+  }
 
-    // rawSql does not surface a changes() count reliably across all shims,
-    // so callers should not rely on the returned number for anything beyond
-    // "the DELETE ran without error". Return 0 as a stable sentinel.
-    return new DbResult(true, 0);
+  if (!Number.isFinite(sinceId) || sinceId < 0) {
+    return fail('deleteImportedRevisionsAfter', 'sinceId must be a non-negative finite number');
+  }
+
+  const sql = 'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(slug)
+        + ' AND PromptId = 0 AND Id > ' + String(Math.floor(sinceId));
+  const resp = await runSql('SCHEMA', sql);
+  if (resp.isFail) {
+    return fail('deleteImportedRevisionsAfter', resp.errorMessage ?? 'delete failed');
+  }
+
+  // rawSql does not surface a changes() count reliably across all shims,
+  // so callers should not rely on the returned number for anything beyond
+  // "the DELETE ran without error". Return 0 as a stable sentinel.
+  return new DbResult(true, 0);
 }
 

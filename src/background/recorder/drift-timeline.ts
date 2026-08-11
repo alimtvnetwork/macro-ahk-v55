@@ -50,48 +50,61 @@ export interface BuildDriftTimelineOptions {
 }
 
 const EMPTY_TIMELINE: DriftTimeline = {
-    State: "no-history",
-    LastSuccess: null,
-    FirstDrift: null,
-    HealthyDurationMs: null,
-    FailuresSinceDrift: 0,
+  State: "no-history",
+  LastSuccess: null,
+  FirstDrift: null,
+  HealthyDurationMs: null,
+  FailuresSinceDrift: 0,
 };
 
 function classifyDriftState(lastSuccess: unknown, firstDrift: unknown): DriftTimelineStateType {
-    if (firstDrift === null && lastSuccess !== null) return "healthy";
-    if (firstDrift !== null && lastSuccess === null) return "always-failing";
-    if (firstDrift !== null && lastSuccess !== null) return "drifted";
+  if (firstDrift === null && lastSuccess !== null) {
+    return "healthy";
+  }
 
-    return "no-history";
+  if (firstDrift !== null && lastSuccess === null) {
+    return "always-failing";
+  }
+
+  if (firstDrift !== null && lastSuccess !== null) {
+    return "drifted";
+  }
+
+  return "no-history";
 }
 
 function healthyWindowMs(lastSuccess: SelectorOutcomePoint | null, firstDrift: SelectorOutcomePoint | null): number | null {
-    if (lastSuccess === null || firstDrift === null) return null;
+  if (lastSuccess === null || firstDrift === null) {
+    return null;
+  }
 
-    return Math.max(0, Date.parse(firstDrift.At) - Date.parse(lastSuccess.At));
+  return Math.max(0, Date.parse(firstDrift.At) - Date.parse(lastSuccess.At));
 }
 
 /**
  * Build the compact two-point drift timeline for a single selector bucket.
  */
 export function buildDriftTimeline(
-    bucket: SelectorHistoryBucket | null,
-    options: BuildDriftTimelineOptions = {},
+  bucket: SelectorHistoryBucket | null,
+  options: BuildDriftTimelineOptions = {},
 ): DriftTimeline {
-    const now = options.Now ?? new Date();
-    if (bucket === null || bucket.Outcomes.length === 0) return EMPTY_TIMELINE;
-    const lastSuccessOutcome = findLastSuccess(bucket.Outcomes);
-    const firstDriftOutcome = findFirstDriftAfter(bucket.Outcomes, lastSuccessOutcome);
-    const lastSuccess = lastSuccessOutcome !== null ? toPoint(lastSuccessOutcome, now) : null;
-    const firstDrift = firstDriftOutcome !== null ? toPoint(firstDriftOutcome, now) : null;
+  const now = options.Now ?? new Date();
+  if (bucket === null || bucket.Outcomes.length === 0) {
+    return EMPTY_TIMELINE;
+  }
 
-    return {
-        State: classifyDriftState(lastSuccess, firstDrift),
-        LastSuccess: lastSuccess,
-        FirstDrift: firstDrift,
-        HealthyDurationMs: healthyWindowMs(lastSuccessOutcome, firstDriftOutcome),
-        FailuresSinceDrift: firstDriftOutcome === null ? 0 : countFailuresFrom(bucket.Outcomes, firstDriftOutcome.RunId),
-    };
+  const lastSuccessOutcome = findLastSuccess(bucket.Outcomes);
+  const firstDriftOutcome = findFirstDriftAfter(bucket.Outcomes, lastSuccessOutcome);
+  const lastSuccess = lastSuccessOutcome !== null ? toPoint(lastSuccessOutcome, now) : null;
+  const firstDrift = firstDriftOutcome !== null ? toPoint(firstDriftOutcome, now) : null;
+
+  return {
+    State: classifyDriftState(lastSuccess, firstDrift),
+    LastSuccess: lastSuccess,
+    FirstDrift: firstDrift,
+    HealthyDurationMs: healthyWindowMs(lastSuccessOutcome, firstDriftOutcome),
+    FailuresSinceDrift: firstDriftOutcome === null ? 0 : countFailuresFrom(bucket.Outcomes, firstDriftOutcome.RunId),
+  };
 }
 
 /**
@@ -100,22 +113,40 @@ export function buildDriftTimeline(
  * for unit tests.
  */
 export function formatRelative(deltaMs: number): string {
-    const abs = Math.max(0, deltaMs);
-    const sec = Math.floor(abs / 1000);
-    if (sec < 45)              return "just now";
-    const min = Math.floor(sec / 60);
-    if (min < 60)              return `${min}m ago`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24)               return `${hr}h ago`;
-    const day = Math.floor(hr / 24);
-    if (day < 14)              return `${day}d ago`;
-    const wk = Math.floor(day / 7);
-    if (wk < 8)                return `${wk}w ago`;
-    const mo = Math.floor(day / 30);
-    if (mo < 12)               return `${mo}mo ago`;
-    const yr = Math.floor(day / 365);
+  const abs = Math.max(0, deltaMs);
+  const sec = Math.floor(abs / 1000);
+  if (sec < 45)              {
+    return "just now";
+  }
 
-    return `${yr}y ago`;
+  const min = Math.floor(sec / 60);
+  if (min < 60)              {
+    return `${min}m ago`;
+  }
+
+  const hr = Math.floor(min / 60);
+  if (hr < 24)               {
+    return `${hr}h ago`;
+  }
+
+  const day = Math.floor(hr / 24);
+  if (day < 14)              {
+    return `${day}d ago`;
+  }
+
+  const wk = Math.floor(day / 7);
+  if (wk < 8)                {
+    return `${wk}w ago`;
+  }
+
+  const mo = Math.floor(day / 30);
+  if (mo < 12)               {
+    return `${mo}mo ago`;
+  }
+
+  const yr = Math.floor(day / 365);
+
+  return `${yr}y ago`;
 }
 
 /**
@@ -123,21 +154,31 @@ export function formatRelative(deltaMs: number): string {
  * ("4d 2h", "3h 15m", "45s"). Used to render the "healthy for ___" strip.
  */
 export function formatDuration(ms: number): string {
-    if (ms < 1000)             return "<1s";
-    const sec = Math.floor(ms / 1000);
-    if (sec < 60)              return `${sec}s`;
-    const min = Math.floor(sec / 60);
-    if (min < 60)              return `${min}m`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24) {
-        const remMin = min - hr * 60;
+  if (ms < 1000)             {
+    return "<1s";
+  }
 
-        return remMin > 0 ? `${hr}h ${remMin}m` : `${hr}h`;
-    }
-    const day = Math.floor(hr / 24);
-    const remHr = hr - day * 24;
+  const sec = Math.floor(ms / 1000);
+  if (sec < 60)              {
+    return `${sec}s`;
+  }
 
-    return remHr > 0 ? `${day}d ${remHr}h` : `${day}d`;
+  const min = Math.floor(sec / 60);
+  if (min < 60)              {
+    return `${min}m`;
+  }
+
+  const hr = Math.floor(min / 60);
+  if (hr < 24) {
+    const remMin = min - hr * 60;
+
+    return remMin > 0 ? `${hr}h ${remMin}m` : `${hr}h`;
+  }
+
+  const day = Math.floor(hr / 24);
+  const remHr = hr - day * 24;
+
+  return remHr > 0 ? `${day}d ${remHr}h` : `${day}d`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,50 +186,63 @@ export function formatDuration(ms: number): string {
 /* ------------------------------------------------------------------ */
 
 function findLastSuccess(outcomes: ReadonlyArray<SelectorOutcomePoint>): SelectorOutcomePoint | null {
-    for (let i = outcomes.length - 1; i >= 0; i--) {
-        if (outcomes[i].IsOk) return outcomes[i];
+  for (let i = outcomes.length - 1; i >= 0; i--) {
+    if (outcomes[i].IsOk) {
+      return outcomes[i];
     }
+  }
 
-    return null;
+  return null;
 }
 
 function findFirstDriftAfter(
-    outcomes: ReadonlyArray<SelectorOutcomePoint>,
-    lastSuccess: SelectorOutcomePoint | null,
+  outcomes: ReadonlyArray<SelectorOutcomePoint>,
+  lastSuccess: SelectorOutcomePoint | null,
 ): SelectorOutcomePoint | null {
-    if (lastSuccess === null) {
-        return outcomes.find((o) => !o.IsOk) ?? null;
-    }
-    const idx = outcomes.findIndex((o) => o.RunId === lastSuccess.RunId);
-    if (idx === -1) return null;
-    for (let i = idx + 1; i < outcomes.length; i++) {
-        if (!outcomes[i].IsOk) return outcomes[i];
-    }
+  if (lastSuccess === null) {
+    return outcomes.find((o) => !o.IsOk) ?? null;
+  }
 
+  const idx = outcomes.findIndex((o) => o.RunId === lastSuccess.RunId);
+  if (idx === -1) {
     return null;
+  }
+
+  for (let i = idx + 1; i < outcomes.length; i++) {
+    if (!outcomes[i].IsOk) {
+      return outcomes[i];
+    }
+  }
+
+  return null;
 }
 
 function countFailuresFrom(
-    outcomes: ReadonlyArray<SelectorOutcomePoint>,
-    fromRunId: number,
+  outcomes: ReadonlyArray<SelectorOutcomePoint>,
+  fromRunId: number,
 ): number {
-    const idx = outcomes.findIndex((o) => o.RunId === fromRunId);
-    if (idx === -1) return 0;
-    let n = 0;
-    for (let i = idx; i < outcomes.length; i++) {
-        if (!outcomes[i].IsOk) n += 1;
-    }
+  const idx = outcomes.findIndex((o) => o.RunId === fromRunId);
+  if (idx === -1) {
+    return 0;
+  }
 
-    return n;
+  let n = 0;
+  for (let i = idx; i < outcomes.length; i++) {
+    if (!outcomes[i].IsOk) {
+      n += 1;
+    }
+  }
+
+  return n;
 }
 
 function toPoint(outcome: SelectorOutcomePoint, now: Date): DriftTimelinePoint {
-    const delta = now.getTime() - Date.parse(outcome.At);
+  const delta = now.getTime() - Date.parse(outcome.At);
 
-    return {
-        RunId: outcome.RunId,
-        At: outcome.At,
-        RelativeLabel: formatRelative(delta),
-        Error: outcome.IsOk ? null : outcome.Error,
-    };
+  return {
+    RunId: outcome.RunId,
+    At: outcome.At,
+    RelativeLabel: formatRelative(delta),
+    Error: outcome.IsOk ? null : outcome.Error,
+  };
 }

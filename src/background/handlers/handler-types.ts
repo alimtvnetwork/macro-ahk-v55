@@ -25,13 +25,14 @@ export type JsonRecord = Record<string, JsonValue>;
 
 /** Collects all rows from a sql.js prepared statement into typed array. */
 export function collectTypedRows(
-    stmt: { step(): boolean; getAsObject(): SqlRow; free(): void },
+  stmt: { step(): boolean; getAsObject(): SqlRow; free(): void },
 ): SqlRow[] {
-    const rows: SqlRow[] = [];
-    while (stmt.step()) {
-        rows.push(stmt.getAsObject());
-    }
-    stmt.free();
+  const rows: SqlRow[] = [];
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject());
+  }
 
-    return rows;
+  stmt.free();
+
+  return rows;
 }

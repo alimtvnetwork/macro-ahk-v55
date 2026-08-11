@@ -37,10 +37,10 @@
 import { describe, expect, it } from "vitest";
 import type { FailureReport } from "../failure-logger";
 import {
-    buildConditionFailureReport,
-    buildSelectorPredicateFailureReport,
-    buildUrlTabClickFailureReport,
-    type UrlTabClickReason,
+  buildConditionFailureReport,
+  buildSelectorPredicateFailureReport,
+  buildUrlTabClickFailureReport,
+  type UrlTabClickReason,
 } from "../instruction-failure-adapters";
 import type { Condition } from "../condition-evaluator";
 
@@ -64,26 +64,29 @@ const FIXED_NOW = (): Date => new Date("2026-04-26T10:00:00.000Z");
  *   rather than a full re-shuffle.
  */
 function normalize(report: FailureReport): unknown {
-    const cloned = JSON.parse(JSON.stringify(report)) as Record<string, unknown>;
-    if (typeof cloned.StackTrace === "string" && cloned.StackTrace.length > 0) {
-        cloned.StackTrace = "<stripped-for-snapshot>";
-    }
+  const cloned = JSON.parse(JSON.stringify(report)) as Record<string, unknown>;
+  if (typeof cloned.StackTrace === "string" && cloned.StackTrace.length > 0) {
+    cloned.StackTrace = "<stripped-for-snapshot>";
+  }
 
-    return sortKeys(cloned);
+  return sortKeys(cloned);
 }
 
 function sortKeys(value: unknown): unknown {
-    if (Array.isArray(value)) return value.map(sortKeys);
-    if (value !== null && typeof value === "object") {
-        const out: Record<string, unknown> = {};
-        for (const k of Object.keys(value as Record<string, unknown>).sort()) {
-            out[k] = sortKeys((value as Record<string, unknown>)[k]);
-        }
+  if (Array.isArray(value)) {
+    return value.map(sortKeys);
+  }
 
-        return out;
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(value as Record<string, unknown>).sort()) {
+      out[k] = sortKeys((value as Record<string, unknown>)[k]);
     }
 
-    return value;
+    return out;
+  }
+
+  return value;
 }
 
 /* ================================================================== */
@@ -91,56 +94,56 @@ function sortKeys(value: unknown): unknown {
 /* ================================================================== */
 
 const URL_TAB_CLICK_REASONS: ReadonlyArray<UrlTabClickReason> = [
-    "UrlTabClickTimeout",
-    "TabNotFound",
-    "InvalidUrlPattern",
-    "SelectorNotFound",
-    "UrlPatternMismatch",
+  "UrlTabClickTimeout",
+  "TabNotFound",
+  "InvalidUrlPattern",
+  "SelectorNotFound",
+  "UrlPatternMismatch",
 ];
 
 describe("FailureReport snapshots, UrlTabClick", () => {
-    it.each(URL_TAB_CLICK_REASONS)(
-        "matches the canonical JSON for reason=%s",
-        (reason) => {
-            const report = buildUrlTabClickFailureReport({
-                Failure: {
-                    Reason: reason,
-                    Detail: `simulated ${reason}`,
-                    UrlPattern: "https://app.example.com/orders/*",
-                    UrlMatch: "Glob",
-                    OperationModeType: "OpenOrFocus",
-                    ObservedUrl: "https://app.example.com/orders/42",
-                    Selector: "a.open-orders",
-                    SelectorKind: "Css",
-                    TimeoutMs: 5_000,
-                    DurationMs: 5_001,
-                },
-                StepId: 901,
-                Index: 3,
-                Now: FIXED_NOW,
-            });
-            expect(normalize(report)).toMatchSnapshot();
+  it.each(URL_TAB_CLICK_REASONS)(
+    "matches the canonical JSON for reason=%s",
+    (reason) => {
+      const report = buildUrlTabClickFailureReport({
+        Failure: {
+          Reason: reason,
+          Detail: `simulated ${reason}`,
+          UrlPattern: "https://app.example.com/orders/*",
+          UrlMatch: "Glob",
+          OperationModeType: "OpenOrFocus",
+          ObservedUrl: "https://app.example.com/orders/42",
+          Selector: "a.open-orders",
+          SelectorKind: "Css",
+          TimeoutMs: 5_000,
+          DurationMs: 5_001,
         },
-    );
+        StepId: 901,
+        Index: 3,
+        Now: FIXED_NOW,
+      });
+      expect(normalize(report)).toMatchSnapshot();
+    },
+  );
 
-    it("matches the canonical JSON when optional fields are omitted", () => {
-        const report = buildUrlTabClickFailureReport({
-            Failure: {
-                Reason: "TabNotFound",
-                Detail: "no matching tab",
-                UrlPattern: "https://x.test/",
-                UrlMatch: "Exact",
-                OperationModeType: "FocusExisting",
-                TimeoutMs: 1_000,
-                DurationMs: 1_000,
-                // No ObservedUrl, Selector, or SelectorKind, proves the
-                // serializer omits them cleanly without producing
-                // `undefined` placeholders in the snapshot.
-            },
-            StepId: 1, Index: 0, Now: FIXED_NOW,
-        });
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON when optional fields are omitted", () => {
+    const report = buildUrlTabClickFailureReport({
+      Failure: {
+        Reason: "TabNotFound",
+        Detail: "no matching tab",
+        UrlPattern: "https://x.test/",
+        UrlMatch: "Exact",
+        OperationModeType: "FocusExisting",
+        TimeoutMs: 1_000,
+        DurationMs: 1_000,
+        // No ObservedUrl, Selector, or SelectorKind, proves the
+        // serializer omits them cleanly without producing
+        // `undefined` placeholders in the snapshot.
+      },
+      StepId: 1, Index: 0, Now: FIXED_NOW,
     });
+    expect(normalize(report)).toMatchSnapshot();
+  });
 });
 
 /* ================================================================== */
@@ -148,77 +151,77 @@ describe("FailureReport snapshots, UrlTabClick", () => {
 /* ================================================================== */
 
 const SAMPLE_COMPOUND_CONDITION: Condition = {
-    All: [
-        { Selector: "//button[@id='submit']", Matcher: { Kind: "Visible" } },
-        { Not: { Selector: ".loading", Matcher: { Kind: "Visible" } } },
-    ],
+  All: [
+    { Selector: "//button[@id='submit']", Matcher: { Kind: "Visible" } },
+    { Not: { Selector: ".loading", Matcher: { Kind: "Visible" } } },
+  ],
 };
 
 describe("FailureReport snapshots, Condition wait", () => {
-    it("matches the canonical JSON for a Gate ConditionTimeout", () => {
-        const report = buildConditionFailureReport({
-            Outcome: {
-                Ok: false,
-                DurationMs: 2_050,
-                Polls: 41,
-                Reason: "ConditionTimeout",
-                Detail: "Condition not met within 2000ms",
-                LastEvaluation: [
-                    {
-                        Selector: "//button[@id='submit']",
-                        Kind: "XPath",
-                        Matcher: "Visible",
-                        Result: false,
-                        Detail: "no match",
-                    },
-                    {
-                        Selector: ".loading",
-                        Kind: "Css",
-                        Matcher: "Visible",
-                        Result: true,
-                    },
-                ],
-            },
-            Condition: SAMPLE_COMPOUND_CONDITION,
-            Source: "Gate",
-            StepId: 501,
-            Index: 2,
-            StepKind: "Click",
-            Now: FIXED_NOW,
-        });
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for a Gate ConditionTimeout", () => {
+    const report = buildConditionFailureReport({
+      Outcome: {
+        Ok: false,
+        DurationMs: 2_050,
+        Polls: 41,
+        Reason: "ConditionTimeout",
+        Detail: "Condition not met within 2000ms",
+        LastEvaluation: [
+          {
+            Selector: "//button[@id='submit']",
+            Kind: "XPath",
+            Matcher: "Visible",
+            Result: false,
+            Detail: "no match",
+          },
+          {
+            Selector: ".loading",
+            Kind: "Css",
+            Matcher: "Visible",
+            Result: true,
+          },
+        ],
+      },
+      Condition: SAMPLE_COMPOUND_CONDITION,
+      Source: "Gate",
+      StepId: 501,
+      Index: 2,
+      StepKind: "Click",
+      Now: FIXED_NOW,
     });
+    expect(normalize(report)).toMatchSnapshot();
+  });
 
-    it("matches the canonical JSON for a dedicated ConditionStep failure", () => {
-        const report = buildConditionFailureReport({
-            Outcome: {
-                Ok: false,
-                DurationMs: 1_500,
-                Polls: 30,
-                Reason: "ConditionTimeout",
-                Detail: "predicate stayed false for 1500ms",
-                LastEvaluation: [
-                    {
-                        Selector: "#status",
-                        Kind: "Css",
-                        Matcher: "TextEquals",
-                        Result: false,
-                        Detail: "got 'pending'",
-                    },
-                ],
-            },
-            Condition: {
-                Selector: "#status",
-                Matcher: { Kind: "TextEquals", Value: "done" },
-            },
-            Source: "ConditionStep",
-            StepId: 502,
-            Index: 7,
-            StepKind: "Condition",
-            Now: FIXED_NOW,
-        });
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for a dedicated ConditionStep failure", () => {
+    const report = buildConditionFailureReport({
+      Outcome: {
+        Ok: false,
+        DurationMs: 1_500,
+        Polls: 30,
+        Reason: "ConditionTimeout",
+        Detail: "predicate stayed false for 1500ms",
+        LastEvaluation: [
+          {
+            Selector: "#status",
+            Kind: "Css",
+            Matcher: "TextEquals",
+            Result: false,
+            Detail: "got 'pending'",
+          },
+        ],
+      },
+      Condition: {
+        Selector: "#status",
+        Matcher: { Kind: "TextEquals", Value: "done" },
+      },
+      Source: "ConditionStep",
+      StepId: 502,
+      Index: 7,
+      StepKind: "Condition",
+      Now: FIXED_NOW,
     });
+    expect(normalize(report)).toMatchSnapshot();
+  });
 });
 
 /* ================================================================== */
@@ -226,64 +229,64 @@ describe("FailureReport snapshots, Condition wait", () => {
 /* ================================================================== */
 
 describe("FailureReport snapshots, XPath/CSS predicate", () => {
-    it("matches the canonical JSON for an XPath InvalidSelector", () => {
-        const report = buildSelectorPredicateFailureReport({
-            Selector: "//button[@id=", // unterminated predicate
-            SelectorKind: "Auto",       // Auto detects XPath via leading `/`
-            Reason: "InvalidSelector",
-            Detail: "Unexpected end of expression",
-            StepId: 701,
-            Index: 1,
-            StepKind: "Click",
-            Now: FIXED_NOW,
-        });
-        // Sanity: this MUST classify as XPathSyntaxError, not CssSyntaxError.
-        expect(report.Reason).toBe("XPathSyntaxError");
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for an XPath InvalidSelector", () => {
+    const report = buildSelectorPredicateFailureReport({
+      Selector: "//button[@id=", // unterminated predicate
+      SelectorKind: "Auto",       // Auto detects XPath via leading `/`
+      Reason: "InvalidSelector",
+      Detail: "Unexpected end of expression",
+      StepId: 701,
+      Index: 1,
+      StepKind: "Click",
+      Now: FIXED_NOW,
     });
+    // Sanity: this MUST classify as XPathSyntaxError, not CssSyntaxError.
+    expect(report.Reason).toBe("XPathSyntaxError");
+    expect(normalize(report)).toMatchSnapshot();
+  });
 
-    it("matches the canonical JSON for a CSS InvalidSelector", () => {
-        const report = buildSelectorPredicateFailureReport({
-            Selector: "div..broken",     // double-dot is invalid CSS
-            SelectorKind: "Css",
-            Reason: "InvalidSelector",
-            Detail: "Expected identifier after '.'",
-            StepId: 702,
-            Index: 1,
-            StepKind: "Click",
-            Now: FIXED_NOW,
-        });
-        expect(report.Reason).toBe("CssSyntaxError");
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for a CSS InvalidSelector", () => {
+    const report = buildSelectorPredicateFailureReport({
+      Selector: "div..broken",     // double-dot is invalid CSS
+      SelectorKind: "Css",
+      Reason: "InvalidSelector",
+      Detail: "Expected identifier after '.'",
+      StepId: 702,
+      Index: 1,
+      StepKind: "Click",
+      Now: FIXED_NOW,
     });
+    expect(report.Reason).toBe("CssSyntaxError");
+    expect(normalize(report)).toMatchSnapshot();
+  });
 
-    it("matches the canonical JSON for a ZeroMatches predicate failure", () => {
-        const report = buildSelectorPredicateFailureReport({
-            Selector: "#never-rendered",
-            SelectorKind: "Css",
-            Reason: "ZeroMatches",
-            Detail: "0 elements matched",
-            StepId: 703,
-            Index: 4,
-            StepKind: "Wait",
-            Now: FIXED_NOW,
-        });
-        expect(report.Reason).toBe("ZeroMatches");
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for a ZeroMatches predicate failure", () => {
+    const report = buildSelectorPredicateFailureReport({
+      Selector: "#never-rendered",
+      SelectorKind: "Css",
+      Reason: "ZeroMatches",
+      Detail: "0 elements matched",
+      StepId: 703,
+      Index: 4,
+      StepKind: "Wait",
+      Now: FIXED_NOW,
     });
+    expect(report.Reason).toBe("ZeroMatches");
+    expect(normalize(report)).toMatchSnapshot();
+  });
 
-    it("matches the canonical JSON for a predicate ConditionTimeout", () => {
-        const report = buildSelectorPredicateFailureReport({
-            Selector: "//*[@data-state='ready']",
-            SelectorKind: "XPath",
-            Reason: "ConditionTimeout",
-            Detail: "predicate never became true",
-            StepId: 704,
-            Index: 5,
-            StepKind: "Wait",
-            Now: FIXED_NOW,
-        });
-        expect(report.Reason).toBe("Timeout");
-        expect(normalize(report)).toMatchSnapshot();
+  it("matches the canonical JSON for a predicate ConditionTimeout", () => {
+    const report = buildSelectorPredicateFailureReport({
+      Selector: "//*[@data-state='ready']",
+      SelectorKind: "XPath",
+      Reason: "ConditionTimeout",
+      Detail: "predicate never became true",
+      StepId: 704,
+      Index: 5,
+      StepKind: "Wait",
+      Now: FIXED_NOW,
     });
+    expect(report.Reason).toBe("Timeout");
+    expect(normalize(report)).toMatchSnapshot();
+  });
 });

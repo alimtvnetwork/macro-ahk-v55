@@ -23,96 +23,96 @@ const logErrorMock = vi.hoisted(() => vi.fn());
 const showPasteToastMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../../queue-control/task-queue-project-store', () => ({
-    getPersistentTaskQueue: () => ({ dequeue: dequeueMock, count: countMock }),
-    resolveTaskQueueProjectId: resolveProjectIdMock,
+  getPersistentTaskQueue: () => ({ dequeue: dequeueMock, count: countMock }),
+  resolveTaskQueueProjectId: resolveProjectIdMock,
 }));
 vi.mock('../../error-utils', () => ({
-    logError: logErrorMock,
+  logError: logErrorMock,
 }));
 vi.mock('../prompt-utils', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('../prompt-utils')>();
+  const actual = await importOriginal<typeof import('../prompt-utils')>();
 
-    return {
-        ...actual,
-        showPasteToast: showPasteToastMock,
-        pasteIntoEditor: vi.fn(),
-    };
+  return {
+    ...actual,
+    showPasteToast: showPasteToastMock,
+    pasteIntoEditor: vi.fn(),
+  };
 });
 
 import { dequeueTaskNextPrompt } from '../task-next-ui';
 
 beforeEach(() => {
-    dequeueMock.mockReset();
-    countMock.mockReset();
-    resolveProjectIdMock.mockReset().mockReturnValue('proj-1');
-    logErrorMock.mockReset();
-    showPasteToastMock.mockReset();
-    vi.spyOn(console, 'log').mockImplementation(() => { /* silent */ });
+  dequeueMock.mockReset();
+  countMock.mockReset();
+  resolveProjectIdMock.mockReset().mockReturnValue('proj-1');
+  logErrorMock.mockReset();
+  showPasteToastMock.mockReset();
+  vi.spyOn(console, 'log').mockImplementation(() => { /* silent */ });
 });
 
 afterEach(() => {
-    vi.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe('dequeueTaskNextPrompt — negative branches', () => {
-    it('Q1 (positive control): returns selection when queue has an item', async () => {
-        dequeueMock.mockResolvedValueOnce({ text: 'hello' });
-        countMock.mockResolvedValueOnce(3);
+  it('Q1 (positive control): returns selection when queue has an item', async () => {
+    dequeueMock.mockResolvedValueOnce({ text: 'hello' });
+    countMock.mockResolvedValueOnce(3);
 
-        const result = await dequeueTaskNextPrompt();
+    const result = await dequeueTaskNextPrompt();
 
-        expect(result.failed).toBe(false);
-        expect(result.selection).toEqual({ text: 'hello', source: 'queue', remaining: 3 });
-        expect(logErrorMock).not.toHaveBeenCalled();
-        expect(showPasteToastMock).not.toHaveBeenCalled();
-    });
+    expect(result.failed).toBe(false);
+    expect(result.selection).toEqual({ text: 'hello', source: 'queue', remaining: 3 });
+    expect(logErrorMock).not.toHaveBeenCalled();
+    expect(showPasteToastMock).not.toHaveBeenCalled();
+  });
 
-    it('Q2 (positive control): empty queue returns null selection without failing', async () => {
-        dequeueMock.mockResolvedValueOnce(null);
+  it('Q2 (positive control): empty queue returns null selection without failing', async () => {
+    dequeueMock.mockResolvedValueOnce(null);
 
-        const result = await dequeueTaskNextPrompt();
+    const result = await dequeueTaskNextPrompt();
 
-        expect(result).toEqual({ selection: null, failed: false });
-        expect(logErrorMock).not.toHaveBeenCalled();
-        expect(showPasteToastMock).not.toHaveBeenCalled();
-    });
+    expect(result).toEqual({ selection: null, failed: false });
+    expect(logErrorMock).not.toHaveBeenCalled();
+    expect(showPasteToastMock).not.toHaveBeenCalled();
+  });
 
-    it('Q3: queue.dequeue() throwing logs via logError with exact scope+message', async () => {
-        const err = new Error('sqlite disk full');
-        dequeueMock.mockRejectedValueOnce(err);
+  it('Q3: queue.dequeue() throwing logs via logError with exact scope+message', async () => {
+    const err = new Error('sqlite disk full');
+    dequeueMock.mockRejectedValueOnce(err);
 
-        const result = await dequeueTaskNextPrompt();
+    const result = await dequeueTaskNextPrompt();
 
-        expect(logErrorMock).toHaveBeenCalledTimes(1);
-        expect(logErrorMock).toHaveBeenCalledWith(
-            'Task Next queue',
-            'dequeue failed before single Next injection; aborting fallback',
-            err,
-        );
-        expect(result).toEqual({ selection: null, failed: true });
-    });
+    expect(logErrorMock).toHaveBeenCalledTimes(1);
+    expect(logErrorMock).toHaveBeenCalledWith(
+      'Task Next queue',
+      'dequeue failed before single Next injection; aborting fallback',
+      err,
+    );
+    expect(result).toEqual({ selection: null, failed: true });
+  });
 
-    it('Q4: queue.dequeue() throwing surfaces the failure toast (not silent)', async () => {
-        dequeueMock.mockRejectedValueOnce(new Error('locked'));
+  it('Q4: queue.dequeue() throwing surfaces the failure toast (not silent)', async () => {
+    dequeueMock.mockRejectedValueOnce(new Error('locked'));
 
-        await dequeueTaskNextPrompt();
+    await dequeueTaskNextPrompt();
 
-        expect(showPasteToastMock).toHaveBeenCalledTimes(1);
-        expect(showPasteToastMock).toHaveBeenCalledWith('❌ Task Next: queue read failed', true);
-    });
+    expect(showPasteToastMock).toHaveBeenCalledTimes(1);
+    expect(showPasteToastMock).toHaveBeenCalledWith('❌ Task Next: queue read failed', true);
+  });
 
-    it('Q5: queue.count() throwing after a successful dequeue still surfaces failed:true', async () => {
-        dequeueMock.mockResolvedValueOnce({ text: 'x' });
-        countMock.mockRejectedValueOnce(new Error('count blew up'));
+  it('Q5: queue.count() throwing after a successful dequeue still surfaces failed:true', async () => {
+    dequeueMock.mockResolvedValueOnce({ text: 'x' });
+    countMock.mockRejectedValueOnce(new Error('count blew up'));
 
-        const result = await dequeueTaskNextPrompt();
+    const result = await dequeueTaskNextPrompt();
 
-        expect(result.failed).toBe(true);
-        expect(result.selection).toBeNull();
-        expect(logErrorMock).toHaveBeenCalledWith(
-            'Task Next queue',
-            'dequeue failed before single Next injection; aborting fallback',
-            expect.any(Error),
-        );
-    });
+    expect(result.failed).toBe(true);
+    expect(result.selection).toBeNull();
+    expect(logErrorMock).toHaveBeenCalledWith(
+      'Task Next queue',
+      'dequeue failed before single Next injection; aborting fallback',
+      expect.any(Error),
+    );
+  });
 });

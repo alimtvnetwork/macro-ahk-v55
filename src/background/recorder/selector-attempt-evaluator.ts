@@ -63,15 +63,17 @@ export interface EvaluatedAttempt {
  * `FailureReason` short-code and `FailureDetail` sentence.
  */
 export function evaluateAllSelectors(
-    selectors: ReadonlyArray<PersistedSelector>,
-    doc: Document,
+  selectors: ReadonlyArray<PersistedSelector>,
+  doc: Document,
 ): ReadonlyArray<EvaluatedAttempt> {
-    if (selectors.length === 0) { return []; }
+  if (selectors.length === 0) {
+    return []; 
+  }
 
-    const byId = new Map(selectors.map((s) => [s.SelectorId, s]));
-    const ordered = orderPrimaryFirst(selectors);
+  const byId = new Map(selectors.map((s) => [s.SelectorId, s]));
+  const ordered = orderPrimaryFirst(selectors);
 
-    return ordered.map((s) => evaluateOne(s, byId, doc));
+  return ordered.map((s) => evaluateOne(s, byId, doc));
 }
 
 /* ------------------------------------------------------------------ */
@@ -81,197 +83,226 @@ export function evaluateAllSelectors(
 const MAX_ANCHOR_DEPTH = 16;
 
 function orderPrimaryFirst(
-    selectors: ReadonlyArray<PersistedSelector>,
+  selectors: ReadonlyArray<PersistedSelector>,
 ): ReadonlyArray<PersistedSelector> {
-    const primary = selectors.filter((s) => s.IsPrimary === 1);
-    const fallback = selectors.filter((s) => s.IsPrimary !== 1);
+  const primary = selectors.filter((s) => s.IsPrimary === 1);
+  const fallback = selectors.filter((s) => s.IsPrimary !== 1);
 
-    return [...primary, ...fallback];
+  return [...primary, ...fallback];
 }
 
 function evaluateOne(
-    selector: PersistedSelector,
-    byId: Map<number, PersistedSelector>,
-    doc: Document,
+  selector: PersistedSelector,
+  byId: Map<number, PersistedSelector>,
+  doc: Document,
 ): EvaluatedAttempt {
-    const strategy = strategyOf(selector.SelectorKindId);
-    const isPrimary = selector.IsPrimary === 1;
+  const strategy = strategyOf(selector.SelectorKindId);
+  const isPrimary = selector.IsPrimary === 1;
 
-    if (selector.Expression.length === 0) {
-        return failure(selector, strategy, isPrimary, "", "EmptyExpression",
-            "Stored Expression is empty, recorder produced no value or row was corrupted.");
-    }
+  if (selector.Expression.length === 0) {
+    return failure(selector, strategy, isPrimary, "", "EmptyExpression",
+      "Stored Expression is empty, recorder produced no value or row was corrupted.");
+  }
 
-    let resolved: string;
-    try {
-        resolved = resolveExpression(selector, byId);
-    } catch (err) {
-        return failure(selector, strategy, isPrimary, "", "UnresolvedAnchor",
-            extractMessage(err));
-    }
+  let resolved: string;
+  try {
+    resolved = resolveExpression(selector, byId);
+  } catch (err) {
+    return failure(selector, strategy, isPrimary, "", "UnresolvedAnchor",
+      extractMessage(err));
+  }
 
-    if (strategy === "Css" || strategy === "Aria") {
-        return evaluateCss(selector, strategy, isPrimary, resolved, doc);
-    }
+  if (strategy === "Css" || strategy === "Aria") {
+    return evaluateCss(selector, strategy, isPrimary, resolved, doc);
+  }
 
-    return evaluateXPath(selector, strategy, isPrimary, resolved, doc);
+  return evaluateXPath(selector, strategy, isPrimary, resolved, doc);
 }
 
 function evaluateXPath(
-    selector: PersistedSelector,
-    strategy: AttemptStrategy,
-    isPrimary: boolean,
-    expression: string,
-    doc: Document,
+  selector: PersistedSelector,
+  strategy: AttemptStrategy,
+  isPrimary: boolean,
+  expression: string,
+  doc: Document,
 ): EvaluatedAttempt {
-    let count = 0;
-    try {
-        const r = doc.evaluate(
-            expression, doc, null,
-            XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
-        );
-        count = r.snapshotLength;
-    } catch (err) {
-        return failure(selector, strategy, isPrimary, expression, "XPathSyntaxError",
-            extractMessage(err));
-    }
-    if (count === 0) {
-        return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
-            `XPath '${expression}' returned 0 nodes.`);
-    }
+  let count = 0;
+  try {
+    const r = doc.evaluate(
+      expression, doc, null,
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null,
+    );
+    count = r.snapshotLength;
+  } catch (err) {
+    return failure(selector, strategy, isPrimary, expression, "XPathSyntaxError",
+      extractMessage(err));
+  }
 
-    return success(selector, strategy, isPrimary, expression, count);
+  if (count === 0) {
+    return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
+      `XPath '${expression}' returned 0 nodes.`);
+  }
+
+  return success(selector, strategy, isPrimary, expression, count);
 }
 
 function evaluateCss(
-    selector: PersistedSelector,
-    strategy: AttemptStrategy,
-    isPrimary: boolean,
-    expression: string,
-    doc: Document,
+  selector: PersistedSelector,
+  strategy: AttemptStrategy,
+  isPrimary: boolean,
+  expression: string,
+  doc: Document,
 ): EvaluatedAttempt {
-    let count = 0;
-    try {
-        const list = doc.querySelectorAll(expression);
-        count = list.length;
-    } catch (err) {
-        return failure(selector, strategy, isPrimary, expression, "CssSyntaxError",
-            extractMessage(err));
-    }
-    if (count === 0) {
-        return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
-            `Selector '${expression}' returned 0 nodes.`);
-    }
+  let count = 0;
+  try {
+    const list = doc.querySelectorAll(expression);
+    count = list.length;
+  } catch (err) {
+    return failure(selector, strategy, isPrimary, expression, "CssSyntaxError",
+      extractMessage(err));
+  }
 
-    return success(selector, strategy, isPrimary, expression, count);
+  if (count === 0) {
+    return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
+      `Selector '${expression}' returned 0 nodes.`);
+  }
+
+  return success(selector, strategy, isPrimary, expression, count);
 }
 
 function resolveExpression(
-    selector: PersistedSelector,
-    byId: Map<number, PersistedSelector>,
+  selector: PersistedSelector,
+  byId: Map<number, PersistedSelector>,
 ): string {
-    return resolveOne(selector, byId, [], 0);
+  return resolveOne(selector, byId, [], 0);
 }
 
 function assertDepthAndCycle(selector: PersistedSelector, chain: number[], depth: number): void {
-    if (depth > MAX_ANCHOR_DEPTH) {
-        throw new Error(`Anchor chain exceeded max depth ${MAX_ANCHOR_DEPTH}, cycle suspected.`);
-    }
-    if (chain.includes(selector.SelectorId)) {
-        throw new Error(`Cycle detected in anchor chain at SelectorId ${selector.SelectorId}.`);
-    }
+  if (depth > MAX_ANCHOR_DEPTH) {
+    throw new Error(`Anchor chain exceeded max depth ${MAX_ANCHOR_DEPTH}, cycle suspected.`);
+  }
+
+  if (chain.includes(selector.SelectorId)) {
+    throw new Error(`Cycle detected in anchor chain at SelectorId ${selector.SelectorId}.`);
+  }
 }
 
 function resolveRelativeAnchor(
-    selector: PersistedSelector, byId: Map<number, PersistedSelector>, chain: number[], depth: number,
+  selector: PersistedSelector, byId: Map<number, PersistedSelector>, chain: number[], depth: number,
 ): string {
-    if (selector.AnchorSelectorId === null) {
-        throw new Error(`XPathRelative selector ${selector.SelectorId} has no AnchorSelectorId.`);
-    }
-    const anchor = byId.get(selector.AnchorSelectorId);
-    if (anchor === undefined) {
-        throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set.`);
-    }
+  if (selector.AnchorSelectorId === null) {
+    throw new Error(`XPathRelative selector ${selector.SelectorId} has no AnchorSelectorId.`);
+  }
 
-    return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
+  const anchor = byId.get(selector.AnchorSelectorId);
+  if (anchor === undefined) {
+    throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set.`);
+  }
+
+  return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
 }
 
 function resolveOne(
-    selector: PersistedSelector,
-    byId: Map<number, PersistedSelector>,
-    chain: number[],
-    depth: number,
+  selector: PersistedSelector,
+  byId: Map<number, PersistedSelector>,
+  chain: number[],
+  depth: number,
 ): string {
-    assertDepthAndCycle(selector, chain, depth);
-    chain.push(selector.SelectorId);
-    if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
-        return resolveRelativeAnchor(selector, byId, chain, depth);
-    }
+  assertDepthAndCycle(selector, chain, depth);
+  chain.push(selector.SelectorId);
+  if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
+    return resolveRelativeAnchor(selector, byId, chain, depth);
+  }
 
-    return selector.Expression;
+  return selector.Expression;
 }
 
 function joinRelative(anchor: string, relative: string): string {
-    const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
-    if (stripped.length === 0) { return anchor; }
-    if (stripped.startsWith("/")) { return `${anchor}${stripped}`; }
+  const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
+  if (stripped.length === 0) {
+    return anchor; 
+  }
 
-    return `${anchor}/${stripped}`;
+  if (stripped.startsWith("/")) {
+    return `${anchor}${stripped}`; 
+  }
+
+  return `${anchor}/${stripped}`;
 }
 
 function strategyOf(kindId: number): AttemptStrategy {
-    if (kindId === SelectorKindId.XPathFull) { return "XPathFull"; }
-    if (kindId === SelectorKindId.XPathRelative) { return "XPathRelative"; }
-    if (kindId === SelectorKindId.Css) { return "Css"; }
-    if (kindId === SelectorKindId.Aria) { return "Aria"; }
+  if (kindId === SelectorKindId.XPathFull) {
+    return "XPathFull"; 
+  }
 
-    return "Unknown";
+  if (kindId === SelectorKindId.XPathRelative) {
+    return "XPathRelative"; 
+  }
+
+  if (kindId === SelectorKindId.Css) {
+    return "Css"; 
+  }
+
+  if (kindId === SelectorKindId.Aria) {
+    return "Aria"; 
+  }
+
+  return "Unknown";
 }
 
 function success(
-    selector: PersistedSelector,
-    strategy: AttemptStrategy,
-    isPrimary: boolean,
-    resolved: string,
-    count: number,
+  selector: PersistedSelector,
+  strategy: AttemptStrategy,
+  isPrimary: boolean,
+  resolved: string,
+  count: number,
 ): EvaluatedAttempt {
-    return {
-        SelectorId: selector.SelectorId,
-        Strategy: strategy,
-        Expression: selector.Expression,
-        ResolvedExpression: resolved,
-        IsPrimary: isPrimary,
-        Matched: true,
-        MatchCount: count,
-        FailureReason: "Matched",
-        FailureDetail: null,
-    };
+  return {
+    SelectorId: selector.SelectorId,
+    Strategy: strategy,
+    Expression: selector.Expression,
+    ResolvedExpression: resolved,
+    IsPrimary: isPrimary,
+    Matched: true,
+    MatchCount: count,
+    FailureReason: "Matched",
+    FailureDetail: null,
+  };
 }
 
 function failure(
-    selector: PersistedSelector,
-    strategy: AttemptStrategy,
-    isPrimary: boolean,
-    resolved: string,
-    reason: AttemptFailureReason,
-    detail: string,
+  selector: PersistedSelector,
+  strategy: AttemptStrategy,
+  isPrimary: boolean,
+  resolved: string,
+  reason: AttemptFailureReason,
+  detail: string,
 ): EvaluatedAttempt {
-    return {
-        SelectorId: selector.SelectorId,
-        Strategy: strategy,
-        Expression: selector.Expression,
-        ResolvedExpression: resolved,
-        IsPrimary: isPrimary,
-        Matched: false,
-        MatchCount: 0,
-        FailureReason: reason,
-        FailureDetail: detail,
-    };
+  return {
+    SelectorId: selector.SelectorId,
+    Strategy: strategy,
+    Expression: selector.Expression,
+    ResolvedExpression: resolved,
+    IsPrimary: isPrimary,
+    Matched: false,
+    MatchCount: 0,
+    FailureReason: reason,
+    FailureDetail: detail,
+  };
 }
 
 function extractMessage(err: unknown): string {
-    if (err instanceof Error) { return err.message; }
-    if (typeof err === "string") { return err; }
-    try { return JSON.stringify(err); } catch (err) { 
- return String(err); }
+  if (err instanceof Error) {
+    return err.message; 
+  }
+
+  if (typeof err === "string") {
+    return err; 
+  }
+
+  try {
+    return JSON.stringify(err); 
+  } catch (err) { 
+    return String(err); 
+  }
 }

@@ -31,8 +31,14 @@ class ActivityLogState {
 }
 
 const activityLogState = new ActivityLogState();
-export function getActivityLogVisible(): boolean { return activityLogState.visible; }
-export function setActivityLogVisible(v: boolean): void { activityLogState.visible = v; }
+export function getActivityLogVisible(): boolean {
+  return activityLogState.visible; 
+}
+
+export function setActivityLogVisible(v: boolean): void {
+  activityLogState.visible = v; 
+}
+
 /** @deprecated Use getActivityLogVisible(). Kept for backward compat. */
 export { activityLogState };
 export const activityLogLines: ActivityLogEntry[] = [];
@@ -79,10 +85,22 @@ class WsSelectionState {
 }
 
 const wsSelectionState = new WsSelectionState();
-export function getLoopWsCheckedIds(): Record<string, boolean> { return wsSelectionState.checkedIds; }
-export function setLoopWsCheckedIds(v: Record<string, boolean>): void { wsSelectionState.checkedIds = v; }
-export function getLoopWsLastCheckedIdx(): number { return wsSelectionState.lastCheckedIdx; }
-export function setLoopWsLastCheckedIdx(v: number): void { wsSelectionState.lastCheckedIdx = v; }
+export function getLoopWsCheckedIds(): Record<string, boolean> {
+  return wsSelectionState.checkedIds; 
+}
+
+export function setLoopWsCheckedIds(v: Record<string, boolean>): void {
+  wsSelectionState.checkedIds = v; 
+}
+
+export function getLoopWsLastCheckedIdx(): number {
+  return wsSelectionState.lastCheckedIdx; 
+}
+
+export function setLoopWsLastCheckedIdx(v: number): void {
+  wsSelectionState.lastCheckedIdx = v; 
+}
+
 // ============================================
 // Auth state (CQ11: singleton)
 // ============================================
@@ -101,8 +119,13 @@ class SessionBridgeState {
 }
 
 const sessionBridgeState = new SessionBridgeState();
-export function getLastSessionBridgeSource(): string { return sessionBridgeState.source; }
-export function setLastSessionBridgeSource(v: string): void { sessionBridgeState.source = v; }
+export function getLastSessionBridgeSource(): string {
+  return sessionBridgeState.source; 
+}
+
+export function setLastSessionBridgeSource(v: string): void {
+  sessionBridgeState.source = v; 
+}
 
 // ============================================
 // Toast constants (legacy — now delegated to SDK marco.notify)
@@ -138,7 +161,13 @@ export const state: ControllerState = {
   workspaceName: _cachedWsName,
   projectNameFromApi: '',
   projectNameFromDom: '',
-  customDisplayName: (() => { try { return localStorage.getItem('marco_custom_display_name') || ''; } catch { return ''; } })(),
+  customDisplayName: (() => {
+    try {
+      return localStorage.getItem('marco_custom_display_name') || ''; 
+    } catch {
+      return ''; 
+    } 
+  })(),
   hasFreeCredit: false,
   lastStatusCheck: 0,
   statusRefreshId: null,

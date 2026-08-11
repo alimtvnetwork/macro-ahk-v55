@@ -19,20 +19,20 @@ import { isNewTabOrBlankUrl } from "../shared/url-utils";
 
 /** Evaluates a URL against all enabled projects (excludes dependency-only projects). */
 export async function evaluateUrlMatches(
-    url: string,
+  url: string,
 ): Promise<MatchResult[]> {
-    // New-tab / empty-URL guard (v2.249.5) — see mem://features/new-tab-no-url-guard
-    if (isNewTabOrBlankUrl(url)) {
-        return [];
-    }
+  // New-tab / empty-URL guard (v2.249.5) — see mem://features/new-tab-no-url-guard
+  if (isNewTabOrBlankUrl(url)) {
+    return [];
+  }
 
-    const projects = await readAllProjects();
-    const enabledProjects = projects
-        .filter(isProjectEnabled)
-        .filter(isNotDependencyOnly);
-    const allMatches = collectAllMatches(enabledProjects, url);
+  const projects = await readAllProjects();
+  const enabledProjects = projects
+    .filter(isProjectEnabled)
+    .filter(isNotDependencyOnly);
+  const allMatches = collectAllMatches(enabledProjects, url);
 
-    return sortByPriority(allMatches);
+  return sortByPriority(allMatches);
 }
 
 /* ------------------------------------------------------------------ */
@@ -41,72 +41,72 @@ export async function evaluateUrlMatches(
 
 /** Collects matches from all enabled projects. */
 function collectAllMatches(
-    projects: StoredProject[],
-    url: string,
+  projects: StoredProject[],
+  url: string,
 ): MatchResult[] {
-    const matches: MatchResult[] = [];
+  const matches: MatchResult[] = [];
 
-    for (const project of projects) {
-        const projectMatches = matchProjectRules(project, url);
-        matches.push(...projectMatches);
-    }
+  for (const project of projects) {
+    const projectMatches = matchProjectRules(project, url);
+    matches.push(...projectMatches);
+  }
 
-    return matches;
+  return matches;
 }
 
 /** Matches a single project's URL rules against a URL. */
 function matchProjectRules(
-    project: StoredProject,
-    url: string,
+  project: StoredProject,
+  url: string,
 ): MatchResult[] {
-    const matches: MatchResult[] = [];
+  const matches: MatchResult[] = [];
 
-    for (const rule of project.targetUrls) {
-        const isMatch = isUrlMatch(url, rule);
+  for (const rule of project.targetUrls) {
+    const isMatch = isUrlMatch(url, rule);
 
-        if (isMatch) {
-            const matchResult = buildMatchResult(project, rule);
-            matches.push(matchResult);
-        }
+    if (isMatch) {
+      const matchResult = buildMatchResult(project, rule);
+      matches.push(matchResult);
     }
+  }
 
-    return matches;
+  return matches;
 }
 
 /** Builds a MatchResult from a project and matched rule. */
 function buildMatchResult(
-    project: StoredProject,
-    rule: StoredProject["targetUrls"][0],
+  project: StoredProject,
+  rule: StoredProject["targetUrls"][0],
 ): MatchResult {
-    const scriptBindings = buildScriptBindings(project);
+  const scriptBindings = buildScriptBindings(project);
 
-    return {
-        projectId: project.id,
-        projectName: project.name,
-        ruleId: `${project.id}:${rule.pattern}`,
-        ruleName: rule.pattern,
-        priority: 100,
-        scriptBindings,
-        conditions: {
-            requireElement: null,
-            requireCookie: null,
-            minDelayMs: 0,
-            requireOnline: false,
-        },
-    };
+  return {
+    projectId: project.id,
+    projectName: project.name,
+    ruleId: `${project.id}:${rule.pattern}`,
+    ruleName: rule.pattern,
+    priority: 100,
+    scriptBindings,
+    conditions: {
+      requireElement: null,
+      requireCookie: null,
+      minDelayMs: 0,
+      requireOnline: false,
+    },
+  };
 }
 
 /** Converts project scripts to resolved script bindings. */
 function buildScriptBindings(
-    project: StoredProject,
+  project: StoredProject,
 ): ScriptBindingResolved[] {
-    return project.scripts.map((script) => ({
-        scriptId: script.path,
-        configId: script.configBinding ?? null,
-        order: script.order,
-        world: "MAIN" as const,
-        runAt: script.runAt ?? "document_idle",
-    }));
+  return project.scripts.map((script) => ({
+    scriptId: script.path,
+    configId: script.configBinding ?? null,
+    order: script.order,
+    world: "MAIN" as const,
+    runAt: script.runAt ?? "document_idle",
+  }));
 }
 
 /* ------------------------------------------------------------------ */
@@ -115,20 +115,20 @@ function buildScriptBindings(
 
 /** Returns true if a project has scripts defined. */
 function isProjectEnabled(project: StoredProject): boolean {
-    const hasScripts = project.scripts.length > 0;
-    const hasRules = project.targetUrls.length > 0;
+  const hasScripts = project.scripts.length > 0;
+  const hasRules = project.targetUrls.length > 0;
 
-    return hasScripts && hasRules;
+  return hasScripts && hasRules;
 }
 
 /** Returns true if the project is NOT restricted to dependency-only execution. */
 function isNotDependencyOnly(project: StoredProject): boolean {
-    return project.settings?.onlyRunAsDependency !== true;
+  return project.settings?.onlyRunAsDependency !== true;
 }
 
 /** Sorts matches by priority (lower number = higher priority). */
 function sortByPriority(matches: MatchResult[]): MatchResult[] {
-    return [...matches].sort((a, b) => a.priority - b.priority);
+  return [...matches].sort((a, b) => a.priority - b.priority);
 }
 
 /* ------------------------------------------------------------------ */
@@ -137,23 +137,23 @@ function sortByPriority(matches: MatchResult[]): MatchResult[] {
 
 /** Deduplicates script bindings across multiple matches. */
 export function deduplicateScripts(
-    matches: MatchResult[],
+  matches: MatchResult[],
 ): ScriptBindingResolved[] {
-    const seenScriptIds = new Set<string>();
-    const deduplicated: ScriptBindingResolved[] = [];
+  const seenScriptIds = new Set<string>();
+  const deduplicated: ScriptBindingResolved[] = [];
 
-    for (const match of matches) {
-        for (const binding of match.scriptBindings) {
-            const isDuplicate = seenScriptIds.has(binding.scriptId);
+  for (const match of matches) {
+    for (const binding of match.scriptBindings) {
+      const isDuplicate = seenScriptIds.has(binding.scriptId);
 
-            if (isDuplicate) {
-                continue;
-            }
+      if (isDuplicate) {
+        continue;
+      }
 
-            seenScriptIds.add(binding.scriptId);
-            deduplicated.push(binding);
-        }
+      seenScriptIds.add(binding.scriptId);
+      deduplicated.push(binding);
     }
+  }
 
-    return deduplicated;
+  return deduplicated;
 }

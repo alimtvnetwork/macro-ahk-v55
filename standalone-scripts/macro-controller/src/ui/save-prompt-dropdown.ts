@@ -54,7 +54,9 @@ export function createPromptsDropdown(): HTMLElement {
     const isVisible = dropdown.style.display !== 'none';
     const isOutsideClick = !dropdown.contains(event.target as Node);
     const shouldClose = isVisible && isOutsideClick;
-    if (shouldClose) dropdown.style.display = 'none';
+    if (shouldClose) {
+      dropdown.style.display = 'none';
+    }
   });
 
   return dropdown;
@@ -163,7 +165,9 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
       }
     });
 
-    setTimeout(function () { searchInput.focus(); }, 50);
+    setTimeout(function () {
+      searchInput.focus(); 
+    }, 50);
   });
 }
 
@@ -187,6 +191,7 @@ function buildDropdownHeader(dropdown: HTMLElement, onToggleEdit: () => void): H
     event.stopPropagation();
     onToggleEdit();
   };
+
   header.appendChild(editToggle);
   dropdown.appendChild(header);
 

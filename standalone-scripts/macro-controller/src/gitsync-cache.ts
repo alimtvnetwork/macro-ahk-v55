@@ -68,8 +68,13 @@ function buildKey(wsId: string, pid: string): string {
 }
 
 function ttlFor(status: GitsyncStatusType): number {
-  if (status === 'found') return GITSYNC_TTL_FOUND_MS;
-  if (status === 'not_linked') return GITSYNC_TTL_NOT_LINKED_MS;
+  if (status === 'found') {
+    return GITSYNC_TTL_FOUND_MS;
+  }
+
+  if (status === 'not_linked') {
+    return GITSYNC_TTL_NOT_LINKED_MS;
+  }
 
   return GITSYNC_TTL_ERROR_MS;
 }
@@ -82,14 +87,26 @@ export async function getGitsyncCache(
   wsId: string,
   pid: string,
 ): Promise<GitsyncCacheRow | null> {
-  if (!wsId || !pid) return null;
+  if (!wsId || !pid) {
+    return null;
+  }
+
   const kv = getKv();
-  if (!kv) return null;
+  if (!kv) {
+    return null;
+  }
+
   try {
     const raw = await kv.get(buildKey(wsId, pid));
-    if (!raw) return null;
+    if (!raw) {
+      return null;
+    }
+
     const parsed = JSON.parse(raw) as Partial<GitsyncCacheRow>;
-    if (typeof parsed.ExpiresAt !== 'number' || typeof parsed.Status !== 'string') return null;
+    if (typeof parsed.ExpiresAt !== 'number' || typeof parsed.Status !== 'string') {
+      return null;
+    }
+
     if (parsed.ExpiresAt <= Date.now()) {
       log('GitsyncCache: expired ws=' + wsId + ' pid=' + pid, 'info');
       kv.delete(buildKey(wsId, pid)).catch(function (e: unknown): void {
@@ -117,13 +134,17 @@ export function setGitsyncCache(
   status: GitsyncStatusType,
   repoUrl?: string,
 ): void {
-  if (!wsId || !pid) return;
+  if (!wsId || !pid) {
+    return;
+  }
+
   const kv = getKv();
   if (!kv) {
     logError('GitsyncCache.write', 'marco.kv unavailable — skipping write for ws=' + wsId + ' pid=' + pid);
 
     return;
   }
+
   const now = Date.now();
   const ttl = ttlFor(status);
   const expires = ttl === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : now + ttl;
@@ -144,9 +165,15 @@ export function setGitsyncCache(
 
 /** Drop a cached row so the next lookup re-fetches. */
 export function invalidateGitsyncCache(wsId: string, pid: string): void {
-  if (!wsId || !pid) return;
+  if (!wsId || !pid) {
+    return;
+  }
+
   const kv = getKv();
-  if (!kv) return;
+  if (!kv) {
+    return;
+  }
+
   kv.delete(buildKey(wsId, pid)).catch(function (e: unknown): void {
     logError('GitsyncCache.invalidate', 'kv.delete failed for ws=' + wsId + ' pid=' + pid, e);
   });

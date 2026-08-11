@@ -9,40 +9,41 @@ import { findByName } from "./workspace-dictionary";
 import type { WorkspaceDictionary, WorkspaceRecord } from "./types";
 
 export function syncWithMacroController(dict: WorkspaceDictionary): WorkspaceRecord | null {
-    try {
-        if (!isOnDashboard()) {
-            return null;
-        }
-
-        return doSync(dict);
-    } catch (caught) {
-        logError("syncMacro", caught);
-
-        return null;
+  try {
+    if (!isOnDashboard()) {
+      return null;
     }
+
+    return doSync(dict);
+  } catch (caught) {
+    logError("syncMacro", caught);
+
+    return null;
+  }
 }
 
 function isOnDashboard(): boolean {
-    return window.location.href === AllowedHomeUrlType.DASHBOARD;
+  return window.location.href === AllowedHomeUrlType.DASHBOARD;
 }
 
 function doSync(dict: WorkspaceDictionary): WorkspaceRecord | null {
-    const name = readCurrentWorkspaceName();
-    if (!name) {
-        logWarn("syncMacro", `CODE RED: CurrentWorkspaceName missing at ${HomepageDashboardVariables.CurrentWorkspaceName.full}`);
+  const name = readCurrentWorkspaceName();
+  if (!name) {
+    logWarn("syncMacro", `CODE RED: CurrentWorkspaceName missing at ${HomepageDashboardVariables.CurrentWorkspaceName.full}`);
 
-        return null;
-    }
-    const match = findByName(dict, name);
-    if (!match) {
-        logWarn("syncMacro", `name "${name}" not in dictionary`);
-    }
+    return null;
+  }
 
-    return match;
+  const match = findByName(dict, name);
+  if (!match) {
+    logWarn("syncMacro", `name "${name}" not in dictionary`);
+  }
+
+  return match;
 }
 
 function readCurrentWorkspaceName(): string | null {
-    const element = resolveElement(HomepageDashboardVariables.CurrentWorkspaceName.full);
+  const element = resolveElement(HomepageDashboardVariables.CurrentWorkspaceName.full);
 
-    return element?.textContent?.trim() ?? null;
+  return element?.textContent?.trim() ?? null;
 }

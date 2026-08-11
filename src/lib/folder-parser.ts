@@ -50,7 +50,9 @@ export function hasFolderEntry(dt: DataTransfer): boolean {
 function findDirectoryEntry(dt: DataTransfer): FileSystemDirectoryEntry | null {
   for (let i = 0; i < dt.items.length; i++) {
     const entry = dt.items[i].webkitGetAsEntry?.();
-    if (entry?.isDirectory) return entry as FileSystemDirectoryEntry;
+    if (entry?.isDirectory) {
+      return entry as FileSystemDirectoryEntry;
+    }
   }
 
   return null;
@@ -76,10 +78,14 @@ function readDirEntries(dir: FileSystemDirectoryEntry): Promise<FileSystemEntry[
     const all: FileSystemEntry[] = [];
     const batch = () => {
       reader.readEntries((entries) => {
-        if (entries.length > 0) { all.push(...entries); batch(); }
-        else resolve(all);
+        if (entries.length > 0) {
+          all.push(...entries); batch(); 
+        } else {
+          resolve(all);
+        }
       }, reject);
     };
+
     batch();
   });
 }
@@ -95,13 +101,19 @@ async function findFile(
     const entries = await readDirEntries(dir);
     const match = entries.find((e) => e.name === segments[i]);
     const isMissing = match === undefined;
-    if (isMissing) return null;
+    if (isMissing) {
+      return null;
+    }
 
     const isLastSegment = i === segments.length - 1;
-    if (isLastSegment) return match.isFile ? (match as FileSystemFileEntry) : null;
+    if (isLastSegment) {
+      return match.isFile ? (match as FileSystemFileEntry) : null;
+    }
 
     const isFile = !match.isDirectory;
-    if (isFile) return null;
+    if (isFile) {
+      return null;
+    }
 
     dir = match as FileSystemDirectoryEntry;
   }
@@ -114,15 +126,21 @@ async function findFile(
 export async function parseDroppedFolder(dt: DataTransfer): Promise<ParsedFolder> {
   const folderEntry = findDirectoryEntry(dt);
   const isFolderMissing = folderEntry === null;
-  if (isFolderMissing) throw new Error("No folder found in drop.");
+  if (isFolderMissing) {
+    throw new Error("No folder found in drop.");
+  }
 
   const manifestEntry = await findFile(folderEntry, "marco-project.json");
   const isManifestMissing = manifestEntry === null;
-  if (isManifestMissing) throw new Error("No marco-project.json found in folder.");
+  if (isManifestMissing) {
+    throw new Error("No marco-project.json found in folder.");
+  }
 
   const raw = JSON.parse(await readEntryAsText(manifestEntry));
   const isNameMissing = !raw.name;
-  if (isNameMissing) throw new Error("marco-project.json missing 'name' field.");
+  if (isNameMissing) {
+    throw new Error("marco-project.json missing 'name' field.");
+  }
 
   const manifest: ParsedManifest = {
     name: raw.name,
@@ -151,9 +169,14 @@ export async function parseDroppedFolder(dt: DataTransfer): Promise<ParsedFolder
 
   // Resolve configs
   const configPaths = new Set<string>();
-  for (const c of manifest.configs) configPaths.add(c.path);
+  for (const c of manifest.configs) {
+    configPaths.add(c.path);
+  }
+
   for (const s of manifest.scripts) {
-    if (s.configBinding) configPaths.add(s.configBinding);
+    if (s.configBinding) {
+      configPaths.add(s.configBinding);
+    }
   }
 
   const configs: ParsedConfigFile[] = [];

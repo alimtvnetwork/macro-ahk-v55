@@ -139,7 +139,9 @@ export function buildToolsMasterSection(
 
 function _buildAuthDiagnostics(): { row: HTMLElement; updateAuthDiagRow: () => void } {
   const authDiagResult = createAuthDiagRow({
-    getLastTokenSource: function() { return getLastTokenSource(); },
+    getLastTokenSource: function() {
+      return getLastTokenSource(); 
+    },
     resolveToken: resolveToken,
     recoverAuthOnce: recoverAuthOnce,
     getSessionCookieNames: getSessionCookieNames,
@@ -194,14 +196,19 @@ function _buildVersionBadge(
     if (toolsMasterBody.style.display === 'none') {
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
-      try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
+      try {
+        localStorage.setItem('ml_collapse_tools_master', 'expanded'); 
+      } catch (_e) {
         logError('MacroController', 'Unknown error');
         logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     }
+
     const target = getReinjectSection();
     if (target) {
-      setTimeout(function() { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+      setTimeout(function() {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+      }, 50);
     }
   };
 
@@ -225,14 +232,25 @@ function _buildToolsCollapsible(
   settingsGearBtn.textContent = '⚙️';
   settingsGearBtn.title = 'Open Settings';
   settingsGearBtn.style.cssText = 'font-size:12px;cursor:pointer;margin-left:auto;padding:2px 6px;border-radius:4px;transition:background 0.15s;';
-  settingsGearBtn.onmouseenter = function() { settingsGearBtn.style.background = 'rgba(255,255,255,0.1)'; };
-  settingsGearBtn.onmouseleave = function() { settingsGearBtn.style.background = 'none'; };
-  settingsGearBtn.onclick = function(e: Event) { e.stopPropagation(); showSettingsDialog(settingsDeps); };
+  settingsGearBtn.onmouseenter = function() {
+    settingsGearBtn.style.background = 'rgba(255,255,255,0.1)'; 
+  };
+
+  settingsGearBtn.onmouseleave = function() {
+    settingsGearBtn.style.background = 'none'; 
+  };
+
+  settingsGearBtn.onclick = function(e: Event) {
+    e.stopPropagation(); showSettingsDialog(settingsDeps); 
+  };
+
   toolsCol.header.style.cssText += 'display:flex;align-items:center;';
   toolsCol.header.appendChild(settingsGearBtn);
 
   let _reinjectSection: HTMLElement | null = null;
-  const versionBadge = _buildVersionBadge(toolsMasterBody, toolsCol, function() { return _reinjectSection; });
+  const versionBadge = _buildVersionBadge(toolsMasterBody, toolsCol, function() {
+    return _reinjectSection; 
+  });
   toolsCol.header.insertBefore(versionBadge, settingsGearBtn);
 
   toolsMasterBody.appendChild(wsHistoryResult.section);

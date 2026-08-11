@@ -54,6 +54,7 @@ import { LabelType } from './types';
 
     return;
   }
+
   timingEnd(LabelType.DomainGuard, 'ok');
 
   // ── Idempotent check (handles re-injection, version mismatch, SPA recovery) ──
@@ -63,6 +64,7 @@ import { LabelType } from './types';
 
     return;
   }
+
   timingEnd('idempotent', 'ok');
 
   // ── Auth global ──
@@ -72,16 +74,33 @@ import { LabelType } from './types';
   const fetchLoopCreditsWithDetect = function(isRetry?: boolean) {
     fetchLoopCredits(isRetry, autoDetectLoopCurrentWorkspace);
   };
+
   nsWrite('api.credits.fetch', fetchLoopCreditsWithDetect);
-  nsWrite('api.credits.getState', function() { return loopCreditState; });
+  nsWrite('api.credits.getState', function() {
+    return loopCreditState; 
+  });
 
   // ── Workspace API globals ──
   nsWrite('api.workspace.moveTo', moveToWorkspace);
-  nsWrite('api.workspace.getRenameDelay', function() { return getRenameDelayMs(); });
-  nsWrite('api.workspace.setRenameDelay', function(ms: number) { setRenameDelayMs(ms); });
-  nsWrite('api.workspace.cancelRename', function() { cancelRename(); });
-  nsWrite('api.workspace.undoRename', function() { undoLastRename(function(_r: unknown, done: boolean) { if (done) populateLoopWorkspaceDropdown(); }); });
-  nsWrite('api.workspace.renameHistory', function() { return getRenameHistory(); });
+  nsWrite('api.workspace.getRenameDelay', function() {
+    return getRenameDelayMs(); 
+  });
+  nsWrite('api.workspace.setRenameDelay', function(ms: number) {
+    setRenameDelayMs(ms); 
+  });
+  nsWrite('api.workspace.cancelRename', function() {
+    cancelRename(); 
+  });
+  nsWrite('api.workspace.undoRename', function() {
+    undoLastRename(function(_r: unknown, done: boolean) {
+      if (done) {
+        populateLoopWorkspaceDropdown();
+      } 
+    }); 
+  });
+  nsWrite('api.workspace.renameHistory', function() {
+    return getRenameHistory(); 
+  });
 
   // ── Bulk rename global ──
   nsWrite('api.workspace.bulkRename', buildBulkRenameFn());
@@ -117,17 +136,29 @@ import { LabelType } from './types';
     triggerLoopMoveFromSelection,
   };
 
-  const createUIWrapper = function() { createUI(panelBuilderDeps); };
+  const createUIWrapper = function() {
+    createUI(panelBuilderDeps); 
+  };
 
   // ── Persist factories for self-healing ──
   nsWrite('_internal.createUIWrapper', createUIWrapper);
-  nsWrite('_internal.createUIManager', function() { const ui = new UIManager(); ui.setCreateFn(createUIWrapper);
+  nsWrite('_internal.createUIManager', function() {
+    const ui = new UIManager(); ui.setCreateFn(createUIWrapper);
 
- return ui; });
-  nsWrite('_internal.createWorkspaceManager', function() { return new WorkspaceManager(); });
-  nsWrite('_internal.createAuthManager', function() { return new AuthManager(); });
-  nsWrite('_internal.createCreditManager', function() { return new CreditManager(); });
-  nsWrite('_internal.createLoopEngine', function() { return new LoopEngine(); });
+    return ui; 
+  });
+  nsWrite('_internal.createWorkspaceManager', function() {
+    return new WorkspaceManager(); 
+  });
+  nsWrite('_internal.createAuthManager', function() {
+    return new AuthManager(); 
+  });
+  nsWrite('_internal.createCreditManager', function() {
+    return new CreditManager(); 
+  });
+  nsWrite('_internal.createLoopEngine', function() {
+    return new LoopEngine(); 
+  });
 
   // ── Wire sub-managers into MacroController singleton ──
   const mc = MacroController.getInstance();
@@ -166,6 +197,7 @@ function buildBulkRenameFn(): (template: string, prefix: string, suffix: string,
 
       return;
     }
+
     const perWs = loopCreditState.perWorkspace || [];
     const entries = [];
     let seqIdx = 0;
@@ -179,6 +211,7 @@ function buildBulkRenameFn(): (template: string, prefix: string, suffix: string,
         seqIdx++;
       }
     }
+
     bulkRenameWorkspaces(entries, function(results: BulkRenameResults, done: boolean) {
       if (done) {
         log('[Rename] Bulk rename finished: ' + results.success + '/' + results.total + ' success', results.failed > 0 ? 'warn' : 'success');

@@ -211,7 +211,9 @@ function PipelinePerformanceBar({
   durationMs?: number;
   budgetMs?: number;
 }) {
-  if (durationMs === undefined) return null;
+  if (durationMs === undefined) {
+    return null;
+  }
 
   const budget = budgetMs ?? 500;
   const ratio = durationMs / budget;
@@ -310,7 +312,9 @@ function VerificationBadge({
 }: {
   verification?: InjectionStatus["verification"];
 }) {
-  if (!verification) return null;
+  if (!verification) {
+    return null;
+  }
 
   const passed = VERIFICATION_CHECKS.filter(
     (c) => verification[c.key] === true,

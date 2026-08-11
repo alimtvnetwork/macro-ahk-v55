@@ -49,35 +49,44 @@ export interface ReplayTrace {
 }
 
 const ERRORED_REASONS: ReadonlySet<SelectorAttempt["FailureReason"]> = new Set([
-    "XPathSyntaxError",
-    "CssSyntaxError",
-    "UnresolvedAnchor",
-    "EmptyExpression",
-    "EvaluationThrew",
+  "XPathSyntaxError",
+  "CssSyntaxError",
+  "UnresolvedAnchor",
+  "EmptyExpression",
+  "EvaluationThrew",
 ]);
 
 function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatusType {
-    if (stopped) return "pending";
-    if (attempt.Matched) return "matched";
-    if (ERRORED_REASONS.has(attempt.FailureReason)) return "errored";
+  if (stopped) {
+    return "pending";
+  }
 
-    return "missed";
+  if (attempt.Matched) {
+    return "matched";
+  }
+
+  if (ERRORED_REASONS.has(attempt.FailureReason)) {
+    return "errored";
+  }
+
+  return "missed";
 }
 
 function noteFor(attempt: SelectorAttempt, status: TraceStepStatusType, role: TraceStepRoleType): string {
-    switch (status) {
-        case "matched":
-            return `${role} resolved → ${attempt.MatchCount} match${attempt.MatchCount === 1 ? "" : "es"}; replay stopped here.`;
-        case "errored": {
-            const detailSuffix = attempt.FailureDetail !== null ? ` — ${attempt.FailureDetail}` : "";
+  switch (status) {
+    case "matched":
+      return `${role} resolved → ${attempt.MatchCount} match${attempt.MatchCount === 1 ? "" : "es"}; replay stopped here.`;
+    case "errored": {
+      const detailSuffix = attempt.FailureDetail !== null ? ` — ${attempt.FailureDetail}` : "";
 
-            return `${role} threw ${attempt.FailureReason}${detailSuffix}.`;
-        }
-        case "missed":
-            return `${role} returned 0 matches; advancing to next candidate.`;
-        case "pending":
-            return `${role} not evaluated — earlier attempt already matched.`;
+      return `${role} threw ${attempt.FailureReason}${detailSuffix}.`;
     }
+
+    case "missed":
+      return `${role} returned 0 matches; advancing to next candidate.`;
+    case "pending":
+      return `${role} not evaluated — earlier attempt already matched.`;
+  }
 }
 
 /**
@@ -86,52 +95,53 @@ function noteFor(attempt: SelectorAttempt, status: TraceStepStatusType, role: Tr
  * live replay loop actually executed.
  */
 export function buildReplayTrace(attempts: ReadonlyArray<SelectorAttempt>): ReplayTrace {
-    if (attempts.length === 0) {
-        return emptyReplayTrace();
-    }
-    const steps = buildTraceSteps(attempts);
-    const summary = summarizeTraceSteps(attempts.length, steps);
+  if (attempts.length === 0) {
+    return emptyReplayTrace();
+  }
 
-    return {
-        Steps: steps,
-        Summary: summary,
-    };
+  const steps = buildTraceSteps(attempts);
+  const summary = summarizeTraceSteps(attempts.length, steps);
+
+  return {
+    Steps: steps,
+    Summary: summary,
+  };
 }
 
 function emptyReplayTrace(): ReplayTrace {
-    return { Steps: [], Summary: { Total: 0, Evaluated: 0, Skipped: 0, StoppedAt: null, Outcome: "empty" } };
+  return { Steps: [], Summary: { Total: 0, Evaluated: 0, Skipped: 0, StoppedAt: null, Outcome: "empty" } };
 }
 
 function buildTraceSteps(attempts: ReadonlyArray<SelectorAttempt>): TraceStep[] {
-    const steps: TraceStep[] = [];
-    for (const attempt of attempts) {
-        steps.push(buildTraceStep(attempt, steps));
-    }
+  const steps: TraceStep[] = [];
+  for (const attempt of attempts) {
+    steps.push(buildTraceStep(attempt, steps));
+  }
 
-    return steps;
+  return steps;
 }
 
 function buildTraceStep(attempt: SelectorAttempt, previous: ReadonlyArray<TraceStep>): TraceStep {
-    const stopped = previous.some((step) => step.Status === "matched");
-    const status = classify(attempt, stopped);
-    const role = attempt.IsPrimary ? "Primary" : "Fallback";
+  const stopped = previous.some((step) => step.Status === "matched");
+  const status = classify(attempt, stopped);
+  const role = attempt.IsPrimary ? "Primary" : "Fallback";
 
-    return createTraceStep(attempt, status, role, previous.length + 1);
+  return createTraceStep(attempt, status, role, previous.length + 1);
 }
 
 function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatusType, role: TraceStepRoleType, order: number): TraceStep {
-    return {
-        Order: order, Role: role, Strategy: attempt.Strategy, Expression: attempt.Expression,
-        ResolvedExpression: attempt.ResolvedExpression.length > 0 ? attempt.ResolvedExpression : attempt.Expression,
-        Matched: attempt.Matched, MatchCount: attempt.MatchCount, Status: status,
-        FailureReason: attempt.FailureReason, FailureDetail: attempt.FailureDetail,
-        Note: noteFor(attempt, status, role),
-    };
+  return {
+    Order: order, Role: role, Strategy: attempt.Strategy, Expression: attempt.Expression,
+    ResolvedExpression: attempt.ResolvedExpression.length > 0 ? attempt.ResolvedExpression : attempt.Expression,
+    Matched: attempt.Matched, MatchCount: attempt.MatchCount, Status: status,
+    FailureReason: attempt.FailureReason, FailureDetail: attempt.FailureDetail,
+    Note: noteFor(attempt, status, role),
+  };
 }
 
 function summarizeTraceSteps(total: number, steps: ReadonlyArray<TraceStep>): ReplayTraceSummary {
-    const stoppedAt = steps.find((step) => step.Status === "matched")?.Order ?? null;
-    const evaluated = stoppedAt ?? total;
+  const stoppedAt = steps.find((step) => step.Status === "matched")?.Order ?? null;
+  const evaluated = stoppedAt ?? total;
 
-    return { Total: total, Evaluated: evaluated, Skipped: total - evaluated, StoppedAt: stoppedAt, Outcome: stoppedAt !== null ? "matched" : "exhausted" };
+  return { Total: total, Evaluated: evaluated, Skipped: total - evaluated, StoppedAt: stoppedAt, Outcome: stoppedAt !== null ? "matched" : "exhausted" };
 }

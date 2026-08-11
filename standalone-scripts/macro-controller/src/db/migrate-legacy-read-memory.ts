@@ -42,7 +42,10 @@ function buildInList(): string {
 async function countLegacyRows(): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Slug IN (' + buildInList() + ')';
   const resp = await runLoggedQuery('QUERY', sql, 'context');
-  if (resp.isFail || !Array.isArray(resp.rows) || resp.rows.length === 0) return 0;
+  if (resp.isFail || !Array.isArray(resp.rows) || resp.rows.length === 0) {
+    return 0;
+  }
+
   const row = resp.rows[0] as { c?: unknown };
   const count = typeof row?.c === 'number' ? row.c : Number(row?.c);
 
@@ -83,7 +86,10 @@ async function invalidateJsonCopy(): Promise<void> {
 export async function migrateRemoveLegacyReadMemoryDuplicates(): Promise<void> {
   try {
     const before = await countLegacyRows();
-    if (before === 0) return;
+    if (before === 0) {
+      return;
+    }
+
     await deleteLegacyPromptRows();
     await invalidateJsonCopy();
     log(

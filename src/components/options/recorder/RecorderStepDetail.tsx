@@ -7,20 +7,20 @@
  */
 
 import type {
-    StepRow,
-    SelectorRow,
-    DataSourceRow,
-    FieldBindingRow,
-    StepLinkSlot,
+  StepRow,
+  SelectorRow,
+  DataSourceRow,
+  FieldBindingRow,
+  StepLinkSlot,
 } from "@/hooks/use-recorder-project-data";
 import { useRecorderStepDetail } from "./recorder-step-detail/use-recorder-step-detail";
 import {
-    VariableSection,
-    DescriptionSection,
-    TagsSection,
-    LinksSection,
-    SelectorsSection,
-    FieldBindingSection,
+  VariableSection,
+  DescriptionSection,
+  TagsSection,
+  LinksSection,
+  SelectorsSection,
+  FieldBindingSection,
 } from "./recorder-step-detail/recorder-step-sections";
 
 interface Props {
@@ -36,45 +36,45 @@ interface Props {
 }
 
 export function RecorderStepDetail(props: Props): JSX.Element {
-    const { step, selectors, dataSources, bindings, tags } = props;
-    const controller = useRecorderStepDetail(props);
-    const binding = bindings.find((row) => row.StepId === step.StepId) ?? null;
-    const boundDs = binding ? dataSources.find((row) => row.DataSourceId === binding.DataSourceId) ?? null : null;
+  const { step, selectors, dataSources, bindings, tags } = props;
+  const controller = useRecorderStepDetail(props);
+  const binding = bindings.find((row) => row.StepId === step.StepId) ?? null;
+  const boundDs = binding ? dataSources.find((row) => row.DataSourceId === binding.DataSourceId) ?? null : null;
 
-    return (
-        <div className="space-y-4">
-            <VariableSection
-                step={step}
-                draftName={controller.draftName}
-                setDraftName={controller.setDraftName}
-                isDirty={controller.isDirty}
-                isSaving={controller.isSaving}
-                renameError={controller.renameError}
-                onSave={() => void controller.handleSave()}
-            />
-            <DescriptionSection
-                draftDesc={controller.draftDesc}
-                setDraftDesc={controller.setDraftDesc}
-                isDescDirty={controller.isDescDirty}
-                descSaving={controller.descSaving}
-                descError={controller.descError}
-                onSave={() => void controller.handleDescSave()}
-            />
-            <TagsSection
-                tags={tags}
-                draftTag={controller.draftTag}
-                setDraftTag={controller.setDraftTag}
-                tagsError={controller.tagsError}
-                onAdd={() => void controller.handleAddTag()}
-                onRemove={(name) => void controller.handleRemoveTag(name)}
-            />
-            <LinksSection
-                step={step}
-                linkError={controller.linkError}
-                onLinkSave={controller.handleLinkSave}
-            />
-            <SelectorsSection selectors={selectors} />
-            <FieldBindingSection binding={binding} boundDs={boundDs} />
-        </div>
-    );
+  return (
+    <div className="space-y-4">
+      <VariableSection
+        step={step}
+        draftName={controller.draftName}
+        setDraftName={controller.setDraftName}
+        isDirty={controller.isDirty}
+        isSaving={controller.isSaving}
+        renameError={controller.renameError}
+        onSave={() => void controller.handleSave()}
+      />
+      <DescriptionSection
+        draftDesc={controller.draftDesc}
+        setDraftDesc={controller.setDraftDesc}
+        isDescDirty={controller.isDescDirty}
+        descSaving={controller.descSaving}
+        descError={controller.descError}
+        onSave={() => void controller.handleDescSave()}
+      />
+      <TagsSection
+        tags={tags}
+        draftTag={controller.draftTag}
+        setDraftTag={controller.setDraftTag}
+        tagsError={controller.tagsError}
+        onAdd={() => void controller.handleAddTag()}
+        onRemove={(name) => void controller.handleRemoveTag(name)}
+      />
+      <LinksSection
+        step={step}
+        linkError={controller.linkError}
+        onLinkSave={controller.handleLinkSave}
+      />
+      <SelectorsSection selectors={selectors} />
+      <FieldBindingSection binding={binding} boundDs={boundDs} />
+    </div>
+  );
 }

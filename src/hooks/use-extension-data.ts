@@ -76,7 +76,9 @@ export function useStatus() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   return { status, health, loading, refresh };
 }
@@ -92,7 +94,9 @@ export function useStorageStats() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   return { stats, loading, refresh };
 }
@@ -130,7 +134,9 @@ export function useDataBrowser(database: DatabaseType, pageSize = 20, filters: D
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [database, pageSize, filterKey]);
 
-  useEffect(() => { void fetchPage(0); }, [fetchPage]);
+  useEffect(() => {
+    void fetchPage(0); 
+  }, [fetchPage]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -160,7 +166,9 @@ export function useDataStore() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   return { entries, loading, refresh };
 }
@@ -181,7 +189,9 @@ export function useConfig() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   return { config, source, loading, refresh };
 }
@@ -221,7 +231,9 @@ export function useXPathRecorder() {
     setRecorded([]);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   return { recorded, isRecording, loading, toggle, clear, refresh };
 }

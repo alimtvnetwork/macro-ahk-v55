@@ -41,10 +41,10 @@ interface SdkSelfTestSnapshot {
 }
 
 const ROWS: Array<{ key: Surface; label: string; description: string }> = [
-    { key: "sync",  label: "SDK shape",   description: "Namespace + meta + .kv.list() Promise contract" },
-    { key: "kv",    label: "KV",          description: "set → get → delete → verify-cleared round-trip" },
-    { key: "files", label: "Files",       description: "save → list → read → delete → list round-trip" },
-    { key: "gkv",   label: "Grouped KV",  description: "set → get → delete → verify-cleared round-trip" },
+  { key: "sync",  label: "SDK shape",   description: "Namespace + meta + .kv.list() Promise contract" },
+  { key: "kv",    label: "KV",          description: "set → get → delete → verify-cleared round-trip" },
+  { key: "files", label: "Files",       description: "save → list → read → delete → list round-trip" },
+  { key: "gkv",   label: "Grouped KV",  description: "set → get → delete → verify-cleared round-trip" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -52,28 +52,51 @@ const ROWS: Array<{ key: Surface; label: string; description: string }> = [
 /* ------------------------------------------------------------------ */
 
 function formatRelative(iso: string): string {
-    if (!iso) return "—";
-    const then = Date.parse(iso);
-    if (Number.isNaN(then)) return "—";
-    const diffMs = Date.now() - then;
-    const sec = Math.round(diffMs / 1000);
-    if (sec < 5) return "just now";
-    if (sec < 60) return `${sec}s ago`;
-    const min = Math.round(sec / 60);
-    if (min < 60) return `${min}m ago`;
-    const hr = Math.round(min / 60);
-    if (hr < 24) return `${hr}h ago`;
-    const day = Math.round(hr / 24);
+  if (!iso) {
+    return "—";
+  }
 
-    return `${day}d ago`;
+  const then = Date.parse(iso);
+  if (Number.isNaN(then)) {
+    return "—";
+  }
+
+  const diffMs = Date.now() - then;
+  const sec = Math.round(diffMs / 1000);
+  if (sec < 5) {
+    return "just now";
+  }
+
+  if (sec < 60) {
+    return `${sec}s ago`;
+  }
+
+  const min = Math.round(sec / 60);
+  if (min < 60) {
+    return `${min}m ago`;
+  }
+
+  const hr = Math.round(min / 60);
+  if (hr < 24) {
+    return `${hr}h ago`;
+  }
+
+  const day = Math.round(hr / 24);
+
+  return `${day}d ago`;
 }
 
 function formatAbsolute(iso: string): string {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "—";
+  if (!iso) {
+    return "—";
+  }
 
-    return d.toLocaleTimeString("en-US", { hour12: false });
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) {
+    return "—";
+  }
+
+  return d.toLocaleTimeString("en-US", { hour12: false });
 }
 
 /* ------------------------------------------------------------------ */
@@ -82,117 +105,118 @@ function formatAbsolute(iso: string): string {
 
 // eslint-disable-next-line max-lines-per-function
 export function SdkSelfTestPanel() {
-    const [snapshot, setSnapshot] = useState<SdkSelfTestSnapshot | null>(null);
-    const [loading, setLoading] = useState(true);
+  const [snapshot, setSnapshot] = useState<SdkSelfTestSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const refresh = useCallback(async () => {
-        try {
-            const res = await sendMessage<{ snapshot: SdkSelfTestSnapshot }>({
-                type: "GET_SDK_SELFTEST",
-            });
-            setSnapshot(res?.snapshot ?? null);
-        } catch (err) { /* swallowed */
-            setSnapshot(null);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+  const refresh = useCallback(async () => {
+    try {
+      const res = await sendMessage<{ snapshot: SdkSelfTestSnapshot }>({
+        type: "GET_SDK_SELFTEST",
+      });
+      setSnapshot(res?.snapshot ?? null);
+    } catch (err) { /* swallowed */
+      setSnapshot(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    useEffect(() => {
-        void refresh();
-    }, [refresh]);
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
-    const hasAnyData = snapshot !== null && (
-        snapshot.sync !== null
+  const hasAnyData = snapshot !== null && (
+    snapshot.sync !== null
         || snapshot.kv !== null
         || snapshot.files !== null
         || snapshot.gkv !== null
-    );
+  );
 
-    return (
-        <section className="rounded-md border border-border bg-card/40">
-            <header className="flex items-center justify-between px-3 py-2 border-b border-border">
-                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <Activity className="h-3.5 w-3.5 text-primary" />
-                    <span>SDK Self-Test</span>
-                    {snapshot?.updatedAt && (
-                        <span className="text-[10px] text-muted-foreground/70">
+  return (
+    <section className="rounded-md border border-border bg-card/40">
+      <header className="flex items-center justify-between px-3 py-2 border-b border-border">
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          <span>SDK Self-Test</span>
+          {snapshot?.updatedAt && (
+            <span className="text-[10px] text-muted-foreground/70">
                             · last activity {formatRelative(snapshot.updatedAt)}
-                        </span>
-                    )}
-                </div>
-                <button
-                    type="button"
-                    onClick={() => void refresh()}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    title="Refresh self-test snapshot"
-                >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                </button>
-            </header>
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          title="Refresh self-test snapshot"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+        </button>
+      </header>
 
-            {loading && !snapshot && (
-                <div className="px-3 py-3 text-xs text-muted-foreground">
+      {loading && !snapshot && (
+        <div className="px-3 py-3 text-xs text-muted-foreground">
                     Loading self-test snapshot…
-                </div>
-            )}
+        </div>
+      )}
 
-            {!loading && !hasAnyData && (
-                <div className="px-3 py-3 text-xs text-muted-foreground">
+      {!loading && !hasAnyData && (
+        <div className="px-3 py-3 text-xs text-muted-foreground">
                     No SDK self-test results yet — open a tab where the Marco SDK is injected.
-                </div>
-            )}
+        </div>
+      )}
 
-            {hasAnyData && (
-                <ul className="divide-y divide-border text-xs">
-                    {ROWS.map((row) => {
-                        const result = snapshot?.[row.key] ?? null;
+      {hasAnyData && (
+        <ul className="divide-y divide-border text-xs">
+          {ROWS.map((row) => {
+            const result = snapshot?.[row.key] ?? null;
 
-                        return (
-                            <li
-                                key={row.key}
-                                className="flex items-center gap-2 px-3 py-1.5"
-                            >
-                                <SelfTestIcon row={result} />
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="font-medium text-foreground/90 min-w-[90px]">
-                                            {row.label}
-                                        </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right" className="max-w-[260px]">
-                                        <p className="text-xs">{row.description}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                                <span className="flex-1 truncate text-muted-foreground">
-                                    {result === null
-                                        ? "no report yet"
-                                        : result.pass
-                                            ? "PASS"
-                                            : `FAIL — ${result.failures[0] ?? "unknown"}`}
-                                </span>
-                                <span
-                                    className="text-[10px] text-muted-foreground/70 shrink-0 tabular-nums"
-                                    title={result?.at ? formatAbsolute(result.at) : undefined}
-                                >
-                                    {result?.at ? formatRelative(result.at) : "—"}
-                                </span>
-                            </li>
-                        );
-                    })}
-                </ul>
-            )}
-        </section>
-    );
+            return (
+              <li
+                key={row.key}
+                className="flex items-center gap-2 px-3 py-1.5"
+              >
+                <SelfTestIcon row={result} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="font-medium text-foreground/90 min-w-[90px]">
+                      {row.label}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-[260px]">
+                    <p className="text-xs">{row.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <span className="flex-1 truncate text-muted-foreground">
+                  {result === null
+                    ? "no report yet"
+                    : result.pass
+                      ? "PASS"
+                      : `FAIL — ${result.failures[0] ?? "unknown"}`}
+                </span>
+                <span
+                  className="text-[10px] text-muted-foreground/70 shrink-0 tabular-nums"
+                  title={result?.at ? formatAbsolute(result.at) : undefined}
+                >
+                  {result?.at ? formatRelative(result.at) : "—"}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 function SelfTestIcon({ row }: { row: SdkSelfTestRow | null }) {
-    if (row === null) {
-        return <span className="inline-block h-3.5 w-3.5 rounded-full bg-muted shrink-0" />;
-    }
-    if (row.pass) {
-        return <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--success))] shrink-0" />;
-    }
+  if (row === null) {
+    return <span className="inline-block h-3.5 w-3.5 rounded-full bg-muted shrink-0" />;
+  }
 
-    return <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />;
+  if (row.pass) {
+    return <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--success))] shrink-0" />;
+  }
+
+  return <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />;
 }

@@ -25,7 +25,9 @@ interface ImportPreviewDialogProps {
 }
 
 function DiffList({ label, icon: Icon, items }: { label: string; icon: React.ElementType; items: DiffItem[] }) {
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-1.5">

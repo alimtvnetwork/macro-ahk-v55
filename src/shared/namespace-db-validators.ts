@@ -25,12 +25,14 @@ export function validateNamespaceName(name: string): void {
   if (typeof name !== 'string' || name.length === 0) {
     throw new NamespaceValidationError('EMPTY', 'namespace must be a non-empty string');
   }
+
   if (name.startsWith(RESERVED_PREFIX)) {
     throw new NamespaceValidationError(
       'RESERVED',
       `namespace "${name}" uses reserved prefix "${RESERVED_PREFIX}"`,
     );
   }
+
   if (!/^[A-Za-z][A-Za-z0-9_.]*$/.test(name)) {
     throw new NamespaceValidationError('FORMAT', `namespace "${name}" has invalid format`);
   }

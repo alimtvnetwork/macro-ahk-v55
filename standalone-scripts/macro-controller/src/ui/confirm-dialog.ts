@@ -30,7 +30,9 @@ const BTN_DESTRUCTIVE = 'background:#dc2626;color:#fff;border-color:#b91c1c;';
 const BTN_PRIMARY = 'background:rgba(124,58,237,0.9);color:#fff;';
 
 export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
-  if (typeof document === 'undefined') return Promise.resolve(false);
+  if (typeof document === 'undefined') {
+    return Promise.resolve(false);
+  }
 
   return new Promise<boolean>((resolve) => {
     const overlay = document.createElement('div');
@@ -72,19 +74,31 @@ export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
 
     const cleanup = (result: boolean): void => {
       document.removeEventListener('keydown', onKey, true);
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+
       resolve(result);
     };
-    const onKey = (ev: KeyboardEvent): void => {
-      if (ev.key === 'Escape') { ev.preventDefault(); cleanup(false);
 
- return; }
+    const onKey = (ev: KeyboardEvent): void => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault(); cleanup(false);
+
+        return; 
+      }
+
       if (ev.key === 'Enter' && document.activeElement === confirmBtn) {
         ev.preventDefault();
         cleanup(true);
       }
     };
-    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) cleanup(false); });
+
+    overlay.addEventListener('click', (ev) => {
+      if (ev.target === overlay) {
+        cleanup(false);
+      } 
+    });
     cancelBtn.addEventListener('click', () => cleanup(false));
     confirmBtn.addEventListener('click', () => cleanup(true));
     document.addEventListener('keydown', onKey, true);

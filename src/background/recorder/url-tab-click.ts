@@ -91,29 +91,39 @@ export interface ValidationError {
 }
 
 function validateDirectOpen(params: UrlTabClickParams): ValidationError | null {
-    if (params.DirectOpen !== true) return null;
-    if (params.OperationModeType !== "OpenNew") {
-        return { Reason: "BadParams", Detail: "DirectOpen requires Mode='OpenNew'" };
-    }
-    if (params.Url === undefined || params.Url === "") {
-        return { Reason: "InvalidUrlPattern", Detail: "DirectOpen requires a literal Url" };
-    }
-
+  if (params.DirectOpen !== true) {
     return null;
+  }
+
+  if (params.OperationModeType !== "OpenNew") {
+    return { Reason: "BadParams", Detail: "DirectOpen requires Mode='OpenNew'" };
+  }
+
+  if (params.Url === undefined || params.Url === "") {
+    return { Reason: "InvalidUrlPattern", Detail: "DirectOpen requires a literal Url" };
+  }
+
+  return null;
 }
 
 export function validateUrlTabClickParams(
-    params: UrlTabClickParams,
+  params: UrlTabClickParams,
 ): ValidationError | null {
-    const directErr = validateDirectOpen(params);
-    if (directErr !== null) return directErr;
-    if (params.TimeoutMs !== undefined && params.TimeoutMs < 0) {
-        return { Reason: "BadParams", Detail: "TimeoutMs must be ≥ 0" };
-    }
-    const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
-    if (!compiled.Ok) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
+  const directErr = validateDirectOpen(params);
+  if (directErr !== null) {
+    return directErr;
+  }
 
-    return null;
+  if (params.TimeoutMs !== undefined && params.TimeoutMs < 0) {
+    return { Reason: "BadParams", Detail: "TimeoutMs must be ≥ 0" };
+  }
+
+  const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
+  if (!compiled.Ok) {
+    return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
+  }
+
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -128,18 +138,29 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * (AC-19.1.1 / 19.1.2).
  */
 export function deriveGlobPattern(url: string): string {
-    const noQuery = url.split("?")[0].split("#")[0];
-    const split = splitForCaseFold(noQuery);
-    if (split.Lead === "") return noQuery;
-    const segments = split.Tail.split("/").map((seg) => {
-        if (seg === "") return seg;
-        if (/^\d+$/.test(seg)) return "*";
-        if (UUID_RE.test(seg)) return "*";
+  const noQuery = url.split("?")[0].split("#")[0];
+  const split = splitForCaseFold(noQuery);
+  if (split.Lead === "") {
+    return noQuery;
+  }
 
-        return seg;
-    });
+  const segments = split.Tail.split("/").map((seg) => {
+    if (seg === "") {
+      return seg;
+    }
 
-    return split.Lead + segments.join("/");
+    if (/^\d+$/.test(seg)) {
+      return "*";
+    }
+
+    if (UUID_RE.test(seg)) {
+      return "*";
+    }
+
+    return seg;
+  });
+
+  return split.Lead + segments.join("/");
 }
 
 export interface CaptureClickContext {
@@ -152,11 +173,11 @@ export interface CaptureClickContext {
 }
 
 function isCrossOriginHref(href: string, locationOrigin: string): boolean {
-    try {
-        return new URL(href).origin !== new URL(locationOrigin).origin;
-    } catch { // allow-swallow: malformed href (e.g. "javascript:", relative-only) — treat as same-origin.
-        return false;
-    }
+  try {
+    return new URL(href).origin !== new URL(locationOrigin).origin;
+  } catch { // allow-swallow: malformed href (e.g. "javascript:", relative-only) — treat as same-origin.
+    return false;
+  }
 }
 
 /**
@@ -165,16 +186,27 @@ function isCrossOriginHref(href: string, locationOrigin: string): boolean {
  * spec §1.4 detection rules 1–4.
  */
 export function shouldRecordAsUrlTabClick(ctx: CaptureClickContext): boolean {
-    if (ctx.Tag === "a" && ctx.Target === "_blank") return true;
-    if (hasCrossOriginAnchorHref(ctx)) return true;
-    if (ctx.WindowOpenCalled) return true;
-    if (ctx.OpenedTabUrl !== undefined && ctx.OpenedTabUrl !== "") return true;
+  if (ctx.Tag === "a" && ctx.Target === "_blank") {
+    return true;
+  }
 
-    return false;
+  if (hasCrossOriginAnchorHref(ctx)) {
+    return true;
+  }
+
+  if (ctx.WindowOpenCalled) {
+    return true;
+  }
+
+  if (ctx.OpenedTabUrl !== undefined && ctx.OpenedTabUrl !== "") {
+    return true;
+  }
+
+  return false;
 }
 
 function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
-    return context.Tag === "a"
+  return context.Tag === "a"
         && context.Href !== undefined
         && context.Href !== ""
         && isCrossOriginHref(context.Href, context.LocationOrigin);
@@ -185,13 +217,21 @@ function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
 /* ------------------------------------------------------------------ */
 
 function selectorKind(params: UrlTabClickParams): PredicateEvaluationKindType {
-    const kind = params.SelectorKind ?? "Auto";
-    if (kind === "XPath") return "XPath";
-    if (kind === "Css") return "Css";
-    const sel = (params.Selector ?? "").trim();
-    if (sel.startsWith("/") || sel.startsWith("(")) return "XPath";
+  const kind = params.SelectorKind ?? "Auto";
+  if (kind === "XPath") {
+    return "XPath";
+  }
 
+  if (kind === "Css") {
     return "Css";
+  }
+
+  const sel = (params.Selector ?? "").trim();
+  if (sel.startsWith("/") || sel.startsWith("(")) {
+    return "XPath";
+  }
+
+  return "Css";
 }
 
 interface ResultBase {
@@ -201,146 +241,164 @@ interface ResultBase {
 }
 
 function buildResult(
-    base: ResultBase,
-    reason: UrlTabClickReason,
-    extras: Partial<UrlTabClickResult> = {},
+  base: ResultBase,
+  reason: UrlTabClickReason,
+  extras: Partial<UrlTabClickResult> = {},
 ): UrlTabClickResult {
-    return {
-        Reason: reason,
-        Pattern: base.params.UrlPattern,
-        Dialect: base.params.UrlMatch,
-        OperationModeType: base.params.OperationModeType,
-        DurationMs: base.now() - base.startedAt,
-        OpenedNewTab: false,
-        ...extras,
-    };
+  return {
+    Reason: reason,
+    Pattern: base.params.UrlPattern,
+    Dialect: base.params.UrlMatch,
+    OperationModeType: base.params.OperationModeType,
+    DurationMs: base.now() - base.startedAt,
+    OpenedNewTab: false,
+    ...extras,
+  };
 }
 
 async function tryFocusExisting(
-    base: ResultBase,
-    tabs: TabsAdapter,
-    test: (url: string) => boolean,
+  base: ResultBase,
+  tabs: TabsAdapter,
+  test: (url: string) => boolean,
 ): Promise<UrlTabClickResult | null> {
-    const existing = await tabs.listTabs();
-    const hit = existing.find((t) => test(t.Url));
-    if (hit !== undefined) {
-        await tabs.focusTab(hit.Id);
+  const existing = await tabs.listTabs();
+  const hit = existing.find((t) => test(t.Url));
+  if (hit !== undefined) {
+    await tabs.focusTab(hit.Id);
 
-        return buildResult(base, "Ok", { ResolvedTabId: hit.Id, ResolvedUrl: hit.Url });
-    }
-    if (base.params.OperationModeType === "FocusExisting") {
-        return buildResult(base, "TabNotFound", { Detail: `no tab matched ${base.params.UrlPattern}` });
-    }
+    return buildResult(base, "Ok", { ResolvedTabId: hit.Id, ResolvedUrl: hit.Url });
+  }
 
-    return null;
+  if (base.params.OperationModeType === "FocusExisting") {
+    return buildResult(base, "TabNotFound", { Detail: `no tab matched ${base.params.UrlPattern}` });
+  }
+
+  return null;
 }
 
 type OpenOutcome = { readonly Kind: "opened"; readonly Tab: TabRef } | { readonly Kind: "error"; readonly Result: UrlTabClickResult };
 
 async function openViaDirect(base: ResultBase, tabs: TabsAdapter): Promise<OpenOutcome> {
-    const url = base.params.Url ?? "";
-    const tab = await tabs.createTab(url);
+  const url = base.params.Url ?? "";
+  const tab = await tabs.createTab(url);
 
-    return { Kind: "opened", Tab: tab };
+  return { Kind: "opened", Tab: tab };
 }
 
 async function openViaSelector(base: ResultBase, tabs: TabsAdapter): Promise<OpenOutcome> {
-    if (tabs.dispatchClick === undefined) {
-        return { Kind: "error", Result: buildResult(base, "BadParams", { Detail: "TabsAdapter.dispatchClick missing" }) };
-    }
-    const sel = base.params.Selector ?? "";
-    const tab = await tabs.dispatchClick(sel, selectorKind(base.params));
+  if (tabs.dispatchClick === undefined) {
+    return { Kind: "error", Result: buildResult(base, "BadParams", { Detail: "TabsAdapter.dispatchClick missing" }) };
+  }
 
-    return { Kind: "opened", Tab: tab };
+  const sel = base.params.Selector ?? "";
+  const tab = await tabs.dispatchClick(sel, selectorKind(base.params));
+
+  return { Kind: "opened", Tab: tab };
 }
 
 async function openNewTab(base: ResultBase, tabs: TabsAdapter): Promise<OpenOutcome> {
-    const { params } = base;
-    try {
-        if (params.DirectOpen === true && params.Url !== undefined) return await openViaDirect(base, tabs);
-        if (params.Selector !== undefined && params.Selector !== "") return await openViaSelector(base, tabs);
-
-        return { Kind: "error", Result: buildResult(base, "BadParams", { Detail: "OpenNew requires either DirectOpen+Url or Selector" }) };
-    } catch (err) {
-        const detail = err instanceof Error ? err.message : "click dispatch failed";
-
-        return { Kind: "error", Result: buildResult(base, "SelectorNotFound", { Detail: detail }) };
+  const { params } = base;
+  try {
+    if (params.DirectOpen === true && params.Url !== undefined) {
+      return await openViaDirect(base, tabs);
     }
+
+    if (params.Selector !== undefined && params.Selector !== "") {
+      return await openViaSelector(base, tabs);
+    }
+
+    return { Kind: "error", Result: buildResult(base, "BadParams", { Detail: "OpenNew requires either DirectOpen+Url or Selector" }) };
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "click dispatch failed";
+
+    return { Kind: "error", Result: buildResult(base, "SelectorNotFound", { Detail: detail }) };
+  }
 }
 
 function settledResult(base: ResultBase, opened: TabRef | null, settled: TabRef | null): UrlTabClickResult {
-    if (settled !== null) {
-        return buildResult(base, "Ok", { ResolvedTabId: settled.Id, ResolvedUrl: settled.Url, OpenedNewTab: true });
-    }
-    const observed = opened?.Url ?? "(none)";
-    const reason: UrlTabClickReason = opened === null ? "UrlTabClickTimeout" : "UrlPatternMismatch";
+  if (settled !== null) {
+    return buildResult(base, "Ok", { ResolvedTabId: settled.Id, ResolvedUrl: settled.Url, OpenedNewTab: true });
+  }
 
-    return buildResult(base, reason, {
-        ResolvedTabId: opened?.Id,
-        ResolvedUrl: opened?.Url,
-        OpenedNewTab: opened !== null,
-        Detail: `observed=${observed} pattern=${base.params.UrlPattern}`,
-    });
+  const observed = opened?.Url ?? "(none)";
+  const reason: UrlTabClickReason = opened === null ? "UrlTabClickTimeout" : "UrlPatternMismatch";
+
+  return buildResult(base, reason, {
+    ResolvedTabId: opened?.Id,
+    ResolvedUrl: opened?.Url,
+    OpenedNewTab: opened !== null,
+    Detail: `observed=${observed} pattern=${base.params.UrlPattern}`,
+  });
 }
 
 async function awaitOpenedSettle(
-    base: ResultBase,
-    tabs: TabsAdapter,
-    test: (url: string) => boolean,
-    opened: TabRef,
-    timeoutMs: number,
+  base: ResultBase,
+  tabs: TabsAdapter,
+  test: (url: string) => boolean,
+  opened: TabRef,
+  timeoutMs: number,
 ): Promise<UrlTabClickResult> {
-    if (test(opened.Url)) {
-        return buildResult(base, "Ok", { ResolvedTabId: opened.Id, ResolvedUrl: opened.Url, OpenedNewTab: true });
-    }
-    const remaining = Math.max(0, timeoutMs - (base.now() - base.startedAt));
-    const settled = await tabs.waitForMatchingTab(test, remaining);
+  if (test(opened.Url)) {
+    return buildResult(base, "Ok", { ResolvedTabId: opened.Id, ResolvedUrl: opened.Url, OpenedNewTab: true });
+  }
 
-    return settledResult(base, opened, settled);
+  const remaining = Math.max(0, timeoutMs - (base.now() - base.startedAt));
+  const settled = await tabs.waitForMatchingTab(test, remaining);
+
+  return settledResult(base, opened, settled);
 }
 
 function precheck(base: ResultBase): { readonly test?: (url: string) => boolean; readonly error?: UrlTabClickResult } {
-    const validation = validateUrlTabClickParams(base.params);
-    const hasValidationError = validation !== null;
-    if (hasValidationError) {
-        const reason: UrlTabClickReason = validation.Reason === "BadParams" ? "BadParams" : "InvalidUrlPattern";
+  const validation = validateUrlTabClickParams(base.params);
+  const hasValidationError = validation !== null;
+  if (hasValidationError) {
+    const reason: UrlTabClickReason = validation.Reason === "BadParams" ? "BadParams" : "InvalidUrlPattern";
 
-        return { error: buildResult(base, reason, { Detail: validation.Detail }) };
-    }
-    const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
-    const isCompileFailed = !compiled.Ok;
-    if (isCompileFailed) return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
+    return { error: buildResult(base, reason, { Detail: validation.Detail }) };
+  }
 
-    return { test: compiled.Test };
+  const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
+  const isCompileFailed = !compiled.Ok;
+  if (isCompileFailed) {
+    return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
+  }
+
+  return { test: compiled.Test };
 }
 
 export async function executeUrlTabClick(init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
-    const now = init.NowMs ?? (() => Date.now());
-    const base: ResultBase = { params: init.Params, now, startedAt: now() };
+  const now = init.NowMs ?? (() => Date.now());
+  const base: ResultBase = { params: init.Params, now, startedAt: now() };
 
-    return executeWithBase(base, init);
+  return executeWithBase(base, init);
 }
 
 async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
-    const pre = precheck(base);
-    const hasPrecheckError = pre.error !== undefined;
-    if (hasPrecheckError) return pre.error!;
+  const pre = precheck(base);
+  const hasPrecheckError = pre.error !== undefined;
+  if (hasPrecheckError) {
+    return pre.error!;
+  }
     
-    const test = pre.test as (url: string) => boolean;
-    const mode = init.Params.OperationModeType;
-    const shouldTryFocus = mode === "FocusExisting" || mode === "OpenOrFocus";
+  const test = pre.test as (url: string) => boolean;
+  const mode = init.Params.OperationModeType;
+  const shouldTryFocus = mode === "FocusExisting" || mode === "OpenOrFocus";
     
-    if (shouldTryFocus) {
-        const focused = await tryFocusExisting(base, init.Tabs, test);
-        const isFocused = focused !== null;
-        if (isFocused) return focused!;
+  if (shouldTryFocus) {
+    const focused = await tryFocusExisting(base, init.Tabs, test);
+    const isFocused = focused !== null;
+    if (isFocused) {
+      return focused!;
     }
+  }
     
-    const outcome = await openNewTab(base, init.Tabs);
-    const isErrorOutcome = outcome.Kind === "error";
-    if (isErrorOutcome) return outcome.Result;
+  const outcome = await openNewTab(base, init.Tabs);
+  const isErrorOutcome = outcome.Kind === "error";
+  if (isErrorOutcome) {
+    return outcome.Result;
+  }
     
-    const timeoutMs = init.Params.TimeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const timeoutMs = init.Params.TimeoutMs ?? DEFAULT_TIMEOUT_MS;
 
-    return awaitOpenedSettle(base, init.Tabs, test, outcome.Tab, timeoutMs);
+  return awaitOpenedSettle(base, init.Tabs, test, outcome.Tab, timeoutMs);
 }

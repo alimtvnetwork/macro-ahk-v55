@@ -61,7 +61,10 @@ function fmtTimestamp(ms: number): string {
 }
 
 function firstLine(text: string | null): string {
-  if (!text) return '(empty)';
+  if (!text) {
+    return '(empty)';
+  }
+
   const line = text.split(/\r?\n/, 1)[0] ?? '';
 
   return line.length > 160 ? line.slice(0, 157) + '...' : line;
@@ -73,8 +76,13 @@ function makeEl<K extends keyof HTMLElementTagNameMap>(
   textContent?: string,
 ): HTMLElementTagNameMap[K] {
   const elem = document.createElement(tag);
-  if (className) elem.className = className;
-  if (textContent !== undefined) elem.textContent = textContent;
+  if (className) {
+    elem.className = className;
+  }
+
+  if (textContent !== undefined) {
+    elem.textContent = textContent;
+  }
 
   return elem;
 }
@@ -176,7 +184,9 @@ export function openProjectHistoryPanel(
   function setStatus(message: string, isError: boolean): void {
     status.textContent = message;
     status.dataset.state = isError ? 'error' : 'ok';
-    if (isError) lastError = message;
+    if (isError) {
+      lastError = message;
+    }
   }
 
   async function refresh(): Promise<void> {
@@ -188,6 +198,7 @@ export function openProjectHistoryPanel(
       for (const entry of entries) {
         list.appendChild(renderRow(entry, handleDelete));
       }
+
       setStatus(`Loaded ${entries.length} rows`, false);
     } catch (err) {
       logError(SCOPE, `refresh failed (projectId=${projectId})`, err);
@@ -203,6 +214,7 @@ export function openProjectHistoryPanel(
 
         return;
       }
+
       await refresh();
     } catch (err) {
       logError(SCOPE, `delete failed (projectId=${projectId}, id=${entry.id})`, err);

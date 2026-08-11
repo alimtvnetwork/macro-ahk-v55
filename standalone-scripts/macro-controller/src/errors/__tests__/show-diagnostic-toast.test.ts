@@ -214,7 +214,10 @@ describe('showDiagnosticToast pipeline (PlanTierType 22 gap #7)', () => {
 
   it('T12: CustomEvent detail carries the same redacted snapshot as the ring buffer', () => {
     let seen: unknown = null;
-    const handler = (e: Event): void => { seen = (e as CustomEvent).detail; };
+    const handler = (e: Event): void => {
+      seen = (e as CustomEvent).detail; 
+    };
+
     window.addEventListener('marco:diagnostic-toast', handler);
     const err = new DiagnosticError('HTTP_REQUEST_E001', {
       op: 'ws.members.list', status: 500, url: 'https://example/api', method: 'GET',

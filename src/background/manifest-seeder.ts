@@ -25,10 +25,10 @@
 import type { StoredScript, StoredConfig, UrlRule } from "../shared/script-config-types";
 import type { StoredProject, ScriptEntry, ConfigEntry } from "../shared/project-types";
 import type {
-    SeedManifest,
-    SeedProjectEntry,
-    SeedScriptEntry,
-    SeedConfigEntry,
+  SeedManifest,
+  SeedProjectEntry,
+  SeedScriptEntry,
+  SeedConfigEntry,
 } from "../shared/seed-manifest-types";
 import { STORAGE_KEY_ALL_SCRIPTS, STORAGE_KEY_ALL_CONFIGS, STORAGE_KEY_ALL_PROJECTS } from "../shared/constants";
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
@@ -45,7 +45,7 @@ const PROJECT_OWNED_BY_DEFAULT_SEEDER = new Set<string>(["macro-controller", "ma
 const STUB_PREFIX = "// STUB: loaded from seed-manifest. Real code fetched at injection time via filePath.\n";
 
 function buildStubCode(fileName: string): string {
-    return STUB_PREFIX + `console.error("[manifest-seeder::buildStubCode] STUB: filePath fetch failed\\n  Path: projects/scripts/${fileName}\\n  Missing: Real script code for \\"${fileName}\\"\\n  Reason: Stub placeholder was never replaced — fetch at injection time did not succeed or was not attempted");`;
+  return STUB_PREFIX + `console.error("[manifest-seeder::buildStubCode] STUB: filePath fetch failed\\n  Path: projects/scripts/${fileName}\\n  Missing: Real script code for \\"${fileName}\\"\\n  Reason: Stub placeholder was never replaced — fetch at injection time did not succeed or was not attempted");`;
 }
 
 /**
@@ -70,91 +70,93 @@ const SUPPORTED_SCHEMA_VERSIONS = { min: 2, max: 2 };
  */
 // eslint-disable-next-line max-lines-per-function -- orchestrator with schema validation + per-project logging
 export async function seedFromManifest(): Promise<SeedResult> {
-    console.log("[manifest-seeder] Fetching seed-manifest.json from extension dist...");
-    const manifest = await fetchManifest();
-    if (!manifest) {
-        logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
+  console.log("[manifest-seeder] Fetching seed-manifest.json from extension dist...");
+  const manifest = await fetchManifest();
+  if (!manifest) {
+    logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
             "Ensure the build pipeline runs compile-instruction + generate-seed-manifest.");
 
-        return { scripts: 0, configs: 0, projects: 0, errors: ["seed-manifest.json not found or invalid"] };
-    }
+    return { scripts: 0, configs: 0, projects: 0, errors: ["seed-manifest.json not found or invalid"] };
+  }
 
-    // Schema version validation
-    const sv = manifest.SchemaVersion;
-    if (typeof sv !== "number" || !Number.isFinite(sv)) {
-        logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Invalid schemaVersion: ${sv} — aborting seed`);
+  // Schema version validation
+  const sv = manifest.SchemaVersion;
+  if (typeof sv !== "number" || !Number.isFinite(sv)) {
+    logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Invalid schemaVersion: ${sv} — aborting seed`);
 
-        return { scripts: 0, configs: 0, projects: 0, errors: [`Invalid schemaVersion: ${sv}`] };
-    }
-    if (sv > SUPPORTED_SCHEMA_VERSIONS.max) {
-        logBgWarnError(BgLogTag.MANIFEST_SEEDER, `schemaVersion ${sv} is newer than supported max (${SUPPORTED_SCHEMA_VERSIONS.max}) — aborting. Update the extension.`);
+    return { scripts: 0, configs: 0, projects: 0, errors: [`Invalid schemaVersion: ${sv}`] };
+  }
 
-        return { scripts: 0, configs: 0, projects: 0, errors: [`Unsupported schemaVersion ${sv} (max supported: ${SUPPORTED_SCHEMA_VERSIONS.max})`] };
-    }
-    if (sv < SUPPORTED_SCHEMA_VERSIONS.min) {
-        // Hard abort: a v1 (camelCase) manifest cannot be remapped now
-        // that the legacy aliases were stripped. The only safe fix is to
-        // rebuild via `node scripts/generate-seed-manifest.mjs`.
-        logBgWarnError(
-            BgLogTag.MANIFEST_SEEDER,
-            `schemaVersion ${sv} is older than min (${SUPPORTED_SCHEMA_VERSIONS.min}) — aborting. ` +
+  if (sv > SUPPORTED_SCHEMA_VERSIONS.max) {
+    logBgWarnError(BgLogTag.MANIFEST_SEEDER, `schemaVersion ${sv} is newer than supported max (${SUPPORTED_SCHEMA_VERSIONS.max}) — aborting. Update the extension.`);
+
+    return { scripts: 0, configs: 0, projects: 0, errors: [`Unsupported schemaVersion ${sv} (max supported: ${SUPPORTED_SCHEMA_VERSIONS.max})`] };
+  }
+
+  if (sv < SUPPORTED_SCHEMA_VERSIONS.min) {
+    // Hard abort: a v1 (camelCase) manifest cannot be remapped now
+    // that the legacy aliases were stripped. The only safe fix is to
+    // rebuild via `node scripts/generate-seed-manifest.mjs`.
+    logBgWarnError(
+      BgLogTag.MANIFEST_SEEDER,
+      `schemaVersion ${sv} is older than min (${SUPPORTED_SCHEMA_VERSIONS.min}) — aborting. ` +
             `Rebuild seed-manifest.json with the current generator.`,
-        );
-
-        return {
-            scripts: 0,
-            configs: 0,
-            projects: 0,
-            errors: [
-                `Unsupported schemaVersion ${sv} (min supported: ${SUPPORTED_SCHEMA_VERSIONS.min}). ` +
-                `Rebuild seed-manifest.json — legacy camelCase manifests are no longer remapped.`,
-            ],
-        };
-    }
-
-    const projectNames = manifest.Projects.map((p) => `${p.Name}(${p.Scripts.length}s/${p.Configs.length}c)`);
-    console.log(
-        "[manifest-seeder] Processing %d project(s) from seed-manifest.json (schema v%d): [%s]",
-        manifest.Projects.length,
-        manifest.SchemaVersion,
-        projectNames.join(", "),
     );
-
-    // Log seedOnInstall status for each project
-    for (const project of manifest.Projects) {
-        console.log(
-            "[manifest-seeder]   → %s: seedOnInstall=%s, scripts=%d, configs=%d, isGlobal=%s",
-            project.Name,
-            project.SeedOnInstall,
-            project.Scripts.length,
-            project.Configs.length,
-            project.IsGlobal,
-        );
-    }
-
-    const scriptResult = await seedScriptsFromManifest(manifest);
-    const configResult = await seedConfigsFromManifest(manifest);
-    const projectResult = await seedProjectsFromManifest(manifest);
-
-    console.log(
-        "[manifest-seeder] ✅ Seeded %d script(s), %d config(s), %d project(s) across %d manifest project(s). Errors: %d",
-        scriptResult.seeded,
-        configResult.seeded,
-        projectResult.seeded,
-        manifest.Projects.length,
-        scriptResult.errors.length + configResult.errors.length + projectResult.errors.length,
-    );
-
-    if (scriptResult.errors.length > 0 || configResult.errors.length > 0 || projectResult.errors.length > 0) {
-        logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Seed errors: ${JSON.stringify([...scriptResult.errors, ...configResult.errors, ...projectResult.errors])}`);
-    }
 
     return {
-        scripts: scriptResult.seeded,
-        configs: configResult.seeded,
-        projects: manifest.Projects.length,
-        errors: [...scriptResult.errors, ...configResult.errors, ...projectResult.errors],
+      scripts: 0,
+      configs: 0,
+      projects: 0,
+      errors: [
+        `Unsupported schemaVersion ${sv} (min supported: ${SUPPORTED_SCHEMA_VERSIONS.min}). ` +
+                `Rebuild seed-manifest.json — legacy camelCase manifests are no longer remapped.`,
+      ],
     };
+  }
+
+  const projectNames = manifest.Projects.map((p) => `${p.Name}(${p.Scripts.length}s/${p.Configs.length}c)`);
+  console.log(
+    "[manifest-seeder] Processing %d project(s) from seed-manifest.json (schema v%d): [%s]",
+    manifest.Projects.length,
+    manifest.SchemaVersion,
+    projectNames.join(", "),
+  );
+
+  // Log seedOnInstall status for each project
+  for (const project of manifest.Projects) {
+    console.log(
+      "[manifest-seeder]   → %s: seedOnInstall=%s, scripts=%d, configs=%d, isGlobal=%s",
+      project.Name,
+      project.SeedOnInstall,
+      project.Scripts.length,
+      project.Configs.length,
+      project.IsGlobal,
+    );
+  }
+
+  const scriptResult = await seedScriptsFromManifest(manifest);
+  const configResult = await seedConfigsFromManifest(manifest);
+  const projectResult = await seedProjectsFromManifest(manifest);
+
+  console.log(
+    "[manifest-seeder] ✅ Seeded %d script(s), %d config(s), %d project(s) across %d manifest project(s). Errors: %d",
+    scriptResult.seeded,
+    configResult.seeded,
+    projectResult.seeded,
+    manifest.Projects.length,
+    scriptResult.errors.length + configResult.errors.length + projectResult.errors.length,
+  );
+
+  if (scriptResult.errors.length > 0 || configResult.errors.length > 0 || projectResult.errors.length > 0) {
+    logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Seed errors: ${JSON.stringify([...scriptResult.errors, ...configResult.errors, ...projectResult.errors])}`);
+  }
+
+  return {
+    scripts: scriptResult.seeded,
+    configs: configResult.seeded,
+    projects: manifest.Projects.length,
+    errors: [...scriptResult.errors, ...configResult.errors, ...projectResult.errors],
+  };
 }
 
 export interface SeedResult {
@@ -169,34 +171,36 @@ export interface SeedResult {
 /* ------------------------------------------------------------------ */
 
 async function fetchManifest(): Promise<SeedManifest | null> {
-    let url: string;
-    try {
-        url = chrome.runtime.getURL(MANIFEST_PATH);
-    } catch (err) {
-        logCaughtError(BgLogTag.MANIFEST_SEEDER, `chrome.runtime.getURL() failed for '${MANIFEST_PATH}'`, err);
+  let url: string;
+  try {
+    url = chrome.runtime.getURL(MANIFEST_PATH);
+  } catch (err) {
+    logCaughtError(BgLogTag.MANIFEST_SEEDER, `chrome.runtime.getURL() failed for '${MANIFEST_PATH}'`, err);
 
-        return null;
+    return null;
+  }
+
+  console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
+  try {
+    const resp = ServiceResult.wrapFetch(await fetch(url));
+    if (resp.isFail) {
+      logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
+
+      return null;
     }
-    console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
-    try {
-        const resp = ServiceResult.wrapFetch(await fetch(url));
-        if (resp.isFail) {
-            logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
 
-            return null;
-        }
-        const raw = await resp.text();
-        console.log("[manifest-seeder] Raw response length: %d chars", raw.length);
-        const manifest = JSON.parse(raw) as SeedManifest;
-        console.log("[manifest-seeder] ✅ Parsed manifest: %d projects, schema v%d, from %s",
-            manifest.Projects?.length ?? 0, manifest.SchemaVersion, url);
+    const raw = await resp.text();
+    console.log("[manifest-seeder] Raw response length: %d chars", raw.length);
+    const manifest = JSON.parse(raw) as SeedManifest;
+    console.log("[manifest-seeder] ✅ Parsed manifest: %d projects, schema v%d, from %s",
+      manifest.Projects?.length ?? 0, manifest.SchemaVersion, url);
 
-        return manifest;
-    } catch (err) {
-        logCaughtError(BgLogTag.MANIFEST_SEEDER, `Fetch/parse error for ${url}`, err);
+    return manifest;
+  } catch (err) {
+    logCaughtError(BgLogTag.MANIFEST_SEEDER, `Fetch/parse error for ${url}`, err);
 
-        return null;
-    }
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -205,64 +209,64 @@ async function fetchManifest(): Promise<SeedManifest | null> {
 
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- insert/refresh loop with logging
 async function seedScriptsFromManifest(
-    manifest: SeedManifest,
+  manifest: SeedManifest,
 ): Promise<{ seeded: number; errors: string[] }> {
-    const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
-    const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
-        ? result[STORAGE_KEY_ALL_SCRIPTS]
-        : [];
+  const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
+  const stored: StoredScript[] = Array.isArray(result[STORAGE_KEY_ALL_SCRIPTS])
+    ? result[STORAGE_KEY_ALL_SCRIPTS]
+    : [];
 
-    console.log("[manifest-seeder:scripts] Store has %d existing script(s)", stored.length);
+  console.log("[manifest-seeder:scripts] Store has %d existing script(s)", stored.length);
 
-    let changed = false;
-    let seeded = 0;
-    const errors: string[] = [];
+  let changed = false;
+  let seeded = 0;
+  const errors: string[] = [];
 
-    for (const project of manifest.Projects) {
-        if (!project.SeedOnInstall) {
-            console.log("[manifest-seeder:scripts] Skipping %s (seedOnInstall=false)", project.Name);
-            continue;
-        }
-
-        for (const scriptDef of project.Scripts) {
-            try {
-                const idx = stored.findIndex((s) => s.id === scriptDef.SeedId);
-
-                if (idx === -1) {
-                    // Insert new
-                    console.log("[manifest-seeder:scripts] + INSERT %s (seedId=%s, filePath=%s)",
-                        scriptDef.File, scriptDef.SeedId, scriptDef.FilePath);
-                    stored.push(buildStoredScript(scriptDef, project, manifest));
-                    changed = true;
-                    seeded++;
-                    continue;
-                }
-
-                // Refresh if stale
-                const current = stored[idx];
-                if (isScriptStale(current, scriptDef, project, manifest)) {
-                    console.log("[manifest-seeder:scripts] ↻ REFRESH %s (seedId=%s, was stale)",
-                        scriptDef.File, scriptDef.SeedId);
-                    stored[idx] = refreshStoredScript(current, scriptDef, project, manifest);
-                    changed = true;
-                    seeded++;
-                } else {
-                    console.log("[manifest-seeder:scripts] = SKIP %s (seedId=%s, up-to-date)",
-                        scriptDef.File, scriptDef.SeedId);
-                }
-            } catch (err) {
-                const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
-                errors.push(seedErrorMessage);
-                logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
-            }
-        }
+  for (const project of manifest.Projects) {
+    if (!project.SeedOnInstall) {
+      console.log("[manifest-seeder:scripts] Skipping %s (seedOnInstall=false)", project.Name);
+      continue;
     }
 
-    if (changed) {
-        await chrome.storage.local.set({ [STORAGE_KEY_ALL_SCRIPTS]: stored });
-    }
+    for (const scriptDef of project.Scripts) {
+      try {
+        const idx = stored.findIndex((s) => s.id === scriptDef.SeedId);
 
-    return { seeded, errors };
+        if (idx === -1) {
+          // Insert new
+          console.log("[manifest-seeder:scripts] + INSERT %s (seedId=%s, filePath=%s)",
+            scriptDef.File, scriptDef.SeedId, scriptDef.FilePath);
+          stored.push(buildStoredScript(scriptDef, project, manifest));
+          changed = true;
+          seeded++;
+          continue;
+        }
+
+        // Refresh if stale
+        const current = stored[idx];
+        if (isScriptStale(current, scriptDef, project, manifest)) {
+          console.log("[manifest-seeder:scripts] ↻ REFRESH %s (seedId=%s, was stale)",
+            scriptDef.File, scriptDef.SeedId);
+          stored[idx] = refreshStoredScript(current, scriptDef, project, manifest);
+          changed = true;
+          seeded++;
+        } else {
+          console.log("[manifest-seeder:scripts] = SKIP %s (seedId=%s, up-to-date)",
+            scriptDef.File, scriptDef.SeedId);
+        }
+      } catch (err) {
+        const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
+        errors.push(seedErrorMessage);
+        logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
+      }
+    }
+  }
+
+  if (changed) {
+    await chrome.storage.local.set({ [STORAGE_KEY_ALL_SCRIPTS]: stored });
+  }
+
+  return { seeded, errors };
 }
 
 /**
@@ -273,7 +277,7 @@ async function seedScriptsFromManifest(
  * for the rich `UrlRule[]` shape that preserves `MatchRuleType`.
  */
 function extractUrlMatches(project: SeedProjectEntry): string[] {
-    return (project.TargetUrls ?? []).map((t) => t.Pattern);
+  return (project.TargetUrls ?? []).map((t) => t.Pattern);
 }
 
 /**
@@ -283,76 +287,76 @@ function extractUrlMatches(project: SeedProjectEntry): string[] {
  * strings or trailing-slash differences.
  */
 function extractUrlMatchRules(project: SeedProjectEntry): UrlRule[] {
-    return (project.TargetUrls ?? []).map((t) => ({
-        pattern: t.Pattern,
-        matchType: t.MatchRuleType,
-    }));
+  return (project.TargetUrls ?? []).map((t) => ({
+    pattern: t.Pattern,
+    matchType: t.MatchRuleType,
+  }));
 }
 
 function buildStoredScript(def: SeedScriptEntry, project: SeedProjectEntry, manifest: SeedManifest): StoredScript {
-    const now = new Date().toISOString();
+  const now = new Date().toISOString();
 
-    return {
-        id: def.SeedId,
-        name: def.File,
-        description: def.Description || project.Description,
-        code: buildStubCode(def.File),
-        filePath: def.FilePath,
-        isAbsolute: false,
-        order: def.Order,
-        isEnabled: true,
-        isIife: def.IsIife,
-        autoInject: def.AutoInject,
-        isGlobal: project.IsGlobal,
-        dependencies: resolveDependencyIds(manifest, project),
-        loadOrder: project.LoadOrder,
-        runAt: def.RunAt,
-        configBinding: resolveConfigSeedId(def.ConfigBinding, project),
-        themeBinding: resolveConfigSeedId(def.ThemeBinding, project),
-        cookieBinding: def.CookieBinding,
-        urlMatches: extractUrlMatches(project),
-        urlMatchRules: extractUrlMatchRules(project),
-        createdAt: now,
-        updatedAt: now,
-    };
+  return {
+    id: def.SeedId,
+    name: def.File,
+    description: def.Description || project.Description,
+    code: buildStubCode(def.File),
+    filePath: def.FilePath,
+    isAbsolute: false,
+    order: def.Order,
+    isEnabled: true,
+    isIife: def.IsIife,
+    autoInject: def.AutoInject,
+    isGlobal: project.IsGlobal,
+    dependencies: resolveDependencyIds(manifest, project),
+    loadOrder: project.LoadOrder,
+    runAt: def.RunAt,
+    configBinding: resolveConfigSeedId(def.ConfigBinding, project),
+    themeBinding: resolveConfigSeedId(def.ThemeBinding, project),
+    cookieBinding: def.CookieBinding,
+    urlMatches: extractUrlMatches(project),
+    urlMatchRules: extractUrlMatchRules(project),
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 function refreshStoredScript(
-    current: StoredScript,
-    def: SeedScriptEntry,
-    project: SeedProjectEntry,
-    manifest: SeedManifest,
+  current: StoredScript,
+  def: SeedScriptEntry,
+  project: SeedProjectEntry,
+  manifest: SeedManifest,
 ): StoredScript {
-    return {
-        ...current,
-        name: def.File,
-        description: def.Description || project.Description,
-        code: buildStubCode(def.File),
-        filePath: def.FilePath,
-        isAbsolute: false,
-        isIife: def.IsIife,
-        autoInject: def.AutoInject,
-        isGlobal: project.IsGlobal,
-        isEnabled: current.isEnabled, // preserve user toggle
-        dependencies: resolveDependencyIds(manifest, project),
-        loadOrder: project.LoadOrder,
-        configBinding: resolveConfigSeedId(def.ConfigBinding, project),
-        themeBinding: resolveConfigSeedId(def.ThemeBinding, project),
-        cookieBinding: def.CookieBinding,
-        urlMatches: extractUrlMatches(project),
-        urlMatchRules: extractUrlMatchRules(project),
-        updatedAt: new Date().toISOString(),
-    };
+  return {
+    ...current,
+    name: def.File,
+    description: def.Description || project.Description,
+    code: buildStubCode(def.File),
+    filePath: def.FilePath,
+    isAbsolute: false,
+    isIife: def.IsIife,
+    autoInject: def.AutoInject,
+    isGlobal: project.IsGlobal,
+    isEnabled: current.isEnabled, // preserve user toggle
+    dependencies: resolveDependencyIds(manifest, project),
+    loadOrder: project.LoadOrder,
+    configBinding: resolveConfigSeedId(def.ConfigBinding, project),
+    themeBinding: resolveConfigSeedId(def.ThemeBinding, project),
+    cookieBinding: def.CookieBinding,
+    urlMatches: extractUrlMatches(project),
+    urlMatchRules: extractUrlMatchRules(project),
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 function isScriptStale(
-    current: StoredScript,
-    def: SeedScriptEntry,
-    project: SeedProjectEntry,
-    manifest: SeedManifest,
+  current: StoredScript,
+  def: SeedScriptEntry,
+  project: SeedProjectEntry,
+  manifest: SeedManifest,
 ): boolean {
-    return (
-        current.filePath !== def.FilePath ||
+  return (
+    current.filePath !== def.FilePath ||
         !current.code.startsWith(STUB_PREFIX) ||
         current.isGlobal !== project.IsGlobal ||
         current.loadOrder !== project.LoadOrder ||
@@ -365,7 +369,7 @@ function isScriptStale(
         JSON.stringify(current.dependencies ?? []) !== JSON.stringify(resolveDependencyIds(manifest, project)) ||
         JSON.stringify(current.urlMatches ?? []) !== JSON.stringify(extractUrlMatches(project)) ||
         JSON.stringify(current.urlMatchRules ?? []) !== JSON.stringify(extractUrlMatchRules(project))
-    );
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -374,89 +378,92 @@ function isScriptStale(
 
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- config fetch+upsert loop
 async function seedConfigsFromManifest(
-    manifest: SeedManifest,
+  manifest: SeedManifest,
 ): Promise<{ seeded: number; errors: string[] }> {
-    const result = await chrome.storage.local.get(STORAGE_KEY_ALL_CONFIGS);
-    const stored: StoredConfig[] = Array.isArray(result[STORAGE_KEY_ALL_CONFIGS])
-        ? result[STORAGE_KEY_ALL_CONFIGS]
-        : [];
+  const result = await chrome.storage.local.get(STORAGE_KEY_ALL_CONFIGS);
+  const stored: StoredConfig[] = Array.isArray(result[STORAGE_KEY_ALL_CONFIGS])
+    ? result[STORAGE_KEY_ALL_CONFIGS]
+    : [];
 
-    let changed = false;
-    let seeded = 0;
-    const errors: string[] = [];
+  let changed = false;
+  let seeded = 0;
+  const errors: string[] = [];
 
-    for (const project of manifest.Projects) {
-        if (!project.SeedOnInstall) continue;
+  for (const project of manifest.Projects) {
+    if (!project.SeedOnInstall) {
+      continue;
+    }
 
-        for (const configDef of project.Configs) {
-            try {
-                // Fetch the actual JSON content from extension dist
-                const configJson = await fetchConfigJson(configDef.FilePath);
+    for (const configDef of project.Configs) {
+      try {
+        // Fetch the actual JSON content from extension dist
+        const configJson = await fetchConfigJson(configDef.FilePath);
 
-                const idx = stored.findIndex((c) => c.id === configDef.SeedId);
+        const idx = stored.findIndex((c) => c.id === configDef.SeedId);
 
-                if (idx === -1) {
-                    stored.push(buildStoredConfig(configDef, configJson));
-                    changed = true;
-                    seeded++;
-                    continue;
-                }
-
-                const current = stored[idx];
-                if (current.name !== configDef.File || current.json !== configJson) {
-                    stored[idx] = {
-                        ...current,
-                        name: configDef.File,
-                        json: configJson,
-                        updatedAt: new Date().toISOString(),
-                    };
-                    changed = true;
-                    seeded++;
-                }
-            } catch (err) {
-                const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
-                errors.push(seedErrorMessage);
-                // Use warn instead of error — config fetch failures are non-fatal
-                // (hardcoded defaults are used) and should not inflate the error table
-                logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
-            }
+        if (idx === -1) {
+          stored.push(buildStoredConfig(configDef, configJson));
+          changed = true;
+          seeded++;
+          continue;
         }
-    }
 
-    if (changed) {
-        await chrome.storage.local.set({ [STORAGE_KEY_ALL_CONFIGS]: stored });
+        const current = stored[idx];
+        if (current.name !== configDef.File || current.json !== configJson) {
+          stored[idx] = {
+            ...current,
+            name: configDef.File,
+            json: configJson,
+            updatedAt: new Date().toISOString(),
+          };
+          changed = true;
+          seeded++;
+        }
+      } catch (err) {
+        const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
+        errors.push(seedErrorMessage);
+        // Use warn instead of error — config fetch failures are non-fatal
+        // (hardcoded defaults are used) and should not inflate the error table
+        logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
+      }
     }
+  }
 
-    return { seeded, errors };
+  if (changed) {
+    await chrome.storage.local.set({ [STORAGE_KEY_ALL_CONFIGS]: stored });
+  }
+
+  return { seeded, errors };
 }
 
 function buildStoredConfig(def: SeedConfigEntry, json: string): StoredConfig {
-    const now = new Date().toISOString();
+  const now = new Date().toISOString();
 
-    return {
-        id: def.SeedId,
-        name: def.File,
-        description: def.Description,
-        json,
-        createdAt: now,
-        updatedAt: now,
-    };
+  return {
+    id: def.SeedId,
+    name: def.File,
+    description: def.Description,
+    json,
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 async function fetchConfigJson(filePath: string): Promise<string> {
-    const url = chrome.runtime.getURL(filePath);
+  const url = chrome.runtime.getURL(filePath);
 
-    // HEFF: single attempt, fail-fast. The previous 3-attempt retry loop was
-    // a direct breach of mem://constraints/no-retry-policy and
-    // mem://constraints/http-error-fail-fast. Bundled-asset fetch failures
-    // mean the file is missing from dist/ — retrying cannot help.
-    const resp = ServiceResult.wrapFetch(await fetch(url));
-    if (resp.isFail) {
-        throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
-    }
-    const data = await resp.json();
+  // HEFF: single attempt, fail-fast. The previous 3-attempt retry loop was
+  // a direct breach of mem://constraints/no-retry-policy and
+  // mem://constraints/http-error-fail-fast. Bundled-asset fetch failures
+  // mean the file is missing from dist/ — retrying cannot help.
+  const resp = ServiceResult.wrapFetch(await fetch(url));
+  if (resp.isFail) {
+    throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
+  }
 
-    return JSON.stringify(data, null, 2);
+  const data = await resp.json();
+
+  return JSON.stringify(data, null, 2);
 }
 
 /* ------------------------------------------------------------------ */
@@ -467,13 +474,16 @@ async function fetchConfigJson(filePath: string): Promise<string> {
  * Resolves a config key (e.g., "config") to its seedId within the project.
  */
 function resolveConfigSeedId(
-    key: string | undefined,
-    project: SeedProjectEntry,
+  key: string | undefined,
+  project: SeedProjectEntry,
 ): string | undefined {
-    if (!key) return undefined;
-    const config = project.Configs.find((c) => c.Key === key);
+  if (!key) {
+    return undefined;
+  }
 
-    return config?.SeedId;
+  const config = project.Configs.find((c) => c.Key === key);
+
+  return config?.SeedId;
 }
 
 /**
@@ -482,22 +492,22 @@ function resolveConfigSeedId(
  * Falls back to looking up the manifest entry for the dependency name.
  */
 function resolveDependencyIds(manifest: SeedManifest, project: SeedProjectEntry): string[] {
-    const resolved = new Set<string>();
+  const resolved = new Set<string>();
 
-    for (const dependencyName of project.Dependencies) {
-        const dependencyProject = manifest.Projects.find((entry) => entry.Name === dependencyName);
+  for (const dependencyName of project.Dependencies) {
+    const dependencyProject = manifest.Projects.find((entry) => entry.Name === dependencyName);
 
-        if (!dependencyProject || dependencyProject.Scripts.length === 0) {
-            resolved.add(dependencyName);
-            continue;
-        }
-
-        for (const dependencyScript of dependencyProject.Scripts) {
-            resolved.add(dependencyScript.SeedId);
-        }
+    if (!dependencyProject || dependencyProject.Scripts.length === 0) {
+      resolved.add(dependencyName);
+      continue;
     }
 
-    return [...resolved];
+    for (const dependencyScript of dependencyProject.Scripts) {
+      resolved.add(dependencyScript.SeedId);
+    }
+  }
+
+  return [...resolved];
 }
 
 /* ------------------------------------------------------------------ */
@@ -514,86 +524,86 @@ function resolveDependencyIds(manifest: SeedManifest, project: SeedProjectEntry)
  * Idempotent: insert when missing, refresh when stale, skip when current.
  */
 export async function seedProjectsFromManifest(
-    manifest: SeedManifest,
+  manifest: SeedManifest,
 ): Promise<{ seeded: number; errors: string[]; migrated: number }> {
-    const result = await chrome.storage.local.get(STORAGE_KEY_ALL_PROJECTS);
-    const initial: StoredProject[] = Array.isArray(result[STORAGE_KEY_ALL_PROJECTS])
-        ? result[STORAGE_KEY_ALL_PROJECTS]
-        : [];
-    const seedableProjects = getSeedableManifestProjects(manifest);
+  const result = await chrome.storage.local.get(STORAGE_KEY_ALL_PROJECTS);
+  const initial: StoredProject[] = Array.isArray(result[STORAGE_KEY_ALL_PROJECTS])
+    ? result[STORAGE_KEY_ALL_PROJECTS]
+    : [];
+  const seedableProjects = getSeedableManifestProjects(manifest);
 
-    // Migration guard (Issue 119 Step 7): collapse duplicate ids, drop
-    // legacy slug-collisions in favour of the canonical SeedId, and bump
-    // schemaVersion on stale records. Runs before upsert so the diff
-    // loop sees a clean baseline.
-    const { canonicalIds, canonicalSlugs } = buildCanonicalProjectMaps(seedableProjects);
-    const { migrated, projects: stored } = migrateLegacyProjectRecords(
-        initial,
-        canonicalIds,
-        canonicalSlugs,
-    );
-    let changed = migrated > 0;
-    let seeded = 0;
-    const errors: string[] = [];
+  // Migration guard (Issue 119 Step 7): collapse duplicate ids, drop
+  // legacy slug-collisions in favour of the canonical SeedId, and bump
+  // schemaVersion on stale records. Runs before upsert so the diff
+  // loop sees a clean baseline.
+  const { canonicalIds, canonicalSlugs } = buildCanonicalProjectMaps(seedableProjects);
+  const { migrated, projects: stored } = migrateLegacyProjectRecords(
+    initial,
+    canonicalIds,
+    canonicalSlugs,
+  );
+  let changed = migrated > 0;
+  let seeded = 0;
+  const errors: string[] = [];
 
-    for (const project of seedableProjects) {
-        try {
-            if (upsertManifestProject(project, stored)) {
-                changed = true;
-                seeded++;
-            }
-        } catch (err) {
-            const seedErrorMessage = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
-            errors.push(seedErrorMessage);
-            logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
-        }
+  for (const project of seedableProjects) {
+    try {
+      if (upsertManifestProject(project, stored)) {
+        changed = true;
+        seeded++;
+      }
+    } catch (err) {
+      const seedErrorMessage = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
+      errors.push(seedErrorMessage);
+      logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
     }
+  }
 
-    if (changed) {
-        await chrome.storage.local.set({ [STORAGE_KEY_ALL_PROJECTS]: stored });
-    }
+  if (changed) {
+    await chrome.storage.local.set({ [STORAGE_KEY_ALL_PROJECTS]: stored });
+  }
 
-    return { seeded, errors, migrated };
+  return { seeded, errors, migrated };
 }
 
 function getSeedableManifestProjects(manifest: SeedManifest): SeedProjectEntry[] {
-    return manifest.Projects.filter(
-        (project) => project.SeedOnInstall && !PROJECT_OWNED_BY_DEFAULT_SEEDER.has(project.Name),
-    );
+  return manifest.Projects.filter(
+    (project) => project.SeedOnInstall && !PROJECT_OWNED_BY_DEFAULT_SEEDER.has(project.Name),
+  );
 }
 
 function buildCanonicalProjectMaps(
-    projects: SeedProjectEntry[],
+  projects: SeedProjectEntry[],
 ): { canonicalIds: Set<string>; canonicalSlugs: Map<string, string> } {
-    return {
-        canonicalIds: new Set(projects.map((project) => project.SeedId)),
-        canonicalSlugs: new Map(projects.map((project) => [project.Name, project.SeedId])),
-    };
+  return {
+    canonicalIds: new Set(projects.map((project) => project.SeedId)),
+    canonicalSlugs: new Map(projects.map((project) => [project.Name, project.SeedId])),
+  };
 }
 
 function upsertManifestProject(project: SeedProjectEntry, stored: StoredProject[]): boolean {
-    const canonical = buildStoredProjectFromSeed(project);
-    const idx = stored.findIndex((storedProject) => storedProject.id === canonical.id);
+  const canonical = buildStoredProjectFromSeed(project);
+  const idx = stored.findIndex((storedProject) => storedProject.id === canonical.id);
 
-    if (idx === -1) {
-        console.log("[manifest-seeder:projects] + INSERT %s (id=%s)", project.Name, canonical.id);
-        stored.push(canonical);
-
-        return true;
-    }
-
-    if (isStoredProjectEquivalent(stored[idx], canonical)) {
-        return false;
-    }
-
-    console.log("[manifest-seeder:projects] ↻ REFRESH %s (id=%s)", project.Name, canonical.id);
-    stored[idx] = {
-        ...canonical,
-        createdAt: stored[idx].createdAt,
-        settings: { ...canonical.settings, ...stored[idx].settings },
-    };
+  if (idx === -1) {
+    console.log("[manifest-seeder:projects] + INSERT %s (id=%s)", project.Name, canonical.id);
+    stored.push(canonical);
 
     return true;
+  }
+
+  if (isStoredProjectEquivalent(stored[idx], canonical)) {
+    return false;
+  }
+
+  console.log("[manifest-seeder:projects] ↻ REFRESH %s (id=%s)", project.Name, canonical.id);
+  stored[idx] = {
+    ...canonical,
+    createdAt: stored[idx].createdAt,
+    settings: { ...canonical.settings, ...stored[idx].settings },
+  };
+
+  return true;
 }
 
 /**
@@ -613,124 +623,124 @@ export const PROJECT_SCHEMA_VERSION = 1;
  *  - bumps `schemaVersion` on rows below the current version.
  */
 export function migrateLegacyProjectRecords(
-    projects: StoredProject[],
-    canonicalIds: Set<string>,
-    canonicalSlugs: Map<string, string>,
+  projects: StoredProject[],
+  canonicalIds: Set<string>,
+  canonicalSlugs: Map<string, string>,
 ): { projects: StoredProject[]; migrated: number } {
-    const seenIds = new Set<string>();
-    const out: StoredProject[] = [];
-    let migrated = 0;
+  const seenIds = new Set<string>();
+  const out: StoredProject[] = [];
+  let migrated = 0;
 
-    for (const project of projects) {
-        // Drop exact-id duplicates (last-wins would lose user state — keep first).
-        if (seenIds.has(project.id)) {
-            console.log("[manifest-seeder:migrate] drop duplicate id=%s", project.id);
-            migrated++;
-            continue;
-        }
+  for (const project of projects) {
+    // Drop exact-id duplicates (last-wins would lose user state — keep first).
+    if (seenIds.has(project.id)) {
+      console.log("[manifest-seeder:migrate] drop duplicate id=%s", project.id);
+      migrated++;
+      continue;
+    }
 
-        // Drop legacy slug-collision rows so the canonical SeedId can claim the slot.
-        const canonicalForSlug = project.slug ? canonicalSlugs.get(project.slug) : undefined;
-        const isLegacySlugCollision =
+    // Drop legacy slug-collision rows so the canonical SeedId can claim the slot.
+    const canonicalForSlug = project.slug ? canonicalSlugs.get(project.slug) : undefined;
+    const isLegacySlugCollision =
             canonicalForSlug !== undefined &&
             canonicalForSlug !== project.id &&
             !canonicalIds.has(project.id);
 
-        if (isLegacySlugCollision) {
-            console.log(
-                "[manifest-seeder:migrate] drop legacy slug-collision slug=%s id=%s (canonical=%s)",
-                project.slug, project.id, canonicalForSlug,
-            );
-            migrated++;
-            continue;
-        }
-
-        seenIds.add(project.id);
-
-        // Bump schemaVersion in place if stale.
-        if ((project.schemaVersion ?? 0) < PROJECT_SCHEMA_VERSION) {
-            out.push({ ...project, schemaVersion: PROJECT_SCHEMA_VERSION });
-            migrated++;
-        } else {
-            out.push(project);
-        }
+    if (isLegacySlugCollision) {
+      console.log(
+        "[manifest-seeder:migrate] drop legacy slug-collision slug=%s id=%s (canonical=%s)",
+        project.slug, project.id, canonicalForSlug,
+      );
+      migrated++;
+      continue;
     }
 
-    return { projects: out, migrated };
+    seenIds.add(project.id);
+
+    // Bump schemaVersion in place if stale.
+    if ((project.schemaVersion ?? 0) < PROJECT_SCHEMA_VERSION) {
+      out.push({ ...project, schemaVersion: PROJECT_SCHEMA_VERSION });
+      migrated++;
+    } else {
+      out.push(project);
+    }
+  }
+
+  return { projects: out, migrated };
 }
 
 /** Builds a canonical `StoredProject` from a manifest project entry. */
 export function buildStoredProjectFromSeed(project: SeedProjectEntry): StoredProject {
-    const now = new Date().toISOString();
+  const now = new Date().toISOString();
 
-    return {
-        id: project.SeedId,
-        schemaVersion: 1,
-        slug: project.Name,
-        name: project.DisplayName || project.Name,
-        version: project.Version,
-        description: project.Description,
-        targetUrls: buildProjectTargetUrls(project),
-        scripts: buildProjectScripts(project),
-        configs: buildProjectConfigs(project),
-        cookies: buildProjectCookies(project),
-        settings: buildProjectSettings(project),
-        dependencies: project.Dependencies.map((dependency) => ({ projectId: dependency, version: "*" })),
-        isGlobal: project.IsGlobal,
-        isRemovable: project.IsRemovable,
-        createdAt: now,
-        updatedAt: now,
-    };
+  return {
+    id: project.SeedId,
+    schemaVersion: 1,
+    slug: project.Name,
+    name: project.DisplayName || project.Name,
+    version: project.Version,
+    description: project.Description,
+    targetUrls: buildProjectTargetUrls(project),
+    scripts: buildProjectScripts(project),
+    configs: buildProjectConfigs(project),
+    cookies: buildProjectCookies(project),
+    settings: buildProjectSettings(project),
+    dependencies: project.Dependencies.map((dependency) => ({ projectId: dependency, version: "*" })),
+    isGlobal: project.IsGlobal,
+    isRemovable: project.IsRemovable,
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 function buildProjectTargetUrls(project: SeedProjectEntry): UrlRule[] {
-    return (project.TargetUrls ?? []).map((targetUrl) => ({
-        pattern: targetUrl.Pattern,
-        matchType: targetUrl.MatchRuleType,
-    }));
+  return (project.TargetUrls ?? []).map((targetUrl) => ({
+    pattern: targetUrl.Pattern,
+    matchType: targetUrl.MatchRuleType,
+  }));
 }
 
 function buildProjectScripts(project: SeedProjectEntry): ScriptEntry[] {
-    return project.Scripts.map((script) => ({
-        path: script.SeedId,
-        order: script.Order,
-        runAt: script.RunAt,
-        configBinding: script.ConfigBinding ? resolveConfigSeedId(script.ConfigBinding, project) : undefined,
-        description: script.Description || project.Description,
-    }));
+  return project.Scripts.map((script) => ({
+    path: script.SeedId,
+    order: script.Order,
+    runAt: script.RunAt,
+    configBinding: script.ConfigBinding ? resolveConfigSeedId(script.ConfigBinding, project) : undefined,
+    description: script.Description || project.Description,
+  }));
 }
 
 function buildProjectConfigs(project: SeedProjectEntry): ConfigEntry[] {
-    return project.Configs.map((config) => ({
-        path: config.SeedId,
-        description: config.Description,
-    }));
+  return project.Configs.map((config) => ({
+    path: config.SeedId,
+    description: config.Description,
+  }));
 }
 
 function buildProjectCookies(project: SeedProjectEntry): StoredProject["cookies"] {
-    return (project.Cookies ?? []).map((cookie) => ({
-        cookieName: cookie.CookieName,
-        url: cookie.Url,
-        role: cookie.Role === "other" ? "custom" : cookie.Role,
-        description: cookie.Description,
-    }));
+  return (project.Cookies ?? []).map((cookie) => ({
+    cookieName: cookie.CookieName,
+    url: cookie.Url,
+    role: cookie.Role === "other" ? "custom" : cookie.Role,
+    description: cookie.Description,
+  }));
 }
 
 function buildProjectSettings(project: SeedProjectEntry): StoredProject["settings"] {
-    return {
-        onlyRunAsDependency: project.Settings?.OnlyRunAsDependency,
-        isolateScripts: project.Settings?.IsolateScripts,
-        logLevel: project.Settings?.LogLevel,
-        retryOnNavigate: project.Settings?.RetryOnNavigate,
-        chatBoxXPath: project.Settings?.ChatBoxXPath,
-        allowDynamicRequests: project.Settings?.AllowDynamicRequests,
-    };
+  return {
+    onlyRunAsDependency: project.Settings?.OnlyRunAsDependency,
+    isolateScripts: project.Settings?.IsolateScripts,
+    logLevel: project.Settings?.LogLevel,
+    retryOnNavigate: project.Settings?.RetryOnNavigate,
+    chatBoxXPath: project.Settings?.ChatBoxXPath,
+    allowDynamicRequests: project.Settings?.AllowDynamicRequests,
+  };
 }
 
 /** Returns true when two stored projects are structurally equivalent (ignores timestamps). */
 export function isStoredProjectEquivalent(a: StoredProject, b: StoredProject): boolean {
-    return (
-        a.id === b.id &&
+  return (
+    a.id === b.id &&
         a.name === b.name &&
         a.version === b.version &&
         (a.description ?? "") === (b.description ?? "") &&
@@ -741,5 +751,5 @@ export function isStoredProjectEquivalent(a: StoredProject, b: StoredProject): b
         JSON.stringify(a.dependencies ?? []) === JSON.stringify(b.dependencies ?? []) &&
         (a.isGlobal ?? false) === (b.isGlobal ?? false) &&
         (a.isRemovable ?? true) === (b.isRemovable ?? true)
-    );
+  );
 }

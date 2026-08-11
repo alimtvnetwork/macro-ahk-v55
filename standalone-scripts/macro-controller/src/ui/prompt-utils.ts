@@ -20,14 +20,20 @@ import { saveCommunication } from '../db/macro-db';
 import { PasteOutcomeType, CaptureSourceType } from "../types/enums";
 
 async function capturePasteSubmit(text: string, source: ChatSubmitSource): Promise<void> {
-  try { await captureChatSubmit({ source, text }); }
-  catch (e) { logError('capturePasteSubmit', 'chat-submit capture threw', e); }
+  try {
+    await captureChatSubmit({ source, text }); 
+  } catch (e) {
+    logError('capturePasteSubmit', 'chat-submit capture threw', e); 
+  }
 }
 
 // ── Prompt entry normalization ──
 // eslint-disable-next-line sonarjs/cognitive-complexity -- field-by-field validation with optional property copying
 export function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number }>[]): PromptEntry[] {
-  if (!Array.isArray(entries)) return [];
+  if (!Array.isArray(entries)) {
+    return [];
+  }
+
   const out: PromptEntry[] = [];
   let droppedCount = 0;
   for (const p of entries) {
@@ -41,17 +47,36 @@ export function normalizePromptEntries(entries: Partial<PromptEntry & { order?: 
         for (const v of raw.replaceValues) {
           out.push(buildExpandedEntry(raw, name, text, String(v)));
         }
+
         continue;
       }
 
       const entry: PromptEntry = { name, text };
-      if (raw.id) { entry.id = raw.id; }
-      if (raw.slug) { entry.slug = raw.slug; }
-      if (raw.category) { entry.category = raw.category; }
-      if (raw.isFavorite) { entry.isFavorite = true; }
-      if (raw.isDefault !== undefined) { entry.isDefault = raw.isDefault; }
-      if (Array.isArray(raw.tags)) { entry.tags = raw.tags; }
-      else { entry.tags = autoTagPrompt(name, text); }
+      if (raw.id) {
+        entry.id = raw.id; 
+      }
+
+      if (raw.slug) {
+        entry.slug = raw.slug; 
+      }
+
+      if (raw.category) {
+        entry.category = raw.category; 
+      }
+
+      if (raw.isFavorite) {
+        entry.isFavorite = true; 
+      }
+
+      if (raw.isDefault !== undefined) {
+        entry.isDefault = raw.isDefault; 
+      }
+
+      if (Array.isArray(raw.tags)) {
+        entry.tags = raw.tags; 
+      } else {
+        entry.tags = autoTagPrompt(name, text); 
+      }
 
       out.push(entry);
     } else {
@@ -59,6 +84,7 @@ export function normalizePromptEntries(entries: Partial<PromptEntry & { order?: 
       console.warn('[normalizePromptEntries] ⚠️ Dropped entry — name="' + (name || '(empty)') + '", text.length=' + text.length + ', id=' + (raw.id || '—') + ', slug=' + (raw.slug || '—') + '. Reason: ' + (!name ? 'missing name' : 'missing text'));
     }
   }
+
   if (droppedCount > 0) {
     console.warn('[normalizePromptEntries] ⚠️ Dropped ' + droppedCount + '/' + entries.length + ' entries due to missing name or text');
   }
@@ -84,14 +110,29 @@ function buildExpandedEntry(
   const slugBase = raw.slugTemplate || raw.slug || expandedName.toLowerCase().replace(/\s+/g, '-');
   const expandedSlug = substituteKey(slugBase, key, value);
   const entry: PromptEntry = { name: expandedName, text: expandedText, slug: expandedSlug };
-  if (raw.id) { entry.id = substituteKey(String(raw.id), key, value) + '-' + value; }
-  if (raw.category) { entry.category = raw.category; }
-  if (raw.isFavorite) { entry.isFavorite = true; }
-  if (raw.isDefault !== undefined) { entry.isDefault = raw.isDefault; }
+  if (raw.id) {
+    entry.id = substituteKey(String(raw.id), key, value) + '-' + value; 
+  }
+
+  if (raw.category) {
+    entry.category = raw.category; 
+  }
+
+  if (raw.isFavorite) {
+    entry.isFavorite = true; 
+  }
+
+  if (raw.isDefault !== undefined) {
+    entry.isDefault = raw.isDefault; 
+  }
+
   // Bridge fields per spec/30-next-button-reference/01-spec.md §1: let future
   // chip-row UI collapse expanded variants back into their parent group.
   entry.parentTitle = name;
-  if (raw.slug) { entry.parentSlug = raw.slug; }
+  if (raw.slug) {
+    entry.parentSlug = raw.slug; 
+  }
+
   entry.variantValue = value;
   entry.tags = Array.isArray(raw.tags) ? raw.tags : autoTagPrompt(expandedName, expandedText);
 
@@ -103,11 +144,25 @@ function autoTagPrompt(name: string, text: string): string[] {
   const tags: string[] = [];
   const content = (name + ' ' + text).toLowerCase();
   
-  if (content.includes('ui') || content.includes('style') || content.includes('css')) tags.push('ui');
-  if (content.includes('fix') || content.includes('bug') || content.includes('issue')) tags.push('fix');
-  if (content.includes('test') || content.includes('spec') || content.includes('vitest')) tags.push('testing');
-  if (content.includes('backend') || content.includes('api') || content.includes('sql')) tags.push('backend');
-  if (content.includes('refactor') || content.includes('clean')) tags.push('refactor');
+  if (content.includes('ui') || content.includes('style') || content.includes('css')) {
+    tags.push('ui');
+  }
+
+  if (content.includes('fix') || content.includes('bug') || content.includes('issue')) {
+    tags.push('fix');
+  }
+
+  if (content.includes('test') || content.includes('spec') || content.includes('vitest')) {
+    tags.push('testing');
+  }
+
+  if (content.includes('backend') || content.includes('api') || content.includes('sql')) {
+    tags.push('backend');
+  }
+
+  if (content.includes('refactor') || content.includes('clean')) {
+    tags.push('refactor');
+  }
   
   return tags;
 }
@@ -135,6 +190,7 @@ export function parseWithRecovery(content: string): unknown {
       if (trimmed.charAt(0) === '[') {
         repaired += ']';
       }
+
       try {
         return JSON.parse(repaired);
       } catch (_repairErr) {
@@ -142,6 +198,7 @@ export function parseWithRecovery(content: string): unknown {
         logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1);
       }
     }
+
     throw e;
   }
 }
@@ -167,7 +224,9 @@ export function showPasteToast(message: string, isError: boolean): void {
   // Enforce max stack — remove oldest if at limit
   while (container.children.length >= TOAST_MAX_STACK) {
     const oldest = container.lastElementChild;
-    if (oldest) oldest.remove();
+    if (oldest) {
+      oldest.remove();
+    }
   }
 
   const isMultiline = message.indexOf('\n') !== -1;
@@ -217,7 +276,9 @@ export function showPasteToast(message: string, isError: boolean): void {
   setTimeout(function() {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(8px)';
-    setTimeout(function() { toast.remove(); }, 250);
+    setTimeout(function() {
+      toast.remove(); 
+    }, 250);
   }, duration);
 }
 
@@ -309,15 +370,22 @@ function _buildCountdown(durationMs: number): {
   const startedAt = { t: 0 };
   const start = function(): void {
     startedAt.t = Date.now();
-    requestAnimationFrame(function() { bar.style.width = '0%'; });
+    requestAnimationFrame(function() {
+      bar.style.width = '0%'; 
+    });
     tickId = setInterval(function() {
       const remaining = Math.max(0, durationMs - (Date.now() - startedAt.t));
       label.textContent = Math.ceil(remaining / 1000) + 's';
-      if (remaining <= 0 && tickId !== null) { clearInterval(tickId); tickId = null; }
+      if (remaining <= 0 && tickId !== null) {
+        clearInterval(tickId); tickId = null; 
+      }
     }, 250);
   };
+
   const stop = function(): void {
-    if (tickId !== null) { clearInterval(tickId); tickId = null; }
+    if (tickId !== null) {
+      clearInterval(tickId); tickId = null; 
+    }
   };
 
   return { wrap, bar, label, start, stop };
@@ -341,7 +409,10 @@ function _wireUndoAction(
 ): void {
   let consumed = false;
   undoBtn.onclick = function(): void {
-    if (consumed) return;
+    if (consumed) {
+      return;
+    }
+
     consumed = true;
     undoBtn.disabled = true;
     undoBtn.textContent = '⏳';
@@ -352,7 +423,9 @@ function _wireUndoAction(
         (result as Promise<void>).catch(function(err) {
           logError('showUndoToast', 'onUndo threw', err);
           showPasteToast('❌ Undo failed: ' + toErrorMessage(err), true);
-        }).then(function() { dismiss(); });
+        }).then(function() {
+          dismiss(); 
+        });
       } else {
         dismiss();
       }
@@ -362,6 +435,7 @@ function _wireUndoAction(
       dismiss();
     }
   };
+
   (undoBtn as unknown as { __isConsumed: () => boolean }).__isConsumed = () => consumed;
 }
 
@@ -373,7 +447,9 @@ export function showUndoToast(
   const container = _getOrCreateToastContainer();
   while (container.children.length >= TOAST_MAX_STACK) {
     const oldest = container.lastElementChild;
-    if (oldest) oldest.remove();
+    if (oldest) {
+      oldest.remove();
+    }
   }
 
   const { toast, content, body } = _buildUndoToastShell();
@@ -394,8 +470,11 @@ export function showUndoToast(
     countdown.stop();
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(8px)';
-    setTimeout(function() { toast.remove(); }, 250);
+    setTimeout(function() {
+      toast.remove(); 
+    }, 250);
   };
+
   _wireUndoAction(undoBtn, onUndo, dismiss);
   content.appendChild(undoBtn);
 
@@ -410,7 +489,10 @@ export function showUndoToast(
 
   const isConsumed = (undoBtn as unknown as { __isConsumed: () => boolean }).__isConsumed;
   setTimeout(function() {
-    if (isConsumed()) return;
+    if (isConsumed()) {
+      return;
+    }
+
     dismiss();
   }, duration);
 }
@@ -420,12 +502,18 @@ export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: stri
   let el: Element | null = null;
   if (promptsCfg.pasteTargetXPath) {
     el = getByXPath(promptsCfg.pasteTargetXPath);
-    if (el) return el;
+    if (el) {
+      return el;
+    }
   }
+
   if (promptsCfg.pasteTargetSelector) {
     el = document.querySelector(promptsCfg.pasteTargetSelector);
-    if (el) return el;
+    if (el) {
+      return el;
+    }
   }
+
   const selectors = [
     'form textarea[placeholder]',
     'div[contenteditable="true"]',
@@ -435,7 +523,9 @@ export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: stri
   for (const sel of selectors) {
     el = document.querySelector(sel);
 
-    if (el) { return el; }
+    if (el) {
+      return el; 
+    }
   }
 
   return null;
@@ -453,6 +543,7 @@ function pasteIntoTextarea(target: HTMLElement, text: string): void {
   } else {
     (target as HTMLInputElement).value = newVal;
   }
+
   target.dispatchEvent(new Event('input', { bubbles: true }));
   target.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -511,14 +602,18 @@ export async function resolveDynamicVariables(text: string): Promise<string | nu
   const variableRegex = /\{\{\?([^}]+)\}\}/g;
   const matches = Array.from(text.matchAll(variableRegex));
 
-  if (matches.length === 0) return text;
+  if (matches.length === 0) {
+    return text;
+  }
 
   // Deduplicate variables
   const uniqueVars = Array.from(new Set(matches.map(m => m[1].trim())));
 
   // Show input modal
   const values = await showVariableInputModal(uniqueVars);
-  if (!values) return null; // User cancelled
+  if (!values) {
+    return null;
+  } // User cancelled
 
   let resolvedText = text;
   uniqueVars.forEach(v => {
@@ -575,7 +670,9 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid #313147;color:#94a3b8;border-radius:6px;cursor:pointer;';
-    cancelBtn.onclick = () => { overlay.remove(); resolve(null); };
+    cancelBtn.onclick = () => {
+      overlay.remove(); resolve(null); 
+    };
     
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Inject Prompt';
@@ -596,12 +693,19 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     // Focus first input
     const firstVar = vars[0];
-    if (firstVar) inputs[firstVar].focus();
+    if (firstVar) {
+      inputs[firstVar].focus();
+    }
 
     // Enter to submit
     overlay.onkeydown = (e) => {
-      if (e.key === 'Enter') submitBtn.click();
-      if (e.key === 'Escape') cancelBtn.click();
+      if (e.key === 'Enter') {
+        submitBtn.click();
+      }
+
+      if (e.key === 'Escape') {
+        cancelBtn.click();
+      }
     };
   });
 }
@@ -615,7 +719,10 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
 
   // 2. Handle dynamic variables
   const resolved = await resolveDynamicVariables(text);
-  if (resolved === null) return 'cancelled';
+  if (resolved === null) {
+    return 'cancelled';
+  }
+
   text = normalizeNewlines(resolved);
 
   const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
@@ -642,7 +749,9 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
       pasteIntoTextarea(target, text);
     } else {
       const ok = pasteIntoContentEditable(target, text);
-      if (!ok) return 'failed';
+      if (!ok) {
+        return 'failed';
+      }
     }
 
     log('Prompt injected: "' + text.substring(0, 80) + '..." (' + text.length + ' total chars)', 'success');
@@ -674,10 +783,15 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
   // Throttle helper
   let timer: number | null = null;
   const throttleSave = (text: string) => {
-    if (timer) clearTimeout(timer);
+    if (timer) {
+      clearTimeout(timer);
+    }
+
     timer = window.setTimeout(async () => {
       const projectId = extractProjectIdFromUrl();
-      if (!projectId) return;
+      if (!projectId) {
+        return;
+      }
 
       // 1. Save to IndexedDB
       const store = getProjectKvStore('macro-controller');

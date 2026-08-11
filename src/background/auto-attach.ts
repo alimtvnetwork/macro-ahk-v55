@@ -66,148 +66,169 @@ export interface AttachDecision {
  * the project has no binding for).
  */
 function checkAutoStart(project: StoredProject): AttachDecision | null {
-    if (project.settings?.autoStart === true) return null;
+  if (project.settings?.autoStart === true) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_AUTOSTART_OFF",
-        detail: `Project "${project.name}" has autoStart=false`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_AUTOSTART_OFF",
+    detail: `Project "${project.name}" has autoStart=false`,
+  };
 }
 
 function checkOptOut(script: LibraryScriptForAttach): AttachDecision | null {
-    if (script.instruction.AutoAttach !== false) return null;
+  if (script.instruction.AutoAttach !== false) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_OPT_OUT",
-        detail: `Script "${script.name}" declared AutoAttach=false`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_OPT_OUT",
+    detail: `Script "${script.name}" declared AutoAttach=false`,
+  };
 }
 
 function checkUrlOverlap(
-    project: StoredProject,
-    script: LibraryScriptForAttach,
+  project: StoredProject,
+  script: LibraryScriptForAttach,
 ): AttachDecision | null {
-    const urlMatches = script.instruction.UrlMatches ?? [];
-    const projectPatterns = project.targetUrls.map((r) => r.pattern);
-    const hasUrlOverlap = urlMatches.some((scriptPattern) =>
-        projectPatterns.some((projectPattern) =>
-            isUrlMatch(projectPattern, { pattern: scriptPattern, matchType: "glob" }),
-        ),
-    );
-    if (hasUrlOverlap) return null;
+  const urlMatches = script.instruction.UrlMatches ?? [];
+  const projectPatterns = project.targetUrls.map((r) => r.pattern);
+  const hasUrlOverlap = urlMatches.some((scriptPattern) =>
+    projectPatterns.some((projectPattern) =>
+      isUrlMatch(projectPattern, { pattern: scriptPattern, matchType: "glob" }),
+    ),
+  );
+  if (hasUrlOverlap) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_URL_NO_MATCH",
-        detail: `Script UrlMatches [${urlMatches.join(", ")}] do not overlap project URLs [${projectPatterns.join(", ")}]`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_URL_NO_MATCH",
+    detail: `Script UrlMatches [${urlMatches.join(", ")}] do not overlap project URLs [${projectPatterns.join(", ")}]`,
+  };
 }
 
 function checkAlreadyAttached(
-    project: StoredProject,
-    script: LibraryScriptForAttach,
+  project: StoredProject,
+  script: LibraryScriptForAttach,
 ): AttachDecision | null {
-    const isAlreadyAttached = project.scripts.some(
-        (s) => s.path === script.id || s.path === script.name,
-    );
-    if (!isAlreadyAttached) return null;
+  const isAlreadyAttached = project.scripts.some(
+    (s) => s.path === script.id || s.path === script.name,
+  );
+  if (!isAlreadyAttached) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_ALREADY_ATTACHED",
-        detail: `Script "${script.name}" already in project.scripts`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_ALREADY_ATTACHED",
+    detail: `Script "${script.name}" already in project.scripts`,
+  };
 }
 
 function checkRunContext(script: LibraryScriptForAttach): AttachDecision | null {
-    const declaredWorld = script.instruction.World;
-    const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
-    if (!isIncompatibleWorld) return null;
+  const declaredWorld = script.instruction.World;
+  const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
+  if (!isIncompatibleWorld) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT",
-        detail: `Script declares World="${declaredWorld}"; pipeline requires MAIN`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT",
+    detail: `Script declares World="${declaredWorld}"; pipeline requires MAIN`,
+  };
 }
 
 function checkCookieBindings(
-    projectCookieNames: ReadonlySet<string>,
-    script: LibraryScriptForAttach,
+  projectCookieNames: ReadonlySet<string>,
+  script: LibraryScriptForAttach,
 ): AttachDecision | null {
-    const requiredCookies = script.instruction.RequiredCookies ?? [];
-    const missingCookie = requiredCookies.find((name) => !projectCookieNames.has(name));
-    if (missingCookie === undefined) return null;
+  const requiredCookies = script.instruction.RequiredCookies ?? [];
+  const missingCookie = requiredCookies.find((name) => !projectCookieNames.has(name));
+  if (missingCookie === undefined) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING",
-        detail: `Project has no cookie binding for "${missingCookie}"`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING",
+    detail: `Project has no cookie binding for "${missingCookie}"`,
+  };
 }
 
 function checkDependencies(
-    script: LibraryScriptForAttach,
-    libraryIds: ReadonlySet<string>,
+  script: LibraryScriptForAttach,
+  libraryIds: ReadonlySet<string>,
 ): AttachDecision | null {
-    const declaredDeps = script.instruction.Dependencies ?? [];
-    const missingDep = declaredDeps.find((depId) => !libraryIds.has(depId));
-    if (missingDep === undefined) return null;
+  const declaredDeps = script.instruction.Dependencies ?? [];
+  const missingDep = declaredDeps.find((depId) => !libraryIds.has(depId));
+  if (missingDep === undefined) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_DEP_MISSING",
-        detail: `Dependency "${missingDep}" is not in the library`,
-    };
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_DEP_MISSING",
+    detail: `Dependency "${missingDep}" is not in the library`,
+  };
 }
 
 function checkInjectionConditions(
-    projectCookieNames: ReadonlySet<string>,
-    script: LibraryScriptForAttach,
+  projectCookieNames: ReadonlySet<string>,
+  script: LibraryScriptForAttach,
 ): AttachDecision | null {
-    const cond = script.instruction.InjectionConditions;
-    const hasCookieRequirement = cond !== undefined && cond.requireCookie != null;
-    if (!hasCookieRequirement) return null;
-    const cookieName = cond!.requireCookie as string;
-    if (projectCookieNames.has(cookieName)) return null;
+  const cond = script.instruction.InjectionConditions;
+  const hasCookieRequirement = cond !== undefined && cond.requireCookie != null;
+  if (!hasCookieRequirement) {
+    return null;
+  }
 
-    return {
-        ok: false,
-        reason: "AUTOATTACH_SKIPPED_CONDITION_FAIL",
-        detail: `InjectionConditions.requireCookie="${cookieName}" has no project binding`,
-    };
+  const cookieName = cond!.requireCookie as string;
+  if (projectCookieNames.has(cookieName)) {
+    return null;
+  }
+
+  return {
+    ok: false,
+    reason: "AUTOATTACH_SKIPPED_CONDITION_FAIL",
+    detail: `InjectionConditions.requireCookie="${cookieName}" has no project binding`,
+  };
 }
 
 export function evaluateAutoAttach(
-    project: StoredProject,
-    script: LibraryScriptForAttach,
-    libraryIds: ReadonlySet<string>,
+  project: StoredProject,
+  script: LibraryScriptForAttach,
+  libraryIds: ReadonlySet<string>,
 ): AttachDecision {
-    const projectCookieNames = new Set(
-        (project.cookies ?? []).map((c) => c.cookieName),
-    );
-    const gates: Array<() => AttachDecision | null> = [
-        () => checkAutoStart(project),
-        () => checkOptOut(script),
-        () => checkUrlOverlap(project, script),
-        () => checkAlreadyAttached(project, script),
-        () => checkRunContext(script),
-        () => checkCookieBindings(projectCookieNames, script),
-        () => checkDependencies(script, libraryIds),
-        () => checkInjectionConditions(projectCookieNames, script),
-    ];
-    for (const gate of gates) {
-        const skip = gate();
-        if (skip !== null) return skip;
+  const projectCookieNames = new Set(
+    (project.cookies ?? []).map((c) => c.cookieName),
+  );
+  const gates: Array<() => AttachDecision | null> = [
+    () => checkAutoStart(project),
+    () => checkOptOut(script),
+    () => checkUrlOverlap(project, script),
+    () => checkAlreadyAttached(project, script),
+    () => checkRunContext(script),
+    () => checkCookieBindings(projectCookieNames, script),
+    () => checkDependencies(script, libraryIds),
+    () => checkInjectionConditions(projectCookieNames, script),
+  ];
+  for (const gate of gates) {
+    const skip = gate();
+    if (skip !== null) {
+      return skip;
     }
+  }
 
-    return {
-        ok: true,
-        reason: "OK",
-        detail: `All C1..C8 satisfied for "${script.name}"`,
-    };
+  return {
+    ok: true,
+    reason: "OK",
+    detail: `All C1..C8 satisfied for "${script.name}"`,
+  };
 }
 
 /**
@@ -215,12 +236,12 @@ export function evaluateAutoAttach(
  * Caller is responsible for persisting the project and logging the attach.
  */
 export function buildAttachedScriptEntry(
-    script: LibraryScriptForAttach,
-    order: number,
+  script: LibraryScriptForAttach,
+  order: number,
 ): ScriptEntry {
-    return {
-        path: script.id,
-        order,
-        runAt: script.instruction.RunAt ?? "document_idle",
-    };
+  return {
+    path: script.id,
+    order,
+    runAt: script.instruction.RunAt ?? "document_idle",
+  };
 }

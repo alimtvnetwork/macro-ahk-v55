@@ -19,77 +19,90 @@ import { KeywordEventsPanel } from "@/components/recorder/KeywordEventsPanel";
 import { flushEffects } from "@/test/support";
 
 function openPanel(): void {
-    fireEvent.click(screen.getByTestId("keyword-events-open"));
+  fireEvent.click(screen.getByTestId("keyword-events-open"));
 }
 
 function addEvent(name: string): void {
-    const input = screen.getByTestId("keyword-events-new-input") as HTMLInputElement;
-    fireEvent.change(input, { target: { value: name } });
-    fireEvent.keyDown(input, { key: "Enter" });
+  const input = screen.getByTestId("keyword-events-new-input") as HTMLInputElement;
+  fireEvent.change(input, { target: { value: name } });
+  fireEvent.keyDown(input, { key: "Enter" });
 }
 
 function eventCards(): HTMLElement[] {
-    // Outer event cards have testid "keyword-event-<uuid>" (UUIDs contain
-    // dashes). Filter by structural depth: the outer card directly hosts an
-    // input labelled "Keyword".
-    const all = Array.from(document.querySelectorAll<HTMLElement>("[data-testid^='keyword-event-']"));
+  // Outer event cards have testid "keyword-event-<uuid>" (UUIDs contain
+  // dashes). Filter by structural depth: the outer card directly hosts an
+  // input labelled "Keyword".
+  const all = Array.from(document.querySelectorAll<HTMLElement>("[data-testid^='keyword-event-']"));
 
-    return all.filter(el => {
-        const tid = el.getAttribute("data-testid") ?? "";
-        if (!tid.startsWith("keyword-event-")) return false;
-        if (tid.startsWith("keyword-event-step")) return false;
-        if (tid.startsWith("keyword-event-sortable-")) return false;
-        if (tid.startsWith("keyword-events-")) return false;
+  return all.filter(el => {
+    const tid = el.getAttribute("data-testid") ?? "";
+    if (!tid.startsWith("keyword-event-")) {
+      return false;
+    }
 
-        // The outer card hosts the keyword input directly.
-        return !!el.querySelector("input[aria-label='Keyword']");
-    });
+    if (tid.startsWith("keyword-event-step")) {
+      return false;
+    }
+
+    if (tid.startsWith("keyword-event-sortable-")) {
+      return false;
+    }
+
+    if (tid.startsWith("keyword-events-")) {
+      return false;
+    }
+
+    // The outer card hosts the keyword input directly.
+    return !!el.querySelector("input[aria-label='Keyword']");
+  });
 }
 
 describe("KeywordEventsPanel, multi-selection", () => {
-    beforeEach(() => {
-        localStorage.clear();
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("plain, shift, and ctrl clicks drive the selection toolbar count", async () => {
+    render(<KeywordEventsPanel />);
+    await flushEffects();
+    openPanel();
+    await flushEffects();
+    act(() => {
+      addEvent("alpha");
+      addEvent("bravo");
+      addEvent("charlie");
     });
+    await flushEffects();
 
-    it("plain, shift, and ctrl clicks drive the selection toolbar count", async () => {
-        render(<KeywordEventsPanel />);
-        await flushEffects();
-        openPanel();
-        await flushEffects();
-        act(() => {
-            addEvent("alpha");
-            addEvent("bravo");
-            addEvent("charlie");
-        });
-        await flushEffects();
+    const cards = eventCards();
+    expect(cards.length).toBe(3);
 
-        const cards = eventCards();
-        expect(cards.length).toBe(3);
+    // Plain click on the first card → 1 selected.
+    fireEvent.click(cards[0]);
+    expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("1 selected");
 
-        // Plain click on the first card → 1 selected.
-        fireEvent.click(cards[0]);
-        expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("1 selected");
+    // Shift-click on the third card → range of 3.
+    fireEvent.click(cards[2], { shiftKey: true });
+    expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("3 selected");
 
-        // Shift-click on the third card → range of 3.
-        fireEvent.click(cards[2], { shiftKey: true });
-        expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("3 selected");
+    // Ctrl-click toggles the middle one off → 2 selected.
+    fireEvent.click(cards[1], { ctrlKey: true });
+    expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("2 selected");
 
-        // Ctrl-click toggles the middle one off → 2 selected.
-        fireEvent.click(cards[1], { ctrlKey: true });
-        expect(screen.getByTestId("keyword-events-selection-count").textContent).toBe("2 selected");
+    // Clear button empties the selection.
+    fireEvent.click(screen.getByTestId("keyword-events-selection-clear"));
+    expect(screen.queryByTestId("keyword-events-selection-toolbar")).toBeNull();
+    await flushEffects();
+  });
 
-        // Clear button empties the selection.
-        fireEvent.click(screen.getByTestId("keyword-events-selection-clear"));
-        expect(screen.queryByTestId("keyword-events-selection-toolbar")).toBeNull();
-        await flushEffects();
+  it("selection toolbar is hidden when nothing is selected", async () => {
+    render(<KeywordEventsPanel />);
+    await flushEffects();
+    openPanel();
+    act(() => {
+      addEvent("solo"); 
     });
-
-    it("selection toolbar is hidden when nothing is selected", async () => {
-        render(<KeywordEventsPanel />);
-        await flushEffects();
-        openPanel();
-        act(() => { addEvent("solo"); });
-        await flushEffects();
-        expect(screen.queryByTestId("keyword-events-selection-toolbar")).toBeNull();
-    });
+    await flushEffects();
+    expect(screen.queryByTestId("keyword-events-selection-toolbar")).toBeNull();
+  });
 });

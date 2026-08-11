@@ -18,33 +18,35 @@ interface MaybeNamespaceWindow {
 }
 
 function getLogger(): NamespaceLogger | null {
-    try {
-        const w = window as unknown as MaybeNamespaceWindow;
+  try {
+    const w = window as unknown as MaybeNamespaceWindow;
 
-        return w.RiseupAsiaMacroExt?.Logger ?? null;
-    } catch {
-        return null;
-    }
+    return w.RiseupAsiaMacroExt?.Logger ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function logError(scope: string, caught: CaughtError): void {
-    const fullScope = `${SCOPE_PREFIX}${scope}`;
-    const logger = getLogger();
-    if (logger) {
-        logger.error(fullScope, caught);
+  const fullScope = `${SCOPE_PREFIX}${scope}`;
+  const logger = getLogger();
+  if (logger) {
+    logger.error(fullScope, caught);
 
-        return;
-    }
-    console.error(fullScope, caught);
+    return;
+  }
+
+  console.error(fullScope, caught);
 }
 
 export function logWarn(scope: string, message: string): void {
-    const fullScope = `${SCOPE_PREFIX}${scope}`;
-    const logger = getLogger();
-    if (logger?.warn) {
-        logger.warn(fullScope, message);
+  const fullScope = `${SCOPE_PREFIX}${scope}`;
+  const logger = getLogger();
+  if (logger?.warn) {
+    logger.warn(fullScope, message);
 
-        return;
-    }
-    console.warn(fullScope, message);
+    return;
+  }
+
+  console.warn(fullScope, message);
 }

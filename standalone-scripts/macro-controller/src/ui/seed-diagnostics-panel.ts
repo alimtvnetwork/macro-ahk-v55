@@ -40,9 +40,12 @@ const STATUS_COLOR: Record<SeedStageStatusType, string> = {
 
 export function openSeedDiagnosticsPanel(): void {
   const existing = document.getElementById('marco-seed-diag-panel');
-  if (existing) { existing.remove();
+  if (existing) {
+    existing.remove();
 
- return; }
+    return; 
+  }
+
   const backdrop = buildBackdrop();
   const modal = buildModal();
   backdrop.appendChild(modal);
@@ -54,7 +57,11 @@ function buildBackdrop(): HTMLDivElement {
   backdrop.id = 'marco-seed-diag-panel';
   backdrop.style.cssText =
     'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2147483000;display:flex;align-items:center;justify-content:center;';
-  backdrop.onclick = (evt) => { if (evt.target === backdrop) backdrop.remove(); };
+  backdrop.onclick = (evt) => {
+    if (evt.target === backdrop) {
+      backdrop.remove();
+    } 
+  };
 
   return backdrop;
 }
@@ -87,7 +94,10 @@ function buildE005Section(): HTMLDivElement {
   downloadBtn.setAttribute('data-testid', 'marco-download-e005-zip');
   downloadBtn.style.cssText =
     'background:#1d4ed8;color:#e5e7eb;border:0;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;';
-  downloadBtn.onclick = () => { downloadE005DiagnosticsZip(); };
+  downloadBtn.onclick = () => {
+    downloadE005DiagnosticsZip(); 
+  };
+
   headerRow.appendChild(title);
   headerRow.appendChild(downloadBtn);
   wrap.appendChild(headerRow);
@@ -97,7 +107,10 @@ function buildE005Section(): HTMLDivElement {
 
     return wrap;
   }
-  for (const summary of summaries) wrap.appendChild(renderE005Summary(summary));
+
+  for (const summary of summaries) {
+    wrap.appendChild(renderE005Summary(summary));
+  }
 
   return wrap;
 }
@@ -132,7 +145,10 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
 }
 
 function buildE005SummaryText(summaries: PromptEditE005Summary[]): string {
-  if (summaries.length === 0) return 'No PROMPT_EDIT_E005 snapshots recorded.\n';
+  if (summaries.length === 0) {
+    return 'No PROMPT_EDIT_E005 snapshots recorded.\n';
+  }
+
   const lines: string[] = ['PROMPT_EDIT_E005 latest-by-role summary', ''];
   for (const summary of summaries) {
     lines.push('- role=' + summary.role);
@@ -141,7 +157,10 @@ function buildE005SummaryText(summaries: PromptEditE005Summary[]): string {
     lines.push('    orphanMismatch   : ' + summary.orphanRoleMismatch);
     lines.push('    site             : ' + summary.site);
     lines.push('    at               : ' + summary.at);
-    if (summary.reason) lines.push('    reason           : ' + summary.reason);
+    if (summary.reason) {
+      lines.push('    reason           : ' + summary.reason);
+    }
+
     lines.push('');
   }
 
@@ -189,12 +208,14 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
   for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
     lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? NOT_ACCEPTED));
   }
+
   lines.push('');
   lines.push('## Candidate probe order');
   lines.push('');
   for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
     lines.push('- ' + bucket + ': ' + bridge.candidates[bucket].join(', '));
   }
+
   lines.push('');
   lines.push('## Observed contract-shape rejections (this session)');
   lines.push('');
@@ -205,7 +226,11 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
       lines.push('- [' + r.at + '] ' + bucket + '/' + r.method + ': ' + r.message);
     }
   }
-  if (!any) lines.push('(none)');
+
+  if (!any) {
+    lines.push('(none)');
+  }
+
   lines.push('');
 
   return lines.join('\n');
@@ -221,7 +246,10 @@ function buildErrorTraceSection(title: string, code: string): HTMLDivElement {
 
     return wrap;
   }
-  for (const evt of events.slice(-10).reverse()) wrap.appendChild(renderTraceRow(evt));
+
+  for (const evt of events.slice(-10).reverse()) {
+    wrap.appendChild(renderTraceRow(evt));
+  }
 
   return wrap;
 }
@@ -255,7 +283,10 @@ function buildHeader(): HTMLDivElement {
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
   closeBtn.style.cssText = 'background:#334155;color:#e5e7eb;border:0;padding:4px 10px;border-radius:4px;cursor:pointer;';
-  closeBtn.onclick = () => { document.getElementById('marco-seed-diag-panel')?.remove(); };
+  closeBtn.onclick = () => {
+    document.getElementById('marco-seed-diag-panel')?.remove(); 
+  };
+
   header.appendChild(title);
   header.appendChild(closeBtn);
 
@@ -271,13 +302,17 @@ function buildSnapshotSection(): HTMLDivElement {
 
     return wrap;
   }
+
   wrap.appendChild(sectionTitle('Last boot snapshot'));
   const meta = document.createElement('div');
   meta.style.cssText = 'margin-bottom:8px;color:#94a3b8;';
   meta.textContent = 'at ' + formatLocal(snap.at) + '  overall=' + snap.overall;
   meta.style.color = STATUS_COLOR[snap.overall];
   wrap.appendChild(meta);
-  for (const stage of snap.stages) wrap.appendChild(renderStageRow(stage));
+  for (const stage of snap.stages) {
+    wrap.appendChild(renderStageRow(stage));
+  }
+
   if (snap.orphanRepair && snap.orphanRepair.entries.length > 0) {
     wrap.appendChild(sectionTitle('Orphan repair entries'));
     for (const entry of snap.orphanRepair.entries) {
@@ -311,9 +346,14 @@ function renderStageRow(stage: SeedStageReport): HTMLDivElement {
 
 function buildStageDetail(stage: SeedStageReport): string {
   const parts: string[] = [stage.status];
-  if (stage.reason) parts.push('reason=' + stage.reason);
+  if (stage.reason) {
+    parts.push('reason=' + stage.reason);
+  }
+
   if (stage.metrics) {
-    for (const [key, value] of Object.entries(stage.metrics)) parts.push(key + '=' + value);
+    for (const [key, value] of Object.entries(stage.metrics)) {
+      parts.push(key + '=' + value);
+    }
   }
 
   return parts.join('  ');
@@ -329,8 +369,11 @@ function buildTraceSection(): HTMLDivElement {
 
     return wrap;
   }
+
   const recent = events.slice(-20).reverse();
-  for (const evt of recent) wrap.appendChild(renderTraceRow(evt));
+  for (const evt of recent) {
+    wrap.appendChild(renderTraceRow(evt));
+  }
 
   return wrap;
 }
@@ -356,9 +399,17 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
 }
 
 function toastColor(level: string): string {
-  if (level === 'error') return '#ef4444';
-  if (level === 'warn') return '#f59e0b';
-  if (level === 'success') return '#22c55e';
+  if (level === 'error') {
+    return '#ef4444';
+  }
+
+  if (level === 'warn') {
+    return '#f59e0b';
+  }
+
+  if (level === 'success') {
+    return '#22c55e';
+  }
 
   return '#93c5fd';
 }
@@ -380,5 +431,9 @@ function muted(text: string): HTMLDivElement {
 }
 
 function formatLocal(iso: string): string {
-  try { return new Date(iso).toLocaleString(); } catch { return iso; }
+  try {
+    return new Date(iso).toLocaleString(); 
+  } catch {
+    return iso; 
+  }
 }

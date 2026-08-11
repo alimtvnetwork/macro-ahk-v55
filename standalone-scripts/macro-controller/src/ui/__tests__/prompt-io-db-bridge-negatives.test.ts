@@ -22,81 +22,86 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 const listMock = vi.hoisted(() => vi.fn());
 const upsertMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: listMock,
-    upsertPrompt: upsertMock,
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: listMock,
+  upsertPrompt: upsertMock,
 }));
 
 import {
-    collectDbEntriesForExport,
-    commitDbEntries,
+  collectDbEntriesForExport,
+  commitDbEntries,
 } from '../prompt-io-db-bridge';
 import { logError } from '../../error-utils';
 import type { CachedPromptEntry } from '../prompt-cache';
 
 beforeEach(() => {
-    listMock.mockReset();
-    upsertMock.mockReset();
-    (logError as unknown as Mock).mockClear();
+  listMock.mockReset();
+  upsertMock.mockReset();
+  (logError as unknown as Mock).mockClear();
 });
 
 describe('commitDbEntries — negative paths', () => {
-    it('missing role: reports "missing role" and never calls upsert', async () => {
-        const entries: CachedPromptEntry[] = [
-            { name: 'X', text: 'x', slug: 'x-1' /* no role */ },
-        ];
-        const result = await commitDbEntries(entries);
-        expect(result.upserted).toBe(0);
-        expect(result.errors).toHaveLength(1);
-        expect(result.errors[0]).toContain('missing role');
-        expect(upsertMock).not.toHaveBeenCalled();
-    });
+  it('missing role: reports "missing role" and never calls upsert', async () => {
+    const entries: CachedPromptEntry[] = [
+      { name: 'X', text: 'x', slug: 'x-1' /* no role */ },
+    ];
+    const result = await commitDbEntries(entries);
+    expect(result.upserted).toBe(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toContain('missing role');
+    expect(upsertMock).not.toHaveBeenCalled();
+  });
 
-    it('empty slug: reports "missing slug for role=<role>" and never calls upsert', async () => {
-        const entries: CachedPromptEntry[] = [
-            { name: 'X', text: 'x', role: 'plan', slug: '   ' },
-        ];
-        listMock.mockResolvedValue(new DbResult(true, []));
-        const result = await commitDbEntries(entries);
-        expect(result.upserted).toBe(0);
-        expect(result.errors[0]).toContain('missing slug for role=plan');
-        expect(upsertMock).not.toHaveBeenCalled();
-    });
+  it('empty slug: reports "missing slug for role=<role>" and never calls upsert', async () => {
+    const entries: CachedPromptEntry[] = [
+      { name: 'X', text: 'x', role: 'plan', slug: '   ' },
+    ];
+    listMock.mockResolvedValue(new DbResult(true, []));
+    const result = await commitDbEntries(entries);
+    expect(result.upserted).toBe(0);
+    expect(result.errors[0]).toContain('missing slug for role=plan');
+    expect(upsertMock).not.toHaveBeenCalled();
+  });
 
-    it('empty entries list: no-op result, no driver calls', async () => {
-        const result = await commitDbEntries([]);
-        expect(result).toEqual({ upserted: 0, errors: [], defaultsProtected: 0 });
-        expect(listMock).not.toHaveBeenCalled();
-        expect(upsertMock).not.toHaveBeenCalled();
-    });
+  it('empty entries list: no-op result, no driver calls', async () => {
+    const result = await commitDbEntries([]);
+    expect(result).toEqual({ upserted: 0, errors: [], defaultsProtected: 0 });
+    expect(listMock).not.toHaveBeenCalled();
+    expect(upsertMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('collectDbEntriesForExport — driver failure per role', () => {
-    it('logs and continues when listPromptsByRole fails for one role', async () => {
-        listMock.mockImplementation(async (role: string) => {
-            if (role === 'plan') return new DbResult(false, undefined, 'db locked');
-            if (role === 'next') return {
-                ok: true, isFail: false, isSuccess: true,
-                value: [{
-                    Id: 3, Slug: 'next-default', Name: 'Next default',
-                    Body: 'N {{n}}', Role: 'next', IsDefault: 1,
-                    CreatedAt: 0, UpdatedAt: 0,
-                }],
-            };
+  it('logs and continues when listPromptsByRole fails for one role', async () => {
+    listMock.mockImplementation(async (role: string) => {
+      if (role === 'plan') {
+        return new DbResult(false, undefined, 'db locked');
+      }
 
-            return new DbResult(true, []);
-        });
+      if (role === 'next') {
+        return {
+          ok: true, isFail: false, isSuccess: true,
+          value: [{
+            Id: 3, Slug: 'next-default', Name: 'Next default',
+            Body: 'N {{n}}', Role: 'next', IsDefault: 1,
+            CreatedAt: 0, UpdatedAt: 0,
+          }],
+        };
+      }
 
-        const result = await collectDbEntriesForExport();
-        // plan failed => skipped; next contributed one row; generic empty.
-        expect(result).toHaveLength(1);
-        expect(result[0].slug).toBe('next-default');
-        expect(logError).toHaveBeenCalledWith(
-            'PromptIoDbBridge',
-            expect.stringContaining('readAllDbRows: listPromptsByRole failed for plan'),
-            expect.objectContaining({ ok: false, isFail: true, isSuccess: false }),
-        );
+      return new DbResult(true, []);
     });
+
+    const result = await collectDbEntriesForExport();
+    // plan failed => skipped; next contributed one row; generic empty.
+    expect(result).toHaveLength(1);
+    expect(result[0].slug).toBe('next-default');
+    expect(logError).toHaveBeenCalledWith(
+      'PromptIoDbBridge',
+      expect.stringContaining('readAllDbRows: listPromptsByRole failed for plan'),
+      expect.objectContaining({ ok: false, isFail: true, isSuccess: false }),
+    );
+  });
 });

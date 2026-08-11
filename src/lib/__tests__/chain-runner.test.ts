@@ -171,7 +171,9 @@ describe("ChainRunner", () => {
     // Make the first step hang until we manually resolve it
     let resolveStep: (() => void) | undefined;
     const waitMock = vi.mocked(executeWait);
-    waitMock.mockImplementationOnce(() => new Promise<void>((resolve) => { resolveStep = resolve; }));
+    waitMock.mockImplementationOnce(() => new Promise<void>((resolve) => {
+      resolveStep = resolve; 
+    }));
 
     const chain = makeChain([
       { type: "wait", durationMs: 100 },
@@ -186,7 +188,10 @@ describe("ChainRunner", () => {
     expect(runner.getState().status).toBe("running");
 
     // Resolve first step, then immediately pause before second starts
-    if (resolveStep) resolveStep();
+    if (resolveStep) {
+      resolveStep();
+    }
+
     // The chain is already complete because mock notify is instant,
     // so just verify the API doesn't crash
     await runPromise;
@@ -198,7 +203,9 @@ describe("ChainRunner", () => {
     let resolveWait: (() => void) | undefined;
     const waitMock = vi.mocked(executeWait);
     waitMock.mockImplementationOnce(
-      () => new Promise<void>((resolve) => { resolveWait = resolve; })
+      () => new Promise<void>((resolve) => {
+        resolveWait = resolve; 
+      })
     );
 
     const chain = makeChain([{ type: "wait", durationMs: 999 }]);
@@ -209,7 +216,10 @@ describe("ChainRunner", () => {
 
     // Resolve the step to move to the "between steps" phase
     // For a single-step chain, it completes. This verifies the API is safe.
-    if (resolveWait) resolveWait();
+    if (resolveWait) {
+      resolveWait();
+    }
+
     await runPromise;
     expect(runner.getState().status).toBe("completed");
   });

@@ -54,8 +54,8 @@ export function DataStoreTable({ entries, loading, onRefresh }: DataStoreTablePr
             <TableBody>
               {hasEntries
                 ? entries.map((entry) => (
-                    <StoreRow key={entry.key} entry={entry} />
-                  ))
+                  <StoreRow key={entry.key} entry={entry} />
+                ))
                 : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
@@ -98,8 +98,13 @@ function StoreRow({ entry }: { entry: DataStoreEntry }) {
 }
 
 function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
 
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

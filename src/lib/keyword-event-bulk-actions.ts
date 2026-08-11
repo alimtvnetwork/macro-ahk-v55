@@ -26,27 +26,28 @@ export interface SequenceRenameInput {
 }
 
 export const DEFAULT_SEQUENCE_RENAME: SequenceRenameInput = {
-    Base: "Event {n}",
-    Start: 1,
-    Padding: 2,
-    Separator: " ",
+  Base: "Event {n}",
+  Start: 1,
+  Padding: 2,
+  Separator: " ",
 };
 
 export function formatSequenceNumber(n: number, padding: number): string {
-    const pad = Math.max(1, Math.min(6, Math.floor(padding)));
-    const safe = Math.max(0, Math.floor(n));
+  const pad = Math.max(1, Math.min(6, Math.floor(padding)));
+  const safe = Math.max(0, Math.floor(n));
 
-    return safe.toString().padStart(pad, "0");
+  return safe.toString().padStart(pad, "0");
 }
 
 export function renderSequenceName(input: SequenceRenameInput, index: number): string {
-    const count = formatSequenceNumber(input.Start + index, input.Padding);
-    if (input.Base.includes("{n}")) {
-        return input.Base.split("{n}").join(count);
-    }
-    const base = input.Base.trim();
+  const count = formatSequenceNumber(input.Start + index, input.Padding);
+  if (input.Base.includes("{n}")) {
+    return input.Base.split("{n}").join(count);
+  }
 
-    return base.length === 0 ? count : `${base}${input.Separator}${count}`;
+  const base = input.Base.trim();
+
+  return base.length === 0 ? count : `${base}${input.Separator}${count}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -106,122 +107,140 @@ interface IssueTallies {
 
 /** Groups outside keywords by their normalised form so collision detection is O(1). */
 function buildOutsideIndex(outsideKeywords: ReadonlyArray<string>): Map<string, string[]> {
-    const outsideByKey = new Map<string, string[]>();
-    for (const raw of outsideKeywords) {
-        const key = normKey(raw);
-        if (key.length === 0) continue;
-        const bucket = outsideByKey.get(key);
-        if (bucket) bucket.push(raw);
-        else outsideByKey.set(key, [raw]);
+  const outsideByKey = new Map<string, string[]>();
+  for (const raw of outsideKeywords) {
+    const key = normKey(raw);
+    if (key.length === 0) {
+      continue;
     }
 
-    return outsideByKey;
+    const bucket = outsideByKey.get(key);
+    if (bucket) {
+      bucket.push(raw);
+    } else {
+      outsideByKey.set(key, [raw]);
+    }
+  }
+
+  return outsideByKey;
 }
 
 /** Renders every selected event's proposed new name via `renderSequenceName`. */
 function buildProposedRenames(
-    selectedEvents: ReadonlyArray<{ readonly Id: string; readonly Keyword: string }>,
-    input: SequenceRenameInput,
+  selectedEvents: ReadonlyArray<{ readonly Id: string; readonly Keyword: string }>,
+  input: SequenceRenameInput,
 ): ProposedRename[] {
-    return selectedEvents.map((ev, i) => ({
-        Id: ev.Id,
-        Old: ev.Keyword,
-        Next: renderSequenceName(input, i),
-    }));
+  return selectedEvents.map((ev, i) => ({
+    Id: ev.Id,
+    Old: ev.Keyword,
+    Next: renderSequenceName(input, i),
+  }));
 }
 
 /** Counts occurrences of each normalised proposed name. >1 ⇒ within-batch duplicate. */
 function countProposedKeys(proposed: ReadonlyArray<ProposedRename>): Map<string, number> {
-    const counts = new Map<string, number>();
-    for (const p of proposed) {
-        const key = normKey(p.Next);
-        if (key.length === 0) continue;
-        counts.set(key, (counts.get(key) ?? 0) + 1);
+  const counts = new Map<string, number>();
+  for (const p of proposed) {
+    const key = normKey(p.Next);
+    if (key.length === 0) {
+      continue;
     }
 
-    return counts;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  return counts;
 }
 
 /** Classifies a single proposed rename, mutating `tallies` for aggregate counts. */
 function classifyProposedRow(
-    p: ProposedRename,
-    counts: ReadonlyMap<string, number>,
-    outsideByKey: ReadonlyMap<string, string[]>,
-    tallies: IssueTallies,
+  p: ProposedRename,
+  counts: ReadonlyMap<string, number>,
+  outsideByKey: ReadonlyMap<string, string[]>,
+  tallies: IssueTallies,
 ): SequencePreviewRow {
-    const issues: SequencePreviewIssue[] = [];
-    const key = normKey(p.Next);
-    if (key.length === 0) {
-        issues.push("empty");
-        tallies.emptyCount += 1;
-    }
-    if (p.Next.length > SEQUENCE_NAME_MAX_LENGTH) {
-        issues.push("too-long");
-        tallies.tooLongCount += 1;
-    }
-    if (key.length > 0 && (counts.get(key) ?? 0) > 1) {
-        issues.push("duplicate");
-        tallies.duplicateCount += 1;
-    }
-    const collidesWith = key.length > 0 ? (outsideByKey.get(key) ?? []) : [];
-    if (collidesWith.length > 0) {
-        issues.push("collision");
-        tallies.collisionCount += 1;
-    }
+  const issues: SequencePreviewIssue[] = [];
+  const key = normKey(p.Next);
+  if (key.length === 0) {
+    issues.push("empty");
+    tallies.emptyCount += 1;
+  }
 
-    return { Id: p.Id, Old: p.Old, Next: p.Next, Issues: issues, CollidesWith: collidesWith };
+  if (p.Next.length > SEQUENCE_NAME_MAX_LENGTH) {
+    issues.push("too-long");
+    tallies.tooLongCount += 1;
+  }
+
+  if (key.length > 0 && (counts.get(key) ?? 0) > 1) {
+    issues.push("duplicate");
+    tallies.duplicateCount += 1;
+  }
+
+  const collidesWith = key.length > 0 ? (outsideByKey.get(key) ?? []) : [];
+  if (collidesWith.length > 0) {
+    issues.push("collision");
+    tallies.collisionCount += 1;
+  }
+
+  return { Id: p.Id, Old: p.Old, Next: p.Next, Issues: issues, CollidesWith: collidesWith };
 }
 
 export function computeSequencePreview(
-    selectedEvents: ReadonlyArray<{ readonly Id: string; readonly Keyword: string }>,
-    input: SequenceRenameInput,
-    outsideKeywords: ReadonlyArray<string>,
+  selectedEvents: ReadonlyArray<{ readonly Id: string; readonly Keyword: string }>,
+  input: SequenceRenameInput,
+  outsideKeywords: ReadonlyArray<string>,
 ): SequencePreviewSummary {
-    const outsideByKey = buildOutsideIndex(outsideKeywords);
-    const proposed = buildProposedRenames(selectedEvents, input);
-    const counts = countProposedKeys(proposed);
-    const tallies: IssueTallies = { duplicateCount: 0, collisionCount: 0, emptyCount: 0, tooLongCount: 0 };
-    const rows = proposed.map(p => classifyProposedRow(p, counts, outsideByKey, tallies));
+  const outsideByKey = buildOutsideIndex(outsideKeywords);
+  const proposed = buildProposedRenames(selectedEvents, input);
+  const counts = countProposedKeys(proposed);
+  const tallies: IssueTallies = { duplicateCount: 0, collisionCount: 0, emptyCount: 0, tooLongCount: 0 };
+  const rows = proposed.map(p => classifyProposedRow(p, counts, outsideByKey, tallies));
 
-    return {
-        Rows: rows,
-        DuplicateCount: tallies.duplicateCount,
-        CollisionCount: tallies.collisionCount,
-        EmptyCount: tallies.emptyCount,
-        TooLongCount: tallies.tooLongCount,
-        IsValid: tallies.duplicateCount === 0 && tallies.collisionCount === 0
+  return {
+    Rows: rows,
+    DuplicateCount: tallies.duplicateCount,
+    CollisionCount: tallies.collisionCount,
+    EmptyCount: tallies.emptyCount,
+    TooLongCount: tallies.tooLongCount,
+    IsValid: tallies.duplicateCount === 0 && tallies.collisionCount === 0
             && tallies.emptyCount === 0 && tallies.tooLongCount === 0,
-    };
+  };
 }
 
 /** Returns a fresh, sorted, de-duplicated tag list (case-insensitive). */
 export function mergeTags(
-    current: readonly string[] | undefined,
-    toAdd: readonly string[],
+  current: readonly string[] | undefined,
+  toAdd: readonly string[],
 ): string[] {
-    const seen = new Map<string, string>();
-    const consume = (raw: string): void => {
-        const trimmed = raw.trim();
-        if (trimmed.length === 0) return;
-        const key = trimmed.toLowerCase();
-        if (!seen.has(key)) seen.set(key, trimmed);
-    };
-    (current ?? []).forEach(consume);
-    toAdd.forEach(consume);
+  const seen = new Map<string, string>();
+  const consume = (raw: string): void => {
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) {
+      return;
+    }
 
-    return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
+    const key = trimmed.toLowerCase();
+    if (!seen.has(key)) {
+      seen.set(key, trimmed);
+    }
+  };
+
+  (current ?? []).forEach(consume);
+  toAdd.forEach(consume);
+
+  return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
 }
 
 export function removeTags(
-    current: readonly string[] | undefined,
-    toRemove: readonly string[],
+  current: readonly string[] | undefined,
+  toRemove: readonly string[],
 ): string[] {
-    const drop = new Set(toRemove.map(t => t.trim().toLowerCase()).filter(Boolean));
+  const drop = new Set(toRemove.map(t => t.trim().toLowerCase()).filter(Boolean));
 
-    return (current ?? [])
-        .filter(t => !drop.has(t.trim().toLowerCase()))
-        .slice()
-        .sort((a, b) => a.localeCompare(b));
+  return (current ?? [])
+    .filter(t => !drop.has(t.trim().toLowerCase()))
+    .slice()
+    .sort((a, b) => a.localeCompare(b));
 }
 
 /**
@@ -229,10 +248,10 @@ export function removeTags(
  * "  foo, bar  baz\nqux " → ["foo", "bar", "baz", "qux"]
  */
 export function parseTagInput(raw: string): string[] {
-    return raw
-        .split(/[\s,]+/)
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
+  return raw
+    .split(/[\s,]+/)
+    .map(t => t.trim())
+    .filter(t => t.length > 0);
 }
 
 /**
@@ -242,26 +261,34 @@ export function parseTagInput(raw: string): string[] {
  * `Category?: string` shape on `KeywordEvent`).
  */
 export function normaliseCategory(raw: string | undefined): string | undefined {
-    if (raw === undefined) return undefined;
-    const trimmed = raw.replace(/\s+/g, " ").trim();
+  if (raw === undefined) {
+    return undefined;
+  }
 
-    return trimmed.length === 0 ? undefined : trimmed;
+  const trimmed = raw.replace(/\s+/g, " ").trim();
+
+  return trimmed.length === 0 ? undefined : trimmed;
 }
 
 /** Returns the unique, non-empty categories currently in use across the
  *  given events — sorted case-insensitively for stable suggestion lists. */
 export function collectCategories(
-    events: ReadonlyArray<{ readonly Category?: string }>,
+  events: ReadonlyArray<{ readonly Category?: string }>,
 ): string[] {
-    const seen = new Map<string, string>();
-    for (const ev of events) {
-        const c = normaliseCategory(ev.Category);
-        if (c === undefined) continue;
-        const key = c.toLowerCase();
-        if (!seen.has(key)) seen.set(key, c);
+  const seen = new Map<string, string>();
+  for (const ev of events) {
+    const c = normaliseCategory(ev.Category);
+    if (c === undefined) {
+      continue;
     }
 
-    return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
+    const key = c.toLowerCase();
+    if (!seen.has(key)) {
+      seen.set(key, c);
+    }
+  }
+
+  return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
 }
 
 export interface ExportPayload {
@@ -271,16 +298,16 @@ export interface ExportPayload {
 }
 
 export function buildExportPayload(events: readonly KeywordEvent[]): ExportPayload {
-    return {
-        Format: "marco.keyword-events.v1",
-        ExportedAt: new Date().toISOString(),
-        Events: events,
-    };
+  return {
+    Format: "marco.keyword-events.v1",
+    ExportedAt: new Date().toISOString(),
+    Events: events,
+  };
 }
 
 /** Slug for the .zip filename — "marco-keyword-events-2026-04-27T...". */
 export function buildExportFilename(now: Date = new Date()): string {
-    const stamp = now.toISOString().replace(/[:.]/g, "-");
+  const stamp = now.toISOString().replace(/[:.]/g, "-");
 
-    return `marco-keyword-events-${stamp}.zip`;
+  return `marco-keyword-events-${stamp}.zip`;
 }

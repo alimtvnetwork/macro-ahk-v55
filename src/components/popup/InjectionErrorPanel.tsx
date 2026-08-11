@@ -86,6 +86,7 @@ export function InjectionErrorPanel() {
     } catch (err) { /* swallowed */
       setErrors([]);
     }
+
     setLoading(false);
   }, []);
 
@@ -324,7 +325,9 @@ function CopySingleButton({ error }: { error: InjectionError }) {
 function CopyAllButton({ errors }: { errors: InjectionError[] }) {
   const [copied, setCopied] = useState(false);
 
-  if (errors.length === 0) return null;
+  if (errors.length === 0) {
+    return null;
+  }
 
   const handleCopy = () => {
     const text = errors.map(formatErrorForCopy).join("\n\n---\n\n");
@@ -363,6 +366,7 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
       // ignore
       logError("AutoCatch", "Automatically caught swallowed error", err);
     }
+
     setClearing(false);
   };
 
@@ -391,11 +395,25 @@ function formatErrorForCopy(error: InjectionError): string {
     `Time: ${error.timestamp}`,
   ];
 
-  if (osano) parts.push("⚠️ Osano.js interference detected");
-  if (error.script_id) parts.push(`Script: ${error.script_id}`);
-  if (error.error_code) parts.push(`Code: ${error.error_code}`);
-  if (error.ext_version) parts.push(`Extension: v${error.ext_version}`);
-  if (error.stack_trace) parts.push(`\nStack Trace:\n${error.stack_trace}`);
+  if (osano) {
+    parts.push("⚠️ Osano.js interference detected");
+  }
+
+  if (error.script_id) {
+    parts.push(`Script: ${error.script_id}`);
+  }
+
+  if (error.error_code) {
+    parts.push(`Code: ${error.error_code}`);
+  }
+
+  if (error.ext_version) {
+    parts.push(`Extension: v${error.ext_version}`);
+  }
+
+  if (error.stack_trace) {
+    parts.push(`\nStack Trace:\n${error.stack_trace}`);
+  }
 
   return parts.join("\n");
 }

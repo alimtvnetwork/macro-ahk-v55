@@ -33,8 +33,11 @@ function schemaResp(
   onErr: (message: string) => void,
 ): (resp: SqlBridgeResp) => void {
   return (resp: SqlBridgeResp): void => {
-    if (resp?.ok) onOk(resp);
-    else onErr(resp?.errorMessage || 'unknown');
+    if (resp?.ok) {
+      onOk(resp);
+    } else {
+      onErr(resp?.errorMessage || 'unknown');
+    }
   };
 }
 /* ------------------------------------------------------------------ */
@@ -48,17 +51,20 @@ function validateSingleTable(t: NonNullable<JsonSchema['tables']>[number], logEl
     appendLog(logEl, 'err', `Table "${t.name || '?'}": name must be PascalCase`);
     issues++;
   }
+
   if (!t.columns || t.columns.length === 0) {
     appendLog(logEl, 'err', `Table "${t.name}": needs at least one column`);
 
     return issues + 1;
   }
+
   for (const c of t.columns) {
     if (!c.name || !/^[A-Z][A-Za-z0-9]*$/.test(c.name)) {
       appendLog(logEl, 'err', `Table "${t.name}" column "${c.name || '?'}": must be PascalCase`);
       issues++;
     }
   }
+
   appendLog(logEl, 'info', `Table "${t.name}": ${t.columns?.length || 0} columns` +
     (t.foreignKeys ? `, ${t.foreignKeys.length} FKs` : ''));
 
@@ -67,7 +73,10 @@ function validateSingleTable(t: NonNullable<JsonSchema['tables']>[number], logEl
 
 /** Validate table definitions, returning the number of issues found. */
 function validateTables(tables: JsonSchema['tables'], logEl: HTMLElement): number {
-  if (!tables) return 0;
+  if (!tables) {
+    return 0;
+  }
+
   let issues = 0;
   for (const t of tables) {
     issues += validateSingleTable(t, logEl);
@@ -79,7 +88,10 @@ function validateTables(tables: JsonSchema['tables'], logEl: HTMLElement): numbe
 /** Validate migration definitions, returning the number of issues found. */
 function validateMigrations(migrations: JsonSchema['migrations'], logEl: HTMLElement): number {
   let issues = 0;
-  if (!migrations) return 0;
+  if (!migrations) {
+    return 0;
+  }
+
   for (const m of migrations) {
     if (!m.table || !m.action) {
       appendLog(logEl, 'err', 'Migration missing table or action');
@@ -144,7 +156,9 @@ export function validateSchema(raw: string, logEl: HTMLElement): JsonSchema | nu
 // eslint-disable-next-line max-lines-per-function
 export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElement): void {
   const schema = validateSchema(raw, logEl);
-  if (!schema) return;
+  if (!schema) {
+    return;
+  }
 
   appendLog(logEl, 'info', '— Applying schema —');
   let pending = 0;
@@ -187,6 +201,7 @@ export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElem
           appendLog(logEl, 'err', `Failed "${t.name}": ${resp?.errorMessage || 'unknown'}`);
           errors++;
         }
+
         checkDone();
       });
     }
@@ -204,6 +219,7 @@ export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElem
           appendLog(logEl, 'err', msg);
           errors++;
         }
+
         checkDone();
       });
     }
@@ -237,6 +253,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       ));
       break;
     }
+
     case 'dropColumn': {
       const colName = m.column?.name || m.oldName || '?';
       runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" DROP COLUMN "${colName}"`, MACRO_CONTROLLER_NS).then(schemaResp(
@@ -245,6 +262,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       ));
       break;
     }
+
     case 'renameColumn': {
       runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" RENAME COLUMN "${m.oldName}" TO "${m.newName}"`, MACRO_CONTROLLER_NS).then(schemaResp(
         () => cb(true, `Renamed "${m.table}.${m.oldName}" → "${m.newName}"`),
@@ -252,6 +270,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       ));
       break;
     }
+
     default:
       cb(false, `Unknown migration action: ${m.action}`);
   }

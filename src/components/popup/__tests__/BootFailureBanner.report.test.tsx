@@ -27,100 +27,104 @@ declare global {
 }
 
 async function captureNextDownload(action: () => void): Promise<CapturedDownload> {
-    let capturedBlob: Blob | null = null;
-    let capturedName = "(unknown)";
+  let capturedBlob: Blob | null = null;
+  let capturedName = "(unknown)";
 
-    const origCreate = URL.createObjectURL;
-    const origRevoke = URL.revokeObjectURL;
-    const origCreateEl = document.createElement.bind(document);
+  const origCreate = URL.createObjectURL;
+  const origRevoke = URL.revokeObjectURL;
+  const origCreateEl = document.createElement.bind(document);
 
-    URL.createObjectURL = (blob: Blob): string => {
-        capturedBlob = blob;
+  URL.createObjectURL = (blob: Blob): string => {
+    capturedBlob = blob;
 
-        return "blob:mock";
-    };
-    URL.revokeObjectURL = (): void => { /* no-op */ };
-    document.createElement = ((tag: string) => {
-        const el = origCreateEl(tag);
-        if (tag === "a") {
-            Object.defineProperty(el, "click", { value: () => {
-                capturedName = (el as HTMLAnchorElement).download;
-            }});
-        }
+    return "blob:mock";
+  };
 
-        return el;
-    }) as typeof document.createElement;
-
-    try {
-        action();
-        if (capturedBlob === null) throw new Error("No blob captured, download handler did not run");
-        const text = await (capturedBlob as Blob).text();
-
-        return { name: capturedName, text };
-    } finally {
-        URL.createObjectURL = origCreate;
-        URL.revokeObjectURL = origRevoke;
-        document.createElement = origCreateEl;
+  URL.revokeObjectURL = (): void => { /* no-op */ };
+  document.createElement = ((tag: string) => {
+    const el = origCreateEl(tag);
+    if (tag === "a") {
+      Object.defineProperty(el, "click", { value: () => {
+        capturedName = (el as HTMLAnchorElement).download;
+      }});
     }
+
+    return el;
+  }) as typeof document.createElement;
+
+  try {
+    action();
+    if (capturedBlob === null) {
+      throw new Error("No blob captured, download handler did not run");
+    }
+
+    const text = await (capturedBlob as Blob).text();
+
+    return { name: capturedName, text };
+  } finally {
+    URL.createObjectURL = origCreate;
+    URL.revokeObjectURL = origRevoke;
+    document.createElement = origCreateEl;
+  }
 }
 
 const PROPS = {
-    bootStep: "failed:wasm-load",
-    bootError: "WASM 404 at chrome-extension://abc/wasm/sql-wasm.wasm",
-    bootErrorStack: "Error: WASM 404\n  at verifyWasmPresence",
-    bootErrorContext: null,
-    wasmProbe: null,
-    frozenTrail: null,
-    failureId: "fail_01HXYZ_UNIQUE",
-    failureAt: "2026-04-21T08:30:00.000Z",
+  bootStep: "failed:wasm-load",
+  bootError: "WASM 404 at chrome-extension://abc/wasm/sql-wasm.wasm",
+  bootErrorStack: "Error: WASM 404\n  at verifyWasmPresence",
+  bootErrorContext: null,
+  wasmProbe: null,
+  frozenTrail: null,
+  failureId: "fail_01HXYZ_UNIQUE",
+  failureAt: "2026-04-21T08:30:00.000Z",
 };
 
 describe("BootFailureBanner, support report parity", () => {
-    it("download .txt includes Failure ID and Snapshot at, matching the clipboard report", async () => {
-        // Force "full" mode so localStorage state from prior tests can't
-        // smuggle "short" through and mask a regression.
-        localStorage.setItem("marco_support_report_mode", "full");
+  it("download .txt includes Failure ID and Snapshot at, matching the clipboard report", async () => {
+    // Force "full" mode so localStorage state from prior tests can't
+    // smuggle "short" through and mask a regression.
+    localStorage.setItem("marco_support_report_mode", "full");
 
-        // Stub clipboard so handleCopyReport resolves and we can read the
-        // text it would have written.
-        let clipboardText = "";
-        Object.assign(navigator, {
-            clipboard: {
-                writeText: (t: string) => {
-                    clipboardText = t;
+    // Stub clipboard so handleCopyReport resolves and we can read the
+    // text it would have written.
+    let clipboardText = "";
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: (t: string) => {
+          clipboardText = t;
 
-                    return Promise.resolve();
-                },
-            },
-        });
-
-        render(<BootFailureBanner {...PROPS} />);
-        await flushEffects();
-
-        // Trigger Copy report
-        fireEvent.click(screen.getByTitle(/Copy .* diagnostic report/i));
-        await flushEffects();
-
-        // Trigger Create support report and capture the blob text
-        const download = await captureNextDownload(() => {
-            fireEvent.click(screen.getByTitle(/Download .* diagnostic report/i));
-        });
-        await flushEffects();
-
-        // Both bundles MUST contain the correlation header verbatim.
-        for (const bundle of [clipboardText, download.text]) {
-            expect(bundle).toMatch(/Failure ID:\s+fail_01HXYZ_UNIQUE/);
-            expect(bundle).toMatch(/Snapshot at:\s+2026-04-21T08:30:00\.000Z/);
-            expect(bundle).toMatch(/Failed step:\s+wasm-load/);
-        }
-
-        // And the download body must equal the clipboard body, modulo the
-        // `Generated:` line, which is the wall-clock at builder-call time
-        // and naturally differs by milliseconds between the two clicks.
-        const stripGenerated = (s: string): string => s.replace(/^ {2}Generated:.*$/m, "  Generated: <ts>");
-        expect(stripGenerated(download.text)).toEqual(stripGenerated(clipboardText));
-
-        // Filename embeds the mode for at-a-glance triage.
-        expect(download.name).toMatch(/^marco-support-report-full-/);
+          return Promise.resolve();
+        },
+      },
     });
+
+    render(<BootFailureBanner {...PROPS} />);
+    await flushEffects();
+
+    // Trigger Copy report
+    fireEvent.click(screen.getByTitle(/Copy .* diagnostic report/i));
+    await flushEffects();
+
+    // Trigger Create support report and capture the blob text
+    const download = await captureNextDownload(() => {
+      fireEvent.click(screen.getByTitle(/Download .* diagnostic report/i));
+    });
+    await flushEffects();
+
+    // Both bundles MUST contain the correlation header verbatim.
+    for (const bundle of [clipboardText, download.text]) {
+      expect(bundle).toMatch(/Failure ID:\s+fail_01HXYZ_UNIQUE/);
+      expect(bundle).toMatch(/Snapshot at:\s+2026-04-21T08:30:00\.000Z/);
+      expect(bundle).toMatch(/Failed step:\s+wasm-load/);
+    }
+
+    // And the download body must equal the clipboard body, modulo the
+    // `Generated:` line, which is the wall-clock at builder-call time
+    // and naturally differs by milliseconds between the two clicks.
+    const stripGenerated = (s: string): string => s.replace(/^ {2}Generated:.*$/m, "  Generated: <ts>");
+    expect(stripGenerated(download.text)).toEqual(stripGenerated(clipboardText));
+
+    // Filename embeds the mode for at-a-glance triage.
+    expect(download.name).toMatch(/^marco-support-report-full-/);
+  });
 });

@@ -4,8 +4,8 @@
  */
 
 import type {
-    CoercionKind,
-    ColumnMapping,
+  CoercionKind,
+  ColumnMapping,
 } from "@/background/recorder/step-library/csv-mapping";
 
 import { CsvMappingVariableCell } from "./CsvMappingVariableCell";
@@ -20,20 +20,20 @@ export interface CsvMappingRowProps {
 }
 
 export function CsvMappingRow(props: CsvMappingRowProps): JSX.Element {
-    const { header, cell, mapping, coercionOptions, onUpdate } = props;
+  const { header, cell, mapping, coercionOptions, onUpdate } = props;
 
-    return (
-        <tr className="border-b last:border-0">
-            <td className="px-2 py-1.5 align-middle font-medium">{header}</td>
-            <td className="max-w-[14rem] truncate px-2 py-1.5 align-middle text-muted-foreground" title={cell}>
-                {cell === "" ? <em className="opacity-50">empty</em> : cell}
-            </td>
-            <td className="px-2 py-1.5 align-middle">
-                <CsvMappingVariableCell header={header} mapping={mapping} onUpdate={onUpdate} />
-            </td>
-            <td className="px-2 py-1.5 align-middle">
-                <CsvMappingCoerceCell mapping={mapping} coercionOptions={coercionOptions} onUpdate={onUpdate} />
-            </td>
-        </tr>
-    );
+  return (
+    <tr className="border-b last:border-0">
+      <td className="px-2 py-1.5 align-middle font-medium">{header}</td>
+      <td className="max-w-[14rem] truncate px-2 py-1.5 align-middle text-muted-foreground" title={cell}>
+        {cell === "" ? <em className="opacity-50">empty</em> : cell}
+      </td>
+      <td className="px-2 py-1.5 align-middle">
+        <CsvMappingVariableCell header={header} mapping={mapping} onUpdate={onUpdate} />
+      </td>
+      <td className="px-2 py-1.5 align-middle">
+        <CsvMappingCoerceCell mapping={mapping} coercionOptions={coercionOptions} onUpdate={onUpdate} />
+      </td>
+    </tr>
+  );
 }

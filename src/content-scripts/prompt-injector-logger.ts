@@ -24,14 +24,15 @@ interface MaybeNamespaceWindow {
 }
 
 function getLogger(): NamespaceLogger | null {
-    try {
-        const w = window as unknown as MaybeNamespaceWindow;
+  try {
+    const w = window as unknown as MaybeNamespaceWindow;
 
-        return w.RiseupAsiaMacroExt?.Logger ?? null;
-    } catch (err) { void 0;
+    return w.RiseupAsiaMacroExt?.Logger ?? null;
+  } catch (err) {
+    void 0;
 
-        return null;
-    }
+    return null;
+  }
 }
 
 /**
@@ -40,16 +41,17 @@ function getLogger(): NamespaceLogger | null {
  * reason) — see `mem://constraints/file-path-error-logging-code-red.md`.
  */
 export function logError(scope: string, message: string, caught?: unknown): void {
-    const fullScope = `${SCOPE_PREFIX}${scope}`;
-    const logger = getLogger();
-    if (logger) {
-        logger.error(fullScope, caught ?? new Error(message));
+  const fullScope = `${SCOPE_PREFIX}${scope}`;
+  const logger = getLogger();
+  if (logger) {
+    logger.error(fullScope, caught ?? new Error(message));
 
-        return;
-    }
-    if (caught !== undefined) {
-        console.error(`[${fullScope}] ${message}`, caught);
-    } else {
-        console.error(`[${fullScope}] ${message}`);
-    }
+    return;
+  }
+
+  if (caught !== undefined) {
+    console.error(`[${fullScope}] ${message}`, caught);
+  } else {
+    console.error(`[${fullScope}] ${message}`);
+  }
 }

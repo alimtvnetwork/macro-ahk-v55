@@ -64,6 +64,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
 
       return;
     }
+
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       toast.error("Request must be a JSON object");
 

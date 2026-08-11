@@ -61,20 +61,22 @@ export interface ResolveDetailedResult {
  * Throws when a referenced column is not present in `row`.
  */
 export function resolveFieldReferences(
-    template: string,
-    row: FieldRow,
+  template: string,
+  row: FieldRow,
 ): string {
-    return template.replace(TOKEN_PATTERN, (match, name: string) => {
-        const isEscaped = match.charAt(0) === "\\";
-        if (isEscaped) return match.slice(1);
+  return template.replace(TOKEN_PATTERN, (match, name: string) => {
+    const isEscaped = match.charAt(0) === "\\";
+    if (isEscaped) {
+      return match.slice(1);
+    }
 
-        const hasColumn = Object.prototype.hasOwnProperty.call(row, name);
-        if (hasColumn === false) {
-            throw new Error(`Field reference {{${name}}} — column missing in row`);
-        }
+    const hasColumn = Object.prototype.hasOwnProperty.call(row, name);
+    if (hasColumn === false) {
+      throw new Error(`Field reference {{${name}}} — column missing in row`);
+    }
 
-        return row[name] ?? "";
-    });
+    return row[name] ?? "";
+  });
 }
 
 /**
@@ -96,47 +98,53 @@ export function resolveFieldReferences(
  * @param rowIndex     — index in the source data set, when known.
  */
 export function resolveFieldReferencesDetailed(
-    template: string,
-    row: LooseFieldRow,
-    options: {
+  template: string,
+  row: LooseFieldRow,
+  options: {
         readonly Source?: string;
         readonly RowIndex?: number;
         readonly ExpectedType?: VariableValueType;
     } = {},
 ): ResolveDetailedResult {
-    const source = options.Source ?? "Row";
-    const rowIndex = options.RowIndex ?? null;
-    const expected = options.ExpectedType ?? "string";
-    const seen = new Map<string, VariableContext>();
-    const failureRef: { first: VariableContext | null } = { first: null };
-    const resolveOne = (match: string, name: string): string =>
-        resolveTemplateToken(match, name, seen, failureRef, row, source, rowIndex, expected);
-    const resolved = template.replace(TOKEN_PATTERN, resolveOne);
+  const source = options.Source ?? "Row";
+  const rowIndex = options.RowIndex ?? null;
+  const expected = options.ExpectedType ?? "string";
+  const seen = new Map<string, VariableContext>();
+  const failureRef: { first: VariableContext | null } = { first: null };
+  const resolveOne = (match: string, name: string): string =>
+    resolveTemplateToken(match, name, seen, failureRef, row, source, rowIndex, expected);
+  const resolved = template.replace(TOKEN_PATTERN, resolveOne);
 
-    return { Resolved: resolved, Variables: Array.from(seen.values()), FirstFailure: failureRef.first };
+  return { Resolved: resolved, Variables: Array.from(seen.values()), FirstFailure: failureRef.first };
 }
 
 function resolveTemplateToken(
-    match: string,
-    name: string,
-    seen: Map<string, VariableContext>,
-    failureRef: { first: VariableContext | null },
-    row: LooseFieldRow,
-    source: string,
-    rowIndex: number | null,
-    expected: VariableValueType,
+  match: string,
+  name: string,
+  seen: Map<string, VariableContext>,
+  failureRef: { first: VariableContext | null },
+  row: LooseFieldRow,
+  source: string,
+  rowIndex: number | null,
+  expected: VariableValueType,
 ): string {
-    if (match.charAt(0) === "\\") return match.slice(1);
-    // Deduplicate per-name so repeated tokens produce one diagnostic.
-    const cached = seen.get(name);
-    if (cached !== undefined) return valueToReplacement(cached.ResolvedValue);
-    const ctx = classifyVariable(name, row, source, rowIndex, expected);
-    seen.set(name, ctx);
-    if (ctx.FailureReason !== "Resolved" && failureRef.first === null) {
-        failureRef.first = ctx;
-    }
+  if (match.charAt(0) === "\\") {
+    return match.slice(1);
+  }
 
-    return valueToReplacement(ctx.ResolvedValue);
+  // Deduplicate per-name so repeated tokens produce one diagnostic.
+  const cached = seen.get(name);
+  if (cached !== undefined) {
+    return valueToReplacement(cached.ResolvedValue);
+  }
+
+  const ctx = classifyVariable(name, row, source, rowIndex, expected);
+  seen.set(name, ctx);
+  if (ctx.FailureReason !== "Resolved" && failureRef.first === null) {
+    failureRef.first = ctx;
+  }
+
+  return valueToReplacement(ctx.ResolvedValue);
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,18 +153,18 @@ function resolveTemplateToken(
 
 /** Lists every distinct column name referenced in a template. */
 export function extractReferencedColumns(template: string): ReadonlyArray<string> {
-    const found = new Set<string>();
-    const pattern = new RegExp(TOKEN_PATTERN.source, "g");
-    let match: RegExpExecArray | null;
+  const found = new Set<string>();
+  const pattern = new RegExp(TOKEN_PATTERN.source, "g");
+  let match: RegExpExecArray | null;
 
-    while ((match = pattern.exec(template)) !== null) {
-        const isEscaped = match[0].charAt(0) === "\\";
-        if (isEscaped === false) {
-            found.add(match[1]!);
-        }
+  while ((match = pattern.exec(template)) !== null) {
+    const isEscaped = match[0].charAt(0) === "\\";
+    if (isEscaped === false) {
+      found.add(match[1]!);
     }
+  }
 
-    return Array.from(found);
+  return Array.from(found);
 }
 
 /* ------------------------------------------------------------------ */
@@ -164,124 +172,155 @@ export function extractReferencedColumns(template: string): ReadonlyArray<string
 /* ------------------------------------------------------------------ */
 
 function classifyMissingColumn(
-    name: string, row: LooseFieldRow, source: string, rowIndex: number | null,
+  name: string, row: LooseFieldRow, source: string, rowIndex: number | null,
 ): VariableContext {
-    const rowSuffix = rowIndex !== null ? `, rowIndex=${rowIndex}` : "";
-    const columnList = Object.keys(row).join(", ") || "<empty>";
-    const detail = `Variable {{${name}}} is not a column in the active row `
+  const rowSuffix = rowIndex !== null ? `, rowIndex=${rowIndex}` : "";
+  const columnList = Object.keys(row).join(", ") || "<empty>";
+  const detail = `Variable {{${name}}} is not a column in the active row `
         + `(source=${source}${rowSuffix}). `
         + `Available columns: [${columnList}].`;
 
-    return {
-        Name: name, Source: source, RowIndex: rowIndex, Column: name,
-        ResolvedValue: null, ValueType: "undefined",
-        FailureReason: "MissingColumn", FailureDetail: detail,
-    };
+  return {
+    Name: name, Source: source, RowIndex: rowIndex, Column: name,
+    ResolvedValue: null, ValueType: "undefined",
+    FailureReason: "MissingColumn", FailureDetail: detail,
+  };
 }
 
 function classifyEmptyValue(
-    name: string, source: string, rowIndex: number | null, raw: JsonValue | undefined,
+  name: string, source: string, rowIndex: number | null, raw: JsonValue | undefined,
 ): VariableContext | null {
-    if (raw === null) {
-        return baseFailure(name, source, rowIndex, null, "null", "NullValue",
-            `Variable {{${name}}} resolved to null (source=${source}, column=${name}).`);
-    }
-    if (raw === undefined) {
-        return baseFailure(name, source, rowIndex, null, "undefined", "UndefinedValue",
-            `Variable {{${name}}} resolved to undefined (source=${source}, column=${name}).`);
-    }
-    if (typeof raw === "string" && raw.length === 0) {
-        return baseFailure(name, source, rowIndex, "", "string", "EmptyString",
-            `Variable {{${name}}} resolved to an empty string (source=${source}, column=${name}). ` +
-            `If empty is valid for this step, ignore.`);
-    }
+  if (raw === null) {
+    return baseFailure(name, source, rowIndex, null, "null", "NullValue",
+      `Variable {{${name}}} resolved to null (source=${source}, column=${name}).`);
+  }
 
-    return null;
+  if (raw === undefined) {
+    return baseFailure(name, source, rowIndex, null, "undefined", "UndefinedValue",
+      `Variable {{${name}}} resolved to undefined (source=${source}, column=${name}).`);
+  }
+
+  if (typeof raw === "string" && raw.length === 0) {
+    return baseFailure(name, source, rowIndex, "", "string", "EmptyString",
+      `Variable {{${name}}} resolved to an empty string (source=${source}, column=${name}). ` +
+            `If empty is valid for this step, ignore.`);
+  }
+
+  return null;
 }
 
 function classifyTypeMismatch(
-    name: string, source: string, rowIndex: number | null,
-    raw: JsonValue, valueType: VariableValueType, expected: VariableValueType,
+  name: string, source: string, rowIndex: number | null,
+  raw: JsonValue, valueType: VariableValueType, expected: VariableValueType,
 ): VariableContext | null {
-    const isPrimitive = valueType === "string" || valueType === "number" || valueType === "boolean";
-    if (isPrimitive || expected === "object" || expected === "array") return null;
-    const redacted = sanitizeDiagnosticValue(name, raw);
-    const display = safeStringify(redacted);
+  const isPrimitive = valueType === "string" || valueType === "number" || valueType === "boolean";
+  if (isPrimitive || expected === "object" || expected === "array") {
+    return null;
+  }
 
-    return baseFailure(name, source, rowIndex, redacted, valueType, "TypeMismatch",
-        `Variable {{${name}}} expected ${expected} but got ${valueType} ` +
+  const redacted = sanitizeDiagnosticValue(name, raw);
+  const display = safeStringify(redacted);
+
+  return baseFailure(name, source, rowIndex, redacted, valueType, "TypeMismatch",
+    `Variable {{${name}}} expected ${expected} but got ${valueType} ` +
         `(source=${source}, column=${name}, value=${display}).`);
 }
 
 function classifyVariable(
-    name: string,
-    row: LooseFieldRow,
-    source: string,
-    rowIndex: number | null,
-    expected: VariableValueType,
+  name: string,
+  row: LooseFieldRow,
+  source: string,
+  rowIndex: number | null,
+  expected: VariableValueType,
 ): VariableContext {
-    if (!Object.prototype.hasOwnProperty.call(row, name)) {
-        return classifyMissingColumn(name, row, source, rowIndex);
-    }
-    const raw = row[name];
-    const valueType = classifyType(raw);
-    const empty = classifyEmptyValue(name, source, rowIndex, raw);
-    if (empty) return empty;
-    // raw is JsonValue here (not undefined, not null) — narrowed by classifyEmptyValue.
-    const rawNarrowed = raw as JsonValue;
-    const mismatch = classifyTypeMismatch(name, source, rowIndex, rawNarrowed, valueType, expected);
-    if (mismatch) return mismatch;
-    const resolved = sanitizeDiagnosticValue(name, rawNarrowed);
+  if (!Object.prototype.hasOwnProperty.call(row, name)) {
+    return classifyMissingColumn(name, row, source, rowIndex);
+  }
 
-    return {
-        Name: name, Source: source, RowIndex: rowIndex, Column: name,
-        ResolvedValue: resolved, ValueType: valueType,
-        FailureReason: "Resolved", FailureDetail: null,
-    };
+  const raw = row[name];
+  const valueType = classifyType(raw);
+  const empty = classifyEmptyValue(name, source, rowIndex, raw);
+  if (empty) {
+    return empty;
+  }
+
+  // raw is JsonValue here (not undefined, not null) — narrowed by classifyEmptyValue.
+  const rawNarrowed = raw as JsonValue;
+  const mismatch = classifyTypeMismatch(name, source, rowIndex, rawNarrowed, valueType, expected);
+  if (mismatch) {
+    return mismatch;
+  }
+
+  const resolved = sanitizeDiagnosticValue(name, rawNarrowed);
+
+  return {
+    Name: name, Source: source, RowIndex: rowIndex, Column: name,
+    ResolvedValue: resolved, ValueType: valueType,
+    FailureReason: "Resolved", FailureDetail: null,
+  };
 }
 
 function baseFailure(
-    name: string,
-    source: string,
-    rowIndex: number | null,
-    resolved: JsonValue | null,
-    valueType: VariableValueType,
-    reason: VariableFailureReason,
-    detail: string,
+  name: string,
+  source: string,
+  rowIndex: number | null,
+  resolved: JsonValue | null,
+  valueType: VariableValueType,
+  reason: VariableFailureReason,
+  detail: string,
 ): VariableContext {
-    return {
-        Name: name, Source: source, RowIndex: rowIndex, Column: name,
-        ResolvedValue: resolved, ValueType: valueType,
-        FailureReason: reason, FailureDetail: detail,
-    };
+  return {
+    Name: name, Source: source, RowIndex: rowIndex, Column: name,
+    ResolvedValue: resolved, ValueType: valueType,
+    FailureReason: reason, FailureDetail: detail,
+  };
 }
 
 function classifyType(v: JsonValue | undefined): VariableValueType {
-    if (v === null) { return "null"; }
-    if (v === undefined) { return "undefined"; }
-    if (Array.isArray(v)) { return "array"; }
-    const t = typeof v;
-    if (t === "string" || t === "number" || t === "boolean" || t === "object") { return t; }
+  if (v === null) {
+    return "null"; 
+  }
 
-    return "object";
+  if (v === undefined) {
+    return "undefined"; 
+  }
+
+  if (Array.isArray(v)) {
+    return "array"; 
+  }
+
+  const t = typeof v;
+  if (t === "string" || t === "number" || t === "boolean" || t === "object") {
+    return t; 
+  }
+
+  return "object";
 }
 
 function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
-    if (isSensitiveDiagnosticName(name)) {
-        return maskDiagnosticValue(value);
-    }
+  if (isSensitiveDiagnosticName(name)) {
+    return maskDiagnosticValue(value);
+  }
 
-    return value;
+  return value;
 }
 
 function safeStringify(v: JsonValue): string {
-    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { 
- return String(v); }
+  try {
+    return JSON.stringify(v) ?? "undefined"; 
+  } catch (err) { 
+    return String(v); 
+  }
 }
 
 function valueToReplacement(value: JsonValue | null): string {
-    if (value === null) { return ""; }
-    if (typeof value === "string") { return value; }
+  if (value === null) {
+    return ""; 
+  }
 
-    return safeStringify(value);
+  if (typeof value === "string") {
+    return value; 
+  }
+
+  return safeStringify(value);
 }

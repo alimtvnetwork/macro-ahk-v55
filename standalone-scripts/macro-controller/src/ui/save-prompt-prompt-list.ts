@@ -29,10 +29,21 @@ export function buildSearchInput(
   input.type = 'text';
   input.placeholder = '🔍 Search prompts…';
   input.style.cssText = 'width:100%;box-sizing:border-box;padding:5px 10px;border-radius:6px;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.3);color:#e0e0e0;font-size:11px;outline:none;font-family:system-ui,sans-serif;';
-  input.onfocus = function () { input.style.borderColor = '#7c3aed'; };
-  input.onblur = function () { input.style.borderColor = 'rgba(124,58,237,0.3)'; };
-  input.oninput = function () { onSearch(input.value.trim().toLowerCase()); };
-  input.onclick = function (event) { event.stopPropagation(); };
+  input.onfocus = function () {
+    input.style.borderColor = '#7c3aed'; 
+  };
+
+  input.onblur = function () {
+    input.style.borderColor = 'rgba(124,58,237,0.3)'; 
+  };
+
+  input.oninput = function () {
+    onSearch(input.value.trim().toLowerCase()); 
+  };
+
+  input.onclick = function (event) {
+    event.stopPropagation(); 
+  };
 
   wrapper.appendChild(input);
   dropdown.appendChild(wrapper);
@@ -80,6 +91,7 @@ export function buildCategoryChips(
     setActiveFilter(null);
     updateStyles();
   };
+
   chipBar.appendChild(allChip);
 
   const chipElements: HTMLElement[] = [allChip];
@@ -93,6 +105,7 @@ export function buildCategoryChips(
       setActiveFilter(categoryName);
       updateStyles();
     };
+
     chipBar.appendChild(chip);
     chipElements.push(chip);
   }
@@ -183,8 +196,13 @@ function buildPromptItem(
 ): HTMLElement {
   const item = document.createElement('div');
   item.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;font-size:12px;color:#e0e0e0;transition:background 0.12s;border-bottom:1px solid rgba(255,255,255,0.04);';
-  item.onmouseover = function () { item.style.background = 'rgba(124,58,237,0.15)'; };
-  item.onmouseout = function () { item.style.background = 'none'; };
+  item.onmouseover = function () {
+    item.style.background = 'rgba(124,58,237,0.15)'; 
+  };
+
+  item.onmouseout = function () {
+    item.style.background = 'none'; 
+  };
 
   const nameSpan = document.createElement('span');
   nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
@@ -229,8 +247,14 @@ function buildEditButton(
   button.textContent = '✏️';
   button.title = 'Edit prompt';
   button.style.cssText = 'cursor:pointer;font-size:11px;flex-shrink:0;opacity:0.7;transition:opacity 0.15s;';
-  button.onmouseover = function () { button.style.opacity = '1'; };
-  button.onmouseout = function () { button.style.opacity = '0.7'; };
+  button.onmouseover = function () {
+    button.style.opacity = '1'; 
+  };
+
+  button.onmouseout = function () {
+    button.style.opacity = '0.7'; 
+  };
+
   button.onclick = function (event) {
     event.stopPropagation();
     dropdown.style.display = 'none';
@@ -245,8 +269,14 @@ function buildCopyButton(prompt: PromptEntry): HTMLElement {
   button.textContent = '📋';
   button.title = 'Copy to clipboard';
   button.style.cssText = 'cursor:pointer;font-size:11px;flex-shrink:0;opacity:0.5;transition:opacity 0.15s;';
-  button.onmouseover = function () { button.style.opacity = '1'; };
-  button.onmouseout = function () { button.style.opacity = '0.5'; };
+  button.onmouseover = function () {
+    button.style.opacity = '1'; 
+  };
+
+  button.onmouseout = function () {
+    button.style.opacity = '0.5'; 
+  };
+
   button.onclick = function (event) {
     event.stopPropagation();
     navigator.clipboard.writeText(prompt.text || '').then(function () {

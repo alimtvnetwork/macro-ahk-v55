@@ -36,7 +36,9 @@ export interface LovableIdleOptions {
 export type LovableIdleResult = LovableIdleResultType;
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms); 
+  });
 }
 
 function isPageBusy(): boolean {
@@ -58,14 +60,22 @@ export async function waitForLovableIdle(opts: LovableIdleOptions): Promise<Lova
   let idleSince = 0;
 
   while (Date.now() < deadline) {
-    if (opts.isCancelled()) return 'cancelled';
+    if (opts.isCancelled()) {
+      return 'cancelled';
+    }
 
     if (isPageBusy()) {
       idleSince = 0;
     } else {
-      if (idleSince === 0) idleSince = Date.now();
-      if (Date.now() - idleSince >= debounceMs) return 'idle';
+      if (idleSince === 0) {
+        idleSince = Date.now();
+      }
+
+      if (Date.now() - idleSince >= debounceMs) {
+        return 'idle';
+      }
     }
+
     await sleep(pollMs);
   }
 

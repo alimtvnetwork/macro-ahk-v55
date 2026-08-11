@@ -52,7 +52,9 @@ function navState(): WsNavState {
 }
 
 /** Get current keyboard navigation index in workspace list. */
-export function getLoopWsNavIndex(): number { return navState().getIndex(); }
+export function getLoopWsNavIndex(): number {
+  return navState().getIndex(); 
+}
 
 // ============================================
 // Checkbox click handler (with Shift range select)
@@ -61,13 +63,21 @@ export function getLoopWsNavIndex(): number { return navState().getIndex(); }
 /** v2.148.0: check every visible row whose data-ws-idx falls within [lo,hi]. */
 function checkVisibleRange(lo: number, hi: number): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
+
   const visibleItems = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of Array.from(visibleItems)) {
     const visIdx = parseInt(item.getAttribute('data-ws-idx') || '-1', 10);
-    if (visIdx < lo || visIdx > hi) continue;
+    if (visIdx < lo || visIdx > hi) {
+      continue;
+    }
+
     const id = item.getAttribute(DataAttrType.WsId);
-    if (id) getLoopWsCheckedIds()[id] = true;
+    if (id) {
+      getLoopWsCheckedIds()[id] = true;
+    }
   }
 }
 
@@ -98,6 +108,7 @@ export function handleWsCheckboxClick(
   } else {
     toggleSingle(wsId);
   }
+
   setLoopWsLastCheckedIdx(idx);
   updateWsSelectionUI();
 }
@@ -105,12 +116,16 @@ export function handleWsCheckboxClick(
 /** Sync checkbox visuals in the workspace list to match checked state. */
 function syncCheckboxVisuals(): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of items) {
     const cb = item.querySelector('.loop-ws-checkbox');
-    if (!cb) continue;
+    if (!cb) {
+      continue;
+    }
 
     const wsId = item.getAttribute(DataAttrType.WsId);
     const isChecked = !!getLoopWsCheckedIds()[wsId!];
@@ -153,10 +168,16 @@ export function updateWsSelectionUI(): void {
 function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
   const currentNavIndex = navState().getIndex();
-  if (!listEl || currentNavIndex < 0) return null;
+  if (!listEl || currentNavIndex < 0) {
+    return null;
+  }
+
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   const navItem = items[currentNavIndex] as HTMLElement | undefined;
-  if (!navItem) return null;
+  if (!navItem) {
+    return null;
+  }
+
   const wsId = navItem.getAttribute(DataAttrType.WsId) || '';
   const wsName = navItem.getAttribute('data-ws-name') || '';
   log('Move fallback: using keyboard-navigated item idx=' + currentNavIndex + ' (' + wsName + ')', 'info');
@@ -167,7 +188,10 @@ function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
 /** Resolve workspace from the first checked checkbox (Fallback 2). */
 function resolveFromCheckedBox(): { wsId: string; wsName: string } | null {
   const checkedIds = Object.keys(getLoopWsCheckedIds());
-  if (checkedIds.length === 0) return null;
+  if (checkedIds.length === 0) {
+    return null;
+  }
+
   const firstCheckedId = checkedIds[0];
   const listEl = document.getElementById(DomIdType.LoopWsList);
   const matchedItem = listEl
@@ -176,7 +200,7 @@ function resolveFromCheckedBox(): { wsId: string; wsName: string } | null {
   const wsName = matchedItem ? (matchedItem.getAttribute('data-ws-name') || '') : '';
   log('Move fallback: using first checked workspace id=' + firstCheckedId + ' (' + wsName + ')'
     + (checkedIds.length > 1 ? ' [' + (checkedIds.length - 1) + ' other checks ignored]' : ''),
-    'info');
+  'info');
 
   return { wsId: firstCheckedId, wsName };
 }
@@ -191,7 +215,9 @@ export function triggerLoopMoveFromSelection(): void {
 
   if (!wsId) {
     const fallback = resolveFromKeyboardNav() ?? resolveFromCheckedBox();
-    if (fallback) { wsId = fallback.wsId; wsName = fallback.wsName; }
+    if (fallback) {
+      wsId = fallback.wsId; wsName = fallback.wsName; 
+    }
   }
 
   if (!wsId) {
@@ -234,7 +260,9 @@ function highlightActiveItem(item: Element): void {
 /** Update the selected-workspace indicator element from the active item. */
 function updateSelectedIndicator(item: Element): void {
   const selectedEl = document.getElementById('loop-ws-selected');
-  if (!selectedEl) return;
+  if (!selectedEl) {
+    return;
+  }
 
   const wsId = item.getAttribute(DataAttrType.WsId) || '';
   const wsName = item.getAttribute('data-ws-name') || '';
@@ -264,7 +292,9 @@ function resetItemStyles(item: Element): void {
 export function setLoopWsNavIndex(idx: number): void {
   navState().setIndex(idx);
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const [itemIndex, item] of Array.from(items).entries()) {
@@ -272,6 +302,7 @@ export function setLoopWsNavIndex(idx: number): void {
       resetItemStyles(item);
       continue;
     }
+
     highlightActiveItem(item);
     updateSelectedIndicator(item);
   }

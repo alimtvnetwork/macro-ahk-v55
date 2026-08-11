@@ -84,7 +84,9 @@ describe('buildBreakdownTable — drag-drop', () => {
       data: store,
       effectAllowed: 'move',
       dropEffect: 'move',
-      setData: (k: string, v: string) => { store[k] = v; },
+      setData: (k: string, v: string) => {
+        store[k] = v; 
+      },
       getData: (k: string) => store[k] || '',
     } as unknown as DataTransfer;
   }

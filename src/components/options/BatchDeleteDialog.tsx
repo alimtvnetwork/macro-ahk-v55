@@ -20,14 +20,14 @@ import { AlertTriangle, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { LabelType } from "@/components/ui/label";
@@ -54,71 +54,77 @@ export interface BatchDeleteDialogProps {
 const CONFIRM_PHRASE = "delete";
 
 export default function BatchDeleteDialog({
-    open,
-    onOpenChange,
-    rows,
-    onConfirm,
+  open,
+  onOpenChange,
+  rows,
+  onConfirm,
 }: BatchDeleteDialogProps) {
-    const [phrase, setPhrase] = useState("");
+  const [phrase, setPhrase] = useState("");
 
-    const totalGroups = rows.reduce((n, r) => n + 1 + r.DescendantCount, 0);
-    const totalSteps = rows.reduce((n, r) => n + r.StepCount, 0);
-    const canConfirm = rows.length > 0 && phrase.trim().toLowerCase() === CONFIRM_PHRASE;
+  const totalGroups = rows.reduce((n, r) => n + 1 + r.DescendantCount, 0);
+  const totalSteps = rows.reduce((n, r) => n + r.StepCount, 0);
+  const canConfirm = rows.length > 0 && phrase.trim().toLowerCase() === CONFIRM_PHRASE;
 
-    const handleConfirm = () => {
-        if (!canConfirm) return;
-        onConfirm(rows.map((r) => r.Group.StepGroupId));
-        setPhrase("");
-        onOpenChange(false);
-    };
+  const handleConfirm = () => {
+    if (!canConfirm) {
+      return;
+    }
 
-    return (
-        <AlertDialog open={open} onOpenChange={(nextOpen) => handleOpenChange(nextOpen, setPhrase, onOpenChange)}>
-            <AlertDialogContent className="max-w-lg">
-                <AlertDialogHeader>
-                    <BatchDeleteTitle count={rows.length} />
-                    <BatchDeleteDescription totalGroups={totalGroups} totalSteps={totalSteps} />
-                </AlertDialogHeader>
+    onConfirm(rows.map((r) => r.Group.StepGroupId));
+    setPhrase("");
+    onOpenChange(false);
+  };
 
-                <BatchDeleteRows rows={rows} />
+  return (
+    <AlertDialog open={open} onOpenChange={(nextOpen) => handleOpenChange(nextOpen, setPhrase, onOpenChange)}>
+      <AlertDialogContent className="max-w-lg">
+        <AlertDialogHeader>
+          <BatchDeleteTitle count={rows.length} />
+          <BatchDeleteDescription totalGroups={totalGroups} totalSteps={totalSteps} />
+        </AlertDialogHeader>
 
-                <ConfirmPhraseInput phrase={phrase} setPhrase={setPhrase} />
+        <BatchDeleteRows rows={rows} />
 
-                <BatchDeleteFooter count={rows.length} canConfirm={canConfirm} onConfirm={handleConfirm} />
-            </AlertDialogContent>
-        </AlertDialog>
-    );
+        <ConfirmPhraseInput phrase={phrase} setPhrase={setPhrase} />
+
+        <BatchDeleteFooter count={rows.length} canConfirm={canConfirm} onConfirm={handleConfirm} />
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }
 
 function handleOpenChange(nextOpen: boolean, setPhrase: (value: string) => void, onOpenChange: (open: boolean) => void): void {
-    if (!nextOpen) setPhrase("");
-    onOpenChange(nextOpen);
+  if (!nextOpen) {
+    setPhrase("");
+  }
+
+  onOpenChange(nextOpen);
 }
 
 function BatchDeleteTitle({ count }: { count: number }): JSX.Element {
-    return <AlertDialogTitle className="flex items-center gap-2 text-destructive"><AlertTriangle className="h-5 w-5" />Delete {count} group{count === 1 ? "" : "s"}?</AlertDialogTitle>;
+  return <AlertDialogTitle className="flex items-center gap-2 text-destructive"><AlertTriangle className="h-5 w-5" />Delete {count} group{count === 1 ? "" : "s"}?</AlertDialogTitle>;
 }
 
 function BatchDeleteDescription({ totalGroups, totalSteps }: { totalGroups: number; totalSteps: number }): JSX.Element {
-    return <AlertDialogDescription asChild><div className="space-y-2 text-sm text-muted-foreground"><p>This permanently removes <strong className="text-foreground">{totalGroups}</strong> group{totalGroups === 1 ? "" : "s"} and <strong className="text-foreground">{totalSteps}</strong> step{totalSteps === 1 ? "" : "s"} (including every nested child group). <strong className="text-destructive">This cannot be undone.</strong></p><p className="text-xs">Tip: export the selection as a ZIP first if you might need it back.</p></div></AlertDialogDescription>;
+  return <AlertDialogDescription asChild><div className="space-y-2 text-sm text-muted-foreground"><p>This permanently removes <strong className="text-foreground">{totalGroups}</strong> group{totalGroups === 1 ? "" : "s"} and <strong className="text-foreground">{totalSteps}</strong> step{totalSteps === 1 ? "" : "s"} (including every nested child group). <strong className="text-destructive">This cannot be undone.</strong></p><p className="text-xs">Tip: export the selection as a ZIP first if you might need it back.</p></div></AlertDialogDescription>;
 }
 
 function BatchDeleteRows({ rows }: { rows: ReadonlyArray<BatchDeleteRow> }): JSX.Element {
-    return <ScrollArea className="max-h-48 rounded border"><ul className="divide-y text-sm">{rows.map((row) => <BatchDeleteRowItem key={row.Group.StepGroupId} row={row} />)}</ul></ScrollArea>;
+  return <ScrollArea className="max-h-48 rounded border"><ul className="divide-y text-sm">{rows.map((row) => <BatchDeleteRowItem key={row.Group.StepGroupId} row={row} />)}</ul></ScrollArea>;
 }
 
 function ConfirmPhraseInput(props: { phrase: string; setPhrase: (value: string) => void }): JSX.Element {
-    return <div className="space-y-1.5"><LabelType htmlFor="batch-delete-confirm" className="text-xs">Type <span className="font-mono font-semibold">{CONFIRM_PHRASE}</span> to confirm</LabelType><Input id="batch-delete-confirm" value={props.phrase} onChange={(event) => props.setPhrase(event.target.value)} placeholder={CONFIRM_PHRASE} autoComplete="off" /></div>;
+  return <div className="space-y-1.5"><LabelType htmlFor="batch-delete-confirm" className="text-xs">Type <span className="font-mono font-semibold">{CONFIRM_PHRASE}</span> to confirm</LabelType><Input id="batch-delete-confirm" value={props.phrase} onChange={(event) => props.setPhrase(event.target.value)} placeholder={CONFIRM_PHRASE} autoComplete="off" /></div>;
 }
 
 function BatchDeleteFooter(props: { count: number; canConfirm: boolean; onConfirm: () => void }): JSX.Element {
-    return <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction asChild><Button variant="destructive" onClick={props.onConfirm} disabled={!props.canConfirm}><Trash2 className="mr-1 h-4 w-4" />Delete {props.count} group{props.count === 1 ? "" : "s"}</Button></AlertDialogAction></AlertDialogFooter>;
+  return <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction asChild><Button variant="destructive" onClick={props.onConfirm} disabled={!props.canConfirm}><Trash2 className="mr-1 h-4 w-4" />Delete {props.count} group{props.count === 1 ? "" : "s"}</Button></AlertDialogAction></AlertDialogFooter>;
 }
 
 function BatchDeleteRowItem({ row }: { row: BatchDeleteRow }): JSX.Element {
-    return <li className="flex items-center gap-2 px-3 py-2"><Trash2 className="h-3.5 w-3.5 shrink-0 text-destructive/70" /><span className="min-w-0 flex-1 truncate font-medium">{row.Group.Name}</span><span className="shrink-0 text-xs text-muted-foreground"><NestedCount count={row.DescendantCount} />{row.StepCount} step{row.StepCount === 1 ? "" : "s"}</span></li>;
+  return <li className="flex items-center gap-2 px-3 py-2"><Trash2 className="h-3.5 w-3.5 shrink-0 text-destructive/70" /><span className="min-w-0 flex-1 truncate font-medium">{row.Group.Name}</span><span className="shrink-0 text-xs text-muted-foreground"><NestedCount count={row.DescendantCount} />{row.StepCount} step{row.StepCount === 1 ? "" : "s"}</span></li>;
 }
 
 function NestedCount({ count }: { count: number }): JSX.Element | null {
-    return count > 0 ? <>+{count} nested, </> : null;
+  return count > 0 ? <>+{count} nested, </> : null;
 }

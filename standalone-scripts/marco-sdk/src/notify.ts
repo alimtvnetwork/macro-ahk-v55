@@ -88,13 +88,13 @@ let _dedupTimer: ReturnType<typeof setInterval> | null = null;
 interface ToastColors { bg: string; border: string; icon: string; text: string; }
 
 function resolveColors(): Record<string, ToastColors> {
-    let errorBg = "#3a1014", errorPale = "#fecaca";
-    let warningBg = "#33260f", warningBorder = "#f59e0b", warningText = "#fde68a"; // eslint-disable-line prefer-const
-    let infoBg = "#0f172a", infoBorder = "#38bdf8", infoText = "#dbeafe";
-    let successBg = "#052e1a", successBorder = "#22c55e"; const successText = "#bbf7d0";
-    let errorBorder = "#ef4444";
+  let errorBg = "#3a1014", errorPale = "#fecaca";
+  let warningBg = "#33260f", warningBorder = "#f59e0b", warningText = "#fde68a"; // eslint-disable-line prefer-const
+  let infoBg = "#0f172a", infoBorder = "#38bdf8", infoText = "#dbeafe";
+  let successBg = "#052e1a", successBorder = "#22c55e"; const successText = "#bbf7d0";
+  let errorBorder = "#ef4444";
 
-    try {
+  try {
         interface ThemeStatusColors { errorBg?: string; errorPale?: string; warningBg?: string; successBg?: string }
         interface ThemeToastGroup { bg?: string; border?: string; text?: string }
         interface ThemeColors { warning?: string; success?: string; error?: string; status?: ThemeStatusColors; toast?: { info?: ThemeToastGroup } }
@@ -108,26 +108,55 @@ function resolveColors(): Record<string, ToastColors> {
         const TC = theme.colors || {};
         const TSt = TC.status || {};
         const TToast = TC.toast || {};
-        if (TSt.errorBg) errorBg = TSt.errorBg;
-        if (TSt.errorPale) errorPale = TSt.errorPale;
-        if (TSt.warningBg) warningBg = TSt.warningBg;
-        if (TC.warning) warningBorder = TC.warning;
-        if (TSt.successBg) successBg = TSt.successBg;
-        if (TC.success) successBorder = TC.success;
-        if (TC.error) errorBorder = TC.error;
-        if (TToast.info) {
-            if (TToast.info.bg) infoBg = TToast.info.bg;
-            if (TToast.info.border) infoBorder = TToast.info.border;
-            if (TToast.info.text) infoText = TToast.info.text;
+        if (TSt.errorBg) {
+          errorBg = TSt.errorBg;
         }
-    } catch { /* fallback defaults */ } // allow-swallow: missing theme tokens fall back to defaults
 
-    return {
-        error:   { bg: errorBg,   border: errorBorder,   icon: "\u274C", text: errorPale },
-        warn:    { bg: warningBg,  border: warningBorder, icon: "\u26A0\uFE0F", text: warningText },
-        info:    { bg: infoBg,     border: infoBorder,    icon: "\u2139\uFE0F", text: infoText },
-        success: { bg: successBg,  border: successBorder, icon: "\u2705", text: successText },
-    };
+        if (TSt.errorPale) {
+          errorPale = TSt.errorPale;
+        }
+
+        if (TSt.warningBg) {
+          warningBg = TSt.warningBg;
+        }
+
+        if (TC.warning) {
+          warningBorder = TC.warning;
+        }
+
+        if (TSt.successBg) {
+          successBg = TSt.successBg;
+        }
+
+        if (TC.success) {
+          successBorder = TC.success;
+        }
+
+        if (TC.error) {
+          errorBorder = TC.error;
+        }
+
+        if (TToast.info) {
+          if (TToast.info.bg) {
+            infoBg = TToast.info.bg;
+          }
+
+          if (TToast.info.border) {
+            infoBorder = TToast.info.border;
+          }
+
+          if (TToast.info.text) {
+            infoText = TToast.info.text;
+          }
+        }
+  } catch { /* fallback defaults */ } // allow-swallow: missing theme tokens fall back to defaults
+
+  return {
+    error:   { bg: errorBg,   border: errorBorder,   icon: "\u274C", text: errorPale },
+    warn:    { bg: warningBg,  border: warningBorder, icon: "\u26A0\uFE0F", text: warningText },
+    info:    { bg: infoBg,     border: infoBorder,    icon: "\u2139\uFE0F", text: infoText },
+    success: { bg: successBg,  border: successBorder, icon: "\u2705", text: successText },
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -135,61 +164,89 @@ function resolveColors(): Record<string, ToastColors> {
 /* ------------------------------------------------------------------ */
 
 function formatRequestDetail(rd: RequestDetail): string {
-    const lines: string[] = [];
-    if (rd.method || rd.url) lines.push("Request: " + (rd.method || "?") + " " + (rd.url || "?"));
-    if (rd.headers) {
-        for (const k of Object.keys(rd.headers)) {
-            const headerValue = k.toLowerCase() === "authorization"
-                ? rd.headers[k].substring(0, 20) + "...REDACTED"
-                : rd.headers[k];
-            lines.push("  " + k + ": " + headerValue);
-        }
-    }
-    if (rd.body) lines.push("Body: " + rd.body.substring(0, 500));
-    if (rd.status != null) lines.push("Response: HTTP " + rd.status + (rd.statusText ? " " + rd.statusText : ""));
-    if (rd.responseBody) lines.push("Response Body: " + rd.responseBody.substring(0, 500));
+  const lines: string[] = [];
+  if (rd.method || rd.url) {
+    lines.push("Request: " + (rd.method || "?") + " " + (rd.url || "?"));
+  }
 
-    return lines.join("\n");
+  if (rd.headers) {
+    for (const k of Object.keys(rd.headers)) {
+      const headerValue = k.toLowerCase() === "authorization"
+        ? rd.headers[k].substring(0, 20) + "...REDACTED"
+        : rd.headers[k];
+      lines.push("  " + k + ": " + headerValue);
+    }
+  }
+
+  if (rd.body) {
+    lines.push("Body: " + rd.body.substring(0, 500));
+  }
+
+  if (rd.status != null) {
+    lines.push("Response: HTTP " + rd.status + (rd.statusText ? " " + rd.statusText : ""));
+  }
+
+  if (rd.responseBody) {
+    lines.push("Response Body: " + rd.responseBody.substring(0, 500));
+  }
+
+  return lines.join("\n");
 }
 
 function nowTimeStr(): string {
-    return new Date().toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date().toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 function ensureDedupCleanup(): void {
-    if (_dedupTimer) return;
-    _dedupTimer = setInterval(() => {
-        const now = Date.now();
-        _recentToasts.forEach((ts, key) => { if (now - ts > DEDUP_MS * 2) _recentToasts.delete(key); });
-        if (_recentToasts.size === 0 && _dedupTimer) { clearInterval(_dedupTimer); _dedupTimer = null; }
-    }, 30000);
+  if (_dedupTimer) {
+    return;
+  }
+
+  _dedupTimer = setInterval(() => {
+    const now = Date.now();
+    _recentToasts.forEach((ts, key) => {
+      if (now - ts > DEDUP_MS * 2) {
+        _recentToasts.delete(key);
+      } 
+    });
+    if (_recentToasts.size === 0 && _dedupTimer) {
+      clearInterval(_dedupTimer); _dedupTimer = null; 
+    }
+  }, 30000);
 }
 
 function pushRecentError(entry: RecentError): void {
-    _recentErrors.unshift(entry);
-    if (_recentErrors.length > RECENT_MAX) _recentErrors.pop();
-    for (const cb of _errorListeners) { try { cb(entry); } catch { /* */ } } // allow-swallow: listener errors must not break notify pipeline
+  _recentErrors.unshift(entry);
+  if (_recentErrors.length > RECENT_MAX) {
+    _recentErrors.pop();
+  }
+
+  for (const cb of _errorListeners) {
+    try {
+      cb(entry); 
+    } catch { /* */ } 
+  } // allow-swallow: listener errors must not break notify pipeline
 }
 
 function getOrCreateContainer(): HTMLElement {
-    let el = document.getElementById(CONTAINER_ID);
+  let el = document.getElementById(CONTAINER_ID);
 
-    // Container may have been removed by SPA navigation — re-create if orphaned
-    if (el && !el.isConnected) {
-        el = null;
-    }
+  // Container may have been removed by SPA navigation — re-create if orphaned
+  if (el && !el.isConnected) {
+    el = null;
+  }
 
-    if (!el) {
-        el = document.createElement("div");
-        el.id = CONTAINER_ID;
-        el.style.cssText = "position:fixed;top:12px;right:12px;z-index:99999;display:flex;flex-direction:column;gap:6px;max-width:400px;pointer-events:none;";
+  if (!el) {
+    el = document.createElement("div");
+    el.id = CONTAINER_ID;
+    el.style.cssText = "position:fixed;top:12px;right:12px;z-index:99999;display:flex;flex-direction:column;gap:6px;max-width:400px;pointer-events:none;";
 
-        // Defensive: wait for document.body if not yet available
-        const target = document.body || document.documentElement;
-        target.appendChild(el);
-    }
+    // Defensive: wait for document.body if not yet available
+    const target = document.body || document.documentElement;
+    target.appendChild(el);
+  }
 
-    return el;
+  return el;
 }
 
 /* ------------------------------------------------------------------ */
@@ -197,21 +254,34 @@ function getOrCreateContainer(): HTMLElement {
 /* ------------------------------------------------------------------ */
 
 function dismissToast(toast: HTMLElement & { _dismissed?: boolean; _dismissTimer?: ReturnType<typeof setTimeout> }): void {
-    if (!toast || toast._dismissed) return;
-    toast._dismissed = true;
-    if (toast._dismissTimer) clearTimeout(toast._dismissTimer);
+  if (!toast || toast._dismissed) {
+    return;
+  }
 
-    const idx = _queue.indexOf(toast);
-    if (idx !== -1) _queue.splice(idx, 1);
+  toast._dismissed = true;
+  if (toast._dismissTimer) {
+    clearTimeout(toast._dismissTimer);
+  }
 
-    toast.style.opacity = "0";
-    toast.style.transform = "translateX(20px)";
-    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  const idx = _queue.indexOf(toast);
+  if (idx !== -1) {
+    _queue.splice(idx, 1);
+  }
+
+  toast.style.opacity = "0";
+  toast.style.transform = "translateX(20px)";
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    } 
+  }, 300);
 }
 
 function dismissAll(): void {
-    const snapshot = _queue.slice();
-    for (const t of snapshot) dismissToast(t);
+  const snapshot = _queue.slice();
+  for (const t of snapshot) {
+    dismissToast(t);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,110 +290,157 @@ function dismissAll(): void {
 
 // eslint-disable-next-line max-lines-per-function
 function showToast(message: string, level: ToastLevelType = "error", opts: ToastOpts = {}): void {
-    // Guard: defer if DOM not ready yet
-    if (!document.body && !document.documentElement) {
-        setTimeout(() => showToast(message, level, opts), 50);
+  // Guard: defer if DOM not ready yet
+  if (!document.body && !document.documentElement) {
+    setTimeout(() => showToast(message, level, opts), 50);
 
-        return;
-    }
-    // Dedup
-    const dedupKey = level + ":" + message;
-    const last = _recentToasts.get(dedupKey) || 0;
-    if (Date.now() - last < DEDUP_MS) return;
-    _recentToasts.set(dedupKey, Date.now());
-    ensureDedupCleanup();
+    return;
+  }
 
-    const timeStr = nowTimeStr();
-    const colors = resolveColors();
-    const c = colors[level] || colors.error;
+  // Dedup
+  const dedupKey = level + ":" + message;
+  const last = _recentToasts.get(dedupKey) || 0;
+  if (Date.now() - last < DEDUP_MS) {
+    return;
+  }
 
-    const container = getOrCreateContainer();
+  _recentToasts.set(dedupKey, Date.now());
+  ensureDedupCleanup();
 
-    // Build toast element
-    const toast = document.createElement("div") as HTMLDivElement & { _dismissed?: boolean; _dismissTimer?: ReturnType<typeof setTimeout> };
-    toast.style.cssText = "display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:8px;font-family:monospace;font-size:11px;color:" + c.text + ";background:" + c.bg + ";border:1px solid " + c.border + ";box-shadow:0 4px 12px rgba(0,0,0,0.4);pointer-events:auto;opacity:0;transform:translateX(20px);transition:all 0.3s ease;position:relative;";
+  const timeStr = nowTimeStr();
+  const colors = resolveColors();
+  const c = colors[level] || colors.error;
 
-    // Icon
-    const iconSpan = document.createElement("span");
-    iconSpan.style.cssText = "font-size:14px;flex-shrink:0;line-height:1;";
-    iconSpan.textContent = c.icon;
+  const container = getOrCreateContainer();
 
-    // Body
-    const bodyDiv = document.createElement("div");
-    bodyDiv.style.cssText = "flex:1;min-width:0;";
+  // Build toast element
+  const toast = document.createElement("div") as HTMLDivElement & { _dismissed?: boolean; _dismissTimer?: ReturnType<typeof setTimeout> };
+  toast.style.cssText = "display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:8px;font-family:monospace;font-size:11px;color:" + c.text + ";background:" + c.bg + ";border:1px solid " + c.border + ";box-shadow:0 4px 12px rgba(0,0,0,0.4);pointer-events:auto;opacity:0;transform:translateX(20px);transition:all 0.3s ease;position:relative;";
 
-    const msgDiv = document.createElement("div");
-    msgDiv.style.cssText = "word-break:break-word;padding-right:40px;";
-    msgDiv.textContent = message;
+  // Icon
+  const iconSpan = document.createElement("span");
+  iconSpan.style.cssText = "font-size:14px;flex-shrink:0;line-height:1;";
+  iconSpan.textContent = c.icon;
 
-    const timeDiv = document.createElement("div");
-    timeDiv.style.cssText = "font-size:9px;opacity:0.6;margin-top:2px;";
-    timeDiv.textContent = "v" + _version + " @ " + timeStr;
+  // Body
+  const bodyDiv = document.createElement("div");
+  bodyDiv.style.cssText = "flex:1;min-width:0;";
 
-    bodyDiv.appendChild(msgDiv);
-    bodyDiv.appendChild(timeDiv);
+  const msgDiv = document.createElement("div");
+  msgDiv.style.cssText = "word-break:break-word;padding-right:40px;";
+  msgDiv.textContent = message;
 
-    // Actions (copy + close)
-    const actionsDiv = document.createElement("div");
-    actionsDiv.style.cssText = "position:absolute;top:6px;right:6px;display:flex;gap:4px;align-items:center;";
+  const timeDiv = document.createElement("div");
+  timeDiv.style.cssText = "font-size:9px;opacity:0.6;margin-top:2px;";
+  timeDiv.textContent = "v" + _version + " @ " + timeStr;
 
-    const copyBtn = document.createElement("button");
-    copyBtn.style.cssText = "background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:" + c.text + ";font-size:10px;padding:2px 6px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;line-height:1.2;";
-    copyBtn.textContent = "\uD83D\uDCCB";
-    copyBtn.title = "Copy details";
-    copyBtn.onmouseenter = () => { copyBtn.style.opacity = "1"; };
-    copyBtn.onmouseleave = () => { copyBtn.style.opacity = "0.7"; };
-    copyBtn.onclick = (e: MouseEvent) => {
-        e.stopPropagation();
-        let copyText = "[v" + _version + " " + level.toUpperCase() + " @ " + timeStr + "]\n" + message;
-        if (opts.requestDetail) copyText += "\n\n" + formatRequestDetail(opts.requestDetail);
-        if (opts.stack) copyText += "\n\nStack:\n" + opts.stack;
-        navigator.clipboard.writeText(copyText).then(
-            () => { copyBtn.textContent = "\u2713"; setTimeout(() => { copyBtn.textContent = "\uD83D\uDCCB"; }, 1500); },
-            () => { /* fallback */ const ta = document.createElement("textarea"); ta.value = copyText; ta.style.cssText = "position:fixed;opacity:0;"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); copyBtn.textContent = "\u2713"; } catch { /* */ } document.body.removeChild(ta); setTimeout(() => { copyBtn.textContent = "\uD83D\uDCCB"; }, 1500); }, // allow-swallow: execCommand fallback for old browsers; UI continues regardless
-        );
-    };
+  bodyDiv.appendChild(msgDiv);
+  bodyDiv.appendChild(timeDiv);
 
-    const closeBtn = document.createElement("button");
-    closeBtn.style.cssText = "background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:" + c.text + ";font-size:12px;padding:1px 5px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;line-height:1.2;font-weight:bold;";
-    closeBtn.textContent = "\u2715";
-    closeBtn.title = "Dismiss";
-    closeBtn.onmouseenter = () => { closeBtn.style.opacity = "1"; };
-    closeBtn.onmouseleave = () => { closeBtn.style.opacity = "0.7"; };
-    closeBtn.onclick = (e: MouseEvent) => { e.stopPropagation(); dismissToast(toast); };
+  // Actions (copy + close)
+  const actionsDiv = document.createElement("div");
+  actionsDiv.style.cssText = "position:absolute;top:6px;right:6px;display:flex;gap:4px;align-items:center;";
 
-    actionsDiv.appendChild(copyBtn);
-    actionsDiv.appendChild(closeBtn);
+  const copyBtn = document.createElement("button");
+  copyBtn.style.cssText = "background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:" + c.text + ";font-size:10px;padding:2px 6px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;line-height:1.2;";
+  copyBtn.textContent = "\uD83D\uDCCB";
+  copyBtn.title = "Copy details";
+  copyBtn.onmouseenter = () => {
+    copyBtn.style.opacity = "1"; 
+  };
 
-    toast.appendChild(iconSpan);
-    toast.appendChild(bodyDiv);
-    toast.appendChild(actionsDiv);
+  copyBtn.onmouseleave = () => {
+    copyBtn.style.opacity = "0.7"; 
+  };
 
-    container.appendChild(toast);
-    _queue.push(toast);
-
-    // Animate in
-    requestAnimationFrame(() => { toast.style.opacity = "1"; toast.style.transform = "translateX(0)"; });
-
-    // Overflow — dismiss oldest
-    const overflow = _queue.length - MAX_VISIBLE;
-    for (let i = 0; i < overflow; i++) { const oldest = _queue[0]; if (oldest) dismissToast(oldest); }
-
-    // Auto-dismiss
-    const ms = opts.duration ?? (level === "error" ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
-    toast._dismissTimer = setTimeout(() => dismissToast(toast), ms);
-
-    // Error-level: trigger stop-loop callback
-    if (level === "error" && !_errorStopTriggered && !opts.noStop && _stopLoopFn) {
-        _errorStopTriggered = true;
-        try { _stopLoopFn(); } catch { /* */ } // allow-swallow: stop-loop callback errors must not block toast pipeline
-        setTimeout(() => { _errorStopTriggered = false; }, 5000);
+  copyBtn.onclick = (e: MouseEvent) => {
+    e.stopPropagation();
+    let copyText = "[v" + _version + " " + level.toUpperCase() + " @ " + timeStr + "]\n" + message;
+    if (opts.requestDetail) {
+      copyText += "\n\n" + formatRequestDetail(opts.requestDetail);
     }
 
-    // Push to recent errors store
-    if (level === "error" || level === "warn") {
-        pushRecentError({ timestamp: timeStr, level, message, stack: opts.stack, requestDetail: opts.requestDetail });
+    if (opts.stack) {
+      copyText += "\n\nStack:\n" + opts.stack;
     }
+
+    navigator.clipboard.writeText(copyText).then(
+      () => {
+        copyBtn.textContent = "\u2713"; setTimeout(() => {
+          copyBtn.textContent = "\uD83D\uDCCB"; 
+        }, 1500); 
+      },
+      () => {
+        /* fallback */ const ta = document.createElement("textarea"); ta.value = copyText; ta.style.cssText = "position:fixed;opacity:0;"; document.body.appendChild(ta); ta.select(); try {
+          document.execCommand("copy"); copyBtn.textContent = "\u2713"; 
+        } catch { /* */ }
+
+        document.body.removeChild(ta); setTimeout(() => {
+          copyBtn.textContent = "\uD83D\uDCCB"; 
+        }, 1500); 
+      }, // allow-swallow: execCommand fallback for old browsers; UI continues regardless
+    );
+  };
+
+  const closeBtn = document.createElement("button");
+  closeBtn.style.cssText = "background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:" + c.text + ";font-size:12px;padding:1px 5px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;line-height:1.2;font-weight:bold;";
+  closeBtn.textContent = "\u2715";
+  closeBtn.title = "Dismiss";
+  closeBtn.onmouseenter = () => {
+    closeBtn.style.opacity = "1"; 
+  };
+
+  closeBtn.onmouseleave = () => {
+    closeBtn.style.opacity = "0.7"; 
+  };
+
+  closeBtn.onclick = (e: MouseEvent) => {
+    e.stopPropagation(); dismissToast(toast); 
+  };
+
+  actionsDiv.appendChild(copyBtn);
+  actionsDiv.appendChild(closeBtn);
+
+  toast.appendChild(iconSpan);
+  toast.appendChild(bodyDiv);
+  toast.appendChild(actionsDiv);
+
+  container.appendChild(toast);
+  _queue.push(toast);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1"; toast.style.transform = "translateX(0)"; 
+  });
+
+  // Overflow — dismiss oldest
+  const overflow = _queue.length - MAX_VISIBLE;
+  for (let i = 0; i < overflow; i++) {
+    const oldest = _queue[0]; if (oldest) {
+      dismissToast(oldest);
+    } 
+  }
+
+  // Auto-dismiss
+  const ms = opts.duration ?? (level === "error" ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
+  toast._dismissTimer = setTimeout(() => dismissToast(toast), ms);
+
+  // Error-level: trigger stop-loop callback
+  if (level === "error" && !_errorStopTriggered && !opts.noStop && _stopLoopFn) {
+    _errorStopTriggered = true;
+    try {
+      _stopLoopFn(); 
+    } catch { /* */ } // allow-swallow: stop-loop callback errors must not block toast pipeline
+
+    setTimeout(() => {
+      _errorStopTriggered = false; 
+    }, 5000);
+  }
+
+  // Push to recent errors store
+  if (level === "error" || level === "warn") {
+    pushRecentError({ timestamp: timeStr, level, message, stack: opts.stack, requestDetail: opts.requestDetail });
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -331,16 +448,32 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
 /* ------------------------------------------------------------------ */
 
 export function createNotifyApi(): NotifyApi {
-    return {
-        toast: showToast,
-        info(message: string, opts?: ToastOpts) { showToast(message, "info", opts); },
-        success(message: string, opts?: ToastOpts) { showToast(message, "success", opts); },
-        warning(message: string, opts?: ToastOpts) { showToast(message, "warn", opts); },
-        error(message: string, opts?: ToastOpts) { showToast(message, "error", opts); },
-        dismissAll,
-        onError(callback: ErrorCallback) { _errorListeners.push(callback); },
-        getRecentErrors() { return _recentErrors.slice(); },
-        _setStopLoopCallback(fn: StopLoopCallback) { _stopLoopFn = fn; },
-        _setVersion(v: string) { _version = v; },
-    };
+  return {
+    toast: showToast,
+    info(message: string, opts?: ToastOpts) {
+      showToast(message, "info", opts); 
+    },
+    success(message: string, opts?: ToastOpts) {
+      showToast(message, "success", opts); 
+    },
+    warning(message: string, opts?: ToastOpts) {
+      showToast(message, "warn", opts); 
+    },
+    error(message: string, opts?: ToastOpts) {
+      showToast(message, "error", opts); 
+    },
+    dismissAll,
+    onError(callback: ErrorCallback) {
+      _errorListeners.push(callback); 
+    },
+    getRecentErrors() {
+      return _recentErrors.slice(); 
+    },
+    _setStopLoopCallback(fn: StopLoopCallback) {
+      _stopLoopFn = fn; 
+    },
+    _setVersion(v: string) {
+      _version = v; 
+    },
+  };
 }

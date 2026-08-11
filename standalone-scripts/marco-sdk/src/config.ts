@@ -22,31 +22,31 @@ export interface ConfigApi {
 const changeListeners: ConfigChangeCallback[] = [];
 
 export function createConfigApi(): ConfigApi {
-    return {
-        get(key: string) {
-            return sendMessage<unknown>("CONFIG_GET", { key });
-        },
-        getAll() {
-            return sendMessage<Record<string, unknown>>("CONFIG_GET_ALL");
-        },
-        async set(key: string, value: unknown) {
-            await sendMessage<void>("CONFIG_SET", { key, value });
-        },
-        onChange(callback: ConfigChangeCallback) {
-            changeListeners.push(callback);
-        },
-    };
+  return {
+    get(key: string) {
+      return sendMessage<unknown>("CONFIG_GET", { key });
+    },
+    getAll() {
+      return sendMessage<Record<string, unknown>>("CONFIG_GET_ALL");
+    },
+    async set(key: string, value: unknown) {
+      await sendMessage<void>("CONFIG_SET", { key, value });
+    },
+    onChange(callback: ConfigChangeCallback) {
+      changeListeners.push(callback);
+    },
+  };
 }
 
 /**
  * Called internally when a CONFIG_CHANGED event is received from the relay.
  */
 export function notifyConfigChange(key: string, value: unknown): void {
-    for (const listener of changeListeners) {
-        try {
-            listener(key, value);
-        } catch (caught) {
-            NamespaceLogger.error("notifyConfigChange", `Config-change listener threw for key="${key}" — listener will continue receiving events but this callback's failure was non-fatal`, caught);
-        }
+  for (const listener of changeListeners) {
+    try {
+      listener(key, value);
+    } catch (caught) {
+      NamespaceLogger.error("notifyConfigChange", `Config-change listener threw for key="${key}" — listener will continue receiving events but this callback's failure was non-fatal`, caught);
     }
+  }
 }

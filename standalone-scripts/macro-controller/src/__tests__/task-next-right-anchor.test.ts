@@ -17,7 +17,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SRC = join(HERE, '..', 'ui', 'prompt-dropdown.ts');
 
 let source = '';
-beforeAll(() => { source = readFileSync(SRC, 'utf-8'); });
+beforeAll(() => {
+  source = readFileSync(SRC, 'utf-8'); 
+});
 
 describe('Task Next sub-menu — right-anchor with viewport fallback (Issue 127 Bug B)', () => {
   it('exposes an anchorTaskNextSub() helper that computes the menu position', () => {

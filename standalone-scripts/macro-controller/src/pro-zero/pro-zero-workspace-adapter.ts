@@ -15,18 +15,18 @@ import type { WorkspaceInfoTyped } from './workspace-info-typed';
 import type { WorkspaceMembership } from './workspace-membership';
 
 function readMembership(src: Record<string, unknown>): WorkspaceMembership {
-    const membershipRaw = (src.membership || {}) as Record<string, unknown>;
-    const limit = membershipRaw.monthly_credit_limit;
+  const membershipRaw = (src.membership || {}) as Record<string, unknown>;
+  const limit = membershipRaw.monthly_credit_limit;
 
-    return {
-        workspace_id: readStr(membershipRaw, 'workspace_id'),
-        user_id: readStr(membershipRaw, 'user_id'),
-        role: readStr(membershipRaw, 'role'),
-        email: readStr(membershipRaw, 'email'),
-        monthly_credit_limit: typeof limit === 'number' ? limit : null,
-        invited_at: readStr(membershipRaw, 'invited_at'),
-        joined_at: readStr(membershipRaw, 'joined_at'),
-    };
+  return {
+    workspace_id: readStr(membershipRaw, 'workspace_id'),
+    user_id: readStr(membershipRaw, 'user_id'),
+    role: readStr(membershipRaw, 'role'),
+    email: readStr(membershipRaw, 'email'),
+    monthly_credit_limit: typeof limit === 'number' ? limit : null,
+    invited_at: readStr(membershipRaw, 'invited_at'),
+    joined_at: readStr(membershipRaw, 'joined_at'),
+  };
 }
 
 /**
@@ -37,34 +37,36 @@ function readMembership(src: Record<string, unknown>): WorkspaceMembership {
  * cast. Returns the parent row when the nested section is missing.
  */
 function pickWorkspaceSection(rawApi: WireWorkspaceRaw): WireWorkspaceRaw {
-    const inner = toWireWorkspaceRaw(rawApi.workspace);
-    if (inner) return inner;
+  const inner = toWireWorkspaceRaw(rawApi.workspace);
+  if (inner) {
+    return inner;
+  }
 
-    return rawApi;
+  return rawApi;
 }
 
 export function adaptWorkspaceInfoTyped(rawApi: unknown): WorkspaceInfoTyped {
-    const wire = toWireWorkspaceRaw(rawApi) ?? ({} as WireWorkspaceRaw);
-    const ws = pickWorkspaceSection(wire);
-    // PlanTierType-10 follow-up: numeric + billing-date fields flow through the
-    // sibling `WireWorkspaceCredits` guard so the pro-zero adapter no
-    // longer duplicates `readNum` invocations.
-    const credits = toWireWorkspaceCredits(ws as Record<string, unknown>);
+  const wire = toWireWorkspaceRaw(rawApi) ?? ({} as WireWorkspaceRaw);
+  const ws = pickWorkspaceSection(wire);
+  // PlanTierType-10 follow-up: numeric + billing-date fields flow through the
+  // sibling `WireWorkspaceCredits` guard so the pro-zero adapter no
+  // longer duplicates `readNum` invocations.
+  const credits = toWireWorkspaceCredits(ws as Record<string, unknown>);
 
-    return {
-        id: readStr(ws as Record<string, unknown>, 'id'),
-        name: readStr(ws as Record<string, unknown>, 'name'),
-        plan: readStr(ws as Record<string, unknown>, 'plan') || readStr(wire as Record<string, unknown>, 'plan'),
-        plan_type: readStr(ws as Record<string, unknown>, 'plan_type'),
-        credits_used: credits.credits_used,
-        credits_granted: credits.credits_granted,
-        total_credits_used: credits.total_credits_used,
-        billing_period_credits_used: credits.billing_period_credits_used,
-        billing_period_credits_limit: credits.billing_period_credits_limit,
-        billing_period_start_date: credits.billing_period_start_date,
+  return {
+    id: readStr(ws as Record<string, unknown>, 'id'),
+    name: readStr(ws as Record<string, unknown>, 'name'),
+    plan: readStr(ws as Record<string, unknown>, 'plan') || readStr(wire as Record<string, unknown>, 'plan'),
+    plan_type: readStr(ws as Record<string, unknown>, 'plan_type'),
+    credits_used: credits.credits_used,
+    credits_granted: credits.credits_granted,
+    total_credits_used: credits.total_credits_used,
+    billing_period_credits_used: credits.billing_period_credits_used,
+    billing_period_credits_limit: credits.billing_period_credits_limit,
+    billing_period_start_date: credits.billing_period_start_date,
 
-        billing_period_end_date: credits.billing_period_end_date,
-        membership: readMembership(wire as Record<string, unknown>),
-    };
+    billing_period_end_date: credits.billing_period_end_date,
+    membership: readMembership(wire as Record<string, unknown>),
+  };
 }
 

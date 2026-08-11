@@ -29,21 +29,21 @@ import type { Database as SqlJsDatabase, Statement } from "sql.js";
 /* ------------------------------------------------------------------ */
 
 export class BindError extends Error {
-    public readonly paramIndex: number;
-    public readonly columnName: string;
-    public readonly sqlPreview: string;
+  public readonly paramIndex: number;
+  public readonly columnName: string;
+  public readonly sqlPreview: string;
 
-    constructor(paramIndex: number, columnName: string, sqlPreview: string) {
-        super(
-            `[SQLite BindError] param index ${paramIndex} (column "${columnName}") is undefined. ` +
+  constructor(paramIndex: number, columnName: string, sqlPreview: string) {
+    super(
+      `[SQLite BindError] param index ${paramIndex} (column "${columnName}") is undefined. ` +
             `Coerce to null via bindOpt() or supply a fallback via bindReq() before binding. ` +
             `SQL: ${sqlPreview}`,
-        );
-        this.name = "BindError";
-        this.paramIndex = paramIndex;
-        this.columnName = columnName;
-        this.sqlPreview = sqlPreview;
-    }
+    );
+    this.name = "BindError";
+    this.paramIndex = paramIndex;
+    this.columnName = columnName;
+    this.sqlPreview = sqlPreview;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -63,33 +63,33 @@ export class BindError extends Error {
  * that cannot be inferred fall back to `<param N>`.
  */
 function inferColumnNames(sql: string): string[] {
-    const placeholderCount = (sql.match(/\?/g) || []).length;
-    const fallback = (i: number): string => `<param ${i}>`;
-    const names: string[] = Array.from({ length: placeholderCount }, (_, i) => fallback(i));
+  const placeholderCount = (sql.match(/\?/g) || []).length;
+  const fallback = (i: number): string => `<param ${i}>`;
+  const names: string[] = Array.from({ length: placeholderCount }, (_, i) => fallback(i));
 
-    const insertMatch = sql.match(/INSERT(?:\s+OR\s+\w+)?\s+INTO\s+\w+\s*\(([^)]+)\)/i);
-    if (insertMatch) {
-        const cols = insertMatch[1].split(",").map((c) => c.trim());
-        for (let i = 0; i < cols.length && i < names.length; i++) {
-            names[i] = cols[i] || fallback(i);
-        }
-
-        return names;
-    }
-
-    // UPDATE / SELECT / DELETE — pull "Col = ?" pairs in source order.
-    const setMatches = Array.from(sql.matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*(?:=|<|>|<=|>=|!=|LIKE)\s*\?/gi));
-    for (let i = 0; i < setMatches.length && i < names.length; i++) {
-        names[i] = setMatches[i][1];
+  const insertMatch = sql.match(/INSERT(?:\s+OR\s+\w+)?\s+INTO\s+\w+\s*\(([^)]+)\)/i);
+  if (insertMatch) {
+    const cols = insertMatch[1].split(",").map((c) => c.trim());
+    for (let i = 0; i < cols.length && i < names.length; i++) {
+      names[i] = cols[i] || fallback(i);
     }
 
     return names;
+  }
+
+  // UPDATE / SELECT / DELETE — pull "Col = ?" pairs in source order.
+  const setMatches = Array.from(sql.matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*(?:=|<|>|<=|>=|!=|LIKE)\s*\?/gi));
+  for (let i = 0; i < setMatches.length && i < names.length; i++) {
+    names[i] = setMatches[i][1];
+  }
+
+  return names;
 }
 
 function previewSql(sql: string): string {
-    const flat = sql.replace(/\s+/g, " ").trim();
+  const flat = sql.replace(/\s+/g, " ").trim();
 
-    return flat.length > 120 ? `${flat.slice(0, 117)}...` : flat;
+  return flat.length > 120 ? `${flat.slice(0, 117)}...` : flat;
 }
 
 /* ------------------------------------------------------------------ */
@@ -105,19 +105,22 @@ function previewSql(sql: string): string {
  *   db.run(sql, assertBindable(sql, params));
  */
 export function assertBindable<T extends ReadonlyArray<unknown>>(
-    sql: string,
-    params: T,
+  sql: string,
+  params: T,
 ): T {
-    if (!params || params.length === 0) return params;
-    const columns = inferColumnNames(sql);
-    for (let i = 0; i < params.length; i++) {
-        if (params[i] === undefined) {
-            const colName = columns[i] ?? `<param ${i}>`;
-            throw new BindError(i, colName, previewSql(sql));
-        }
-    }
-
+  if (!params || params.length === 0) {
     return params;
+  }
+
+  const columns = inferColumnNames(sql);
+  for (let i = 0; i < params.length; i++) {
+    if (params[i] === undefined) {
+      const colName = columns[i] ?? `<param ${i}>`;
+      throw new BindError(i, colName, previewSql(sql));
+    }
+  }
+
+  return params;
 }
 
 /* ------------------------------------------------------------------ */
@@ -141,66 +144,69 @@ type BindParams = Parameters<SqlJsDatabase["run"]>[1];
  *     underlying database via Proxy default behaviour.
  */
 export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
-    return new Proxy(db, {
-        get(target, prop, receiver) {
-            if (prop === "run") {
-                return function wrappedRun(sql: string, params?: BindParams): SqlJsDatabase {
-                    if (Array.isArray(params) && params.length > 0) {
-                        assertBindable(sql, params as ReadonlyArray<unknown>);
-                    }
-                    target.run(sql, params);
+  return new Proxy(db, {
+    get(target, prop, receiver) {
+      if (prop === "run") {
+        return function wrappedRun(sql: string, params?: BindParams): SqlJsDatabase {
+          if (Array.isArray(params) && params.length > 0) {
+            assertBindable(sql, params as ReadonlyArray<unknown>);
+          }
 
-                    return receiver as SqlJsDatabase;
-                };
-            }
+          target.run(sql, params);
 
-            if (prop === "exec") {
-                return function wrappedExec(sql: string, params?: BindParams) {
-                    if (Array.isArray(params) && params.length > 0) {
-                        assertBindable(sql, params as ReadonlyArray<unknown>);
-                    }
+          return receiver as SqlJsDatabase;
+        };
+      }
 
-                    // sql.js Database.exec accepts an optional params array even
-                    // though our typings only declare the single-arg form.
-                    return (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params);
-                };
-            }
+      if (prop === "exec") {
+        return function wrappedExec(sql: string, params?: BindParams) {
+          if (Array.isArray(params) && params.length > 0) {
+            assertBindable(sql, params as ReadonlyArray<unknown>);
+          }
 
-            if (prop === "prepare") {
-                return function wrappedPrepare(sql: string): Statement {
-                    const stmt = target.prepare(sql);
+          // sql.js Database.exec accepts an optional params array even
+          // though our typings only declare the single-arg form.
+          return (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params);
+        };
+      }
 
-                    return wrapStatementWithBindSafety(stmt, sql);
-                };
-            }
+      if (prop === "prepare") {
+        return function wrappedPrepare(sql: string): Statement {
+          const stmt = target.prepare(sql);
 
-            return Reflect.get(target, prop, receiver);
-        },
-    });
+          return wrapStatementWithBindSafety(stmt, sql);
+        };
+      }
+
+      return Reflect.get(target, prop, receiver);
+    },
+  });
 }
 
 function wrapStatementWithBindSafety(stmt: Statement, sql: string): Statement {
-    return new Proxy(stmt, {
-        get(target, prop, receiver) {
-            if (prop === "bind") {
-                return function wrappedBind(params?: BindParams): boolean {
-                    if (Array.isArray(params) && params.length > 0) {
-                        assertBindable(sql, params as ReadonlyArray<unknown>);
-                    }
+  return new Proxy(stmt, {
+    get(target, prop, receiver) {
+      if (prop === "bind") {
+        return function wrappedBind(params?: BindParams): boolean {
+          if (Array.isArray(params) && params.length > 0) {
+            assertBindable(sql, params as ReadonlyArray<unknown>);
+          }
 
-                    return target.bind(params);
-                };
-            }
-            if (prop === "run") {
-                return function wrappedStmtRun(params?: BindParams): void {
-                    if (Array.isArray(params) && params.length > 0) {
-                        assertBindable(sql, params as ReadonlyArray<unknown>);
-                    }
-                    target.run(params);
-                };
-            }
+          return target.bind(params);
+        };
+      }
 
-            return Reflect.get(target, prop, receiver);
-        },
-    });
+      if (prop === "run") {
+        return function wrappedStmtRun(params?: BindParams): void {
+          if (Array.isArray(params) && params.length > 0) {
+            assertBindable(sql, params as ReadonlyArray<unknown>);
+          }
+
+          target.run(params);
+        };
+      }
+
+      return Reflect.get(target, prop, receiver);
+    },
+  });
 }

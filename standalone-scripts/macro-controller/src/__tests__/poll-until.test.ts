@@ -68,9 +68,11 @@ describe('pollUntil', () => {
     let callCount = 0;
 
     const promise = pollUntil(
-      () => { callCount++;
+      () => {
+        callCount++;
 
- return callCount >= 2 ? 'ok' : false; },
+        return callCount >= 2 ? 'ok' : false; 
+      },
       { intervalMs: 100, timeoutMs: 5000, onFound },
     );
 
@@ -102,9 +104,11 @@ describe('pollUntil', () => {
     let callCount = 0;
 
     const promise = pollUntil(
-      () => { callCount++;
+      () => {
+        callCount++;
 
- return callCount >= 2 ? 'ok' : null; },
+        return callCount >= 2 ? 'ok' : null; 
+      },
       { intervalMs: 50, timeoutMs: 500, onTimeout },
     );
 

@@ -18,8 +18,12 @@ const MS_PER_DAY = 86_400_000;
 
 // Freeze the system clock so relative-time formatters (Date.now()) inside
 // ws-hover-card.ts and workspace-status.ts produce deterministic output.
-beforeAll(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); });
-afterAll(() => { vi.useRealTimers(); });
+beforeAll(() => {
+  vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); 
+});
+afterAll(() => {
+  vi.useRealTimers(); 
+});
 
 const CFG: WorkspaceLifecycleConfig = {
   expiryGracePeriodDays: 30,
@@ -62,10 +66,16 @@ function makeWs(overrides: Partial<WorkspaceCredit>): WorkspaceCredit {
 function extractSubscriptionSection(html: string): string {
   const headerToken = 'Subscription';
   const headerIdx = html.indexOf(headerToken);
-  if (headerIdx === -1) return '';
+  if (headerIdx === -1) {
+    return '';
+  }
+
   // Walk back to the start of the surrounding <div ...>Subscription</div>.
   const sectionOpen = html.lastIndexOf('<div', headerIdx);
-  if (sectionOpen === -1) return '';
+  if (sectionOpen === -1) {
+    return '';
+  }
+
   // Find the next section header div (font-size:9px ... uppercase) or end.
   const NEXT_HEADER_MARKER = 'font-size:9px;font-weight:700';
   const nextHeaderIdx = html.indexOf(NEXT_HEADER_MARKER, headerIdx + headerToken.length);

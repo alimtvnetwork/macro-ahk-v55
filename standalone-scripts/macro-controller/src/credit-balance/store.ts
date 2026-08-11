@@ -61,70 +61,73 @@ interface KvBridge {
 }
 
 function getKv(): KvBridge['kv'] | null {
-    const sdk = (window as unknown as { marco?: KvBridge }).marco;
+  const sdk = (window as unknown as { marco?: KvBridge }).marco;
 
-    return sdk && sdk.kv ? sdk.kv : null;
+  return sdk && sdk.kv ? sdk.kv : null;
 }
 
 function buildKey(workspaceId: string): string {
-    return KEY_PREFIX + workspaceId;
+  return KEY_PREFIX + workspaceId;
 }
 
 /** Build a row from a fresh API response (pure — no I/O). */
 export function buildRow(
-    workspaceId: string,
-    response: CreditBalanceResponse,
-    source: CreditBalanceFetchSource,
-    nowMs: number = Date.now(),
+  workspaceId: string,
+  response: CreditBalanceResponse,
+  source: CreditBalanceFetchSource,
+  nowMs: number = Date.now(),
 ): CreditBalanceCacheRow {
-    return {
-        WorkspaceId: workspaceId,
-        FetchedAtMs: nowMs,
-        Source: source,
-        TotalGranted: Number(response.total_granted ?? 0),
-        TotalRemaining: Number(response.total_remaining ?? 0),
-        TotalBillingUsed: Number(response.total_billing_period_used ?? 0),
-        DailyLimit: Number(response.daily_limit ?? 0),
-        DailyRemaining: Number(response.daily_remaining ?? 0),
-        RawJson: JSON.stringify(response),
-    };
+  return {
+    WorkspaceId: workspaceId,
+    FetchedAtMs: nowMs,
+    Source: source,
+    TotalGranted: Number(response.total_granted ?? 0),
+    TotalRemaining: Number(response.total_remaining ?? 0),
+    TotalBillingUsed: Number(response.total_billing_period_used ?? 0),
+    DailyLimit: Number(response.daily_limit ?? 0),
+    DailyRemaining: Number(response.daily_remaining ?? 0),
+    RawJson: JSON.stringify(response),
+  };
 }
 
 /** Read one workspace's cached credit-balance row. Null on miss / malformed. */
 export async function readCreditBalanceCache(
-    workspaceId: string,
+  workspaceId: string,
 ): Promise<CreditBalanceCacheRow | null> {
-    if (!workspaceId) {
-        return null;
+  if (!workspaceId) {
+    return null;
+  }
+
+  const kv = getKv();
+  if (!kv) {
+    return null;
+  }
+
+  try {
+    const raw = await kv.get(buildKey(workspaceId));
+    if (!raw) {
+      return null;
     }
-    const kv = getKv();
-    if (!kv) {
-        return null;
-    }
-    try {
-        const raw = await kv.get(buildKey(workspaceId));
-        if (!raw) {
-            return null;
-        }
-        const parsed = JSON.parse(raw) as Partial<CreditBalanceCacheRow>;
-        const hasShape =
+
+    const parsed = JSON.parse(raw) as Partial<CreditBalanceCacheRow>;
+    const hasShape =
             typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.FetchedAtMs === 'number' &&
             typeof parsed.TotalRemaining === 'number';
-        if (!hasShape) {
-            return null;
-        }
-
-        return parsed as CreditBalanceCacheRow;
-    } catch (caught: unknown) {
-        logError(
-            'CreditBalanceCache.read',
-            'kv.get failed for ws=' + workspaceId,
-            caught,
-        );
-
-        return null;
+    if (!hasShape) {
+      return null;
     }
+
+    return parsed as CreditBalanceCacheRow;
+  } catch (caught: unknown) {
+    logError(
+      'CreditBalanceCache.read',
+      'kv.get failed for ws=' + workspaceId,
+      caught,
+    );
+
+    return null;
+  }
 }
 
 /**
@@ -132,52 +135,56 @@ export async function readCreditBalanceCache(
  * the SQLite write happens in the background.
  */
 export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
-    if (!row.WorkspaceId) {
-        return;
-    }
-    const kv = getKv();
-    if (!kv) {
-        logError(
-            'CreditBalanceCache.write',
-            'marco.kv unavailable — skipping SQLite upsert for ws=' + row.WorkspaceId,
-        );
+  if (!row.WorkspaceId) {
+    return;
+  }
 
-        return;
-    }
-    kv.set(buildKey(row.WorkspaceId), JSON.stringify(row))
-        .then(function (): void {
-            log(
-                'CreditBalanceCache: wrote ws=' + row.WorkspaceId +
+  const kv = getKv();
+  if (!kv) {
+    logError(
+      'CreditBalanceCache.write',
+      'marco.kv unavailable — skipping SQLite upsert for ws=' + row.WorkspaceId,
+    );
+
+    return;
+  }
+
+  kv.set(buildKey(row.WorkspaceId), JSON.stringify(row))
+    .then(function (): void {
+      log(
+        'CreditBalanceCache: wrote ws=' + row.WorkspaceId +
                     ' source=' + row.Source +
                     ' remaining=' + row.TotalRemaining,
-                'info',
-            );
-        })
-        .catch(function (caught: unknown): void {
-            logError(
-                'CreditBalanceCache.write',
-                'kv.set failed for ws=' + row.WorkspaceId,
-                caught,
-            );
-        });
+        'info',
+      );
+    })
+    .catch(function (caught: unknown): void {
+      logError(
+        'CreditBalanceCache.write',
+        'kv.set failed for ws=' + row.WorkspaceId,
+        caught,
+      );
+    });
 }
 
 /** Drop one workspace's cache row (debug / future "clear cache" UX). */
 export function clearCreditBalanceCache(workspaceId: string): void {
-    if (!workspaceId) {
-        return;
-    }
-    const kv = getKv();
-    if (!kv) {
-        return;
-    }
-    kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {
-        logError(
-            'CreditBalanceCache.clear',
-            'kv.delete failed for ws=' + workspaceId,
-            caught,
-        );
-    });
+  if (!workspaceId) {
+    return;
+  }
+
+  const kv = getKv();
+  if (!kv) {
+    return;
+  }
+
+  kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {
+    logError(
+      'CreditBalanceCache.clear',
+      'kv.delete failed for ws=' + workspaceId,
+      caught,
+    );
+  });
 }
 
 /**
@@ -186,34 +193,35 @@ export function clearCreditBalanceCache(workspaceId: string): void {
  * Returns [] if marco.kv has no `list()` support — caller must tolerate.
  */
 export async function listCreditBalanceCache(): Promise<ReadonlyArray<CreditBalanceCacheRow>> {
-    const kv = getKv();
-    if (!kv || typeof kv.list !== 'function') {
-        return [];
-    }
-    try {
-        const entries = await kv.list(KEY_PREFIX);
-        const rows: CreditBalanceCacheRow[] = [];
-        for (const entry of entries) {
-            try {
-                const parsed = JSON.parse(entry.value) as Partial<CreditBalanceCacheRow>;
-                if (typeof parsed.WorkspaceId === 'string' && typeof parsed.FetchedAtMs === 'number') {
-                    rows.push(parsed as CreditBalanceCacheRow);
-                }
-            } catch (caught: unknown) {
-                logError(
-                    'CreditBalanceCache.list',
-                    'malformed row at key=' + entry.key,
-                    caught,
-                );
-            }
+  const kv = getKv();
+  if (!kv || typeof kv.list !== 'function') {
+    return [];
+  }
+
+  try {
+    const entries = await kv.list(KEY_PREFIX);
+    const rows: CreditBalanceCacheRow[] = [];
+    for (const entry of entries) {
+      try {
+        const parsed = JSON.parse(entry.value) as Partial<CreditBalanceCacheRow>;
+        if (typeof parsed.WorkspaceId === 'string' && typeof parsed.FetchedAtMs === 'number') {
+          rows.push(parsed as CreditBalanceCacheRow);
         }
-
-        return rows;
-    } catch (caught: unknown) {
-        logError('CreditBalanceCache.list', 'kv.list failed', caught);
-
-        return [];
+      } catch (caught: unknown) {
+        logError(
+          'CreditBalanceCache.list',
+          'malformed row at key=' + entry.key,
+          caught,
+        );
+      }
     }
+
+    return rows;
+  } catch (caught: unknown) {
+    logError('CreditBalanceCache.list', 'kv.list failed', caught);
+
+    return [];
+  }
 }
 
 export const CREDIT_BALANCE_CACHE_KEY_PREFIX = KEY_PREFIX;

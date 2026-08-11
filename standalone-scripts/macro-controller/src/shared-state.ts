@@ -41,8 +41,11 @@ if (_configWarnings.length > 0) {
   setTimeout(function () {
     void import('./logging').then(function (mod) {
       for (const w of _configWarnings) {
-        try { mod.log('[Config Validation] ' + w, 'warn'); }
-        catch { console.warn('[Config Validation] ' + w); }
+        try {
+          mod.log('[Config Validation] ' + w, 'warn'); 
+        } catch {
+          console.warn('[Config Validation] ' + w); 
+        }
       }
     }).catch(function () {
       for (const w of _configWarnings) {
@@ -51,16 +54,27 @@ if (_configWarnings.length > 0) {
     });
   }, 0);
 }
+
 /** Get config validation warnings (for diagnostics). */
-export function getConfigValidationWarnings(): string[] { return _configWarnings; }
+export function getConfigValidationWarnings(): string[] {
+  return _configWarnings; 
+}
 
 import { StorageKeyType } from './types';
 
 export function resolvePreset(key: string): ThemePreset {
   const darkPreset = themeRoot.presets?.dark;
-  if (darkPreset) return darkPreset;
-  if (themeRoot.presets && themeRoot.presets[key]) return themeRoot.presets[key];
-  if (themeRoot.colors) return { colors: themeRoot.colors };
+  if (darkPreset) {
+    return darkPreset;
+  }
+
+  if (themeRoot.presets && themeRoot.presets[key]) {
+    return themeRoot.presets[key];
+  }
+
+  if (themeRoot.colors) {
+    return { colors: themeRoot.colors };
+  }
 
   return {} as ThemePreset;
 }
@@ -96,7 +110,10 @@ try {
   const hasRoot = root !== null && root !== undefined;
   const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
   if (hasProjects && root!.Projects!.MacroController) {
-    if (!root!.Projects!.MacroController.meta) root!.Projects!.MacroController.meta = {};
+    if (!root!.Projects!.MacroController.meta) {
+root!.Projects!.MacroController.meta = {};
+    }
+
     root!.Projects!.MacroController.meta.version = VERSION;
   }
 } catch (_e) {

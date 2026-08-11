@@ -59,9 +59,9 @@ export interface CountArgs {
 const TABLE_NAME_REGEX = /^[A-Z][A-Za-z0-9]{0,63}$/;
 
 function assertValidTable(name: string): void {
-    if (!TABLE_NAME_REGEX.test(name)) {
-        throw new Error(`[query-builder] Invalid table name: "${name}". Must be PascalCase.`);
-    }
+  if (!TABLE_NAME_REGEX.test(name)) {
+    throw new Error(`[query-builder] Invalid table name: "${name}". Must be PascalCase.`);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -69,33 +69,33 @@ function assertValidTable(name: string): void {
 /* ------------------------------------------------------------------ */
 
 function buildWhere(where?: WhereClause): { clause: string; params: SqlValue[] } {
-    if (!where || Object.keys(where).length === 0) {
-        return { clause: "", params: [] };
+  if (!where || Object.keys(where).length === 0) {
+    return { clause: "", params: [] };
+  }
+
+  const conditions: string[] = [];
+  const params: SqlValue[] = [];
+
+  for (const [col, whereValue] of Object.entries(where)) {
+    if (typeof whereValue === 'object' && whereValue !== null && !(whereValue instanceof Uint8Array)) {
+      const whereObject = whereValue as Record<string, unknown>;
+      if ('ilike' in whereObject) {
+        conditions.push(`"${col}" LIKE ? COLLATE NOCASE`);
+        params.push(whereObject.ilike as SqlValue);
+      } else if ('like' in whereObject) {
+        conditions.push(`"${col}" LIKE ?`);
+        params.push(whereObject.like as SqlValue);
+      } else {
+        conditions.push(`"${col}" = ?`);
+        params.push(whereValue as unknown as SqlValue);
+      }
+    } else {
+      conditions.push(`"${col}" = ?`);
+      params.push(whereValue as SqlValue);
     }
+  }
 
-    const conditions: string[] = [];
-    const params: SqlValue[] = [];
-
-    for (const [col, whereValue] of Object.entries(where)) {
-        if (typeof whereValue === 'object' && whereValue !== null && !(whereValue instanceof Uint8Array)) {
-            const whereObject = whereValue as Record<string, unknown>;
-            if ('ilike' in whereObject) {
-                conditions.push(`"${col}" LIKE ? COLLATE NOCASE`);
-                params.push(whereObject.ilike as SqlValue);
-            } else if ('like' in whereObject) {
-                conditions.push(`"${col}" LIKE ?`);
-                params.push(whereObject.like as SqlValue);
-            } else {
-                conditions.push(`"${col}" = ?`);
-                params.push(whereValue as unknown as SqlValue);
-            }
-        } else {
-            conditions.push(`"${col}" = ?`);
-            params.push(whereValue as SqlValue);
-        }
-    }
-
-    return { clause: ` WHERE ${conditions.join(" AND ")}`, params };
+  return { clause: ` WHERE ${conditions.join(" AND ")}`, params };
 }
 
 /* ------------------------------------------------------------------ */
@@ -103,13 +103,15 @@ function buildWhere(where?: WhereClause): { clause: string; params: SqlValue[] }
 /* ------------------------------------------------------------------ */
 
 function buildOrderBy(orderBy?: OrderByClause): string {
-    if (!orderBy || Object.keys(orderBy).length === 0) return "";
+  if (!orderBy || Object.keys(orderBy).length === 0) {
+    return "";
+  }
 
-    const parts = Object.entries(orderBy).map(
-        ([col, dir]) => `"${col}" ${dir.toUpperCase()}`,
-    );
+  const parts = Object.entries(orderBy).map(
+    ([col, dir]) => `"${col}" ${dir.toUpperCase()}`,
+  );
 
-    return ` ORDER BY ${parts.join(", ")}`;
+  return ` ORDER BY ${parts.join(", ")}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -117,16 +119,19 @@ function buildOrderBy(orderBy?: OrderByClause): string {
 /* ------------------------------------------------------------------ */
 
 function collectRows(db: SqlJsDatabase, sql: string, params: SqlValue[]): Record<string, SqlValue>[] {
-    const stmt = db.prepare(sql);
-    if (params.length > 0) stmt.bind(params);
+  const stmt = db.prepare(sql);
+  if (params.length > 0) {
+    stmt.bind(params);
+  }
 
-    const rows: Record<string, SqlValue>[] = [];
-    while (stmt.step()) {
-        rows.push(stmt.getAsObject() as Record<string, SqlValue>);
-    }
-    stmt.free();
+  const rows: Record<string, SqlValue>[] = [];
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject() as Record<string, SqlValue>);
+  }
 
-    return rows;
+  stmt.free();
+
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -134,101 +139,101 @@ function collectRows(db: SqlJsDatabase, sql: string, params: SqlValue[]): Record
 /* ------------------------------------------------------------------ */
 
 export function queryCreate(
-    db: SqlJsDatabase,
-    table: string,
-    args: CreateArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args: CreateArgs,
 ): Record<string, unknown> {
-    assertValidTable(table);
-    const cols = Object.keys(args.data);
-    const placeholders = cols.map(() => "?").join(", ");
-    const values = cols.map((c) => args.data[c] as SqlValue);
+  assertValidTable(table);
+  const cols = Object.keys(args.data);
+  const placeholders = cols.map(() => "?").join(", ");
+  const values = cols.map((c) => args.data[c] as SqlValue);
 
-    const quotedCols = cols.map(c => `"${c}"`).join(", ");
-    const sql = `INSERT INTO "${table}" (${quotedCols}) VALUES (${placeholders})`;
-    db.run(sql, values);
+  const quotedCols = cols.map(c => `"${c}"`).join(", ");
+  const sql = `INSERT INTO "${table}" (${quotedCols}) VALUES (${placeholders})`;
+  db.run(sql, values);
 
-    const idResult = db.exec("SELECT last_insert_rowid() AS Id");
-    const id = idResult.length > 0 ? idResult[0].values[0][0] : null;
+  const idResult = db.exec("SELECT last_insert_rowid() AS Id");
+  const id = idResult.length > 0 ? idResult[0].values[0][0] : null;
 
-    return { Id: id, ...args.data };
+  return { Id: id, ...args.data };
 }
 
 export function queryFindMany(
-    db: SqlJsDatabase,
-    table: string,
-    args?: FindManyArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args?: FindManyArgs,
 ): Record<string, unknown>[] {
-    assertValidTable(table);
-    const { clause, params } = buildWhere(args?.where);
-    const orderBy = buildOrderBy(args?.orderBy);
-    const limit = args?.take ? ` LIMIT ${Number(args.take)}` : "";
-    const offset = args?.skip ? ` OFFSET ${Number(args.skip)}` : "";
+  assertValidTable(table);
+  const { clause, params } = buildWhere(args?.where);
+  const orderBy = buildOrderBy(args?.orderBy);
+  const limit = args?.take ? ` LIMIT ${Number(args.take)}` : "";
+  const offset = args?.skip ? ` OFFSET ${Number(args.skip)}` : "";
 
-    const sql = `SELECT * FROM "${table}"${clause}${orderBy}${limit}${offset}`;
+  const sql = `SELECT * FROM "${table}"${clause}${orderBy}${limit}${offset}`;
 
-    return collectRows(db, sql, params);
+  return collectRows(db, sql, params);
 }
 
 export function queryFindUnique(
-    db: SqlJsDatabase,
-    table: string,
-    args: FindUniqueArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args: FindUniqueArgs,
 ): Record<string, unknown> | null {
-    assertValidTable(table);
-    const { clause, params } = buildWhere(args.where);
-    const sql = `SELECT * FROM "${table}"${clause} LIMIT 1`;
-    const rows = collectRows(db, sql, params);
+  assertValidTable(table);
+  const { clause, params } = buildWhere(args.where);
+  const sql = `SELECT * FROM "${table}"${clause} LIMIT 1`;
+  const rows = collectRows(db, sql, params);
 
-    return rows.length > 0 ? rows[0] : null;
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export function queryUpdate(
-    db: SqlJsDatabase,
-    table: string,
-    args: UpdateArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args: UpdateArgs,
 ): { count: number } {
-    assertValidTable(table);
-    const setCols = Object.keys(args.data);
-    const setClause = setCols.map((c) => `"${c}" = ?`).join(", ");
-    const setValues = setCols.map((c) => args.data[c] as SqlValue);
+  assertValidTable(table);
+  const setCols = Object.keys(args.data);
+  const setClause = setCols.map((c) => `"${c}" = ?`).join(", ");
+  const setValues = setCols.map((c) => args.data[c] as SqlValue);
 
-    const { clause, params } = buildWhere(args.where);
-    const sql = `UPDATE "${table}" SET ${setClause}${clause}`;
-    db.run(sql, [...setValues, ...params]);
+  const { clause, params } = buildWhere(args.where);
+  const sql = `UPDATE "${table}" SET ${setClause}${clause}`;
+  db.run(sql, [...setValues, ...params]);
 
-    const changes = db.exec("SELECT changes() AS Count");
-    const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
+  const changes = db.exec("SELECT changes() AS Count");
+  const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
 
-    return { count };
+  return { count };
 }
 
 export function queryDelete(
-    db: SqlJsDatabase,
-    table: string,
-    args: DeleteArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args: DeleteArgs,
 ): { count: number } {
-    assertValidTable(table);
-    const { clause, params } = buildWhere(args.where);
-    const sql = `DELETE FROM "${table}"${clause}`;
-    db.run(sql, params);
+  assertValidTable(table);
+  const { clause, params } = buildWhere(args.where);
+  const sql = `DELETE FROM "${table}"${clause}`;
+  db.run(sql, params);
 
-    const changes = db.exec("SELECT changes() AS Count");
-    const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
+  const changes = db.exec("SELECT changes() AS Count");
+  const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
 
-    return { count };
+  return { count };
 }
 
 export function queryCount(
-    db: SqlJsDatabase,
-    table: string,
-    args?: CountArgs,
+  db: SqlJsDatabase,
+  table: string,
+  args?: CountArgs,
 ): number {
-    assertValidTable(table);
-    const { clause, params } = buildWhere(args?.where);
-    const sql = `SELECT COUNT(*) AS Count FROM "${table}"${clause}`;
-    const rows = collectRows(db, sql, params);
+  assertValidTable(table);
+  const { clause, params } = buildWhere(args?.where);
+  const sql = `SELECT COUNT(*) AS Count FROM "${table}"${clause}`;
+  const rows = collectRows(db, sql, params);
 
-    return rows.length > 0 ? (rows[0].Count as number) : 0;
+  return rows.length > 0 ? (rows[0].Count as number) : 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -243,43 +248,43 @@ export interface ColumnDef {
 }
 
 export function createUserTable(db: SqlJsDatabase, tableName: string, columns: ColumnDef[]): void {
-    assertValidTable(tableName);
+  assertValidTable(tableName);
 
-    const colDefs = columns.map((col) => {
-        const type = col.Type === "BOOLEAN" ? "INTEGER" : col.Type;
-        const nullable = col.Nullable ? "" : " NOT NULL";
-        const def = col.Default !== undefined ? ` DEFAULT ${col.Default}` : "";
+  const colDefs = columns.map((col) => {
+    const type = col.Type === "BOOLEAN" ? "INTEGER" : col.Type;
+    const nullable = col.Nullable ? "" : " NOT NULL";
+    const def = col.Default !== undefined ? ` DEFAULT ${col.Default}` : "";
 
-        return `"${col.Name}" ${type}${nullable}${def}`;
-    });
+    return `"${col.Name}" ${type}${nullable}${def}`;
+  });
 
-    const sql = `CREATE TABLE IF NOT EXISTS "${tableName}" (
+  const sql = `CREATE TABLE IF NOT EXISTS "${tableName}" (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     ${colDefs.join(",\n    ")},
     CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
     UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))
 )`;
-    db.run(sql);
+  db.run(sql);
 
-    // Register in ProjectSchema meta-table
-    db.run(
-        `INSERT OR REPLACE INTO ProjectSchema (TableName, ColumnDefs, UpdatedAt) VALUES (?, ?, datetime('now'))`,
-        [tableName, JSON.stringify(columns)],
-    );
+  // Register in ProjectSchema meta-table
+  db.run(
+    `INSERT OR REPLACE INTO ProjectSchema (TableName, ColumnDefs, UpdatedAt) VALUES (?, ?, datetime('now'))`,
+    [tableName, JSON.stringify(columns)],
+  );
 
-    // Also register in MetaTables + MetaColumns for the new meta engine
-    ensureMetaTables(db);
+  // Also register in MetaTables + MetaColumns for the new meta engine
+  ensureMetaTables(db);
 
-    db.run(
-        `INSERT INTO MetaTables (TableName, Description, UpdatedAt) VALUES (?, '', datetime('now'))
+  db.run(
+    `INSERT INTO MetaTables (TableName, Description, UpdatedAt) VALUES (?, '', datetime('now'))
          ON CONFLICT(TableName) DO UPDATE SET UpdatedAt = datetime('now')`,
-        [tableName],
-    );
+    [tableName],
+  );
 
-    for (let i = 0; i < columns.length; i++) {
-        const col = columns[i];
-        db.run(
-            `INSERT INTO MetaColumns (TableName, ColumnName, ColumnType, IsNullable, DefaultValue, SortOrder, UpdatedAt)
+  for (let i = 0; i < columns.length; i++) {
+    const col = columns[i];
+    db.run(
+      `INSERT INTO MetaColumns (TableName, ColumnName, ColumnType, IsNullable, DefaultValue, SortOrder, UpdatedAt)
              VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
              ON CONFLICT(TableName, ColumnName) DO UPDATE SET
                 ColumnType = excluded.ColumnType,
@@ -287,29 +292,30 @@ export function createUserTable(db: SqlJsDatabase, tableName: string, columns: C
                 DefaultValue = excluded.DefaultValue,
                 SortOrder = excluded.SortOrder,
                 UpdatedAt = datetime('now')`,
-            [tableName, col.Name, col.Type, col.Nullable ? 1 : 0, col.Default ?? null, i],
-        );
-    }
+      [tableName, col.Name, col.Type, col.Nullable ? 1 : 0, col.Default ?? null, i],
+    );
+  }
 }
 
 export function dropUserTable(db: SqlJsDatabase, tableName: string): void {
-    assertValidTable(tableName);
-    db.run(`DROP TABLE IF EXISTS "${tableName}"`);
-    db.run(`DELETE FROM ProjectSchema WHERE TableName = ?`, [tableName]);
+  assertValidTable(tableName);
+  db.run(`DROP TABLE IF EXISTS "${tableName}"`);
+  db.run(`DELETE FROM ProjectSchema WHERE TableName = ?`, [tableName]);
 }
 
 export function listUserTables(db: SqlJsDatabase): Array<{ TableName: string; ColumnDefs: string; EndpointName: string | null }> {
-    const stmt = db.prepare("SELECT TableName, ColumnDefs, EndpointName FROM ProjectSchema ORDER BY TableName");
-    const rows: Array<{ TableName: string; ColumnDefs: string; EndpointName: string | null }> = [];
-    while (stmt.step()) {
-        const row = stmt.getAsObject() as Record<string, unknown>;
-        rows.push({
-            TableName: row.TableName as string,
-            ColumnDefs: row.ColumnDefs as string,
-            EndpointName: (row.EndpointName as string) || null,
-        });
-    }
-    stmt.free();
+  const stmt = db.prepare("SELECT TableName, ColumnDefs, EndpointName FROM ProjectSchema ORDER BY TableName");
+  const rows: Array<{ TableName: string; ColumnDefs: string; EndpointName: string | null }> = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject() as Record<string, unknown>;
+    rows.push({
+      TableName: row.TableName as string,
+      ColumnDefs: row.ColumnDefs as string,
+      EndpointName: (row.EndpointName as string) || null,
+    });
+  }
 
-    return rows;
+  stmt.free();
+
+  return rows;
 }

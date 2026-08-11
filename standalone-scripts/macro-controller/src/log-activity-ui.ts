@@ -43,13 +43,21 @@ export function addActivityLog(time: string | null, level: string, message: stri
 
 function _buildLogEntryHtml(entry: ActivityLogEntry): string {
   let color = cLogDefault;
-  if (entry.level === 'ERROR' || entry.level === 'error') color = cLogError;
-  else if (entry.level === 'INFO') color = cLogInfo;
-  else if (entry.level === 'success') color = cLogSuccess;
-  else if (entry.level === 'DEBUG') color = cLogDebug;
-  else if (entry.level === 'WARN' || entry.level === 'warn') color = cLogWarn;
-  else if (entry.level === 'delegate') color = cLogDelegate;
-  else if (entry.level === 'check') color = cLogCheck;
+  if (entry.level === 'ERROR' || entry.level === 'error') {
+    color = cLogError;
+  } else if (entry.level === 'INFO') {
+    color = cLogInfo;
+  } else if (entry.level === 'success') {
+    color = cLogSuccess;
+  } else if (entry.level === 'DEBUG') {
+    color = cLogDebug;
+  } else if (entry.level === 'WARN' || entry.level === 'warn') {
+    color = cLogWarn;
+  } else if (entry.level === 'delegate') {
+    color = cLogDelegate;
+  } else if (entry.level === 'check') {
+    color = cLogCheck;
+  }
 
   const indentPx = (entry.indent || 0) * 12;
   let html = '<div style="font-size:' + tFontSm + ';font-family:' + tFont + ';padding:2px 0;color:' + color + ';margin-left:' + indentPx + 'px;">';
@@ -59,6 +67,7 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
     html += CssFragmentType.SpanStyleColor + cLogTimestamp + ';">[' + entry.time + ']</span> ';
     html += CssFragmentType.SpanStyleColor + cLogDefault + ';">[' + entry.level + ']</span> ';
   }
+
   html += entry.message;
   html += '</div>';
 
@@ -67,7 +76,9 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
 
 export function updateActivityLogUI(didTrim: boolean): void {
   const logContainer = document.getElementById('loop-activity-log-content');
-  if (!logContainer) return;
+  if (!logContainer) {
+    return;
+  }
 
   const total = activityLogLines.length;
   if (total === 0) {
@@ -82,6 +93,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
     for (let i = total - 1; i >= 0; i--) {
       html += _buildLogEntryHtml(activityLogLines[i]);
     }
+
     logContainer.innerHTML = html;
     logRenderState.count = total;
 
@@ -89,14 +101,19 @@ export function updateActivityLogUI(didTrim: boolean): void {
   }
 
   const newCount = total - logRenderState.count;
-  if (newCount <= 0) return;
+  if (newCount <= 0) {
+    return;
+  }
 
   const frag = document.createDocumentFragment();
   for (let j = total - 1; j >= total - newCount; j--) {
     const div = document.createElement('div');
     div.innerHTML = _buildLogEntryHtml(activityLogLines[j]);
-    if (div.firstChild) frag.appendChild(div.firstChild);
+    if (div.firstChild) {
+      frag.appendChild(div.firstChild);
+    }
   }
+
   logContainer.insertBefore(frag, logContainer.firstChild);
   logRenderState.count = total;
 }

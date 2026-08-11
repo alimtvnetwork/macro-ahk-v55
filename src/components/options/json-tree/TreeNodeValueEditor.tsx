@@ -34,10 +34,14 @@ export function TreeNodeValueEditor({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const isEnter = e.key === "Enter";
-    if (isEnter) onCommitEdit();
+    if (isEnter) {
+      onCommitEdit();
+    }
 
     const isEscape = e.key === "Escape";
-    if (isEscape) onCancelEdit();
+    if (isEscape) {
+      onCancelEdit();
+    }
   };
 
   const isPrimitive = isExpandable === false;

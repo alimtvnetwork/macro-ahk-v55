@@ -33,9 +33,9 @@ CREATE INDEX IdxGroupMemberProject ON ProjectGroupMember(ProjectIdUuid);
 `;
 
 export function getV9Statements(): string[] {
-    return V9_PROJECT_GROUP_MEMBER_REBUILD
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
-        .map((s) => s + ";");
+  return V9_PROJECT_GROUP_MEMBER_REBUILD
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => s + ";");
 }

@@ -114,6 +114,7 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
     tr.innerHTML = '<td colspan="4" style="padding:10px;text-align:center;color:#888;">No entries to import</td>';
     tbody.appendChild(tr);
   }
+
   rows.forEach((r, i) => tbody.appendChild(buildPreviewRow(r, i, onChange)));
   table.appendChild(tbody);
   wrap.appendChild(table);
@@ -135,25 +136,43 @@ function conflictBadge(state: PreviewRow['conflict']): string {
 }
 
 export function defaultActionFor(conflict: PreviewRow['conflict']): RowAction {
-  if (conflict === 'new') return 'add';
-  if (conflict === 'update') return 'overwrite';
-  if (conflict === 'identical') return 'skip';
+  if (conflict === 'new') {
+    return 'add';
+  }
+
+  if (conflict === 'update') {
+    return 'overwrite';
+  }
+
+  if (conflict === 'identical') {
+    return 'skip';
+  }
 
   return 'skip';
 }
 
 export function allowedActionsFor(conflict: PreviewRow['conflict']): RowAction[] {
   // A brand-new slug can only be added (nothing to overwrite) or skipped.
-  if (conflict === 'new') return ['add', 'skip'];
+  if (conflict === 'new') {
+    return ['add', 'skip'];
+  }
 
   // Everything else has an existing counterpart; user picks the resolution.
   return ['overwrite', 'skip', 'rename'];
 }
 
 function actionLabel(action: RowAction): string {
-  if (action === 'add') return 'Add';
-  if (action === 'overwrite') return 'Overwrite';
-  if (action === 'skip') return 'Skip';
+  if (action === 'add') {
+    return 'Add';
+  }
+
+  if (action === 'overwrite') {
+    return 'Overwrite';
+  }
+
+  if (action === 'skip') {
+    return 'Skip';
+  }
 
   return 'Rename';
 }
@@ -180,13 +199,17 @@ function buildPreviewRow(row: PreviewRow, index: number, onChange: () => void): 
     const opt = document.createElement('option');
     opt.value = act;
     opt.textContent = actionLabel(act);
-    if (act === row.action) opt.selected = true;
+    if (act === row.action) {
+      opt.selected = true;
+    }
+
     select.appendChild(opt);
   });
   select.onchange = () => {
     row.action = select.value as RowAction;
     onChange();
   };
+
   actionCell.appendChild(select);
 
   tr.appendChild(slugCell);
@@ -211,7 +234,9 @@ function escapeHtml(text: string): string {
 function isDeepEqual(a: PromptEntry, b: PromptEntry): boolean {
   const aKeys = Object.keys(a).sort();
   const bKeys = Object.keys(b).sort();
-  if (aKeys.length !== bKeys.length) return false;
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
 
   return JSON.stringify(a) === JSON.stringify(b);
 }
@@ -247,21 +272,36 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
   drop.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">📥</div>'
     + '<div style="font-size:13px;color:#ddd;margin-bottom:4px;">Drop a .json, .zip, or .sqlite file here</div>'
     + '<div style="font-size:11px;color:#888;">or click to choose a file</div>';
-  drop.ondragover = (ev) => { ev.preventDefault(); drop.style.background = 'rgba(124,58,237,0.12)'; };
-  drop.ondragleave = () => { drop.style.background = 'transparent'; };
+  drop.ondragover = (ev) => {
+    ev.preventDefault(); drop.style.background = 'rgba(124,58,237,0.12)'; 
+  };
+
+  drop.ondragleave = () => {
+    drop.style.background = 'transparent'; 
+  };
+
   drop.ondrop = (ev) => {
     ev.preventDefault();
     drop.style.background = 'transparent';
     const file = ev.dataTransfer && ev.dataTransfer.files[0];
-    if (file) onFile(file);
+    if (file) {
+      onFile(file);
+    }
   };
+
   drop.onclick = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json,.zip,.sqlite,.db';
-    input.onchange = () => { const f = input.files && input.files[0]; if (f) onFile(f); };
+    input.onchange = () => {
+      const f = input.files && input.files[0]; if (f) {
+        onFile(f);
+      } 
+    };
+
     input.click();
   };
+
   body.appendChild(drop);
 }
 
@@ -298,7 +338,9 @@ function renderPreview(body: HTMLElement, state: ModalState, rerender: () => voi
 
 function countByAction(rows: PreviewRow[]): { add: number; overwrite: number; skip: number; rename: number } {
   const c = { add: 0, overwrite: 0, skip: 0, rename: 0 };
-  rows.forEach((r) => { c[r.action] += 1; });
+  rows.forEach((r) => {
+    c[r.action] += 1; 
+  });
 
   return c;
 }
@@ -318,8 +360,13 @@ function buildBulkActionsBar(rows: PreviewRow[], onChange: () => void): HTMLElem
       + 'border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#ddd;');
     b.onclick = () => {
       rows.forEach((r) => {
-        if (r.conflict === 'new') return; // "new" is not a conflict; leave alone
-        if (allowedActionsFor(r.conflict).indexOf(action) !== -1) r.action = action;
+        if (r.conflict === 'new') {
+          return;
+        } // "new" is not a conflict; leave alone
+
+        if (allowedActionsFor(r.conflict).indexOf(action) !== -1) {
+          r.action = action;
+        }
       });
       onChange();
     };
@@ -376,6 +423,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
     badge.textContent = input.code;
     headRow.appendChild(badge);
   }
+
   const heading = document.createElement('div');
   applyStyle(heading, 'font-weight:700;');
   heading.textContent = 'Import failed: ' + input.message;
@@ -404,7 +452,10 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   const retry = document.createElement('a');
   applyStyle(retry, 'color:#93c5fd;cursor:pointer;font-size:11px;');
   retry.textContent = 'Try another file';
-  retry.onclick = (ev) => { ev.preventDefault(); input.onRetry(); };
+  retry.onclick = (ev) => {
+    ev.preventDefault(); input.onRetry(); 
+  };
+
   actions.appendChild(retry);
 
   if (input.auditId) {
@@ -412,9 +463,13 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
     applyStyle(audit, 'color:#93c5fd;cursor:pointer;font-size:11px;font-family:monospace;');
     audit.textContent = 'View audit entry (' + input.auditId.slice(0, 24) + '...)';
     audit.title = 'Audit id: ' + input.auditId;
-    audit.onclick = (ev) => { ev.preventDefault(); input.onViewAudit(); };
+    audit.onclick = (ev) => {
+      ev.preventDefault(); input.onViewAudit(); 
+    };
+
     actions.appendChild(audit);
   }
+
   panel.appendChild(actions);
 
   body.appendChild(panel);
@@ -428,7 +483,11 @@ function buildShell(onClose: () => void): { root: HTMLElement; body: HTMLElement
   const overlay = document.createElement('div');
   overlay.setAttribute(MODAL_ATTR, '1');
   applyStyle(overlay, 'position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;');
-  overlay.onclick = (ev) => { if (ev.target === overlay) onClose(); };
+  overlay.onclick = (ev) => {
+    if (ev.target === overlay) {
+      onClose();
+    } 
+  };
 
   const panel = document.createElement('div');
   applyStyle(panel, 'width:640px;max-width:92vw;background:#1e1b2e;border:1px solid rgba(255,255,255,0.12);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.7);color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;');
@@ -490,6 +549,7 @@ function bucketPreviewRows(
 
       return;
     }
+
     const validated = validate(row.incoming);
     if (!validated) {
       skippedCount += 1;
@@ -497,6 +557,7 @@ function bucketPreviewRows(
 
       return;
     }
+
     if (row.action === 'rename') {
       const baseSlug = validated.slug || validated.name;
       const uniqueSlug = makeUniqueSlug(baseSlug, existingKeys);
@@ -507,6 +568,7 @@ function bucketPreviewRows(
 
       return;
     }
+
     toImport.push(validated);
     auditActions.push({ slug: row.slug, action: row.action });
   });
@@ -520,10 +582,10 @@ async function handleCommitError(err: unknown, state: ModalState): Promise<void>
   const classified = asCommit
     ? { code: asCommit.code, message: asCommit.message, hint: asCommit.hint }
     : (() => {
-        const c = errors.classifyImportError(err, 'commit');
+      const c = errors.classifyImportError(err, 'commit');
 
-        return { code: c.code, message: c.message, hint: c.hint };
-      })();
+      return { code: c.code, message: c.message, hint: c.hint };
+    })();
   state.errorMessage = 'Commit failed (changes rolled back)';
   state.errorDetails = err instanceof Error && err.stack ? err.stack : String(err);
   state.errorCode = classified.code;
@@ -542,7 +604,10 @@ async function performImportCommit(
   transition: (next: Stage) => void,
   close: () => void,
 ): Promise<void> {
-  if (!state.bundle) return;
+  if (!state.bundle) {
+    return;
+  }
+
   transition('committing');
   try {
     const io = await import('./prompt-io');
@@ -579,14 +644,19 @@ async function performImportCommit(
 
 export function openPromptImportModal(deps: ImportModalDeps): void {
   const existing = document.querySelector('[' + MODAL_ATTR + ']');
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const state: ModalState = {
     stage: 'idle', filename: '', format: null, bundle: null, rows: [],
     errorMessage: '', errorDetails: '', errorCode: '', errorHint: '', errorAuditId: '',
   };
 
-  const close = (): void => { refs.root.remove(); };
+  const close = (): void => {
+    refs.root.remove(); 
+  };
+
   const { root, body, footer } = buildShell(close);
   const cancelBtn = makeBtn('Cancel', 'ghost');
   const primaryBtn = makeBtn('Import', 'primary');
@@ -596,7 +666,10 @@ export function openPromptImportModal(deps: ImportModalDeps): void {
 
   const refs: ModalRefs = { root, body, primaryBtn, cancelBtn, onCommit: async () => { /* set below */ } };
   const rerender = (): void => renderStage(state, refs, deps, transition);
-  const transition = (next: Stage): void => { state.stage = next; rerender(); };
+  const transition = (next: Stage): void => {
+    state.stage = next; rerender(); 
+  };
+
   refs.onCommit = () => performImportCommit(state, refs, deps, transition, close);
 
   document.body.appendChild(root);
@@ -616,12 +689,14 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
 
     return;
   }
+
   if (state.stage === 'parsing') {
     primaryBtn.disabled = true;
     renderParsing(body, state.filename);
 
     return;
   }
+
   if (state.stage === 'preview') {
     const importCount = state.rows.filter((r) => r.action !== 'skip').length;
     primaryBtn.textContent = 'Import ' + importCount;
@@ -631,6 +706,7 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
 
     return;
   }
+
   if (state.stage === 'committing') {
     primaryBtn.disabled = true;
     cancelBtn.disabled = true;
@@ -638,6 +714,7 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
 
     return;
   }
+
   if (state.stage === 'error') {
     primaryBtn.style.display = 'none';
     renderError(body, {
@@ -662,7 +739,9 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
                 actions: entry ? entry.actions.length : 0,
               },
             });
-            if (entry) console.log('[ImportModal] Audit entry:', entry);
+            if (entry) {
+              console.log('[ImportModal] Audit entry:', entry);
+            }
           });
         });
       },
@@ -713,11 +792,13 @@ async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Pr
 
     return reader.parsePromptsBundleZip(bytes).bundle;
   }
+
   if (format === 'sqlite') {
     const reader = await import('./prompt-io-sqlite-reader');
 
     return (await reader.parsePromptsBundleSqlite(bytes)).bundle;
   }
+
   const bundleTypes = await import('./prompt-bundle-types');
   const text = new TextDecoder('utf-8').decode(bytes);
   const raw = JSON.parse(text) as unknown;
@@ -725,10 +806,13 @@ async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Pr
     && 'schemaVersion' in (raw as Record<string, unknown>);
   if (isEnvelope) {
     const result = bundleTypes.validatePromptsBundle(raw);
-    if (!result.isValid || !result.bundle) throwDiagnostic('PROMPT_IO_ENVELOPE_E001', { errorList: result.errors.join('; ') });
+    if (!result.isValid || !result.bundle) {
+      throwDiagnostic('PROMPT_IO_ENVELOPE_E001', { errorList: result.errors.join('; ') });
+    }
 
     return result.bundle;
   }
+
   // Legacy bare-array JSON — synthesize an envelope.
   const items = Array.isArray(raw) ? raw : [raw];
   const io = await import('./prompt-io');

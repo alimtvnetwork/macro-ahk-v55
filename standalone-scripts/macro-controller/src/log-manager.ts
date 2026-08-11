@@ -72,10 +72,22 @@ class LogConfigState {
   }
 
   merge(partial: Partial<LogManagerConfig>): void {
-    if (partial.enabled !== undefined) { this._config.enabled = partial.enabled; }
-    if (partial.consoleOutput !== undefined) { this._config.consoleOutput = partial.consoleOutput; }
-    if (partial.persistLogs !== undefined) { this._config.persistLogs = partial.persistLogs; }
-    if (partial.activityLogUi !== undefined) { this._config.activityLogUi = partial.activityLogUi; }
+    if (partial.enabled !== undefined) {
+      this._config.enabled = partial.enabled; 
+    }
+
+    if (partial.consoleOutput !== undefined) {
+      this._config.consoleOutput = partial.consoleOutput; 
+    }
+
+    if (partial.persistLogs !== undefined) {
+      this._config.persistLogs = partial.persistLogs; 
+    }
+
+    if (partial.activityLogUi !== undefined) {
+      this._config.activityLogUi = partial.activityLogUi; 
+    }
+
     if (partial.levels) {
       for (const key of Object.keys(partial.levels)) {
         this._config.levels[key.toLowerCase()] = partial.levels[key];
@@ -104,14 +116,18 @@ function loadConfig(): void {
         levels: { ...DEFAULT_CONFIG.levels, ...(parsed.levels || {}) },
       };
     }
-  } catch (_e) { console.warn('[MacroLoop] Failed to parse log config — using defaults:', _e instanceof Error ? _e.message : String(_e)); }
+  } catch (_e) {
+    console.warn('[MacroLoop] Failed to parse log config — using defaults:', _e instanceof Error ? _e.message : String(_e)); 
+  }
 }
 
 /** Persist current config to localStorage */
 function saveConfig(): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(logConfigState.config));
-  } catch (_e) { console.warn('[MacroLoop] Failed to save log config:', _e instanceof Error ? _e.message : String(_e)); }
+  } catch (_e) {
+    console.warn('[MacroLoop] Failed to save log config:', _e instanceof Error ? _e.message : String(_e)); 
+  }
 }
 
 // Auto-load on module init
@@ -124,10 +140,18 @@ loadConfig();
 /** Check if a log at the given level should be emitted */
 export function shouldLog(level?: string): boolean {
   const config = logConfigState.config;
-  if (!config.enabled) { return false; }
-  if (!level) { return true; }
+  if (!config.enabled) {
+    return false; 
+  }
+
+  if (!level) {
+    return true; 
+  }
+
   const normalized = level.toLowerCase();
-  if (config.levels[normalized] === undefined) { return true; }
+  if (config.levels[normalized] === undefined) {
+    return true; 
+  }
 
   return config.levels[normalized];
 }

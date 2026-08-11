@@ -84,6 +84,7 @@ export function computePromptHash(entries: CachedPromptEntry[]): string {
   for (const entry of entries) {
     parts.push((entry.name || '') + ':' + (entry.text || '').length);
   }
+
   parts.sort();
 
   return parts.join('|');
@@ -100,8 +101,14 @@ function openDb(): Promise<IDBDatabase> {
       request.onupgradeneeded = function() {
         createStoresIfMissing(request.result);
       };
-      request.onsuccess = function() { resolve(request.result); };
-      request.onerror = function() { reject(request.error); };
+
+      request.onsuccess = function() {
+        resolve(request.result); 
+      };
+
+      request.onerror = function() {
+        reject(request.error); 
+      };
     } catch (e) {
       logError('readFromStore', 'IndexedDB read failed', e);
       showToast('❌ IndexedDB read failed', 'error');
@@ -115,6 +122,7 @@ function createStoresIfMissing(db: IDBDatabase): void {
   if (!db.objectStoreNames.contains(PromptCacheKeyType.Store)) {
     db.createObjectStore(PromptCacheKeyType.Store, { keyPath: 'id' });
   }
+
   if (!db.objectStoreNames.contains(PromptCacheKeyType.UiStore)) {
     db.createObjectStore(PromptCacheKeyType.UiStore, { keyPath: 'id' });
   }
@@ -131,17 +139,27 @@ function readRecord<T>(storeName: string, key: string): Promise<T | null> {
       try {
         const tx = db.transaction(storeName, 'readonly');
         const req = tx.objectStore(storeName).get(key);
-        req.onsuccess = function() { resolve((req.result as T) || null); };
-        req.onerror = function() { resolve(null); };
-        tx.oncomplete = function() { db.close(); };
+        req.onsuccess = function() {
+          resolve((req.result as T) || null); 
+        };
+
+        req.onerror = function() {
+          resolve(null); 
+        };
+
+        tx.oncomplete = function() {
+          db.close(); 
+        };
       } catch (_e) {
         log('[PromptCache] readRecord(' + storeName + '/' + key + ') transaction failed: ' + (_e instanceof Error ? _e.message : String(_e)), 'warn');
         resolve(null);
       }
     });
-  }).catch(function(e: unknown) { log('[PromptCache] readRecord(' + storeName + ') IndexedDB open failed: ' + (e instanceof Error ? e.message : String(e)), 'warn');
+  }).catch(function(e: unknown) {
+    log('[PromptCache] readRecord(' + storeName + ') IndexedDB open failed: ' + (e instanceof Error ? e.message : String(e)), 'warn');
 
- return null; });
+    return null; 
+  });
 }
 
 /** Write a record to a store. */
@@ -151,8 +169,13 @@ function writeRecord(storeName: string, record: Record<string, unknown>): Promis
       try {
         const tx = db.transaction(storeName, 'readwrite');
         tx.objectStore(storeName).put(record);
-        tx.oncomplete = function() { db.close(); resolve(); };
-        tx.onerror = function() { db.close(); resolve(); };
+        tx.oncomplete = function() {
+          db.close(); resolve(); 
+        };
+
+        tx.onerror = function() {
+          db.close(); resolve(); 
+        };
       } catch (e) {
         logError('MacroController', 'Unknown error');
         logWriteError(storeName, e);
@@ -171,14 +194,21 @@ function deleteRecord(storeName: string, key: string): Promise<void> {
       try {
         const tx = db.transaction(storeName, 'readwrite');
         tx.objectStore(storeName).delete(key);
-        tx.oncomplete = function() { db.close(); resolve(); };
-        tx.onerror = function() { db.close(); resolve(); };
+        tx.oncomplete = function() {
+          db.close(); resolve(); 
+        };
+
+        tx.onerror = function() {
+          db.close(); resolve(); 
+        };
       } catch (_e) {
         log('[PromptCache] deleteRecord(' + storeName + ') transaction failed: ' + (_e instanceof Error ? _e.message : String(_e)), 'warn');
         resolve();
       }
     });
-  }).catch(function(e: unknown) { log('[PromptCache] deleteRecord(' + storeName + '/' + key + ') failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); });
+  }).catch(function(e: unknown) {
+    log('[PromptCache] deleteRecord(' + storeName + '/' + key + ') failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  });
 }
 
 function logWriteError(storeName: string, e: unknown): void {
@@ -196,6 +226,7 @@ export function readJsonCopy(): Promise<JsonCopyRecord | null> {
     if (!record || record.schemaVersion !== String(DB_VERSION) || !record.entries || record.entries.length === 0) {
       return null;
     }
+
     log('[PromptCache] JsonCopy read: ' + record.entries.length + ' entries', 'info');
 
     return record;
@@ -226,6 +257,7 @@ export function readHtmlCopy(): Promise<HtmlCopyRecord | null> {
     if (!record || !record.html) {
       return null;
     }
+
     log('[PromptCache] HtmlCopy read: ' + record.promptCount + ' prompts', 'info');
 
     return record;

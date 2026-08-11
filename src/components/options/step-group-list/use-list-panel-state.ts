@@ -22,76 +22,79 @@ import { useListPanelSelection } from "./use-list-panel-selection";
 import { useListPanelView } from "./use-list-panel-view";
 
 export function useListPanelState() {
-    const lib = useStepLibrary();
-    const exportApi = useStepGroupExport({
-        Lib: lib.Lib,
-        Project: lib.Project,
-        SqlJs: lib.SqlJs,
-    });
-    const importApi = useStepGroupImport({
-        lib: { Lib: lib.Lib, Project: lib.Project, SqlJs: lib.SqlJs },
-        onAfterImport: lib.refresh,
-    });
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [query, setQuery] = useState("");
+  const lib = useStepLibrary();
+  const exportApi = useStepGroupExport({
+    Lib: lib.Lib,
+    Project: lib.Project,
+    SqlJs: lib.SqlJs,
+  });
+  const importApi = useStepGroupImport({
+    lib: { Lib: lib.Lib, Project: lib.Project, SqlJs: lib.SqlJs },
+    onAfterImport: lib.refresh,
+  });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [query, setQuery] = useState("");
 
-    const projectKey = lib.Project?.ProjectId ?? "__noproject__";
-    const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
-        `marco.list.activeGroup.${projectKey}`,
-        null,
-        decodeNullableNumber,
-    );
+  const projectKey = lib.Project?.ProjectId ?? "__noproject__";
+  const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
+    `marco.list.activeGroup.${projectKey}`,
+    null,
+    decodeNullableNumber,
+  );
 
-    const view = useListPanelView({
-        groups: lib.Groups,
-        stepsByGroup: lib.StepsByGroup,
-        groupInputs: lib.GroupInputs,
-        activeGroupId,
-        query,
-    });
+  const view = useListPanelView({
+    groups: lib.Groups,
+    stepsByGroup: lib.StepsByGroup,
+    groupInputs: lib.GroupInputs,
+    activeGroupId,
+    query,
+  });
 
-    useEffect(() => {
-        if (lib.Project === null) return;
-        if (activeGroupId !== null && !view.groupsById.has(activeGroupId)) {
-            setActiveGroupId(null);
-        }
-    }, [lib.Project, view.groupsById, activeGroupId, setActiveGroupId]);
+  useEffect(() => {
+    if (lib.Project === null) {
+      return;
+    }
 
-    const selection = useListPanelSelection(view.filtered, lib.Groups);
+    if (activeGroupId !== null && !view.groupsById.has(activeGroupId)) {
+      setActiveGroupId(null);
+    }
+  }, [lib.Project, view.groupsById, activeGroupId, setActiveGroupId]);
 
-    const [batchRenameOpen, setBatchRenameOpen] = useState(false);
-    const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+  const selection = useListPanelSelection(view.filtered, lib.Groups);
 
-    const deletePreview = useMemo(
-        () => buildDeletePreview(Array.from(selection.selected), lib.Groups, lib.StepsByGroup),
-        [selection.selected, lib.Groups, lib.StepsByGroup],
-    );
+  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
 
-    const exportSelected = () => {
-        exportApi.requestExport(Array.from(selection.selected), true);
-    };
+  const deletePreview = useMemo(
+    () => buildDeletePreview(Array.from(selection.selected), lib.Groups, lib.StepsByGroup),
+    [selection.selected, lib.Groups, lib.StepsByGroup],
+  );
 
-    return {
-        lib,
-        exportApi,
-        importApi,
-        fileInputRef,
-        query,
-        setQuery,
-        activeGroupId,
-        setActiveGroupId,
-        ...view,
-        ...selection,
-        batchRenameOpen,
-        setBatchRenameOpen,
-        batchDeleteOpen,
-        setBatchDeleteOpen,
-        deletePreview,
-        exportSelected,
-        projectName: lib.Project?.Name ?? null,
-        allGroups: lib.Groups,
-        onToggleStep: lib.setStepDisabled,
-    };
+  const exportSelected = () => {
+    exportApi.requestExport(Array.from(selection.selected), true);
+  };
+
+  return {
+    lib,
+    exportApi,
+    importApi,
+    fileInputRef,
+    query,
+    setQuery,
+    activeGroupId,
+    setActiveGroupId,
+    ...view,
+    ...selection,
+    batchRenameOpen,
+    setBatchRenameOpen,
+    batchDeleteOpen,
+    setBatchDeleteOpen,
+    deletePreview,
+    exportSelected,
+    projectName: lib.Project?.Name ?? null,
+    allGroups: lib.Groups,
+    onToggleStep: lib.setStepDisabled,
+  };
 }
 
 export type ListPanelState = ReturnType<typeof useListPanelState>;

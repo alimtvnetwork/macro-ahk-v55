@@ -40,38 +40,38 @@ export interface XPathValidationResult {
 
 /** Validates all XPath selectors from the message payload against the active tab. */
 export async function handleValidateAllXPaths(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<XPathValidationResult> {
-    const request = message as MessageRequest & {
+  const request = message as MessageRequest & {
         xpaths: Record<string, { xpath: string; selector?: string }>;
     };
 
-    const tabId = await getActiveTabId();
-    if (tabId === null) {
-        const entries = Object.entries(request.xpaths).map(([name, { xpath, selector }]) => ({
-            name,
-            xpath,
-            selector,
-            found: 0,
-            status: "fail" as const,
-            error: "No active tab found",
-        }));
+  const tabId = await getActiveTabId();
+  if (tabId === null) {
+    const entries = Object.entries(request.xpaths).map(([name, { xpath, selector }]) => ({
+      name,
+      xpath,
+      selector,
+      found: 0,
+      status: "fail" as const,
+      error: "No active tab found",
+    }));
 
-        return { results: entries, passCount: 0, failCount: entries.length, fallbackCount: 0 };
-    }
+    return { results: entries, passCount: 0, failCount: entries.length, fallbackCount: 0 };
+  }
 
-    const results: XPathValidationEntry[] = [];
+  const results: XPathValidationEntry[] = [];
 
-    for (const [name, { xpath, selector }] of Object.entries(request.xpaths)) {
-        const entry = await validateSingleXPath(tabId, name, xpath, selector);
-        results.push(entry);
-    }
+  for (const [name, { xpath, selector }] of Object.entries(request.xpaths)) {
+    const entry = await validateSingleXPath(tabId, name, xpath, selector);
+    results.push(entry);
+  }
 
-    const passCount = results.filter(r => r.status === "pass").length;
-    const failCount = results.filter(r => r.status === "fail").length;
-    const fallbackCount = results.filter(r => r.status === "fallback").length;
+  const passCount = results.filter(r => r.status === "pass").length;
+  const failCount = results.filter(r => r.status === "fail").length;
+  const fallbackCount = results.filter(r => r.status === "fallback").length;
 
-    return { results, passCount, failCount, fallbackCount };
+  return { results, passCount, failCount, fallbackCount };
 }
 
 /* ------------------------------------------------------------------ */
@@ -79,86 +79,86 @@ export async function handleValidateAllXPaths(
 /* ------------------------------------------------------------------ */
 
 async function getActiveTabId(): Promise<number | null> {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    return tabs.length > 0 && tabs[0].id !== undefined ? tabs[0].id! : null;
+  return tabs.length > 0 && tabs[0].id !== undefined ? tabs[0].id! : null;
 }
 
 // eslint-disable-next-line max-lines-per-function
 async function validateSingleXPath(
-    tabId: number,
-    name: string,
-    xpath: string,
-    selector?: string,
+  tabId: number,
+  name: string,
+  xpath: string,
+  selector?: string,
 ): Promise<XPathValidationEntry> {
-    if (!xpath && !selector) {
-        return { name, xpath, selector, found: 0, status: "fail", error: "No xpath or selector configured" };
+  if (!xpath && !selector) {
+    return { name, xpath, selector, found: 0, status: "fail", error: "No xpath or selector configured" };
+  }
+
+  try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: evaluateXPathAndSelector,
+      args: [xpath, selector ?? null],
+    });
+
+    if (results.length === 0) {
+      return { name, xpath, selector, found: 0, status: "fail", error: "No result returned" };
     }
 
-    try {
-        const results = await chrome.scripting.executeScript({
-            target: { tabId },
-            func: evaluateXPathAndSelector,
-            args: [xpath, selector ?? null],
-        });
+    const r = results[0].result as { xpathFound: number; selectorFound: number; error?: string };
 
-        if (results.length === 0) {
-            return { name, xpath, selector, found: 0, status: "fail", error: "No result returned" };
-        }
-
-        const r = results[0].result as { xpathFound: number; selectorFound: number; error?: string };
-
-        if (r.error) {
-            return { name, xpath, selector, found: 0, status: "fail", error: r.error };
-        }
-
-        if (r.xpathFound > 0) {
-            return { name, xpath, selector, found: r.xpathFound, status: "pass" };
-        }
-
-        if (selector && r.selectorFound > 0) {
-            return {
-                name, xpath, selector, found: r.selectorFound, status: "fallback",
-                fallbackUsed: true,
-                error: `XPath stale — CSS fallback found ${r.selectorFound} element(s). Update XPath config for "${name}".`,
-            };
-        }
-
-        return {
-            name, xpath, selector, found: 0, status: "fail",
-            error: `XPath not found: "${name}". ${selector ? "CSS fallback also failed." : "Consider adding a CSS selector fallback."}`,
-        };
-    } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-
-        return { name, xpath, selector, found: 0, status: "fail", error: errorMessage };
+    if (r.error) {
+      return { name, xpath, selector, found: 0, status: "fail", error: r.error };
     }
+
+    if (r.xpathFound > 0) {
+      return { name, xpath, selector, found: r.xpathFound, status: "pass" };
+    }
+
+    if (selector && r.selectorFound > 0) {
+      return {
+        name, xpath, selector, found: r.selectorFound, status: "fallback",
+        fallbackUsed: true,
+        error: `XPath stale — CSS fallback found ${r.selectorFound} element(s). Update XPath config for "${name}".`,
+      };
+    }
+
+    return {
+      name, xpath, selector, found: 0, status: "fail",
+      error: `XPath not found: "${name}". ${selector ? "CSS fallback also failed." : "Consider adding a CSS selector fallback."}`,
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+
+    return { name, xpath, selector, found: 0, status: "fail", error: errorMessage };
+  }
 }
 
 /** Runs in page context. */
 function evaluateXPathAndSelector(
-    xpath: string,
-    selector: string | null,
+  xpath: string,
+  selector: string | null,
 ): { xpathFound: number; selectorFound: number; error?: string } {
-    let xpathFound = 0;
-    let selectorFound = 0;
+  let xpathFound = 0;
+  let selectorFound = 0;
 
-    try {
-        if (xpath) {
-            const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-            xpathFound = result.snapshotLength;
-        }
-    } catch (e) {
-        return { xpathFound: 0, selectorFound: 0, error: `Invalid XPath: ${(e as Error).message}` };
+  try {
+    if (xpath) {
+      const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      xpathFound = result.snapshotLength;
     }
+  } catch (e) {
+    return { xpathFound: 0, selectorFound: 0, error: `Invalid XPath: ${(e as Error).message}` };
+  }
 
-    try {
-        if (selector) {
-            selectorFound = document.querySelectorAll(selector).length;
-        }
-    } catch (err) {
+  try {
+    if (selector) {
+      selectorFound = document.querySelectorAll(selector).length;
+    }
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 
-    return { xpathFound, selectorFound };
+  return { xpathFound, selectorFound };
 }

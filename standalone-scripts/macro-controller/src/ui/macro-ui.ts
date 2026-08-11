@@ -56,6 +56,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
     _selectionMode = false;
     refreshTaskQueueUI(listContainer);
   };
+
   bulkBtns.appendChild(bulkRetry);
 
   const bulkDel = document.createElement('button');
@@ -70,6 +71,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
       refreshTaskQueueUI(listContainer);
     }
   };
+
   bulkBtns.appendChild(bulkDel);
   
   const bulkCancel = document.createElement('button');
@@ -80,6 +82,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
     _selectionMode = false;
     refreshTaskQueueUI(listContainer);
   };
+
   bulkBtns.appendChild(bulkCancel);
 
   bulkRow.appendChild(bulkBtns);
@@ -134,6 +137,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
       void mod.saveSettingsOverrides(s);
     });
   };
+
   retriesWrap.appendChild(retriesInput);
   settingsRow.appendChild(retriesWrap);
   
@@ -204,11 +208,11 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
     const mgr = TaskQueueManager.getInstance();
     const pauseBtn = section.querySelector('.task-pause-btn') as HTMLButtonElement;
     if (pauseBtn) {
-       const isPaused = mgr.isPaused();
-       const isStopped = mgr.isStopped();
-       pauseBtn.textContent = isPaused || isStopped ? '▶ Resume' : '⏸ Pause';
-       pauseBtn.style.background = isPaused || isStopped ? 'rgba(34,197,94,0.15)' : cPanelBgAlt;
-       pauseBtn.style.color = isPaused || isStopped ? '#4ade80' : '#9ca3af';
+      const isPaused = mgr.isPaused();
+      const isStopped = mgr.isStopped();
+      pauseBtn.textContent = isPaused || isStopped ? '▶ Resume' : '⏸ Pause';
+      pauseBtn.style.background = isPaused || isStopped ? 'rgba(34,197,94,0.15)' : cPanelBgAlt;
+      pauseBtn.style.color = isPaused || isStopped ? '#4ade80' : '#9ca3af';
     }
   }, Timings.TIMEOUT_SHORT);
 
@@ -267,8 +271,10 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
       log(TASK_QUEUE_SCOPE + ' Pausing queue...', 'info');
       mgr.stopProcessing();
     }
+
     refreshTaskQueueUI(listContainer);
   };
+
   controls.appendChild(pauseBtn);
 
   const retryBtn = document.createElement('button');
@@ -280,6 +286,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
     await retryFailedTasks();
     refreshTaskQueueUI(listContainer);
   };
+
   controls.appendChild(retryBtn);
 
   const clearBtn = document.createElement('button');
@@ -290,6 +297,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
     await clearCompletedTasks();
     refreshTaskQueueUI(listContainer);
   };
+
   clearBtn.oncontextmenu = async (e) => {
     e.preventDefault();
     if (confirm('Clear ALL tasks from the queue?')) {
@@ -298,6 +306,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
       refreshTaskQueueUI(listContainer);
     }
   };
+
   controls.appendChild(clearBtn);
 
   header.appendChild(controls);
@@ -341,7 +350,9 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
   if (bulkRow) {
     bulkRow.style.display = _selectionMode && _selectedTaskIds.size > 0 ? 'flex' : 'none';
     const bulkCount = document.getElementById('task-bulk-count');
-    if (bulkCount) bulkCount.textContent = `${_selectedTaskIds.size} selected`;
+    if (bulkCount) {
+      bulkCount.textContent = `${_selectedTaskIds.size} selected`;
+    }
   }
 
   if (tasksToShow.length === 0) {
@@ -356,8 +367,13 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
     const isSelected = _selectedTaskIds.has(task.id);
     
     item.style.cssText = `padding:6px 8px;background:${isSelected ? 'rgba(59,130,246,0.15)' : cPanelBgAlt};border-radius:4px;border-left:3px solid ${getStatusColor(task.status)};display:flex;flex-direction:column;gap:2px;position:relative;cursor:pointer;transition:all 0.1s;`;
-    if (_activeQueueTab === 'history' && !isSelected) item.style.opacity = '0.7';
-    if (isSelected) item.style.borderColor = '#3b82f6';
+    if (_activeQueueTab === 'history' && !isSelected) {
+      item.style.opacity = '0.7';
+    }
+
+    if (isSelected) {
+      item.style.borderColor = '#3b82f6';
+    }
 
     const row1 = document.createElement('div');
     row1.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
@@ -373,6 +389,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
       e.stopPropagation();
       _toggleTaskSelection(task.id, container);
     };
+
     checkWrap.appendChild(checkbox);
     row1.appendChild(checkWrap);
 
@@ -422,6 +439,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
     } else {
       status.textContent = task.status.toUpperCase();
     }
+
     row1.appendChild(status);
     
     item.appendChild(row1);
@@ -459,6 +477,7 @@ function _toggleTaskSelection(taskId: string, container: HTMLElement): void {
     _selectedTaskIds.add(taskId);
     _selectionMode = true;
   }
+
   refreshTaskQueueUI(container);
 }
 
@@ -483,9 +502,13 @@ function renderLiveStream(container: HTMLElement): void {
     const line = document.createElement('div');
     line.style.cssText = 'padding:2px 4px;border-radius:2px;white-space:pre-wrap;word-break:break-all;';
     
-    if (msg.includes('successfully')) line.style.color = cSuccess;
-    else if (msg.includes('failed') || msg.includes('error')) line.style.color = cError;
-    else line.style.color = '#94a3b8';
+    if (msg.includes('successfully')) {
+      line.style.color = cSuccess;
+    } else if (msg.includes('failed') || msg.includes('error')) {
+      line.style.color = cError;
+    } else {
+      line.style.color = '#94a3b8';
+    }
 
     line.textContent = msg;
     logList.appendChild(line);
@@ -494,11 +517,15 @@ function renderLiveStream(container: HTMLElement): void {
   container.appendChild(logList);
   
   // Auto-scroll to bottom
-  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 0);
+  setTimeout(() => {
+    container.scrollTop = container.scrollHeight; 
+  }, 0);
 
   // Hook for updates if not already hooked
   mgr.onLogUpdate(() => {
-    if (_activeQueueTab === 'live') refreshTaskQueueUI(container);
+    if (_activeQueueTab === 'live') {
+      refreshTaskQueueUI(container);
+    }
   });
 }
 
@@ -506,7 +533,11 @@ function renderLiveStream(container: HTMLElement): void {
 function showTaskDetailModal(task: MacroTask): void {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);font-family:system-ui,-apple-system,sans-serif;';
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
 
   const modal = document.createElement('div');
   modal.style.cssText = 'background:' + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;width:90%;max-width:500px;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,0.5);overflow:hidden;';
@@ -543,7 +574,10 @@ function showTaskDetailModal(task: MacroTask): void {
 
   body.appendChild(field('Project', task.projectName));
   body.appendChild(field('Prompt', task.prompt, true));
-  if (task.error) body.appendChild(field('Error', task.error));
+  if (task.error) {
+    body.appendChild(field('Error', task.error));
+  }
+
   body.appendChild(field('Timestamp', new Date(task.timestamp).toLocaleString()));
   body.appendChild(field('ID', task.id));
 
@@ -566,14 +600,20 @@ function getStatusColor(status: MacroTask['status']): string {
 /** Opens a full-screen modal showing the task queue. */
 export function showTaskQueueModal(): void {
   const existing = document.getElementById('macro-task-queue-modal');
-  if (existing) { existing.remove();
+  if (existing) {
+    existing.remove();
 
- return; }
+    return; 
+  }
 
   const overlay = document.createElement('div');
   overlay.id = 'macro-task-queue-modal';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
 
   const modal = document.createElement('div');
   modal.style.cssText = 'background:' + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;width:92%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,0.5);overflow:hidden;';

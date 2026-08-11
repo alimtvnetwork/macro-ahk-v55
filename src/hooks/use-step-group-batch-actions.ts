@@ -45,72 +45,82 @@ interface GroupIndex {
 }
 
 function indexGroups(allGroups: ReadonlyArray<StepGroupRow>): GroupIndex {
-    const byParent = new Map<number | null, StepGroupRow[]>();
-    const byId = new Map<number, StepGroupRow>();
-    for (const g of allGroups) {
-        byId.set(g.StepGroupId, g);
-        const key = g.ParentStepGroupId ?? null;
-        const items = byParent.get(key) ?? [];
-        items.push(g);
-        byParent.set(key, items);
-    }
+  const byParent = new Map<number | null, StepGroupRow[]>();
+  const byId = new Map<number, StepGroupRow>();
+  for (const g of allGroups) {
+    byId.set(g.StepGroupId, g);
+    const key = g.ParentStepGroupId ?? null;
+    const items = byParent.get(key) ?? [];
+    items.push(g);
+    byParent.set(key, items);
+  }
 
-    return { byId, byParent };
+  return { byId, byParent };
 }
 
 function hasSelectedAncestor(
-    g: StepGroupRow,
-    selected: ReadonlySet<number>,
-    byId: ReadonlyMap<number, StepGroupRow>,
+  g: StepGroupRow,
+  selected: ReadonlySet<number>,
+  byId: ReadonlyMap<number, StepGroupRow>,
 ): boolean {
-    let cursor: number | null = g.ParentStepGroupId ?? null;
-    while (cursor !== null) {
-        if (selected.has(cursor)) return true;
-        cursor = byId.get(cursor)?.ParentStepGroupId ?? null;
+  let cursor: number | null = g.ParentStepGroupId ?? null;
+  while (cursor !== null) {
+    if (selected.has(cursor)) {
+      return true;
     }
 
-    return false;
+    cursor = byId.get(cursor)?.ParentStepGroupId ?? null;
+  }
+
+  return false;
 }
 
 function countSubtree(
-    rootId: number,
-    byParent: ReadonlyMap<number | null, StepGroupRow[]>,
-    stepsByGroup: ReadonlyMap<number, ReadonlyArray<unknown>>,
+  rootId: number,
+  byParent: ReadonlyMap<number | null, StepGroupRow[]>,
+  stepsByGroup: ReadonlyMap<number, ReadonlyArray<unknown>>,
 ): { Descendants: number; Steps: number } {
-    let descendants = 0;
-    let steps = stepsByGroup.get(rootId)?.length ?? 0;
-    const stack: number[] = [rootId];
-    while (stack.length > 0) {
-        const id = stack.pop() as number;
-        const kids = byParent.get(id) ?? [];
-        for (const k of kids) {
-            descendants += 1;
-            steps += stepsByGroup.get(k.StepGroupId)?.length ?? 0;
-            stack.push(k.StepGroupId);
-        }
+  let descendants = 0;
+  let steps = stepsByGroup.get(rootId)?.length ?? 0;
+  const stack: number[] = [rootId];
+  while (stack.length > 0) {
+    const id = stack.pop() as number;
+    const kids = byParent.get(id) ?? [];
+    for (const k of kids) {
+      descendants += 1;
+      steps += stepsByGroup.get(k.StepGroupId)?.length ?? 0;
+      stack.push(k.StepGroupId);
     }
+  }
 
-    return { Descendants: descendants, Steps: steps };
+  return { Descendants: descendants, Steps: steps };
 }
 
 export function buildDeletePreview(
-    selectedIds: ReadonlyArray<number>,
-    allGroups: ReadonlyArray<StepGroupRow>,
-    stepsByGroup: ReadonlyMap<number, ReadonlyArray<unknown>>,
+  selectedIds: ReadonlyArray<number>,
+  allGroups: ReadonlyArray<StepGroupRow>,
+  stepsByGroup: ReadonlyMap<number, ReadonlyArray<unknown>>,
 ): BatchDeleteRow[] {
-    const selected = new Set(selectedIds);
-    const { byId, byParent } = indexGroups(allGroups);
-    const rows: BatchDeleteRow[] = [];
-    for (const id of selectedIds) {
-        const g = byId.get(id);
-        if (g === undefined) continue;
-        if (hasSelectedAncestor(g, selected, byId)) continue;
-        const { Descendants, Steps } = countSubtree(g.StepGroupId, byParent, stepsByGroup);
-        rows.push({ Group: g, DescendantCount: Descendants, StepCount: Steps });
+  const selected = new Set(selectedIds);
+  const { byId, byParent } = indexGroups(allGroups);
+  const rows: BatchDeleteRow[] = [];
+  for (const id of selectedIds) {
+    const g = byId.get(id);
+    if (g === undefined) {
+      continue;
     }
-    rows.sort((a, b) => a.Group.Name.localeCompare(b.Group.Name));
 
-    return rows;
+    if (hasSelectedAncestor(g, selected, byId)) {
+      continue;
+    }
+
+    const { Descendants, Steps } = countSubtree(g.StepGroupId, byParent, stepsByGroup);
+    rows.push({ Group: g, DescendantCount: Descendants, StepCount: Steps });
+  }
+
+  rows.sort((a, b) => a.Group.Name.localeCompare(b.Group.Name));
+
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -131,50 +141,51 @@ export interface BatchRenameOutcome {
 }
 
 export function useStepGroupBatchActions(lib: UseStepLibraryApi) {
-    /**
+  /**
      * Applies a batch of {Id, OldName, NewName} changes sequentially.
      * On success, the returned `undo()` reverts every Old→New back to
      * Old. We snapshot the *applied* list rather than the requested
      * one so a partial failure produces a partial undo that exactly
      * matches the on-disk state.
      */
-    const applyBatchRename = useCallback(
-        (changes: ReadonlyArray<BatchRenameChange>): BatchRenameOutcome => {
-            const applied: BatchRenameChange[] = [];
-            let firstError: string | null = null;
-            for (const c of changes) {
-                try {
-                    lib.renameGroup(c.Id, c.NewName);
-                    applied.push(c);
-                } catch (err) {
-                    firstError = err instanceof Error ? err.message : String(err);
-                    break;
-                }
-            }
-            const undo = (): BatchRenameOutcome => {
-                const undone: BatchRenameChange[] = [];
-                let undoError: string | null = null;
-                for (const c of applied) {
-                    try {
-                        lib.renameGroup(c.Id, c.OldName);
-                        undone.push({ Id: c.Id, OldName: c.NewName, NewName: c.OldName });
-                    } catch (err) {
-                        undoError = err instanceof Error ? err.message : String(err);
-                        break;
-                    }
-                }
+  const applyBatchRename = useCallback(
+    (changes: ReadonlyArray<BatchRenameChange>): BatchRenameOutcome => {
+      const applied: BatchRenameChange[] = [];
+      let firstError: string | null = null;
+      for (const c of changes) {
+        try {
+          lib.renameGroup(c.Id, c.NewName);
+          applied.push(c);
+        } catch (err) {
+          firstError = err instanceof Error ? err.message : String(err);
+          break;
+        }
+      }
 
-                return {
-                    Applied: undone.length,
-                    Error: undoError,
-                    undo: () => ({ Applied: 0, Error: "Already undone", undo: () => undone[0] as never }),
-                };
-            };
+      const undo = (): BatchRenameOutcome => {
+        const undone: BatchRenameChange[] = [];
+        let undoError: string | null = null;
+        for (const c of applied) {
+          try {
+            lib.renameGroup(c.Id, c.OldName);
+            undone.push({ Id: c.Id, OldName: c.NewName, NewName: c.OldName });
+          } catch (err) {
+            undoError = err instanceof Error ? err.message : String(err);
+            break;
+          }
+        }
 
-            return { Applied: applied.length, Error: firstError, undo };
-        },
-        [lib],
-    );
+        return {
+          Applied: undone.length,
+          Error: undoError,
+          undo: () => ({ Applied: 0, Error: "Already undone", undo: () => undone[0] as never }),
+        };
+      };
 
-    return { applyBatchRename };
+      return { Applied: applied.length, Error: firstError, undo };
+    },
+    [lib],
+  );
+
+  return { applyBatchRename };
 }

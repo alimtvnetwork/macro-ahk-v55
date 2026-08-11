@@ -26,9 +26,9 @@ import { Events } from "@/constants/events";
  */
 
 import {
-    extractReferencedColumns,
-    resolveFieldReferences,
-    type FieldRow,
+  extractReferencedColumns,
+  resolveFieldReferences,
+  type FieldRow,
 } from "./field-reference-resolver";
 
 export const FIELD_BINDING_HOST_ID = "marco-recorder-field-binding-host";
@@ -147,353 +147,432 @@ interface State {
 }
 
 function buildTitle(text: string): HTMLDivElement {
-    const t = document.createElement("div");
-    t.className = "title";
-    t.textContent = text;
+  const t = document.createElement("div");
+  t.className = "title";
+  t.textContent = text;
 
-    return t;
+  return t;
 }
 
 function buildColumnButton(col: string, sampleRow: FieldRow | undefined, onClick: (c: string) => void): HTMLButtonElement {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "col";
-    btn.dataset.column = col;
-    btn.setAttribute("role", "menuitem");
-    const name = document.createElement("span");
-    name.className = "col-name";
-    name.textContent = col;
-    btn.appendChild(name);
-    const colPreview = document.createElement("span");
-    colPreview.className = "col-preview";
-    colPreview.textContent = sampleRow?.[col] ?? "";
-    btn.appendChild(colPreview);
-    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); });
-    btn.addEventListener(Events.CLICK, () => { onClick(col); });
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "col";
+  btn.dataset.column = col;
+  btn.setAttribute("role", "menuitem");
+  const name = document.createElement("span");
+  name.className = "col-name";
+  name.textContent = col;
+  btn.appendChild(name);
+  const colPreview = document.createElement("span");
+  colPreview.className = "col-preview";
+  colPreview.textContent = sampleRow?.[col] ?? "";
+  btn.appendChild(colPreview);
+  btn.addEventListener(Events.MOUSEDOWN, (e) => {
+    e.preventDefault(); 
+  });
+  btn.addEventListener(Events.CLICK, () => {
+    onClick(col); 
+  });
 
-    return btn;
+  return btn;
 }
 
 function buildTemplateInput(state: State): HTMLInputElement {
-    const templateInput = document.createElement("input");
-    templateInput.type = "text";
-    templateInput.className = "template-input";
-    templateInput.placeholder = "{{First}} {{Last}}";
-    templateInput.spellcheck = false;
-    templateInput.addEventListener(Events.INPUT, () => {
-        state.template = templateInput.value;
-        refreshPreview(state);
-    });
-    templateInput.addEventListener(Events.MOUSEDOWN, (e) => { e.stopPropagation(); });
-    templateInput.addEventListener(Events.CLICK, (e) => { e.stopPropagation(); });
-    state.templateInput = templateInput;
+  const templateInput = document.createElement("input");
+  templateInput.type = "text";
+  templateInput.className = "template-input";
+  templateInput.placeholder = "{{First}} {{Last}}";
+  templateInput.spellcheck = false;
+  templateInput.addEventListener(Events.INPUT, () => {
+    state.template = templateInput.value;
+    refreshPreview(state);
+  });
+  templateInput.addEventListener(Events.MOUSEDOWN, (e) => {
+    e.stopPropagation(); 
+  });
+  templateInput.addEventListener(Events.CLICK, (e) => {
+    e.stopPropagation(); 
+  });
+  state.templateInput = templateInput;
 
-    return templateInput;
+  return templateInput;
 }
 
 function buildPreviewBlock(state: State): DocumentFragment {
-    const frag = document.createDocumentFragment();
-    const previewLabel = document.createElement("div");
-    previewLabel.className = "preview-label";
-    previewLabel.textContent = "Preview";
-    frag.appendChild(previewLabel);
-    const preview = document.createElement("div");
-    preview.className = "preview";
-    frag.appendChild(preview);
-    state.preview = preview;
-    const tagsRow = document.createElement("div");
-    tagsRow.className = "tags";
-    frag.appendChild(tagsRow);
-    state.tagsRow = tagsRow;
+  const frag = document.createDocumentFragment();
+  const previewLabel = document.createElement("div");
+  previewLabel.className = "preview-label";
+  previewLabel.textContent = "Preview";
+  frag.appendChild(previewLabel);
+  const preview = document.createElement("div");
+  preview.className = "preview";
+  frag.appendChild(preview);
+  state.preview = preview;
+  const tagsRow = document.createElement("div");
+  tagsRow.className = "tags";
+  frag.appendChild(tagsRow);
+  state.tagsRow = tagsRow;
 
-    return frag;
+  return frag;
 }
 
 function buildComposer(state: State): HTMLDivElement {
-    const composer = document.createElement("div");
-    composer.className = "composer";
-    composer.dataset.open = "false";
-    composer.appendChild(buildTitle("Template"));
-    composer.appendChild(buildTemplateInput(state));
-    composer.appendChild(buildPreviewBlock(state));
-    composer.appendChild(buildComposerActions(state));
+  const composer = document.createElement("div");
+  composer.className = "composer";
+  composer.dataset.open = "false";
+  composer.appendChild(buildTitle("Template"));
+  composer.appendChild(buildTemplateInput(state));
+  composer.appendChild(buildPreviewBlock(state));
+  composer.appendChild(buildComposerActions(state));
 
-    return composer;
+  return composer;
 }
 
 function buildBindButton(state: State): HTMLButtonElement {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-primary";
-    btn.textContent = "Bind";
-    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); e.stopPropagation(); });
-    btn.addEventListener(Events.CLICK, (e) => { e.stopPropagation(); commitTemplate(state); });
-    state.bindBtn = btn;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn btn-primary";
+  btn.textContent = "Bind";
+  btn.addEventListener(Events.MOUSEDOWN, (e) => {
+    e.preventDefault(); e.stopPropagation(); 
+  });
+  btn.addEventListener(Events.CLICK, (e) => {
+    e.stopPropagation(); commitTemplate(state); 
+  });
+  state.bindBtn = btn;
 
-    return btn;
+  return btn;
 }
 
 function buildClearButton(state: State): HTMLButtonElement {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-secondary";
-    btn.textContent = "Clear";
-    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); e.stopPropagation(); });
-    btn.addEventListener(Events.CLICK, (e) => {
-        e.stopPropagation();
-        state.template = "";
-        if (state.templateInput !== null) { state.templateInput.value = ""; }
-        refreshPreview(state);
-        state.templateInput?.focus();
-    });
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn btn-secondary";
+  btn.textContent = "Clear";
+  btn.addEventListener(Events.MOUSEDOWN, (e) => {
+    e.preventDefault(); e.stopPropagation(); 
+  });
+  btn.addEventListener(Events.CLICK, (e) => {
+    e.stopPropagation();
+    state.template = "";
+    if (state.templateInput !== null) {
+      state.templateInput.value = ""; 
+    }
 
-    return btn;
+    refreshPreview(state);
+    state.templateInput?.focus();
+  });
+
+  return btn;
 }
 
 function buildComposerActions(state: State): HTMLDivElement {
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    actions.appendChild(buildBindButton(state));
-    actions.appendChild(buildClearButton(state));
+  const actions = document.createElement("div");
+  actions.className = "actions";
+  actions.appendChild(buildBindButton(state));
+  actions.appendChild(buildClearButton(state));
 
-    return actions;
+  return actions;
 }
 
 function renderColumns(state: State): void {
-    state.popover.innerHTML = "";
-    state.popover.appendChild(buildTitle("Bind to column"));
-    for (const col of state.options.Columns) {
-        state.popover.appendChild(buildColumnButton(col, state.options.SampleRow, (c) => handleColumnClick(state, c)));
-    }
-    state.composer = buildComposer(state);
-    state.popover.appendChild(state.composer);
+  state.popover.innerHTML = "";
+  state.popover.appendChild(buildTitle("Bind to column"));
+  for (const col of state.options.Columns) {
+    state.popover.appendChild(buildColumnButton(col, state.options.SampleRow, (c) => handleColumnClick(state, c)));
+  }
+
+  state.composer = buildComposer(state);
+  state.popover.appendChild(state.composer);
 }
 
 function handleColumnClick(state: State, col: string): void {
-    if (state.hovered === null) { return; }
-    const token = `{{${col}}}`;
-    if (state.pinned) {
-        insertTokenIntoTemplate(state, token);
-        refreshPreview(state);
-        state.templateInput?.focus();
+  if (state.hovered === null) {
+    return; 
+  }
 
-        return;
-    }
-    emitBinding(state, token);
-    hide(state);
+  const token = `{{${col}}}`;
+  if (state.pinned) {
+    insertTokenIntoTemplate(state, token);
+    refreshPreview(state);
+    state.templateInput?.focus();
+
+    return;
+  }
+
+  emitBinding(state, token);
+  hide(state);
 }
 
 function insertTokenIntoTemplate(state: State, token: string): void {
-    if (state.templateInput === null) {
-        state.template = `${state.template}${token}`;
+  if (state.templateInput === null) {
+    state.template = `${state.template}${token}`;
 
-        return;
-    }
-    const start = state.templateInput.selectionStart ?? state.template.length;
-    const end = state.templateInput.selectionEnd ?? state.template.length;
-    const next = `${state.template.slice(0, start)}${token}${state.template.slice(end)}`;
-    state.template = next;
-    state.templateInput.value = next;
-    const caret = start + token.length;
-    state.templateInput.setSelectionRange(caret, caret);
+    return;
+  }
+
+  const start = state.templateInput.selectionStart ?? state.template.length;
+  const end = state.templateInput.selectionEnd ?? state.template.length;
+  const next = `${state.template.slice(0, start)}${token}${state.template.slice(end)}`;
+  state.template = next;
+  state.templateInput.value = next;
+  const caret = start + token.length;
+  state.templateInput.setSelectionRange(caret, caret);
 }
 
 function renderPreviewTags(state: State, cols: ReadonlyArray<string>): void {
-    if (state.tagsRow === null) { return; }
-    state.tagsRow.innerHTML = "";
-    for (const c of cols) {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = c;
-        state.tagsRow.appendChild(tag);
-    }
+  if (state.tagsRow === null) {
+    return; 
+  }
+
+  state.tagsRow.innerHTML = "";
+  for (const c of cols) {
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = c;
+    state.tagsRow.appendChild(tag);
+  }
 }
 
 function renderResolvedPreview(state: State, preview: HTMLElement): void {
-    if (state.options.SampleRow === undefined) {
-        preview.textContent = state.template;
-        preview.dataset.error = "false";
+  if (state.options.SampleRow === undefined) {
+    preview.textContent = state.template;
+    preview.dataset.error = "false";
 
-        return;
-    }
-    try {
-        preview.textContent = resolveFieldReferences(state.template, state.options.SampleRow);
-        preview.dataset.error = "false";
-    } catch (err) {
-        preview.textContent = err instanceof Error ? err.message : String(err);
-        preview.dataset.error = "true";
-    }
+    return;
+  }
+
+  try {
+    preview.textContent = resolveFieldReferences(state.template, state.options.SampleRow);
+    preview.dataset.error = "false";
+  } catch (err) {
+    preview.textContent = err instanceof Error ? err.message : String(err);
+    preview.dataset.error = "true";
+  }
 }
 
 function refreshPreview(state: State): void {
-    if (state.preview === null || state.tagsRow === null) return;
-    renderPreviewTags(state, extractReferencedColumns(state.template));
-    if (state.template === "") {
-        state.preview.textContent = "";
-        state.preview.dataset.error = "false";
-        if (state.bindBtn !== null) state.bindBtn.disabled = true;
+  if (state.preview === null || state.tagsRow === null) {
+    return;
+  }
 
-        return;
+  renderPreviewTags(state, extractReferencedColumns(state.template));
+  if (state.template === "") {
+    state.preview.textContent = "";
+    state.preview.dataset.error = "false";
+    if (state.bindBtn !== null) {
+      state.bindBtn.disabled = true;
     }
-    renderResolvedPreview(state, state.preview);
-    if (state.bindBtn !== null) state.bindBtn.disabled = false;
+
+    return;
+  }
+
+  renderResolvedPreview(state, state.preview);
+  if (state.bindBtn !== null) {
+    state.bindBtn.disabled = false;
+  }
 }
 
 function commitTemplate(state: State): void {
-    if (state.hovered === null || state.template === "") { return; }
-    emitBinding(state, state.template);
-    state.pinned = false;
-    state.template = "";
-    if (state.templateInput !== null) { state.templateInput.value = ""; }
-    refreshPreview(state);
-    hide(state);
+  if (state.hovered === null || state.template === "") {
+    return; 
+  }
+
+  emitBinding(state, state.template);
+  state.pinned = false;
+  state.template = "";
+  if (state.templateInput !== null) {
+    state.templateInput.value = ""; 
+  }
+
+  refreshPreview(state);
+  hide(state);
 }
 
 function emitBinding(state: State, tpl: string): void {
-    if (state.hovered === null) { return; }
-    const cols = extractReferencedColumns(tpl);
-    const primary = cols[0] ?? "";
-    let previewValue: string | null = null;
-    if (state.options.SampleRow !== undefined) {
-        try { previewValue = resolveFieldReferences(tpl, state.options.SampleRow); }
-        catch (err) {
-            previewValue = null;
-        }
+  if (state.hovered === null) {
+    return; 
+  }
+
+  const cols = extractReferencedColumns(tpl);
+  const primary = cols[0] ?? "";
+  let previewValue: string | null = null;
+  if (state.options.SampleRow !== undefined) {
+    try {
+      previewValue = resolveFieldReferences(tpl, state.options.SampleRow); 
+    } catch (err) {
+      previewValue = null;
     }
-    state.options.OnBind({
-        Target: state.hovered,
-        ColumnName: primary,
-        Columns: cols,
-        Template: tpl,
-        PreviewValue: previewValue,
-    });
+  }
+
+  state.options.OnBind({
+    Target: state.hovered,
+    ColumnName: primary,
+    Columns: cols,
+    Template: tpl,
+    PreviewValue: previewValue,
+  });
 }
 
 function show(state: State, target: HTMLElement): void {
-    state.hovered = target;
-    const rect = target.getBoundingClientRect();
-    state.outline.style.left = `${rect.left}px`;
-    state.outline.style.top = `${rect.top}px`;
-    state.outline.style.width = `${rect.width}px`;
-    state.outline.style.height = `${rect.height}px`;
-    state.outline.dataset.open = "true";
+  state.hovered = target;
+  const rect = target.getBoundingClientRect();
+  state.outline.style.left = `${rect.left}px`;
+  state.outline.style.top = `${rect.top}px`;
+  state.outline.style.width = `${rect.width}px`;
+  state.outline.style.height = `${rect.height}px`;
+  state.outline.dataset.open = "true";
 
-    state.popover.style.left = `${rect.left}px`;
-    state.popover.style.top = `${rect.bottom + 6}px`;
-    state.popover.dataset.open = "true";
+  state.popover.style.left = `${rect.left}px`;
+  state.popover.style.top = `${rect.bottom + 6}px`;
+  state.popover.dataset.open = "true";
 
-    if (state.composer !== null) {
-        state.composer.dataset.open = state.pinned ? "true" : "false";
-    }
-    if (state.pinned) { refreshPreview(state); }
+  if (state.composer !== null) {
+    state.composer.dataset.open = state.pinned ? "true" : "false";
+  }
+
+  if (state.pinned) {
+    refreshPreview(state); 
+  }
 }
 
 function hide(state: State): void {
-    if (state.pinned) { return; }
-    state.hovered = null;
-    state.outline.dataset.open = "false";
-    state.popover.dataset.open = "false";
-    if (state.composer !== null) { state.composer.dataset.open = "false"; }
+  if (state.pinned) {
+    return; 
+  }
+
+  state.hovered = null;
+  state.outline.dataset.open = "false";
+  state.popover.dataset.open = "false";
+  if (state.composer !== null) {
+    state.composer.dataset.open = "false"; 
+  }
 }
 
 function isOurNode(state: State, node: EventTarget | null): boolean {
-    return node === state.host || (node instanceof Node && state.host.contains(node));
+  return node === state.host || (node instanceof Node && state.host.contains(node));
 }
 
 function onMove(state: State, e: MouseEvent): void {
-    if (state.pinned) { return; }
-    const t = e.target;
-    if (isOurNode(state, t)) { return; }
-    if (!(t instanceof HTMLElement)) { hide(state);
+  if (state.pinned) {
+    return; 
+  }
 
- return; }
-    const candidate = t.closest(BINDABLE_SELECTOR);
-    if (candidate instanceof HTMLElement) { show(state, candidate); }
-    else { hide(state); }
+  const t = e.target;
+  if (isOurNode(state, t)) {
+    return; 
+  }
+
+  if (!(t instanceof HTMLElement)) {
+    hide(state);
+
+    return; 
+  }
+
+  const candidate = t.closest(BINDABLE_SELECTOR);
+  if (candidate instanceof HTMLElement) {
+    show(state, candidate); 
+  } else {
+    hide(state); 
+  }
 }
 
 function onClick(state: State, e: MouseEvent): void {
-    const t = e.target;
-    if (isOurNode(state, t)) { return; }
-    if (!(t instanceof HTMLElement)) { return; }
-    const candidate = t.closest(BINDABLE_SELECTOR);
-    if (candidate instanceof HTMLElement) {
-        e.preventDefault();
-        state.pinned = true;
-        show(state, candidate);
-        refreshPreview(state);
-    } else {
-        state.pinned = false;
-        state.template = "";
-        if (state.templateInput !== null) { state.templateInput.value = ""; }
-        hide(state);
+  const t = e.target;
+  if (isOurNode(state, t)) {
+    return; 
+  }
+
+  if (!(t instanceof HTMLElement)) {
+    return; 
+  }
+
+  const candidate = t.closest(BINDABLE_SELECTOR);
+  if (candidate instanceof HTMLElement) {
+    e.preventDefault();
+    state.pinned = true;
+    show(state, candidate);
+    refreshPreview(state);
+  } else {
+    state.pinned = false;
+    state.template = "";
+    if (state.templateInput !== null) {
+      state.templateInput.value = ""; 
     }
+
+    hide(state);
+  }
 }
 
 function buildShadowDom(container: ParentNode): { host: HTMLElement; root: ShadowRoot; popover: HTMLDivElement; outline: HTMLDivElement } {
-    const host = document.createElement("div");
-    host.id = FIELD_BINDING_HOST_ID;
-    const root = host.attachShadow({ mode: "closed" });
-    const style = document.createElement("style");
-    style.textContent = STYLE;
-    root.appendChild(style);
-    const outline = document.createElement("div");
-    outline.className = "outline";
-    outline.dataset.open = "false";
-    root.appendChild(outline);
-    const popover = document.createElement("div");
-    popover.className = "popover";
-    popover.dataset.open = "false";
-    popover.setAttribute("role", "menu");
-    popover.setAttribute("aria-label", "Field bindings");
-    root.appendChild(popover);
-    container.appendChild(host);
+  const host = document.createElement("div");
+  host.id = FIELD_BINDING_HOST_ID;
+  const root = host.attachShadow({ mode: "closed" });
+  const style = document.createElement("style");
+  style.textContent = STYLE;
+  root.appendChild(style);
+  const outline = document.createElement("div");
+  outline.className = "outline";
+  outline.dataset.open = "false";
+  root.appendChild(outline);
+  const popover = document.createElement("div");
+  popover.className = "popover";
+  popover.dataset.open = "false";
+  popover.setAttribute("role", "menu");
+  popover.setAttribute("aria-label", "Field bindings");
+  root.appendChild(popover);
+  container.appendChild(host);
 
-    return { host, root, popover, outline };
+  return { host, root, popover, outline };
 }
 
 function initOverlayState(options: FieldBindingOptions, container: ParentNode): { state: State; root: ShadowRoot } {
-    const { host, root, popover, outline } = buildShadowDom(container);
-    const state: State = {
-        options, host, popover, outline,
-        composer: null, templateInput: null, preview: null, tagsRow: null, bindBtn: null,
-        hovered: null, pinned: false, template: "",
-    };
-    renderColumns(state);
+  const { host, root, popover, outline } = buildShadowDom(container);
+  const state: State = {
+    options, host, popover, outline,
+    composer: null, templateInput: null, preview: null, tagsRow: null, bindBtn: null,
+    hovered: null, pinned: false, template: "",
+  };
+  renderColumns(state);
 
-    return { state, root };
+  return { state, root };
 }
 
 function attachOverlayListeners(state: State): { move: (e: MouseEvent) => void; click: (e: MouseEvent) => void } {
-    const move = (e: MouseEvent): void => onMove(state, e);
-    const click = (e: MouseEvent): void => onClick(state, e);
-    document.addEventListener("mousemove", move, true);
-    document.addEventListener(Events.CLICK, click, true);
+  const move = (e: MouseEvent): void => onMove(state, e);
+  const click = (e: MouseEvent): void => onClick(state, e);
+  document.addEventListener("mousemove", move, true);
+  document.addEventListener(Events.CLICK, click, true);
 
-    return { move, click };
+  return { move, click };
 }
 
 export function mountFieldBindingOverlay(
-    options: FieldBindingOptions,
-    container: ParentNode = document.body,
+  options: FieldBindingOptions,
+  container: ParentNode = document.body,
 ): FieldBindingHandle {
-    if (container === null || container === undefined) {
-        throw new Error("mountFieldBindingOverlay: no container available");
-    }
-    const { state, root } = initOverlayState(options, container);
-    const handlers = attachOverlayListeners(state);
-    let destroyed = false;
+  if (container === null || container === undefined) {
+    throw new Error("mountFieldBindingOverlay: no container available");
+  }
 
-    return {
-        Host: state.host, Root: root,
-        GetHoveredTarget: () => state.hovered,
-        GetTemplate: () => state.template,
-        Destroy: () => {
-            if (destroyed) { return; }
-            destroyed = true;
-            document.removeEventListener("mousemove", handlers.move, true);
-            document.removeEventListener(Events.CLICK, handlers.click, true);
-            state.host.remove();
-        },
-    };
+  const { state, root } = initOverlayState(options, container);
+  const handlers = attachOverlayListeners(state);
+  let destroyed = false;
+
+  return {
+    Host: state.host, Root: root,
+    GetHoveredTarget: () => state.hovered,
+    GetTemplate: () => state.template,
+    Destroy: () => {
+      if (destroyed) {
+        return; 
+      }
+
+      destroyed = true;
+      document.removeEventListener("mousemove", handlers.move, true);
+      document.removeEventListener(Events.CLICK, handlers.click, true);
+      state.host.remove();
+    },
+  };
 }

@@ -48,7 +48,9 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
       const row = stmt.getAsObject();
       const key = String(row.Key ?? '');
       const value = String(row.Value ?? '');
-      if (key.length > 0) meta.set(key, value);
+      if (key.length > 0) {
+        meta.set(key, value);
+      }
     }
   } finally {
     stmt.free();
@@ -59,15 +61,22 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
 
 function requireMeta(meta: Map<string, string>, key: string): string {
   const value = meta.get(key);
-  if (!value) throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
+  if (!value) {
+    throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
+  }
 
   return value as string;
 }
 
 function parseTags(raw: unknown): string[] | undefined {
-  if (typeof raw !== 'string' || raw.length === 0) return undefined;
+  if (typeof raw !== 'string' || raw.length === 0) {
+    return undefined;
+  }
+
   const parsed = JSON.parse(raw) as unknown;
-  if (!Array.isArray(parsed)) return undefined;
+  if (!Array.isArray(parsed)) {
+    return undefined;
+  }
 
   return parsed.filter((t): t is string => typeof t === 'string');
 }
@@ -75,15 +84,32 @@ function parseTags(raw: unknown): string[] | undefined {
 function rowToEntry(row: Record<string, unknown>): PromptEntry {
   const name = String(row.Name ?? '').trim();
   const text = typeof row.BodyMarkdown === 'string' ? row.BodyMarkdown : '';
-  if (!name) throwDiagnostic('PROMPT_IO_SQLITE_E002', { rowId: String(row.rowid ?? row.Slug ?? 'unknown') });
+  if (!name) {
+    throwDiagnostic('PROMPT_IO_SQLITE_E002', { rowId: String(row.rowid ?? row.Slug ?? 'unknown') });
+  }
+
   const entry: PromptEntry = { name, text };
-  if (typeof row.Slug === 'string' && row.Slug.length > 0) entry.slug = row.Slug;
-  if (typeof row.Category === 'string' && row.Category.length > 0) entry.category = row.Category;
+  if (typeof row.Slug === 'string' && row.Slug.length > 0) {
+    entry.slug = row.Slug;
+  }
+
+  if (typeof row.Category === 'string' && row.Category.length > 0) {
+    entry.category = row.Category;
+  }
+
   const tags = parseTags(row.Tags);
-  if (tags) entry.tags = tags;
-  if (typeof row.ReplaceKey === 'string' && row.ReplaceKey.length > 0) entry.replaceKey = row.ReplaceKey;
+  if (tags) {
+    entry.tags = tags;
+  }
+
+  if (typeof row.ReplaceKey === 'string' && row.ReplaceKey.length > 0) {
+    entry.replaceKey = row.ReplaceKey;
+  }
+
   const excludeRaw = row.ExcludeFromExport;
-  if (typeof excludeRaw === 'number') entry.excludeFromExport = excludeRaw !== 0;
+  if (typeof excludeRaw === 'number') {
+    entry.excludeFromExport = excludeRaw !== 0;
+  }
 
   return entry;
 }
@@ -94,7 +120,9 @@ function readPrompts(db: SqlDatabaseRO): PromptEntry[] {
   );
   const entries: PromptEntry[] = [];
   try {
-    while (stmt.step()) entries.push(rowToEntry(stmt.getAsObject()));
+    while (stmt.step()) {
+      entries.push(rowToEntry(stmt.getAsObject()));
+    }
   } finally {
     stmt.free();
   }
@@ -106,8 +134,13 @@ function assertSchema(db: SqlDatabaseRO): void {
   const rows = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('Meta','Prompts');");
   const names = new Set<string>();
   rows.forEach((r) => r.values.forEach((v) => names.add(String(v[0]))));
-  if (!names.has('Meta')) throwDiagnostic('PROMPT_IO_SQLITE_E003', { tableName: 'Meta' });
-  if (!names.has('Prompts')) throwDiagnostic('PROMPT_IO_SQLITE_E003', { tableName: 'Prompts' });
+  if (!names.has('Meta')) {
+    throwDiagnostic('PROMPT_IO_SQLITE_E003', { tableName: 'Meta' });
+  }
+
+  if (!names.has('Prompts')) {
+    throwDiagnostic('PROMPT_IO_SQLITE_E003', { tableName: 'Prompts' });
+  }
 }
 
 export interface SqliteImportResult {
@@ -127,6 +160,7 @@ export async function parsePromptsBundleSqlite(bytes: Uint8Array): Promise<Sqlit
     if (schemaVersion !== PROMPTS_BUNDLE_SCHEMA_VERSION) {
       throwDiagnostic('PROMPT_IO_SQLITE_E004', { actualVersion: schemaVersion, expectedVersion: PROMPTS_BUNDLE_SCHEMA_VERSION });
     }
+
     const entries = readPrompts(db);
     const bundle: PromptsBundleV1 = {
       id: requireMeta(meta, 'BundleId'),

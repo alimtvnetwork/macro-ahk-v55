@@ -113,29 +113,29 @@ let wasmChecksumOutcome: WasmChecksumOutcome | null = null;
 
 /** Returns the latest boot step label. */
 export function getBootStep(): string {
-    return bootStep;
+  return bootStep;
 }
 
 /** Updates the current boot step and records timing for the previous step. */
 export function setBootStep(step: string): void {
-    const now = performance.now();
-    const isFirstStep = bootStep === "pre-init" && step === "pre-init";
+  const now = performance.now();
+  const isFirstStep = bootStep === "pre-init" && step === "pre-init";
 
-    if (!isFirstStep) {
-        const durationMs = Math.round(now - stepStartTime);
-        bootTimings.push({ step: bootStep, durationMs });
-    }
+  if (!isFirstStep) {
+    const durationMs = Math.round(now - stepStartTime);
+    bootTimings.push({ step: bootStep, durationMs });
+  }
 
-    bootStep = step;
-    stepStartTime = now;
+  bootStep = step;
+  stepStartTime = now;
 }
 
 /** Marks boot as complete and records the final step timing. */
 export function finalizeBoot(): void {
-    const now = performance.now();
-    const durationMs = Math.round(now - stepStartTime);
-    bootTimings.push({ step: bootStep, durationMs });
-    totalBootMs = bootTimings.reduce((sum, t) => sum + t.durationMs, 0);
+  const now = performance.now();
+  const durationMs = Math.round(now - stepStartTime);
+  bootTimings.push({ step: bootStep, durationMs });
+  totalBootMs = bootTimings.reduce((sum, t) => sum + t.durationMs, 0);
 }
 
 /* ------------------------------------------------------------------ */
@@ -144,12 +144,12 @@ export function finalizeBoot(): void {
 
 /** Returns the persistence mode resolved during boot. */
 export function getBootPersistenceMode(): BootPersistenceModeType {
-    return bootPersistenceMode;
+  return bootPersistenceMode;
 }
 
 /** Updates the persistence mode resolved during boot. */
 export function setBootPersistenceMode(mode: BootPersistenceModeType): void {
-    bootPersistenceMode = mode;
+  bootPersistenceMode = mode;
 }
 
 /* ------------------------------------------------------------------ */
@@ -158,12 +158,12 @@ export function setBootPersistenceMode(mode: BootPersistenceModeType): void {
 
 /** Returns a copy of all recorded boot timings. */
 export function getBootTimings(): BootTiming[] {
-    return [...bootTimings];
+  return [...bootTimings];
 }
 
 /** Returns total boot duration in milliseconds. */
 export function getTotalBootMs(): number {
-    return totalBootMs;
+  return totalBootMs;
 }
 
 /* ------------------------------------------------------------------ */
@@ -184,29 +184,30 @@ export function getTotalBootMs(): number {
  * copyable code block.
  */
 export function setBootError(error: unknown): void {
-    if (error instanceof Error) {
-        bootErrorMessage = error.message;
-        bootErrorStack = error.stack ?? null;
-    } else {
-        bootErrorMessage = String(error);
-        bootErrorStack = null;
-    }
-    bootErrorContext = parseBootErrorContext(bootErrorMessage);
+  if (error instanceof Error) {
+    bootErrorMessage = error.message;
+    bootErrorStack = error.stack ?? null;
+  } else {
+    bootErrorMessage = String(error);
+    bootErrorStack = null;
+  }
+
+  bootErrorContext = parseBootErrorContext(bootErrorMessage);
 }
 
 /** Returns the human-readable boot error message, or null if boot succeeded. */
 export function getBootErrorMessage(): string | null {
-    return bootErrorMessage;
+  return bootErrorMessage;
 }
 
 /** Returns the boot error stack trace, or null if unavailable. */
 export function getBootErrorStack(): string | null {
-    return bootErrorStack;
+  return bootErrorStack;
 }
 
 /** Returns structured context (sql/migration step) for the boot error, if any. */
 export function getBootErrorContext(): BootErrorContext | null {
-    return bootErrorContext;
+  return bootErrorContext;
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,12 +221,12 @@ export function getBootErrorContext(): BootErrorContext | null {
  * head error) in the BootFailureBanner's expanded WASM diagnostics block.
  */
 export function setWasmProbeResult(result: WasmProbeResult): void {
-    wasmProbeResult = result;
+  wasmProbeResult = result;
 }
 
 /** Returns the captured WASM HEAD probe result, or null if the probe never ran. */
 export function getWasmProbeResult(): WasmProbeResult | null {
-    return wasmProbeResult;
+  return wasmProbeResult;
 }
 
 /* ------------------------------------------------------------------ */
@@ -240,12 +241,12 @@ export function getWasmProbeResult(): WasmProbeResult | null {
  * (match) vs an old build with no sidecar (manifest-missing).
  */
 export function setWasmChecksumOutcome(outcome: WasmChecksumOutcome): void {
-    wasmChecksumOutcome = outcome;
+  wasmChecksumOutcome = outcome;
 }
 
 /** Returns the captured WASM checksum outcome, or null if it was never computed. */
 export function getWasmChecksumOutcome(): WasmChecksumOutcome | null {
-    return wasmChecksumOutcome;
+  return wasmChecksumOutcome;
 }
 
 /* ------------------------------------------------------------------ */
@@ -262,31 +263,31 @@ const SQL_LINE_RE = /\bSQL:\s*([\s\S]+?)(?:\n\s*Reason:|\n\s*$|$)/;
  * generic stack-trace presentation.
  */
 function parseBootErrorContext(message: string | null): BootErrorContext | null {
-    if (message === null || message.length === 0) {
-        return null;
-    }
-
-    const migrationMatch = MIGRATION_TAG_RE.exec(message);
-    if (migrationMatch !== null) {
-        return {
-            sql: extractSql(migrationMatch[3]),
-            migrationVersion: Number(migrationMatch[1]),
-            migrationDescription: migrationMatch[2],
-            scope: "migration-up",
-        };
-    }
-
-    const schemaMatch = SCHEMA_INIT_TAG_RE.exec(message);
-    if (schemaMatch !== null) {
-        return {
-            sql: extractSql(schemaMatch[2]),
-            migrationVersion: null,
-            migrationDescription: null,
-            scope: schemaMatch[1],
-        };
-    }
-
+  if (message === null || message.length === 0) {
     return null;
+  }
+
+  const migrationMatch = MIGRATION_TAG_RE.exec(message);
+  if (migrationMatch !== null) {
+    return {
+      sql: extractSql(migrationMatch[3]),
+      migrationVersion: Number(migrationMatch[1]),
+      migrationDescription: migrationMatch[2],
+      scope: "migration-up",
+    };
+  }
+
+  const schemaMatch = SCHEMA_INIT_TAG_RE.exec(message);
+  if (schemaMatch !== null) {
+    return {
+      sql: extractSql(schemaMatch[2]),
+      migrationVersion: null,
+      migrationDescription: null,
+      scope: schemaMatch[1],
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -294,11 +295,12 @@ function parseBootErrorContext(message: string | null): BootErrorContext | null 
  * trimmed body when no explicit `SQL:` marker is present.
  */
 function extractSql(body: string): string | null {
-    const sqlMatch = SQL_LINE_RE.exec(body);
-    if (sqlMatch !== null) {
-        return sqlMatch[1].trim();
-    }
-    const trimmed = body.trim();
+  const sqlMatch = SQL_LINE_RE.exec(body);
+  if (sqlMatch !== null) {
+    return sqlMatch[1].trim();
+  }
 
-    return trimmed.length > 0 ? trimmed : null;
+  const trimmed = body.trim();
+
+  return trimmed.length > 0 ? trimmed : null;
 }

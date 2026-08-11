@@ -25,14 +25,26 @@ class StatusRenderState {
   /** P1 performance counters — tracks dirty-flag effectiveness for status bar */
   readonly stats = { skipped: 0, executed: 0 };
 
-  get lastStatusKey(): string { return this._lastStatusKey; }
-  set lastStatusKey(value: string) { this._lastStatusKey = value; }
+  get lastStatusKey(): string {
+    return this._lastStatusKey; 
+  }
+  set lastStatusKey(value: string) {
+    this._lastStatusKey = value; 
+  }
 
-  get recordDot(): HTMLSpanElement | null { return this._recordDot; }
-  set recordDot(value: HTMLSpanElement | null) { this._recordDot = value; }
+  get recordDot(): HTMLSpanElement | null {
+    return this._recordDot; 
+  }
+  set recordDot(value: HTMLSpanElement | null) {
+    this._recordDot = value; 
+  }
 
-  get recordLabel(): Text | null { return this._recordLabel; }
-  set recordLabel(value: Text | null) { this._recordLabel = value; }
+  get recordLabel(): Text | null {
+    return this._recordLabel; 
+  }
+  set recordLabel(value: Text | null) {
+    this._recordLabel = value; 
+  }
 }
 
 const statusRenderState = new StatusRenderState();
@@ -110,7 +122,9 @@ function _ensureStatusElements(el: HTMLElement): { statusLine: HTMLElement, prog
 
 export function updateStatus(): void {
   const el = document.getElementById(IDS.STATUS);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   // Clear skeleton placeholders on first real data hydration
   clearSkeletons(el);
@@ -134,9 +148,12 @@ export function updateStatus(): void {
   ].join('|');
 
   // Skip innerHTML rebuild if nothing changed
-  if (statusKey === statusRenderState.lastStatusKey) { statusRenderStats.skipped++;
+  if (statusKey === statusRenderState.lastStatusKey) {
+    statusRenderStats.skipped++;
 
- return; }
+    return; 
+  }
+
   statusRenderState.lastStatusKey = statusKey;
   statusRenderStats.executed++;
 
@@ -187,10 +204,14 @@ export function updateQueueBadge(): void {
 }
 
 function buildCreditBarsHtml(): string {
-  if (!loopCreditState.lastCheckedAt) return '';
+  if (!loopCreditState.lastCheckedAt) {
+    return '';
+  }
 
   const cws = loopCreditState.currentWs;
-  if (!cws) return '';
+  if (!cws) {
+    return '';
+  }
 
   const summary = resolveCreditSummary(cws);
   const cacheKey = (loopCreditState.lastCheckedAt || 0) + '|'
@@ -198,6 +219,7 @@ function buildCreditBarsHtml(): string {
   if (window._creditBarCache && window._creditBarCache.key === cacheKey) {
     return window._creditBarCache.html;
   }
+
   if (summary.renderDash) {
     const dashText = summary.source === 'Pending' ? '— fetching…' : '— unavailable';
     const dashHtml = '<span title="Credit-balance ' + summary.source + '" style="font-size:11px;color:' + cWarning + ';min-width:160px;display:inline-block;margin-top:4px;">' + dashText + '</span>';
@@ -216,7 +238,9 @@ function buildCreditBarsHtml(): string {
   let _maxTc = 0;
   for (const _ws of _perWs) {
     const _mtc = Math.round(resolveCreditSummary(_ws).total);
-    if (_mtc > _maxTc) _maxTc = _mtc;
+    if (_mtc > _maxTc) {
+      _maxTc = _mtc;
+    }
   }
 
   const html = renderCreditBar({
@@ -240,9 +264,18 @@ function renderRunningStatus(statusLine: HTMLElement, progressContainer: HTMLEle
   for (const p of parts) {
     const span = document.createElement('span');
     span.textContent = p.text;
-    if (p.color) span.style.color = p.color;
-    if (p.bold) span.style.fontWeight = '700';
-    if (p.id) span.id = p.id;
+    if (p.color) {
+      span.style.color = p.color;
+    }
+
+    if (p.bold) {
+      span.style.fontWeight = '700';
+    }
+
+    if (p.id) {
+      span.id = p.id;
+    }
+
     statusLine.appendChild(span);
   }
 
@@ -250,7 +283,9 @@ function renderRunningStatus(statusLine: HTMLElement, progressContainer: HTMLEle
 }
 
 function buildDelegateText(): string {
-  if (!state.isDelegating) return '';
+  if (!state.isDelegating) {
+    return '';
+  }
 
   return state.forceDirection
     ? ' | FORCE ' + state.forceDirection.toUpperCase()
@@ -261,9 +296,13 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
   const parts: Array<{ text: string; color?: string; bold?: boolean; id?: string }> = [];
   if (state.workspaceName) {
     parts.push({ text: state.workspaceName, color: '#fbbf24', bold: true });
-    if (state.workspaceJustChanged) parts.push({ text: ' ⚡ WS Changed', color: '#f97316', bold: true });
+    if (state.workspaceJustChanged) {
+      parts.push({ text: ' ⚡ WS Changed', color: '#f97316', bold: true });
+    }
+
     parts.push({ text: ' | ' });
   }
+
   parts.push({ text: '● ', color: '#10b981' });
   parts.push({ text: state.direction.toUpperCase() + ' | #' + state.cycleCount + ' | ' });
   parts.push({ text: creditIcon + ' ' + creditLabel, color: '#fbbf24' });
@@ -288,6 +327,7 @@ function renderProgressBar(progressContainer: HTMLElement): void {
       + '<div id="marco-progress-bar" style="width:0%;height:100%;border-radius:3px;transition:width 0.8s linear;"></div></div>';
     barEl = document.getElementById('marco-progress-bar');
   }
+
   if (barEl) {
     barEl.style.width = pct + '%';
     barEl.style.background = barColor;
@@ -308,6 +348,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
     statusLine.appendChild(wsSpan);
     statusLine.appendChild(document.createTextNode(' | '));
   }
+
   const stopIcon = document.createElement('span');
   stopIcon.textContent = '[=]';
   stopIcon.style.color = '#9ca3af';
@@ -321,6 +362,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
     creditSpan.style.color = '#fbbf24';
     statusLine.appendChild(creditSpan);
   }
+
   const hasWorkspaces = (loopCreditState.perWorkspace || []).length > 0;
   if (!wsName && !hasWorkspaces) {
     const hint = document.createElement('div');
@@ -333,6 +375,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
     hint.textContent = '⚠️ Workspace not detected — click ☑ Check to identify current workspace';
     statusLine.appendChild(hint);
   }
+
   // Clear progress bar when stopped
   progressContainer.innerHTML = '';
 }
@@ -359,7 +402,9 @@ function ensureRecordChildren(el: HTMLElement): { dot: HTMLSpanElement; label: T
 
 export function updateRecordIndicator(): void {
   const el = document.getElementById(IDS.RECORD_INDICATOR);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   if (state.running) {
     el.style.display = 'flex';

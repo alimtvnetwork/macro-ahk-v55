@@ -18,36 +18,36 @@ import type { EmptySettings } from "../../types/instruction/seed/empty-settings"
 import { VERSION } from "../../shared-version";
 
 const instruction: ProjectInstruction<EmptySettings> = {
-    SchemaVersion: "1.0",
-    Name: "lovable-dashboard",
-    DisplayName: "Lovable Dashboard",
-    Version: VERSION,
-    Description: "Lovable.dev dashboard home-screen enhancements: search, nav controls, credit panel, workspace tools. Auto-injects only on the exact /dashboard URL.",
-    World: InjectionWorldType.Main,
-    IsGlobal: false,
-    Dependencies: ["lovable-common"],
-    LoadOrder: 40,
-    Seed: {
-        Id: "default-lovable-dashboard",
-        SeedOnInstall: true,
-        IsRemovable: false,
-        AutoInject: true,
-        RunAt: InjectionRunAtType.DocumentIdle,
-        TargetUrls: [
-            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: MatchRuleType.Exact },
-        ],
-        Cookies: [],
-        Settings: {},
-    },
-    Assets: {
-        Css: [],
-        Configs: [],
-        Scripts: [
-            { File: "lovable-dashboard.js", Order: 1, IsIife: true },
-        ],
-        Templates: [],
-        Prompts: [],
-    },
+  SchemaVersion: "1.0",
+  Name: "lovable-dashboard",
+  DisplayName: "Lovable Dashboard",
+  Version: VERSION,
+  Description: "Lovable.dev dashboard home-screen enhancements: search, nav controls, credit panel, workspace tools. Auto-injects only on the exact /dashboard URL.",
+  World: InjectionWorldType.Main,
+  IsGlobal: false,
+  Dependencies: ["lovable-common"],
+  LoadOrder: 40,
+  Seed: {
+    Id: "default-lovable-dashboard",
+    SeedOnInstall: true,
+    IsRemovable: false,
+    AutoInject: true,
+    RunAt: InjectionRunAtType.DocumentIdle,
+    TargetUrls: [
+      { Pattern: "https://lovable.dev/dashboard", MatchRuleType: MatchRuleType.Exact },
+    ],
+    Cookies: [],
+    Settings: {},
+  },
+  Assets: {
+    Css: [],
+    Configs: [],
+    Scripts: [
+      { File: "lovable-dashboard.js", Order: 1, IsIife: true },
+    ],
+    Templates: [],
+    Prompts: [],
+  },
 };
 
 export default instruction;

@@ -32,18 +32,21 @@ function classifyCommitError(err: unknown, name: string, message: string): Class
       hint: 'Browser storage is full. Delete some prompts or clear the extension\'s IndexedDB and retry.',
     };
   }
+
   if (/indexeddb is not defined|idb.*unavailable|SecurityError/i.test(message) || name === 'SecurityError') {
     return {
       code: 'COMMIT_IDB_UNAVAILABLE', message, original: err,
       hint: 'IndexedDB is disabled or blocked. Enable third-party storage for this origin.',
     };
   }
+
   if (name === 'TransactionInactiveError' || /transaction.*(inactive|abort)/i.test(message)) {
     return {
       code: 'COMMIT_TRANSACTION_ABORTED', message, original: err,
       hint: 'The write transaction was aborted mid-flight. Changes were rolled back; retry the import.',
     };
   }
+
   if (/DOUBLE_FAULT/.test(message)) {
     return {
       code: 'COMMIT_DOUBLE_FAULT', message, original: err,
@@ -61,15 +64,19 @@ function classifyParseError(err: unknown, message: string): ClassifiedImportErro
   if (/JSON envelope invalid|Unexpected token|Failed to parse JSON/i.test(message)) {
     return { code: 'PARSE_INVALID_JSON', message, hint: 'The JSON file is malformed. Open it in a text editor to verify.', original: err };
   }
+
   if (/zip|EOCD|central directory|compressed/i.test(message)) {
     return { code: 'PARSE_ZIP_CORRUPT', message, hint: 'The ZIP bundle is corrupt or uses compression. Re-export as a store-only ZIP.', original: err };
   }
+
   if (/sqlite|Meta table|SchemaVersion/i.test(message)) {
     return { code: 'PARSE_SQLITE_INVALID', message, hint: 'The SQLite bundle is missing required tables or the schema version is wrong.', original: err };
   }
+
   if (/Unknown bundle format|Unknown prompt bundle format|First 16 bytes|PROMPT_IO_FORMAT_E001/i.test(message)) {
     return { code: 'PARSE_UNKNOWN_FORMAT', message, hint: 'File format not recognised. Accepted: JSON, ZIP, SQLite.', original: err };
   }
+
   if (/schemaVersion/i.test(message)) {
     return { code: 'PARSE_SCHEMA_MISMATCH', message, hint: 'This bundle was made by a newer version. Update the extension and retry.', original: err };
   }
@@ -131,11 +138,15 @@ export function logStructured(input: {
   if (input.fields) {
     Object.keys(input.fields).forEach((k) => {
       const v = input.fields![k];
-      if (v === undefined) return;
+      if (v === undefined) {
+        return;
+      }
+
       const value = v === null ? 'null' : String(v);
       const needsQuote = /[\s"=]/.test(value);
       parts.push(k + '=' + (needsQuote ? '"' + value.replace(/"/g, '\\"') + '"' : value));
     });
   }
+
   log('[' + input.namespace + '] ' + parts.join(' '), input.level);
 }

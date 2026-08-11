@@ -31,7 +31,10 @@ const STYLES_ID = 'marco-chat-history-styles';
 const PREVIEW_MAX_CHARS = 240;
 
 function injectStyles(): void {
-  if (document.getElementById(STYLES_ID)) return;
+  if (document.getElementById(STYLES_ID)) {
+    return;
+  }
+
   const style = document.createElement('style');
   style.id = STYLES_ID;
   style.textContent = `
@@ -69,13 +72,23 @@ function formatTimestamp(ms: number): string {
     return new Date(ms).toLocaleString(undefined, {
       dateStyle: 'medium', timeStyle: 'short',
     });
-  } catch { return String(ms); }
+  } catch {
+    return String(ms); 
+  }
 }
 
 function previewBody(entry: HistoryEntry): string {
-  if (entry.body === null) return '(body unavailable — OPFS read failed or blob was pruned)';
-  if (entry.body.length === 0) return '(empty)';
-  if (entry.body.length <= PREVIEW_MAX_CHARS) return entry.body;
+  if (entry.body === null) {
+    return '(body unavailable — OPFS read failed or blob was pruned)';
+  }
+
+  if (entry.body.length === 0) {
+    return '(empty)';
+  }
+
+  if (entry.body.length <= PREVIEW_MAX_CHARS) {
+    return entry.body;
+  }
 
   return `${entry.body.slice(0, PREVIEW_MAX_CHARS)}…`;
 }
@@ -141,6 +154,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
 
       return;
     }
+
     for (const entry of entries) {
       const row = renderRow(entry, async () => {
         statusEl.textContent = `Deleting entry ${entry.id}…`;
@@ -155,6 +169,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
       });
       listEl.appendChild(row);
     }
+
     statusEl.textContent = `Showing ${entries.length} recent submissions.`;
   } catch (err) {
     logError(SCOPE, `reloadList failed (projectId=${projectId})`, err);
@@ -164,16 +179,22 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
 
 export function showChatHistoryModal(): void {
   const existing = document.getElementById(MODAL_ID);
-  if (existing) { existing.remove();
+  if (existing) {
+    existing.remove();
 
- return; }
+    return; 
+  }
 
   injectStyles();
 
   const container = document.createElement('div');
   container.id = MODAL_ID;
   container.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  container.onclick = (e) => { if (e.target === container) container.remove(); };
+  container.onclick = (e) => {
+    if (e.target === container) {
+      container.remove();
+    } 
+  };
 
   const modal = document.createElement('div');
   modal.className = 'marco-history-modal';
@@ -221,8 +242,14 @@ export function showChatHistoryModal(): void {
     return;
   }
 
-  copyBtn.onclick = () => { void copyExportToClipboard(projectId, status); };
-  refreshBtn.onclick = () => { void reloadList(projectId, list, status); };
+  copyBtn.onclick = () => {
+    void copyExportToClipboard(projectId, status); 
+  };
+
+  refreshBtn.onclick = () => {
+    void reloadList(projectId, list, status); 
+  };
+
   void reloadList(projectId, list, status);
   log(`[${SCOPE}] opened for projectId=${projectId}`, 'info');
 }

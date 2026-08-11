@@ -47,101 +47,101 @@ export function StatusPanel() {
     <div className="space-y-4">
       <WasmStatusBanner />
       <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
           System Status
-        </CardTitle>
-        <Button variant="ghost" size="icon" onClick={refresh} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Health State with indicator dot */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Health</span>
+          </CardTitle>
+          <Button variant="ghost" size="icon" onClick={refresh} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Health State with indicator dot */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Health</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${config.bg} ${config.pulse ? "animate-pulse" : ""}`}
+              />
+              <Badge className={`${config.bg} ${config.text}`}>
+                {state}
+              </Badge>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${config.bg} ${config.pulse ? "animate-pulse" : ""}`}
-            />
-            <Badge className={`${config.bg} ${config.text}`}>
-              {state}
+
+          {/* Connection */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {status?.connection === "online" ? (
+                <Wifi className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <WifiOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <span className="text-sm">Connection</span>
+            </div>
+            <Badge variant="outline">{status?.connection ?? "—"}</Badge>
+          </div>
+
+          {/* Token */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Auth Token</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className={tokenColors[status?.token?.status ?? "missing"]}>
+                {status?.token?.status ?? "—"}
+              </Badge>
+              {status?.token?.expiresIn && (
+                <span className="text-xs text-muted-foreground">
+                  {status.token.expiresIn}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Config */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Config</span>
+            </div>
+            <Badge variant="outline">
+              {status?.config?.source ?? "—"}
             </Badge>
           </div>
-        </div>
 
-        {/* Connection */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {status?.connection === "online" ? (
-              <Wifi className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <WifiOff className="h-4 w-4 text-muted-foreground" />
-            )}
-            <span className="text-sm">Connection</span>
-          </div>
-          <Badge variant="outline">{status?.connection ?? "—"}</Badge>
-        </div>
+          {/* Token Seeder access status — auto-hides when no tabs are blocked */}
+          <TokenSeederStatusIndicator />
 
-        {/* Token */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Key className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Auth Token</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge className={tokenColors[status?.token?.status ?? "missing"]}>
-              {status?.token?.status ?? "—"}
-            </Badge>
-            {status?.token?.expiresIn && (
-              <span className="text-xs text-muted-foreground">
-                {status.token.expiresIn}
+          {/* Version & Logging */}
+          <div className="flex items-center justify-between border-t border-border pt-3">
+            <span className="text-xs text-muted-foreground">
+            v{status?.version ?? "—"} · {status?.loggingMode ?? "—"} logging
+            </span>
+            {health?.details && health.details.length > 0 && (
+              <span className="text-xs text-destructive">
+                {health.details.length} issue(s)
               </span>
             )}
           </div>
-        </div>
 
-        {/* Config */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Config</span>
-          </div>
-          <Badge variant="outline">
-            {status?.config?.source ?? "—"}
-          </Badge>
-        </div>
-
-        {/* Token Seeder access status — auto-hides when no tabs are blocked */}
-        <TokenSeederStatusIndicator />
-
-        {/* Version & Logging */}
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <span className="text-xs text-muted-foreground">
-            v{status?.version ?? "—"} · {status?.loggingMode ?? "—"} logging
-          </span>
+          {/* Health Details */}
           {health?.details && health.details.length > 0 && (
-            <span className="text-xs text-destructive">
-              {health.details.length} issue(s)
-            </span>
+            <div className="rounded-md bg-destructive/10 p-3 space-y-1">
+              {health.details.map((detail, i) => (
+                <div key={i} className="text-xs text-destructive flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-destructive" />
+                  {detail}
+                </div>
+              ))}
+            </div>
           )}
-        </div>
-
-        {/* Health Details */}
-        {health?.details && health.details.length > 0 && (
-          <div className="rounded-md bg-destructive/10 p-3 space-y-1">
-            {health.details.map((detail, i) => (
-              <div key={i} className="text-xs text-destructive flex items-center gap-1.5">
-                <span className="h-1 w-1 rounded-full bg-destructive" />
-                {detail}
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 }

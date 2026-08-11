@@ -65,13 +65,17 @@ export function useLibraryLinkMap(projectId?: number | null): {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load(); 
+  }, [load]);
 
   const assetSlugs = useMemo(() => new Set(assets.map(a => a.Slug)), [assets]);
 
   const linkMap = useMemo(() => {
     const map = new Map<string, LinkInfo>();
-    if (!projectId) return map;
+    if (!projectId) {
+      return map;
+    }
 
     const projectLinks = links.filter(l => l.ProjectId === projectId);
     const assetById = new Map(assets.map(a => [a.Id, a]));

@@ -90,12 +90,18 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Pr
   return new Promise<T>(function (resolve) {
     let isSettled = false;
     const timer = setTimeout(function () {
-      if (isSettled) { return; }
+      if (isSettled) {
+        return; 
+      }
+
       isSettled = true;
       resolve(fallback);
     }, ms);
     promise.then(function (value) {
-      if (isSettled) { return; }
+      if (isSettled) {
+        return; 
+      }
+
       isSettled = true;
       clearTimeout(timer);
       resolve(value);
@@ -121,8 +127,14 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions):
       return await fn();
     } catch (error: unknown) {
       lastError = error;
-      if (attempt === options.maxAttempts) { throw error; }
-      if (options.onRetry) { options.onRetry(attempt, error); }
+      if (attempt === options.maxAttempts) {
+        throw error; 
+      }
+
+      if (options.onRetry) {
+        options.onRetry(attempt, error); 
+      }
+
       await delay(currentDelay);
       if (options.backoffMultiplier !== undefined) {
         currentDelay = currentDelay * options.backoffMultiplier;
@@ -149,7 +161,10 @@ interface WaiterEntry<T> {
 function resolveAllWaiters<T>(waiters: WaiterEntry<T>[], value: T): void {
   const pending = waiters.splice(0);
   for (const waiter of pending) {
-    if (waiter.timer !== null) { clearTimeout(waiter.timer); }
+    if (waiter.timer !== null) {
+      clearTimeout(waiter.timer); 
+    }
+
     waiter.resolve({ value, wasQueued: true });
   }
 }
@@ -169,7 +184,9 @@ export function createConcurrencyLock<T>(): ConcurrencyLock<T> {
   const waiters: WaiterEntry<T>[] = [];
 
   return {
-    get isInFlight(): boolean { return inFlight !== null; },
+    get isInFlight(): boolean {
+      return inFlight !== null; 
+    },
     run(fn: () => Promise<T>, timeoutMs?: number, fallback?: T): Promise<ConcurrencyLockResult<T>> {
       if (inFlight !== null) {
         return new Promise<ConcurrencyLockResult<T>>(function (resolve) {
@@ -177,13 +194,18 @@ export function createConcurrencyLock<T>(): ConcurrencyLock<T> {
           if (timeoutMs !== undefined && fallback !== undefined) {
             entry.timer = setTimeout(function () {
               const idx = waiters.indexOf(entry);
-              if (idx !== -1) { waiters.splice(idx, 1); }
+              if (idx !== -1) {
+                waiters.splice(idx, 1); 
+              }
+
               resolve({ value: fallback!, wasQueued: true });
             }, timeoutMs);
           }
+
           waiters.push(entry);
         });
       }
+
       inFlight = fn();
 
       return inFlight.then(function (value) {
@@ -207,7 +229,9 @@ export function delay(ms: number): Promise<void> {
     return sdk.delay(ms);
   }
 
-  return new Promise<void>(function (resolve) { setTimeout(resolve, ms); });
+  return new Promise<void>(function (resolve) {
+    setTimeout(resolve, ms); 
+  });
 }
 
 // ============================================
@@ -232,7 +256,10 @@ export function pollUntil<T>(
     const immediate = condition();
 
     if (immediate) {
-      if (options.onFound) { options.onFound(0); }
+      if (options.onFound) {
+        options.onFound(0); 
+      }
+
       resolve(immediate);
 
       return;
@@ -244,7 +271,10 @@ export function pollUntil<T>(
 
       if (result) {
         trackedClearInterval(timer);
-        if (options.onFound) { options.onFound(elapsed); }
+        if (options.onFound) {
+          options.onFound(elapsed); 
+        }
+
         resolve(result);
 
         return;
@@ -252,7 +282,10 @@ export function pollUntil<T>(
 
       if (elapsed >= timeoutMs) {
         trackedClearInterval(timer);
-        if (options.onTimeout) { options.onTimeout(); }
+        if (options.onTimeout) {
+          options.onTimeout(); 
+        }
+
         resolve(null);
       }
     }, intervalMs);

@@ -91,9 +91,17 @@ export function mapBackendEntry(u: Record<string, unknown>): UpdaterEntry {
     : [];
 
   const computeStatus = (): UpdaterEntry["status"] => {
-    if (!u.LastCheckedAt) return "unchecked";
-    if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
-    if (u.LatestVersion) return STATUS_UP_TO_DATE;
+    if (!u.LastCheckedAt) {
+      return "unchecked";
+    }
+
+    if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) {
+      return STATUS_UPDATE_AVAILABLE;
+    }
+
+    if (u.LatestVersion) {
+      return STATUS_UP_TO_DATE;
+    }
 
     return "unchecked";
   };

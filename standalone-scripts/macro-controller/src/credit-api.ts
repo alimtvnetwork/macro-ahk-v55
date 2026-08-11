@@ -26,12 +26,16 @@ const PRO_ZERO_PLAN_LITERAL = 'pro_0';
  * prod with exact path + missing item + reasoning per memory.
  */
 export function assertNotLegacyCalcForProZero(plan: string | undefined, fnName: string): void {
-  if ((plan || '').toLowerCase() !== PRO_ZERO_PLAN_LITERAL) return;
+  if ((plan || '').toLowerCase() !== PRO_ZERO_PLAN_LITERAL) {
+    return;
+  }
+
   const isProd = typeof process !== 'undefined' && process?.env?.NODE_ENV === 'production';
   const ctx = { fnName, plan: PRO_ZERO_PLAN_LITERAL };
   if (!isProd) {
     throwDiagnostic('CREDIT_ASSERT_E001', ctx);
   }
+
   // In prod: CODE-RED log per file-path-error-logging memory (exact path + missing item + reason),
   // but do not throw — credit rendering must degrade gracefully rather than crash the loop.
   logError('MacroController', '[CODE RED] ' + fnName + '() called for plan=pro_0. '
@@ -174,6 +178,7 @@ export function renderCreditBar(opts: CreditBarOpts): string {
     h += CssFragmentType.SpanStyleColor + cCbAvail + ';' + icoStyleWide + '" title="⚡ Available / Total credits">⚡' + av + '/' + tc + '</span>';
     h += '</span>';
   }
+
   h += '</div>';
 
   return h;

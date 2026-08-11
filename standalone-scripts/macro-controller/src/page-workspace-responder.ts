@@ -38,58 +38,75 @@ export interface DetectedWorkspaceSnapshot {
 let isRegistered = false;
 
 export function registerPageWorkspaceResponder(): void {
-    if (isRegistered) return;
-    isRegistered = true;
+  if (isRegistered) {
+    return;
+  }
 
-    window.addEventListener('message', function (event: MessageEvent): void {
-        if (event.source !== window) return;
+  isRegistered = true;
 
-        const data = event.data as Record<string, unknown> | null;
-        if (!data) return;
-        if (data.source !== REQUEST_SOURCE) return;
-        if (data.type !== REQUEST_TYPE) return;
+  window.addEventListener('message', function (event: MessageEvent): void {
+    if (event.source !== window) {
+      return;
+    }
 
-        const requestId = typeof data.requestId === 'string' ? data.requestId : null;
+    const data = event.data as Record<string, unknown> | null;
+    if (!data) {
+      return;
+    }
 
-        try {
-            const snapshot = buildSnapshot();
-            window.postMessage({
-                source: RESPONSE_SOURCE,
-                type: REQUEST_TYPE,
-                requestId: requestId,
-                payload: snapshot,
-            }, '*');
-        } catch (e) {
-            logError('pageWorkspaceResponder', 'Failed to build workspace snapshot', e);
-            window.postMessage({
-                source: RESPONSE_SOURCE,
-                type: REQUEST_TYPE,
-                requestId: requestId,
-                payload: null,
-                errorMessage: e instanceof Error ? e.message : String(e),
-            }, '*');
-        }
-    });
+    if (data.source !== REQUEST_SOURCE) {
+      return;
+    }
+
+    if (data.type !== REQUEST_TYPE) {
+      return;
+    }
+
+    const requestId = typeof data.requestId === 'string' ? data.requestId : null;
+
+    try {
+      const snapshot = buildSnapshot();
+      window.postMessage({
+        source: RESPONSE_SOURCE,
+        type: REQUEST_TYPE,
+        requestId: requestId,
+        payload: snapshot,
+      }, '*');
+    } catch (e) {
+      logError('pageWorkspaceResponder', 'Failed to build workspace snapshot', e);
+      window.postMessage({
+        source: RESPONSE_SOURCE,
+        type: REQUEST_TYPE,
+        requestId: requestId,
+        payload: null,
+        errorMessage: e instanceof Error ? e.message : String(e),
+      }, '*');
+    }
+  });
 }
 
 function buildSnapshot(): DetectedWorkspaceSnapshot {
-    const wsName = state.workspaceName || '';
-    const wsId = getCachedWorkspaceId();
-    const projectId = extractProjectIdFromUrl();
+  const wsName = state.workspaceName || '';
+  const wsId = getCachedWorkspaceId();
+  const projectId = extractProjectIdFromUrl();
 
-    let source: DetectedWorkspaceSnapshot['source'] = 'none';
-    if (state.workspaceFromApi) source = 'api';
-    else if (state.workspaceFromCache && wsName) source = 'cache';
-    else if (state.projectNameFromDom) source = 'dom';
+  let source: DetectedWorkspaceSnapshot['source'] = 'none';
+  if (state.workspaceFromApi) {
+    source = 'api';
+  } else if (state.workspaceFromCache && wsName) {
+    source = 'cache';
+  } else if (state.projectNameFromDom) {
+    source = 'dom';
+  }
 
-    // Fallback: cached value present but state hasn't been hydrated (very early boot)
-    const finalName = wsName || getCachedWorkspaceName();
+  // Fallback: cached value present but state hasn't been hydrated (very early boot)
+  const finalName = wsName || getCachedWorkspaceName();
 
-    return {
-        workspaceName: finalName,
-        workspaceId: wsId,
-        projectId: projectId,
-        source: source,
-        capturedAt: new Date().toISOString(),
-    };
+  return {
+    workspaceName: finalName,
+    workspaceId: wsId,
+    projectId: projectId,
+    source: source,
+    capturedAt: new Date().toISOString(),
+  };
 }

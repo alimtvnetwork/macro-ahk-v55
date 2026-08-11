@@ -12,12 +12,12 @@
  */
 
 import {
-    UPDATER_INFO_SCHEMA,
-    UPDATER_CATEGORY_SCHEMA,
-    UPDATER_TO_CATEGORY_SCHEMA,
-    UPDATER_ENDPOINTS_SCHEMA,
-    UPDATER_STEPS_SCHEMA,
-    UPDATER_DETAILS_VIEW,
+  UPDATER_INFO_SCHEMA,
+  UPDATER_CATEGORY_SCHEMA,
+  UPDATER_TO_CATEGORY_SCHEMA,
+  UPDATER_ENDPOINTS_SCHEMA,
+  UPDATER_STEPS_SCHEMA,
+  UPDATER_DETAILS_VIEW,
 } from "./db-schemas";
 
 /**
@@ -25,18 +25,18 @@ import {
  * Each schema constant may contain multiple statements separated by semicolons.
  */
 export function getV5Statements(): string[] {
-    const allSql = [
-        UPDATER_INFO_SCHEMA,
-        UPDATER_CATEGORY_SCHEMA,
-        UPDATER_TO_CATEGORY_SCHEMA,
-        UPDATER_ENDPOINTS_SCHEMA,
-        UPDATER_STEPS_SCHEMA,
-        UPDATER_DETAILS_VIEW,
-    ].join("\n");
+  const allSql = [
+    UPDATER_INFO_SCHEMA,
+    UPDATER_CATEGORY_SCHEMA,
+    UPDATER_TO_CATEGORY_SCHEMA,
+    UPDATER_ENDPOINTS_SCHEMA,
+    UPDATER_STEPS_SCHEMA,
+    UPDATER_DETAILS_VIEW,
+  ].join("\n");
 
-    return allSql
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
-        .map((s) => s + ";");
+  return allSql
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => s + ";");
 }

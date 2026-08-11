@@ -39,10 +39,10 @@ export interface UserAddLogSink {
 }
 
 export const buildUserAddEntry = (
-    taskId: string, rowIndex: number | null,
-    phase: UserAddLogPhaseType, severity: UserAddLogSeverityType, message: string,
+  taskId: string, rowIndex: number | null,
+  phase: UserAddLogPhaseType, severity: UserAddLogSeverityType, message: string,
 ): UserAddLogEntry => ({
-    TaskId: taskId, RowIndex: rowIndex, Phase: phase,
-    Severity: severity, Message: message,
-    TimestampUtc: new Date().toISOString(),
+  TaskId: taskId, RowIndex: rowIndex, Phase: phase,
+  Severity: severity, Message: message,
+  TimestampUtc: new Date().toISOString(),
 });

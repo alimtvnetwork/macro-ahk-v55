@@ -27,8 +27,8 @@ export interface UserAddMigration {
 const MIGRATION_VERSION = 1;
 
 export const USER_ADD_MIGRATION_V1: UserAddMigration = Object.freeze({
-    Version: MIGRATION_VERSION,
-    Ddl: ALL_DDL,
-    TaskStatusSeeds: TASK_STATUS_SEEDS,
-    MembershipRoleSeeds: MEMBERSHIP_ROLE_SEEDS,
+  Version: MIGRATION_VERSION,
+  Ddl: ALL_DDL,
+  TaskStatusSeeds: TASK_STATUS_SEEDS,
+  MembershipRoleSeeds: MEMBERSHIP_ROLE_SEEDS,
 });

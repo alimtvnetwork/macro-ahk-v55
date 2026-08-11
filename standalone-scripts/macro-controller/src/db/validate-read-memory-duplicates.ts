@@ -50,7 +50,9 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
   const resp = await runLoggedQuery('QUERY', sql, 'context');
-  if (resp.isFail || !Array.isArray(resp.rows)) return [];
+  if (resp.isFail || !Array.isArray(resp.rows)) {
+    return [];
+  }
 
   return toDuplicateRows(resp.rows as unknown[]);
 }
@@ -105,10 +107,12 @@ export async function validateAndDisableReadMemoryDuplicates(): Promise<ReadMemo
     if (duplicates.length === 0) {
       return { detected: 0, disabled: 0, slugs: [] };
     }
+
     const ok = await demoteDuplicates(duplicates.map((row) => row.Id));
     if (!ok) {
       return { detected: duplicates.length, disabled: 0, slugs: duplicates.map((row) => row.Slug) };
     }
+
     await invalidateJsonCopy();
     const slugs = duplicates.map((row) => row.Slug);
     log(

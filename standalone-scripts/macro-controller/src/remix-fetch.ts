@@ -53,7 +53,10 @@ function getSdk(op: string): MarcoSDKApiModule {
  */
 export async function fetchWorkspaceProjectNames(wsId: string, force = false): Promise<Set<string>> {
   const op = 'fetchWorkspaceProjectNames';
-  if (!wsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
+  if (!wsId) {
+    throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
+  }
+
   const existing = cache[wsId];
   const isForceFetch = force;
   const hasCachedEntry = existing !== undefined && existing !== null;
@@ -75,6 +78,7 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
     logError('Remix', 'projects.list HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });
   }
+
   const data = resp.data as ProjectsListResponse;
   const list = Array.isArray(data.projects) ? data.projects : [];
   const names = new Set<string>();
@@ -86,6 +90,7 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
       names.add(p.name.trim().toLowerCase());
     }
   }
+
   cache[wsId] = { names, fetchedAt: Date.now() };
   log('[Remix] ✅ ' + names.size + ' existing project names fetched', 'success');
 
@@ -94,10 +99,15 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
 
 /** Drop the cached project-name list for a workspace. */
 export function clearProjectNamesCache(wsId?: string): void {
-  if (wsId) { delete cache[wsId];
+  if (wsId) {
+    delete cache[wsId];
 
- return; }
-  for (const k of Object.keys(cache)) delete cache[k];
+    return; 
+  }
+
+  for (const k of Object.keys(cache)) {
+    delete cache[k];
+  }
 }
 
 /** Submit the remix POST. Returns the new project id when the API supplies it. */
@@ -113,6 +123,7 @@ export async function submitRemix(opts: {
   if (!api.remix || typeof api.remix.init !== 'function') {
     throwDiagnostic('REMIX_FETCH_E001', { missingApi: 'window.marco.api.remix.init', op });
   }
+
   const url = '/projects/' + opts.projectId + '/remix/init';
   log('[Remix] POST ' + url + ' → "' + opts.projectName + '"', 'delegate');
   const resp = await api.remix.init(opts.projectId, {
@@ -127,6 +138,7 @@ export async function submitRemix(opts: {
     logError('Remix', 'remix.init HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });
   }
+
   const data = resp.data as RemixInitResponse;
   const newProjectId = String(data.project_id || data.id || '');
   const redirectUrl = String(data.redirect_url || data.url || '');

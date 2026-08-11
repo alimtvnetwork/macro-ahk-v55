@@ -23,7 +23,9 @@ import { logError } from './error-utils';
 import { WORKSPACE_OBSERVER_MAX_RETRIES } from './constants';
 import { LabelType } from './types';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // Workspace Name Validation
@@ -36,16 +38,30 @@ function mc() { return MacroController.getInstance(); }
  * See: spec/22-app-issues/workspace-name-binding-bug.md (RCA-3)
  */
 export function isKnownWorkspaceName(name: string): boolean {
-  if (!name) return false;
+  if (!name) {
+    return false;
+  }
+
   const perWs = loopCreditState.perWorkspace || [];
   // Issue 84 Fix 1: When workspace list is not yet loaded, allow the name through
   // so that fetchWorkspaceNameFromNav() and the observer can set an early workspace
   // name. Previously this returned false, blocking ALL name detection until credits loaded.
-  if (perWs.length === 0) return true;
+  if (perWs.length === 0) {
+    return true;
+  }
+
   for (const ws of perWs) {
-    if (ws.fullName === name) { return true; }
-    if (ws.name === name) { return true; }
-    if (ws.fullName && ws.fullName.toLowerCase() === name.toLowerCase()) { return true; }
+    if (ws.fullName === name) {
+      return true; 
+    }
+
+    if (ws.name === name) {
+      return true; 
+    }
+
+    if (ws.fullName && ws.fullName.toLowerCase() === name.toLowerCase()) {
+      return true; 
+    }
   }
 
   return false;
@@ -62,11 +78,13 @@ function tryApplyWorkspaceName(name: string, source: string): boolean {
 
     return false;
   }
+
   if (state.workspaceFromApi) {
     logSub(source + ' returned "' + name + LabelType.IgnoringApiSet + state.workspaceName, 1);
 
     return true; // accepted but not changed
   }
+
   if (name !== state.workspaceName) {
     const oldName = state.workspaceName;
     state.workspaceName = name;
@@ -88,6 +106,7 @@ export function fetchWorkspaceName(): void {
 
     return;
   }
+
   try {
     log('Fetching workspace name from XPath: ' + wsXpath, 'check');
     const el = getByXPath(wsXpath);
@@ -101,6 +120,7 @@ export function fetchWorkspaceName(): void {
     } else {
       log('Workspace element NOT FOUND at XPath: ' + wsXpath, 'warn');
     }
+
     mc().updateUI();
   } catch (e) {
     logError('fetchWorkspaceName error', '' + (e as Error).message);
@@ -115,7 +135,9 @@ export function autoDiscoverWorkspaceNavElement(): Element | null {
   const candidates = collectNavCandidates();
 
   if (candidates.length > 0) {
-    candidates.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+    candidates.sort(function (a, b) {
+      return a.y - b.y || a.x - b.x; 
+    });
     const best = candidates[0];
     log('Auto-discovered workspace nav element: "' + best.text + '" <' + best.el.tagName.toLowerCase() + '> at (' + Math.round(best.x) + ',' + Math.round(best.y) + ')', 'success');
 
@@ -133,9 +155,18 @@ function collectFromNavButtons(): NavCandidate[] {
   const navButtons = document.querySelectorAll('nav button, nav a, nav span, [role="navigation"] button');
   for (const el of navButtons) {
     const text = (el.textContent || '').trim();
-    if (!text || text.length < 2 || text.length > 60) continue;
-    if (/^(Projects?|Settings|Home|Menu|Sign|Log|Help|Docs|\+|×|☰|⋮)$/i.test(text)) continue;
-    if (text.length <= 2 && /[^a-zA-Z0-9]/.test(text)) continue;
+    if (!text || text.length < 2 || text.length > 60) {
+      continue;
+    }
+
+    if (/^(Projects?|Settings|Home|Menu|Sign|Log|Help|Docs|\+|×|☰|⋮)$/i.test(text)) {
+      continue;
+    }
+
+    if (text.length <= 2 && /[^a-zA-Z0-9]/.test(text)) {
+      continue;
+    }
+
     const rect = el.getBoundingClientRect();
     const hasWidth = rect.width > 0;
     const hasHeight = rect.height > 0;
@@ -155,7 +186,10 @@ function collectFromTopNav(): NavCandidate[] {
   const topNavEls = document.querySelectorAll('nav div span, nav div p, nav div a, header span, header a');
   for (const el2 of topNavEls) {
     const text2 = (el2.textContent || '').trim();
-    if (!text2 || text2.length < 3 || text2.length > 60) continue;
+    if (!text2 || text2.length < 3 || text2.length > 60) {
+      continue;
+    }
+
     const rect2 = el2.getBoundingClientRect();
     const hasWidth2 = rect2.width > 0;
     const hasHeight2 = rect2.height > 0;
@@ -189,18 +223,26 @@ export function fetchWorkspaceNameFromNav(): boolean {
   const hasXpath = navXpath && navXpath.indexOf('__') !== 0 && navXpath !== '';
   try {
     let el: Node | null = null;
-    if (hasXpath) el = getByXPath(navXpath);
-    if (!el) el = autoDiscoverWorkspaceNavElement();
+    if (hasXpath) {
+      el = getByXPath(navXpath);
+    }
+
+    if (!el) {
+      el = autoDiscoverWorkspaceNavElement();
+    }
 
     if (el) {
       const name = (el.textContent || '').trim();
       if (name) {
         const accepted = tryApplyWorkspaceName(name, 'Nav');
-        if (accepted) mc().updateUI();
+        if (accepted) {
+          mc().updateUI();
+        }
 
         return accepted;
       }
     }
+
     logSub('Nav workspace element not found or empty', 1);
 
     return false;
@@ -234,13 +276,23 @@ class WorkspaceObserverState {
   private _mutationCapReached = false;
   private _pendingTimers = new Set<ReturnType<typeof setTimeout>>();
 
-  get instance(): MutationObserver | null { return this._instance; }
-  set instance(value: MutationObserver | null) { this._instance = value; }
+  get instance(): MutationObserver | null {
+    return this._instance; 
+  }
+  set instance(value: MutationObserver | null) {
+    this._instance = value; 
+  }
 
-  get retryCount(): number { return this._retryCount; }
-  set retryCount(value: number) { this._retryCount = value; }
+  get retryCount(): number {
+    return this._retryCount; 
+  }
+  set retryCount(value: number) {
+    this._retryCount = value; 
+  }
 
-  incrementRetry(): number { return ++this._retryCount; }
+  incrementRetry(): number {
+    return ++this._retryCount; 
+  }
 
   /** Track a setTimeout handle so we can clear it on disconnect. */
   trackTimer(handle: ReturnType<typeof setTimeout>): void {
@@ -263,27 +315,33 @@ class WorkspaceObserverState {
       this._mutationReinstallCount = 0;
       this._mutationCapReached = false;
     }
+
     if (this._mutationReinstallCount >= MUTATION_REINSTALL_CAP) {
       this._mutationCapReached = true;
 
       return null;
     }
+
     const idx = Math.min(this._mutationReinstallCount, MUTATION_BACKOFF_LADDER_MS.length - 1);
     this._mutationReinstallCount += 1;
 
     return MUTATION_BACKOFF_LADDER_MS[idx];
   }
 
-  get mutationCapReached(): boolean { return this._mutationCapReached; }
+  get mutationCapReached(): boolean {
+    return this._mutationCapReached; 
+  }
 
   disconnect(): void {
     if (this._instance) {
       this._instance.disconnect();
       this._instance = null;
     }
+
     for (const handle of this._pendingTimers) {
       clearTimeout(handle);
     }
+
     this._pendingTimers.clear();
   }
 }
@@ -328,7 +386,9 @@ function resolveNavElement(): Node | Element | null {
 
   if (hasXpath) {
     navEl = getByXPath(navXpath);
-    if (navEl) logSub('Workspace nav element found via XPath', 1);
+    if (navEl) {
+      logSub('Workspace nav element found via XPath', 1);
+    }
   }
 
   if (!navEl) {
@@ -337,6 +397,7 @@ function resolveNavElement(): Node | Element | null {
     } else {
       logSub('WorkspaceNavXPath not configured — trying auto-discovery', 1);
     }
+
     navEl = autoDiscoverWorkspaceNavElement();
   }
 
@@ -361,12 +422,16 @@ function scheduleObserverRetry(): void {
 
 /** Apply the workspace name read during observer initialization. */
 function applyInitialObserverName(name: string): void {
-  if (!name) return;
+  if (!name) {
+    return;
+  }
+
   if (name === state.workspaceName) {
     logSub('Workspace name already set: ' + name, 1);
 
     return;
   }
+
   if (!isKnownWorkspaceName(name)) {
     logSub('Observer init: "' + name + '" not a known workspace — skipping (API will detect)', 1);
   } else if (state.workspaceFromApi) {
@@ -378,6 +443,7 @@ function applyInitialObserverName(name: string): void {
     if (oldName && oldName !== name) {
       addWorkspaceChangeEntry(oldName, name);
     }
+
     mc().updateUI();
   }
 }
@@ -397,6 +463,7 @@ function handleObserverMutation(navEl: Node | Element): void {
 
       return;
     }
+
     const handle = setTimeout(function () {
       wsObserverState.untrackTimer(handle);
       startWorkspaceObserver();
@@ -412,19 +479,26 @@ function handleObserverMutation(navEl: Node | Element): void {
 
     return;
   }
+
   if (state.workspaceFromApi) {
     logSub('Observer mutation: "' + newName + LabelType.IgnoringApiSet + state.workspaceName, 1);
 
     return;
   }
+
   if (newName && newName !== state.workspaceName) {
     const oldName = state.workspaceName;
     state.workspaceName = newName;
     log('⚡ Workspace changed (observer): "' + oldName + '" → "' + newName + '"', 'success');
-    if (oldName) addWorkspaceChangeEntry(oldName, newName);
+    if (oldName) {
+      addWorkspaceChangeEntry(oldName, newName);
+    }
 
     state.workspaceJustChanged = true;
-    if (state.workspaceChangedTimer) clearTimeout(state.workspaceChangedTimer);
+    if (state.workspaceChangedTimer) {
+      clearTimeout(state.workspaceChangedTimer);
+    }
+
     state.workspaceChangedTimer = setTimeout(function () {
       state.workspaceJustChanged = false;
       mc().updateUI();
@@ -496,11 +570,16 @@ export function addWorkspaceChangeEntry(fromName: string, toName: string): void 
       projectName: projectName,
       projectId: projectId,
     });
-    if (history.length > WS_HISTORY_MAX_ENTRIES) history = history.slice(history.length - WS_HISTORY_MAX_ENTRIES);
+    if (history.length > WS_HISTORY_MAX_ENTRIES) {
+      history = history.slice(history.length - WS_HISTORY_MAX_ENTRIES);
+    }
+
     safeSetItem(key, JSON.stringify(history));
     log('Workspace changed: "' + fromName + '" → "' + toName + '" (project=' + projectName + ', key=' + key + ')', 'success');
     mc().updateUI();
-  } catch (e) { log('Failed to record workspace change: ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('Failed to record workspace change: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }
 
 export function getWorkspaceHistory(): Array<Record<string, string>> {
@@ -519,5 +598,7 @@ export function clearWorkspaceHistory(): void {
   try {
     const key = getWsHistoryKey();
     localStorage.removeItem(key);
-  } catch (e) { log('Failed to clear workspace history: ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('Failed to clear workspace history: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }

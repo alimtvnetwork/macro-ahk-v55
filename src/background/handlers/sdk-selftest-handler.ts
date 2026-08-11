@@ -56,11 +56,11 @@ export interface SdkSelfTestSnapshot {
 }
 
 const EMPTY_SNAPSHOT: SdkSelfTestSnapshot = {
-    sync: null,
-    kv: null,
-    files: null,
-    gkv: null,
-    updatedAt: null,
+  sync: null,
+  kv: null,
+  files: null,
+  gkv: null,
+  updatedAt: null,
 };
 
 /* ------------------------------------------------------------------ */
@@ -68,43 +68,44 @@ const EMPTY_SNAPSHOT: SdkSelfTestSnapshot = {
 /* ------------------------------------------------------------------ */
 
 async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
-    try {
-        const stored = await chrome.storage.local.get(STORAGE_KEY);
-        const raw = stored[STORAGE_KEY] as Partial<SdkSelfTestSnapshot> | undefined;
-        if (!raw || typeof raw !== "object") {
-            return { ...EMPTY_SNAPSHOT };
-        }
-
-        return {
-            sync: normalizeRow(raw.sync),
-            kv: normalizeRow(raw.kv),
-            files: normalizeRow(raw.files),
-            gkv: normalizeRow(raw.gkv),
-            updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
-        };
-    } catch (err) { 
-        return { ...EMPTY_SNAPSHOT };
-    }
-}
-
-function normalizeRow(value: unknown): SdkSelfTestRow | null {
-    if (!value || typeof value !== "object") {
-        return null;
-    }
-    const r = value as Partial<SdkSelfTestRow>;
-    if (typeof r.surface !== "string" || !VALID_SURFACES.includes(r.surface as Surface)) {
-        return null;
+  try {
+    const stored = await chrome.storage.local.get(STORAGE_KEY);
+    const raw = stored[STORAGE_KEY] as Partial<SdkSelfTestSnapshot> | undefined;
+    if (!raw || typeof raw !== "object") {
+      return { ...EMPTY_SNAPSHOT };
     }
 
     return {
-        surface: r.surface as Surface,
-        pass: r.pass === true,
-        failures: Array.isArray(r.failures)
-            ? r.failures.filter((f) => typeof f === "string") as string[]
-            : [],
-        at: typeof r.at === "string" ? r.at : "",
-        version: typeof r.version === "string" ? r.version : "",
+      sync: normalizeRow(raw.sync),
+      kv: normalizeRow(raw.kv),
+      files: normalizeRow(raw.files),
+      gkv: normalizeRow(raw.gkv),
+      updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
     };
+  } catch (err) { 
+    return { ...EMPTY_SNAPSHOT };
+  }
+}
+
+function normalizeRow(value: unknown): SdkSelfTestRow | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const r = value as Partial<SdkSelfTestRow>;
+  if (typeof r.surface !== "string" || !VALID_SURFACES.includes(r.surface as Surface)) {
+    return null;
+  }
+
+  return {
+    surface: r.surface as Surface,
+    pass: r.pass === true,
+    failures: Array.isArray(r.failures)
+      ? r.failures.filter((f) => typeof f === "string") as string[]
+      : [],
+    at: typeof r.at === "string" ? r.at : "",
+    version: typeof r.version === "string" ? r.version : "",
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -127,43 +128,43 @@ interface SdkSelfTestReportRequest {
  * surface can't corrupt the popup's view of the existing four.
  */
 export async function handleSdkSelfTestReport(
-    payload: MessageRequest,
+  payload: MessageRequest,
 ): Promise<OkResponse | { isOk: false; errorMessage: string }> {
-    const raw = payload as MessageRequest & SdkSelfTestReportRequest;
-    const surface = typeof raw.surface === "string" ? raw.surface : "";
-    if (!VALID_SURFACES.includes(surface as Surface)) {
-        return {
-            isOk: false,
-            errorMessage: `[sdk-selftest] unknown surface "${surface}" — expected one of ${VALID_SURFACES.join(", ")}`,
-        };
-    }
-
-    const failures = Array.isArray(raw.failures)
-        ? raw.failures.filter((f): f is string => typeof f === "string")
-        : [];
-
-    const row: SdkSelfTestRow = {
-        surface: surface as Surface,
-        pass: raw.pass === true,
-        failures,
-        at: new Date().toISOString(),
-        version: typeof raw.version === "string" ? raw.version : "",
+  const raw = payload as MessageRequest & SdkSelfTestReportRequest;
+  const surface = typeof raw.surface === "string" ? raw.surface : "";
+  if (!VALID_SURFACES.includes(surface as Surface)) {
+    return {
+      isOk: false,
+      errorMessage: `[sdk-selftest] unknown surface "${surface}" — expected one of ${VALID_SURFACES.join(", ")}`,
     };
+  }
 
-    const snapshot = await readSnapshot();
-    snapshot[surface as Surface] = row;
-    snapshot.updatedAt = row.at;
+  const failures = Array.isArray(raw.failures)
+    ? raw.failures.filter((f): f is string => typeof f === "string")
+    : [];
 
-    try {
-        await chrome.storage.local.set({ [STORAGE_KEY]: snapshot });
-    } catch (err) {
-        return {
-            isOk: false,
-            errorMessage: `[sdk-selftest] storage.set failed: ${err instanceof Error ? err.message : String(err)}`,
-        };
-    }
+  const row: SdkSelfTestRow = {
+    surface: surface as Surface,
+    pass: raw.pass === true,
+    failures,
+    at: new Date().toISOString(),
+    version: typeof raw.version === "string" ? raw.version : "",
+  };
 
-    return { isOk: true };
+  const snapshot = await readSnapshot();
+  snapshot[surface as Surface] = row;
+  snapshot.updatedAt = row.at;
+
+  try {
+    await chrome.storage.local.set({ [STORAGE_KEY]: snapshot });
+  } catch (err) {
+    return {
+      isOk: false,
+      errorMessage: `[sdk-selftest] storage.set failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+
+  return { isOk: true };
 }
 
 /**
@@ -171,9 +172,9 @@ export async function handleSdkSelfTestReport(
  * (rows may be null when no SDK page has reported yet).
  */
 export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSnapshot }> {
-    const snapshot = await readSnapshot();
+  const snapshot = await readSnapshot();
 
-    return { snapshot };
+  return { snapshot };
 }
 
 /* ------------------------------------------------------------------ */
@@ -182,9 +183,9 @@ export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSna
 
 /** Test-only — clears the persisted snapshot. Not wired to any message. */
 export async function __resetSdkSelfTestForTests(): Promise<void> {
-    try {
-        await chrome.storage.local.remove(STORAGE_KEY);
-    } catch (err) {
+  try {
+    await chrome.storage.local.remove(STORAGE_KEY);
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }

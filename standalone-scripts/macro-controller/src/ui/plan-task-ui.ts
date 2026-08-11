@@ -55,6 +55,7 @@ async function resolvePlanBody(n: number): Promise<string> {
 
       return substituteToken(result.value.Body, key, n);
     }
+
     console.warn('[PlanTask] No plan-default row; falling back to hardcoded template');
   } catch (err) {
     logError('PlanTask', 'resolvePlanBody DB read failed; falling back to hardcoded template', err);
@@ -71,7 +72,9 @@ function injectPlanPrompt(n: number): void {
     console.log('[PlanTask] Injection outcome: ' + outcome);
     // Success ('injected') and clipboard-fallback ('clipboard') already toast from prompt-utils.
     // Only show a caller-side toast on hard failure.
-    if (String(outcome) === 'failed') showPasteToast('❌ PlanTierType prompt: injection failed', true);
+    if (String(outcome) === 'failed') {
+      showPasteToast('❌ PlanTierType prompt: injection failed', true);
+    }
   })();
 }
 
@@ -114,8 +117,11 @@ function buildGearAction(text: string, onClick: () => void): HTMLElement {
   el.style.cssText = 'cursor:pointer;color:' + cPrimary + ';text-decoration:underline;';
   el.onclick = function (e: Event) {
     e.stopPropagation();
-    try { onClick(); }
-    catch (err) { logError('PlanTask', 'gear action "' + text + '" failed', err); }
+    try {
+      onClick(); 
+    } catch (err) {
+      logError('PlanTask', 'gear action "' + text + '" failed', err); 
+    }
   };
 
   return el;
@@ -161,14 +167,20 @@ function wireShellToggle(row: HTMLElement, arrow: HTMLElement, sub: HTMLElement,
     sub.style.display = 'block';
     keepInView(dropdown, sub);
   };
+
   const hide = function(): void {
     row.style.background = 'transparent';
     arrow.textContent = '▸';
     sub.style.display = 'none';
   };
+
   row.onclick = function(e: Event) {
     e.stopPropagation();
-    if (sub.style.display === 'none') show(); else hide();
+    if (sub.style.display === 'none') {
+      show();
+    } else {
+      hide();
+    }
   };
   // RC-3 fix: do NOT auto-collapse on mouseleave. Outside-click handler in prompts-dropdown.ts
   // already closes the parent dropdown (and therefore this sub) when the user clicks away.
@@ -179,7 +191,9 @@ function keepInView(dropdown: HTMLElement, sub: HTMLElement): void {
   window.requestAnimationFrame(function() {
     const dr = dropdown.getBoundingClientRect();
     const sr = sub.getBoundingClientRect();
-    if (sr.bottom > dr.bottom) dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
+    if (sr.bottom > dr.bottom) {
+      dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
+    }
   });
 }
 
@@ -189,13 +203,20 @@ function renderPresetStepsInto(sub: HTMLElement, dropdown: HTMLElement, values: 
     it.setAttribute('data-plan-preset', '1');
     it.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:' + cPanelFg + ';';
     it.textContent = 'PlanTierType ' + n;
-    it.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-    it.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+    it.onmouseover = function() {
+      (this as HTMLElement).style.background = cBtnMenuHover; 
+    };
+
+    it.onmouseout = function() {
+      (this as HTMLElement).style.background = 'transparent'; 
+    };
+
     it.onclick = function(e: Event) {
       e.stopPropagation();
       injectPlanPrompt(n);
       dropdown.style.display = 'none';
     };
+
     sub.appendChild(it);
   }
 }
@@ -212,9 +233,15 @@ function appendPresetSteps(sub: HTMLElement, dropdown: HTMLElement): void {
       const values = await resolveConfiguredChipValues('plan', PLAN_TASK_STEP_COUNTS);
       const isSame = values.length === PLAN_TASK_STEP_COUNTS.length
         && values.every((v, i) => v === PLAN_TASK_STEP_COUNTS[i]);
-      if (isSame) return;
+      if (isSame) {
+        return;
+      }
+
       // Remove existing preset rows we appended (all direct children so far).
-      while (sub.firstChild) sub.removeChild(sub.firstChild);
+      while (sub.firstChild) {
+        sub.removeChild(sub.firstChild);
+      }
+
       renderPresetStepsInto(sub, dropdown, values);
       // Re-append the custom-step row after refresh.
       appendCustomStepRow(sub, dropdown);
@@ -235,7 +262,10 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   const inp = document.createElement('input');
   inp.type = 'number'; inp.min = '1'; inp.max = '999'; inp.placeholder = '#';
   inp.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
-  inp.onclick = function(e: Event) { e.stopPropagation(); };
+  inp.onclick = function(e: Event) {
+    e.stopPropagation(); 
+  };
+
   row.appendChild(inp);
   const go = document.createElement('span');
   go.textContent = '▶'; go.title = 'PlanTierType';
@@ -243,13 +273,22 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   go.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(inp.value, 10);
-    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true);
+    if (!n || n < 1 || n > 999) {
+      showPasteToast('⚠️ Enter 1–999', true);
 
- return; }
+      return; 
+    }
+
     injectPlanPrompt(n);
     dropdown.style.display = 'none';
   };
-  inp.onkeydown = function(e: KeyboardEvent) { if (e.key === 'Enter') { e.stopPropagation(); go.click(); } };
+
+  inp.onkeydown = function(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.stopPropagation(); go.click(); 
+    } 
+  };
+
   row.appendChild(go);
   sub.appendChild(row);
 }

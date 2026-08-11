@@ -205,8 +205,8 @@ export function DataTable({
             <TableBody>
               {hasRows
                 ? rows.map((row) => (
-                    <DataRow key={row.id} row={row} activeDb={activeDb} />
-                  ))
+                  <DataRow key={row.id} row={row} activeDb={activeDb} />
+                ))
                 : <EmptyDataRow isLoading={isLoading} />}
             </TableBody>
           </Table>

@@ -27,7 +27,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SRC = join(HERE, '..', 'ws-list-renderer.ts');
 
 let source = '';
-beforeAll(() => { source = readFileSync(SRC, 'utf-8'); });
+beforeAll(() => {
+  source = readFileSync(SRC, 'utf-8'); 
+});
 
 describe('Refill-soon filter — invariants', () => {
   it('filterAndSortWorkspaces applies refill-priority sort when refillSoon filter is on', () => {

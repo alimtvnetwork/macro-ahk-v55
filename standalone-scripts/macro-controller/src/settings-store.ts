@@ -32,6 +32,7 @@ function logSettings(message: string, type: string): void {
 
     return;
   }
+
   logError('SettingsStore', 'logging unavailable: ' + message);
 }
 
@@ -109,22 +110,34 @@ function isFiniteNonNegative(n: unknown): n is number {
 function sanitizePerWorkspace(
   raw: unknown,
 ): Record<string, PerWorkspaceLifecycleOverride> | undefined {
-  if (!raw || typeof raw !== 'object') return undefined;
+  if (!raw || typeof raw !== 'object') {
+    return undefined;
+  }
+
   const out: Record<string, PerWorkspaceLifecycleOverride> = {};
   for (const [wsId, overrideValue] of Object.entries(raw as Record<string, unknown>)) {
-    if (!wsId || typeof wsId !== 'string') continue;
-    if (!overrideValue || typeof overrideValue !== 'object') continue;
+    if (!wsId || typeof wsId !== 'string') {
+      continue;
+    }
+
+    if (!overrideValue || typeof overrideValue !== 'object') {
+      continue;
+    }
+
     const overrideRecord = overrideValue as Record<string, unknown>;
     const entry: PerWorkspaceLifecycleOverride = {};
     if (isFiniteNonNegative(overrideRecord.expiryGracePeriodDays)) {
       entry.expiryGracePeriodDays = Math.floor(overrideRecord.expiryGracePeriodDays);
     }
+
     if (isFiniteNonNegative(overrideRecord.refillWarningThresholdDays)) {
       entry.refillWarningThresholdDays = Math.floor(overrideRecord.refillWarningThresholdDays);
     }
+
     if (isFiniteNonNegative(overrideRecord.hoverCardHideGracePeriodMs)) {
       entry.hoverCardHideGracePeriodMs = Math.floor(overrideRecord.hoverCardHideGracePeriodMs);
     }
+
     if (entry.expiryGracePeriodDays !== undefined || entry.refillWarningThresholdDays !== undefined || entry.hoverCardHideGracePeriodMs !== undefined) {
       out[wsId] = entry;
     }
@@ -134,7 +147,10 @@ function sanitizePerWorkspace(
 }
 
 function sanitize(raw: unknown): SettingsOverrides {
-  if (!raw || typeof raw !== 'object') return {};
+  if (!raw || typeof raw !== 'object') {
+    return {};
+  }
+
   const r = raw as Record<string, unknown>;
   const out: SettingsOverrides = {};
 
@@ -209,20 +225,30 @@ const LS_KEY = '__marco__:' + STORAGE_KEY;
 function hasLocalStorage(): boolean {
   try {
     return typeof window !== 'undefined' && !!window.localStorage;
-  } catch (_e: unknown) { return false; } // allow-swallow: SecurityError in sandboxed iframe.
+  } catch (_e: unknown) {
+    return false; 
+  } // allow-swallow: SecurityError in sandboxed iframe.
 }
 
 function readFromLocalStorage(): unknown {
-  if (!hasLocalStorage()) return undefined;
+  if (!hasLocalStorage()) {
+    return undefined;
+  }
+
   try {
     const raw = window.localStorage.getItem(LS_KEY);
 
     return raw ? JSON.parse(raw) : undefined;
-  } catch (_e: unknown) { return undefined; } // allow-swallow: corrupt JSON falls back to defaults.
+  } catch (_e: unknown) {
+    return undefined; 
+  } // allow-swallow: corrupt JSON falls back to defaults.
 }
 
 function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: false; reason: string } {
-  if (!hasLocalStorage()) return { ok: false, reason: 'localStorage unavailable' };
+  if (!hasLocalStorage()) {
+    return { ok: false, reason: 'localStorage unavailable' };
+  }
+
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(value));
 
@@ -241,6 +267,7 @@ export async function loadSettingsOverrides(): Promise<SettingsOverrides> {
 
     return cache.overrides;
   }
+
   try {
     const result = await chrome.storage.local.get(STORAGE_KEY);
     cache.overrides = sanitize(result[STORAGE_KEY]);
@@ -277,13 +304,17 @@ export async function saveSettingsOverrides(next: SettingsOverrides): Promise<vo
         fallbackStage: 'localStorage',
       });
     }
+
     logSettings('[Settings] saved overrides via localStorage fallback', 'info');
   }
+
   cache.overrides = sanitized;
   cache.loaded = true;
   logSettings('[Settings] saved overrides: ' + JSON.stringify(sanitized), 'success');
   listeners.forEach(function (fn) {
-    try { fn(sanitized); } catch (e: unknown) {
+    try {
+      fn(sanitized); 
+    } catch (e: unknown) {
       logError('SettingsStore', 'listener threw: ' + (e instanceof Error ? e.message : String(e)));
     }
   });
@@ -298,5 +329,7 @@ export function clearSettingsOverrides(): Promise<void> {
 export function onSettingsChange(fn: SettingsListener): () => void {
   listeners.add(fn);
 
-  return function () { listeners.delete(fn); };
+  return function () {
+    listeners.delete(fn); 
+  };
 }

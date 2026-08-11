@@ -46,17 +46,25 @@ export function resolveAutoAttachConfig(autoAttachCfg?: Record<string, unknown>)
 }
 
 function autoAttachDelay(ms: number) {
-  return new Promise(function(resolve) { setTimeout(resolve, ms); });
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms); 
+  });
 }
 
 export function clickByXPath(xpath: string, label: string): boolean {
-  if (!xpath) { log('Auto-Attach: No XPath for ' + label, 'warn');
+  if (!xpath) {
+    log('Auto-Attach: No XPath for ' + label, 'warn');
 
- return false; }
+    return false; 
+  }
+
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+  if (!el) {
+    log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
 
- return false; }
+    return false; 
+  }
+
   (el as HTMLElement).click();
   log('Auto-Attach: Clicked ' + label, 'info');
 
@@ -64,11 +72,17 @@ export function clickByXPath(xpath: string, label: string): boolean {
 }
 
 export function insertTextIntoElement(xpath: string, text: string, label: string): boolean {
-  if (!xpath || !text) return false;
-  const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
-  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+  if (!xpath || !text) {
+    return false;
+  }
 
- return false; }
+  const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
+  if (!el) {
+    log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+
+    return false; 
+  }
+
   el.focus();
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value') ||
                                 Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
@@ -81,6 +95,7 @@ export function insertTextIntoElement(xpath: string, text: string, label: string
   } else {
     el.textContent = text;
   }
+
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
   log('Auto-Attach: Inserted text into ' + label + ' (' + text.length + ' chars)', 'success');
@@ -121,12 +136,14 @@ export async function runAutoAttachGroup(
       logError('Auto-Attach', 'Failed to click Plus button — aborting');
       break;
     }
+
     await autoAttachDelay(preDialogDelay);
 
     if (!clickByXPath(aaCfg.attachXPath, 'Attach button')) {
       logError('Auto-Attach', 'Failed to click Attach button — aborting');
       break;
     }
+
     await autoAttachDelay(preFileDialogDelay);
 
     try {

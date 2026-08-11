@@ -27,14 +27,19 @@ export function ReproBuildErrorPanel() {
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => () => {
-    if (timerRef.current !== null) clearTimeout(timerRef.current);
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+    }
   }, []);
 
   const handleClick = async () => {
     try {
       await navigator.clipboard.writeText(REPRO_COMMAND);
       setCopied(true);
-      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+      }
+
       timerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch (err) { /* swallowed */
       setCopied(false);

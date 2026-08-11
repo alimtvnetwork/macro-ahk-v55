@@ -62,7 +62,9 @@ function computeMaxTotalCredits(workspaces: WorkspaceCredit[]): number {
   let maxTotalCredits = 1;
   for (const ws of workspaces) {
     const mtc = Math.round(resolveCreditSummary(ws).total);
-    if (mtc > maxTotalCredits) maxTotalCredits = mtc;
+    if (mtc > maxTotalCredits) {
+      maxTotalCredits = mtc;
+    }
   }
 
   return maxTotalCredits;
@@ -76,7 +78,10 @@ export function filterAndSortWorkspaces(
   const survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }> = [];
   for (const [wsIndex, ws] of workspaces.entries()) {
     const isFilteredOut = !passesFilters(ws, fs);
-    if (isFilteredOut) continue;
+    if (isFilteredOut) {
+      continue;
+    }
+
     survivors.push({ ws, wsIndex });
   }
 
@@ -91,14 +96,18 @@ export function filterAndSortWorkspaces(
       const statusB = getEffectiveStatus(b.ws, config);
       const daysA = statusA.daysSince || 0;
       const daysB = statusB.daysSince || 0;
-      if (daysB !== daysA) return daysB - daysA;
+      if (daysB !== daysA) {
+        return daysB - daysA;
+      }
 
       return resolveCreditSummary(b.ws).available - resolveCreditSummary(a.ws).available;
     });
   } else if (viewState().getRefillPriority() || fs.refillSoon) {
     const sorted = sortByRefillPriority(survivors, REFILL_PRIORITY_WINDOW_DAYS);
     survivors.length = 0;
-    for (const r of sorted) survivors.push(r);
+    for (const r of sorted) {
+      survivors.push(r);
+    }
   }
 
   if (fs.creditSortMode !== 'none') {
@@ -116,7 +125,10 @@ export function filterAndSortWorkspaces(
 
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
-  if (!countLabel) return;
+  if (!countLabel) {
+    return;
+  }
+
   const anyFilterActive = filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits()
     || getLoopWsExpiring() || getLoopWsRefillSoon()
     || viewState().getCreditSortMode() !== 'none' || count !== total;
@@ -131,7 +143,9 @@ export function renderLoopWorkspaceList(
   filter: string,
 ): void {
   const listEl = document.getElementById('loop-ws-list');
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
 
   const maxTotalCredits = computeMaxTotalCredits(workspaces);
   const survivors = filterAndSortWorkspaces(workspaces, filter);
@@ -162,7 +176,10 @@ function buildWorkspaceNodes(
 
   for (const { ws, wsIndex } of survivors) {
     const isCurrent = isCurrentWorkspace(ws, currentName);
-    if (isCurrent) currentIdx = count;
+    if (isCurrent) {
+      currentIdx = count;
+    }
+
     frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits, selIdValue, DataAttrType.WsId, DataAttrType.WsName, DataAttrType.WsCurrent));
     count++;
   }
@@ -183,7 +200,9 @@ function attachHoverCardForList(listEl: HTMLElement): void {
     const list = loopCreditState.perWorkspace || [];
     for (const w of list) {
       const wid = String(w.id || (w.raw && w.raw.id) || '');
-      if (wid === id) return w;
+      if (wid === id) {
+        return w;
+      }
     }
 
     return null;
@@ -244,7 +263,10 @@ function scrollToCurrentIfNeeded(listEl: HTMLElement, currentIdx: number, filter
 function _createClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     if ((e.target as HTMLElement).classList && (e.target as HTMLElement).classList.contains('loop-ws-checkbox')) {
       e.preventDefault();
       e.stopPropagation();
@@ -256,6 +278,7 @@ function _createClickHandler(): (e: MouseEvent) => void {
 
       return;
     }
+
     setLoopWsNavIndex(parseInt(item.getAttribute('data-ws-idx') || '0', 10));
     log('Selected workspace: ' + item.getAttribute(DataAttrType.WsName), 'success');
   };
@@ -264,7 +287,10 @@ function _createClickHandler(): (e: MouseEvent) => void {
 function _createDblClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     if (item.getAttribute(DataAttrType.WsCurrent) === 'true') {
@@ -272,6 +298,7 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
 
       return;
     }
+
     log('Double-click move -> ' + item.getAttribute(DataAttrType.WsName) + ' (id=' + item.getAttribute(DataAttrType.WsId) + ')', 'delegate');
     moveToWorkspace(item.getAttribute(DataAttrType.WsId) || '', item.getAttribute(DataAttrType.WsName) || '');
   };
@@ -280,7 +307,10 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
 function _createCtxHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     showWsContextMenu(
@@ -294,13 +324,22 @@ function _createCtxHandler(): (e: MouseEvent) => void {
 function _createHoverHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
-    if (isCurrent) return;
+    if (isCurrent) {
+      return;
+    }
+
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
     const itemId = item.getAttribute(DataAttrType.WsId);
-    if (selId && selId === itemId) return;
+    if (selId && selId === itemId) {
+      return;
+    }
+
     item.style.background = 'rgba(59,130,246,0.15)';
   };
 }
@@ -308,13 +347,22 @@ function _createHoverHandler(): (e: MouseEvent) => void {
 function _createOutHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
-    if (isCurrent) return;
+    if (isCurrent) {
+      return;
+    }
+
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
     const itemId = item.getAttribute(DataAttrType.WsId);
-    if (selId && selId === itemId) return;
+    if (selId && selId === itemId) {
+      return;
+    }
+
     item.style.background = 'transparent';
   };
 }
@@ -332,11 +380,21 @@ class WsDropdownState {
     return WsDropdownState.instance;
   }
 
-  getHash(): string { return this.hash; }
-  setHash(nextHash: string): void { this.hash = nextHash; }
-  invalidate(): void { this.hash = ''; }
-  recordSkip(): void { wsRenderStats.skipped++; }
-  recordExecution(): void { wsRenderStats.executed++; }
+  getHash(): string {
+    return this.hash; 
+  }
+  setHash(nextHash: string): void {
+    this.hash = nextHash; 
+  }
+  invalidate(): void {
+    this.hash = ''; 
+  }
+  recordSkip(): void {
+    wsRenderStats.skipped++; 
+  }
+  recordExecution(): void {
+    wsRenderStats.executed++; 
+  }
 }
 
 function dropdownState(): WsDropdownState {
@@ -345,18 +403,25 @@ function dropdownState(): WsDropdownState {
 
 export function populateLoopWorkspaceDropdown(): void {
   const listEl = document.getElementById('loop-ws-list');
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
+
   const workspaces = loopCreditState.perWorkspace || [];
   if (workspaces.length === 0) {
-    if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip();
+    if (dropdownState().getHash() === '_empty') {
+      dropdownState().recordSkip();
 
- return; }
+      return; 
+    }
+
     dropdownState().setHash('_empty');
     dropdownState().recordExecution();
     listEl.innerHTML = '<div style="padding:6px;color:' + cPrimaryLight + ';font-size:10px;">📭 No workspaces loaded — click 💰 Credits to retry</div>';
 
     return;
   }
+
   const currentName = state.workspaceName || '';
   const searchEl = document.getElementById('loop-ws-search');
   const filter = searchEl ? (searchEl as HTMLInputElement).value.trim() : '';
@@ -384,9 +449,12 @@ export function populateLoopWorkspaceDropdown(): void {
     checkedCount,
   ].join('|');
 
-  if (hash === dropdownState().getHash()) { dropdownState().recordSkip();
+  if (hash === dropdownState().getHash()) {
+    dropdownState().recordSkip();
 
- return; }
+    return; 
+  }
+
   dropdownState().setHash(hash);
   dropdownState().recordExecution();
   renderLoopWorkspaceList(workspaces, currentName, filter);
@@ -420,6 +488,7 @@ class CreditResolvedRepaintScheduler {
     if (this.timer !== null) {
       return;
     }
+
     this.timer = setTimeout(() => {
       this.timer = null;
       try {

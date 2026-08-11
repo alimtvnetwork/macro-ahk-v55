@@ -11,8 +11,8 @@ export { validateRow } from "./csv-validator";
 export { isValidEmail } from "./email-validator";
 export { OwnerSwitchCsvColumnType, ALL_COLUMNS, REQUIRED_COLUMNS } from "./csv-column";
 export type {
-    OwnerSwitchCsvRow,
-    OwnerSwitchCsvParseResult,
-    CsvParseError,
-    CsvParseWarning,
+  OwnerSwitchCsvRow,
+  OwnerSwitchCsvParseResult,
+  CsvParseError,
+  CsvParseWarning,
 } from "./csv-types";

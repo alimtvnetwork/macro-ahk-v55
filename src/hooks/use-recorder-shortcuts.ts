@@ -29,64 +29,77 @@ export interface UseRecorderShortcutsArgs {
 }
 
 export const RECORDER_SHORTCUT_LABELS = {
-    Play: "Ctrl+Alt+P",
-    Pause: "Ctrl+Alt+;",
-    Stop: "Ctrl+Alt+.",
+  Play: "Ctrl+Alt+P",
+  Pause: "Ctrl+Alt+;",
+  Stop: "Ctrl+Alt+.",
 } as const;
 
 function isEditableTarget(t: EventTarget | null): boolean {
-    if (!(t instanceof HTMLElement)) { return false; }
-    if (t.isContentEditable) { return true; }
-    const tag = t.tagName;
+  if (!(t instanceof HTMLElement)) {
+    return false; 
+  }
 
-    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+  if (t.isContentEditable) {
+    return true; 
+  }
+
+  const tag = t.tagName;
+
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
 }
 
 /** Returns true if the event matches a Ctrl+Alt+<key> chord (no Shift/Meta). */
 function matchesChord(e: KeyboardEvent, key: string): boolean {
-    return e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey && e.key === key;
+  return e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey && e.key === key;
 }
 
 export function useRecorderShortcuts(args: UseRecorderShortcutsArgs): void {
-    const { session, onResume, onPause, onStop } = args;
-    const phase = session?.Phase ?? null;
+  const { session, onResume, onPause, onStop } = args;
+  const phase = session?.Phase ?? null;
 
-    useEffect(() => {
-        if (phase === null || phase === "Idle") { return; }
-        if (typeof window === "undefined") { return; }
+  useEffect(() => {
+    if (phase === null || phase === "Idle") {
+      return; 
+    }
 
-        const onKey = (e: KeyboardEvent) => {
-            if (isEditableTarget(e.target)) { return; }
+    if (typeof window === "undefined") {
+      return; 
+    }
 
-            // Ctrl+Alt+P — Play/Resume (only meaningful when Paused).
-            if (matchesChord(e, "p") || matchesChord(e, "P")) {
-                if (phase === "Paused") {
-                    e.preventDefault();
-                    void onResume();
-                }
+    const onKey = (e: KeyboardEvent) => {
+      if (isEditableTarget(e.target)) {
+        return; 
+      }
 
-                return;
-            }
+      // Ctrl+Alt+P — Play/Resume (only meaningful when Paused).
+      if (matchesChord(e, "p") || matchesChord(e, "P")) {
+        if (phase === "Paused") {
+          e.preventDefault();
+          void onResume();
+        }
 
-            // Ctrl+Alt+; — Pause (only meaningful when Recording).
-            if (matchesChord(e, ";")) {
-                if (phase === "Recording") {
-                    e.preventDefault();
-                    void onPause();
-                }
+        return;
+      }
 
-                return;
-            }
+      // Ctrl+Alt+; — Pause (only meaningful when Recording).
+      if (matchesChord(e, ";")) {
+        if (phase === "Recording") {
+          e.preventDefault();
+          void onPause();
+        }
 
-            // Ctrl+Alt+. — Stop (always allowed when a session exists).
-            if (matchesChord(e, ".")) {
-                e.preventDefault();
-                void onStop();
-            }
-        };
+        return;
+      }
 
-        window.addEventListener(Events.KEYDOWN, onKey);
+      // Ctrl+Alt+. — Stop (always allowed when a session exists).
+      if (matchesChord(e, ".")) {
+        e.preventDefault();
+        void onStop();
+      }
+    };
 
-        return () => window.removeEventListener(Events.KEYDOWN, onKey);
-    }, [phase, onResume, onPause, onStop]);
+    window.addEventListener(Events.KEYDOWN, onKey);
+
+    return () => window.removeEventListener(Events.KEYDOWN, onKey);
+  }, [phase, onResume, onPause, onStop]);
 }

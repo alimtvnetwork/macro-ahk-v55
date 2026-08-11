@@ -42,25 +42,25 @@ export interface BuildSelectorBundleOpts {
 
 /** Build the JSON-serialisable bundle (deterministic when `Now` is injected). */
 export function buildSelectorComparisonBundle(
-    comparison: SelectorComparison,
-    opts: BuildSelectorBundleOpts = {},
+  comparison: SelectorComparison,
+  opts: BuildSelectorBundleOpts = {},
 ): SelectorComparisonBundle {
-    const now = opts.Now ?? ((): Date => new Date());
+  const now = opts.Now ?? ((): Date => new Date());
 
-    return {
-        Generator: "marco-extension",
-        Kind: "SelectorComparison",
-        Version: 1,
-        ExportedAt: now().toISOString(),
-        StepId: opts.StepId ?? null,
-        Url: opts.Url ?? null,
-        Comparison: comparison,
-    };
+  return {
+    Generator: "marco-extension",
+    Kind: "SelectorComparison",
+    Version: 1,
+    ExportedAt: now().toISOString(),
+    StepId: opts.StepId ?? null,
+    Url: opts.Url ?? null,
+    Comparison: comparison,
+  };
 }
 
 /** Pretty-printed JSON ready to drop into a Blob. */
 export function serializeSelectorComparisonBundle(bundle: SelectorComparisonBundle): string {
-    return JSON.stringify(bundle, null, 2);
+  return JSON.stringify(bundle, null, 2);
 }
 
 /**
@@ -69,13 +69,13 @@ export function serializeSelectorComparisonBundle(bundle: SelectorComparisonBund
  * Falls back to `step-na` when no StepId is provided.
  */
 export function buildSelectorComparisonFilename(
-    stepId: number | null,
-    now: Date = new Date(),
+  stepId: number | null,
+  now: Date = new Date(),
 ): string {
-    const iso = now.toISOString();
-    const date = iso.slice(0, 10);
-    const time = iso.slice(11, 16).replace(":", "");
-    const stepFragment = stepId !== null ? `step${stepId}` : "step-na";
+  const iso = now.toISOString();
+  const date = iso.slice(0, 10);
+  const time = iso.slice(11, 16).replace(":", "");
+  const stepFragment = stepId !== null ? `step${stepId}` : "step-na";
 
-    return `marco-selector-comparison-${stepFragment}-${date}-${time}.json`;
+  return `marco-selector-comparison-${stepFragment}-${date}-${time}.json`;
 }

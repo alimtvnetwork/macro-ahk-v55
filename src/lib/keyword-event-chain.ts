@@ -44,9 +44,9 @@ export interface KeywordEventChainSettings {
 }
 
 export const DEFAULT_CHAIN_SETTINGS: KeywordEventChainSettings = {
-    Enabled: false,
-    PauseMs: 250,
-    RunAfterRecording: false,
+  Enabled: false,
+  PauseMs: 250,
+  RunAfterRecording: false,
 };
 
 const STORAGE_KEY = "marco-keyword-event-chain-v1";
@@ -54,59 +54,91 @@ const PAUSE_MIN = 0;
 const PAUSE_MAX = 60_000;
 
 function clampPause(n: unknown): number {
-    if (typeof n !== "number" || !Number.isFinite(n)) { return DEFAULT_CHAIN_SETTINGS.PauseMs; }
-    if (n < PAUSE_MIN) { return PAUSE_MIN; }
-    if (n > PAUSE_MAX) { return PAUSE_MAX; }
+  if (typeof n !== "number" || !Number.isFinite(n)) {
+    return DEFAULT_CHAIN_SETTINGS.PauseMs; 
+  }
 
-    return Math.round(n);
+  if (n < PAUSE_MIN) {
+    return PAUSE_MIN; 
+  }
+
+  if (n > PAUSE_MAX) {
+    return PAUSE_MAX; 
+  }
+
+  return Math.round(n);
 }
 
 function isSettings(v: unknown): v is { Enabled: unknown; PauseMs: unknown; RunAfterRecording: unknown } {
-    return v !== null && typeof v === "object";
+  return v !== null && typeof v === "object";
 }
 
 export function loadChainSettings(): KeywordEventChainSettings {
-    if (typeof window === "undefined") { return DEFAULT_CHAIN_SETTINGS; }
-    let raw: string | null = null;
-    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (err) { void 0;
+  if (typeof window === "undefined") {
+    return DEFAULT_CHAIN_SETTINGS; 
+  }
 
- return DEFAULT_CHAIN_SETTINGS; }
-    if (raw === null) { return DEFAULT_CHAIN_SETTINGS; }
-    try {
-        const parsed: unknown = JSON.parse(raw);
-        if (!isSettings(parsed)) { return DEFAULT_CHAIN_SETTINGS; }
+  let raw: string | null = null;
+  try {
+    raw = window.localStorage.getItem(STORAGE_KEY); 
+  } catch (err) {
+    void 0;
 
-        return {
-            Enabled: typeof parsed.Enabled === "boolean" ? parsed.Enabled : DEFAULT_CHAIN_SETTINGS.Enabled,
-            PauseMs: clampPause(parsed.PauseMs),
-            RunAfterRecording: typeof parsed.RunAfterRecording === "boolean"
-                ? parsed.RunAfterRecording
-                : DEFAULT_CHAIN_SETTINGS.RunAfterRecording,
-        };
-    } catch (err) { void 0;
+    return DEFAULT_CHAIN_SETTINGS; 
+  }
 
-        return DEFAULT_CHAIN_SETTINGS;
+  if (raw === null) {
+    return DEFAULT_CHAIN_SETTINGS; 
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isSettings(parsed)) {
+      return DEFAULT_CHAIN_SETTINGS; 
     }
+
+    return {
+      Enabled: typeof parsed.Enabled === "boolean" ? parsed.Enabled : DEFAULT_CHAIN_SETTINGS.Enabled,
+      PauseMs: clampPause(parsed.PauseMs),
+      RunAfterRecording: typeof parsed.RunAfterRecording === "boolean"
+        ? parsed.RunAfterRecording
+        : DEFAULT_CHAIN_SETTINGS.RunAfterRecording,
+    };
+  } catch (err) {
+    void 0;
+
+    return DEFAULT_CHAIN_SETTINGS;
+  }
 }
 
 export function saveChainSettings(next: KeywordEventChainSettings): void {
-    if (typeof window === "undefined") { return; }
-    const safe: KeywordEventChainSettings = {
-        Enabled: Boolean(next.Enabled),
-        PauseMs: clampPause(next.PauseMs),
-        RunAfterRecording: Boolean(next.RunAfterRecording),
-    };
-    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); } catch (err) {
-        console.warn("[keyword-event-chain] localStorage.setItem failed", err);
-    }
+  if (typeof window === "undefined") {
+    return; 
+  }
+
+  const safe: KeywordEventChainSettings = {
+    Enabled: Boolean(next.Enabled),
+    PauseMs: clampPause(next.PauseMs),
+    RunAfterRecording: Boolean(next.RunAfterRecording),
+  };
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(safe)); 
+  } catch (err) {
+    console.warn("[keyword-event-chain] localStorage.setItem failed", err);
+  }
 }
 
 /** Test-only helper. Safe in production. */
 export function __resetChainSettingsForTests(): void {
-    if (typeof window === "undefined") { return; }
-    try { window.localStorage.removeItem(STORAGE_KEY); } catch (err) {
-        console.warn("[keyword-event-chain] localStorage.removeItem failed in test reset", err);
-    }
+  if (typeof window === "undefined") {
+    return; 
+  }
+
+  try {
+    window.localStorage.removeItem(STORAGE_KEY); 
+  } catch (err) {
+    console.warn("[keyword-event-chain] localStorage.removeItem failed in test reset", err);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,23 +177,30 @@ export interface ChainRunResult {
 }
 
 function pause(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (ms <= 0) { resolve();
+  return new Promise((resolve, reject) => {
+    if (ms <= 0) {
+      resolve();
 
- return; }
-        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError"));
+      return; 
+    }
 
- return; }
-        const t = setTimeout(() => {
-            signal?.removeEventListener("abort", onAbort);
-            resolve();
-        }, ms);
-        const onAbort = (): void => {
-            clearTimeout(t);
-            reject(new DOMException("Aborted", "AbortError"));
-        };
-        signal?.addEventListener("abort", onAbort, { once: true });
-    });
+    if (signal?.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
+
+      return; 
+    }
+
+    const t = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    const onAbort = (): void => {
+      clearTimeout(t);
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
 /**
@@ -171,52 +210,63 @@ function pause(ms: number, signal?: AbortSignal): Promise<void> {
  */
 /* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */
 export async function runKeywordEventChain(
-    events: ReadonlyArray<KeywordEvent>,
-    options: ChainRunOptions = {},
+  events: ReadonlyArray<KeywordEvent>,
+  options: ChainRunOptions = {},
 ): Promise<ChainRunResult> {
-    const pauseMs = clampPause(options.pauseMs ?? DEFAULT_CHAIN_SETTINGS.PauseMs);
-    const runner = options.runner ?? runKeywordEvent;
-    const results: { EventId: string; Result: PlaybackResult }[] = [];
-    let attempted = 0;
-    let completed = 0;
-    let aborted = false;
+  const pauseMs = clampPause(options.pauseMs ?? DEFAULT_CHAIN_SETTINGS.PauseMs);
+  const runner = options.runner ?? runKeywordEvent;
+  const results: { EventId: string; Result: PlaybackResult }[] = [];
+  let attempted = 0;
+  let completed = 0;
+  let aborted = false;
 
-    const enabled = events.filter((e) => e.Enabled);
+  const enabled = events.filter((e) => e.Enabled);
 
-    for (let i = 0; i < enabled.length; i += 1) {
-        if (options.signal?.aborted) { aborted = true; break; }
-        const ev = enabled[i];
-        options.onEventStart?.(ev, i);
-        attempted += 1;
-        const result = await runner(ev, {
-            target: options.target ?? undefined,
-            signal: options.signal,
-            onStep: options.onStep === undefined
-                ? undefined
-                : (step, stepIndex) => { options.onStep?.(step, stepIndex, ev); },
-        });
-        results.push({ EventId: ev.Id, Result: result });
-        options.onEventEnd?.(ev, i, result);
-        if (result.Completed) { completed += 1; }
-        if (result.Aborted) { aborted = true; break; }
-
-        const isLast = i === enabled.length - 1;
-        if (!isLast) {
-            // Per-event override wins over the global pause when set to a
-            // finite, non-negative number. Clamped to the same range as the
-            // global setting so a corrupt value can't hang playback.
-            const override = ev.PauseAfterMs;
-            const effective = (typeof override === "number" && Number.isFinite(override) && override >= 0)
-                ? clampPause(override)
-                : pauseMs;
-            if (effective > 0) {
-                try { await pause(effective, options.signal); }
-                catch (err) {
-                    aborted = true;break;
-                }
-            }
-        }
+  for (let i = 0; i < enabled.length; i += 1) {
+    if (options.signal?.aborted) {
+      aborted = true; break; 
     }
 
-    return { EventsAttempted: attempted, EventsCompleted: completed, Aborted: aborted, Results: results };
+    const ev = enabled[i];
+    options.onEventStart?.(ev, i);
+    attempted += 1;
+    const result = await runner(ev, {
+      target: options.target ?? undefined,
+      signal: options.signal,
+      onStep: options.onStep === undefined
+        ? undefined
+        : (step, stepIndex) => {
+          options.onStep?.(step, stepIndex, ev); 
+        },
+    });
+    results.push({ EventId: ev.Id, Result: result });
+    options.onEventEnd?.(ev, i, result);
+    if (result.Completed) {
+      completed += 1; 
+    }
+
+    if (result.Aborted) {
+      aborted = true; break; 
+    }
+
+    const isLast = i === enabled.length - 1;
+    if (!isLast) {
+      // Per-event override wins over the global pause when set to a
+      // finite, non-negative number. Clamped to the same range as the
+      // global setting so a corrupt value can't hang playback.
+      const override = ev.PauseAfterMs;
+      const effective = (typeof override === "number" && Number.isFinite(override) && override >= 0)
+        ? clampPause(override)
+        : pauseMs;
+      if (effective > 0) {
+        try {
+          await pause(effective, options.signal); 
+        } catch (err) {
+          aborted = true;break;
+        }
+      }
+    }
+  }
+
+  return { EventsAttempted: attempted, EventsCompleted: completed, Aborted: aborted, Results: results };
 }

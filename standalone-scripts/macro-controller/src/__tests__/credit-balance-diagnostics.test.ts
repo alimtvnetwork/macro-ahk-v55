@@ -115,7 +115,9 @@ describe('credit-balance diagnostic toasts', () => {
   it('CREDIT_BALANCE_E003 fires when workspace resolve throws', async () => {
     testWin.marco = {
       api: {
-        workspace: { resolveByProject: vi.fn(async () => { throw new Error('boom'); }) },
+        workspace: { resolveByProject: vi.fn(async () => {
+          throw new Error('boom'); 
+        }) },
         credits: { fetchBalance: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} })) },
       },
     };
@@ -163,7 +165,9 @@ describe('credit-balance diagnostic toasts', () => {
     testWin.marco = {
       api: {
         workspace: { resolveByProject: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1' } } })) },
-        credits: { fetchBalance: vi.fn(async () => { throw new Error('offline'); }) },
+        credits: { fetchBalance: vi.fn(async () => {
+          throw new Error('offline'); 
+        }) },
       },
     };
     const mod = await loadModule();

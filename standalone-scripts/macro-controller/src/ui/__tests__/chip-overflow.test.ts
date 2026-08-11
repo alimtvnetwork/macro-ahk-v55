@@ -43,9 +43,16 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
     get() {
       let w = 0;
       const chips = body.querySelectorAll<HTMLElement>('[data-chip="1"]');
-      for (const c of chips) if (c.style.display !== 'none') w += CHIP_W;
+      for (const c of chips) {
+        if (c.style.display !== 'none') {
+          w += CHIP_W;
+        }
+      }
+
       const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]');
-      if (wrap && wrap.style.display !== 'none') w += OVERFLOW_W;
+      if (wrap && wrap.style.display !== 'none') {
+        w += OVERFLOW_W;
+      }
 
       return w;
     },
@@ -69,7 +76,10 @@ function buildStrip(chipNs: readonly number[]): {
 } {
   const body = document.createElement('div');
   body.style.display = 'flex';
-  for (const n of chipNs) body.appendChild(makeChip(n));
+  for (const n of chipNs) {
+    body.appendChild(makeChip(n));
+  }
+
   const moreWrap = document.createElement('span');
   moreWrap.dataset.role = 'more';
   body.appendChild(moreWrap);
@@ -102,7 +112,9 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
     const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]')!;
     expect(wrap.style.display).toBe('none');
     const chips = body.querySelectorAll<HTMLElement>('[data-chip="1"]');
-    for (const c of chips) expect(c.style.display).toBe('');
+    for (const c of chips) {
+      expect(c.style.display).toBe('');
+    }
   });
 
   it('moves the trailing chips into the popover when the strip overflows', () => {
@@ -127,6 +139,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
         visible.push(Number(c.dataset.n));
       }
     }
+
     expect(visible).toEqual([1, 2]);
 
     const panel = wrap.querySelector<HTMLElement>('[role="menu"]')!;

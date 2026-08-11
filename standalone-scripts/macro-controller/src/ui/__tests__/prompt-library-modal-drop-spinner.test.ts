@@ -20,49 +20,58 @@ vi.mock('../../error-utils', () => ({ logError: mocks.logError }));
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 
 vi.mock('../prompt-cache', () => ({
-    readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
-    writeJsonCopy: vi.fn(async () => undefined),
-    clearPromptCache: vi.fn(async () => undefined),
+  readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
+  writeJsonCopy: vi.fn(async () => undefined),
+  clearPromptCache: vi.fn(async () => undefined),
 }));
 vi.mock('../prompt-io-db-bridge', () => ({
-    collectDbEntriesForExport: vi.fn(async () => []),
-    mergeDbIntoExport: vi.fn((c: unknown[]) => c),
-    partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
-    commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
+  collectDbEntriesForExport: vi.fn(async () => []),
+  mergeDbIntoExport: vi.fn((c: unknown[]) => c),
+  partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
+  commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
-    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
-    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
-    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+  setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+  deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+  upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 const io = vi.hoisted(() => {
-    let releaseFn: ((ok: boolean) => void) | null = null;
+  let releaseFn: ((ok: boolean) => void) | null = null;
 
-    return {
-        exportPromptsToJson: vi.fn(async () => undefined),
-        parsePromptsText: vi.fn(() => ({
-            valid: [{ name: 'p', text: 'body {{n}}' }],
-            errors: [] as string[],
-        })),
-        performPromptImport: vi.fn(() => new Promise((resolve, reject) => {
-            releaseFn = (ok: boolean): void => {
-                if (ok) resolve({ added: 1, updated: 0, errors: [] });
-                else reject(new Error('drop failed'));
-            };
-        })),
-        release: (ok: boolean): void => { if (releaseFn) releaseFn(ok); releaseFn = null; },
-    };
+  return {
+    exportPromptsToJson: vi.fn(async () => undefined),
+    parsePromptsText: vi.fn(() => ({
+      valid: [{ name: 'p', text: 'body {{n}}' }],
+      errors: [] as string[],
+    })),
+    performPromptImport: vi.fn(() => new Promise((resolve, reject) => {
+      releaseFn = (ok: boolean): void => {
+        if (ok) {
+          resolve({ added: 1, updated: 0, errors: [] });
+        } else {
+          reject(new Error('drop failed'));
+        }
+      };
+    })),
+    release: (ok: boolean): void => {
+      if (releaseFn) {
+        releaseFn(ok);
+      }
+
+      releaseFn = null; 
+    },
+  };
 });
 vi.mock('../prompt-io', () => ({
-    exportPromptsToJson: io.exportPromptsToJson,
-    parsePromptsText: io.parsePromptsText,
-    performPromptImport: io.performPromptImport,
+  exportPromptsToJson: io.exportPromptsToJson,
+  parsePromptsText: io.parsePromptsText,
+  performPromptImport: io.performPromptImport,
 }));
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
@@ -70,75 +79,78 @@ import { openPromptLibraryModal } from '../prompt-library-modal';
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
 function getRoot(): HTMLElement {
-    return document.querySelector<HTMLElement>('[data-testid="prompt-library-modal"]')
+  return document.querySelector<HTMLElement>('[data-testid="prompt-library-modal"]')
         ?? (document.body.firstElementChild as HTMLElement);
 }
+
 function getImportBtn(): HTMLButtonElement {
-    return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
+  return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
 }
 
 function fireDrop(root: HTMLElement, filename: string): void {
-    const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
-    const dt = { files: [file], dropEffect: 'copy' };
-    const ev = new Event('drop', { bubbles: true, cancelable: true });
-    Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
-    root.dispatchEvent(ev);
+  const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
+  const dt = { files: [file], dropEffect: 'copy' };
+  const ev = new Event('drop', { bubbles: true, cancelable: true });
+  Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
+  root.dispatchEvent(ev);
 }
 
 describe('prompt-library-modal - spinner + label during drag-and-drop import', () => {
-    beforeEach(() => {
-        document.body.innerHTML = '';
-        mocks.logError.mockReset();
-        mocks.showToast.mockReset();
-        io.performPromptImport.mockClear();
-    });
-    afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    mocks.logError.mockReset();
+    mocks.showToast.mockReset();
+    io.performPromptImport.mockClear();
+  });
+  afterEach(() => {
+    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+  });
 
-    it('shows spinner + "Importing…" label on the Import button during a drop, and restores after success', async () => {
-        await openPromptLibraryModal();
-        await tick();
+  it('shows spinner + "Importing…" label on the Import button during a drop, and restores after success', async () => {
+    await openPromptLibraryModal();
+    await tick();
 
-        const btn = getImportBtn();
-        const originalLabel = btn.textContent ?? 'Import';
+    const btn = getImportBtn();
+    const originalLabel = btn.textContent ?? 'Import';
 
-        fireDrop(getRoot(), 'a.json');
-        await tick(); await tick();
+    fireDrop(getRoot(), 'a.json');
+    await tick(); await tick();
 
-        // Mid-import: label swapped and spinner present.
-        expect(btn.textContent).toContain('Importing');
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).not.toBeNull();
-        expect(btn.disabled).toBe(true);
-        expect(btn.getAttribute('aria-busy')).toBe('true');
+    // Mid-import: label swapped and spinner present.
+    expect(btn.textContent).toContain('Importing');
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).not.toBeNull();
+    expect(btn.disabled).toBe(true);
+    expect(btn.getAttribute('aria-busy')).toBe('true');
 
-        io.release(true);
-        await tick(); await tick(); await tick();
+    io.release(true);
+    await tick(); await tick(); await tick();
 
-        // Restored after success.
-        expect(btn.textContent).toBe(originalLabel);
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
-        expect(btn.disabled).toBe(false);
-        expect(btn.hasAttribute('aria-busy')).toBe(false);
-    });
+    // Restored after success.
+    expect(btn.textContent).toBe(originalLabel);
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
+    expect(btn.disabled).toBe(false);
+    expect(btn.hasAttribute('aria-busy')).toBe(false);
+  });
 
-    it('restores spinner + label after a drop-triggered import failure', async () => {
-        await openPromptLibraryModal();
-        await tick();
+  it('restores spinner + label after a drop-triggered import failure', async () => {
+    await openPromptLibraryModal();
+    await tick();
 
-        const btn = getImportBtn();
-        const originalLabel = btn.textContent ?? 'Import';
+    const btn = getImportBtn();
+    const originalLabel = btn.textContent ?? 'Import';
 
-        fireDrop(getRoot(), 'b.json');
-        await tick(); await tick();
+    fireDrop(getRoot(), 'b.json');
+    await tick(); await tick();
 
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).not.toBeNull();
-        expect(btn.textContent).toContain('Importing');
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).not.toBeNull();
+    expect(btn.textContent).toContain('Importing');
 
-        io.release(false);
-        await tick(); await tick(); await tick();
+    io.release(false);
+    await tick(); await tick(); await tick();
 
-        expect(btn.textContent).toBe(originalLabel);
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
-        expect(btn.disabled).toBe(false);
-        expect(btn.hasAttribute('aria-busy')).toBe(false);
-    });
+    expect(btn.textContent).toBe(originalLabel);
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
+    expect(btn.disabled).toBe(false);
+    expect(btn.hasAttribute('aria-busy')).toBe(false);
+  });
 });

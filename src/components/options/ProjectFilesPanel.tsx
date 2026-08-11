@@ -101,6 +101,7 @@ function buildTree(files: ProjectFile[]): FileNode[] {
           dir = { name: part, path, isDir: true, children: [] };
           current.children.push(dir);
         }
+
         current = dir;
       }
     }
@@ -108,12 +109,15 @@ function buildTree(files: ProjectFile[]): FileNode[] {
 
   const sortNodes = (nodes: FileNode[]) => {
     nodes.sort((a, b) => {
-      if (a.isDir !== b.isDir) return a.isDir ? -1 : 1;
+      if (a.isDir !== b.isDir) {
+        return a.isDir ? -1 : 1;
+      }
 
       return a.name.localeCompare(b.name);
     });
     nodes.forEach((n) => n.isDir && sortNodes(n.children));
   };
+
   sortNodes(root.children);
 
   return root.children;
@@ -121,8 +125,13 @@ function buildTree(files: ProjectFile[]): FileNode[] {
 
 function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
-  if (ext === "json") return "json";
-  if (["md", "markdown", "txt", "prompt"].includes(ext)) return "markdown";
+  if (ext === "json") {
+    return "json";
+  }
+
+  if (["md", "markdown", "txt", "prompt"].includes(ext)) {
+    return "markdown";
+  }
 
   return "javascript";
 }
@@ -161,8 +170,13 @@ function buildDataUrl(base64: string, mimeType: string): string {
 }
 
 function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
 
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
@@ -176,6 +190,7 @@ function readFileAsBase64(file: globalThis.File): Promise<string> {
       const base64 = result.includes(",") ? result.split(",")[1] : result;
       resolve(base64);
     };
+
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -236,17 +251,26 @@ function TreeNode({
   const [dragOver, setDragOver] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    if (node.isDir) return;
+    if (node.isDir) {
+      return;
+    }
+
     e.dataTransfer.setData("application/x-marco-file-path", node.path);
     e.dataTransfer.effectAllowed = "move";
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     // Accept internal file moves on dirs, or external file drops on dirs
-    if (!node.isDir) return;
+    if (!node.isDir) {
+      return;
+    }
+
     const hasInternal = e.dataTransfer.types.includes("application/x-marco-file-path");
     const hasFiles = e.dataTransfer.types.includes("Files");
-    if (!hasInternal && !hasFiles) return;
+    if (!hasInternal && !hasFiles) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = hasInternal ? "move" : "copy";
@@ -259,7 +283,9 @@ function TreeNode({
     e.preventDefault();
     e.stopPropagation();
     setDragOver(false);
-    if (!node.isDir) return;
+    if (!node.isDir) {
+      return;
+    }
 
     // Internal file move
     const sourcePath = e.dataTransfer.getData("application/x-marco-file-path");
@@ -285,8 +311,11 @@ function TreeNode({
         } ${dragOver ? "bg-primary/20 ring-1 ring-primary/40" : ""}`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={() => {
-          if (node.isDir) onToggleDir(node.path);
-          else onSelect(node);
+          if (node.isDir) {
+            onToggleDir(node.path);
+          } else {
+            onSelect(node);
+          }
         }}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
@@ -382,7 +411,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
   /* ── File operations ── */
 
   const handleSelectFile = useCallback(async (node: FileNode) => {
-    if (!node.file) return;
+    if (!node.file) {
+      return;
+    }
+
     try {
       const result = await sendMessage<{ data: string; dataBase64?: string }>({
         type: "FILE_GET",
@@ -403,7 +435,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
   }, []);
 
   const handleSave = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      return;
+    }
+
     setSaving(true);
     try {
       await sendMessage({
@@ -433,6 +468,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
         setEditedContent("");
         setIsDirty(false);
       }
+
       toast.success("File deleted");
       void loadFiles();
     } catch (err) {
@@ -442,7 +478,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleCreateFile = async () => {
     const name = newFileName.trim();
-    if (!name) return;
+    if (!name) {
+      return;
+    }
+
     try {
       await sendMessage({
         type: "FILE_SAVE",
@@ -462,7 +501,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleCreateFolder = async () => {
     const name = newFolderName.trim().replace(/\/+$/, "");
-    if (!name) return;
+    if (!name) {
+      return;
+    }
+
     // Create a placeholder .gitkeep to establish the folder
     try {
       await sendMessage({
@@ -482,13 +524,17 @@ export function ProjectFilesPanel({ projectId }: Props) {
   };
 
   const handleRename = async () => {
-    if (!selectedFile || !renameValue.trim()) return;
+    if (!selectedFile || !renameValue.trim()) {
+      return;
+    }
+
     const newName = renameValue.trim();
     if (newName === selectedFile.filename) {
       setRenaming(false);
 
       return;
     }
+
     setSaving(true);
     try {
       // Save with new name using existing content
@@ -513,7 +559,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
   };
 
   const handleDownload = () => {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      return;
+    }
+
     const blob = new Blob([editedContent], { type: selectedFile.mimeType || "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -543,6 +592,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
         toast.error(`Failed to upload ${file.name}: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
+
     if (count > 0) {
       toast.success(`Uploaded ${count} file(s)`);
       void loadFiles();
@@ -551,7 +601,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputFiles = e.target.files;
-    if (!inputFiles || inputFiles.length === 0) return;
+    if (!inputFiles || inputFiles.length === 0) {
+      return;
+    }
+
     void uploadFiles(Array.from(inputFiles));
     e.target.value = "";
   };
@@ -562,10 +615,16 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleMoveFile = async (sourcePath: string, targetDir: string) => {
     const sourceFile = files.find((f) => f.filename === sourcePath);
-    if (!sourceFile) return;
+    if (!sourceFile) {
+      return;
+    }
+
     const baseName = sourcePath.split("/").pop() ?? sourcePath;
     const newPath = targetDir ? `${targetDir}/${baseName}` : baseName;
-    if (newPath === sourcePath) return;
+    if (newPath === sourcePath) {
+      return;
+    }
+
     try {
       // Read file content
       const result = await sendMessage<{ dataBase64?: string; data?: string }>({
@@ -586,6 +645,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
       if (selectedFile?.id === sourceFile.id) {
         setSelectedFile(null);
       }
+
       toast.success(`Moved to ${newPath}`);
       void loadFiles();
     } catch (err) {
@@ -599,7 +659,10 @@ export function ProjectFilesPanel({ projectId }: Props) {
   };
 
   const handleRootDragLeave = (e: React.DragEvent) => {
-    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    if (e.currentTarget.contains(e.relatedTarget as Node)) {
+      return;
+    }
+
     setRootDragOver(false);
   };
 
@@ -615,8 +678,11 @@ export function ProjectFilesPanel({ projectId }: Props) {
   const handleToggleDir = (path: string) => {
     setExpandedDirs((prev) => {
       const next = new Set(prev);
-      if (next.has(path)) next.delete(path);
-      else next.add(path);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
 
       return next;
     });
@@ -651,10 +717,14 @@ export function ProjectFilesPanel({ projectId }: Props) {
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => fileInputRef.current?.click()} title="Upload files">
                 <Upload className="h-3 w-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setShowNewFile(!showNewFile); setShowNewFolder(false); }} title="New file">
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
+                setShowNewFile(!showNewFile); setShowNewFolder(false); 
+              }} title="New file">
                 <Plus className="h-3 w-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setShowNewFolder(!showNewFolder); setShowNewFile(false); }} title="New folder">
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
+                setShowNewFolder(!showNewFolder); setShowNewFile(false); 
+              }} title="New folder">
                 <FolderPlus className="h-3 w-3" />
               </Button>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={loadFiles} disabled={loading} title="Refresh">
@@ -743,8 +813,13 @@ export function ProjectFilesPanel({ projectId }: Props) {
                         onChange={(e) => setRenameValue(e.target.value)}
                         className="h-6 text-[11px] font-mono flex-1"
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") void handleRename();
-                          if (e.key === "Escape") setRenaming(false);
+                          if (e.key === "Enter") {
+                            void handleRename();
+                          }
+
+                          if (e.key === "Escape") {
+                            setRenaming(false);
+                          }
                         }}
                         autoFocus
                       />
@@ -764,7 +839,9 @@ export function ProjectFilesPanel({ projectId }: Props) {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => { setRenaming(true); setRenameValue(selectedFile.filename); }}
+                    onClick={() => {
+                      setRenaming(true); setRenameValue(selectedFile.filename); 
+                    }}
                     title="Rename"
                   >
                     <Pencil className="h-3 w-3" />

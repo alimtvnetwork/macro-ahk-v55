@@ -50,35 +50,38 @@ export interface ShouldFetchDecision {
  * - Otherwise enforces PER_WS_MIN_INTERVAL_MS, then INTER_WS_GAP_MS.
  */
 export function shouldFetch(
-    workspaceId: string,
-    nowMs: number = Date.now(),
-    force: boolean = false,
+  workspaceId: string,
+  nowMs: number = Date.now(),
+  force: boolean = false,
 ): ShouldFetchDecision {
-    if (force) {
-        return { allowed: true, waitMs: 0, reason: 'forced' };
-    }
-    const lastWs = lastFetchedAt.get(workspaceId) ?? 0;
-    const perWsWait = lastWs + PER_WS_MIN_INTERVAL_MS - nowMs;
-    if (perWsWait > 0) {
-        return { allowed: false, waitMs: perWsWait, reason: 'per-ws-cooldown' };
-    }
-    const interWsWait = lastAnyFetchAt + INTER_WS_GAP_MS - nowMs;
-    if (interWsWait > 0) {
-        return { allowed: false, waitMs: interWsWait, reason: 'inter-ws-cooldown' };
-    }
+  if (force) {
+    return { allowed: true, waitMs: 0, reason: 'forced' };
+  }
 
-    return { allowed: true, waitMs: 0, reason: 'ok' };
+  const lastWs = lastFetchedAt.get(workspaceId) ?? 0;
+  const perWsWait = lastWs + PER_WS_MIN_INTERVAL_MS - nowMs;
+  if (perWsWait > 0) {
+    return { allowed: false, waitMs: perWsWait, reason: 'per-ws-cooldown' };
+  }
+
+  const interWsWait = lastAnyFetchAt + INTER_WS_GAP_MS - nowMs;
+  if (interWsWait > 0) {
+    return { allowed: false, waitMs: interWsWait, reason: 'inter-ws-cooldown' };
+  }
+
+  return { allowed: true, waitMs: 0, reason: 'ok' };
 }
 
 /** Record a successful fetch. Updates both per-ws and global timestamps. */
 export function recordFetch(workspaceId: string, nowMs: number = Date.now()): void {
-    if (!workspaceId) {
-        return;
-    }
-    lastFetchedAt.set(workspaceId, nowMs);
-    if (nowMs > lastAnyFetchAt) {
-        lastAnyFetchAt = nowMs;
-    }
+  if (!workspaceId) {
+    return;
+  }
+
+  lastFetchedAt.set(workspaceId, nowMs);
+  if (nowMs > lastAnyFetchAt) {
+    lastAnyFetchAt = nowMs;
+  }
 }
 
 /**
@@ -88,27 +91,28 @@ export function recordFetch(workspaceId: string, nowMs: number = Date.now()): vo
  * by INTER_WS_GAP_MS.
  */
 export function seedLastFetched(workspaceId: string, fetchedAtMs: number): void {
-    if (!workspaceId || fetchedAtMs <= 0) {
-        return;
-    }
-    const existing = lastFetchedAt.get(workspaceId) ?? 0;
-    if (fetchedAtMs > existing) {
-        lastFetchedAt.set(workspaceId, fetchedAtMs);
-    }
+  if (!workspaceId || fetchedAtMs <= 0) {
+    return;
+  }
+
+  const existing = lastFetchedAt.get(workspaceId) ?? 0;
+  if (fetchedAtMs > existing) {
+    lastFetchedAt.set(workspaceId, fetchedAtMs);
+  }
 }
 
 /** Read-only inspector (tests + diagnostics). */
 export function getLastFetched(workspaceId: string): number {
-    return lastFetchedAt.get(workspaceId) ?? 0;
+  return lastFetchedAt.get(workspaceId) ?? 0;
 }
 
 /** Read-only inspector (tests + diagnostics). */
 export function getLastAnyFetchAt(): number {
-    return lastAnyFetchAt;
+  return lastAnyFetchAt;
 }
 
 /** Test-only reset. Not exported from the module barrel. */
 export function __resetThrottleForTests(): void {
-    lastFetchedAt.clear();
-    lastAnyFetchAt = 0;
+  lastFetchedAt.clear();
+  lastAnyFetchAt = 0;
 }

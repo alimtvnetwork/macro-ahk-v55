@@ -94,14 +94,14 @@ const CHECKSUM_RESOURCE_PATH = "wasm/sql-wasm.wasm.checksum.json";
  * page; no Node `crypto` dependency).
  */
 async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
-    const digest = await crypto.subtle.digest("SHA-256", bytes);
-    const view = new Uint8Array(digest);
-    let hex = "";
-    for (let i = 0; i < view.length; i++) {
-        hex += view[i].toString(16).padStart(2, "0");
-    }
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  const view = new Uint8Array(digest);
+  let hex = "";
+  for (let i = 0; i < view.length; i++) {
+    hex += view[i].toString(16).padStart(2, "0");
+  }
 
-    return hex;
+  return hex;
 }
 
 /** Loads + parses the sidecar checksum file. Returns null on any failure. */
@@ -111,79 +111,84 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
     | { kind: "missing"; httpStatus: number | null; fetchError: string | null }
     | { kind: "malformed"; reason: string }
 > {
-    let response: Response;
-    try {
-        response = ServiceResult.wrapFetch(await fetch(checksumUrl));
-    } catch (err) {
-        return {
-            kind: "missing",
-            httpStatus: null,
-            fetchError: err instanceof Error ? err.message : String(err),
-        };
-    }
-    if (response.isFail) {
-        // HEFF: report non-2xx. No retry. Outcome is "missing" so caller can
-        // surface a fix-step banner; no method-swap, no re-fetch loop.
-        console.warn(
-            `[HEFF] HTTP ${response.status} on GET ${checksumUrl} — checksum manifest unavailable; ` +
-            `do NOT retry. Loop halted. Awaiting user instruction.`,
-        );
-
-        return { kind: "missing", httpStatus: response.status, fetchError: null };
-    }
-
-    let json: unknown;
-    try {
-        json = await response.json();
-    } catch (err) {
-        return {
-            kind: "malformed",
-            reason: `JSON parse failed: ${err instanceof Error ? err.message : String(err)}`,
-        };
-    }
-
-    if (typeof json !== "object" || json === null) {
-        return { kind: "malformed", reason: "checksum file is not a JSON object" };
-    }
-    const record = json as Record<string, unknown>;
-
-    const schema = record.schema;
-    const algorithm = record.algorithm;
-    const hash = record.hash;
-    const byteLength = record.byteLength;
-
-    if (schema !== WASM_CHECKSUM_SCHEMA) {
-        return {
-            kind: "malformed",
-            reason: `unexpected schema "${String(schema)}" (expected "${WASM_CHECKSUM_SCHEMA}") — extension may have been built by an incompatible toolchain`,
-        };
-    }
-    if (algorithm !== "SHA-256") {
-        return { kind: "malformed", reason: `unsupported algorithm "${String(algorithm)}"` };
-    }
-    if (typeof hash !== "string" || !/^[0-9a-f]{64}$/.test(hash)) {
-        return { kind: "malformed", reason: `hash field is not 64 lowercase hex chars: ${JSON.stringify(hash)}` };
-    }
-    if (typeof byteLength !== "number" || !Number.isFinite(byteLength) || byteLength <= 0) {
-        return { kind: "malformed", reason: `byteLength field is not a positive number: ${JSON.stringify(byteLength)}` };
-    }
-
-    const sourcePath = typeof record.sourcePath === "string" ? record.sourcePath : "(unknown)";
-    const sqlJsVersion = typeof record.sqlJsVersion === "string" ? record.sqlJsVersion : "unknown";
-    const generatedAt = typeof record.generatedAt === "string" ? record.generatedAt : "(unknown)";
-
+  let response: Response;
+  try {
+    response = ServiceResult.wrapFetch(await fetch(checksumUrl));
+  } catch (err) {
     return {
-        kind: "ok",
-        manifest: {
-            schema: WASM_CHECKSUM_SCHEMA,
-            algorithm: "SHA-256",
-            hash,
-            byteLength,
-            sourcePath,
-            sqlJsVersion,
-            generatedAt,
-        },
+      kind: "missing",
+      httpStatus: null,
+      fetchError: err instanceof Error ? err.message : String(err),
     };
+  }
+
+  if (response.isFail) {
+    // HEFF: report non-2xx. No retry. Outcome is "missing" so caller can
+    // surface a fix-step banner; no method-swap, no re-fetch loop.
+    console.warn(
+      `[HEFF] HTTP ${response.status} on GET ${checksumUrl} — checksum manifest unavailable; ` +
+            `do NOT retry. Loop halted. Awaiting user instruction.`,
+    );
+
+    return { kind: "missing", httpStatus: response.status, fetchError: null };
+  }
+
+  let json: unknown;
+  try {
+    json = await response.json();
+  } catch (err) {
+    return {
+      kind: "malformed",
+      reason: `JSON parse failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+
+  if (typeof json !== "object" || json === null) {
+    return { kind: "malformed", reason: "checksum file is not a JSON object" };
+  }
+
+  const record = json as Record<string, unknown>;
+
+  const schema = record.schema;
+  const algorithm = record.algorithm;
+  const hash = record.hash;
+  const byteLength = record.byteLength;
+
+  if (schema !== WASM_CHECKSUM_SCHEMA) {
+    return {
+      kind: "malformed",
+      reason: `unexpected schema "${String(schema)}" (expected "${WASM_CHECKSUM_SCHEMA}") — extension may have been built by an incompatible toolchain`,
+    };
+  }
+
+  if (algorithm !== "SHA-256") {
+    return { kind: "malformed", reason: `unsupported algorithm "${String(algorithm)}"` };
+  }
+
+  if (typeof hash !== "string" || !/^[0-9a-f]{64}$/.test(hash)) {
+    return { kind: "malformed", reason: `hash field is not 64 lowercase hex chars: ${JSON.stringify(hash)}` };
+  }
+
+  if (typeof byteLength !== "number" || !Number.isFinite(byteLength) || byteLength <= 0) {
+    return { kind: "malformed", reason: `byteLength field is not a positive number: ${JSON.stringify(byteLength)}` };
+  }
+
+  const sourcePath = typeof record.sourcePath === "string" ? record.sourcePath : "(unknown)";
+  const sqlJsVersion = typeof record.sqlJsVersion === "string" ? record.sqlJsVersion : "unknown";
+  const generatedAt = typeof record.generatedAt === "string" ? record.generatedAt : "(unknown)";
+
+  return {
+    kind: "ok",
+    manifest: {
+      schema: WASM_CHECKSUM_SCHEMA,
+      algorithm: "SHA-256",
+      hash,
+      byteLength,
+      sourcePath,
+      sqlJsVersion,
+      generatedAt,
+    },
+  };
 }
 
 /**
@@ -193,56 +198,57 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
  */
 // eslint-disable-next-line max-lines-per-function -- structured outcome translator with 5 mutually-exclusive branches; splitting would obscure the contract
 export async function verifyWasmChecksum(wasmBinary: ArrayBuffer): Promise<WasmChecksumOutcome> {
-    const checksumUrl = chrome.runtime.getURL(CHECKSUM_RESOURCE_PATH);
+  const checksumUrl = chrome.runtime.getURL(CHECKSUM_RESOURCE_PATH);
 
-    const loaded = await loadChecksumManifest(checksumUrl);
-    if (loaded.kind === "missing") {
-        return {
-            status: "manifest-missing",
-            checksumUrl,
-            httpStatus: loaded.httpStatus,
-            fetchError: loaded.fetchError,
-        };
-    }
-    if (loaded.kind === "malformed") {
-        return { status: "manifest-malformed", checksumUrl, reason: loaded.reason };
-    }
-
-    let actualHash: string;
-    try {
-        actualHash = await sha256Hex(wasmBinary);
-    } catch (err) {
-        return {
-            status: "compute-failed",
-            reason: `crypto.subtle.digest threw: ${err instanceof Error ? err.message : String(err)}`,
-        };
-    }
-
-    const { manifest } = loaded;
-    const sizeMatches = wasmBinary.byteLength === manifest.byteLength;
-    const hashMatches = actualHash === manifest.hash;
-
-    if (sizeMatches && hashMatches) {
-        return {
-            status: "match",
-            algorithm: "SHA-256",
-            hash: manifest.hash,
-            byteLength: manifest.byteLength,
-            sqlJsVersion: manifest.sqlJsVersion,
-            generatedAt: manifest.generatedAt,
-        };
-    }
-
+  const loaded = await loadChecksumManifest(checksumUrl);
+  if (loaded.kind === "missing") {
     return {
-        status: "mismatch",
-        algorithm: "SHA-256",
-        expectedHash: manifest.hash,
-        actualHash,
-        expectedByteLength: manifest.byteLength,
-        actualByteLength: wasmBinary.byteLength,
-        sqlJsVersion: manifest.sqlJsVersion,
-        generatedAt: manifest.generatedAt,
+      status: "manifest-missing",
+      checksumUrl,
+      httpStatus: loaded.httpStatus,
+      fetchError: loaded.fetchError,
     };
+  }
+
+  if (loaded.kind === "malformed") {
+    return { status: "manifest-malformed", checksumUrl, reason: loaded.reason };
+  }
+
+  let actualHash: string;
+  try {
+    actualHash = await sha256Hex(wasmBinary);
+  } catch (err) {
+    return {
+      status: "compute-failed",
+      reason: `crypto.subtle.digest threw: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+
+  const { manifest } = loaded;
+  const sizeMatches = wasmBinary.byteLength === manifest.byteLength;
+  const hashMatches = actualHash === manifest.hash;
+
+  if (sizeMatches && hashMatches) {
+    return {
+      status: "match",
+      algorithm: "SHA-256",
+      hash: manifest.hash,
+      byteLength: manifest.byteLength,
+      sqlJsVersion: manifest.sqlJsVersion,
+      generatedAt: manifest.generatedAt,
+    };
+  }
+
+  return {
+    status: "mismatch",
+    algorithm: "SHA-256",
+    expectedHash: manifest.hash,
+    actualHash,
+    expectedByteLength: manifest.byteLength,
+    actualByteLength: wasmBinary.byteLength,
+    sqlJsVersion: manifest.sqlJsVersion,
+    generatedAt: manifest.generatedAt,
+  };
 }
 
 /**
@@ -250,17 +256,17 @@ export async function verifyWasmChecksum(wasmBinary: ArrayBuffer): Promise<WasmC
  * and the support report. Always safe to call with any outcome shape.
  */
 export function summarizeChecksumOutcome(outcome: WasmChecksumOutcome): string {
-    switch (outcome.status) {
-        case "match":
-            return `OK (sha256=${outcome.hash.slice(0, 12)}…, ${outcome.byteLength} bytes, sql.js@${outcome.sqlJsVersion})`;
-        case "mismatch":
-            return `MISMATCH (expected sha256=${outcome.expectedHash.slice(0, 12)}…/${outcome.expectedByteLength}B, got ${outcome.actualHash.slice(0, 12)}…/${outcome.actualByteLength}B)`;
-        case "manifest-missing":
-            // eslint-disable-next-line sonarjs/no-nested-template-literals -- inline diagnostic formatting; extracting helpers obscures the one-line summary
-            return `MANIFEST MISSING (${outcome.httpStatus !== null ? `HTTP ${outcome.httpStatus}` : "fetch threw"} at ${outcome.checksumUrl})`;
-        case "manifest-malformed":
-            return `MANIFEST MALFORMED (${outcome.reason})`;
-        case "compute-failed":
-            return `COMPUTE FAILED (${outcome.reason})`;
-    }
+  switch (outcome.status) {
+    case "match":
+      return `OK (sha256=${outcome.hash.slice(0, 12)}…, ${outcome.byteLength} bytes, sql.js@${outcome.sqlJsVersion})`;
+    case "mismatch":
+      return `MISMATCH (expected sha256=${outcome.expectedHash.slice(0, 12)}…/${outcome.expectedByteLength}B, got ${outcome.actualHash.slice(0, 12)}…/${outcome.actualByteLength}B)`;
+    case "manifest-missing":
+      // eslint-disable-next-line sonarjs/no-nested-template-literals -- inline diagnostic formatting; extracting helpers obscures the one-line summary
+      return `MANIFEST MISSING (${outcome.httpStatus !== null ? `HTTP ${outcome.httpStatus}` : "fetch threw"} at ${outcome.checksumUrl})`;
+    case "manifest-malformed":
+      return `MANIFEST MALFORMED (${outcome.reason})`;
+    case "compute-failed":
+      return `COMPUTE FAILED (${outcome.reason})`;
+  }
 }

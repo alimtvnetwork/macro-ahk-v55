@@ -23,6 +23,7 @@ async function loadJSZip(): Promise<typeof JSZipType> {
 
   return mod.default;
 }
+
 import { sendMessage } from "@/lib/message-client";
 import type {
   StoredProject,
@@ -249,6 +250,7 @@ function insertProjects(db: Database, projects: StoredProject[]): void {
       p.updatedAt ?? now,
     ]);
   }
+
   stmt.free();
 }
 
@@ -279,6 +281,7 @@ function insertScripts(db: Database, scripts: StoredScript[]): void {
       s.updatedAt ?? now,
     ]);
   }
+
   stmt.free();
 }
 
@@ -300,6 +303,7 @@ function insertConfigs(db: Database, configs: StoredConfig[]): void {
       c.updatedAt ?? now,
     ]);
   }
+
   stmt.free();
 }
 
@@ -335,6 +339,7 @@ function insertPrompts(db: Database, prompts: PromptEntry[]): void {
       p.updatedAt ?? now,
     ]);
   }
+
   stmt.free();
 }
 
@@ -354,7 +359,10 @@ function insertDependencies(db: Database, projects: ReadonlyArray<StoredProject>
     for (const dep of deps) {
       const d = dep as unknown as Record<string, unknown>;
       const dependsOn = typeof d.projectId === "string" ? d.projectId : "";
-      if (!dependsOn) continue;
+      if (!dependsOn) {
+        continue;
+      }
+
       stmt.run([
         null,
         p.id ?? "",
@@ -365,6 +373,7 @@ function insertDependencies(db: Database, projects: ReadonlyArray<StoredProject>
       ]);
     }
   }
+
   stmt.free();
 }
 
@@ -382,7 +391,10 @@ function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): 
   for (const p of projects) {
     const settings = (p.settings ?? {}) as Record<string, unknown>;
     const rawVars = settings.variables;
-    if (rawVars == null || typeof rawVars !== "object") continue;
+    if (rawVars == null || typeof rawVars !== "object") {
+      continue;
+    }
+
     const vars = rawVars as Record<string, unknown>;
     for (const [name, value] of Object.entries(vars)) {
       stmt.run([
@@ -395,6 +407,7 @@ function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): 
       ]);
     }
   }
+
   stmt.free();
 }
 
@@ -406,13 +419,19 @@ function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): 
 function parsePromptCategories(raw: Record<string, unknown>): string[] {
   const joined = typeof raw.categories === "string" ? raw.categories
     : typeof raw.category === "string" ? raw.category
-    : "";
-  if (!joined) return [];
+      : "";
+  if (!joined) {
+    return [];
+  }
+
   const seen = new Set<string>();
   const out: string[] = [];
   for (const part of joined.split(",")) {
     const trimmed = part.trim();
-    if (!trimmed || seen.has(trimmed)) continue;
+    if (!trimmed || seen.has(trimmed)) {
+      continue;
+    }
+
     seen.add(trimmed);
     out.push(trimmed);
   }
@@ -457,6 +476,7 @@ function insertPromptCategories(
   for (let i = 0; i < orderedCategories.length; i++) {
     catStmt.run([null, orderedCategories[i], i, now]);
   }
+
   catStmt.free();
 
   // 3) Insert junction rows for each (PromptUid, CategoryName).
@@ -465,11 +485,15 @@ function insertPromptCategories(
     VALUES (?, ?, ?)
   `);
   for (const [promptUid, cats] of promptCategoryMap.entries()) {
-    if (!promptUid) continue;
+    if (!promptUid) {
+      continue;
+    }
+
     for (const catName of cats) {
       linkStmt.run([promptUid, catName, now]);
     }
   }
+
   linkStmt.free();
 }
 
@@ -488,23 +512,23 @@ export async function exportAllAsSqliteZip(): Promise<void> {
   const rawPromptsByUid = new Map<string, Record<string, unknown>>();
   const prompts: PromptEntry[] = Array.isArray(promptsRes.prompts)
     ? promptsRes.prompts.map((raw, i) => {
-        const r = raw as unknown as Record<string, unknown>;
-        const uid = String(r.id ?? "");
-        rawPromptsByUid.set(uid, r);
+      const r = raw as unknown as Record<string, unknown>;
+      const uid = String(r.id ?? "");
+      rawPromptsByUid.set(uid, r);
 
-        return {
-          id: uid,
-          slug: typeof r.slug === "string" ? r.slug : undefined,
-          name: (r.name as string) ?? "",
-          text: (r.text as string) ?? "",
-          order: typeof r.order === "number" ? r.order : i,
-          isDefault: r.isDefault === true,
-          isFavorite: r.isFavorite === true,
-          category: typeof r.category === "string" ? r.category : undefined,
-          createdAt: (r.createdAt as string) ?? new Date().toISOString(),
-          updatedAt: (r.updatedAt as string) ?? new Date().toISOString(),
-        };
-      })
+      return {
+        id: uid,
+        slug: typeof r.slug === "string" ? r.slug : undefined,
+        name: (r.name as string) ?? "",
+        text: (r.text as string) ?? "",
+        order: typeof r.order === "number" ? r.order : i,
+        isDefault: r.isDefault === true,
+        isFavorite: r.isFavorite === true,
+        category: typeof r.category === "string" ? r.category : undefined,
+        createdAt: (r.createdAt as string) ?? new Date().toISOString(),
+        updatedAt: (r.updatedAt as string) ?? new Date().toISOString(),
+      };
+    })
     : [];
 
   const db = await initDb();
@@ -628,8 +652,13 @@ export async function exportProjectsAsSqliteZip(
   const allScriptPaths = new Set<string>();
   const allConfigPaths = new Set<string>();
   for (const p of projects) {
-    for (const s of p.scripts ?? []) allScriptPaths.add(s.path);
-    for (const c of p.configs ?? []) allConfigPaths.add(c.path);
+    for (const s of p.scripts ?? []) {
+      allScriptPaths.add(s.path);
+    }
+
+    for (const c of p.configs ?? []) {
+      allConfigPaths.add(c.path);
+    }
   }
 
   const relatedScripts = scriptsRes.scripts.filter(
@@ -718,7 +747,9 @@ function col(
   snakeName: string,
   strict = false,
 ): SqlValue {
-  if (strict) return rowObject[pascalName];
+  if (strict) {
+    return rowObject[pascalName];
+  }
 
   return rowObject[pascalName] ?? rowObject[snakeName];
 }
@@ -727,7 +758,10 @@ function col(
  *  In strict mode only Uid / Id (PascalCase) are consulted; lowercase uid/id fallbacks are skipped. */
 function resolveUid(rowObject: Record<string, unknown>, strict = false): string {
   const uid = strict ? rowObject["Uid"] : (rowObject["Uid"] ?? rowObject["uid"]);
-  if (uid != null && String(uid) !== "") return String(uid);
+  if (uid != null && String(uid) !== "") {
+    return String(uid);
+  }
+
   // Fallback for v3 bundles where Id was TEXT PK containing the runtime UUID
   const id = strict ? rowObject["Id"] : (rowObject["Id"] ?? rowObject["id"]);
 
@@ -741,16 +775,27 @@ function resolveUid(rowObject: Record<string, unknown>, strict = false): string 
 function readDependenciesTable(db: Database): Map<string, Array<{ projectId: string; version: string }>> {
   const out = new Map<string, Array<{ projectId: string; version: string }>>();
   let rows;
-  try { rows = db.exec("SELECT * FROM Dependencies"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT * FROM Dependencies"); 
+  } catch (err) {
+    void 0;
 
- return out; }
-  if (rows.length === 0 || rows[0].values.length === 0) return out;
+    return out; 
+  }
+
+  if (rows.length === 0 || rows[0].values.length === 0) {
+    return out;
+  }
+
   const cols = rows[0].columns;
   for (const row of rows[0].values) {
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
     const projectUid = String(rowObject["ProjectUid"] ?? "");
     const dependsOn = String(rowObject["DependsOnProjectId"] ?? "");
-    if (!projectUid || !dependsOn) continue;
+    if (!projectUid || !dependsOn) {
+      continue;
+    }
+
     const version = rowObject["Version"] != null ? String(rowObject["Version"]) : "";
     const list = out.get(projectUid) ?? [];
     list.push({ projectId: dependsOn, version });
@@ -767,23 +812,37 @@ function readDependenciesTable(db: Database): Map<string, Array<{ projectId: str
 function readVariablesTable(db: Database): Map<string, Record<string, unknown>> {
   const out = new Map<string, Record<string, unknown>>();
   let rows;
-  try { rows = db.exec("SELECT * FROM Variables"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT * FROM Variables"); 
+  } catch (err) {
+    void 0;
 
- return out; }
-  if (rows.length === 0 || rows[0].values.length === 0) return out;
+    return out; 
+  }
+
+  if (rows.length === 0 || rows[0].values.length === 0) {
+    return out;
+  }
+
   const cols = rows[0].columns;
   for (const row of rows[0].values) {
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
     const projectUid = String(rowObject["ProjectUid"] ?? "");
     const name = String(rowObject["Name"] ?? "");
-    if (!projectUid || !name) continue;
+    if (!projectUid || !name) {
+      continue;
+    }
+
     const rawValue = rowObject["Value"];
     let parsed: unknown = null;
     if (rawValue != null) {
-      try { parsed = JSON.parse(String(rawValue)); } catch (err) {
+      try {
+        parsed = JSON.parse(String(rawValue)); 
+      } catch (err) {
         parsed = String(rawValue);
       }
     }
+
     const map = out.get(projectUid) ?? {};
     map[name] = parsed;
     out.set(projectUid, map);
@@ -795,14 +854,27 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
 /* eslint-disable-next-line max-lines-per-function */
 function readProjects(db: Database, strict = false): StoredProject[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Projects"); } catch (err) { void 0;
-    if (strict) return [];
-    try { rows = db.exec("SELECT * FROM projects"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT * FROM Projects"); 
+  } catch (err) {
+    void 0;
+    if (strict) {
+      return [];
+    }
 
- return []; }
+    try {
+      rows = db.exec("SELECT * FROM projects"); 
+    } catch (err) {
+      void 0;
+
+      return []; 
+    }
   }
+
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
-  if (!hasRows) return [];
+  if (!hasRows) {
+    return [];
+  }
 
   // v6 row-table maps (empty for v4/v5 bundles — fall back to JSON blobs).
   const depsByProject = readDependenciesTable(db);
@@ -851,14 +923,27 @@ function readProjects(db: Database, strict = false): StoredProject[] {
 
 function readScripts(db: Database, strict = false): StoredScript[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Scripts"); } catch (err) { void 0;
-    if (strict) return [];
-    try { rows = db.exec("SELECT * FROM scripts"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT * FROM Scripts"); 
+  } catch (err) {
+    void 0;
+    if (strict) {
+      return [];
+    }
 
- return []; }
+    try {
+      rows = db.exec("SELECT * FROM scripts"); 
+    } catch (err) {
+      void 0;
+
+      return []; 
+    }
   }
+
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
-  if (!hasRows) return [];
+  if (!hasRows) {
+    return [];
+  }
 
   const cols = rows[0].columns;
 
@@ -887,14 +972,27 @@ function readScripts(db: Database, strict = false): StoredScript[] {
 
 function readConfigs(db: Database, strict = false): StoredConfig[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Configs"); } catch (err) { void 0;
-    if (strict) return [];
-    try { rows = db.exec("SELECT * FROM configs"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT * FROM Configs"); 
+  } catch (err) {
+    void 0;
+    if (strict) {
+      return [];
+    }
 
- return []; }
+    try {
+      rows = db.exec("SELECT * FROM configs"); 
+    } catch (err) {
+      void 0;
+
+      return []; 
+    }
   }
+
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
-  if (!hasRows) return [];
+  if (!hasRows) {
+    return [];
+  }
 
   const cols = rows[0].columns;
 
@@ -919,14 +1017,25 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
 function readPromptCategoriesTable(db: Database): Map<string, string[]> {
   const out = new Map<string, string[]>();
   let rows;
-  try { rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); } catch (err) { void 0;
+  try {
+    rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); 
+  } catch (err) {
+    void 0;
 
- return out; }
-  if (rows.length === 0 || rows[0].values.length === 0) return out;
+    return out; 
+  }
+
+  if (rows.length === 0 || rows[0].values.length === 0) {
+    return out;
+  }
+
   for (const row of rows[0].values) {
     const uid = String(row[0] ?? "");
     const name = String(row[1] ?? "");
-    if (!uid || !name) continue;
+    if (!uid || !name) {
+      continue;
+    }
+
     const list = out.get(uid) ?? [];
     list.push(name);
     out.set(uid, list);
@@ -938,14 +1047,27 @@ function readPromptCategoriesTable(db: Database): Map<string, string[]> {
 function readPrompts(db: Database, strict = false): PromptEntry[] {
   try {
     let rows;
-    try { rows = db.exec("SELECT * FROM Prompts"); } catch (err) { void 0;
-      if (strict) return [];
-      try { rows = db.exec("SELECT * FROM prompts"); } catch (err) { void 0;
+    try {
+      rows = db.exec("SELECT * FROM Prompts"); 
+    } catch (err) {
+      void 0;
+      if (strict) {
+        return [];
+      }
 
- return []; }
+      try {
+        rows = db.exec("SELECT * FROM prompts"); 
+      } catch (err) {
+        void 0;
+
+        return []; 
+      }
     }
+
     const hasRows = rows.length > 0 && rows[0].values.length > 0;
-    if (!hasRows) return [];
+    if (!hasRows) {
+      return [];
+    }
 
     // v6 junction (empty in v4/v5 bundles).
     const catsByPromptUid = readPromptCategoriesTable(db);
@@ -978,7 +1100,8 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
         updatedAt: (col(rowObject, "UpdatedAt", "updated_at", strict) as string),
       } as PromptEntry;
     });
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     // prompts table may not exist in older bundles
     return [];
@@ -1024,7 +1147,9 @@ export async function previewSqliteZip(
     } catch (errPascal) {
       if (!strict) {
         console.warn("[sqlite-bundle] Meta (PascalCase) exported_at query failed, trying legacy lowercase", errPascal);
-        try { metaRows = db.exec("SELECT value FROM meta WHERE key = 'exported_at'"); } catch (errLower) {
+        try {
+          metaRows = db.exec("SELECT value FROM meta WHERE key = 'exported_at'"); 
+        } catch (errLower) {
           console.warn("[sqlite-bundle] legacy meta exported_at query failed; treating as absent", errLower);
           metaRows = [];
         }
@@ -1032,6 +1157,7 @@ export async function previewSqliteZip(
         metaRows = [];
       }
     }
+
     if (Array.isArray(metaRows) && metaRows.length > 0 && metaRows[0].values.length > 0) {
       exportedAt = metaRows[0].values[0][0] as string;
     }
@@ -1141,7 +1267,10 @@ async function extractBundle(file: File, options?: ImportOptions) {
   const arrayBuffer = await file.arrayBuffer();
   const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
-  if (!dbFile) throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
+  if (!dbFile) {
+    throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
+  }
+
   const dbData = await dbFile.async("uint8array");
   const db = await openDb(dbData);
 
@@ -1246,11 +1375,14 @@ async function mergeAll(
 
 function safeJsonParse<T>(raw: string | null, fallback: T): T {
   const isAbsent = !raw;
-  if (isAbsent) return fallback;
+  if (isAbsent) {
+    return fallback;
+  }
 
   try {
     return JSON.parse(raw) as T;
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     return fallback;
   }
@@ -1266,23 +1398,23 @@ export async function exportPromptsAsSqliteZip(): Promise<void> {
   const rawPromptsByUid = new Map<string, Record<string, unknown>>();
   const prompts: PromptEntry[] = Array.isArray(result.prompts)
     ? result.prompts.map((raw, i) => {
-        const r = raw as unknown as Record<string, unknown>;
-        const uid = String(r.id ?? "");
-        rawPromptsByUid.set(uid, r);
+      const r = raw as unknown as Record<string, unknown>;
+      const uid = String(r.id ?? "");
+      rawPromptsByUid.set(uid, r);
 
-        return {
-          id: uid,
-          slug: typeof r.slug === "string" ? r.slug : undefined,
-          name: (r.name as string) ?? "",
-          text: (r.text as string) ?? "",
-          order: typeof r.order === "number" ? r.order : i,
-          isDefault: r.isDefault === true,
-          isFavorite: r.isFavorite === true,
-          category: typeof r.category === "string" ? r.category : undefined,
-          createdAt: (r.createdAt as string) ?? new Date().toISOString(),
-          updatedAt: (r.updatedAt as string) ?? new Date().toISOString(),
-        };
-      })
+      return {
+        id: uid,
+        slug: typeof r.slug === "string" ? r.slug : undefined,
+        name: (r.name as string) ?? "",
+        text: (r.text as string) ?? "",
+        order: typeof r.order === "number" ? r.order : i,
+        isDefault: r.isDefault === true,
+        isFavorite: r.isFavorite === true,
+        category: typeof r.category === "string" ? r.category : undefined,
+        createdAt: (r.createdAt as string) ?? new Date().toISOString(),
+        updatedAt: (r.updatedAt as string) ?? new Date().toISOString(),
+      };
+    })
     : [];
 
   const db = await initDb();
@@ -1312,7 +1444,10 @@ async function extractPromptsBundle(
   const arrayBuffer = await file.arrayBuffer();
   const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
-  if (!dbFile) throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
+  if (!dbFile) {
+    throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
+  }
+
   const dbData = await dbFile.async("uint8array");
   const db = await openDb(dbData);
   const validation = validateBundleSchema(db, "prompts-only");
@@ -1320,9 +1455,12 @@ async function extractPromptsBundle(
     db.close();
     throw new Error(formatValidationError(validation));
   }
+
   const prompts = readPrompts(db, strict);
   db.close();
-  if (prompts.length === 0) throw new Error("No prompts found in bundle");
+  if (prompts.length === 0) {
+    throw new Error("No prompts found in bundle");
+  }
 
   return prompts;
 }
@@ -1388,7 +1526,9 @@ async function assertIsZipBlob(blob: Blob, context: string): Promise<void> {
   const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
   const isLocalFileHeader = header[0] === 0x50 && header[1] === 0x4b
     && header[2] === 0x03 && header[3] === 0x04;
-  if (isLocalFileHeader) return;
+  if (isLocalFileHeader) {
+    return;
+  }
 
   // Helpful classification for the most common failure mode: a JSON-shaped
   // payload accidentally piped through the ZIP path.

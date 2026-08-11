@@ -52,14 +52,22 @@ interface SdkBridge {
 }
 
 export function pickRepoUrl(body: GitsyncApiResponse): string | null {
-  if (body.config?.repo_url) return body.config.repo_url;
+  if (body.config?.repo_url) {
+    return body.config.repo_url;
+  }
+
   if (body.config?.owner_name && body.config?.repo_name) {
     return 'https://github.com/' + body.config.owner_name + '/' + body.config.repo_name;
   }
-  if (body.github_repo_url) return body.github_repo_url;
+
+  if (body.github_repo_url) {
+    return body.github_repo_url;
+  }
+
   if (body.github_owner && body.github_repo) {
     return 'https://github.com/' + body.github_owner + '/' + body.github_repo;
   }
+
   if (body.github_repo && body.github_repo.indexOf('/') > 0) {
     return 'https://github.com/' + body.github_repo;
   }
@@ -69,7 +77,9 @@ export function pickRepoUrl(body: GitsyncApiResponse): string | null {
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
-  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
+    return null;
+  }
 
   return sdk;
 }
@@ -85,6 +95,7 @@ export async function fetchGitsyncConfig(
   if (!wsId || !pid) {
     return { status: 'error', message: 'missing wsId or projectId' };
   }
+
   const sdk = getSdk();
   if (!sdk) {
     logError('GitsyncApi', 'marco.api.call unavailable (SDK not injected yet)');
@@ -111,6 +122,7 @@ export async function fetchGitsyncConfig(
 
     return { status: 'not_linked' };
   }
+
   if (resp.isFail) {
     logError('GitsyncApi', 'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
@@ -122,6 +134,7 @@ export async function fetchGitsyncConfig(
   if (body.enabled === false || body.synced === false) {
     return { status: 'not_linked' };
   }
+
   const repo = pickRepoUrl(body);
   if (!repo) {
     log('[GitsyncApi] ws=' + wsId + ' pid=' + pid + ' returned no repo fields → not_linked', 'info');

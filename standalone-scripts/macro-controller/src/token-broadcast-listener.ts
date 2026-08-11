@@ -48,7 +48,10 @@ const broadcastState = new BroadcastListenerState();
  * Idempotent — safe to call multiple times.
  */
 export function registerTokenBroadcastListener(): void {
-  if (broadcastState.registered) return;
+  if (broadcastState.registered) {
+    return;
+  }
+
   broadcastState.registered = true;
 
   window.addEventListener('message', handleTokenBroadcast);
@@ -57,7 +60,9 @@ export function registerTokenBroadcastListener(): void {
 
 function handleTokenBroadcast(event: MessageEvent): void {
   const data = event.data as TokenBroadcast | null;
-  if (!data || data.source !== LabelType.SourceExtension) return;
+  if (!data || data.source !== LabelType.SourceExtension) {
+    return;
+  }
 
   const token = data.token
     || data.payload?.token

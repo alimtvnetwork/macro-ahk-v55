@@ -85,10 +85,12 @@ function assertPayloadSchema(payload: Payload): void {
   for (const key of Object.keys(payload)) {
     expect(SCHEMA_KEYS_ALL.has(key), `unexpected payload key: ${key}`).toBe(true);
   }
+
   // 2. All required keys present and typed correctly.
   for (const key of REQUIRED_KEYS) {
     expect(payload[key], `missing required key: ${key}`).toBeDefined();
   }
+
   expect(typeof payload.code).toBe('string');
   expect(payload.code.length).toBeGreaterThan(0);
   expect(typeof payload.area).toBe('string');
@@ -216,10 +218,12 @@ describe('logDiagnosticFromCode — structured payload schema (all logger varian
       normalized.push(normalize(extractPayload(consoleMock)));
       uninstallLogger();
     }
+
     // Every variant must produce byte-identical payloads (bar timestamp).
     for (let i = 1; i < normalized.length; i++) {
       expect(normalized[i]).toEqual(normalized[0]);
     }
+
     // Freeze the exact shape as a snapshot. Any drift (new key, renamed
     // field, changed severity/area/action) will fail here and force an
     // intentional update.

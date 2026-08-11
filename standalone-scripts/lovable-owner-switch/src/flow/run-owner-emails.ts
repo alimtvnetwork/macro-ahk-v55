@@ -31,71 +31,71 @@ export interface OwnerEmailsResult {
 }
 
 const collectTargets = (ctx: RowExecutionContext): string[] => {
-    const targets: string[] = [ctx.Row.OwnerEmail1];
+  const targets: string[] = [ctx.Row.OwnerEmail1];
 
-    if (ctx.Row.OwnerEmail2 !== null) {
-        targets.push(ctx.Row.OwnerEmail2);
-    }
+  if (ctx.Row.OwnerEmail2 !== null) {
+    targets.push(ctx.Row.OwnerEmail2);
+  }
 
-    return targets;
+  return targets;
 };
 
 const logPromote = (
-    ctx: RowExecutionContext, sink: LogSink, ownerEmail: string, error: string | null,
+  ctx: RowExecutionContext, sink: LogSink, ownerEmail: string, error: string | null,
 ): void => {
-    sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote,
-        error === null ? LogSeverityType.Info : LogSeverityType.Error,
-        `Promote ${ownerEmail}: ${error ?? "ok"}`,
-    ));
+  sink.write(buildEntry(
+    ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote,
+    error === null ? LogSeverityType.Info : LogSeverityType.Error,
+    `Promote ${ownerEmail}: ${error ?? "ok"}`,
+  ));
 };
 
 const logNoRollback = (
-    ctx: RowExecutionContext, sink: LogSink, alreadyDone: ReadonlyArray<string>,
+  ctx: RowExecutionContext, sink: LogSink, alreadyDone: ReadonlyArray<string>,
 ): void => {
-    if (alreadyDone.length === 0) {
-        return;
-    }
+  if (alreadyDone.length === 0) {
+    return;
+  }
 
-    sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote, LogSeverityType.Warn,
-        `No rollback performed (per policy). Already promoted in this row: ${alreadyDone.join(", ")}. ` +
+  sink.write(buildEntry(
+    ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote, LogSeverityType.Warn,
+    `No rollback performed (per policy). Already promoted in this row: ${alreadyDone.join(", ")}. ` +
         `Re-run will skip these and only retry the failed owner(s).`,
-    ));
+  ));
 };
 
 export const runOwnerEmails = async (
-    ctx: RowExecutionContext, sink: LogSink,
+  ctx: RowExecutionContext, sink: LogSink,
 ): Promise<OwnerEmailsResult> => {
-    const records: PromotedOwnerRecord[] = [];
-    const succeeded: string[] = [];
+  const records: PromotedOwnerRecord[] = [];
+  const succeeded: string[] = [];
 
-    for (const ownerEmail of collectTargets(ctx)) {
-        const promote = await runPromote(ctx.Api, ctx.Caches, {
-            LoginEmail: ctx.Row.LoginEmail, OwnerEmail: ownerEmail,
-        });
-        logPromote(ctx, sink, ownerEmail, promote.Error);
+  for (const ownerEmail of collectTargets(ctx)) {
+    const promote = await runPromote(ctx.Api, ctx.Caches, {
+      LoginEmail: ctx.Row.LoginEmail, OwnerEmail: ownerEmail,
+    });
+    logPromote(ctx, sink, ownerEmail, promote.Error);
 
-        if (promote.Error !== null) {
-            records.push({
-                OwnerEmail: ownerEmail, Promoted: false,
-                FailedStep: promote.FailedStep, Error: promote.Error,
-            });
-            logNoRollback(ctx, sink, succeeded);
+    if (promote.Error !== null) {
+      records.push({
+        OwnerEmail: ownerEmail, Promoted: false,
+        FailedStep: promote.FailedStep, Error: promote.Error,
+      });
+      logNoRollback(ctx, sink, succeeded);
 
-            return {
-                Records: records,
-                Failure: {
-                    Email: ownerEmail, Error: promote.Error, FailedStep: promote.FailedStep,
-                },
-            };
-        }
-
-        records.push({
-            OwnerEmail: ownerEmail, Promoted: true, FailedStep: null, Error: null,
-        });
-        succeeded.push(ownerEmail);
+      return {
+        Records: records,
+        Failure: {
+          Email: ownerEmail, Error: promote.Error, FailedStep: promote.FailedStep,
+        },
+      };
     }
 
-    return { Records: records, Failure: null };
+    records.push({
+      OwnerEmail: ownerEmail, Promoted: true, FailedStep: null, Error: null,
+    });
+    succeeded.push(ownerEmail);
+  }
+
+  return { Records: records, Failure: null };
 };

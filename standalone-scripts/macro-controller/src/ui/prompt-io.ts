@@ -48,8 +48,11 @@ export function filterUserAddedEntries(
   const kept: CachedPromptEntry[] = [];
   let defaultsSkipped = 0;
   for (const e of entries) {
-    if (isUserAddedEntry(e)) kept.push(e);
-    else defaultsSkipped++;
+    if (isUserAddedEntry(e)) {
+      kept.push(e);
+    } else {
+      defaultsSkipped++;
+    }
   }
 
   return { kept, defaultsSkipped };
@@ -67,6 +70,7 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
 
       return;
     }
+
     const { kept: entries, defaultsSkipped } = filterUserAddedEntries(rawEntries);
     if (entries.length === 0) {
       showToast('Only default prompts exist, nothing to export', 'warn');
@@ -100,7 +104,10 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     a.click();
 
     setTimeout(() => {
-      if (a.parentNode) a.parentNode.removeChild(a);
+      if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
+
       URL.revokeObjectURL(url);
     }, Timings.POLL_INTERVAL_FAST);
 
@@ -126,13 +133,17 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
   const seenSlugs = new Set<string>();
   for (const e of entries) {
     const slug = e.slug;
-    if (!slug || seenSlugs.has(slug)) continue;
+    if (!slug || seenSlugs.has(slug)) {
+      continue;
+    }
+
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
     if (res.isFail || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
     }
+
     for (const r of res.value) {
       out.push({
         Slug: r.Slug,
@@ -210,17 +221,41 @@ function setLoose(target: object, key: string, value: unknown): void {
 }
 
 function preserveDynamicFields(e: LoosePromptShape, loose: CachedPromptEntry): void {
-  if (typeof e.id === 'string') setLoose(loose, 'id', e.id);
-  if (Array.isArray(e.tags)) setLoose(loose, 'tags', e.tags.filter((t) => typeof t === 'string'));
-  if (typeof e.isDynamic === 'boolean') setLoose(loose, 'isDynamic', e.isDynamic);
-  if (typeof e.replaceKey === 'string') setLoose(loose, 'replaceKey', e.replaceKey);
+  if (typeof e.id === 'string') {
+    setLoose(loose, 'id', e.id);
+  }
+
+  if (Array.isArray(e.tags)) {
+    setLoose(loose, 'tags', e.tags.filter((t) => typeof t === 'string'));
+  }
+
+  if (typeof e.isDynamic === 'boolean') {
+    setLoose(loose, 'isDynamic', e.isDynamic);
+  }
+
+  if (typeof e.replaceKey === 'string') {
+    setLoose(loose, 'replaceKey', e.replaceKey);
+  }
+
   if (Array.isArray(e.replaceValues)) {
     setLoose(loose, 'replaceValues', e.replaceValues.filter((v) => typeof v === 'string'));
   }
-  if (typeof e.slugTemplate === 'string') setLoose(loose, 'slugTemplate', e.slugTemplate);
-  if (typeof e.parentTitle === 'string') setLoose(loose, 'parentTitle', e.parentTitle);
-  if (typeof e.parentSlug === 'string') setLoose(loose, 'parentSlug', e.parentSlug);
-  if (typeof e.variantValue === 'string') setLoose(loose, 'variantValue', e.variantValue);
+
+  if (typeof e.slugTemplate === 'string') {
+    setLoose(loose, 'slugTemplate', e.slugTemplate);
+  }
+
+  if (typeof e.parentTitle === 'string') {
+    setLoose(loose, 'parentTitle', e.parentTitle);
+  }
+
+  if (typeof e.parentSlug === 'string') {
+    setLoose(loose, 'parentSlug', e.parentSlug);
+  }
+
+  if (typeof e.variantValue === 'string') {
+    setLoose(loose, 'variantValue', e.variantValue);
+  }
 }
 
 export function validatePromptEntry(entry: unknown): CachedPromptEntry | null {
@@ -237,10 +272,12 @@ export function validatePromptEntryDetailed(
   if (!entry || typeof entry !== 'object') {
     return { entry: null, field: '', reason: 'not an object' };
   }
+
   const e = entry as LoosePromptShape;
   if (typeof e.name !== 'string' || !e.name.trim()) {
     return { entry: null, field: 'name', reason: 'missing or empty string' };
   }
+
   if (typeof e.text !== 'string') {
     return { entry: null, field: 'text', reason: 'missing or not a string' };
   }
@@ -255,11 +292,26 @@ export function validatePromptEntryDetailed(
     // and must never be re-created via bundle import.
     isDefault: false,
   };
-  if (typeof e.slug === 'string') out.slug = e.slug.trim();
-  if (typeof e.order === 'number') out.order = e.order;
-  if (typeof e.version === 'string') out.version = e.version;
-  if (typeof e.excludeFromExport === 'boolean') out.excludeFromExport = e.excludeFromExport;
-  if (isPromptRole(e.role)) out.role = e.role;
+  if (typeof e.slug === 'string') {
+    out.slug = e.slug.trim();
+  }
+
+  if (typeof e.order === 'number') {
+    out.order = e.order;
+  }
+
+  if (typeof e.version === 'string') {
+    out.version = e.version;
+  }
+
+  if (typeof e.excludeFromExport === 'boolean') {
+    out.excludeFromExport = e.excludeFromExport;
+  }
+
+  if (isPromptRole(e.role)) {
+    out.role = e.role;
+  }
+
   preserveDynamicFields(e, out);
 
   return { entry: out, field: null, reason: null };
@@ -308,6 +360,7 @@ export function mergePrompts(
 
         return;
       }
+
       if (overwrite) {
         results.updated++;
         mergedMap.set(key, imp);
@@ -359,10 +412,14 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
         }
       });
     }
-    if (errors.length === 0) errors.push(...result.errors);
+
+    if (errors.length === 0) {
+      errors.push(...result.errors);
+    }
 
     return { valid, errors };
   }
+
   result.bundle.entries.forEach((entry, index) => {
     const detail = validatePromptEntryDetailed(entry);
     if (detail.entry) {
@@ -376,6 +433,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
   if (result.bundle.revisions && result.bundle.revisions.length > 0) {
     out.revisions = result.bundle.revisions;
   }
+
   if (result.bundle.promptOrder && result.bundle.promptOrder.length > 0) {
     out.promptOrder = result.bundle.promptOrder;
   }
@@ -477,12 +535,18 @@ export function applyRoleFilter(
   entries: readonly CachedPromptEntry[],
   roleFilter: PromptRole | undefined,
 ): { kept: CachedPromptEntry[]; droppedCount: number } {
-  if (!roleFilter) return { kept: [...entries], droppedCount: 0 };
+  if (!roleFilter) {
+    return { kept: [...entries], droppedCount: 0 };
+  }
+
   const kept: CachedPromptEntry[] = [];
   let droppedCount = 0;
   for (const e of entries) {
-    if (isPromptRole(e.role) && e.role === roleFilter) kept.push(e);
-    else droppedCount++;
+    if (isPromptRole(e.role) && e.role === roleFilter) {
+      kept.push(e);
+    } else {
+      droppedCount++;
+    }
   }
 
   return { kept, droppedCount };
@@ -507,10 +571,18 @@ async function commitRevisions(
   const groups = new Map<string, BundleRevisionRow[]>();
   let orphanCount = 0;
   for (const r of revisionsIn) {
-    if (!committedSlugs.has(r.Slug)) { orphanCount++; continue; }
+    if (!committedSlugs.has(r.Slug)) {
+      orphanCount++; continue; 
+    }
+
     const bucket = groups.get(r.Slug);
-    if (bucket) bucket.push(r); else groups.set(r.Slug, [r]);
+    if (bucket) {
+      bucket.push(r);
+    } else {
+      groups.set(r.Slug, [r]);
+    }
   }
+
   const totalGroups = groups.size;
   const totalRevisions = Array.from(groups.values()).reduce((a, rows) => a + rows.length, 0);
   emit({ phase: 'revisions', entriesCommitted, totalEntries, insertedRevisions: 0, totalRevisions, groupsDone: 0, totalGroups });
@@ -518,13 +590,24 @@ async function commitRevisions(
   let groupsDone = 0;
   for (const [slug, rows] of groups) {
     const res = await insertImportedRevisions(slug, rows);
-    if (res.isSuccess) inserted += rows.length;
-    else results.errors.push(`revisions for slug=${slug}: ${res.error ?? 'unknown'}`);
+    if (res.isSuccess) {
+      inserted += rows.length;
+    } else {
+      results.errors.push(`revisions for slug=${slug}: ${res.error ?? 'unknown'}`);
+    }
+
     groupsDone++;
     emit({ phase: 'revisions', entriesCommitted, totalEntries, insertedRevisions: inserted, totalRevisions, groupsDone, totalGroups, slug });
   }
-  if (inserted > 0) results.revisionsImported = inserted;
-  if (orphanCount > 0) results.errors.push(`${orphanCount} revision rows dropped (slug not in committed entries)`);
+
+  if (inserted > 0) {
+    results.revisionsImported = inserted;
+  }
+
+  if (orphanCount > 0) {
+    results.errors.push(`${orphanCount} revision rows dropped (slug not in committed entries)`);
+  }
+
   void totalRevisionsInput;
 }
 
@@ -534,10 +617,17 @@ export async function performPromptImport(
 ): Promise<PromptImportResults> {
   const totalRevisionsInput = options.revisions?.length ?? 0;
   const emit = (progress: ImportProgress): void => {
-    if (!options.onProgress) return;
-    try { options.onProgress(progress); }
-    catch (err) { log('[PromptIO] onProgress listener threw: ' + String(err), 'warn'); }
+    if (!options.onProgress) {
+      return;
+    }
+
+    try {
+      options.onProgress(progress); 
+    } catch (err) {
+      log('[PromptIO] onProgress listener threw: ' + String(err), 'warn'); 
+    }
   };
+
   const { kept, droppedCount } = applyRoleFilter(importedPrompts, options.roleFilter);
   const bridge = await import('./prompt-io-db-bridge');
   const { dbEntries, cacheEntries } = bridge.partitionByRole(kept);
@@ -560,6 +650,7 @@ export async function performPromptImport(
   if (dbResult.defaultsProtected > 0) {
     results.defaultsProtected = (results.defaultsProtected ?? 0) + dbResult.defaultsProtected;
   }
+
   if (droppedCount > 0) {
     results.errors.push(`${droppedCount} entries skipped (roleFilter=${String(options.roleFilter)})`);
   }
@@ -577,10 +668,12 @@ export async function performPromptImport(
   if (options.revisions && options.revisions.length > 0) {
     await commitRevisions(options.revisions, dbEntries, results, importedPrompts.length, totalRevisionsInput, dbResult.upserted, emit);
   }
+
   if (options.promptOrder && options.promptOrder.length > 0) {
     const { savePromptOrder } = await import('./prompt-drag-order');
     savePromptOrder(options.promptOrder.slice());
   }
+
   emit({
     phase: 'done',
     entriesCommitted: dbResult.upserted,
@@ -612,12 +705,21 @@ export interface PromptImportPreview {
 async function collectExistingRoleSlugs(dbEntries: readonly CachedPromptEntry[]): Promise<Set<string>> {
   const { listPromptsByRole } = await import('../db/prompt-db');
   const rolesTouched = new Set<PromptRole>();
-  for (const e of dbEntries) if (isPromptRole(e.role)) rolesTouched.add(e.role);
+  for (const e of dbEntries) {
+    if (isPromptRole(e.role)) {
+      rolesTouched.add(e.role);
+    }
+  }
+
   const existing = new Set<string>();
   for (const role of rolesTouched) {
     const res = await listPromptsByRole(role);
     if (res.isSuccess && res.value) {
-      for (const r of res.value) if (r.Slug) existing.add(role + ':' + r.Slug);
+      for (const r of res.value) {
+        if (r.Slug) {
+          existing.add(role + ':' + r.Slug);
+        }
+      }
     }
   }
 
@@ -634,7 +736,11 @@ function tallyPreviewEntries(
   for (const e of dbEntries) {
     if (e.slug && isPromptRole(e.role)) {
       committedSlugs.add(e.slug);
-      if (existing.has(e.role + ':' + e.slug)) updated++; else added++;
+      if (existing.has(e.role + ':' + e.slug)) {
+        updated++;
+      } else {
+        added++;
+      }
     } else {
       added++;
     }
@@ -651,7 +757,11 @@ function tallyPreviewRevisions(
   let orphan = 0;
   if (revisions) {
     for (const r of revisions) {
-      if (committedSlugs.has(r.Slug)) revs++; else orphan++;
+      if (committedSlugs.has(r.Slug)) {
+        revs++;
+      } else {
+        orphan++;
+      }
     }
   }
 

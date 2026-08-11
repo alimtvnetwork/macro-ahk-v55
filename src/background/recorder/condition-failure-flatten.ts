@@ -18,28 +18,43 @@ export interface FlattenedSelectors {
 }
 
 export function flattenConditionSelectors(c: Condition): FlattenedSelectors {
-    const all: string[] = [];
-    const xpath: string[] = [];
-    walk(c);
+  const all: string[] = [];
+  const xpath: string[] = [];
+  walk(c);
 
-    return { Selectors: all, XPath: xpath };
+  return { Selectors: all, XPath: xpath };
 
-    function walk(node: Condition): void {
-        if ("All" in node) { for (const child of node.All) walk(child);
+  function walk(node: Condition): void {
+    if ("All" in node) {
+      for (const child of node.All) {
+        walk(child);
+      }
 
- return; }
-        if ("Any" in node) { for (const child of node.Any) walk(child);
-
- return; }
-        if ("Not" in node) { walk(node.Not);
-
- return; }
-        collectLeaf(node);
+      return; 
     }
 
-    function collectLeaf(p: Predicate): void {
-        all.push(p.Selector);
-        const kind = resolveSelectorKind(p.SelectorKind ?? "Auto", p.Selector);
-        if (kind === "XPath") xpath.push(p.Selector);
+    if ("Any" in node) {
+      for (const child of node.Any) {
+        walk(child);
+      }
+
+      return; 
     }
+
+    if ("Not" in node) {
+      walk(node.Not);
+
+      return; 
+    }
+
+    collectLeaf(node);
+  }
+
+  function collectLeaf(p: Predicate): void {
+    all.push(p.Selector);
+    const kind = resolveSelectorKind(p.SelectorKind ?? "Auto", p.Selector);
+    if (kind === "XPath") {
+      xpath.push(p.Selector);
+    }
+  }
 }

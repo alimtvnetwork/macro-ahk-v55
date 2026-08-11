@@ -114,22 +114,22 @@ export interface NormalizedInjectScriptsResponse {
  * error instead of crashing on a property access.
  */
 export function normalizeInjectScriptsResponse(
-    raw: InjectScriptsResponse | null | undefined,
+  raw: InjectScriptsResponse | null | undefined,
 ): NormalizedInjectScriptsResponse {
-    const safe = raw ?? { results: [] };
-    const results = Array.isArray(safe.results) ? safe.results : [];
-    const flag = safe.inlineSyntaxErrorDetected;
-    if (typeof flag === "boolean") {
-        return {
-            results,
-            inlineSyntaxErrorDetected: flag,
-            inlineSyntaxFlagSource: "wire",
-        };
-    }
-
+  const safe = raw ?? { results: [] };
+  const results = Array.isArray(safe.results) ? safe.results : [];
+  const flag = safe.inlineSyntaxErrorDetected;
+  if (typeof flag === "boolean") {
     return {
-        results,
-        inlineSyntaxErrorDetected: false,
-        inlineSyntaxFlagSource: "legacy-default",
+      results,
+      inlineSyntaxErrorDetected: flag,
+      inlineSyntaxFlagSource: "wire",
     };
+  }
+
+  return {
+    results,
+    inlineSyntaxErrorDetected: false,
+    inlineSyntaxFlagSource: "legacy-default",
+  };
 }

@@ -34,16 +34,28 @@ const CURRENT_MIGRATION_REV = 5;
  * (gated by `MIGRATION_REV_KEY`). Safe to call repeatedly.
  */
 function runPromptOrderMigrations(): void {
-  if (typeof localStorage === 'undefined') return;
+  if (typeof localStorage === 'undefined') {
+    return;
+  }
+
   try {
     const storedRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0');
-    if (Number.isFinite(storedRev) && storedRev >= CURRENT_MIGRATION_REV) return;
+    if (Number.isFinite(storedRev) && storedRev >= CURRENT_MIGRATION_REV) {
+      return;
+    }
+
     const legacy = readLegacyOrder();
     const current = loadPromptOrder();
     const source = current.length > 0 ? current : legacy;
     const migrated = migrateSavedOrder(source);
-    if (migrated.length > 0) savePromptOrder(migrated);
-    for (const key of LEGACY_STORAGE_KEYS) localStorage.removeItem(key);
+    if (migrated.length > 0) {
+      savePromptOrder(migrated);
+    }
+
+    for (const key of LEGACY_STORAGE_KEYS) {
+      localStorage.removeItem(key);
+    }
+
     localStorage.setItem(MIGRATION_REV_KEY, String(CURRENT_MIGRATION_REV));
   } catch (err) {
     logError('PromptDragOrder', UNKNOWN_ERROR);
@@ -54,7 +66,10 @@ function readLegacyOrder(): string[] {
   for (const key of LEGACY_STORAGE_KEYS) {
     try {
       const raw = localStorage.getItem(key);
-      if (!raw) continue;
+      if (!raw) {
+        continue;
+      }
+
       const parsed: unknown = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         return parsed.filter((v): v is string => typeof v === 'string');
@@ -82,14 +97,26 @@ export function migrateSavedOrder(saved: readonly string[]): string[] {
   const kept: string[] = [];
   const seen = new Set<string>();
   for (const slug of saved) {
-    if (seen.has(slug)) continue;
-    if (terminalSet.has(slug)) continue;      // terminal 7 are re-appended below
-    if (!defaultSet.has(slug)) continue;      // drop unknown / obsolete slugs
+    if (seen.has(slug)) {
+      continue;
+    }
+
+    if (terminalSet.has(slug)) {
+      continue;
+    }      // terminal 7 are re-appended below
+
+    if (!defaultSet.has(slug)) {
+      continue;
+    }      // drop unknown / obsolete slugs
+
     seen.add(slug);
     kept.push(slug);
   }
+
   for (const slug of defaults.slice(0, defaults.length - terminalCount)) {
-    if (!seen.has(slug)) { kept.push(slug); seen.add(slug); }
+    if (!seen.has(slug)) {
+      kept.push(slug); seen.add(slug); 
+    }
   }
 
   return [...kept, ...terminal];
@@ -139,7 +166,10 @@ export const DEFAULT_PROMPT_ORDER: readonly string[] = [
 export function loadPromptOrder(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      return [];
+    }
+
     const parsed: unknown = JSON.parse(raw);
 
     return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
@@ -172,11 +202,19 @@ export function resetPromptOrderToDefault(): string[] {
 /** Slugs the user has explicitly moved via drag-and-drop. */
 function loadDragTouched(): Set<string> {
   try {
-    if (typeof localStorage === 'undefined') return new Set();
+    if (typeof localStorage === 'undefined') {
+      return new Set();
+    }
+
     const raw = localStorage.getItem(DRAG_TOUCHED_KEY);
-    if (!raw) return new Set();
+    if (!raw) {
+      return new Set();
+    }
+
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return new Set();
+    if (!Array.isArray(parsed)) {
+      return new Set();
+    }
 
     return new Set(parsed.filter((v): v is string => typeof v === 'string'));
   } catch {
@@ -186,7 +224,10 @@ function loadDragTouched(): Set<string> {
 
 function saveDragTouched(set: Set<string>): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     localStorage.setItem(DRAG_TOUCHED_KEY, JSON.stringify([...set]));
   } catch (err) {
     logError('PromptDragOrder', UNKNOWN_ERROR);
@@ -195,7 +236,9 @@ function saveDragTouched(set: Set<string>): void {
 
 function clearDragTouched(): void {
   try {
-    if (typeof localStorage !== 'undefined') localStorage.removeItem(DRAG_TOUCHED_KEY);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(DRAG_TOUCHED_KEY);
+    }
   } catch (err) {
     logError('PromptDragOrder', UNKNOWN_ERROR);
   }
@@ -228,12 +271,17 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
   } catch (err) {
     logError('PromptDragOrder', UNKNOWN_ERROR);
   }
+
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
   let source: SlugPositionSource;
-  if (saved.length === 0 || index < 0) source = 'default';
-  else if (touched.has(slug)) source = 'drag';
-  else source = 'migrated';
+  if (saved.length === 0 || index < 0) {
+    source = 'default';
+  } else if (touched.has(slug)) {
+    source = 'drag';
+  } else {
+    source = 'migrated';
+  }
 
   return { source, storageKey: STORAGE_KEY, migrationRev, currentRev: CURRENT_MIGRATION_REV, index };
 }
@@ -268,6 +316,7 @@ export function getPromptOrderSource(): PromptOrderSource {
   } catch (err) {
     logError('PromptDragOrder', UNKNOWN_ERROR);
   }
+
   const usingSaved = saved.length > 0;
 
   return {
@@ -285,7 +334,10 @@ function entryKey(p: PromptEntry): string {
 
 export function sortEntriesByOrder<T extends PromptEntry>(entries: T[]): T[] {
   const order = getEffectivePromptOrder();
-  if (order.length === 0) return entries.slice();
+  if (order.length === 0) {
+    return entries.slice();
+  }
+
   const rank = new Map<string, number>();
   order.forEach((slug, idx) => rank.set(slug, idx));
   const tagged = entries.map((entry, idx) => ({ entry, idx, r: rank.get(entryKey(entry)) }));
@@ -298,9 +350,17 @@ function compareOrderedEntries<T extends PromptEntry>(
   a: { entry: T; idx: number; r: number | undefined },
   b: { entry: T; idx: number; r: number | undefined },
 ): number {
-  if (a.r === undefined && b.r === undefined) return a.idx - b.idx;
-  if (a.r === undefined) return 1;
-  if (b.r === undefined) return -1;
+  if (a.r === undefined && b.r === undefined) {
+    return a.idx - b.idx;
+  }
+
+  if (a.r === undefined) {
+    return 1;
+  }
+
+  if (b.r === undefined) {
+    return -1;
+  }
 
   return a.r - b.r;
 }
@@ -330,6 +390,7 @@ function handleDragStart(event: DragEvent, slug: string, item: HTMLElement): voi
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', slug);
   }
+
   item.style.opacity = '0.5';
 }
 
@@ -340,13 +401,22 @@ function handleDragEnd(item: HTMLElement): void {
 }
 
 function handleDragOver(event: DragEvent, item: HTMLElement): void {
-  if (!dragState.draggingSlug) return;
+  if (!dragState.draggingSlug) {
+    return;
+  }
+
   event.preventDefault();
-  if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+  }
+
   clearDropIndicators(findDropdownRoot(item));
   const insertBefore = shouldInsertBefore(event, item);
-  if (insertBefore) item.style.borderTop = '2px solid #7c3aed';
-  else item.style.borderBottom = '2px solid #7c3aed';
+  if (insertBefore) {
+    item.style.borderTop = '2px solid #7c3aed';
+  } else {
+    item.style.borderBottom = '2px solid #7c3aed';
+  }
 }
 
 function shouldInsertBefore(event: DragEvent, item: HTMLElement): boolean {
@@ -361,7 +431,10 @@ function clearItemIndicator(item: HTMLElement): void {
 }
 
 function clearDropIndicators(root: HTMLElement | null): void {
-  if (!root) return;
+  if (!root) {
+    return;
+  }
+
   root.querySelectorAll<HTMLElement>('[data-prompt-slug]').forEach(node => {
     node.style.borderTop = '';
     node.style.borderBottom = '';
@@ -378,14 +451,27 @@ function handleDrop(event: DragEvent, target: HTMLElement, onReorder: () => void
   clearDropIndicators(root);
   const sourceSlug = dragState.draggingSlug;
   dragState.draggingSlug = null;
-  if (!sourceSlug || !root) return;
+  if (!sourceSlug || !root) {
+    return;
+  }
+
   const source = root.querySelector<HTMLElement>('[data-prompt-slug="' + cssEscape(sourceSlug) + '"]');
-  if (!source || source === target) return;
+  if (!source || source === target) {
+    return;
+  }
+
   const insertBefore = shouldInsertBefore(event, target);
   const targetParent = target.parentElement;
-  if (!targetParent) return;
-  if (insertBefore) targetParent.insertBefore(source, target);
-  else targetParent.insertBefore(source, target.nextSibling);
+  if (!targetParent) {
+    return;
+  }
+
+  if (insertBefore) {
+    targetParent.insertBefore(source, target);
+  } else {
+    targetParent.insertBefore(source, target.nextSibling);
+  }
+
   markDragTouched(sourceSlug);
   persistDomOrder(root);
   onReorder();
@@ -407,7 +493,10 @@ function persistDomOrder(root: HTMLElement): void {
   const seenInDom = new Set<string>();
   root.querySelectorAll<HTMLElement>('[data-prompt-slug]').forEach(node => {
     const slug = node.getAttribute('data-prompt-slug');
-    if (!slug || seenInDom.has(slug)) return;
+    if (!slug || seenInDom.has(slug)) {
+      return;
+    }
+
     seenInDom.add(slug);
     domSlugs.push(slug);
   });

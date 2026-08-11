@@ -38,11 +38,20 @@ function toMessage(caught: CaughtError): string {
 
 function hydrate(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      return;
+    }
+
     const prefs = JSON.parse(raw) as InlineStripGroupPrefs;
-    if (typeof prefs.collapsed === 'boolean') state.collapsed = prefs.collapsed;
+    if (typeof prefs.collapsed === 'boolean') {
+      state.collapsed = prefs.collapsed;
+    }
+
     // NOTE: `removed` is intentionally NOT hydrated. × is a session-only hide
     // until a proper restore action ships in the TS Macro menu. If a prior
     // build persisted removed=true, clear it now so strips re-appear.
@@ -58,7 +67,10 @@ function hydrate(): void {
 
 function persist(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       collapsed: state.collapsed,
       // removed is session-only; do not persist
@@ -70,8 +82,9 @@ function persist(): void {
 
 function notify(): void {
   for (const subscriber of state.subscribers) {
-    try { subscriber(); }
-    catch (caught: CaughtError) {
+    try {
+      subscriber(); 
+    } catch (caught: CaughtError) {
       log('InlineStripGroup: subscriber failed — ' + toMessage(caught), 'warn');
     }
   }
@@ -84,7 +97,10 @@ export function getInlineStripGroupCollapsed(): boolean {
 }
 
 export function setInlineStripGroupCollapsed(collapsed: boolean): void {
-  if (state.collapsed === collapsed) return;
+  if (state.collapsed === collapsed) {
+    return;
+  }
+
   state.collapsed = collapsed;
   persist();
   notify();
@@ -99,7 +115,10 @@ export function getInlineStripGroupRemoved(): boolean {
 }
 
 export function setInlineStripGroupRemoved(removed: boolean): void {
-  if (state.removed === removed) return;
+  if (state.removed === removed) {
+    return;
+  }
+
   state.removed = removed;
   persist();
   notify();
@@ -109,17 +128,27 @@ export function setInlineStripGroupRemoved(removed: boolean): void {
 export function subscribeInlineStripGroupCollapse(subscriber: () => void): () => void {
   state.subscribers.add(subscriber);
 
-  return function unsubscribe(): void { state.subscribers.delete(subscriber); };
+  return function unsubscribe(): void {
+    state.subscribers.delete(subscriber); 
+  };
 }
 
 function applyPlanCollapse(plan: HTMLElement, collapsed: boolean): void {
   plan.dataset.groupCollapsed = collapsed ? '1' : '0';
   plan.style.display = 'flex';
   const body = plan.querySelector<HTMLElement>(SEL_PLAN_BODY);
-  if (body) body.style.display = collapsed ? 'none' : 'flex';
-  if (!collapsed) return;
+  if (body) {
+    body.style.display = collapsed ? 'none' : 'flex';
+  }
+
+  if (!collapsed) {
+    return;
+  }
+
   const dropup = plan.querySelector<HTMLElement>(SEL_PLAN_DROPUP);
-  if (dropup) dropup.style.display = 'none';
+  if (dropup) {
+    dropup.style.display = 'none';
+  }
 }
 
 export function applyInlineStripGroupCollapse(doc: Document = document): void {
@@ -128,7 +157,15 @@ export function applyInlineStripGroupCollapse(doc: Document = document): void {
   const next = doc.getElementById(NEXT_ID);
   const repeat = doc.getElementById(REPEAT_ID);
 
-  if (plan instanceof HTMLElement) applyPlanCollapse(plan, collapsed);
-  if (next instanceof HTMLElement) next.style.display = collapsed ? 'none' : 'flex';
-  if (repeat instanceof HTMLElement) repeat.style.display = collapsed ? 'none' : 'inline-flex';
+  if (plan instanceof HTMLElement) {
+    applyPlanCollapse(plan, collapsed);
+  }
+
+  if (next instanceof HTMLElement) {
+    next.style.display = collapsed ? 'none' : 'flex';
+  }
+
+  if (repeat instanceof HTMLElement) {
+    repeat.style.display = collapsed ? 'none' : 'inline-flex';
+  }
 }

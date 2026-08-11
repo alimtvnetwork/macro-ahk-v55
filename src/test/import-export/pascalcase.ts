@@ -11,6 +11,7 @@ export function isPascalCase(name: string): boolean {
   if (typeof name !== "string" || name.length === 0) {
     return false;
   }
+
   if (name.includes("_") || name.includes("-")) {
     return false;
   }
@@ -40,6 +41,7 @@ export function findSchemaViolations(db: Database): SchemaViolation[] {
     if (!isPascalCase(table)) {
       violations.push({ table, reason: `table name '${table}' is not PascalCase` });
     }
+
     const cols = db.exec(`PRAGMA table_info('${table.replace(/'/g, "''")}')`);
     const colNames: string[] = cols[0]?.values.map((row) => String(row[1])) ?? [];
     for (const col of colNames) {

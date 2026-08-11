@@ -55,45 +55,81 @@ const TAG_NAME_PATTERN = /^[A-Za-z0-9_\-. ]+$/;
 const PROJECT_SLUG_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
 function assertRetry(n: number): void {
-    if (!Number.isInteger(n) || n < 0) throw new Error(`RetryCount must be a non-negative integer; got ${n}`);
-    if (n > MAX_RETRY_COUNT) throw new Error(`RetryCount exceeds ${MAX_RETRY_COUNT}; got ${n}`);
+  if (!Number.isInteger(n) || n < 0) {
+    throw new Error(`RetryCount must be a non-negative integer; got ${n}`);
+  }
+
+  if (n > MAX_RETRY_COUNT) {
+    throw new Error(`RetryCount exceeds ${MAX_RETRY_COUNT}; got ${n}`);
+  }
 }
 
 function assertTimeout(n: number | null): void {
-    if (n === null) return;
-    if (!Number.isInteger(n) || n <= 0) throw new Error(`TimeoutMs must be a positive integer or null; got ${n}`);
-    if (n > MAX_TIMEOUT_MS) throw new Error(`TimeoutMs exceeds ${MAX_TIMEOUT_MS}ms; got ${n}`);
+  if (n === null) {
+    return;
+  }
+
+  if (!Number.isInteger(n) || n <= 0) {
+    throw new Error(`TimeoutMs must be a positive integer or null; got ${n}`);
+  }
+
+  if (n > MAX_TIMEOUT_MS) {
+    throw new Error(`TimeoutMs exceeds ${MAX_TIMEOUT_MS}ms; got ${n}`);
+  }
 }
 
 function assertLabel(s: string): void {
-    if (typeof s !== "string") throw new Error("LabelType must be a string");
-    const trimmed = s.trim();
-    if (trimmed.length === 0) throw new Error("LabelType cannot be empty");
-    if (trimmed.length > MAX_LABEL_LENGTH) {
-        throw new Error(`LabelType exceeds ${MAX_LABEL_LENGTH} chars: ${trimmed.length}`);
-    }
+  if (typeof s !== "string") {
+    throw new Error("LabelType must be a string");
+  }
+
+  const trimmed = s.trim();
+  if (trimmed.length === 0) {
+    throw new Error("LabelType cannot be empty");
+  }
+
+  if (trimmed.length > MAX_LABEL_LENGTH) {
+    throw new Error(`LabelType exceeds ${MAX_LABEL_LENGTH} chars: ${trimmed.length}`);
+  }
 }
 
 function assertDescription(s: string | null): void {
-    if (s === null) return;
-    if (typeof s !== "string") throw new Error("Description must be a string or null");
-    if (s.length > MAX_DESCRIPTION_LENGTH) {
-        throw new Error(`Description exceeds ${MAX_DESCRIPTION_LENGTH} chars: ${s.length}`);
-    }
+  if (s === null) {
+    return;
+  }
+
+  if (typeof s !== "string") {
+    throw new Error("Description must be a string or null");
+  }
+
+  if (s.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error(`Description exceeds ${MAX_DESCRIPTION_LENGTH} chars: ${s.length}`);
+  }
 }
 
 function assertTagName(s: string): void {
-    if (typeof s !== "string") throw new Error("Tag name must be a string");
-    const trimmed = s.trim();
-    if (trimmed.length === 0) throw new Error("Tag name cannot be empty");
-    if (trimmed.length > MAX_TAG_LENGTH) throw new Error(`Tag name exceeds ${MAX_TAG_LENGTH} chars: ${trimmed.length}`);
-    if (!TAG_NAME_PATTERN.test(trimmed)) {
-        throw new Error(`Tag name contains invalid characters (allowed: A-Z a-z 0-9 _ - . space): "${trimmed}"`);
-    }
+  if (typeof s !== "string") {
+    throw new Error("Tag name must be a string");
+  }
+
+  const trimmed = s.trim();
+  if (trimmed.length === 0) {
+    throw new Error("Tag name cannot be empty");
+  }
+
+  if (trimmed.length > MAX_TAG_LENGTH) {
+    throw new Error(`Tag name exceeds ${MAX_TAG_LENGTH} chars: ${trimmed.length}`);
+  }
+
+  if (!TAG_NAME_PATTERN.test(trimmed)) {
+    throw new Error(`Tag name contains invalid characters (allowed: A-Z a-z 0-9 _ - . space): "${trimmed}"`);
+  }
 }
 
 function assertTagSetSize(n: number): void {
-    if (n > MAX_TAGS_PER_STEP) throw new Error(`Tag set exceeds ${MAX_TAGS_PER_STEP} entries; got ${n}`);
+  if (n > MAX_TAGS_PER_STEP) {
+    throw new Error(`Tag set exceeds ${MAX_TAGS_PER_STEP} entries; got ${n}`);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -101,62 +137,83 @@ function assertTagSetSize(n: number): void {
 /* ------------------------------------------------------------------ */
 
 function validateMetaPatch(patch: StepMetaPatch): void {
-    if (patch.LabelType !== undefined) assertLabel(patch.LabelType);
-    if (patch.Description !== undefined) assertDescription(patch.Description ?? null);
-    if (patch.RetryCount !== undefined) assertRetry(patch.RetryCount);
-    if (patch.TimeoutMs !== undefined) assertTimeout(patch.TimeoutMs);
-    if (patch.IsDisabled !== undefined && typeof patch.IsDisabled !== "boolean") {
-        throw new Error(`IsDisabled must be a boolean; got ${typeof patch.IsDisabled}`);
-    }
+  if (patch.LabelType !== undefined) {
+    assertLabel(patch.LabelType);
+  }
+
+  if (patch.Description !== undefined) {
+    assertDescription(patch.Description ?? null);
+  }
+
+  if (patch.RetryCount !== undefined) {
+    assertRetry(patch.RetryCount);
+  }
+
+  if (patch.TimeoutMs !== undefined) {
+    assertTimeout(patch.TimeoutMs);
+  }
+
+  if (patch.IsDisabled !== undefined && typeof patch.IsDisabled !== "boolean") {
+    throw new Error(`IsDisabled must be a boolean; got ${typeof patch.IsDisabled}`);
+  }
 }
 
 function buildMetaSets(patch: StepMetaPatch): { sets: string[]; params: Array<string | number | null> } {
-    const sets: string[] = [];
-    const params: Array<string | number | null> = [];
-    pushIfDefined(patch.LabelType, "LabelType", sets, params);
-    pushIfDefined(patch.Description ?? undefined, "Description", sets, params);
-    pushIfDefinedBool(patch.IsDisabled, "IsDisabled", sets, params);
-    pushIfDefined(patch.RetryCount, "RetryCount", sets, params);
-    pushIfDefined(patch.TimeoutMs ?? undefined, "TimeoutMs", sets, params);
+  const sets: string[] = [];
+  const params: Array<string | number | null> = [];
+  pushIfDefined(patch.LabelType, "LabelType", sets, params);
+  pushIfDefined(patch.Description ?? undefined, "Description", sets, params);
+  pushIfDefinedBool(patch.IsDisabled, "IsDisabled", sets, params);
+  pushIfDefined(patch.RetryCount, "RetryCount", sets, params);
+  pushIfDefined(patch.TimeoutMs ?? undefined, "TimeoutMs", sets, params);
 
-    return { sets, params };
+  return { sets, params };
 }
 
 export function updateStepMetaRow(
-    db: SqlJsDatabase,
-    stepId: number,
-    patch: StepMetaPatch,
+  db: SqlJsDatabase,
+  stepId: number,
+  patch: StepMetaPatch,
 ): PersistedStep {
-    validateMetaPatch(patch);
-    const { sets, params } = buildMetaSets(patch);
-    if (sets.length === 0) return readStepRow(db, stepId);
-    sets.push("UpdatedAt = datetime('now')");
-    params.push(stepId);
-    db.run(`UPDATE Step SET ${sets.join(", ")} WHERE StepId = ?`, params);
-
+  validateMetaPatch(patch);
+  const { sets, params } = buildMetaSets(patch);
+  if (sets.length === 0) {
     return readStepRow(db, stepId);
+  }
+
+  sets.push("UpdatedAt = datetime('now')");
+  params.push(stepId);
+  db.run(`UPDATE Step SET ${sets.join(", ")} WHERE StepId = ?`, params);
+
+  return readStepRow(db, stepId);
 }
 
 function pushIfDefined(
-    value: string | number | null | undefined,
-    column: string,
-    sets: string[],
-    params: Array<string | number | null>,
+  value: string | number | null | undefined,
+  column: string,
+  sets: string[],
+  params: Array<string | number | null>,
 ): void {
-    if (value === undefined) return;
-    sets.push(`${column} = ?`);
-    params.push(value);
+  if (value === undefined) {
+    return;
+  }
+
+  sets.push(`${column} = ?`);
+  params.push(value);
 }
 
 function pushIfDefinedBool(
-    value: boolean | undefined,
-    column: string,
-    sets: string[],
-    params: Array<string | number | null>,
+  value: boolean | undefined,
+  column: string,
+  sets: string[],
+  params: Array<string | number | null>,
 ): void {
-    if (value === undefined) return;
-    sets.push(`${column} = ?`);
-    params.push(value ? 1 : 0);
+  if (value === undefined) {
+    return;
+  }
+
+  sets.push(`${column} = ?`);
+  params.push(value ? 1 : 0);
 }
 
 /* ------------------------------------------------------------------ */
@@ -164,45 +221,48 @@ function pushIfDefinedBool(
 /* ------------------------------------------------------------------ */
 
 export function setStepTagsRow(
-    db: SqlJsDatabase,
-    stepId: number,
-    names: ReadonlyArray<string>,
+  db: SqlJsDatabase,
+  stepId: number,
+  names: ReadonlyArray<string>,
 ): ReadonlyArray<string> {
-    const unique = dedupeTags(names);
-    assertTagSetSize(unique.length);
-    db.run("DELETE FROM StepTag WHERE StepId = ?", [stepId]);
-    for (const name of unique) {
-        db.run("INSERT INTO StepTag (StepId, Name) VALUES (?, ?)", [stepId, name]);
-    }
+  const unique = dedupeTags(names);
+  assertTagSetSize(unique.length);
+  db.run("DELETE FROM StepTag WHERE StepId = ?", [stepId]);
+  for (const name of unique) {
+    db.run("INSERT INTO StepTag (StepId, Name) VALUES (?, ?)", [stepId, name]);
+  }
 
-    return listStepTagsRow(db, stepId);
+  return listStepTagsRow(db, stepId);
 }
 
 function dedupeTags(names: ReadonlyArray<string>): string[] {
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const raw of names) {
-        assertTagName(raw);
-        const trimmed = raw.trim();
-        if (seen.has(trimmed)) continue;
-        seen.add(trimmed);
-        out.push(trimmed);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of names) {
+    assertTagName(raw);
+    const trimmed = raw.trim();
+    if (seen.has(trimmed)) {
+      continue;
     }
 
-    return out;
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+
+  return out;
 }
 
 export function listStepTagsRow(
-    db: SqlJsDatabase,
-    stepId: number,
+  db: SqlJsDatabase,
+  stepId: number,
 ): ReadonlyArray<string> {
-    const result = db.exec(
-        "SELECT Name FROM StepTag WHERE StepId = ? ORDER BY Name ASC",
-        [stepId],
-    );
-    const values = result[0]?.values ?? [];
+  const result = db.exec(
+    "SELECT Name FROM StepTag WHERE StepId = ? ORDER BY Name ASC",
+    [stepId],
+  );
+  const values = result[0]?.values ?? [];
 
-    return values.map((row) => row[0] as string);
+  return values.map((row) => row[0] as string);
 }
 
 /* ------------------------------------------------------------------ */
@@ -210,33 +270,43 @@ export function listStepTagsRow(
 /* ------------------------------------------------------------------ */
 
 export function setStepLinkRow(
-    db: SqlJsDatabase,
-    stepId: number,
-    slot: StepLinkSlot,
-    projectSlug: string | null,
+  db: SqlJsDatabase,
+  stepId: number,
+  slot: StepLinkSlot,
+  projectSlug: string | null,
 ): PersistedStep {
-    const value = normaliseProjectSlug(projectSlug);
-    db.run(
-        `UPDATE Step SET ${slot} = ?, UpdatedAt = datetime('now') WHERE StepId = ?`,
-        [value, stepId],
-    );
+  const value = normaliseProjectSlug(projectSlug);
+  db.run(
+    `UPDATE Step SET ${slot} = ?, UpdatedAt = datetime('now') WHERE StepId = ?`,
+    [value, stepId],
+  );
 
-    return readStepRow(db, stepId);
+  return readStepRow(db, stepId);
 }
 
 function normaliseProjectSlug(raw: string | null): string | null {
-    if (raw === null) return null;
-    if (typeof raw !== "string") throw new Error("Project slug must be a string or null");
-    const trimmed = raw.trim();
-    if (trimmed.length === 0) return null;
-    if (trimmed.length > MAX_SLUG_LENGTH) {
-        throw new Error(`Project slug exceeds ${MAX_SLUG_LENGTH} chars: ${trimmed.length}`);
-    }
-    if (!PROJECT_SLUG_PATTERN.test(trimmed)) {
-        throw new Error(`Project slug contains invalid characters (allowed: A-Z a-z 0-9 _ - .): "${trimmed}"`);
-    }
+  if (raw === null) {
+    return null;
+  }
 
-    return trimmed;
+  if (typeof raw !== "string") {
+    throw new Error("Project slug must be a string or null");
+  }
+
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  if (trimmed.length > MAX_SLUG_LENGTH) {
+    throw new Error(`Project slug exceeds ${MAX_SLUG_LENGTH} chars: ${trimmed.length}`);
+  }
+
+  if (!PROJECT_SLUG_PATTERN.test(trimmed)) {
+    throw new Error(`Project slug contains invalid characters (allowed: A-Z a-z 0-9 _ - .): "${trimmed}"`);
+  }
+
+  return trimmed;
 }
 
 /* ------------------------------------------------------------------ */
@@ -244,47 +314,47 @@ function normaliseProjectSlug(raw: string | null): string | null {
 /* ------------------------------------------------------------------ */
 
 export async function updateStepMeta(
-    projectSlug: string,
-    stepId: number,
-    patch: StepMetaPatch,
+  projectSlug: string,
+  stepId: number,
+  patch: StepMetaPatch,
 ): Promise<PersistedStep> {
-    const mgr = await initProjectDb(projectSlug);
-    const step = updateStepMetaRow(mgr.getDb(), stepId, patch);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const step = updateStepMetaRow(mgr.getDb(), stepId, patch);
+  mgr.markDirty();
 
-    return step;
+  return step;
 }
 
 export async function setStepTags(
-    projectSlug: string,
-    stepId: number,
-    names: ReadonlyArray<string>,
+  projectSlug: string,
+  stepId: number,
+  names: ReadonlyArray<string>,
 ): Promise<ReadonlyArray<string>> {
-    const mgr = await initProjectDb(projectSlug);
-    const tags = setStepTagsRow(mgr.getDb(), stepId, names);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const tags = setStepTagsRow(mgr.getDb(), stepId, names);
+  mgr.markDirty();
 
-    return tags;
+  return tags;
 }
 
 export async function listStepTags(
-    projectSlug: string,
-    stepId: number,
+  projectSlug: string,
+  stepId: number,
 ): Promise<ReadonlyArray<string>> {
-    const mgr = await initProjectDb(projectSlug);
+  const mgr = await initProjectDb(projectSlug);
 
-    return listStepTagsRow(mgr.getDb(), stepId);
+  return listStepTagsRow(mgr.getDb(), stepId);
 }
 
 export async function setStepLink(
-    projectSlug: string,
-    stepId: number,
-    slot: StepLinkSlot,
-    targetProjectSlug: string | null,
+  projectSlug: string,
+  stepId: number,
+  slot: StepLinkSlot,
+  targetProjectSlug: string | null,
 ): Promise<PersistedStep> {
-    const mgr = await initProjectDb(projectSlug);
-    const step = setStepLinkRow(mgr.getDb(), stepId, slot, targetProjectSlug);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const step = setStepLinkRow(mgr.getDb(), stepId, slot, targetProjectSlug);
+  mgr.markDirty();
 
-    return step;
+  return step;
 }

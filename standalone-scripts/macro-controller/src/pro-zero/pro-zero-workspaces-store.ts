@@ -24,29 +24,32 @@ export interface WorkspacesRow {
 interface KvBridge { kv: { set(key: string, value: string): Promise<void> }; }
 
 function getKv(): KvBridge['kv'] | null {
-    const sdk = (window as unknown as { marco?: KvBridge }).marco;
+  const sdk = (window as unknown as { marco?: KvBridge }).marco;
 
-    return sdk && sdk.kv ? sdk.kv : null;
+  return sdk && sdk.kv ? sdk.kv : null;
 }
 
 function buildRow(workspace: WorkspaceInfoTyped, balance: CreditBalanceResponseTyped): WorkspacesRow {
-    return {
-        WorkspaceId: workspace.id,
-        WorkspaceJson: JSON.stringify(workspace),
-        CreditBalanceJson: JSON.stringify(balance),
-        PlanTierType: workspace.plan,
-        FetchedAt: new Date().toISOString(),
-    };
+  return {
+    WorkspaceId: workspace.id,
+    WorkspaceJson: JSON.stringify(workspace),
+    CreditBalanceJson: JSON.stringify(balance),
+    PlanTierType: workspace.plan,
+    FetchedAt: new Date().toISOString(),
+  };
 }
 
 export function upsertWorkspacesRow(workspace: WorkspaceInfoTyped, balance: CreditBalanceResponseTyped): void {
-    const kv = getKv();
-    if (!kv) { logError('ProZeroWorkspacesStore', 'marco.kv unavailable — skipping SQLite upsert');
+  const kv = getKv();
+  if (!kv) {
+    logError('ProZeroWorkspacesStore', 'marco.kv unavailable — skipping SQLite upsert');
 
- return; }
-    const row = buildRow(workspace, balance);
-    const key = SQLITE_WORKSPACES_KEY_PREFIX + workspace.id;
-    kv.set(key, JSON.stringify(row)).catch(function (caught: unknown): void {
-        logError('ProZeroWorkspacesStore.upsert', 'kv.set failed for ' + workspace.id, caught);
-    });
+    return; 
+  }
+
+  const row = buildRow(workspace, balance);
+  const key = SQLITE_WORKSPACES_KEY_PREFIX + workspace.id;
+  kv.set(key, JSON.stringify(row)).catch(function (caught: unknown): void {
+    logError('ProZeroWorkspacesStore.upsert', 'kv.set failed for ' + workspace.id, caught);
+  });
 }

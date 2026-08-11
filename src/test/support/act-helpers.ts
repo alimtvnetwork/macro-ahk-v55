@@ -28,11 +28,11 @@ import { vi } from "vitest";
  * subsequent `setState`.
  */
 export async function flushEffects(ticks: number = 2): Promise<void> {
-    await act(async () => {
-        for (let i = 0; i < ticks; i += 1) {
-            await Promise.resolve();
-        }
-    });
+  await act(async () => {
+    for (let i = 0; i < ticks; i += 1) {
+      await Promise.resolve();
+    }
+  });
 }
 
 /**
@@ -40,11 +40,13 @@ export async function flushEffects(ticks: number = 2): Promise<void> {
  * prop-change-driven `useEffect` state updates land inside act.
  */
 export async function actRerender(
-    rerender: (ui: React.ReactElement) => void,
-    ui: React.ReactElement,
+  rerender: (ui: React.ReactElement) => void,
+  ui: React.ReactElement,
 ): Promise<void> {
-    await act(async () => { rerender(ui); });
-    await flushEffects();
+  await act(async () => {
+    rerender(ui); 
+  });
+  await flushEffects();
 }
 
 /**
@@ -54,9 +56,9 @@ export async function actRerender(
  * `LiveRecordedActionsTree.scroll.test.tsx`).
  */
 export async function waitRealMs(ms: number): Promise<void> {
-    await act(async () => {
-        await new Promise<void>((resolve) => setTimeout(resolve, ms));
-    });
+  await act(async () => {
+    await new Promise<void>((resolve) => setTimeout(resolve, ms));
+  });
 }
 
 /**
@@ -65,16 +67,18 @@ export async function waitRealMs(ms: number): Promise<void> {
  * it is invoked inside `act(...)` after `body` resolves.
  */
 export async function withFakeTimers(
-    body: () => Promise<void> | void,
-    advanceMs?: number,
+  body: () => Promise<void> | void,
+  advanceMs?: number,
 ): Promise<void> {
-    vi.useFakeTimers();
-    try {
-        await body();
-        if (advanceMs !== undefined) {
-            await act(async () => { vi.advanceTimersByTime(advanceMs); });
-        }
-    } finally {
-        vi.useRealTimers();
+  vi.useFakeTimers();
+  try {
+    await body();
+    if (advanceMs !== undefined) {
+      await act(async () => {
+        vi.advanceTimersByTime(advanceMs); 
+      });
     }
+  } finally {
+    vi.useRealTimers();
+  }
 }

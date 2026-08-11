@@ -30,9 +30,9 @@ vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ getRevalidateContext: mocks.getRevalidateContext }));
 vi.mock('../prompt-injection', () => ({ openPromptCreationModal: mocks.openPromptCreationModal }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   listPromptsByRole: mocks.listPromptsByRole,
   getDefaultPromptForRole: mocks.getDefaultPromptForRole,
   upsertPrompt: mocks.upsertPrompt,
@@ -64,7 +64,10 @@ describe('prompt-editor DiagnosticError migration (PlanTierType 26 · step 8)', 
   let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    for (const m of Object.values(mocks)) m.mockReset();
+    for (const m of Object.values(mocks)) {
+      m.mockReset();
+    }
+
     // Restore default seed behavior consumed by openDefaultPromptEditor preflight.
     mocks.seedPlanNextPrompts.mockResolvedValue(new DbResult(true, undefined));
     errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

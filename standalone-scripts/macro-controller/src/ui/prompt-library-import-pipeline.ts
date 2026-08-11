@@ -11,7 +11,10 @@ import { logError, logError } from '../error-utils';
 import { PreviewTriggerType } from "../types/enums";
 
 export function ensureSpinnerStyle(doc: Document): void {
-  if (doc.getElementById('mc-spinner-style')) return;
+  if (doc.getElementById('mc-spinner-style')) {
+    return;
+  }
+
   const style = doc.createElement('style');
   style.id = 'mc-spinner-style';
   style.textContent = '@keyframes mc-spin{to{transform:rotate(360deg)}}';
@@ -38,9 +41,14 @@ export function hideImportSpinner(importBtn: HTMLButtonElement, originalLabel: s
 }
 
 export function restoreFocusToImportButton(refs: ModalRefs): void {
-  if (!refs.root.isConnected) return;
+  if (!refs.root.isConnected) {
+    return;
+  }
+
   const btn = refs.root.querySelector<HTMLButtonElement>('[data-testid="library-import"]');
-  if (btn) btn.focus();
+  if (btn) {
+    btn.focus();
+  }
 }
 
 export async function handleExport(refs: ModalRefs): Promise<void> {
@@ -85,9 +93,17 @@ async function executeImportDb(
   const roleSel = refs.importRoleSelect?.value;
   const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
   const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite: true };
-  if (roleFilter) importOpts.roleFilter = roleFilter;
-  if (parsed.revisions && parsed.revisions.length > 0) importOpts.revisions = parsed.revisions;
-  if (parsed.promptOrder && parsed.promptOrder.length > 0) importOpts.promptOrder = parsed.promptOrder;
+  if (roleFilter) {
+    importOpts.roleFilter = roleFilter;
+  }
+
+  if (parsed.revisions && parsed.revisions.length > 0) {
+    importOpts.revisions = parsed.revisions;
+  }
+
+  if (parsed.promptOrder && parsed.promptOrder.length > 0) {
+    importOpts.promptOrder = parsed.promptOrder;
+  }
   
   showImportProgress(refs);
   importOpts.onProgress = (p) => updateImportProgress(refs, p);
@@ -118,9 +134,12 @@ function _handleImportValidationError(
   logLibraryImportFailure('validation', 'name=' + file.name + ' size=' + String(file.size) + ' type=' + file.type + ' headline=' + invalid.headline);
   showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
   refs.lastImportFailed = true;
-  try { fileInput.value = ''; } catch (err) {
+  try {
+    fileInput.value = ''; 
+  } catch (err) {
     logError('MacroController', 'Unknown error');
   }
+
   focusErrorBanner(refs);
 }
 
@@ -132,10 +151,15 @@ export async function handleImportFile(
   renderAllRoles: (r: ModalRefs) => Promise<void>,
   origin: PreviewTriggerType = 'click',
 ): Promise<void> {
-  if (importBtn.disabled) return;
+  if (importBtn.disabled) {
+    return;
+  }
+
   const retrying = refs.lastImportFailed === true;
   const attemptPrefix = retrying ? 'Retrying import: ' : 'Importing ';
-  const retry = (): void => { void handleImportFile(refs, file, fileInput, importBtn, renderAllRoles, 'click'); };
+  const retry = (): void => {
+    void handleImportFile(refs, file, fileInput, importBtn, renderAllRoles, 'click'); 
+  };
   
   const invalid = validateImportFile(file);
   if (invalid) {
@@ -170,7 +194,9 @@ export async function handleImportFile(
     refs.lastImportFailed = false;
     clearImportErrorBanner(refs);
     renderPartialImportErrors(refs, results.errors, parsed.errors);
-    if (origin === 'drop') focusAfter = 'import';
+    if (origin === 'drop') {
+      focusAfter = 'import';
+    }
   } catch (err) {
     logError('MacroController', 'Unknown error');
     logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
@@ -187,7 +213,10 @@ export async function handleImportFile(
     importBtn.removeAttribute('aria-busy');
     hideImportSpinner(importBtn, originalLabel);
     hideImportProgress(refs);
-    if (focusAfter === 'import') restoreFocusToImportButton(refs);
-    else if (focusAfter === 'banner') focusErrorBanner(refs);
+    if (focusAfter === 'import') {
+      restoreFocusToImportButton(refs);
+    } else if (focusAfter === 'banner') {
+      focusErrorBanner(refs);
+    }
   }
 }

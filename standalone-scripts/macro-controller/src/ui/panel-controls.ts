@@ -81,18 +81,24 @@ import { CssFragmentType } from '../types';
 
 function focusCurrentWorkspaceInList(): void {
   const listEl = document.getElementById('loop-ws-list');
-  if (!listEl) return;
+  if (!listEl) {
+    return;
+  }
+
   const currentName = state.workspaceName;
   if (!currentName) {
     log('Credits: no current workspace name to focus', 'warn');
 
     return;
   }
+
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
     (currentItem as HTMLElement).style.outline = '2px solid #F59E0B';
-    setTimeout(function() { (currentItem as HTMLElement).style.outline = ''; }, Timings.TIMEOUT_NORMAL);
+    setTimeout(function() {
+      (currentItem as HTMLElement).style.outline = ''; 
+    }, Timings.TIMEOUT_NORMAL);
     log('Credits: ✅ Focused current workspace: ' + currentName, 'success');
   } else {
     log('Credits: current workspace item not found in list for "' + currentName + '"', 'warn');
@@ -177,7 +183,9 @@ export function buildButtonRow(deps: PanelBuilderDeps): ButtonRowResult {
   const savePromptDeps = {
     getPromptsConfig: getPromptsConfig,
     getByXPath: ((xpath: string) => getByXPath(xpath) as Element | null) as (xpath: string) => Element | null,
-    openPromptCreationModal: function(data: Partial<PromptEntry>) { openPromptCreationModal(promptsResult.promptCtx, promptsResult.taskNextDeps, null, data); },
+    openPromptCreationModal: function(data: Partial<PromptEntry>) {
+      openPromptCreationModal(promptsResult.promptCtx, promptsResult.taskNextDeps, null, data); 
+    },
     taskNextDeps: promptsResult.taskNextDeps,
   };
   injectSavePromptButton(savePromptDeps);
@@ -211,8 +219,14 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   startStopBtn.textContent = '▶';
   startStopBtn.title = 'Start loop';
   startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
-  startStopBtn.onmouseenter = function() { startStopBtn.style.filter = 'brightness(1.12)'; startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; };
-  startStopBtn.onmouseleave = function() { startStopBtn.style.filter = ''; startStopBtn.style.boxShadow = cBtnStartGlow; };
+  startStopBtn.onmouseenter = function() {
+    startStopBtn.style.filter = 'brightness(1.12)'; startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
+  };
+
+  startStopBtn.onmouseleave = function() {
+    startStopBtn.style.filter = ''; startStopBtn.style.boxShadow = cBtnStartGlow; 
+  };
+
   startStopBtn.onclick = function() {
     if (state.running) {
       deps.stopLoop();
@@ -234,8 +248,12 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   // Countdown auto-restart IS a programmatic resume, but it represents the user's prior gesture
   // (they pressed Start, then a transient credit pause kicked in). Re-mark the gesture so the
   // resume is honored without forcing the user to click again mid-loop.
-  const cdCtx = createCountdownCtx(startStopBtn, countdownBadge, function(d: string) { markUserGesture('panel-controls/countdown-resume'); deps.startLoop(d); }, deps.stopLoop);
-  nsWrite('_internal.updateStartStopBtn', function(running: boolean) { updateStartStopBtn(cdCtx, running); });
+  const cdCtx = createCountdownCtx(startStopBtn, countdownBadge, function(d: string) {
+    markUserGesture('panel-controls/countdown-resume'); deps.startLoop(d); 
+  }, deps.stopLoop);
+  nsWrite('_internal.updateStartStopBtn', function(running: boolean) {
+    updateStartStopBtn(cdCtx, running); 
+  });
   updateStartStopBtn(cdCtx, !!state.running);
 
   return { wrap: startStopWrap, btn: startStopBtn };
@@ -315,8 +333,13 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
   creditBtn.textContent = '💰 Credits';
   creditBtn.title = 'Fetch credit status via API and refresh workspace bars';
   creditBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnCreditGrad + ';color:#1a1a2e;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragmentType.Border1pxSolidRgba;
-  creditBtn.onmouseenter = function() { creditBtn.style.filter = 'brightness(1.12)'; creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; };
-  creditBtn.onmouseleave = function() { creditBtn.style.filter = ''; creditBtn.style.boxShadow = cBtnCreditGlow; };
+  creditBtn.onmouseenter = function() {
+    creditBtn.style.filter = 'brightness(1.12)'; creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
+  };
+
+  creditBtn.onmouseleave = function() {
+    creditBtn.style.filter = ''; creditBtn.style.boxShadow = cBtnCreditGlow; 
+  };
 
   let creditInFlight = false;
   creditBtn.onclick = function() {
@@ -325,13 +348,16 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
 
       return;
     }
+
     creditInFlight = true;
     setCreditBtnLoading(creditBtn, true);
 
     const creditFetchCtx: CreditFetchCtx = {
       deps,
       creditBtn,
-      onComplete: function() { creditInFlight = false; },
+      onComplete: function() {
+        creditInFlight = false; 
+      },
     };
 
     getBearerToken().then(function(token: string) {
@@ -361,8 +387,13 @@ function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): Prompt
   promptsBtn.textContent = '📋 Prompts';
   promptsBtn.title = 'Select a prompt to paste or copy';
   promptsBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnPromptGrad + ';color:#fff;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragmentType.Border1pxSolidRgba;
-  promptsBtn.onmouseenter = function() { promptsBtn.style.filter = 'brightness(1.15)'; promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; };
-  promptsBtn.onmouseleave = function() { promptsBtn.style.filter = ''; promptsBtn.style.boxShadow = cBtnPromptGlow; };
+  promptsBtn.onmouseenter = function() {
+    promptsBtn.style.filter = 'brightness(1.15)'; promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; 
+  };
+
+  promptsBtn.onmouseleave = function() {
+    promptsBtn.style.filter = ''; promptsBtn.style.boxShadow = cBtnPromptGlow; 
+  };
 
   const promptsDropdown = document.createElement('div');
   // Portaled to document.body to escape panel overflow:hidden clipping.
@@ -407,8 +438,11 @@ function showPromptsErrorState(
     ev.stopPropagation();
     promptsDropdown.innerHTML = '';
     promptsDropdown.appendChild(createPromptsListSkeleton());
-    loadPromptsFromJson().then(function() { renderPromptsDropdown(promptCtx, taskNextDeps); });
+    loadPromptsFromJson().then(function() {
+      renderPromptsDropdown(promptCtx, taskNextDeps); 
+    });
   };
+
   promptsDropdown.appendChild(errEl);
 }
 
@@ -455,10 +489,15 @@ function attachPromptsDropdownBehavior(
     const target = ev.target as Node | null;
     const insideDropdown = target !== null && promptsDropdown.contains(target);
     const onButton = target !== null && promptsBtn.contains(target);
-    if (insideDropdown || onButton) { return; }
+    if (insideDropdown || onButton) {
+      return; 
+    }
+
     promptsDropdown.style.display = 'none';
     const sub = document.querySelector('[data-task-next-sub]') as HTMLElement | null;
-    if (sub) { sub.style.display = 'none'; }
+    if (sub) {
+      sub.style.display = 'none'; 
+    }
   });
 
   const onReflow = function(): void {
@@ -466,6 +505,7 @@ function attachPromptsDropdownBehavior(
       positionPromptsDropdown(promptsBtn, promptsDropdown);
     }
   };
+
   // Ignore scroll events that originate inside the dropdown itself —
   // otherwise positionPromptsDropdown resets maxHeight on every wheel tick,
   // causing layout thrash that prevents scrolling past the initial viewport.
@@ -474,8 +514,10 @@ function attachPromptsDropdownBehavior(
     if (tgt !== null && (tgt === promptsDropdown || (tgt instanceof Node && promptsDropdown.contains(tgt)))) {
       return;
     }
+
     onReflow();
   };
+
   window.addEventListener('resize', onReflow);
   window.addEventListener('scroll', onScrollReflow, true);
 }
@@ -519,10 +561,16 @@ function positionPromptsDropdown(triggerBtn: HTMLElement, dropdown: HTMLElement)
   if (overflowsRight) {
     left = Math.round(btnRect.right - dropWidth);
   }
+
   const minLeft = DROPDOWN_SAFE_GUTTER;
   const maxLeft = Math.max(minLeft, vw - dropWidth - DROPDOWN_SAFE_GUTTER);
-  if (left < minLeft) { left = minLeft; }
-  if (left > maxLeft) { left = maxLeft; }
+  if (left < minLeft) {
+    left = minLeft; 
+  }
+
+  if (left > maxLeft) {
+    left = maxLeft; 
+  }
 
   dropdown.style.top = Math.round(top) + 'px';
   dropdown.style.left = left + 'px';
@@ -575,6 +623,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
 
         return;
       }
+
       const count = getOverlayErrorCount();
       const hasErrors = count > 0;
       badge.style.display = hasErrors ? 'inline-block' : 'none';

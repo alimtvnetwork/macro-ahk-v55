@@ -49,28 +49,28 @@ const PROBLEM_WRONG_TYPE = "wrong-type" as const;
  * the producer; this map enforces the on-disk payload.
  */
 const REPORT_FIELD_SPEC: Readonly<Record<string, FieldSpec>> = {
-    Phase:         { kind: "string" },
-    Reason:        { kind: "string" },
-    ReasonDetail:  { kind: "string" },
-    StackTrace:    { kind: KIND_STRING_OR_NULL },
-    StepId:        { kind: "number|null" },
-    Index:         { kind: "number|null" },
-    StepKind:      { kind: KIND_STRING_OR_NULL },
-    Selectors:     { kind: "array" },
-    Variables:     { kind: "array" },
-    DomContext:    { kind: KIND_OBJECT_OR_NULL },
-    ResolvedXPath: { kind: KIND_STRING_OR_NULL },
-    Timestamp:     { kind: "string" },
-    SourceFile:    { kind: "string" },
-    Verbose:       { kind: "boolean" },
+  Phase:         { kind: "string" },
+  Reason:        { kind: "string" },
+  ReasonDetail:  { kind: "string" },
+  StackTrace:    { kind: KIND_STRING_OR_NULL },
+  StepId:        { kind: "number|null" },
+  Index:         { kind: "number|null" },
+  StepKind:      { kind: KIND_STRING_OR_NULL },
+  Selectors:     { kind: "array" },
+  Variables:     { kind: "array" },
+  DomContext:    { kind: KIND_OBJECT_OR_NULL },
+  ResolvedXPath: { kind: KIND_STRING_OR_NULL },
+  Timestamp:     { kind: "string" },
+  SourceFile:    { kind: "string" },
+  Verbose:       { kind: "boolean" },
 };
 
 const REQUIRED_BUNDLE_FIELDS: ReadonlyArray<string> = [
-    "Generator",
-    "Version",
-    "ExportedAt",
-    "Count",
-    "Reports",
+  "Generator",
+  "Version",
+  "ExportedAt",
+  "Count",
+  "Reports",
 ];
 
 /* ------------------------------------------------------------------ */
@@ -116,14 +116,20 @@ export interface ValidationResult {
  * and report a top-level issue if parsing fails.
  */
 export function validateFailureReportPayload(
-    input: unknown,
+  input: unknown,
 ): ValidationResult {
-    const parsed = coercePayloadToObject(input);
-    if ("Issue" in parsed) return failResult([parsed.Issue], [], 0);
-    if (isBundleShape(parsed.Obj)) return validateBundle(parsed.Obj);
-    const reportIssues = validateOneReport(parsed.Obj, "$");
+  const parsed = coercePayloadToObject(input);
+  if ("Issue" in parsed) {
+    return failResult([parsed.Issue], [], 0);
+  }
 
-    return finalize([], reportIssues, 1);
+  if (isBundleShape(parsed.Obj)) {
+    return validateBundle(parsed.Obj);
+  }
+
+  const reportIssues = validateOneReport(parsed.Obj, "$");
+
+  return finalize([], reportIssues, 1);
 }
 
 type CoerceResult =
@@ -131,43 +137,49 @@ type CoerceResult =
     | { readonly Issue: FieldIssue };
 
 function coercePayloadToObject(input: unknown): CoerceResult {
-    const parsed = parseIfString(input);
-    if ("Issue" in parsed) return parsed;
-    const payload = parsed.Value;
-    if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
-        return {
-            Issue: {
-                Path: "$",
-                Problem: PROBLEM_WRONG_TYPE,
-                Expected: KIND_OBJECT_OR_NULL,
-                Actual: kindOf(payload),
-            },
-        };
-    }
+  const parsed = parseIfString(input);
+  if ("Issue" in parsed) {
+    return parsed;
+  }
 
-    return { Obj: payload as Record<string, unknown> };
+  const payload = parsed.Value;
+  if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
+    return {
+      Issue: {
+        Path: "$",
+        Problem: PROBLEM_WRONG_TYPE,
+        Expected: KIND_OBJECT_OR_NULL,
+        Actual: kindOf(payload),
+      },
+    };
+  }
+
+  return { Obj: payload as Record<string, unknown> };
 }
 
 function parseIfString(
-    input: unknown,
+  input: unknown,
 ): { readonly Value: unknown } | { readonly Issue: FieldIssue } {
-    if (typeof input !== "string") return { Value: input };
-    try {
-        return { Value: JSON.parse(input) };
-    } catch (e) {
-        return {
-            Issue: {
-                Path: "$",
-                Problem: PROBLEM_WRONG_TYPE,
-                Expected: KIND_OBJECT_OR_NULL,
-                Actual: `invalid JSON (${(e as Error).message})`,
-            },
-        };
-    }
+  if (typeof input !== "string") {
+    return { Value: input };
+  }
+
+  try {
+    return { Value: JSON.parse(input) };
+  } catch (e) {
+    return {
+      Issue: {
+        Path: "$",
+        Problem: PROBLEM_WRONG_TYPE,
+        Expected: KIND_OBJECT_OR_NULL,
+        Actual: `invalid JSON (${(e as Error).message})`,
+      },
+    };
+  }
 }
 
 function isBundleShape(obj: Record<string, unknown>): boolean {
-    return "Reports" in obj || "Generator" in obj || "ExportedAt" in obj;
+  return "Reports" in obj || "Generator" in obj || "ExportedAt" in obj;
 }
 
 /* ------------------------------------------------------------------ */
@@ -175,151 +187,168 @@ function isBundleShape(obj: Record<string, unknown>): boolean {
 /* ------------------------------------------------------------------ */
 
 function validateBundle(bundle: Record<string, unknown>): ValidationResult {
-    const rootIssues = collectBundleRootIssues(bundle);
-    const reports = bundle.Reports;
-    if (!Array.isArray(reports)) {
-        rootIssues.push({
-            Path: "Reports", Problem: PROBLEM_WRONG_TYPE,
-            Expected: "array", Actual: kindOf(reports),
-        });
+  const rootIssues = collectBundleRootIssues(bundle);
+  const reports = bundle.Reports;
+  if (!Array.isArray(reports)) {
+    rootIssues.push({
+      Path: "Reports", Problem: PROBLEM_WRONG_TYPE,
+      Expected: "array", Actual: kindOf(reports),
+    });
 
-        return finalize(rootIssues, [], 0);
-    }
-    const reportIssues = collectReportIssues(reports);
+    return finalize(rootIssues, [], 0);
+  }
 
-    return finalize(rootIssues, reportIssues, reports.length);
+  const reportIssues = collectReportIssues(reports);
+
+  return finalize(rootIssues, reportIssues, reports.length);
 }
 
 function collectBundleRootIssues(bundle: Record<string, unknown>): FieldIssue[] {
-    const rootIssues: FieldIssue[] = [];
-    for (const f of REQUIRED_BUNDLE_FIELDS) {
-        if (f in bundle) continue;
-        rootIssues.push({
-            Path: f, Problem: "missing", Expected: null, Actual: "undefined",
-        });
+  const rootIssues: FieldIssue[] = [];
+  for (const f of REQUIRED_BUNDLE_FIELDS) {
+    if (f in bundle) {
+      continue;
     }
 
-    return rootIssues;
+    rootIssues.push({
+      Path: f, Problem: "missing", Expected: null, Actual: "undefined",
+    });
+  }
+
+  return rootIssues;
 }
 
 function collectReportIssues(reports: ReadonlyArray<unknown>): FieldIssue[] {
-    const reportIssues: FieldIssue[] = [];
-    for (let i = 0; i < reports.length; i++) {
-        const r = reports[i];
-        if (r === null || typeof r !== "object" || Array.isArray(r)) {
-            reportIssues.push({
-                Path: `Reports[${i}]`, Problem: PROBLEM_WRONG_TYPE,
-                Expected: KIND_OBJECT_OR_NULL, Actual: kindOf(r),
-            });
-            continue;
-        }
-        reportIssues.push(
-            ...validateOneReport(r as Record<string, unknown>, `Reports[${i}]`),
-        );
+  const reportIssues: FieldIssue[] = [];
+  for (let i = 0; i < reports.length; i++) {
+    const r = reports[i];
+    if (r === null || typeof r !== "object" || Array.isArray(r)) {
+      reportIssues.push({
+        Path: `Reports[${i}]`, Problem: PROBLEM_WRONG_TYPE,
+        Expected: KIND_OBJECT_OR_NULL, Actual: kindOf(r),
+      });
+      continue;
     }
 
-    return reportIssues;
+    reportIssues.push(
+      ...validateOneReport(r as Record<string, unknown>, `Reports[${i}]`),
+    );
+  }
+
+  return reportIssues;
 }
 
 function validateOneReport(
-    r: Record<string, unknown>,
-    pathPrefix: string,
+  r: Record<string, unknown>,
+  pathPrefix: string,
 ): FieldIssue[] {
-    const out: FieldIssue[] = [];
-    for (const [field, spec] of Object.entries(REPORT_FIELD_SPEC)) {
-        const path = pathPrefix === "$" ? field : `${pathPrefix}.${field}`;
-        const issue = validateReportField(r, field, path, spec);
-        if (issue !== null) out.push(issue);
+  const out: FieldIssue[] = [];
+  for (const [field, spec] of Object.entries(REPORT_FIELD_SPEC)) {
+    const path = pathPrefix === "$" ? field : `${pathPrefix}.${field}`;
+    const issue = validateReportField(r, field, path, spec);
+    if (issue !== null) {
+      out.push(issue);
     }
+  }
 
-    return out;
+  return out;
 }
 
 function validateReportField(
-    r: Record<string, unknown>,
-    field: string,
-    path: string,
-    spec: FieldSpec,
+  r: Record<string, unknown>,
+  field: string,
+  path: string,
+  spec: FieldSpec,
 ): FieldIssue | null {
-    if (!(field in r)) {
-        return { Path: path, Problem: "missing", Expected: spec.kind, Actual: "undefined" };
-    }
-    const v = r[field];
-    if (matchesKind(v, spec.kind)) return null;
+  if (!(field in r)) {
+    return { Path: path, Problem: "missing", Expected: spec.kind, Actual: "undefined" };
+  }
 
-    return {
-        Path: path,
-        Problem: v === null ? "null-not-allowed" : PROBLEM_WRONG_TYPE,
-        Expected: spec.kind,
-        Actual: kindOf(v),
-    };
+  const v = r[field];
+  if (matchesKind(v, spec.kind)) {
+    return null;
+  }
+
+  return {
+    Path: path,
+    Problem: v === null ? "null-not-allowed" : PROBLEM_WRONG_TYPE,
+    Expected: spec.kind,
+    Actual: kindOf(v),
+  };
 }
 
 function matchesKind(v: unknown, kind: FieldKind): boolean {
-    switch (kind) {
-        case "string":      return typeof v === "string";
-        case "string|null": return v === null || typeof v === "string";
-        case "number|null": return v === null || typeof v === "number";
-        case "boolean":     return typeof v === "boolean";
-        case "array":       return Array.isArray(v);
-        case KIND_OBJECT_OR_NULL:
-            return v === null
+  switch (kind) {
+    case "string":      return typeof v === "string";
+    case "string|null": return v === null || typeof v === "string";
+    case "number|null": return v === null || typeof v === "number";
+    case "boolean":     return typeof v === "boolean";
+    case "array":       return Array.isArray(v);
+    case KIND_OBJECT_OR_NULL:
+      return v === null
                 || (typeof v === "object" && !Array.isArray(v));
-    }
+  }
 }
 
 function kindOf(v: unknown): string {
-    if (v === null) return "null";
-    if (Array.isArray(v)) return "array";
+  if (v === null) {
+    return "null";
+  }
 
-    return typeof v;
+  if (Array.isArray(v)) {
+    return "array";
+  }
+
+  return typeof v;
 }
 
 function failResult(
-    rootIssues: ReadonlyArray<FieldIssue>,
-    reportIssues: ReadonlyArray<FieldIssue>,
-    reportsChecked: number,
+  rootIssues: ReadonlyArray<FieldIssue>,
+  reportIssues: ReadonlyArray<FieldIssue>,
+  reportsChecked: number,
 ): ValidationResult {
-    return finalize(rootIssues, reportIssues, reportsChecked);
+  return finalize(rootIssues, reportIssues, reportsChecked);
 }
 
 function finalize(
-    rootIssues: ReadonlyArray<FieldIssue>,
-    reportIssues: ReadonlyArray<FieldIssue>,
-    reportsChecked: number,
+  rootIssues: ReadonlyArray<FieldIssue>,
+  reportIssues: ReadonlyArray<FieldIssue>,
+  reportsChecked: number,
 ): ValidationResult {
-    const total = rootIssues.length + reportIssues.length;
-    if (total === 0) return okResult(reportsChecked);
+  const total = rootIssues.length + reportIssues.length;
+  if (total === 0) {
+    return okResult(reportsChecked);
+  }
 
-    return {
-        Valid: false,
-        RootIssues: rootIssues,
-        ReportIssues: reportIssues,
-        ReportsChecked: reportsChecked,
-        Summary: summarizeIssues(rootIssues, reportIssues, total),
-    };
+  return {
+    Valid: false,
+    RootIssues: rootIssues,
+    ReportIssues: reportIssues,
+    ReportsChecked: reportsChecked,
+    Summary: summarizeIssues(rootIssues, reportIssues, total),
+  };
 }
 
 function okResult(reportsChecked: number): ValidationResult {
-    return {
-        Valid: true,
-        RootIssues: [],
-        ReportIssues: [],
-        ReportsChecked: reportsChecked,
-        Summary: "",
-    };
+  return {
+    Valid: true,
+    RootIssues: [],
+    ReportIssues: [],
+    ReportsChecked: reportsChecked,
+    Summary: "",
+  };
 }
 
 function summarizeIssues(
-    rootIssues: ReadonlyArray<FieldIssue>,
-    reportIssues: ReadonlyArray<FieldIssue>,
-    total: number,
+  rootIssues: ReadonlyArray<FieldIssue>,
+  reportIssues: ReadonlyArray<FieldIssue>,
+  total: number,
 ): string {
-    const first = rootIssues[0] ?? reportIssues[0];
-    const more = total - 1;
-    const tail = more > 0 ? ` (+${more} more)` : "";
-    const expected = first.Expected ? `, expected ${first.Expected}, got ${first.Actual}` : "";
+  const first = rootIssues[0] ?? reportIssues[0];
+  const more = total - 1;
+  const tail = more > 0 ? ` (+${more} more)` : "";
+  const expected = first.Expected ? `, expected ${first.Expected}, got ${first.Actual}` : "";
 
-    return `${first.Path}: ${first.Problem}${expected}${tail}`;
+  return `${first.Path}: ${first.Problem}${expected}${tail}`;
 }
 

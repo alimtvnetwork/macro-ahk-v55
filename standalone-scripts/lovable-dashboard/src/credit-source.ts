@@ -45,38 +45,38 @@ interface BridgeWindow {
 }
 
 export function toCreditPair(wc: WorkspaceCredit): CreditPair {
-    return { available: wc.available, total: wc.totalCredits };
+  return { available: wc.available, total: wc.totalCredits };
 }
 
 export async function loadCreditMap(): Promise<CreditMap> {
-    try {
-        triggerRefresh();
+  try {
+    triggerRefresh();
 
-        return readMap();
-    } catch (caught) {
-        logError("CreditSourceType.load", caught);
+    return readMap();
+  } catch (caught) {
+    logError("CreditSourceType.load", caught);
 
-        return new Map();
-    }
+    return new Map();
+  }
 }
 
 function getCreditsApi(): CreditsApiShape | null {
-    const w = window as unknown as BridgeWindow;
+  const w = window as unknown as BridgeWindow;
 
-    return w.RiseupAsiaMacroExt?.Projects?.MacroController?.api?.credits ?? null;
+  return w.RiseupAsiaMacroExt?.Projects?.MacroController?.api?.credits ?? null;
 }
 
 function triggerRefresh(): void {
-    getCreditsApi()?.fetch?.();
+  getCreditsApi()?.fetch?.();
 }
 
 function readMap(): CreditMap {
-    const state = getCreditsApi()?.getState?.() ?? null;
-    const credits = state?.perWorkspace ?? [];
-    const map: CreditMap = new Map();
-    for (const wc of credits) {
-        map.set(wc.name, toCreditPair(wc));
-    }
+  const state = getCreditsApi()?.getState?.() ?? null;
+  const credits = state?.perWorkspace ?? [];
+  const map: CreditMap = new Map();
+  for (const wc of credits) {
+    map.set(wc.name, toCreditPair(wc));
+  }
 
-    return map;
+  return map;
 }

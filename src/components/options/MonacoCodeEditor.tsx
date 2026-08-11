@@ -47,8 +47,11 @@ function readFileContent(file: File, onContent: (content: string) => void): void
   const reader = new FileReader();
   reader.onload = (event) => {
     const result = event.target?.result;
-    if (typeof result === "string") onContent(result);
+    if (typeof result === "string") {
+      onContent(result);
+    }
   };
+
   reader.readAsText(file);
 }
 
@@ -121,11 +124,21 @@ function highlightJavascript(raw: string): string {
       const q = raw[i];
       let j = i + 1;
       while (j < raw.length) {
-        if (raw[j] === "\\" && q !== "`") { j += 2; continue; }
-        if (raw[j] === q) { j++; break; }
-        if (q !== "`" && raw[j] === "\n") break;
+        if (raw[j] === "\\" && q !== "`") {
+          j += 2; continue; 
+        }
+
+        if (raw[j] === q) {
+          j++; break; 
+        }
+
+        if (q !== "`" && raw[j] === "\n") {
+          break;
+        }
+
         j++;
       }
+
       tokens.push({ text: raw.slice(i, j), cls: "js-string" });
       i = j;
       continue;
@@ -134,7 +147,10 @@ function highlightJavascript(raw: string): string {
     // Numbers
     if (/\d/.test(raw[i]) && (i === 0 || !/[a-zA-Z_$]/.test(raw[i - 1]))) {
       let j = i;
-      while (j < raw.length && /[\d.eE+\-xXa-fA-F_]/.test(raw[j])) j++;
+      while (j < raw.length && /[\d.eE+\-xXa-fA-F_]/.test(raw[j])) {
+        j++;
+      }
+
       tokens.push({ text: raw.slice(i, j), cls: "js-number" });
       i = j;
       continue;
@@ -143,17 +159,27 @@ function highlightJavascript(raw: string): string {
     // Identifiers / keywords
     if (/[a-zA-Z_$]/.test(raw[i])) {
       let j = i;
-      while (j < raw.length && /[a-zA-Z0-9_$]/.test(raw[j])) j++;
+      while (j < raw.length && /[a-zA-Z0-9_$]/.test(raw[j])) {
+        j++;
+      }
+
       const word = raw.slice(i, j);
       // Peek ahead for function call
       let k = j;
-      while (k < raw.length && raw[k] === " ") k++;
+      while (k < raw.length && raw[k] === " ") {
+        k++;
+      }
+
       const isCall = raw[k] === "(";
 
       let cls: string | undefined;
-      if (JS_KEYWORDS.has(word)) cls = "js-keyword";
-      else if (JS_BUILTINS.has(word)) cls = "js-builtin";
-      else if (isCall) cls = "js-function";
+      if (JS_KEYWORDS.has(word)) {
+        cls = "js-keyword";
+      } else if (JS_BUILTINS.has(word)) {
+        cls = "js-builtin";
+      } else if (isCall) {
+        cls = "js-function";
+      }
 
       tokens.push({ text: word, cls });
       i = j;
@@ -264,9 +290,12 @@ function wrapSelection(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
-  if (!textarea) { onChange(prefix + value + suffix);
+  if (!textarea) {
+    onChange(prefix + value + suffix);
 
- return; }
+    return; 
+  }
+
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const selectedText = value.slice(start, end);
@@ -286,9 +315,12 @@ function insertLinePrefix(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
-  if (!textarea) { onChange(prefix + value);
+  if (!textarea) {
+    onChange(prefix + value);
 
- return; }
+    return; 
+  }
+
   const start = textarea.selectionStart;
   const lineStart = value.lastIndexOf("\n", start - 1) + 1;
   const newText = value.slice(0, lineStart) + prefix + value.slice(lineStart);
@@ -318,7 +350,9 @@ function formatMarkdown(value: string): string {
   let result = value;
   result = result.replace(/\n{3,}/g, "\n\n");
   result = result.replace(/([^\n])\n(#{1,6}\s)/g, "$1\n\n$2");
-  if (!result.endsWith("\n")) result += "\n";
+  if (!result.endsWith("\n")) {
+    result += "\n";
+  }
 
   return result;
 }
@@ -336,7 +370,10 @@ function MarkdownToolbar({
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   readOnly: boolean;
 }) {
-  if (readOnly) return null;
+  if (readOnly) {
+    return null;
+  }
+
   const btn = "h-6 w-6 hover:bg-primary/15 hover:text-primary";
 
   return (
@@ -425,9 +462,17 @@ function HighlightedFallback({
   const preRef = useRef<HTMLPreElement>(null);
 
   const highlightedHtml = useMemo(() => {
-    if (language === "json") return highlightJson(value);
-    if (language === "javascript") return highlightJavascript(value);
-    if (language === "markdown") return highlightMarkdown(value);
+    if (language === "json") {
+      return highlightJson(value);
+    }
+
+    if (language === "javascript") {
+      return highlightJavascript(value);
+    }
+
+    if (language === "markdown") {
+      return highlightMarkdown(value);
+    }
 
     return null;
   }, [value, language]);
@@ -446,7 +491,10 @@ function HighlightedFallback({
 
   useEffect(() => {
     const textarea = textareaRef.current;
-    if (!textarea || !showHighlight) return;
+    if (!textarea || !showHighlight) {
+      return;
+    }
+
     textarea.addEventListener("scroll", handleScroll);
 
     return () => textarea.removeEventListener("scroll", handleScroll);
@@ -529,16 +577,25 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
 
   const handleFormat = useCallback(() => {
     if (language === "json") {
-      try { onChange(JSON.stringify(JSON.parse(safeValue), null, 2));
+      try {
+        onChange(JSON.stringify(JSON.parse(safeValue), null, 2));
 
- return; } catch (caught) {
+        return; 
+      } catch (caught) {
         logError("MonacoCodeEditor.handleFormat", "JSON.parse failed during format — user content is not valid JSON, leaving as-is", caught);
       }
     }
-    if (language === "markdown") { onChange(formatMarkdown(safeValue));
 
- return; }
-    if (useFallback) return;
+    if (language === "markdown") {
+      onChange(formatMarkdown(safeValue));
+
+      return; 
+    }
+
+    if (useFallback) {
+      return;
+    }
+
     editorRef.current?.getAction("editor.action.formatDocument")?.run().catch((error: unknown) => {
       setEditorError(error instanceof Error ? error.message : "Formatting failed");
     });
@@ -548,12 +605,17 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
     event.preventDefault();
     event.stopPropagation();
     const file = event.dataTransfer.files[0];
-    if (file) readFileContent(file, onChange);
+    if (file) {
+      readFileContent(file, onChange);
+    }
   }, [onChange]);
 
   const handleFileSelect = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
+
     readFileContent(file, onChange);
     event.target.value = "";
   }, [onChange]);
@@ -565,13 +627,16 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
 
   const fileAccept = language === "json" ? ".json"
     : language === "markdown" ? ".md,.markdown,.txt"
-    : ".js,.mjs";
+      : ".js,.mjs";
 
   const jsonValid = language === "json" ? (() => {
-    try { JSON.parse(safeValue);
+    try {
+      JSON.parse(safeValue);
 
- return true; } catch (err) { /* swallowed */
- return false; }
+      return true; 
+    } catch (err) { /* swallowed */
+      return false; 
+    }
   })() : true;
 
   return (

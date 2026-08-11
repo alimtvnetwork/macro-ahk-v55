@@ -22,8 +22,12 @@ vi.mock('../database-modal-data', () => {
 });
 
 describe('database-data-table.loadTableData — error routing', () => {
-  beforeEach(() => { logErrorSpy.mockClear(); });
-  afterEach(() => { vi.resetModules(); });
+  beforeEach(() => {
+    logErrorSpy.mockClear(); 
+  });
+  afterEach(() => {
+    vi.resetModules(); 
+  });
 
   it('calls logError with the databaseDataTable scope when the dynamic import rejects', async () => {
     const mod = await import('../database-data-table');

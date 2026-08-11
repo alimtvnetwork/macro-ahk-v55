@@ -23,80 +23,80 @@ import type { PromotedOwnerRecord, RowExecutionContext, RowExecutionResult } fro
 import type { RowStateStore } from "./row-state-store";
 
 const resolvePassword = (ctx: RowExecutionContext): string | null => {
-    return ctx.Row.Password ?? ctx.Task.CommonPassword;
+  return ctx.Row.Password ?? ctx.Task.CommonPassword;
 };
 
 const failResult = (
-    ctx: RowExecutionContext, startedAt: number, outcome: RowOutcomeCodeType,
-    error: string, promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
+  ctx: RowExecutionContext, startedAt: number, outcome: RowOutcomeCodeType,
+  error: string, promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
 ): RowExecutionResult => ({
-    RowIndex: ctx.Row.RowIndex, Outcome: outcome,
-    IsDone: false, HasError: true, LastError: error,
-    DurationMs: Date.now() - startedAt, PromotedOwners: promotedOwners,
+  RowIndex: ctx.Row.RowIndex, Outcome: outcome,
+  IsDone: false, HasError: true, LastError: error,
+  DurationMs: Date.now() - startedAt, PromotedOwners: promotedOwners,
 });
 
 const succeedResult = (
-    ctx: RowExecutionContext, startedAt: number,
-    promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
+  ctx: RowExecutionContext, startedAt: number,
+  promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
 ): RowExecutionResult => ({
-    RowIndex: ctx.Row.RowIndex, Outcome: RowOutcomeCodeType.Succeeded,
-    IsDone: true, HasError: false, LastError: null,
-    DurationMs: Date.now() - startedAt, PromotedOwners: promotedOwners,
+  RowIndex: ctx.Row.RowIndex, Outcome: RowOutcomeCodeType.Succeeded,
+  IsDone: true, HasError: false, LastError: null,
+  DurationMs: Date.now() - startedAt, PromotedOwners: promotedOwners,
 });
 
 const noteSignOut = (ctx: RowExecutionContext, sink: LogSink, error: string | null): void => {
-    sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.SignOut,
-        LogSeverityType.Warn, `Sign-out best-effort failed: ${error ?? "unknown"}`,
-    ));
+  sink.write(buildEntry(
+    ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.SignOut,
+    LogSeverityType.Warn, `Sign-out best-effort failed: ${error ?? "unknown"}`,
+  ));
 };
 
 const promoteOutcomeCode = (records: ReadonlyArray<PromotedOwnerRecord>): RowOutcomeCodeType => {
-    const anyPromoted = records.some((r) => r.Promoted);
+  const anyPromoted = records.some((r) => r.Promoted);
 
-    return anyPromoted ? RowOutcomeCodeType.PromoteFailedPartial : RowOutcomeCodeType.PromoteFailed;
+  return anyPromoted ? RowOutcomeCodeType.PromoteFailedPartial : RowOutcomeCodeType.PromoteFailed;
 };
 
 export const runRow = async (
-    ctx: RowExecutionContext, sink: LogSink, store: RowStateStore,
+  ctx: RowExecutionContext, sink: LogSink, store: RowStateStore,
 ): Promise<RowExecutionResult> => {
-    const startedAt = Date.now();
-    const password = resolvePassword(ctx);
+  const startedAt = Date.now();
+  const password = resolvePassword(ctx);
 
-    if (password === null) {
-        return finalizeRow(ctx, sink, store, failResult(
-            ctx, startedAt, RowOutcomeCodeType.PasswordMissing,
-            "Password missing on row and no CommonPassword fallback", [],
-        ));
-    }
+  if (password === null) {
+    return finalizeRow(ctx, sink, store, failResult(
+      ctx, startedAt, RowOutcomeCodeType.PasswordMissing,
+      "Password missing on row and no CommonPassword fallback", [],
+    ));
+  }
 
-    const login = await runLogin({
-        Credentials: { LoginEmail: ctx.Row.LoginEmail, Password: password },
-        LoginUrl: ctx.Task.LoginUrl,
-    }, ctx.XPathOverrides);
+  const login = await runLogin({
+    Credentials: { LoginEmail: ctx.Row.LoginEmail, Password: password },
+    LoginUrl: ctx.Task.LoginUrl,
+  }, ctx.XPathOverrides);
 
-    if (login.Error !== null) {
-        return finalizeRow(ctx, sink, store, failResult(
-            ctx, startedAt, RowOutcomeCodeType.LoginFailed, login.Error, [],
-        ));
-    }
+  if (login.Error !== null) {
+    return finalizeRow(ctx, sink, store, failResult(
+      ctx, startedAt, RowOutcomeCodeType.LoginFailed, login.Error, [],
+    ));
+  }
 
-    const owners = await runOwnerEmails(ctx, sink);
+  const owners = await runOwnerEmails(ctx, sink);
 
-    if (owners.Failure !== null) {
-        await runSignOut(ctx.XPathOverrides);
+  if (owners.Failure !== null) {
+    await runSignOut(ctx.XPathOverrides);
 
-        return finalizeRow(ctx, sink, store, failResult(
-            ctx, startedAt, promoteOutcomeCode(owners.Records),
-            `${owners.Failure.Email}: ${owners.Failure.Error}`, owners.Records,
-        ));
-    }
+    return finalizeRow(ctx, sink, store, failResult(
+      ctx, startedAt, promoteOutcomeCode(owners.Records),
+      `${owners.Failure.Email}: ${owners.Failure.Error}`, owners.Records,
+    ));
+  }
 
-    const signOut = await runSignOut(ctx.XPathOverrides);
+  const signOut = await runSignOut(ctx.XPathOverrides);
 
-    if (!signOut.Succeeded) {
-        noteSignOut(ctx, sink, signOut.Error);
-    }
+  if (!signOut.Succeeded) {
+    noteSignOut(ctx, sink, signOut.Error);
+  }
 
-    return finalizeRow(ctx, sink, store, succeedResult(ctx, startedAt, owners.Records));
+  return finalizeRow(ctx, sink, store, succeedResult(ctx, startedAt, owners.Records));
 };

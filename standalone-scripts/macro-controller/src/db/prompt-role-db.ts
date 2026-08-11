@@ -26,7 +26,7 @@ export type EnforceResult = ServiceResult<void, string>;
 
 /** Escape a SQL string literal (single-quote doubling). Exported for CRUD reuse. */
 export function sqlLit(s: string): string {
-    return "'" + s.replace(/'/g, "''") + "'";
+  return "'" + s.replace(/'/g, "''") + "'";
 }
 
 /**
@@ -35,38 +35,43 @@ export function sqlLit(s: string): string {
  * data cannot reach the DB layer.
  */
 export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: number): Promise<EnforceResult> {
-    if (!isPromptRole(role)) {
-        const err = 'enforceSingleDefaultPerRole: invalid role ' + String(role);
-        logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role: String(role), keepId, stage: 'validate-role', reason: 'invalid role' });
+  if (!isPromptRole(role)) {
+    const err = 'enforceSingleDefaultPerRole: invalid role ' + String(role);
+    logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role: String(role), keepId, stage: 'validate-role', reason: 'invalid role' });
 
-        return new ServiceResult(false, undefined, err);
+    return new ServiceResult(false, undefined, err);
+  }
+
+  if (!Number.isInteger(keepId) || keepId <= 0) {
+    const err = 'enforceSingleDefaultPerRole: keepId must be a positive integer, got ' + String(keepId);
+    logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId: String(keepId), stage: 'validate-keepId', reason: 'keepId must be a positive integer' });
+
+    return new ServiceResult(false, undefined, err);
+  }
+
+  const sql = [
+    'BEGIN TRANSACTION;',
+    'UPDATE Prompt SET IsDefault = 0 WHERE Role = ' + sqlLit(role) + ' AND Id <> ' + String(keepId) + ';',
+    'UPDATE Prompt SET IsDefault = 1 WHERE Id = ' + String(keepId) + ' AND Role = ' + sqlLit(role) + ';',
+    'COMMIT;',
+  ].join('\n');
+
+  try {
+    void DB_NAME;
+    const resp = await runLoggedQuery('SCHEMA', sql, 'context');
+    if (resp && resp.ok) {
+      return new ServiceResult(true);
     }
-    if (!Number.isInteger(keepId) || keepId <= 0) {
-        const err = 'enforceSingleDefaultPerRole: keepId must be a positive integer, got ' + String(keepId);
-        logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId: String(keepId), stage: 'validate-keepId', reason: 'keepId must be a positive integer' });
 
-        return new ServiceResult(false, undefined, err);
-    }
+    const reason = resp?.errorMessage || 'unknown error';
+    const message = 'enforceSingleDefaultPerRole failed: ' + reason;
+    logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });
 
-    const sql = [
-        'BEGIN TRANSACTION;',
-        'UPDATE Prompt SET IsDefault = 0 WHERE Role = ' + sqlLit(role) + ' AND Id <> ' + String(keepId) + ';',
-        'UPDATE Prompt SET IsDefault = 1 WHERE Id = ' + String(keepId) + ' AND Role = ' + sqlLit(role) + ';',
-        'COMMIT;',
-    ].join('\n');
+    return new ServiceResult(false, undefined, message);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'threw', reason }, err);
 
-    try {
-        void DB_NAME;
-        const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-        if (resp && resp.ok) return new ServiceResult(true);
-        const reason = resp?.errorMessage || 'unknown error';
-        const message = 'enforceSingleDefaultPerRole failed: ' + reason;
-        logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });
-
-        return new ServiceResult(false, undefined, message);
-    } catch (err) {
-        const reason = err instanceof Error ? err.message : String(err);
-        logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'threw', reason }, err);
-        return new ServiceResult(false, undefined, reason);
-    }
+    return new ServiceResult(false, undefined, reason);
+  }
 }

@@ -29,73 +29,73 @@ function uninstallSdk(): void {
 }
 
 describe('ws-members-mutations bulk', () => {
-    const wsIds = ['ws-1', 'ws-2'];
-    const workspaces = [
-        { id: 'ws-1', name: 'WS 1', fullName: 'Workspace 1' },
-        { id: 'ws-2', name: 'WS 2', fullName: 'Workspace 2' }
-    ] as any;
+  const wsIds = ['ws-1', 'ws-2'];
+  const workspaces = [
+    { id: 'ws-1', name: 'WS 1', fullName: 'Workspace 1' },
+    { id: 'ws-2', name: 'WS 2', fullName: 'Workspace 2' }
+  ] as any;
 
-    beforeEach(() => {
-        vi.clearAllMocks();
-        uninstallSdk();
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    uninstallSdk();
+  });
 
-    it('should invite multiple emails to multiple workspaces', async () => {
-        const api: MembershipsApi = {
-            invite: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
-            remove: vi.fn(),
-            updateRole: vi.fn(),
-        };
-        installSdk(api);
+  it('should invite multiple emails to multiple workspaces', async () => {
+    const api: MembershipsApi = {
+      invite: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
+      remove: vi.fn(),
+      updateRole: vi.fn(),
+    };
+    installSdk(api);
 
-        const result = await inviteMemberMany(wsIds, ['a@b.com', 'c@d.com'], 'member', workspaces);
+    const result = await inviteMemberMany(wsIds, ['a@b.com', 'c@d.com'], 'member', workspaces);
         
-        expect(result.success).toBe(4);
-        expect(api.invite).toHaveBeenCalledTimes(4);
-        expect(invalidateMembersCache).toHaveBeenCalled();
-    });
+    expect(result.success).toBe(4);
+    expect(api.invite).toHaveBeenCalledTimes(4);
+    expect(invalidateMembersCache).toHaveBeenCalled();
+  });
 
-    it('should track failures in bulk invite', async () => {
-        const api: MembershipsApi = {
-            invite: vi.fn()
-                .mockResolvedValueOnce({ ok: false, isFail: true, isSuccess: false, status: 429, data: 'Rate limited' })
-                .mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
-            remove: vi.fn(),
-            updateRole: vi.fn(),
-        };
-        installSdk(api);
+  it('should track failures in bulk invite', async () => {
+    const api: MembershipsApi = {
+      invite: vi.fn()
+        .mockResolvedValueOnce({ ok: false, isFail: true, isSuccess: false, status: 429, data: 'Rate limited' })
+        .mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
+      remove: vi.fn(),
+      updateRole: vi.fn(),
+    };
+    installSdk(api);
         
-        const result = await inviteMemberMany(wsIds, ['a@b.com'], 'member', workspaces);
+    const result = await inviteMemberMany(wsIds, ['a@b.com'], 'member', workspaces);
         
-        expect(result.success).toBe(1);
-        expect(result.fail).toBe(1);
-        expect(result.failures[0].wsName).toBe('Workspace 1');
-        expect(result.failures[0].reason).toContain('HTTP 429');
-    });
+    expect(result.success).toBe(1);
+    expect(result.fail).toBe(1);
+    expect(result.failures[0].wsName).toBe('Workspace 1');
+    expect(result.failures[0].reason).toContain('HTTP 429');
+  });
 
-    it('should update role across workspaces', async () => {
-        const api: MembershipsApi = {
-            invite: vi.fn(),
-            remove: vi.fn(),
-            updateRole: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
-        };
-        installSdk(api);
+  it('should update role across workspaces', async () => {
+    const api: MembershipsApi = {
+      invite: vi.fn(),
+      remove: vi.fn(),
+      updateRole: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
+    };
+    installSdk(api);
 
-        const result = await updateMemberRoleMany(wsIds, 'user-123', 'owner', workspaces);
-        expect(result.success).toBe(2);
-        expect(api.updateRole).toHaveBeenCalledTimes(2);
-    });
+    const result = await updateMemberRoleMany(wsIds, 'user-123', 'owner', workspaces);
+    expect(result.success).toBe(2);
+    expect(api.updateRole).toHaveBeenCalledTimes(2);
+  });
 
-    it('should remove member across workspaces', async () => {
-        const api: MembershipsApi = {
-            invite: vi.fn(),
-            remove: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
-            updateRole: vi.fn(),
-        };
-        installSdk(api);
+  it('should remove member across workspaces', async () => {
+    const api: MembershipsApi = {
+      invite: vi.fn(),
+      remove: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
+      updateRole: vi.fn(),
+    };
+    installSdk(api);
 
-        const result = await removeMemberMany(wsIds, 'user-123', workspaces);
-        expect(result.success).toBe(2);
-        expect(api.remove).toHaveBeenCalledTimes(2);
-    });
+    const result = await removeMemberMany(wsIds, 'user-123', workspaces);
+    expect(result.success).toBe(2);
+    expect(api.remove).toHaveBeenCalledTimes(2);
+  });
 });

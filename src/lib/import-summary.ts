@@ -67,6 +67,7 @@ export function buildImportSummary(preview: BundlePreview, mode: PopupActionsMod
     totalMatched += counts.matched;
     totalUnmatched += counts.unmatched;
   }
+
   lines.push(`Total: ${totalMatched} matched, ${totalUnmatched} new`);
 
   return lines.join("\n");

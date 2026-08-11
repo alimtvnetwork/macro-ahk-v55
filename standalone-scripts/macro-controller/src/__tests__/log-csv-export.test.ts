@@ -58,7 +58,9 @@ beforeEach(() => {
     constructor(parts: BlobPart[], opts?: BlobPropertyBag) {
       super(parts, opts);
       const first = parts && parts[0];
-      if (typeof first === 'string') capturedCsv = first;
+      if (typeof first === 'string') {
+        capturedCsv = first;
+      }
     }
   }
   vi.stubGlobal('Blob', CapturingBlob);

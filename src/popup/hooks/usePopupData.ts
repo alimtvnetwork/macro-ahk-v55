@@ -87,79 +87,89 @@ export interface ErrorData {
 
 // eslint-disable-next-line max-lines-per-function
 export function usePopupData() {
-    const [status, setStatus] = useState<StatusData | null>(null);
-    const [health, setHealth] = useState<HealthData | null>(null);
-    const [project, setProject] = useState<ProjectData | null>(null);
-    const [errors, setErrors] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [fatalError, setFatalError] = useState<string | null>(null);
+  const [status, setStatus] = useState<StatusData | null>(null);
+  const [health, setHealth] = useState<HealthData | null>(null);
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fatalError, setFatalError] = useState<string | null>(null);
 
-    const platform = getPlatform();
+  const platform = getPlatform();
 
-    const loadData = useCallback(async () => {
-        try {
-            const [statusRes, healthRes, projectRes, errorsRes] =
+  const loadData = useCallback(async () => {
+    try {
+      const [statusRes, healthRes, projectRes, errorsRes] =
                 await Promise.all([
-                    platform.sendMessage<StatusData>({ type: "GET_STATUS" }),
-                    platform.sendMessage<HealthData>({ type: "GET_HEALTH_STATUS" }),
-                    platform.sendMessage<ProjectData>({ type: "GET_ACTIVE_PROJECT" }),
-                    platform.sendMessage<ErrorData>({ type: "GET_ACTIVE_ERRORS" }),
+                  platform.sendMessage<StatusData>({ type: "GET_STATUS" }),
+                  platform.sendMessage<HealthData>({ type: "GET_HEALTH_STATUS" }),
+                  platform.sendMessage<ProjectData>({ type: "GET_ACTIVE_PROJECT" }),
+                  platform.sendMessage<ErrorData>({ type: "GET_ACTIVE_ERRORS" }),
                 ]);
 
-            setStatus(statusRes);
-            setHealth(healthRes);
-            setProject(projectRes);
-            setErrors(errorsRes.errors ?? []);
-            setFatalError(null);
-        } catch (err) {
-            const message = err instanceof Error ? err.message : String(err);
-            setFatalError(message);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [platform]);
+      setStatus(statusRes);
+      setHealth(healthRes);
+      setProject(projectRes);
+      setErrors(errorsRes.errors ?? []);
+      setFatalError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setFatalError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [platform]);
 
-    // PERF-7 (2026-04-25): pause polling while the popup tab/window is
-    // hidden. The popup can be detached into its own window, in which
-    // case it would otherwise fan out 4 sendMessage calls every 30s
-    // forever (waking the SW each time).
-    useEffect(() => {
-        void loadData();
+  // PERF-7 (2026-04-25): pause polling while the popup tab/window is
+  // hidden. The popup can be detached into its own window, in which
+  // case it would otherwise fan out 4 sendMessage calls every 30s
+  // forever (waking the SW each time).
+  useEffect(() => {
+    void loadData();
 
-        let intervalId: ReturnType<typeof setInterval> | null = null;
-        const startPolling = () => {
-            if (intervalId !== null) return;
-            intervalId = setInterval(() => void loadData(), 30_000);
-        };
-        const stopPolling = () => {
-            if (intervalId !== null) { clearInterval(intervalId); intervalId = null; }
-        };
-        const onVisChange = () => {
-            if (document.hidden) {
-                stopPolling();
-            } else {
-                // Refresh immediately on becoming visible to catch up on missed ticks.
-                void loadData();
-                startPolling();
-            }
-        };
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    const startPolling = () => {
+      if (intervalId !== null) {
+        return;
+      }
 
-        if (!document.hidden) startPolling();
-        document.addEventListener("visibilitychange", onVisChange);
-
-        return () => {
-            stopPolling();
-            document.removeEventListener("visibilitychange", onVisChange);
-        };
-    }, [loadData]);
-
-    return {
-        status,
-        health,
-        project,
-        errors,
-        isLoading,
-        fatalError,
-        reload: loadData,
+      intervalId = setInterval(() => void loadData(), 30_000);
     };
+
+    const stopPolling = () => {
+      if (intervalId !== null) {
+        clearInterval(intervalId); intervalId = null; 
+      }
+    };
+
+    const onVisChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        // Refresh immediately on becoming visible to catch up on missed ticks.
+        void loadData();
+        startPolling();
+      }
+    };
+
+    if (!document.hidden) {
+      startPolling();
+    }
+
+    document.addEventListener("visibilitychange", onVisChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", onVisChange);
+    };
+  }, [loadData]);
+
+  return {
+    status,
+    health,
+    project,
+    errors,
+    isLoading,
+    fatalError,
+    reload: loadData,
+  };
 }

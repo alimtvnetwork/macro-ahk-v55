@@ -90,29 +90,40 @@ export const WORKSPACE_BADGE_DISPLAY: Record<WorkspaceDisplayKind, { tone: Works
 const MAX_DAY_BADGE = 99;
 
 function clampDays(n: number): number {
-  if (!Number.isFinite(n) || n < 0) return 0;
-  if (n > MAX_DAY_BADGE) return MAX_DAY_BADGE;
+  if (!Number.isFinite(n) || n < 0) {
+    return 0;
+  }
+
+  if (n > MAX_DAY_BADGE) {
+    return MAX_DAY_BADGE;
+  }
 
   return Math.floor(n);
 }
 
 export function formatRefillLabel(daysToRefill: number): string {
   const d = clampDays(daysToRefill);
-  if (d === 0) return 'Refill today';
+  if (d === 0) {
+    return 'Refill today';
+  }
 
   return 'Refill ' + d + 'd';
 }
 
 export function formatExpireSoonLabel(daysUntilExpiry: number): string {
   const d = clampDays(daysUntilExpiry);
-  if (d === 0) return 'Expire today';
+  if (d === 0) {
+    return 'Expire today';
+  }
 
   return 'Expire ' + d + 'd';
 }
 
 export function formatExpiredLabel(daysSinceExpiry: number): string {
   const d = clampDays(daysSinceExpiry);
-  if (d === 0) return 'Expired';
+  if (d === 0) {
+    return 'Expired';
+  }
 
   return 'Expired ' + d + 'd';
 }
@@ -120,7 +131,9 @@ export function formatExpiredLabel(daysSinceExpiry: number): string {
 /** Issue 118: past-due countdown label — 'Today' when 0d, 'Passed Nd' otherwise. */
 export function formatPassedLabel(daysPassed: number): string {
   const d = clampDays(daysPassed);
-  if (d === 0) return 'Today';
+  if (d === 0) {
+    return 'Today';
+  }
 
   return 'Passed ' + d + 'd';
 }
@@ -137,9 +150,17 @@ export function formatPassedLabel(daysPassed: number): string {
  *   ≥10d  → danger (red)
  */
 export function pickPastDueTone(daysPassed: number): WorkspaceDisplayTone {
-  if (!Number.isFinite(daysPassed) || daysPassed < 0) return 'muted';
-  if (daysPassed >= 10) return 'danger';
-  if (daysPassed >= 3) return 'warning';
+  if (!Number.isFinite(daysPassed) || daysPassed < 0) {
+    return 'muted';
+  }
+
+  if (daysPassed >= 10) {
+    return 'danger';
+  }
+
+  if (daysPassed >= 3) {
+    return 'warning';
+  }
 
   return 'muted';
 }
@@ -263,9 +284,11 @@ function buildCanceledTooltip(source: WorkspaceStatus): string {
   if (source.kind === 'expired-canceled') {
     return source.sinceIso ? 'Canceled on ' + source.sinceIso : 'Canceled';
   }
+
   if (source.kind === 'fully-expired') {
     return source.sinceIso ? 'Fully expired since ' + source.sinceIso : 'Fully expired';
   }
+
   if (source.kind === 'expired') {
     return source.sinceIso ? 'Expired since ' + source.sinceIso : 'Expired';
   }
@@ -280,7 +303,9 @@ function buildCanceledTooltip(source: WorkspaceStatus): string {
  */
 function computeDaysUntilExpiry(ws: WorkspaceCredit, nowMs?: number): number | null {
   const days = daysToRefillForWs(ws, nowMs);
-  if (days === null) return null;
+  if (days === null) {
+    return null;
+  }
 
   return days;
 }

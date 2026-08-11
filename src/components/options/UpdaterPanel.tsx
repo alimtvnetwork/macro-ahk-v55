@@ -51,7 +51,9 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
     }
   }, []);
 
-  useEffect(() => { void loadUpdaters(); }, [loadUpdaters]);
+  useEffect(() => {
+    void loadUpdaters(); 
+  }, [loadUpdaters]);
 
   const handleAdd = async (data: AddUpdaterData) => {
     try {
@@ -84,7 +86,10 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleRemove = async (id: number) => {
     try {
       await sendMessage({ type: "DELETE_UPDATER", updaterId: id });
-      if (expandedId === id) setExpandedId(null);
+      if (expandedId === id) {
+        setExpandedId(null);
+      }
+
       toast.success("Updater removed");
       await loadUpdaters();
     } catch (err) {
@@ -122,12 +127,12 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
           prev.map((u) =>
             u.id === id
               ? {
-                  ...u,
-                  status,
-                  latestVersion: result.latestVersion ?? u.latestVersion,
-                  currentVersion: result.currentVersion ?? u.currentVersion,
-                  lastCheckedAt: new Date().toISOString(),
-                }
+                ...u,
+                status,
+                latestVersion: result.latestVersion ?? u.latestVersion,
+                currentVersion: result.currentVersion ?? u.currentVersion,
+                lastCheckedAt: new Date().toISOString(),
+              }
               : u,
           ),
         );
@@ -155,7 +160,10 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleAddEndpoint = (updaterId: number) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
+
         const ep: UpdaterEndpoint = {
           id: Date.now(),
           url: "",
@@ -173,7 +181,9 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleRemoveEndpoint = (updaterId: number, endpointId: number) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
 
         return { ...u, endpoints: u.endpoints.filter((e) => e.id !== endpointId) };
       }),
@@ -183,7 +193,9 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleUpdateEndpoint = (updaterId: number, endpointId: number, field: keyof UpdaterEndpoint, value: UpdaterEndpoint[keyof UpdaterEndpoint]) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
 
         return {
           ...u,
@@ -198,7 +210,10 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleAddStep = (updaterId: number) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
+
         const step: UpdaterStep = {
           id: Date.now(),
           stepId: `step-${u.steps.length + 1}`,
@@ -214,7 +229,9 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleRemoveStep = (updaterId: number, stepId: number) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
 
         return { ...u, steps: u.steps.filter((s) => s.id !== stepId) };
       }),
@@ -224,7 +241,9 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleUpdateStep = (updaterId: number, stepId: number, field: keyof UpdaterStep, value: UpdaterStep[keyof UpdaterStep]) => {
     setUpdaters((prev) =>
       prev.map((u) => {
-        if (u.id !== updaterId) return u;
+        if (u.id !== updaterId) {
+          return u;
+        }
 
         return {
           ...u,

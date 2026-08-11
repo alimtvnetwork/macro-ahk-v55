@@ -22,7 +22,9 @@ import {
   setAuthRecoveryExhausted as setAuthRecoveryExhaustedLeaf,
 } from './rename-auth-recovery-flag';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ── Types ──
 
@@ -116,7 +118,9 @@ export class BulkRenameManager {
 
     this.opTimes = updatedTimes;
     this.avgOpMs = Math.round(
-      this.opTimes.reduce(function (a: number, b: number) { return a + b; }, 0) / this.opTimes.length,
+      this.opTimes.reduce(function (a: number, b: number) {
+        return a + b; 
+      }, 0) / this.opTimes.length,
     );
   }
 
@@ -193,7 +197,9 @@ export class BulkRenameManager {
     onProgress: (results: BulkRenameResults, done: boolean) => void,
     forceRetry?: boolean,
   ): void {
-    const forbiddenSkipped = forceRetry ? 0 : entries.filter(function (e: BulkRenameEntry) { return hasForbidden(e.wsId); }).length;
+    const forbiddenSkipped = forceRetry ? 0 : entries.filter(function (e: BulkRenameEntry) {
+      return hasForbidden(e.wsId); 
+    }).length;
     const hasForbiddenSkips = forbiddenSkipped > 0;
 
     if (hasForbiddenSkips) {
@@ -250,7 +256,9 @@ export class BulkRenameManager {
         onProgress(results, false);
       }
 
-      setTimeout(() => { this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); }, MODAL_ANIMATION_DELAY_MS);
+      setTimeout(() => {
+        this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); 
+      }, MODAL_ANIMATION_DELAY_MS);
 
       return;
     }
@@ -273,7 +281,9 @@ export class BulkRenameManager {
         onProgress(results, false);
       }
 
-      setTimeout(() => { this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, resetFailures); }, this.delayMs);
+      setTimeout(() => {
+        this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, resetFailures); 
+      }, this.delayMs);
     }).catch((err: Error) => {
       results.failed++;
       const newFailures = consecutiveFailures + 1;
@@ -292,7 +302,9 @@ export class BulkRenameManager {
         onProgress(results, false);
       }
 
-      setTimeout(() => { this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, newFailures); }, this.delayMs);
+      setTimeout(() => {
+        this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, newFailures); 
+      }, this.delayMs);
     });
   }
 
@@ -444,15 +456,41 @@ function updatePerWorkspaceName(wsId: string, newName: string): void {
 
 const mgr = () => BulkRenameManager.getInstance();
 
-export function getRenameDelayMs(): number { return mgr().getDelayMs(); }
-export function setRenameDelayMs(ms: number): void { mgr().setDelayMs(ms); }
-export function cancelRename(): void { mgr().cancel(); }
-export function isRenameCancelled(): boolean { return mgr().isCancelled(); }
-export function getAuthRecoveryExhausted(): boolean { return mgr().getAuthRecoveryExhausted(); }
-export function setAuthRecoveryExhausted(value: boolean): void { mgr().setAuthRecoveryExhausted(value); }
-export function getRenameAvgOpMs(): number { return mgr().getAvgOpMs(); }
-export function getRenameHistory(): RenameHistoryEntry[] { return mgr().getHistory(); }
-export function updateUndoBtnVisibility(): void { mgr().updateUndoBtnVisibility(); }
+export function getRenameDelayMs(): number {
+  return mgr().getDelayMs(); 
+}
+
+export function setRenameDelayMs(ms: number): void {
+  mgr().setDelayMs(ms); 
+}
+
+export function cancelRename(): void {
+  mgr().cancel(); 
+}
+
+export function isRenameCancelled(): boolean {
+  return mgr().isCancelled(); 
+}
+
+export function getAuthRecoveryExhausted(): boolean {
+  return mgr().getAuthRecoveryExhausted(); 
+}
+
+export function setAuthRecoveryExhausted(value: boolean): void {
+  mgr().setAuthRecoveryExhausted(value); 
+}
+
+export function getRenameAvgOpMs(): number {
+  return mgr().getAvgOpMs(); 
+}
+
+export function getRenameHistory(): RenameHistoryEntry[] {
+  return mgr().getHistory(); 
+}
+
+export function updateUndoBtnVisibility(): void {
+  mgr().updateUndoBtnVisibility(); 
+}
 
 export function bulkRenameWorkspaces(
   entries: BulkRenameEntry[],

@@ -22,7 +22,7 @@ export { finalizeUserAddRow } from "./row-finalize";
 export { buildRowFailure, buildRowSuccess } from "./row-result-builders";
 export type { UserAddRowStateStore, UserAddRowStateUpdate } from "./row-state-store";
 export {
-    UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry,
+  UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry,
 } from "./log-sink";
 export type { UserAddLogSink, UserAddLogEntry } from "./log-sink";
 export { runTaskSignOut } from "./run-task-sign-out";

@@ -34,7 +34,10 @@ import { resolveCreditSummary } from './credit-balance-update/credit-summary-res
 // ── CSV Helpers ──
 
 function csvVal(v: string | number | boolean | null | undefined): string {
-  if (v === null || v === undefined) return '';
+  if (v === null || v === undefined) {
+    return '';
+  }
+
   const s = String(v);
   if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
     return '"' + s.replace(/"/g, '""') + '"';
@@ -45,7 +48,9 @@ function csvVal(v: string | number | boolean | null | undefined): string {
 
 /** Round to 1 decimal; returns '' for non-finite. */
 function pct(count: number, denom: number): string {
-  if (!Number.isFinite(count) || !Number.isFinite(denom) || denom <= 0) return '';
+  if (!Number.isFinite(count) || !Number.isFinite(denom) || denom <= 0) {
+    return '';
+  }
 
   return (Math.round((count / denom) * 1000) / 10).toFixed(1);
 }

@@ -102,7 +102,9 @@ function getProjectStorageChangeArea(): ProjectStorageChangeArea | undefined {
 
 async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
   const storage = getProjectStorageLocal();
-  if (!storage) return [];
+  if (!storage) {
+    return [];
+  }
 
   const out = await readProjectStorageKey(storage);
   const raw = (out as { marco_projects?: unknown } | null)?.marco_projects;
@@ -113,16 +115,20 @@ async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
 async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Record<string, unknown> | null> {
   try {
     const out = await storage.get("marco_projects");
-    if (out && typeof out === "object") return out;
+    if (out && typeof out === "object") {
+      return out;
+    }
   } catch (err) { 
- /* fall through to callback storage API */
-    logError("AutoCatch", "Automatically caught swallowed error", err); }
+    /* fall through to callback storage API */
+    logError("AutoCatch", "Automatically caught swallowed error", err); 
+  }
 
   return new Promise((resolve) => {
     try {
       storage.get("marco_projects", (out) => resolve(out ?? null));
     } catch (err) { /* swallowed */
- resolve(null); }
+      resolve(null); 
+    }
   });
 }
 
@@ -138,7 +144,9 @@ async function readProjectsViaMessage(): Promise<StoredProject[]> {
 
 async function loadProjectRosterSnapshot(): Promise<StoredProject[]> {
   const direct = await readProjectsDirectFromChromeStorage().catch(() => []);
-  if (direct.length > 0) return direct;
+  if (direct.length > 0) {
+    return direct;
+  }
 
   return Promise.race([
     readProjectsViaMessage(),
@@ -151,11 +159,15 @@ async function pollProjectRoster(
   onLoaded: (projects: StoredProject[]) => void,
 ): Promise<void> {
   for (const delayMs of PROJECT_ROSTER_POLL_DELAYS_MS) {
-    if (await loadRosterAfterDelay(delayMs, isCancelled, onLoaded)) return;
+    if (await loadRosterAfterDelay(delayMs, isCancelled, onLoaded)) {
+      return;
+    }
   }
 
   for (let attempt = 0; attempt < PROJECT_ROSTER_TAIL_ATTEMPTS; attempt++) {
-    if (await loadRosterAfterDelay(500, isCancelled, onLoaded)) return;
+    if (await loadRosterAfterDelay(500, isCancelled, onLoaded)) {
+      return;
+    }
   }
 }
 
@@ -164,11 +176,23 @@ async function loadRosterAfterDelay(
   isCancelled: () => boolean,
   onLoaded: (projects: StoredProject[]) => void,
 ): Promise<boolean> {
-  if (isCancelled()) return true;
-  if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+  if (isCancelled()) {
+    return true;
+  }
+
+  if (delayMs > 0) {
+    await new Promise((r) => setTimeout(r, delayMs));
+  }
+
   const projects = await loadProjectRosterSnapshot();
-  if (isCancelled()) return true;
-  if (projects.length === 0) return false;
+  if (isCancelled()) {
+    return true;
+  }
+
+  if (projects.length === 0) {
+    return false;
+  }
+
   onLoaded(projects);
 
   return true;
@@ -199,6 +223,7 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
 
       return;
     }
+
     setSaving(true);
     try {
       const result = await sendMessage<{ groupId: number; cascadedCount: number }>({
@@ -313,7 +338,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   // Load on mount AND whenever the selected group changes.
   // Was previously `useState(() => { loadMembers(); })` which only fired
   // during initial mount — switching groups stranded stale member lists.
-  useEffect(() => { loadMembers(); }, [loadMembers]);
+  useEffect(() => {
+    loadMembers(); 
+  }, [loadMembers]);
 
   // Cross-tab sync: when another Options/popup tab mutates library state,
   // background broadcasts LIBRARY_CHANGED — re-pull this group's members
@@ -322,18 +349,33 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
       | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
-    if (!runtime?.onMessage) return;
+    if (!runtime?.onMessage) {
+      return;
+    }
+
     let timer: ReturnType<typeof setTimeout> | null = null;
     const listener = (message: unknown) => {
       const msg = message as { type?: string } | null;
-      if (msg?.type !== "LIBRARY_CHANGED") return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => { void loadMembers(); }, 150);
+      if (msg?.type !== "LIBRARY_CHANGED") {
+        return;
+      }
+
+      if (timer) {
+        clearTimeout(timer);
+      }
+
+      timer = setTimeout(() => {
+        void loadMembers(); 
+      }, 150);
     };
+
     runtime.onMessage.addListener(listener);
 
     return () => {
-      if (timer) clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
+
       runtime.onMessage!.removeListener(listener);
     };
   }, [loadMembers]);
@@ -349,10 +391,16 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     // snapshot if projects appear after this panel mounts.
     const storageArea = getProjectStorageChangeArea();
     const onChanged = (changes: Record<string, { newValue?: unknown }>, area: string) => {
-      if (area !== "local" || !("marco_projects" in changes)) return;
+      if (area !== "local" || !("marco_projects" in changes)) {
+        return;
+      }
+
       const next = changes.marco_projects?.newValue;
-      if (Array.isArray(next)) setAllProjects(next as StoredProject[]);
+      if (Array.isArray(next)) {
+        setAllProjects(next as StoredProject[]);
+      }
     };
+
     storageArea?.onChanged?.addListener(onChanged);
     void pollProjectRoster(() => cancelled, setAllProjects);
 
@@ -365,7 +413,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   const memberIdSet = useMemo(() => new Set(members.map(m => m.ProjectIdUuid)), [members]);
   const projectsById = useMemo(() => {
     const map = new Map<string, StoredProject>();
-    for (const p of allProjects) map.set(p.id, p);
+    for (const p of allProjects) {
+      map.set(p.id, p);
+    }
 
     return map;
   }, [allProjects]);
@@ -375,7 +425,10 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   );
 
   const addMemberById = useCallback(async (projectUuid: string) => {
-    if (!projectUuid || memberIdSet.has(projectUuid)) return;
+    if (!projectUuid || memberIdSet.has(projectUuid)) {
+      return;
+    }
+
     setAdding(true);
     try {
       await sendMessage({
@@ -399,6 +452,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
 
       return;
     }
+
     await addMemberById(addProjectId);
     setAddProjectId("");
   }, [addProjectId, addMemberById]);
@@ -455,7 +509,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
 
   let parsedSettings: Record<string, unknown> | null = null;
   if (group.SharedSettingsJson) {
-    try { parsedSettings = JSON.parse(group.SharedSettingsJson); } catch (caught) {
+    try {
+      parsedSettings = JSON.parse(group.SharedSettingsJson); 
+    } catch (caught) {
       logError("ProjectGroupPanel.parseSettings", `Group "${group.Id}" has invalid SharedSettingsJson — rendering with parsedSettings=null`, caught);
     }
   }
@@ -574,7 +630,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
             if (e.dataTransfer.types.includes("application/x-marco-project-uuid")) {
               e.preventDefault();
               e.dataTransfer.dropEffect = "copy";
-              if (!dropActive) setDropActive(true);
+              if (!dropActive) {
+                setDropActive(true);
+              }
             }
           }}
           onDragLeave={() => setDropActive(false)}
@@ -582,7 +640,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
             e.preventDefault();
             setDropActive(false);
             const uuid = e.dataTransfer.getData("application/x-marco-project-uuid");
-            if (uuid) void addMemberById(uuid);
+            if (uuid) {
+              void addMemberById(uuid);
+            }
           }}
           data-testid="project-group-member-drop-target"
           className={
@@ -640,7 +700,9 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
         <GroupFormDialog
           open={editOpen}
           onOpenChange={setEditOpen}
-          onSaved={() => { onRefresh(); }}
+          onSaved={() => {
+            onRefresh(); 
+          }}
           editGroup={group}
         />
       )}
@@ -664,7 +726,11 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       </AlertDialog>
 
       {/* Remove member confirmation */}
-      <AlertDialog open={!!removeMember} onOpenChange={(v) => { if (!v) setRemoveMember(null); }}>
+      <AlertDialog open={!!removeMember} onOpenChange={(v) => {
+        if (!v) {
+          setRemoveMember(null);
+        } 
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove "{projectsById.get(removeMember?.ProjectIdUuid ?? "")?.name ?? removeMember?.ProjectIdUuid}"?</AlertDialogTitle>
@@ -698,7 +764,9 @@ export function ProjectGroupPanel({ groups, onRefresh }: ProjectGroupPanelProps)
       <GroupDetailPanel
         group={selectedGroup}
         onBack={() => setSelectedGroup(null)}
-        onRefresh={() => { setSelectedGroup(null); onRefresh(); }}
+        onRefresh={() => {
+          setSelectedGroup(null); onRefresh(); 
+        }}
       />
     );
   }

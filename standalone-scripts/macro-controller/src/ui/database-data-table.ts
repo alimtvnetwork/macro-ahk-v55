@@ -23,6 +23,7 @@ function loadTableData(
       logError('databaseDataTable.loadTableData', 'dynamic import failed', e);
     });
 }
+
 import { DB_PAGE_SIZE as PAGE_SIZE } from '../constants';
 // PlanTierType-17 step 16: escapeHtml re-exported from leaf so consumers that only
 // need escaping (e.g. database-data-filter) do NOT import data-table and

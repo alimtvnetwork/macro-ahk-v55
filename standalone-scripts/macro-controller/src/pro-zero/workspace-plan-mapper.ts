@@ -13,22 +13,24 @@ import { WIRE_PLAN_PRO_ZERO } from './pro-zero-constants';
 const PRO_ZERO_WIRE_TOKENS: ReadonlyArray<string> = [WIRE_PLAN_PRO_ZERO];
 
 function normalize(rawPlan: string): string {
-    return (rawPlan || '').toLowerCase().trim();
+  return (rawPlan || '').toLowerCase().trim();
 }
 
 function hasProZeroToken(normalized: string): boolean {
-    return PRO_ZERO_WIRE_TOKENS.indexOf(normalized) >= 0;
+  return PRO_ZERO_WIRE_TOKENS.indexOf(normalized) >= 0;
 }
 
 /** Map a wire-string `plan` value to the `WorkspacePlanType` Enum. */
 export function mapWorkspacePlan(rawPlan: string): WorkspacePlanType {
-    const normalized = normalize(rawPlan);
-    if (hasProZeroToken(normalized)) return WorkspacePlanType.PRO_ZERO;
+  const normalized = normalize(rawPlan);
+  if (hasProZeroToken(normalized)) {
+    return WorkspacePlanType.PRO_ZERO;
+  }
 
-    return WorkspacePlanType.OTHER;
+  return WorkspacePlanType.OTHER;
 }
 
 /** True when the resolved `WorkspacePlanType` is the only branch that needs /credit-balance. */
 export function isProZeroPlan(plan: WorkspacePlanType): boolean {
-    return plan === WorkspacePlanType.PRO_ZERO;
+  return plan === WorkspacePlanType.PRO_ZERO;
 }

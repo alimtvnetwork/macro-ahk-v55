@@ -87,10 +87,10 @@ function buildNamespaceDiagnostic(opts: {
 }): string {
   const stack = opts.error instanceof Error && typeof opts.error.stack === 'string'
     ? opts.error.stack
-        .split('\n')
-        .filter((l) => !/chunk-[a-z0-9]+\.js|\/assets\/[^)]*\.js/i.test(l))
-        .slice(0, 6)
-        .join('\n')
+      .split('\n')
+      .filter((l) => !/chunk-[a-z0-9]+\.js|\/assets\/[^)]*\.js/i.test(l))
+      .slice(0, 6)
+      .join('\n')
     : '(no stack)';
 
   return [
@@ -126,6 +126,7 @@ function ensureMutableBranch<T extends object>(node: T): T {
 
     return node;
   }
+
   // Whole node frozen — shallow clone, then heal children.
   const clone = { ...(node as unknown as Record<string, unknown>) };
   for (const key of ['api', '_internal', 'meta'] as const) {
@@ -144,7 +145,9 @@ function ensureMutableBranch<T extends object>(node: T): T {
  */
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- namespace bootstrap: cache check + window guards + Projects.MacroController hydration all need shared scope
 export function getNamespace(): MacroControllerNamespace | null {
-  if (nsCache.ns) return nsCache.ns;
+  if (nsCache.ns) {
+    return nsCache.ns;
+  }
 
   const root = (typeof window !== 'undefined'
     ? (window as Window).RiseupAsiaMacroExt
@@ -160,6 +163,7 @@ export function getNamespace(): MacroControllerNamespace | null {
 
     return null;
   }
+
   if (!root.Projects) {
     logError('getNamespace', buildNamespaceDiagnostic({
       lookup: 'window.RiseupAsiaMacroExt.Projects',
@@ -189,17 +193,46 @@ export function getNamespace(): MacroControllerNamespace | null {
 
     const mc = root.Projects.MacroController as unknown as MacroControllerNamespace;
 
-    if (!mc.meta || typeof mc.meta !== 'object' || !Object.isExtensible(mc.meta)) mc.meta = { version: '', displayName: '' };
-    if (!mc.api || typeof mc.api !== 'object' || !Object.isExtensible(mc.api)) mc.api = {} as MacroControllerApi;
+    if (!mc.meta || typeof mc.meta !== 'object' || !Object.isExtensible(mc.meta)) {
+      mc.meta = { version: '', displayName: '' };
+    }
+
+    if (!mc.api || typeof mc.api !== 'object' || !Object.isExtensible(mc.api)) {
+      mc.api = {} as MacroControllerApi;
+    }
+
     const api = mc.api;
-    if (!api.loop || typeof api.loop !== 'object' || !Object.isExtensible(api.loop)) api.loop = {} as LoopApi;
-    if (!api.credits || typeof api.credits !== 'object' || !Object.isExtensible(api.credits)) api.credits = {} as CreditsApi;
-    if (!api.auth || typeof api.auth !== 'object' || !Object.isExtensible(api.auth)) api.auth = {} as AuthApi;
-    if (!api.workspace || typeof api.workspace !== 'object' || !Object.isExtensible(api.workspace)) api.workspace = {} as WorkspaceApi;
-    if (!api.ui || typeof api.ui !== 'object' || !Object.isExtensible(api.ui)) api.ui = {} as UiApi;
-    if (!api.config || typeof api.config !== 'object' || !Object.isExtensible(api.config)) api.config = {} as ConfigApi;
-    if (!api.autoAttach || typeof api.autoAttach !== 'object' || !Object.isExtensible(api.autoAttach)) api.autoAttach = {} as AutoAttachApi;
-    if (!mc._internal || typeof mc._internal !== 'object' || !Object.isExtensible(mc._internal)) mc._internal = {} as MacroControllerInternal;
+    if (!api.loop || typeof api.loop !== 'object' || !Object.isExtensible(api.loop)) {
+      api.loop = {} as LoopApi;
+    }
+
+    if (!api.credits || typeof api.credits !== 'object' || !Object.isExtensible(api.credits)) {
+      api.credits = {} as CreditsApi;
+    }
+
+    if (!api.auth || typeof api.auth !== 'object' || !Object.isExtensible(api.auth)) {
+      api.auth = {} as AuthApi;
+    }
+
+    if (!api.workspace || typeof api.workspace !== 'object' || !Object.isExtensible(api.workspace)) {
+      api.workspace = {} as WorkspaceApi;
+    }
+
+    if (!api.ui || typeof api.ui !== 'object' || !Object.isExtensible(api.ui)) {
+      api.ui = {} as UiApi;
+    }
+
+    if (!api.config || typeof api.config !== 'object' || !Object.isExtensible(api.config)) {
+      api.config = {} as ConfigApi;
+    }
+
+    if (!api.autoAttach || typeof api.autoAttach !== 'object' || !Object.isExtensible(api.autoAttach)) {
+      api.autoAttach = {} as AutoAttachApi;
+    }
+
+    if (!mc._internal || typeof mc._internal !== 'object' || !Object.isExtensible(mc._internal)) {
+      mc._internal = {} as MacroControllerInternal;
+    }
 
     mc.meta.version = VERSION;
     mc.meta.displayName = 'Macro Controller';
@@ -233,7 +266,9 @@ export function getNamespace(): MacroControllerNamespace | null {
  */
 export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P]): void {
   const ns = getNamespace();
-  if (!ns) return;
+  if (!ns) {
+    return;
+  }
 
   // 2-segment: _internal.* or api.mc
   const dot1 = path.indexOf('.');
@@ -265,7 +300,9 @@ export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P])
  */
 export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | undefined {
   const ns = getNamespace();
-  if (!ns) return undefined;
+  if (!ns) {
+    return undefined;
+  }
 
   const dot1 = path.indexOf('.');
   const dot2 = path.indexOf('.', dot1 + 1);
@@ -331,5 +368,7 @@ export function nsRead(_windowKey: string, nsPath: string): unknown {
 /** @deprecated Use nsCallTyped() instead. */
 export function nsCall(_windowKey: string, nsPath: string, ...args: unknown[]): unknown {
   const fn = nsReadTyped(nsPath as keyof NsPathMap);
-  if (typeof fn === 'function') return (fn as (...a: unknown[]) => unknown)(...args);
+  if (typeof fn === 'function') {
+    return (fn as (...a: unknown[]) => unknown)(...args);
+  }
 }

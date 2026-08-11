@@ -56,14 +56,14 @@ export enum StepKindId {
 }
 
 const STEP_KIND_SEED: ReadonlyArray<{ Id: StepKindId; Name: string }> = [
-    { Id: StepKindId.Click,       Name: "Click" },
-    { Id: StepKindId.Type,        Name: "Type" },
-    { Id: StepKindId.Select,      Name: "Select" },
-    { Id: StepKindId.JsInline,    Name: "JsInline" },
-    { Id: StepKindId.Wait,        Name: "Wait" },
-    { Id: StepKindId.RunGroup,    Name: "RunGroup" },
-    { Id: StepKindId.Hotkey,      Name: "Hotkey" },
-    { Id: StepKindId.UrlTabClick, Name: "UrlTabClick" },
+  { Id: StepKindId.Click,       Name: "Click" },
+  { Id: StepKindId.Type,        Name: "Type" },
+  { Id: StepKindId.Select,      Name: "Select" },
+  { Id: StepKindId.JsInline,    Name: "JsInline" },
+  { Id: StepKindId.Wait,        Name: "Wait" },
+  { Id: StepKindId.RunGroup,    Name: "RunGroup" },
+  { Id: StepKindId.Hotkey,      Name: "Hotkey" },
+  { Id: StepKindId.UrlTabClick, Name: "UrlTabClick" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -244,63 +244,69 @@ CREATE TABLE IF NOT EXISTS SchemaMigration (
  * Red error per mem://constraints/file-path-error-logging-code-red).
  */
 function createTables(db: Database): void {
-    db.exec(DDL_PROJECT);
-    db.exec(DDL_STEP_GROUP);
-    db.exec(DDL_STEP_GROUP_TRIGGERS);
-    db.exec(DDL_STEP_KIND);
-    db.exec(DDL_STEP);
-    db.exec(DDL_STEP_TRIGGERS);
-    db.exec(DDL_SCHEMA_MIGRATION);
+  db.exec(DDL_PROJECT);
+  db.exec(DDL_STEP_GROUP);
+  db.exec(DDL_STEP_GROUP_TRIGGERS);
+  db.exec(DDL_STEP_KIND);
+  db.exec(DDL_STEP);
+  db.exec(DDL_STEP_TRIGGERS);
+  db.exec(DDL_SCHEMA_MIGRATION);
 }
 
 function seedStepKinds(db: Database): void {
-    const insertKind = db.prepare(
-        "INSERT OR IGNORE INTO StepKind (StepKindId, Name) VALUES (?, ?);",
-    );
-    try {
-        for (const k of STEP_KIND_SEED) {
-            insertKind.run([k.Id, k.Name]);
-        }
-    } finally {
-        insertKind.free();
+  const insertKind = db.prepare(
+    "INSERT OR IGNORE INTO StepKind (StepKindId, Name) VALUES (?, ?);",
+  );
+  try {
+    for (const k of STEP_KIND_SEED) {
+      insertKind.run([k.Id, k.Name]);
     }
+  } finally {
+    insertKind.free();
+  }
 }
 
 function recordMigration(db: Database): void {
-    db.exec(
-        `INSERT OR IGNORE INTO SchemaMigration (Version, Description) VALUES (` +
+  db.exec(
+    `INSERT OR IGNORE INTO SchemaMigration (Version, Description) VALUES (` +
         `${STEP_LIBRARY_SCHEMA_VERSION}, 'initial step-library schema');`,
-    );
-    db.exec(`PRAGMA user_version = ${STEP_LIBRARY_SCHEMA_VERSION};`);
+  );
+  db.exec(`PRAGMA user_version = ${STEP_LIBRARY_SCHEMA_VERSION};`);
 }
 
 export function applySchema(db: Database): void {
-    db.exec("PRAGMA foreign_keys = ON;");
+  db.exec("PRAGMA foreign_keys = ON;");
 
-    const currentVersion = readUserVersion(db);
-    if (currentVersion > STEP_LIBRARY_SCHEMA_VERSION) {
-        throw new Error(
-            `step-library DB at user_version=${currentVersion} but this build only supports ${STEP_LIBRARY_SCHEMA_VERSION}. ` +
+  const currentVersion = readUserVersion(db);
+  if (currentVersion > STEP_LIBRARY_SCHEMA_VERSION) {
+    throw new Error(
+      `step-library DB at user_version=${currentVersion} but this build only supports ${STEP_LIBRARY_SCHEMA_VERSION}. ` +
             `Refusing to open, bundle was produced by a newer extension.`,
-        );
+    );
+  }
+
+  db.exec("BEGIN;");
+  try {
+    createTables(db);
+    seedStepKinds(db);
+    if (currentVersion < STEP_LIBRARY_SCHEMA_VERSION) {
+      recordMigration(db); 
     }
 
-    db.exec("BEGIN;");
-    try {
-        createTables(db);
-        seedStepKinds(db);
-        if (currentVersion < STEP_LIBRARY_SCHEMA_VERSION) { recordMigration(db); }
-        db.exec("COMMIT;");
-    } catch (e) {
-        db.exec("ROLLBACK;");
-        throw e;
-    }
+    db.exec("COMMIT;");
+  } catch (e) {
+    db.exec("ROLLBACK;");
+    throw e;
+  }
 }
 
 export function readUserVersion(db: Database): number {
-    const res = db.exec("PRAGMA user_version;");
-    if (res.length === 0 || res[0].values.length === 0) return 0;
-    const v = res[0].values[0][0];
+  const res = db.exec("PRAGMA user_version;");
+  if (res.length === 0 || res[0].values.length === 0) {
+    return 0;
+  }
 
-    return typeof v === "number" ? v : 0;
+  const v = res[0].values[0][0];
+
+  return typeof v === "number" ? v : 0;
 }

@@ -52,18 +52,18 @@ const _snapshots: ChainSnapshot[] = [];
 
 /** Record a new chain snapshot from a completed injection pipeline. */
 export function recordChainSnapshot(snapshot: ChainSnapshot): void {
-    _snapshots.unshift(snapshot);
-    if (_snapshots.length > MAX_SNAPSHOTS) {
-        _snapshots.length = MAX_SNAPSHOTS;
-    }
+  _snapshots.unshift(snapshot);
+  if (_snapshots.length > MAX_SNAPSHOTS) {
+    _snapshots.length = MAX_SNAPSHOTS;
+  }
 }
 
 /** Get the most recent chain snapshot (or null). */
 export function getLatestChainSnapshot(): ChainSnapshot | null {
-    return _snapshots[0] ?? null;
+  return _snapshots[0] ?? null;
 }
 
 /** Get all stored chain snapshots (most recent first). */
 export function getAllChainSnapshots(): ChainSnapshot[] {
-    return _snapshots.slice();
+  return _snapshots.slice();
 }

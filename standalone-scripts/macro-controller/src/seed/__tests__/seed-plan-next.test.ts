@@ -15,160 +15,164 @@ let responsesQueue: Record<string, unknown>[] = [];
 const logCalls: Array<{ message: string; level?: string | undefined }> = [];
 
 vi.mock('../../db/extension-bridge', () => ({
-    sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
-        captured.push({ method: p.method, sql: p.params.sql });
+  sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
+    captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
+  }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
-        captured.push({ method: p.method, sql: p.params.sql });
+  sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
+    captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
+  }),
 }));
 vi.mock('../../error-utils', async () => {
-    const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+  const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
 
-    return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
+  return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({
-    log: vi.fn((message: string, level?: string) => { logCalls.push({ message, level }); }),
+  log: vi.fn((message: string, level?: string) => {
+    logCalls.push({ message, level }); 
+  }),
 }));
 
 import { seedPlanNextPrompts } from '../seed-plan-next';
 import { logError } from "../../error-utils";
 
 beforeEach(() => {
-    captured.length = 0; responsesQueue = []; logCalls.length = 0;
-    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        logError('MacroController', 'Unknown error');
-    }
+  captured.length = 0; responsesQueue = []; logCalls.length = 0;
+  try {
+    localStorage.removeItem('marco_last_seed_telemetry'); 
+  } catch (err) {
+    logError('MacroController', 'Unknown error');
+  }
 });
 
 describe('seedPlanNextPrompts', () => {
-    it('first boot: pre-select empty -> insert -> promotes both role defaults; telemetry reports all inserted', async () => {
-        // Sequence (post-SQL-queue drift repair): [0] pre-select, [1] INSERT OR IGNORE,
-        // [2] legacy read plan-default, [3] legacy read next-default,
-        // [4] hasDefault plan, [5] promote plan, [6] hasDefault next, [7] promote next,
-        // [8] audit-log INSERT (because inserts+promotes occurred).
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select existing slugs -> none
-            { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault plan -> none
-            { ok: true, isFail: false, isSuccess: true },                            // promote plan-default
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault next -> none
-            { ok: true, isFail: false, isSuccess: true },                            // promote next-default
-            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
-        ];
-        const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
-        expect(captured).toHaveLength(9);
-        expect(captured[0].sql).toMatch(/^SELECT Slug FROM Prompt WHERE Slug IN/);
-        expect(captured[1].sql).toMatch(/^INSERT OR IGNORE INTO Prompt/);
-        expect(captured[5].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'plan-default' AND Role = 'plan'");
-        expect(captured[7].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'next-default' AND Role = 'next'");
-        expect(captured[8].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
-        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
-        const next = r.data?.telemetry?.find(t => t.role === 'next');
-        expect(plan).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
-        expect(next).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
-        expect(logCalls.some(c => c.message.includes('[SeedPlanNext]'))).toBe(true);
-    });
+  it('first boot: pre-select empty -> insert -> promotes both role defaults; telemetry reports all inserted', async () => {
+    // Sequence (post-SQL-queue drift repair): [0] pre-select, [1] INSERT OR IGNORE,
+    // [2] legacy read plan-default, [3] legacy read next-default,
+    // [4] hasDefault plan, [5] promote plan, [6] hasDefault next, [7] promote next,
+    // [8] audit-log INSERT (because inserts+promotes occurred).
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select existing slugs -> none
+      { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault plan -> none
+      { ok: true, isFail: false, isSuccess: true },                            // promote plan-default
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault next -> none
+      { ok: true, isFail: false, isSuccess: true },                            // promote next-default
+      { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
+    ];
+    const r = await seedPlanNextPrompts();
+    expect(r.ok).toBe(true);
+    expect(captured).toHaveLength(9);
+    expect(captured[0].sql).toMatch(/^SELECT Slug FROM Prompt WHERE Slug IN/);
+    expect(captured[1].sql).toMatch(/^INSERT OR IGNORE INTO Prompt/);
+    expect(captured[5].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'plan-default' AND Role = 'plan'");
+    expect(captured[7].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'next-default' AND Role = 'next'");
+    expect(captured[8].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
+    const plan = r.data?.telemetry?.find(t => t.role === 'plan');
+    const next = r.data?.telemetry?.find(t => t.role === 'next');
+    expect(plan).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
+    expect(next).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
+    expect(logCalls.some(c => c.message.includes('[SeedPlanNext]'))).toBe(true);
+  });
 
-    it('second boot: all slugs already present, defaults preserved -> zero inserts, zero promotes, audit skipped', async () => {
-        const allSlugs = [
-            'plan-default', 'plan-concise', 'plan-with-evidence', 'plan-risk-annotated',
-            'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
-        ].map(s => ({ Slug: s }));
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: allSlugs },           // pre-select -> all present
-            { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE (driver no-op)
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault plan
-            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault next
-        ];
-        const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
-        expect(captured).toHaveLength(6);
-        expect(captured.some(c => c.sql.startsWith('UPDATE Prompt SET IsDefault = 1'))).toBe(false);
-        expect(captured.some(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'))).toBe(false);
-        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
-        expect(plan).toMatchObject({ inserted: 0, skipped: 4, promotedDefault: 0, alreadyDefault: 1 });
-    });
+  it('second boot: all slugs already present, defaults preserved -> zero inserts, zero promotes, audit skipped', async () => {
+    const allSlugs = [
+      'plan-default', 'plan-concise', 'plan-with-evidence', 'plan-risk-annotated',
+      'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
+    ].map(s => ({ Slug: s }));
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: allSlugs },           // pre-select -> all present
+      { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE (driver no-op)
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault plan
+      { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault next
+    ];
+    const r = await seedPlanNextPrompts();
+    expect(r.ok).toBe(true);
+    expect(captured).toHaveLength(6);
+    expect(captured.some(c => c.sql.startsWith('UPDATE Prompt SET IsDefault = 1'))).toBe(false);
+    expect(captured.some(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'))).toBe(false);
+    const plan = r.data?.telemetry?.find(t => t.role === 'plan');
+    expect(plan).toMatchObject({ inserted: 0, skipped: 4, promotedDefault: 0, alreadyDefault: 1 });
+  });
 
-    it('mixed: plan default already set, next default missing -> promotes only next + writes audit row', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
-            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // plan has default
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // next missing
-            { ok: true, isFail: false, isSuccess: true },                            // promote next
-            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
-        ];
-        const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
-        expect(captured).toHaveLength(8);
-        expect(captured[6].sql).toContain("Slug = 'next-default'");
-        expect(captured[7].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
-        const next = r.data?.telemetry?.find(t => t.role === 'next');
-        expect(next?.promotedDefault).toBe(1);
-    });
+  it('mixed: plan default already set, next default missing -> promotes only next + writes audit row', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
+      { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // plan has default
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // next missing
+      { ok: true, isFail: false, isSuccess: true },                            // promote next
+      { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
+    ];
+    const r = await seedPlanNextPrompts();
+    expect(r.ok).toBe(true);
+    expect(captured).toHaveLength(8);
+    expect(captured[6].sql).toContain("Slug = 'next-default'");
+    expect(captured[7].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
+    const next = r.data?.telemetry?.find(t => t.role === 'next');
+    expect(next?.promotedDefault).toBe(1);
+  });
 
-    it('surfaces INSERT failure instead of swallowing it', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select
-            { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk full' },
-        ];
-        const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(false);
-        expect(r.error).toMatch(/disk full/);
-    });
+  it('surfaces INSERT failure instead of swallowing it', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select
+      { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk full' },
+    ];
+    const r = await seedPlanNextPrompts();
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/disk full/);
+  });
 
-    it('INSERT SQL includes all 8 seed rows', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
-            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
-            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
-        ];
-        await seedPlanNextPrompts();
-        const sql = captured[1].sql;
-        for (const slug of [
-            'plan-default', 'plan-concise', 'plan-with-evidence', 'plan-risk-annotated',
-            'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
-        ]) {
-            expect(sql, 'seed SQL must include ' + slug).toContain("'" + slug + "'");
-        }
-    });
+  it('INSERT SQL includes all 8 seed rows', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
+      { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+      { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+    ];
+    await seedPlanNextPrompts();
+    const sql = captured[1].sql;
+    for (const slug of [
+      'plan-default', 'plan-concise', 'plan-with-evidence', 'plan-risk-annotated',
+      'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
+    ]) {
+      expect(sql, 'seed SQL must include ' + slug).toContain("'" + slug + "'");
+    }
+  });
 
-    it('persists telemetry to localStorage under marco_last_seed_telemetry', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
-            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
-            { ok: true, isFail: false, isSuccess: true, rows: [] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true, rows: [] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
-        ];
-        await seedPlanNextPrompts();
-        const raw = localStorage.getItem('marco_last_seed_telemetry');
-        expect(raw).toBeTruthy();
-        const parsed = JSON.parse(raw ?? '{}');
-        expect(typeof parsed.at).toBe('string');
-        expect(Array.isArray(parsed.roles)).toBe(true);
-        const plan = parsed.roles.find((r: { role: string }) => r.role === 'plan');
-        expect(plan).toMatchObject({ inserted: 4, promotedDefault: 1 });
-    });
+  it('persists telemetry to localStorage under marco_last_seed_telemetry', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
+      { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
+      { ok: true, isFail: false, isSuccess: true, rows: [] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true, rows: [] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
+    ];
+    await seedPlanNextPrompts();
+    const raw = localStorage.getItem('marco_last_seed_telemetry');
+    expect(raw).toBeTruthy();
+    const parsed = JSON.parse(raw ?? '{}');
+    expect(typeof parsed.at).toBe('string');
+    expect(Array.isArray(parsed.roles)).toBe(true);
+    const plan = parsed.roles.find((r: { role: string }) => r.role === 'plan');
+    expect(plan).toMatchObject({ inserted: 4, promotedDefault: 1 });
+  });
 });

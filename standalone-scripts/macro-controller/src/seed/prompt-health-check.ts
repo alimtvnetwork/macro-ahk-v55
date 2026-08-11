@@ -60,17 +60,21 @@ function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, 
 
     return;
   }
+
   if (row.IsDefault !== 1) {
     issues.push({ role, slug: row.Slug, code: 'not-flagged-default', detail: 'row id=' + row.Id + ' has IsDefault=' + String(row.IsDefault) });
   }
+
   if (typeof row.Name !== 'string' || row.Name.trim().length === 0) {
     issues.push({ role, slug: row.Slug, code: 'name-empty', detail: 'Name is empty on row id=' + row.Id });
   }
+
   if (typeof row.Body !== 'string' || row.Body.trim().length === 0) {
     issues.push({ role, slug: row.Slug, code: 'body-empty', detail: 'Body is empty on row id=' + row.Id });
 
     return; // no point checking token drift on empty body
   }
+
   const required = getRequiredTokensForRole(role);
   const present = new Set(extractParamTokens(row.Body));
   const missing = required.filter(t => !present.has(t));
@@ -80,9 +84,11 @@ function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, 
       detail: 'row id=' + row.Id + ' Body is missing required token(s): ' + missing.join(', '),
     });
   }
+
   if (typeof row.ReplaceKey !== 'string' || row.ReplaceKey.trim().length === 0) {
     issues.push({ role, slug: row.Slug, code: 'replace-key-invalid', detail: 'ReplaceKey empty/invalid on row id=' + row.Id });
   }
+
   if (!Array.isArray(row.ReplaceValues)) {
     issues.push({ role, slug: row.Slug, code: 'replace-values-invalid', detail: 'ReplaceValues is not an array on row id=' + row.Id });
   }
@@ -114,12 +120,14 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;
       }
+
       inspectRow(role, seedSlug, res.data, issues);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       issues.push({ role, slug: seedSlug, code: 'query-failed', detail: 'threw: ' + message });
     }
   }
+
   const report: PromptHealthReport = { ok: issues.length === 0, checkedAt: Date.now(), issues };
   publishReport(report, opts.silent === true);
 
@@ -160,7 +168,9 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
     });
   }
 
-  if (silent) return;
+  if (silent) {
+    return;
+  }
 
   const rolesAffected = Array.from(new Set(report.issues.map(i => i.role))).join(', ');
   const codes = Array.from(new Set(report.issues.map(i => i.code))).join(', ');

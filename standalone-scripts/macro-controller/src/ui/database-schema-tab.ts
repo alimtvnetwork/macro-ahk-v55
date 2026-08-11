@@ -108,6 +108,7 @@ function buildCreateTableForm(
     columns.push({ name: '', type: 'TEXT', nullable: true, defaultVal: '', validation: null, foreignKey: null });
     renderColumn(columns.length - 1, columns, colsContainer, rebuildAllColumns, existingTables);
   };
+
   createSection.appendChild(addColumnButton);
 
   const createButton = el('button', 'marco-schema-btn marco-schema-btn-primary', '✨ Create Table');
@@ -170,7 +171,10 @@ function buildColumnMainRow(
   nameInput.placeholder = 'ColumnName';
   nameInput.value = col.name;
   nameInput.style.maxWidth = '140px';
-  nameInput.oninput = () => { col.name = nameInput.value; };
+  nameInput.oninput = () => {
+    col.name = nameInput.value; 
+  };
+
   main.appendChild(nameInput);
 
   const typeSelect = el('select', 'marco-schema-select') as HTMLSelectElement;
@@ -179,10 +183,17 @@ function buildColumnMainRow(
     option.value = colType;
     option.textContent = colType;
     const isSelected = colType === col.type;
-    if (isSelected) option.selected = true;
+    if (isSelected) {
+      option.selected = true;
+    }
+
     typeSelect.appendChild(option);
   }
-  typeSelect.onchange = () => { col.type = typeSelect.value as ColumnEntry['type']; };
+
+  typeSelect.onchange = () => {
+    col.type = typeSelect.value as ColumnEntry['type']; 
+  };
+
   main.appendChild(typeSelect);
 
   const nullableLabel = el('label');
@@ -190,7 +201,10 @@ function buildColumnMainRow(
   const nullableCheckbox = el('input', 'marco-schema-checkbox') as HTMLInputElement;
   nullableCheckbox.type = 'checkbox';
   nullableCheckbox.checked = col.nullable;
-  nullableCheckbox.onchange = () => { col.nullable = nullableCheckbox.checked; };
+  nullableCheckbox.onchange = () => {
+    col.nullable = nullableCheckbox.checked; 
+  };
+
   nullableLabel.appendChild(nullableCheckbox);
   nullableLabel.appendChild(document.createTextNode('Nullable'));
   main.appendChild(nullableLabel);
@@ -199,7 +213,10 @@ function buildColumnMainRow(
   defaultInput.placeholder = 'Default';
   defaultInput.value = col.defaultVal;
   defaultInput.style.maxWidth = '80px';
-  defaultInput.oninput = () => { col.defaultVal = defaultInput.value; };
+  defaultInput.oninput = () => {
+    col.defaultVal = defaultInput.value; 
+  };
+
   main.appendChild(defaultInput);
 
   const removeButton = el('button', 'marco-schema-btn marco-schema-btn-danger marco-schema-btn-sm', '✕');
@@ -207,6 +224,7 @@ function buildColumnMainRow(
     columns.splice(index, 1);
     rebuildAllColumns();
   };
+
   main.appendChild(removeButton);
 
   return main;
@@ -220,7 +238,9 @@ function buildColumnExtras(
 
   const valPanel = el('div', 'marco-schema-val-panel');
   valPanel.style.display = col.validation ? 'block' : 'none';
-  if (col.validation) renderValidationPanel(valPanel, col);
+  if (col.validation) {
+    renderValidationPanel(valPanel, col);
+  }
 
   const valToggle = el('button', 'marco-schema-btn marco-schema-btn-sm',
     col.validation ? '📏 Validation ✓' : '📏 Validation');
@@ -237,11 +257,14 @@ function buildColumnExtras(
       renderValidationPanel(valPanel, col);
     }
   };
+
   extras.appendChild(valToggle);
 
   const fkPanel = el('div', 'marco-schema-fk-panel');
   fkPanel.style.display = col.foreignKey ? 'block' : 'none';
-  if (col.foreignKey) renderFkPanel(fkPanel, col, existingTables);
+  if (col.foreignKey) {
+    renderFkPanel(fkPanel, col, existingTables);
+  }
 
   const fkToggle = el('button', 'marco-schema-btn marco-schema-btn-sm',
     col.foreignKey ? '🔗 FK ✓' : '🔗 FK');
@@ -258,6 +281,7 @@ function buildColumnExtras(
       renderFkPanel(fkPanel, col, existingTables);
     }
   };
+
   extras.appendChild(fkToggle);
 
   return { extras, valPanel, fkPanel };

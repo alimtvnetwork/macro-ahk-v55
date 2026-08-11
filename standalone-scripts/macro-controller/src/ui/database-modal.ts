@@ -95,7 +95,9 @@ function createOverlay(): HTMLElement {
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
   overlay.onclick = (event) => {
     const isBackdropClick = event.target === overlay;
-    if (isBackdropClick) overlay.remove();
+    if (isBackdropClick) {
+      overlay.remove();
+    }
   };
 
   return overlay;
@@ -144,7 +146,9 @@ function buildTabBar(): HTMLElement {
 // CQ16: Extracted from wireTabSwitching closure
 function switchDbTab(tabs: HTMLElement[], bodies: HTMLElement[], index: number): void {
   tabs.forEach((tab, tabIndex) => tab.classList.toggle('active', tabIndex === index));
-  bodies.forEach((body, bodyIndex) => { body.style.display = bodyIndex === index ? 'flex' : 'none'; });
+  bodies.forEach((body, bodyIndex) => {
+    body.style.display = bodyIndex === index ? 'flex' : 'none'; 
+  });
 }
 
 function wireTabSwitching(

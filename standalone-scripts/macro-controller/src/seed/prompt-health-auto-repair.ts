@@ -103,6 +103,7 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
       isHealthy: initialReport.ok,
     };
   }
+
   emitRepairStart(initialReport);
   const reseed = await reseedPromptsOnDemand();
   // Second probe is intentionally LOUD (silent=false): if issues remain,
@@ -110,8 +111,12 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
   // short-circuits before the toast, so a healthy state stays quiet.
   const finalReport = await runPromptHealthCheck({ silent: false });
   const isHealthy = finalReport.ok;
-  if (isHealthy) emitRepairRecovered();
-  else emitRepairFailed(finalReport, reseed.error);
+  if (isHealthy) {
+    emitRepairRecovered();
+  } else {
+    emitRepairFailed(finalReport, reseed.error);
+  }
+
   const result: AutoRepairResult = {
     initialReport,
     repairAttempted: true,
@@ -119,7 +124,9 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
     finalReport,
     isHealthy,
   };
-  if (reseed.error) result.reseedError = reseed.error;
+  if (reseed.error) {
+    result.reseedError = reseed.error;
+  }
 
   return result;
 }

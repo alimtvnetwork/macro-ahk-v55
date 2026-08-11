@@ -37,9 +37,15 @@ export const hasXPathUtils = (): boolean => xpathUtilsState.detected;
 export function initXPathUtils(): void {
   if (hasXPathUtils()) {
     window.XPathUtils.setLogger(
-      function(fn: string, msg: string) { log(LabelType.LogXpathUtils + fn + '] ' + msg, 'check'); },
-      function(_fn: string, msg: string) { logSub(msg); },
-      function(fn: string, msg: string) { log(LabelType.LogXpathUtils + fn + '] WARN: ' + msg, 'warn'); }
+      function(fn: string, msg: string) {
+        log(LabelType.LogXpathUtils + fn + '] ' + msg, 'check'); 
+      },
+      function(_fn: string, msg: string) {
+        logSub(msg); 
+      },
+      function(fn: string, msg: string) {
+        log(LabelType.LogXpathUtils + fn + '] WARN: ' + msg, 'warn'); 
+      }
     );
     log('XPathUtils v' + window.XPathUtils.version + ' detected — using shared utilities', 'success');
   } else {
@@ -48,9 +54,15 @@ export function initXPathUtils(): void {
       if (typeof window.XPathUtils !== 'undefined' && !hasXPathUtils()) {
         xpathUtilsState.detected = true;
         window.XPathUtils.setLogger(
-          function(fn: string, msg: string) { log(LabelType.LogXpathUtils + fn + '] ' + msg, 'check'); },
-          function(_fn: string, msg: string) { logSub(msg); },
-          function(fn: string, msg: string) { log(LabelType.LogXpathUtils + fn + '] WARN: ' + msg, 'warn'); }
+          function(fn: string, msg: string) {
+            log(LabelType.LogXpathUtils + fn + '] ' + msg, 'check'); 
+          },
+          function(_fn: string, msg: string) {
+            logSub(msg); 
+          },
+          function(fn: string, msg: string) {
+            log(LabelType.LogXpathUtils + fn + '] WARN: ' + msg, 'warn'); 
+          }
         );
         log('XPathUtils detected on deferred retry (500ms)', 'success');
       }
@@ -67,6 +79,7 @@ export function reactClick(el: Element, callerXpath?: string): void {
 
     return;
   }
+
   // Fallback: inline implementation
   const fn = 'reactClick';
   const tag = '<' + el.tagName.toLowerCase() + ((el as HTMLElement).id ? '#' + (el as HTMLElement).id : '') + '>';
@@ -123,7 +136,10 @@ interface ElementDescriptor {
 
 /** Try finding element via configured XPath. */
 function findViaXPath(desc: ElementDescriptor): Element | null {
-  if (!desc.xpath) return null;
+  if (!desc.xpath) {
+    return null;
+  }
+
   log('  Method 1 (XPath) for ' + desc.name + ': ' + desc.xpath, 'check');
   const result = getByXPath(desc.xpath);
   if (result) {
@@ -131,6 +147,7 @@ function findViaXPath(desc: ElementDescriptor): Element | null {
 
     return result as Element;
   }
+
   log('  ' + desc.name + ' XPath failed: ' + desc.xpath + ' — trying fallbacks', 'warn');
 
   return null;
@@ -138,7 +155,10 @@ function findViaXPath(desc: ElementDescriptor): Element | null {
 
 /** Try finding element via text content matching. */
 function findViaTextScan(desc: ElementDescriptor): Element | null {
-  if (!desc.textMatch) return null;
+  if (!desc.textMatch) {
+    return null;
+  }
+
   const tag = desc.tag || 'button';
   const texts = Array.isArray(desc.textMatch) ? desc.textMatch : [desc.textMatch];
   log('  Method 2 (text scan): looking in <' + tag + '> for ' + JSON.stringify(texts), 'check');
@@ -158,7 +178,10 @@ function findViaTextScan(desc: ElementDescriptor): Element | null {
 
 /** Try finding element via CSS selectors. */
 function findViaCssSelector(desc: ElementDescriptor): Element | null {
-  if (!desc.selector) return null;
+  if (!desc.selector) {
+    return null;
+  }
+
   const selectors = Array.isArray(desc.selector) ? desc.selector : [desc.selector];
   log('  Method 3 (CSS selector): trying ' + selectors.length + ' selectors', 'check');
   for (const [sIdx, sel] of selectors.entries()) {
@@ -170,6 +193,7 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
 
         return result;
       }
+
       log('    ❌ Not found', 'warn');
     } catch (e: unknown) {
       logError('unknown', '    ❌ Invalid selector: ' + toErrorMessage(e));
@@ -181,7 +205,10 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
 
 /** Try finding element via ARIA label attributes. */
 function findViaAriaLabel(desc: ElementDescriptor): Element | null {
-  if (!desc.ariaLabel) return null;
+  if (!desc.ariaLabel) {
+    return null;
+  }
+
   const labels = Array.isArray(desc.ariaLabel) ? desc.ariaLabel : [desc.ariaLabel];
   for (const label of labels) {
     try {
@@ -202,7 +229,10 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
 
 /** Try finding element via role attribute. */
 function findViaRole(desc: ElementDescriptor): Element | null {
-  if (!desc.role) return null;
+  if (!desc.role) {
+    return null;
+  }
+
   const result = document.querySelector('[role="' + desc.role + '"]');
   if (result) {
     log('  ' + desc.name + ' FOUND via role: ' + desc.role, 'success');
@@ -215,7 +245,10 @@ function findViaRole(desc: ElementDescriptor): Element | null {
 
 /** Try finding element via ARIA labels or role attributes. */
 function findViaAria(desc: ElementDescriptor): Element | null {
-  if (!desc.ariaLabel && !desc.role) return null;
+  if (!desc.ariaLabel && !desc.role) {
+    return null;
+  }
+
   log('  Method 4 (ARIA/role)', 'check');
 
   return findViaAriaLabel(desc) || findViaRole(desc);

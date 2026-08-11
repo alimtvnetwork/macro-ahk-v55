@@ -17,26 +17,26 @@ vi.mock('../../error-utils', () => ({ logError: mocks.logError }));
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 
 const cache = vi.hoisted(() => ({
-    readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
-    writeJsonCopy: vi.fn(async () => undefined),
-    clearPromptCache: vi.fn(async () => undefined),
+  readJsonCopy: vi.fn(async () => ({ entries: [] as unknown[] })),
+  writeJsonCopy: vi.fn(async () => undefined),
+  clearPromptCache: vi.fn(async () => undefined),
 }));
 vi.mock('../prompt-cache', () => cache);
 vi.mock('../prompt-io-db-bridge', () => ({
-    collectDbEntriesForExport: vi.fn(async () => []),
-    mergeDbIntoExport: vi.fn((c: unknown[]) => c),
-    partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
-    commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
+  collectDbEntriesForExport: vi.fn(async () => []),
+  mergeDbIntoExport: vi.fn((c: unknown[]) => c),
+  partitionByRole: vi.fn((e: unknown[]) => ({ dbEntries: [], cacheEntries: e })),
+  commitDbEntries: vi.fn(async () => ({ upserted: 0, errors: [] })),
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
-    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
-    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
-    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+  setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+  deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+  upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 type Deferred = {
@@ -44,21 +44,22 @@ type Deferred = {
     resolve: () => void;
 };
 function defer(): Deferred {
-    let resolveFn!: () => void;
-    const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
-        resolveFn = () => res({ added: 1, updated: 0, errors: [] });
-    });
+  let resolveFn!: () => void;
+  const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
+    resolveFn = () => res({ added: 1, updated: 0, errors: [] });
+  });
 
-    return { promise, resolve: resolveFn };
+  return { promise, resolve: resolveFn };
 }
+
 const importDeferred = defer();
 const io = vi.hoisted(() => ({
-    exportPromptsToJson: vi.fn(async () => undefined),
-    parsePromptsText: vi.fn(() => ({
-        valid: [{ name: 'p', text: 'body {{n}}' }],
-        errors: [] as string[],
-    })),
-    performPromptImport: vi.fn(() => importDeferred.promise),
+  exportPromptsToJson: vi.fn(async () => undefined),
+  parsePromptsText: vi.fn(() => ({
+    valid: [{ name: 'p', text: 'body {{n}}' }],
+    errors: [] as string[],
+  })),
+  performPromptImport: vi.fn(() => importDeferred.promise),
 }));
 vi.mock('../prompt-io', () => io);
 
@@ -67,55 +68,59 @@ import { openPromptLibraryModal } from '../prompt-library-modal';
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
 function getImportBtn(): HTMLButtonElement {
-    return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
+  return document.querySelector<HTMLButtonElement>('[data-testid="library-import"]')!;
 }
+
 function getFileInput(): HTMLInputElement {
-    return document.querySelector<HTMLInputElement>('[data-testid="library-import-file"]')!;
+  return document.querySelector<HTMLInputElement>('[data-testid="library-import-file"]')!;
 }
+
 function fireFileChange(filename: string): void {
-    const fileInput = getFileInput();
-    const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
-    Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
-    fileInput.dispatchEvent(new Event('change'));
+  const fileInput = getFileInput();
+  const file = new File(['{"entries":[]}'], filename, { type: 'application/json' });
+  Object.defineProperty(fileInput, 'files', { value: [file], configurable: true });
+  fileInput.dispatchEvent(new Event('change'));
 }
 
 describe('prompt-library-modal - spinner shown while performPromptImport runs', () => {
-    beforeEach(() => {
-        document.body.innerHTML = '';
-        mocks.logError.mockReset();
-        mocks.showToast.mockReset();
-        io.performPromptImport.mockClear();
-    });
-    afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    mocks.logError.mockReset();
+    mocks.showToast.mockReset();
+    io.performPromptImport.mockClear();
+  });
+  afterEach(() => {
+    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+  });
 
-    it('renders spinner + "Importing…" mid-flight and restores "Import" on completion', async () => {
-        await openPromptLibraryModal();
-        await tick();
+  it('renders spinner + "Importing…" mid-flight and restores "Import" on completion', async () => {
+    await openPromptLibraryModal();
+    await tick();
 
-        const btn = getImportBtn();
-        expect(btn.textContent).toBe('Import');
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
+    const btn = getImportBtn();
+    expect(btn.textContent).toBe('Import');
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
 
-        fireFileChange('a.json');
-        await tick();
-        await tick();
+    fireFileChange('a.json');
+    await tick();
+    await tick();
 
-        const spinner = btn.querySelector<HTMLElement>('[data-testid="library-import-spinner"]');
-        expect(spinner).not.toBeNull();
-        expect(spinner!.getAttribute('aria-hidden')).toBe('true');
-        expect(btn.textContent).toContain('Importing');
-        expect(btn.getAttribute('aria-busy')).toBe('true');
+    const spinner = btn.querySelector<HTMLElement>('[data-testid="library-import-spinner"]');
+    expect(spinner).not.toBeNull();
+    expect(spinner!.getAttribute('aria-hidden')).toBe('true');
+    expect(btn.textContent).toContain('Importing');
+    expect(btn.getAttribute('aria-busy')).toBe('true');
 
-        // Keyframes stylesheet is injected once.
-        expect(document.getElementById('mc-spinner-style')).not.toBeNull();
+    // Keyframes stylesheet is injected once.
+    expect(document.getElementById('mc-spinner-style')).not.toBeNull();
 
-        importDeferred.resolve();
-        await tick();
-        await tick();
-        await tick();
+    importDeferred.resolve();
+    await tick();
+    await tick();
+    await tick();
 
-        expect(btn.textContent).toBe('Import');
-        expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
-        expect(btn.hasAttribute('aria-busy')).toBe(false);
-    });
+    expect(btn.textContent).toBe('Import');
+    expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();
+    expect(btn.hasAttribute('aria-busy')).toBe(false);
+  });
 });

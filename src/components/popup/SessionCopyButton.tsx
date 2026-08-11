@@ -54,18 +54,34 @@ interface SessionReportResponse {
 
 /** Formats an ISO timestamp as a relative age label like "2h ago", "3d ago". */
 function formatAge(iso: string): string {
-  if (!iso) return "";
+  if (!iso) {
+    return "";
+  }
+
   const diffMs = Date.now() - new Date(iso).getTime();
-  if (diffMs < 0) return "now";
+  if (diffMs < 0) {
+    return "now";
+  }
+
   const mins = Math.floor(diffMs / 60_000);
-  if (mins < 1) return "now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) {
+    return "now";
+  }
+
+  if (mins < 60) {
+    return `${mins}m ago`;
+  }
+
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) {
+    return `${hrs}h ago`;
+  }
+
   const days = Math.floor(hrs / 24);
 
   return `${days}d ago`;
 }
+
 interface SessionLogsResponse {
   sessionId: string;
   logs: SessionLog[];
@@ -105,7 +121,8 @@ function getExtensionVersion(): string {
 
     return g.chrome?.runtime?.getManifest?.().version ?? "?";
   } catch (err) { /* swallowed */
- return "?"; }
+    return "?"; 
+  }
 }
 
 function buildReport(data: SessionLogsResponse): string {
@@ -149,7 +166,10 @@ export function SessionCopyButton() {
 
     sendMessage<SessionReportResponse>({ type: "GET_SESSION_REPORT" })
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
+
         const withTs = res.sessionsWithTimestamps ?? (res.sessions ?? []).map((id) => ({ id, lastModified: "" }));
         setSessions(withTs);
         if (res.sessionId && res.sessionId !== "none") {
@@ -160,10 +180,14 @@ export function SessionCopyButton() {
         logError("SessionCopyButton.fetchSessions", "GET_SESSION_REPORT failed — sessions dropdown will be empty", caught);
       })
       .finally(() => {
-        if (!cancelled) setLoadingSessions(false);
+        if (!cancelled) {
+          setLoadingSessions(false);
+        }
       });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true; 
+    };
   }, []);
 
   const handleCopy = useCallback(async () => {

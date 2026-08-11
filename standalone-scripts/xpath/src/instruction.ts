@@ -15,37 +15,37 @@ import type { EmptySettings } from "../../types/instruction/seed/empty-settings"
 import { VERSION } from "../../shared-version";
 
 const instruction: ProjectInstruction<EmptySettings> = {
-    SchemaVersion: "1.0",
-    Name: "xpath",
-    DisplayName: "XPath Utilities",
-    Version: VERSION,
-    Description: "Global XPath utility library (getByXPath, findElement, reactClick)",
-    World: InjectionWorldType.Main,
-    IsGlobal: true,
-    Dependencies: [],
-    LoadOrder: 1,
-    Seed: {
-        Id: "default-xpath-utils",
-        SeedOnInstall: true,
-        IsRemovable: false,
-        AutoInject: true,
-        TargetUrls: [
-            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
-            { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
-            { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
-        ],
-        Cookies: [],
-        Settings: {},
-    },
-    Assets: {
-        Css: [],
-        Configs: [],
-        Scripts: [
-            { File: "xpath.js", Order: 1, IsIife: true },
-        ],
-        Templates: [],
-        Prompts: [],
-    },
+  SchemaVersion: "1.0",
+  Name: "xpath",
+  DisplayName: "XPath Utilities",
+  Version: VERSION,
+  Description: "Global XPath utility library (getByXPath, findElement, reactClick)",
+  World: InjectionWorldType.Main,
+  IsGlobal: true,
+  Dependencies: [],
+  LoadOrder: 1,
+  Seed: {
+    Id: "default-xpath-utils",
+    SeedOnInstall: true,
+    IsRemovable: false,
+    AutoInject: true,
+    TargetUrls: [
+      { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
+    ],
+    Cookies: [],
+    Settings: {},
+  },
+  Assets: {
+    Css: [],
+    Configs: [],
+    Scripts: [
+      { File: "xpath.js", Order: 1, IsIife: true },
+    ],
+    Templates: [],
+    Prompts: [],
+  },
 };
 
 export default instruction;

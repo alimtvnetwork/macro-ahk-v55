@@ -15,14 +15,14 @@ export enum OwnerSwitchCsvColumnType {
 }
 
 export const REQUIRED_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> = Object.freeze([
-    OwnerSwitchCsvColumnType.LoginEmail,
-    OwnerSwitchCsvColumnType.OwnerEmail1,
+  OwnerSwitchCsvColumnType.LoginEmail,
+  OwnerSwitchCsvColumnType.OwnerEmail1,
 ]);
 
 export const OPTIONAL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> = Object.freeze([
-    OwnerSwitchCsvColumnType.Password,
-    OwnerSwitchCsvColumnType.OwnerEmail2,
-    OwnerSwitchCsvColumnType.Notes,
+  OwnerSwitchCsvColumnType.Password,
+  OwnerSwitchCsvColumnType.OwnerEmail2,
+  OwnerSwitchCsvColumnType.Notes,
 ]);
 
 export const ALL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> =

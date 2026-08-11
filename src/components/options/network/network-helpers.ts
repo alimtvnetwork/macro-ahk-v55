@@ -2,16 +2,24 @@ import { HttpCodes } from "../../../constants/http";
 /** Categorize an HTTP status code into a bucket string. */
 export function categorizeStatus(status: number): string {
   const is2xx = status >= HttpCodes.OK && status < 300;
-  if (is2xx) return "2xx";
+  if (is2xx) {
+    return "2xx";
+  }
 
   const is3xx = status >= 300 && status < HttpCodes.BAD_REQUEST;
-  if (is3xx) return "3xx";
+  if (is3xx) {
+    return "3xx";
+  }
 
   const is4xx = status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR;
-  if (is4xx) return "4xx";
+  if (is4xx) {
+    return "4xx";
+  }
 
   const is5xx = status >= HttpCodes.INTERNAL_SERVER_ERROR;
-  if (is5xx) return "5xx";
+  if (is5xx) {
+    return "5xx";
+  }
 
   return "0xx";
 }
@@ -45,7 +53,9 @@ export function truncateUrl(url: string): string {
 /** Format a timestamp string into a short time display. */
 export function formatNetworkTimestamp(ts: string): string {
   const isMissing = ts === "" || ts === undefined || ts === null;
-  if (isMissing) return "—";
+  if (isMissing) {
+    return "—";
+  }
 
   try {
     return new Date(ts).toLocaleString("en-US", {

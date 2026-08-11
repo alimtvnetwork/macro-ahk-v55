@@ -61,7 +61,9 @@ export function CreateDatabaseForm({
     (nameValidation?.valid ?? false);
 
   const handleCreate = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      return;
+    }
 
     setCreating(true);
     try {
@@ -75,8 +77,11 @@ export function CreateDatabaseForm({
       // Determine which schema to auto-create based on kind
       const kindNum = Number(kindId);
       let extraSchema = "";
-      if (kindNum === 1) extraSchema = KV_KIND_SCHEMA;
-      else if (kindNum === 3) extraSchema = CONFIG_KIND_SCHEMA;
+      if (kindNum === 1) {
+        extraSchema = KV_KIND_SCHEMA;
+      } else if (kindNum === 3) {
+        extraSchema = CONFIG_KIND_SCHEMA;
+      }
 
       // Create via PROJECT_DB_CREATE_TABLE for KV/Config kinds
       if (extraSchema) {

@@ -28,45 +28,45 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = join(HERE, 'fixtures');
 
 function loadFixtures(): Fixture[] {
-    const files = readdirSync(FIXTURE_DIR).filter((f) => f.endsWith('.json')).sort();
+  const files = readdirSync(FIXTURE_DIR).filter((f) => f.endsWith('.json')).sort();
 
-    return files.map((f) => JSON.parse(readFileSync(join(FIXTURE_DIR, f), 'utf-8')) as Fixture);
+  return files.map((f) => JSON.parse(readFileSync(join(FIXTURE_DIR, f), 'utf-8')) as Fixture);
 }
 
 const FIXTURES = loadFixtures();
 
 function runFixtureTests(fixtures: Fixture[]): void {
-    for (const fx of fixtures) {
-        it('E2E: ' + fx.name + ' — ' + fx.description, () => {
-            const nowMs = fx.nowIso ? Date.parse(fx.nowIso) : 0;
-            const actual = calculateProZeroCreditSummary(fx.input, nowMs);
-            for (const key of Object.keys(fx.expected) as Array<keyof MacroCreditSummary>) {
-                expect({ key, value: actual[key] }).toEqual({ key, value: fx.expected[key] });
-            }
-        });
-    }
+  for (const fx of fixtures) {
+    it('E2E: ' + fx.name + ' — ' + fx.description, () => {
+      const nowMs = fx.nowIso ? Date.parse(fx.nowIso) : 0;
+      const actual = calculateProZeroCreditSummary(fx.input, nowMs);
+      for (const key of Object.keys(fx.expected) as Array<keyof MacroCreditSummary>) {
+        expect({ key, value: actual[key] }).toEqual({ key, value: fx.expected[key] });
+      }
+    });
+  }
 }
 
 describe('Group D — credit-balance E2E (6 fixtures)', () => {
-    it('loads all 6 fixtures from disk', () => {
-        expect(FIXTURES).toHaveLength(6);
-    });
+  it('loads all 6 fixtures from disk', () => {
+    expect(FIXTURES).toHaveLength(6);
+  });
 
-    runFixtureTests(FIXTURES);
+  runFixtureTests(FIXTURES);
 
-    it('bonus-and-billing: BonusRemaining + BillingRemaining ≤ AvailableCredits', () => {
-        const fx = FIXTURES.find((f) => f.name === 'bonus-and-billing');
-        expect(fx).toBeDefined();
-        const out = calculateProZeroCreditSummary(fx!.input, 0);
-        expect(out.BonusRemaining + out.BillingRemaining).toBeLessThanOrEqual(out.AvailableCredits);
-    });
+  it('bonus-and-billing: BonusRemaining + BillingRemaining ≤ AvailableCredits', () => {
+    const fx = FIXTURES.find((f) => f.name === 'bonus-and-billing');
+    expect(fx).toBeDefined();
+    const out = calculateProZeroCreditSummary(fx!.input, 0);
+    expect(out.BonusRemaining + out.BillingRemaining).toBeLessThanOrEqual(out.AvailableCredits);
+  });
 
-    it('all fixtures use sanitized IDs (no real workspace_01* or @lovable.dev)', () => {
-        for (const fx of FIXTURES) {
-            expect(fx.workspace.id).toMatch(/^ws-\d{3}$/);
-            const email = fx.workspace.owner_email || '';
-            expect(email === '' || email.endsWith('@sample.com')).toBe(true);
-            expect(fx.workspace.id).not.toMatch(/workspace_01/);
-        }
-    });
+  it('all fixtures use sanitized IDs (no real workspace_01* or @lovable.dev)', () => {
+    for (const fx of FIXTURES) {
+      expect(fx.workspace.id).toMatch(/^ws-\d{3}$/);
+      const email = fx.workspace.owner_email || '';
+      expect(email === '' || email.endsWith('@sample.com')).toBe(true);
+      expect(fx.workspace.id).not.toMatch(/workspace_01/);
+    }
+  });
 });

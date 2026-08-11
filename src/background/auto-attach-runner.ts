@@ -22,10 +22,10 @@ import { ServiceResult } from '../utils/result-wrapper';
 import type { StoredProject, ScriptEntry } from "../shared/project-types";
 import type { StoredScript } from "../shared/script-config-types";
 import {
-    evaluateAutoAttach,
-    buildAttachedScriptEntry,
-    type LibraryScriptForAttach,
-    type AttachDecision,
+  evaluateAutoAttach,
+  buildAttachedScriptEntry,
+  type LibraryScriptForAttach,
+  type AttachDecision,
 } from "./auto-attach";
 import { logBgWarnError, BgLogTag, logCaughtError } from "./bg-logger";
 import { STORAGE_KEY_AUTO_ATTACH_DECISIONS } from "../shared/constants";
@@ -58,21 +58,21 @@ interface ScriptAttachExtras {
 }
 
 function toLibraryScriptForAttach(s: StoredScript): LibraryScriptForAttach {
-    const extras = s as unknown as ScriptAttachExtras;
+  const extras = s as unknown as ScriptAttachExtras;
 
-    return {
-        id: s.id,
-        name: s.name,
-        instruction: {
-            UrlMatches: extras.urlMatches,
-            AutoAttach: extras.autoAttach ?? s.autoInject,
-            RunAt: s.runAt,
-            World: extras.world,
-            RequiredCookies: extras.requiredCookies,
-            Dependencies: s.dependencies,
-            InjectionConditions: extras.injectionConditions,
-        },
-    };
+  return {
+    id: s.id,
+    name: s.name,
+    instruction: {
+      UrlMatches: extras.urlMatches,
+      AutoAttach: extras.autoAttach ?? s.autoInject,
+      RunAt: s.runAt,
+      World: extras.world,
+      RequiredCookies: extras.requiredCookies,
+      Dependencies: s.dependencies,
+      InjectionConditions: extras.injectionConditions,
+    },
+  };
 }
 
 /**
@@ -81,45 +81,45 @@ function toLibraryScriptForAttach(s: StoredScript): LibraryScriptForAttach {
  * reason code; the returned project is a no-op clone when nothing matches.
  */
 export function runAutoAttach(
-    project: StoredProject,
-    library: StoredScript[],
+  project: StoredProject,
+  library: StoredScript[],
 ): { project: StoredProject; attached: ScriptEntry[]; decisions: Array<{ scriptId: string; decision: AttachDecision }> } {
-    const libraryIds = new Set(library.map((s) => s.id));
-    const startingOrder = project.scripts.length;
-    const attached: ScriptEntry[] = [];
-    const decisions: Array<{ scriptId: string; decision: AttachDecision }> = [];
+  const libraryIds = new Set(library.map((s) => s.id));
+  const startingOrder = project.scripts.length;
+  const attached: ScriptEntry[] = [];
+  const decisions: Array<{ scriptId: string; decision: AttachDecision }> = [];
 
-    for (const stored of library) {
-        const view = toLibraryScriptForAttach(stored);
-        const decision = evaluateAutoAttach(project, view, libraryIds);
-        decisions.push({ scriptId: stored.id, decision });
+  for (const stored of library) {
+    const view = toLibraryScriptForAttach(stored);
+    const decision = evaluateAutoAttach(project, view, libraryIds);
+    decisions.push({ scriptId: stored.id, decision });
 
-        if (decision.isSuccess) {
-            attached.push(buildAttachedScriptEntry(view, startingOrder + attached.length));
-            continue;
-        }
+    if (decision.isSuccess) {
+      attached.push(buildAttachedScriptEntry(view, startingOrder + attached.length));
+      continue;
+    }
 
-        // Non-silent: surface every skip. WARN for binding/dep issues, INFO otherwise.
-        const isWarn =
+    // Non-silent: surface every skip. WARN for binding/dep issues, INFO otherwise.
+    const isWarn =
             decision.reason === "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING" ||
             decision.reason === "AUTOATTACH_SKIPPED_DEP_MISSING";
-        const line = `auto-attach skip [${decision.reason}] project="${project.name}" script="${stored.name}" — ${decision.detail}`;
-        if (isWarn) {
-            logBgWarnError(TAG, line);
-        } else {
-            console.info(`${TAG} ${line}`);
-        }
+    const line = `auto-attach skip [${decision.reason}] project="${project.name}" script="${stored.name}" — ${decision.detail}`;
+    if (isWarn) {
+      logBgWarnError(TAG, line);
+    } else {
+      console.info(`${TAG} ${line}`);
     }
+  }
 
-    if (attached.length === 0) {
-        return { project, attached, decisions };
-    }
+  if (attached.length === 0) {
+    return { project, attached, decisions };
+  }
 
-    return {
-        project: { ...project, scripts: [...project.scripts, ...attached] },
-        attached,
-        decisions,
-    };
+  return {
+    project: { ...project, scripts: [...project.scripts, ...attached] },
+    attached,
+    decisions,
+  };
 }
 
 /**
@@ -129,29 +129,29 @@ export function runAutoAttach(
  * are logged but never thrown.
  */
 export async function persistAutoAttachDecisions(
-    project: StoredProject,
-    library: StoredScript[],
-    decisions: Array<{ scriptId: string; decision: AttachDecision }>,
+  project: StoredProject,
+  library: StoredScript[],
+  decisions: Array<{ scriptId: string; decision: AttachDecision }>,
 ): Promise<void> {
-    try {
-        const libraryById = new Map(library.map((s) => [s.id, s] as const));
-        const record: PersistedAutoAttachRecord = {
-            projectId: project.id,
-            projectName: project.name,
-            evaluatedAt: new Date().toISOString(),
-            decisions: decisions.map(({ scriptId, decision }) => ({
-                scriptId,
-                scriptName: libraryById.get(scriptId)?.name ?? scriptId,
-                ok: decision.isSuccess,
-                reason: decision.reason,
-                detail: decision.detail,
-            })),
-        };
-        const existing = await chrome.storage.local.get(STORAGE_KEY_AUTO_ATTACH_DECISIONS);
-        const map = (existing[STORAGE_KEY_AUTO_ATTACH_DECISIONS] as Record<string, PersistedAutoAttachRecord> | undefined) ?? {};
-        map[project.id] = record;
-        await chrome.storage.local.set({ [STORAGE_KEY_AUTO_ATTACH_DECISIONS]: map });
-    } catch (caught) {
-        logCaughtError(TAG, `persistAutoAttachDecisions failed for project "${project.id}"`, caught);
-    }
+  try {
+    const libraryById = new Map(library.map((s) => [s.id, s] as const));
+    const record: PersistedAutoAttachRecord = {
+      projectId: project.id,
+      projectName: project.name,
+      evaluatedAt: new Date().toISOString(),
+      decisions: decisions.map(({ scriptId, decision }) => ({
+        scriptId,
+        scriptName: libraryById.get(scriptId)?.name ?? scriptId,
+        ok: decision.isSuccess,
+        reason: decision.reason,
+        detail: decision.detail,
+      })),
+    };
+    const existing = await chrome.storage.local.get(STORAGE_KEY_AUTO_ATTACH_DECISIONS);
+    const map = (existing[STORAGE_KEY_AUTO_ATTACH_DECISIONS] as Record<string, PersistedAutoAttachRecord> | undefined) ?? {};
+    map[project.id] = record;
+    await chrome.storage.local.set({ [STORAGE_KEY_AUTO_ATTACH_DECISIONS]: map });
+  } catch (caught) {
+    logCaughtError(TAG, `persistAutoAttachDecisions failed for project "${project.id}"`, caught);
+  }
 }

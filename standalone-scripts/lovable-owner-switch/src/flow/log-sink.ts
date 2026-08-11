@@ -39,16 +39,16 @@ export interface LogSink {
 }
 
 export const buildEntry = (
-    taskId: string,
-    rowIndex: number | null,
-    phase: LogPhaseType,
-    severity: LogSeverityType,
-    message: string,
+  taskId: string,
+  rowIndex: number | null,
+  phase: LogPhaseType,
+  severity: LogSeverityType,
+  message: string,
 ): LogEntry => ({
-    TaskId: taskId,
-    RowIndex: rowIndex,
-    Phase: phase,
-    Severity: severity,
-    Message: message,
-    TimestampUtc: new Date().toISOString(),
+  TaskId: taskId,
+  RowIndex: rowIndex,
+  Phase: phase,
+  Severity: severity,
+  Message: message,
+  TimestampUtc: new Date().toISOString(),
 });

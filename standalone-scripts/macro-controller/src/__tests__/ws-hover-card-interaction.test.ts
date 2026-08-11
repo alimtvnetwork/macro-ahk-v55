@@ -71,7 +71,9 @@ function setupList(itemRect: { left: number; top: number; width: number; height:
     right: itemRect.left + itemRect.width,
     bottom: itemRect.top + itemRect.height,
     x: itemRect.left, y: itemRect.top,
-    toJSON() { return this; },
+    toJSON() {
+      return this; 
+    },
   } as DOMRect;
   item.getBoundingClientRect = () => rect;
   name.getBoundingClientRect = () => rect;

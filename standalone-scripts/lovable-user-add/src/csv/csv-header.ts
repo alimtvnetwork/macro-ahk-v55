@@ -18,61 +18,61 @@ export interface HeaderResolution {
 const HEADER_ROW_INDEX = 0;
 
 const buildIndexMap = (header: ReadonlyArray<string>): Map<UserAddCsvColumnType, number> => {
-    const out = new Map<UserAddCsvColumnType, number>();
+  const out = new Map<UserAddCsvColumnType, number>();
 
-    for (const column of ALL_COLUMNS) {
-        const idx = header.findIndex((h) => h.trim() === column);
+  for (const column of ALL_COLUMNS) {
+    const idx = header.findIndex((h) => h.trim() === column);
 
-        if (idx >= 0) {
-            out.set(column, idx);
-        }
+    if (idx >= 0) {
+      out.set(column, idx);
     }
+  }
 
-    return out;
+  return out;
 };
 
 const collectMissingErrors = (
-    indices: ReadonlyMap<UserAddCsvColumnType, number>,
+  indices: ReadonlyMap<UserAddCsvColumnType, number>,
 ): CsvParseError[] => {
-    const errors: CsvParseError[] = [];
+  const errors: CsvParseError[] = [];
 
-    for (const required of REQUIRED_COLUMNS) {
-        if (!indices.has(required)) {
-            errors.push({
-                RowIndex: HEADER_ROW_INDEX,
-                Column: required,
-                Message: `Required column missing: ${required}`,
-            });
-        }
+  for (const required of REQUIRED_COLUMNS) {
+    if (!indices.has(required)) {
+      errors.push({
+        RowIndex: HEADER_ROW_INDEX,
+        Column: required,
+        Message: `Required column missing: ${required}`,
+      });
     }
+  }
 
-    return errors;
+  return errors;
 };
 
 const collectUnknownWarnings = (header: ReadonlyArray<string>): CsvParseWarning[] => {
-    const known: ReadonlySet<string> = new Set(ALL_COLUMNS);
-    const warnings: CsvParseWarning[] = [];
+  const known: ReadonlySet<string> = new Set(ALL_COLUMNS);
+  const warnings: CsvParseWarning[] = [];
 
-    for (const raw of header) {
-        const name = raw.trim();
+  for (const raw of header) {
+    const name = raw.trim();
 
-        if (name.length > 0 && !known.has(name)) {
-            warnings.push({
-                RowIndex: HEADER_ROW_INDEX,
-                Message: `Unknown column ignored: ${name}`,
-            });
-        }
+    if (name.length > 0 && !known.has(name)) {
+      warnings.push({
+        RowIndex: HEADER_ROW_INDEX,
+        Message: `Unknown column ignored: ${name}`,
+      });
     }
+  }
 
-    return warnings;
+  return warnings;
 };
 
 export const resolveHeader = (header: ReadonlyArray<string>): HeaderResolution => {
-    const indices = buildIndexMap(header);
+  const indices = buildIndexMap(header);
 
-    return {
-        Indices: indices,
-        Errors: collectMissingErrors(indices),
-        Warnings: collectUnknownWarnings(header),
-    };
+  return {
+    Indices: indices,
+    Errors: collectMissingErrors(indices),
+    Warnings: collectUnknownWarnings(header),
+  };
 };

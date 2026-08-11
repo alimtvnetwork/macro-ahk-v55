@@ -48,97 +48,97 @@ interface RunResultsSummaryPanelProps {
 }
 
 export default function RunResultsSummaryPanel(props: RunResultsSummaryPanelProps) {
-    const { reports, totalDurationMs, groupName } = props;
-    const counts = aggregate(reports);
-    const failedReports = reports.filter((r) => r.Status === "Failed");
-    const overallOk = counts.Failures === 0 && counts.GroupsRun > 0;
+  const { reports, totalDurationMs, groupName } = props;
+  const counts = aggregate(reports);
+  const failedReports = reports.filter((r) => r.Status === "Failed");
+  const overallOk = counts.Failures === 0 && counts.GroupsRun > 0;
 
-    return (
-        <section
-            className="rounded-md border bg-card"
-            aria-label="Run results summary"
-        >
-            <header className="flex items-center justify-between gap-2 border-b px-3 py-2">
-                <div className="flex items-center gap-2">
-                    {overallOk ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                        <XCircle className="h-4 w-4 text-destructive" />
-                    )}
-                    <h3 className="text-sm font-semibold">
-                        {overallOk ? "Run complete" : "Run finished with failures"}
-                    </h3>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Timer className="h-3.5 w-3.5" />
-                    {formatDuration(totalDurationMs)}
-                </div>
-            </header>
+  return (
+    <section
+      className="rounded-md border bg-card"
+      aria-label="Run results summary"
+    >
+      <header className="flex items-center justify-between gap-2 border-b px-3 py-2">
+        <div className="flex items-center gap-2">
+          {overallOk ? (
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          ) : (
+            <XCircle className="h-4 w-4 text-destructive" />
+          )}
+          <h3 className="text-sm font-semibold">
+            {overallOk ? "Run complete" : "Run finished with failures"}
+          </h3>
+        </div>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Timer className="h-3.5 w-3.5" />
+          {formatDuration(totalDurationMs)}
+        </div>
+      </header>
 
-            <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
-                <Stat
-                    icon={<FolderTree className="h-4 w-4" />}
-                    label="Groups run"
-                    value={counts.GroupsRun}
-                />
-                <Stat
-                    icon={<FolderTree className="h-4 w-4" />}
-                    label="Groups entered"
-                    value={counts.GroupsEntered}
-                    hint="Includes root + nested RunGroup invocations"
-                />
-                <Stat
-                    icon={<ListChecks className="h-4 w-4" />}
-                    label="Steps executed"
-                    value={counts.StepsExecuted}
-                    tone="success"
-                />
-                <Stat
-                    icon={<FastForward className="h-4 w-4" />}
-                    label="Steps skipped"
-                    value={counts.StepsSkipped}
-                    hint="Disabled steps short-circuited by the runner"
-                    tone={counts.StepsSkipped > 0 ? "muted" : "default"}
-                />
-            </div>
+      <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
+        <Stat
+          icon={<FolderTree className="h-4 w-4" />}
+          label="Groups run"
+          value={counts.GroupsRun}
+        />
+        <Stat
+          icon={<FolderTree className="h-4 w-4" />}
+          label="Groups entered"
+          value={counts.GroupsEntered}
+          hint="Includes root + nested RunGroup invocations"
+        />
+        <Stat
+          icon={<ListChecks className="h-4 w-4" />}
+          label="Steps executed"
+          value={counts.StepsExecuted}
+          tone="success"
+        />
+        <Stat
+          icon={<FastForward className="h-4 w-4" />}
+          label="Steps skipped"
+          value={counts.StepsSkipped}
+          hint="Disabled steps short-circuited by the runner"
+          tone={counts.StepsSkipped > 0 ? "muted" : "default"}
+        />
+      </div>
 
-            {failedReports.length > 0 && (
-                <div className="border-t px-3 py-2">
-                    <p className="mb-1 text-xs font-medium text-destructive">
-                        {failedReports.length} group{failedReports.length === 1 ? "" : "s"} failed
+      {failedReports.length > 0 && (
+        <div className="border-t px-3 py-2">
+          <p className="mb-1 text-xs font-medium text-destructive">
+            {failedReports.length} group{failedReports.length === 1 ? "" : "s"} failed
+          </p>
+          <ul className="space-y-1 text-xs">
+            {failedReports.map((r) => {
+              const result = r.Result;
+              const reason = result !== null && !result.Ok ? result.Reason : "Unknown";
+              const detail = result !== null && !result.Ok ? result.ReasonDetail : "";
+              const name = groupName?.(r.StepGroupId) ?? `Group #${r.StepGroupId}`;
+
+              return (
+                <li
+                  key={r.StepGroupId}
+                  className="rounded border border-destructive/30 bg-destructive/5 px-2 py-1.5"
+                >
+                  <div className="flex items-center gap-2">
+                    <XCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                    <span className="truncate font-medium">{name}</span>
+                    <span className="rounded bg-destructive/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-destructive">
+                      {reason}
+                    </span>
+                  </div>
+                  {detail !== "" && (
+                    <p className="mt-0.5 text-muted-foreground line-clamp-2">
+                      {detail}
                     </p>
-                    <ul className="space-y-1 text-xs">
-                        {failedReports.map((r) => {
-                            const result = r.Result;
-                            const reason = result !== null && !result.Ok ? result.Reason : "Unknown";
-                            const detail = result !== null && !result.Ok ? result.ReasonDetail : "";
-                            const name = groupName?.(r.StepGroupId) ?? `Group #${r.StepGroupId}`;
-
-                            return (
-                                <li
-                                    key={r.StepGroupId}
-                                    className="rounded border border-destructive/30 bg-destructive/5 px-2 py-1.5"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <XCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
-                                        <span className="truncate font-medium">{name}</span>
-                                        <span className="rounded bg-destructive/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-destructive">
-                                            {reason}
-                                        </span>
-                                    </div>
-                                    {detail !== "" && (
-                                        <p className="mt-0.5 text-muted-foreground line-clamp-2">
-                                            {detail}
-                                        </p>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
-            )}
-        </section>
-    );
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
 }
 
 interface StatProps {
@@ -150,22 +150,22 @@ interface StatProps {
 }
 
 function Stat({ icon, label, value, hint, tone = "default" }: StatProps) {
-    const valueClass =
+  const valueClass =
         tone === "success" ? "text-emerald-600 dark:text-emerald-400"
-        : tone === "muted" ? "text-muted-foreground"
-        : "text-foreground";
+          : tone === "muted" ? "text-muted-foreground"
+            : "text-foreground";
 
-    return (
-        <div className="rounded-md border bg-muted/30 px-3 py-2" title={hint}>
-            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">
-                {icon}
-                <span>{label}</span>
-            </div>
-            <div className={`mt-1 text-2xl font-semibold tabular-nums ${valueClass}`}>
-                {value}
-            </div>
-        </div>
-    );
+  return (
+    <div className="rounded-md border bg-muted/30 px-3 py-2" title={hint}>
+      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <div className={`mt-1 text-2xl font-semibold tabular-nums ${valueClass}`}>
+        {value}
+      </div>
+    </div>
+  );
 }
 
 // Aggregator + trace helpers now live in ./run-results-summary-aggregate.ts

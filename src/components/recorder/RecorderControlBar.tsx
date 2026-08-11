@@ -27,79 +27,88 @@ export interface RecorderControlBarProps {
 }
 
 export function RecorderControlBar(props: RecorderControlBarProps): JSX.Element {
-    const { projectSlug, className } = props;
-    const { session, start, pause, resume, stop } = useRecordingSession();
+  const { projectSlug, className } = props;
+  const { session, start, pause, resume, stop } = useRecordingSession();
 
-    const phase = session?.Phase ?? "Idle";
-    const isRecording = phase === "Recording";
-    const isPaused = phase === "Paused";
-    const isActive = isRecording || isPaused;
+  const phase = session?.Phase ?? "Idle";
+  const isRecording = phase === "Recording";
+  const isPaused = phase === "Paused";
+  const isActive = isRecording || isPaused;
 
-    const playEnabled = !isActive || isPaused;
-    const pauseEnabled = isRecording;
-    const stopEnabled = isActive;
+  const playEnabled = !isActive || isPaused;
+  const pauseEnabled = isRecording;
+  const stopEnabled = isActive;
 
-    const handlePlay = () => {
-        if (isPaused) { void resume();
+  const handlePlay = () => {
+    if (isPaused) {
+      void resume();
 
- return; }
-        if (!isActive) { void start(projectSlug); }
-    };
+      return; 
+    }
 
-    return (
-        <div
-            className={cn(
-                "inline-flex items-center gap-2 rounded-md border border-border bg-card/80 p-1.5",
-                className,
-            )}
-            role="toolbar"
-            aria-label="Recorder controls"
-            data-testid="recorder-control-bar"
-        >
-            <Button
-                size="sm"
-                variant="secondary"
-                disabled={!playEnabled}
-                onClick={handlePlay}
-                className="h-8 px-3"
-                aria-label={isPaused ? "Resume recording" : "Start recording"}
-                data-testid="recorder-control-play"
-            >
-                <Play className="h-3.5 w-3.5 mr-1" />
-                {isPaused ? "Resume" : "Play"}
-            </Button>
-            <Button
-                size="sm"
-                variant="secondary"
-                disabled={!pauseEnabled}
-                onClick={() => { void pause(); }}
-                className="h-8 px-3"
-                aria-label="Pause recording"
-                data-testid="recorder-control-pause"
-            >
-                <Pause className="h-3.5 w-3.5 mr-1" />
+    if (!isActive) {
+      void start(projectSlug); 
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-2 rounded-md border border-border bg-card/80 p-1.5",
+        className,
+      )}
+      role="toolbar"
+      aria-label="Recorder controls"
+      data-testid="recorder-control-bar"
+    >
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={!playEnabled}
+        onClick={handlePlay}
+        className="h-8 px-3"
+        aria-label={isPaused ? "Resume recording" : "Start recording"}
+        data-testid="recorder-control-play"
+      >
+        <Play className="h-3.5 w-3.5 mr-1" />
+        {isPaused ? "Resume" : "Play"}
+      </Button>
+      <Button
+        size="sm"
+        variant="secondary"
+        disabled={!pauseEnabled}
+        onClick={() => {
+          void pause(); 
+        }}
+        className="h-8 px-3"
+        aria-label="Pause recording"
+        data-testid="recorder-control-pause"
+      >
+        <Pause className="h-3.5 w-3.5 mr-1" />
                 Pause
-            </Button>
-            <Button
-                size="sm"
-                variant="destructive"
-                disabled={!stopEnabled}
-                onClick={() => { void stop(); }}
-                className="h-8 px-3"
-                aria-label="Stop recording"
-                data-testid="recorder-control-stop"
-            >
-                <Square className="h-3.5 w-3.5 mr-1" />
+      </Button>
+      <Button
+        size="sm"
+        variant="destructive"
+        disabled={!stopEnabled}
+        onClick={() => {
+          void stop(); 
+        }}
+        className="h-8 px-3"
+        aria-label="Stop recording"
+        data-testid="recorder-control-stop"
+      >
+        <Square className="h-3.5 w-3.5 mr-1" />
                 Stop
-            </Button>
-            <Badge
-                variant="outline"
-                className="text-[10px] uppercase tracking-wider ml-1"
-                data-testid="recorder-control-phase"
-            >
-                {phase}
-            </Badge>
-            <KeywordEventsPanel className="ml-1" />
-        </div>
-    );
+      </Button>
+      <Badge
+        variant="outline"
+        className="text-[10px] uppercase tracking-wider ml-1"
+        data-testid="recorder-control-phase"
+      >
+        {phase}
+      </Badge>
+      <KeywordEventsPanel className="ml-1" />
+    </div>
+  );
 }

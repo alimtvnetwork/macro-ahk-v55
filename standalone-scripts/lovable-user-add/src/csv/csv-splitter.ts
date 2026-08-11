@@ -15,11 +15,11 @@ const CHAR_LF = "\n";
 const isLineBreak = (ch: string): boolean => ch === CHAR_CR || ch === CHAR_LF;
 
 const finalizeRow = (rows: string[][], row: string[]): string[] => {
-    if (row.length > 0) {
-        rows.push(row);
-    }
+  if (row.length > 0) {
+    rows.push(row);
+  }
 
-    return [];
+  return [];
 };
 
 interface SplitState {
@@ -30,51 +30,51 @@ interface SplitState {
 }
 
 const handleQuote = (state: SplitState, next: string): void => {
-    if (state.inQuotes && next === CHAR_QUOTE) {
-        state.cell += CHAR_QUOTE;
+  if (state.inQuotes && next === CHAR_QUOTE) {
+    state.cell += CHAR_QUOTE;
 
-        return;
-    }
+    return;
+  }
 
-    state.inQuotes = !state.inQuotes;
+  state.inQuotes = !state.inQuotes;
 };
 
 const handleChar = (state: SplitState, ch: string, next: string): void => {
-    if (ch === CHAR_QUOTE) {
-        handleQuote(state, next);
+  if (ch === CHAR_QUOTE) {
+    handleQuote(state, next);
 
-        return;
-    }
+    return;
+  }
 
-    if (!state.inQuotes && ch === CHAR_COMMA) {
-        state.row.push(state.cell);
-        state.cell = "";
+  if (!state.inQuotes && ch === CHAR_COMMA) {
+    state.row.push(state.cell);
+    state.cell = "";
 
-        return;
-    }
+    return;
+  }
 
-    if (!state.inQuotes && isLineBreak(ch)) {
-        state.row.push(state.cell);
-        state.cell = "";
-        state.row = finalizeRow(state.rows, state.row);
+  if (!state.inQuotes && isLineBreak(ch)) {
+    state.row.push(state.cell);
+    state.cell = "";
+    state.row = finalizeRow(state.rows, state.row);
 
-        return;
-    }
+    return;
+  }
 
-    state.cell += ch;
+  state.cell += ch;
 };
 
 export const splitCsv = (text: string): string[][] => {
-    const state: SplitState = { rows: [], row: [], cell: "", inQuotes: false };
+  const state: SplitState = { rows: [], row: [], cell: "", inQuotes: false };
 
-    for (let i = 0; i < text.length; i += 1) {
-        handleChar(state, text[i], i + 1 < text.length ? text[i + 1] : "");
-    }
+  for (let i = 0; i < text.length; i += 1) {
+    handleChar(state, text[i], i + 1 < text.length ? text[i + 1] : "");
+  }
 
-    if (state.cell.length > 0 || state.row.length > 0) {
-        state.row.push(state.cell);
-        finalizeRow(state.rows, state.row);
-    }
+  if (state.cell.length > 0 || state.row.length > 0) {
+    state.row.push(state.cell);
+    finalizeRow(state.rows, state.row);
+  }
 
-    return state.rows;
+  return state.rows;
 };

@@ -124,175 +124,218 @@ export interface UseKeywordEventsApi {
 }
 
 const newId = (): string =>
-    (typeof crypto !== "undefined" && "randomUUID" in crypto)
-        ? crypto.randomUUID()
-        : `ke_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  (typeof crypto !== "undefined" && "randomUUID" in crypto)
+    ? crypto.randomUUID()
+    : `ke_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
 function load(): KeywordEvent[] {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed: unknown = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-
-        return parsed.filter((e): e is KeywordEvent =>
-            !!e && typeof e === "object" && typeof (e as KeywordEvent).Id === "string",
-        );
-    } catch (caught) {
-        logError("useKeywordEvents.load", `localStorage read/parse failed for key "${STORAGE_KEY}" — returning empty event list`, caught);
-
-        return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return [];
     }
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((e): e is KeywordEvent =>
+      !!e && typeof e === "object" && typeof (e as KeywordEvent).Id === "string",
+    );
+  } catch (caught) {
+    logError("useKeywordEvents.load", `localStorage read/parse failed for key "${STORAGE_KEY}" — returning empty event list`, caught);
+
+    return [];
+  }
 }
 
 function save(events: readonly KeywordEvent[]): void {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
-    } catch (caught) {
-        logError("useKeywordEvents.save", `localStorage write failed for key "${STORAGE_KEY}" (quota exceeded or SSR) — events not persisted`, caught);
-    }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+  } catch (caught) {
+    logError("useKeywordEvents.save", `localStorage write failed for key "${STORAGE_KEY}" (quota exceeded or SSR) — events not persisted`, caught);
+  }
 }
 
 // eslint-disable-next-line max-lines-per-function -- single hook owns the full event+step API surface
 export function useKeywordEvents(): UseKeywordEventsApi {
-    const [events, setEvents] = useState<readonly KeywordEvent[]>(() => load());
+  const [events, setEvents] = useState<readonly KeywordEvent[]>(() => load());
 
-    useEffect(() => { save(events); }, [events]);
+  useEffect(() => {
+    save(events); 
+  }, [events]);
 
-    const addEvent = useCallback((keyword: string, description = ""): string => {
-        const id = newId();
-        const next: KeywordEvent = {
-            Id: id,
-            Keyword: keyword.trim() || "untitled",
-            Description: description,
-            Steps: [],
-            Enabled: true,
-            Target: DEFAULT_KEYWORD_EVENT_TARGET,
-        };
-        setEvents(prev => [...prev, next]);
-
-        return id;
-    }, []);
-
-    const removeEvent = useCallback((id: string) => {
-        setEvents(prev => prev.filter(e => e.Id !== id));
-    }, []);
-
-    const updateEvent = useCallback((id: string, patch: Partial<Omit<KeywordEvent, "Id">>) => {
-        setEvents(prev => prev.map(e => e.Id === id ? { ...e, ...patch } : e));
-    }, []);
-
-    const addStep = useCallback((eventId: string, step: Omit<KeywordEventStep, "Id">) => {
-        const withId = { ...step, Id: newId() } as KeywordEventStep;
-        setEvents(prev => prev.map(e =>
-            e.Id === eventId ? { ...e, Steps: [...e.Steps, withId] } : e,
-        ));
-    }, []);
-
-    const removeStep = useCallback((eventId: string, stepId: string) => {
-        setEvents(prev => prev.map(e =>
-            e.Id === eventId ? { ...e, Steps: e.Steps.filter(s => s.Id !== stepId) } : e,
-        ));
-    }, []);
-
-    const moveStep = useCallback((eventId: string, stepId: string, direction: DirectionType) => {
-        setEvents(prev => prev.map(e => {
-            if (e.Id !== eventId) return e;
-            const idx = e.Steps.findIndex(s => s.Id === stepId);
-            if (idx < 0) return e;
-            const target = direction === "up" ? idx - 1 : idx + 1;
-            if (target < 0 || target >= e.Steps.length) return e;
-            const copy = [...e.Steps];
-            const [moved] = copy.splice(idx, 1);
-            copy.splice(target, 0, moved);
-
-            return { ...e, Steps: copy };
-        }));
-    }, []);
-
-    const removeSteps = useCallback((eventId: string, stepIds: readonly string[]) => {
-        if (stepIds.length === 0) return;
-        const drop = new Set(stepIds);
-        setEvents(prev => prev.map(e =>
-            e.Id === eventId ? { ...e, Steps: e.Steps.filter(s => !drop.has(s.Id)) } : e,
-        ));
-    }, []);
-
-    const setStepsEnabled = useCallback(
-        (eventId: string, stepIds: readonly string[], enabled: boolean) => {
-            if (stepIds.length === 0) return;
-            const target = new Set(stepIds);
-            setEvents(prev => prev.map(e => {
-                if (e.Id !== eventId) return e;
-
-                return {
-                    ...e,
-                    Steps: e.Steps.map(s => {
-                        if (!target.has(s.Id)) return s;
-                        // `Enabled === undefined` already means enabled, so when
-                        // enabling we strip the field to keep persisted JSON tidy.
-                        if (enabled) {
-                            const { Enabled: _drop, ...rest } = s as KeywordEventStep & { Enabled?: boolean };
-                            void _drop;
-
-                            return rest as KeywordEventStep;
-                        }
-
-                        return { ...s, Enabled: false } as KeywordEventStep;
-                    }),
-                };
-            }));
-        },
-        [],
-    );
-
-    const relabelSteps = useCallback(
-        (eventId: string, stepIds: readonly string[], labels: readonly string[]) => {
-            if (stepIds.length === 0) return;
-            const labelById = new Map<string, string>();
-            stepIds.forEach((id, i) => { labelById.set(id, labels[i] ?? ""); });
-            setEvents(prev => prev.map(e => {
-                if (e.Id !== eventId) return e;
-
-                return {
-                    ...e,
-                    Steps: e.Steps.map(s => {
-                        const next = labelById.get(s.Id);
-                        if (next === undefined) return s;
-                        const trimmed = next.trim();
-                        if (trimmed.length === 0) {
-                            const { LabelType: _drop, ...rest } = s as KeywordEventStep & { LabelType?: string };
-                            void _drop;
-
-                            return rest as KeywordEventStep;
-                        }
-
-                        return { ...s, LabelType: trimmed } as KeywordEventStep;
-                    }),
-                };
-            }));
-        },
-        [],
-    );
-
-    const reorderEvents = useCallback((fromId: string, toId: string) => {
-        if (fromId === toId) { return; }
-        setEvents(prev => {
-            const fromIdx = prev.findIndex(e => e.Id === fromId);
-            const toIdx = prev.findIndex(e => e.Id === toId);
-            if (fromIdx < 0 || toIdx < 0) { return prev; }
-            const next = [...prev];
-            const [moved] = next.splice(fromIdx, 1);
-            next.splice(toIdx, 0, moved);
-
-            return next;
-        });
-    }, []);
-
-    return {
-        events, addEvent, removeEvent, updateEvent,
-        addStep, removeStep, moveStep,
-        removeSteps, setStepsEnabled, relabelSteps,
-        reorderEvents,
+  const addEvent = useCallback((keyword: string, description = ""): string => {
+    const id = newId();
+    const next: KeywordEvent = {
+      Id: id,
+      Keyword: keyword.trim() || "untitled",
+      Description: description,
+      Steps: [],
+      Enabled: true,
+      Target: DEFAULT_KEYWORD_EVENT_TARGET,
     };
+    setEvents(prev => [...prev, next]);
+
+    return id;
+  }, []);
+
+  const removeEvent = useCallback((id: string) => {
+    setEvents(prev => prev.filter(e => e.Id !== id));
+  }, []);
+
+  const updateEvent = useCallback((id: string, patch: Partial<Omit<KeywordEvent, "Id">>) => {
+    setEvents(prev => prev.map(e => e.Id === id ? { ...e, ...patch } : e));
+  }, []);
+
+  const addStep = useCallback((eventId: string, step: Omit<KeywordEventStep, "Id">) => {
+    const withId = { ...step, Id: newId() } as KeywordEventStep;
+    setEvents(prev => prev.map(e =>
+      e.Id === eventId ? { ...e, Steps: [...e.Steps, withId] } : e,
+    ));
+  }, []);
+
+  const removeStep = useCallback((eventId: string, stepId: string) => {
+    setEvents(prev => prev.map(e =>
+      e.Id === eventId ? { ...e, Steps: e.Steps.filter(s => s.Id !== stepId) } : e,
+    ));
+  }, []);
+
+  const moveStep = useCallback((eventId: string, stepId: string, direction: DirectionType) => {
+    setEvents(prev => prev.map(e => {
+      if (e.Id !== eventId) {
+        return e;
+      }
+
+      const idx = e.Steps.findIndex(s => s.Id === stepId);
+      if (idx < 0) {
+        return e;
+      }
+
+      const target = direction === "up" ? idx - 1 : idx + 1;
+      if (target < 0 || target >= e.Steps.length) {
+        return e;
+      }
+
+      const copy = [...e.Steps];
+      const [moved] = copy.splice(idx, 1);
+      copy.splice(target, 0, moved);
+
+      return { ...e, Steps: copy };
+    }));
+  }, []);
+
+  const removeSteps = useCallback((eventId: string, stepIds: readonly string[]) => {
+    if (stepIds.length === 0) {
+      return;
+    }
+
+    const drop = new Set(stepIds);
+    setEvents(prev => prev.map(e =>
+      e.Id === eventId ? { ...e, Steps: e.Steps.filter(s => !drop.has(s.Id)) } : e,
+    ));
+  }, []);
+
+  const setStepsEnabled = useCallback(
+    (eventId: string, stepIds: readonly string[], enabled: boolean) => {
+      if (stepIds.length === 0) {
+        return;
+      }
+
+      const target = new Set(stepIds);
+      setEvents(prev => prev.map(e => {
+        if (e.Id !== eventId) {
+          return e;
+        }
+
+        return {
+          ...e,
+          Steps: e.Steps.map(s => {
+            if (!target.has(s.Id)) {
+              return s;
+            }
+
+            // `Enabled === undefined` already means enabled, so when
+            // enabling we strip the field to keep persisted JSON tidy.
+            if (enabled) {
+              const { Enabled: _drop, ...rest } = s as KeywordEventStep & { Enabled?: boolean };
+              void _drop;
+
+              return rest as KeywordEventStep;
+            }
+
+            return { ...s, Enabled: false } as KeywordEventStep;
+          }),
+        };
+      }));
+    },
+    [],
+  );
+
+  const relabelSteps = useCallback(
+    (eventId: string, stepIds: readonly string[], labels: readonly string[]) => {
+      if (stepIds.length === 0) {
+        return;
+      }
+
+      const labelById = new Map<string, string>();
+      stepIds.forEach((id, i) => {
+        labelById.set(id, labels[i] ?? ""); 
+      });
+      setEvents(prev => prev.map(e => {
+        if (e.Id !== eventId) {
+          return e;
+        }
+
+        return {
+          ...e,
+          Steps: e.Steps.map(s => {
+            const next = labelById.get(s.Id);
+            if (next === undefined) {
+              return s;
+            }
+
+            const trimmed = next.trim();
+            if (trimmed.length === 0) {
+              const { LabelType: _drop, ...rest } = s as KeywordEventStep & { LabelType?: string };
+              void _drop;
+
+              return rest as KeywordEventStep;
+            }
+
+            return { ...s, LabelType: trimmed } as KeywordEventStep;
+          }),
+        };
+      }));
+    },
+    [],
+  );
+
+  const reorderEvents = useCallback((fromId: string, toId: string) => {
+    if (fromId === toId) {
+      return; 
+    }
+
+    setEvents(prev => {
+      const fromIdx = prev.findIndex(e => e.Id === fromId);
+      const toIdx = prev.findIndex(e => e.Id === toId);
+      if (fromIdx < 0 || toIdx < 0) {
+        return prev; 
+      }
+
+      const next = [...prev];
+      const [moved] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, moved);
+
+      return next;
+    });
+  }, []);
+
+  return {
+    events, addEvent, removeEvent, updateEvent,
+    addStep, removeStep, moveStep,
+    removeSteps, setStepsEnabled, relabelSteps,
+    reorderEvents,
+  };
 }

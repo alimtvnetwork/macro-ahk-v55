@@ -21,76 +21,89 @@ export interface TimelineRowProps {
 }
 
 function EventStartRow(props: { entry: Extract<TimelineEntry, { Kind: "EventStart" }> }): JSX.Element {
-    const { entry } = props;
+  const { entry } = props;
 
-    return (
-        <div className="flex items-start gap-2 text-foreground" data-testid="timeline-event-start">
-            <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
-            <Play className="h-3 w-3 mt-0.5 text-primary shrink-0" />
-            <span className="truncate">
-                <span className="text-muted-foreground">[{entry.Index + 1}/{entry.Total}]</span>{" "}
-                <span className="font-semibold">{entry.Keyword}</span>
-            </span>
-        </div>
-    );
+  return (
+    <div className="flex items-start gap-2 text-foreground" data-testid="timeline-event-start">
+      <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
+      <Play className="h-3 w-3 mt-0.5 text-primary shrink-0" />
+      <span className="truncate">
+        <span className="text-muted-foreground">[{entry.Index + 1}/{entry.Total}]</span>{" "}
+        <span className="font-semibold">{entry.Keyword}</span>
+      </span>
+    </div>
+  );
 }
 
 function StepRow(props: { entry: Extract<TimelineEntry, { Kind: "Step" }> }): JSX.Element {
-    const { entry } = props;
+  const { entry } = props;
 
-    return (
-        <div className="flex items-start gap-2 text-muted-foreground pl-3" data-testid="timeline-step">
-            <span className="tabular-nums">{formatOffset(entry.AtMs)}</span>
-            <Circle className="h-2.5 w-2.5 mt-1 text-muted-foreground/70 shrink-0" />
-            <span className="truncate">
-                <span className="opacity-70">#{entry.StepIndex + 1}</span> {entry.LabelType}
-            </span>
-        </div>
-    );
+  return (
+    <div className="flex items-start gap-2 text-muted-foreground pl-3" data-testid="timeline-step">
+      <span className="tabular-nums">{formatOffset(entry.AtMs)}</span>
+      <Circle className="h-2.5 w-2.5 mt-1 text-muted-foreground/70 shrink-0" />
+      <span className="truncate">
+        <span className="opacity-70">#{entry.StepIndex + 1}</span> {entry.LabelType}
+      </span>
+    </div>
+  );
 }
 
 function eventEndTone(entry: Extract<TimelineEntry, { Kind: "EventEnd" }>): { tone: string; label: string; Icon: typeof CheckCircle2 } {
-    if (entry.Aborted) return { tone: CSS_TEXT_DESTRUCTIVE, label: "aborted", Icon: XCircle };
-    if (entry.Completed) return { tone: "text-emerald-500", label: "done", Icon: CheckCircle2 };
+  if (entry.Aborted) {
+    return { tone: CSS_TEXT_DESTRUCTIVE, label: "aborted", Icon: XCircle };
+  }
 
-    return { tone: CSS_TEXT_DESTRUCTIVE, label: "failed", Icon: XCircle };
+  if (entry.Completed) {
+    return { tone: "text-emerald-500", label: "done", Icon: CheckCircle2 };
+  }
+
+  return { tone: CSS_TEXT_DESTRUCTIVE, label: "failed", Icon: XCircle };
 }
 
 function EventEndRow(props: { entry: Extract<TimelineEntry, { Kind: "EventEnd" }> }): JSX.Element {
-    const { entry } = props;
-    const { tone, label, Icon } = eventEndTone(entry);
+  const { entry } = props;
+  const { tone, label, Icon } = eventEndTone(entry);
 
-    return (
-        <div className="flex items-start gap-2" data-testid="timeline-event-end">
-            <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
-            <Icon className={cn("h-3 w-3 mt-0.5 shrink-0", tone)} />
-            <span className={cn("truncate", tone)}>
-                <span className="font-semibold">{entry.Keyword}</span> {label}
-            </span>
-        </div>
-    );
+  return (
+    <div className="flex items-start gap-2" data-testid="timeline-event-end">
+      <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
+      <Icon className={cn("h-3 w-3 mt-0.5 shrink-0", tone)} />
+      <span className={cn("truncate", tone)}>
+        <span className="font-semibold">{entry.Keyword}</span> {label}
+      </span>
+    </div>
+  );
 }
 
 function ChainEndRow(props: { entry: Extract<TimelineEntry, { Kind: "ChainEnd" }> }): JSX.Element {
-    const { entry } = props;
-    const tone = entry.Aborted ? CSS_TEXT_DESTRUCTIVE : "text-emerald-500";
+  const { entry } = props;
+  const tone = entry.Aborted ? CSS_TEXT_DESTRUCTIVE : "text-emerald-500";
 
-    return (
-        <div className="flex items-start gap-2 mt-1" data-testid="timeline-chain-end">
-            <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
-            <Square className="h-3 w-3 mt-0.5 text-muted-foreground shrink-0" />
-            <span className={cn("truncate font-semibold", tone)}>
+  return (
+    <div className="flex items-start gap-2 mt-1" data-testid="timeline-chain-end">
+      <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
+      <Square className="h-3 w-3 mt-0.5 text-muted-foreground shrink-0" />
+      <span className={cn("truncate font-semibold", tone)}>
                 Chain {entry.Aborted ? "aborted" : "complete"}, {entry.Completed}/{entry.Attempted}
-            </span>
-        </div>
-    );
+      </span>
+    </div>
+  );
 }
 
 export function TimelineRow(props: TimelineRowProps): JSX.Element {
-    const { entry } = props;
-    if (entry.Kind === "EventStart") return <EventStartRow entry={entry} />;
-    if (entry.Kind === "Step") return <StepRow entry={entry} />;
-    if (entry.Kind === "EventEnd") return <EventEndRow entry={entry} />;
+  const { entry } = props;
+  if (entry.Kind === "EventStart") {
+    return <EventStartRow entry={entry} />;
+  }
 
-    return <ChainEndRow entry={entry} />;
+  if (entry.Kind === "Step") {
+    return <StepRow entry={entry} />;
+  }
+
+  if (entry.Kind === "EventEnd") {
+    return <EventEndRow entry={entry} />;
+  }
+
+  return <ChainEndRow entry={entry} />;
 }

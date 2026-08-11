@@ -19,29 +19,29 @@ const SRC = resolve(__dirname, '..', 'ui', 'panel-controls.ts');
 const SOURCE = readFileSync(SRC, 'utf8');
 
 function getExecuteCreditFetchBody(): string {
-    const start = SOURCE.indexOf('function executeCreditFetch');
-    expect(start, 'executeCreditFetch must exist').toBeGreaterThan(-1);
-    const rest = SOURCE.slice(start);
-    const endRel = rest.indexOf('\n}\n');
+  const start = SOURCE.indexOf('function executeCreditFetch');
+  expect(start, 'executeCreditFetch must exist').toBeGreaterThan(-1);
+  const rest = SOURCE.slice(start);
+  const endRel = rest.indexOf('\n}\n');
 
-    return endRel === -1 ? rest : rest.slice(0, endRel + 2);
+  return endRel === -1 ? rest : rest.slice(0, endRel + 2);
 }
 
 describe('💰 Credits button — enrichment fan-out contract', () => {
-    const body = getExecuteCreditFetchBody();
+  const body = getExecuteCreditFetchBody();
 
-    it('imports the capped credit-enrichment fan-out helper', () => {
-        expect(SOURCE).toMatch(
-            /import\s*\{[^}]*\bfanOutCreditEnrichment\b[^}]*\}\s*from\s*['"]\.\.\/credit-balance-update\/credit-enrichment-fanout['"]/,
-        );
-    });
+  it('imports the capped credit-enrichment fan-out helper', () => {
+    expect(SOURCE).toMatch(
+      /import\s*\{[^}]*\bfanOutCreditEnrichment\b[^}]*\}\s*from\s*['"]\.\.\/credit-balance-update\/credit-enrichment-fanout['"]/,
+    );
+  });
 
-    it('passes all parsed workspaces to the fan-out helper', () => {
-        expect(body).toMatch(/fanOutCreditEnrichment\s*\(\s*loopCreditState\.perWorkspace\s*\|\|\s*\[\]\s*\)/);
-    });
+  it('passes all parsed workspaces to the fan-out helper', () => {
+    expect(body).toMatch(/fanOutCreditEnrichment\s*\(\s*loopCreditState\.perWorkspace\s*\|\|\s*\[\]\s*\)/);
+  });
 
-    it('only clears loading after BOTH pro_1 batch AND fan-out settle', () => {
-        expect(body).toMatch(/Promise\.allSettled\(\s*\[\s*proOneRefresh\s*,\s*enrichmentFanOut\s*\]\s*\)\.finally\(/);
-        expect(body).toMatch(/setCreditBtnLoading\s*\(\s*\w+\.creditBtn\s*,\s*false\s*\)/);
-    });
+  it('only clears loading after BOTH pro_1 batch AND fan-out settle', () => {
+    expect(body).toMatch(/Promise\.allSettled\(\s*\[\s*proOneRefresh\s*,\s*enrichmentFanOut\s*\]\s*\)\.finally\(/);
+    expect(body).toMatch(/setCreditBtnLoading\s*\(\s*\w+\.creditBtn\s*,\s*false\s*\)/);
+  });
 });

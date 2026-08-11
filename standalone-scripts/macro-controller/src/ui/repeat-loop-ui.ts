@@ -87,7 +87,10 @@ export const repeatLoopState: RepeatState = {
 // so we use synchronous localStorage — reliable, no async race with first render.
 function persist(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     const payload = {
       v: 2,
       count: repeatLoopState.count,
@@ -96,65 +99,99 @@ function persist(): void {
       collapsed: repeatLoopState.collapsed,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  } catch (e) { log('Repeat: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('Repeat: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }
 
 function hydrate(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      return;
+    }
+
     const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return;
+    if (!parsed || typeof parsed !== 'object') {
+      return;
+    }
+
     const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown; collapsed?: unknown };
     if (typeof o.count === 'number' && o.count >= 1) {
       repeatLoopState.count = Math.max(1, Math.min(1000, Math.floor(o.count)));
     }
+
     if (o.waitMode === WAIT_MODE_SUBMIT_READY || o.waitMode === WAIT_MODE_FIXED_DELAY) {
       repeatLoopState.waitMode = o.waitMode;
     }
+
     if (typeof o.delaySec === 'number' && o.delaySec >= 1) {
       repeatLoopState.delaySec = Math.max(1, Math.min(3600, Math.floor(o.delaySec)));
     }
+
     if (typeof o.collapsed === 'boolean') {
       repeatLoopState.collapsed = o.collapsed;
     }
+
     log('Repeat: prefs hydrated — count=' + repeatLoopState.count + ', mode=' + repeatLoopState.waitMode + ', delay=' + repeatLoopState.delaySec + 's', 'info');
-  } catch (e) { log('Repeat: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('Repeat: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }
+
 hydrate();
 
 function notify(): void {
   for (const subscriber of repeatLoopState.subscribers) {
-    try { subscriber(); } catch (e) { log('Repeat: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+    try {
+      subscriber(); 
+    } catch (e) {
+      log('Repeat: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+    }
   }
 }
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  if (!target) return '';
+  if (!target) {
+    return '';
+  }
 
   return extractEditorPlainText(target);
 }
 
 function setEditorText(text: string): boolean {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  if (!target) return false;
+  if (!target) {
+    return false;
+  }
 
   return replaceEditorText(target, text);
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms); 
+  });
 }
 
 /** Wait for the submit button to be present and enabled. */
 async function waitForSubmitReady(maxMs: number): Promise<HTMLElement | null> {
   const deadline = Date.now() + maxMs;
   while (Date.now() < deadline) {
-    if (repeatLoopState.cancelled) return null;
+    if (repeatLoopState.cancelled) {
+      return null;
+    }
+
     const btn = findAddToTasksButton();
-    if (btn && !(btn as HTMLButtonElement).disabled) return btn;
+    if (btn && !(btn as HTMLButtonElement).disabled) {
+      return btn;
+    }
+
     await sleep(POLL_MS);
   }
 
@@ -167,10 +204,16 @@ async function waitForCompletion(maxMs: number): Promise<void> {
   // Brief wait for state transition into "processing"
   await sleep(800);
   while (Date.now() < deadline) {
-    if (repeatLoopState.cancelled) return;
+    if (repeatLoopState.cancelled) {
+      return;
+    }
+
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
-    if (!processing) return;
+    if (!processing) {
+      return;
+    }
+
     await sleep(POLL_MS);
   }
 }
@@ -186,6 +229,7 @@ async function waitBetweenIterations(): Promise<void> {
 
     return;
   }
+
   setPhase('waiting-completion', 0);
   await waitForCompletion(MAX_WAIT_MS);
 }
@@ -210,8 +254,9 @@ function errMsg(e: unknown): string {
 }
 
 function getRepeatChatForm(TAG: string): HTMLElement | null {
-  try { return document.getElementById('chat-input'); }
-  catch (e) {
+  try {
+    return document.getElementById('chat-input'); 
+  } catch (e) {
     const m = errMsg(e);
     showPasteToast('⚠ ' + TAG + ': getElementById threw (' + m + ')', true);
     log('Repeat: getElementById threw — ' + m, 'warn');
@@ -223,8 +268,9 @@ function getRepeatChatForm(TAG: string): HTMLElement | null {
 function tryRepeatSubmitForm(TAG: string, form: HTMLElement | null): boolean {
   if (form instanceof HTMLFormElement) {
     try {
-      if (typeof form.requestSubmit === 'function') form.requestSubmit();
-      else {
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
         showPasteToast('⚠ ' + TAG + ': requestSubmit unsupported — using submit event', false);
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
@@ -247,13 +293,18 @@ function tryRepeatSubmitForm(TAG: string, form: HTMLElement | null): boolean {
 
 function tryRepeatSubmitButton(TAG: string): boolean {
   let btn: HTMLElement | null = null;
-  try { btn = findAddToTasksButton(); }
-  catch (e) { log('Repeat: findAddToTasksButton threw — ' + errMsg(e), 'warn'); }
+  try {
+    btn = findAddToTasksButton(); 
+  } catch (e) {
+    log('Repeat: findAddToTasksButton threw — ' + errMsg(e), 'warn'); 
+  }
+
   if (!btn || (btn as HTMLButtonElement).disabled) {
     showPasteToast('❌ ' + TAG + ': no enabled submit button — submit failed', true);
 
     return false;
   }
+
   try {
     btn.click();
     showPasteToast('✅ ' + TAG + ': submitted via submit-button fallback', false);
@@ -276,8 +327,11 @@ function dispatchChatSubmit(): boolean {
 
     return false;
   }
+
   const form = getRepeatChatForm(TAG);
-  if (tryRepeatSubmitForm(TAG, form)) return true;
+  if (tryRepeatSubmitForm(TAG, form)) {
+    return true;
+  }
 
   return tryRepeatSubmitButton(TAG);
 }
@@ -290,6 +344,7 @@ async function submitOneIteration(): Promise<boolean> {
 
     return false;
   }
+
   const btn = await waitForSubmitReady(MAX_WAIT_MS);
   if (!btn) {
     if (!repeatLoopState.cancelled) {
@@ -298,11 +353,13 @@ async function submitOneIteration(): Promise<boolean> {
 
     return false;
   }
+
   if (!dispatchChatSubmit()) {
     showPasteToast('❌ Repeat: no form#chat-input nor submit button — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
 
     return false;
   }
+
   repeatLoopState.completed++;
   log('Repeat: iteration ' + repeatLoopState.completed + '/' + repeatLoopState.count + ' submitted (form#chat-input)', 'info');
   showPasteToast('🔁 Repeat: ' + repeatLoopState.completed + '/' + repeatLoopState.count, false);
@@ -318,12 +375,22 @@ async function submitOneIteration(): Promise<boolean> {
 
 async function runRepeatLoopAsync(): Promise<void> {
   for (let i = repeatLoopState.completed; i < repeatLoopState.count; i++) {
-    if (repeatLoopState.cancelled) break;
+    if (repeatLoopState.cancelled) {
+      break;
+    }
+
     const ok = await submitOneIteration();
-    if (!ok) break;
-    if (repeatLoopState.completed >= repeatLoopState.count) break;
+    if (!ok) {
+      break;
+    }
+
+    if (repeatLoopState.completed >= repeatLoopState.count) {
+      break;
+    }
+
     await waitBetweenIterations();
   }
+
   finishRepeatLoop();
 }
 
@@ -351,12 +418,14 @@ export function startRepeatLoop(): void {
 
     return;
   }
+
   const text = readEditorText().trim();
   if (!text) {
     showPasteToast('❌ Repeat: chat box is empty — type or paste something first', true);
 
     return;
   }
+
   const n = Math.max(1, Math.min(1000, Math.floor(repeatLoopState.count) || 1));
   repeatLoopState.count = n;
   repeatLoopState.capturedText = text;
@@ -370,7 +439,10 @@ export function startRepeatLoop(): void {
 }
 
 export function stopRepeatLoop(): void {
-  if (!repeatLoopState.running) return;
+  if (!repeatLoopState.running) {
+    return;
+  }
+
   repeatLoopState.cancelled = true;
   log('Repeat: stop requested', 'warn');
   notify();
@@ -419,12 +491,17 @@ export function toggleRepeatCollapsed(): void {
  */
 export function nextPresetAbove(current: number): number {
   for (const p of PRESETS) {
-    if (p > current) return p;
+    if (p > current) {
+      return p;
+    }
   }
+
   // Wrap: find the first preset above the inline threshold to cycle within
   // the "tail" range (60, 70, 75, 80, 100, 200) rather than snapping to 1.
   for (const p of PRESETS) {
-    if (p > PRESET_INLINE_MAX) return p;
+    if (p > PRESET_INLINE_MAX) {
+      return p;
+    }
   }
 
   return PRESETS[PRESETS.length - 1];
@@ -437,10 +514,16 @@ export function nextPresetAbove(current: number): number {
 export function prevPresetBelow(current: number): number {
   let prev: number | null = null;
   for (const p of PRESETS) {
-    if (p < current) prev = p;
-    else break;
+    if (p < current) {
+      prev = p;
+    } else {
+      break;
+    }
   }
-  if (prev !== null) return prev;
+
+  if (prev !== null) {
+    return prev;
+  }
 
   return PRESETS[PRESETS.length - 1];
 }
@@ -452,14 +535,20 @@ function buildCountInput(): HTMLInputElement {
   input.max = '1000';
   input.value = String(repeatLoopState.count);
   input.style.cssText = 'width:60px;padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;';
-  input.oninput = function () { setRepeatCount(parseInt(input.value, 10) || 1); };
+  input.oninput = function () {
+    setRepeatCount(parseInt(input.value, 10) || 1); 
+  };
+
   // Once the count reaches the tail range (>= PRESET_INLINE_MAX), snap
   // ArrowUp / ArrowDown / wheel steps through the preset ladder so values
   // beyond 60 cycle into 70, 75, 80, 100, 200 (and wrap) rather than
   // creeping by ±1 or stopping at the current max.
   input.addEventListener('keydown', function (e: KeyboardEvent) {
     const cur = repeatLoopState.count;
-    if (cur < PRESET_INLINE_MAX) return;
+    if (cur < PRESET_INLINE_MAX) {
+      return;
+    }
+
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       setRepeatCount(nextPresetAbove(cur));
@@ -471,9 +560,15 @@ function buildCountInput(): HTMLInputElement {
     }
   });
   input.addEventListener('wheel', function (e: WheelEvent) {
-    if (document.activeElement !== input) return;
+    if (document.activeElement !== input) {
+      return;
+    }
+
     const cur = repeatLoopState.count;
-    if (cur < PRESET_INLINE_MAX) return;
+    if (cur < PRESET_INLINE_MAX) {
+      return;
+    }
+
     e.preventDefault();
     const next = e.deltaY < 0 ? nextPresetAbove(cur) : prevPresetBelow(cur);
     setRepeatCount(next);
@@ -506,6 +601,7 @@ function wireTogglePopover(
     document.addEventListener('keydown', onKey, true);
     window.addEventListener('pagehide', close);
   }
+
   function close(): void {
     pop.hidden = true;
     pop.style.display = 'none';
@@ -514,16 +610,28 @@ function wireTogglePopover(
     document.removeEventListener('keydown', onKey, true);
     window.removeEventListener('pagehide', close);
   }
+
   function onDocClick(e: Event): void {
     const target = e.target as Node | null;
-    if (!target || wrap.contains(target)) return;
+    if (!target || wrap.contains(target)) {
+      return;
+    }
+
     close();
   }
+
   function onKey(e: KeyboardEvent): void {
-    if (e.key === 'Escape') { e.stopPropagation(); close(); }
+    if (e.key === 'Escape') {
+      e.stopPropagation(); close(); 
+    }
   }
+
   trigger.addEventListener('click', function () {
-    if (pop.hidden) open(); else close();
+    if (pop.hidden) {
+      open();
+    } else {
+      close();
+    }
   });
 
   return { open, close };
@@ -554,7 +662,9 @@ function makePresetButton(n: number, small: boolean): HTMLButtonElement {
   b.dataset.repeatPreset = String(n);
   const pad = small ? '2px 8px' : '2px 6px';
   b.style.cssText = 'padding:' + pad + ';background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:10px;';
-  b.onclick = function () { setRepeatCount(n); };
+  b.onclick = function () {
+    setRepeatCount(n); 
+  };
 
   return b;
 }
@@ -586,9 +696,12 @@ function buildMorePresetsPopover(overflow: readonly number[]): HTMLElement {
   const { close } = wireTogglePopover(wrap, trigger, pop, 'flex');
   for (const n of overflow) {
     const b = makePresetButton(n, true);
-    b.addEventListener('click', function () { close(); });
+    b.addEventListener('click', function () {
+      close(); 
+    });
     pop.appendChild(b);
   }
+
   pop.appendChild(buildMorePopoverSchemeDetails());
 
   wrap.appendChild(trigger);
@@ -602,8 +715,13 @@ export function buildCountPresets(): DocumentFragment {
   const inline: number[] = [];
   const overflow: number[] = [];
   for (const n of PRESETS) {
-    if (n <= PRESET_INLINE_MAX) inline.push(n); else overflow.push(n);
+    if (n <= PRESET_INLINE_MAX) {
+      inline.push(n);
+    } else {
+      overflow.push(n);
+    }
   }
+
   for (const n of inline) {
     const chip = makePresetButton(n, false);
     chip.dataset['chip'] = '1';
@@ -611,7 +729,10 @@ export function buildCountPresets(): DocumentFragment {
     chip.dataset['highlighted'] = '0';
     frag.appendChild(chip);
   }
-  if (overflow.length > 0) frag.appendChild(buildMorePresetsPopover(overflow));
+
+  if (overflow.length > 0) {
+    frag.appendChild(buildMorePresetsPopover(overflow));
+  }
 
   return frag;
 }
@@ -753,7 +874,10 @@ function buildWaitControls(): WaitControls {
   const optA = document.createElement('option'); optA.value = WAIT_MODE_SUBMIT_READY; optA.textContent = 'auto (submit ready)'; modeSel.appendChild(optA);
   const optB = document.createElement('option'); optB.value = WAIT_MODE_FIXED_DELAY; optB.textContent = 'fixed delay'; modeSel.appendChild(optB);
   modeSel.value = repeatLoopState.waitMode;
-  modeSel.onchange = function () { setRepeatWaitMode(modeSel.value as RepeatWaitMode); };
+  modeSel.onchange = function () {
+    setRepeatWaitMode(modeSel.value as RepeatWaitMode); 
+  };
+
   wrap.appendChild(modeSel);
 
   const delayInput = document.createElement('input');
@@ -761,7 +885,10 @@ function buildWaitControls(): WaitControls {
   delayInput.value = String(repeatLoopState.delaySec);
   delayInput.title = 'Fixed delay between iterations (seconds)';
   delayInput.style.cssText = 'width:52px;padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
-  delayInput.oninput = function () { setRepeatDelaySec(parseInt(delayInput.value, 10) || 1); };
+  delayInput.oninput = function () {
+    setRepeatDelaySec(parseInt(delayInput.value, 10) || 1); 
+  };
+
   wrap.appendChild(delayInput);
   const sUnit = document.createElement('span'); sUnit.textContent = 's'; sUnit.style.cssText = 'font-size:10px;opacity:0.7;'; wrap.appendChild(sUnit);
 
@@ -769,7 +896,10 @@ function buildWaitControls(): WaitControls {
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = s + 's'; b.title = 'Set fixed delay to ' + s + 's';
     b.style.cssText = 'padding:1px 4px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:3px;color:' + cPanelFg + ';cursor:pointer;font-size:9px;';
-    b.onclick = function () { setRepeatWaitMode(WAIT_MODE_FIXED_DELAY); setRepeatDelaySec(s); };
+    b.onclick = function () {
+      setRepeatWaitMode(WAIT_MODE_FIXED_DELAY); setRepeatDelaySec(s); 
+    };
+
     wrap.appendChild(b);
   }
 
@@ -787,13 +917,20 @@ interface ControlRefs {
 function formatPhaseTimer(): string {
   const now = Date.now();
   const phase = repeatLoopState.phase;
-  if (phase === 'idle') return '';
-  if (phase === 'submitting') return '⏳ submitting…';
+  if (phase === 'idle') {
+    return '';
+  }
+
+  if (phase === 'submitting') {
+    return '⏳ submitting…';
+  }
+
   if (phase === 'waiting-completion') {
     const elapsed = Math.max(0, Math.floor((now - repeatLoopState.phaseStartedAt) / 1000));
 
     return '⏱ waiting reply ' + elapsed + 's';
   }
+
   // waiting-delay (fixed delay): show countdown
   const remainMs = Math.max(0, repeatLoopState.phaseDeadlineAt - now);
   const remainSec = Math.ceil(remainMs / 1000);
@@ -838,13 +975,18 @@ function buildActionButton(): HTMLButtonElement {
     action.style.filter = 'brightness(1.08)';
     action.style.transform = 'translateY(-1px)';
   };
+
   action.onmouseleave = function () {
     action.style.filter = '';
     action.style.transform = '';
   };
+
   action.onclick = function () {
-    if (repeatLoopState.running) stopRepeatLoop();
-    else startRepeatLoop();
+    if (repeatLoopState.running) {
+      stopRepeatLoop();
+    } else {
+      startRepeatLoop();
+    }
   };
 
   return action;
@@ -856,7 +998,9 @@ function buildCollapseButton(): HTMLButtonElement {
   btn.title = 'Collapse repeat controls';
   btn.style.cssText = 'margin-left:4px;padding:2px 6px;background:transparent;border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:11px;line-height:1;';
   btn.textContent = '–';
-  btn.onclick = function () { toggleRepeatCollapsed(); };
+  btn.onclick = function () {
+    toggleRepeatCollapsed(); 
+  };
 
   return btn;
 }
@@ -894,7 +1038,9 @@ function buildTopRow(opts: { useLocalCollapse: boolean }): BuiltTopRow {
   action.dataset['trailingAction'] = '1';
   row.appendChild(action);
   
-  if (opts.useLocalCollapse) row.appendChild(buildCollapseButton());
+  if (opts.useLocalCollapse) {
+    row.appendChild(buildCollapseButton());
+  }
 
   installOverflowHooks(row, wrap, sentinel);
 
@@ -951,7 +1097,9 @@ function buildCollapsedPill(): HTMLButtonElement {
   pill.type = 'button';
   pill.title = 'Expand repeat controls';
   pill.style.cssText = 'display:none;align-items:center;gap:4px;padding:3px 8px;background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.3);border-radius:999px;color:' + cPrimaryLight + ';cursor:pointer;font:600 11px system-ui,-apple-system,sans-serif;flex:0 0 auto;';
-  pill.onclick = function () { toggleRepeatCollapsed(); };
+  pill.onclick = function () {
+    toggleRepeatCollapsed(); 
+  };
 
   return pill;
 }
@@ -996,6 +1144,7 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
       pill.textContent = status + ' ▸';
     }
   };
+
   render();
   repeatLoopState.subscribers.add(render);
   // Tick teardown: previously used raw setInterval which:
@@ -1006,17 +1155,30 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
   // leave dangling closures alive.
   let tickId: ReturnType<typeof trackedSetInterval> | null = null;
   const teardown = (): void => {
-    if (tickId !== null) { trackedClearInterval(tickId); tickId = null; }
-    repeatLoopState.subscribers.delete(render);
-    if (typeof window !== 'undefined') window.removeEventListener('pagehide', teardown);
-  };
-  tickId = trackedSetInterval('RepeatLoopUI.tick', function () {
-    if (typeof document === 'undefined' || !document.body || !document.body.contains(host)) { teardown();
+    if (tickId !== null) {
+      trackedClearInterval(tickId); tickId = null; 
+    }
 
- return; }
-    if (repeatLoopState.running) render();
+    repeatLoopState.subscribers.delete(render);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pagehide', teardown);
+    }
+  };
+
+  tickId = trackedSetInterval('RepeatLoopUI.tick', function () {
+    if (typeof document === 'undefined' || !document.body || !document.body.contains(host)) {
+      teardown();
+
+      return; 
+    }
+
+    if (repeatLoopState.running) {
+      render();
+    }
   }, 1000);
-  if (typeof window !== 'undefined') window.addEventListener('pagehide', teardown, { once: true });
+  if (typeof window !== 'undefined') {
+    window.addEventListener('pagehide', teardown, { once: true });
+  }
 
   return host;
 }
@@ -1035,17 +1197,27 @@ const INLINE_ID = 'marco-repeat-inline';
 const INLINE_WRAP_ID = 'marco-repeat-inline-wrap';
 
 function tryMountInline(): boolean {
-  if (document.getElementById(INLINE_WRAP_ID)) return true;
+  if (document.getElementById(INLINE_WRAP_ID)) {
+    return true;
+  }
+
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  if (!target) return false;
+  if (!target) {
+    return false;
+  }
+
   // Mount above the closest form, falling back to the editor's parent.
   const host = (target.closest && target.closest('form')) || target.parentElement;
-  if (!host || !host.parentElement) return false;
+  if (!host || !host.parentElement) {
+    return false;
+  }
 
   // v4.16+: mount into shared frame body so PlanTierType/Next/Repeat share one visual
   // unit and one minimize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
-  if (!framed) return false;
+  if (!framed) {
+    return false;
+  }
 
   const wrap = document.createElement('div');
   wrap.id = INLINE_WRAP_ID;
@@ -1058,7 +1230,9 @@ function tryMountInline(): boolean {
   applyInlineStripGroupCollapse();
   // Ensure collapse state applies again after any subsequent group-toggle
   // click, since Repeat used to have its own toggle.
-  subscribeInlineStripGroupCollapse(function () { applyInlineStripGroupCollapse(); });
+  subscribeInlineStripGroupCollapse(function () {
+    applyInlineStripGroupCollapse(); 
+  });
   log('Repeat: inline strip mounted into unified frame', 'info');
 
   return true;
@@ -1067,10 +1241,19 @@ function tryMountInline(): boolean {
 let _inlineObserver: MutationObserver | null = null;
 
 export function mountRepeatInlineStrip(): void {
-  if (tryMountInline()) return;
-  if (_inlineObserver) return;
+  if (tryMountInline()) {
+    return;
+  }
+
+  if (_inlineObserver) {
+    return;
+  }
+
   _inlineObserver = new MutationObserver(function () {
-    if (typeof document === 'undefined' || !document.body) return;
+    if (typeof document === 'undefined' || !document.body) {
+      return;
+    }
+
     if (!document.getElementById(INLINE_WRAP_ID) && tryMountInline()) {
       // Keep observing — Lovable re-renders the chat shell on route changes
       // and we want to remount when it disappears.

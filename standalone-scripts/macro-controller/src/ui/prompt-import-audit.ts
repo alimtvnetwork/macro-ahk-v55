@@ -94,10 +94,17 @@ function readFile(): ImportAuditFile {
 
     return emptyFile();
   }
-  if (!raw) return emptyFile();
+
+  if (!raw) {
+    return emptyFile();
+  }
+
   try {
     const parsed = JSON.parse(raw) as unknown;
-    if (!parsed || typeof parsed !== 'object') throwDiagnostic('PROMPT_IO_AUDIT_E001', { actualType: parsed === null ? 'null' : typeof parsed });
+    if (!parsed || typeof parsed !== 'object') {
+      throwDiagnostic('PROMPT_IO_AUDIT_E001', { actualType: parsed === null ? 'null' : typeof parsed });
+    }
+
     const file = parsed as Partial<ImportAuditFile>;
     if (file.schemaVersion !== CURRENT_SCHEMA) {
       log('[ImportAudit] schemaVersion mismatch (' + String(file.schemaVersion)
@@ -105,7 +112,10 @@ function readFile(): ImportAuditFile {
 
       return emptyFile();
     }
-    if (!Array.isArray(file.entries)) throwDiagnostic('PROMPT_IO_AUDIT_E002', { actualType: file.entries === null ? 'null' : typeof file.entries });
+
+    if (!Array.isArray(file.entries)) {
+      throwDiagnostic('PROMPT_IO_AUDIT_E002', { actualType: file.entries === null ? 'null' : typeof file.entries });
+    }
 
     return { schemaVersion: CURRENT_SCHEMA, entries: file.entries as ImportAuditEntry[] };
   } catch (err) {
@@ -120,6 +130,7 @@ function writeFile(file: ImportAuditFile): void {
   if (file.entries.length > MAX_ENTRIES) {
     file.entries = file.entries.slice(file.entries.length - MAX_ENTRIES);
   }
+
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(file));
   } catch (err) {
@@ -184,9 +195,13 @@ export function finalizeImportAuditEntry(
 
     return;
   }
+
   entry.status = outcome.status;
   entry.counts = outcome.counts;
-  if (outcome.status === 'rolled_back') entry.error = outcome.error;
+  if (outcome.status === 'rolled_back') {
+    entry.error = outcome.error;
+  }
+
   writeFile(file);
   log('[ImportAudit] finalize id=' + id + ' status=' + outcome.status
     + ' added=' + outcome.counts.added

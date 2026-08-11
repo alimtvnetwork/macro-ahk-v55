@@ -67,6 +67,7 @@ export function ApiExplorerSwagger() {
     if (categoryFilter !== "all") {
       list = list.filter((e) => e.Category === categoryFilter);
     }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -85,7 +86,10 @@ export function ApiExplorerSwagger() {
     const map = new Map<string, EndpointDoc[]>();
     for (const ep of filtered) {
       const cat = ep.Category;
-      if (!map.has(cat)) map.set(cat, []);
+      if (!map.has(cat)) {
+        map.set(cat, []);
+      }
+
       map.get(cat)!.push(ep);
     }
 

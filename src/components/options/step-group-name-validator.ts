@@ -35,17 +35,23 @@ export const STEP_GROUP_NAME_MAX_LEN = 120;
  *                       the same value isn't reported as a clash.
  */
 export function validateStepGroupName(
-    raw: string,
-    siblingNames: ReadonlyArray<string>,
+  raw: string,
+  siblingNames: ReadonlyArray<string>,
 ): string | null {
-    const trimmed = raw.trim();
-    if (trimmed === "") return "Name is required.";
-    if (trimmed.length > STEP_GROUP_NAME_MAX_LEN) {
-        return `Name must be ${STEP_GROUP_NAME_MAX_LEN} characters or fewer.`;
-    }
-    const lower = trimmed.toLowerCase();
-    const clash = siblingNames.find((s) => s.toLowerCase() === lower);
-    if (clash !== undefined) return "Another group at this level already has that name.";
+  const trimmed = raw.trim();
+  if (trimmed === "") {
+    return "Name is required.";
+  }
 
-    return null;
+  if (trimmed.length > STEP_GROUP_NAME_MAX_LEN) {
+    return `Name must be ${STEP_GROUP_NAME_MAX_LEN} characters or fewer.`;
+  }
+
+  const lower = trimmed.toLowerCase();
+  const clash = siblingNames.find((s) => s.toLowerCase() === lower);
+  if (clash !== undefined) {
+    return "Another group at this level already has that name.";
+  }
+
+  return null;
 }

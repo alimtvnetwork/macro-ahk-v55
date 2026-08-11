@@ -75,7 +75,10 @@ const state: SplitterState = {
 
 function persist(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       v: 1,
       bigText: state.bigText,
@@ -85,23 +88,51 @@ function persist(): void {
       perStepPromptSlug: state.perStepPromptSlug,
       collapsed: state.collapsed,
     }));
-  } catch (e) { log('TaskSplitter: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('TaskSplitter: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }
 
 function hydrate(): void {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      return;
+    }
+
     const o = JSON.parse(raw) as Partial<SplitterState>;
-    if (typeof o.bigText === 'string') state.bigText = o.bigText;
-    if (typeof o.stepCount === 'number') state.stepCount = clamp(o.stepCount, STEP_MIN, STEP_MAX);
-    if (typeof o.delaySec === 'number') state.delaySec = clamp(o.delaySec, 1, 3600);
-    if (typeof o.splitPromptSlug === 'string') state.splitPromptSlug = o.splitPromptSlug;
-    if (typeof o.perStepPromptSlug === 'string') state.perStepPromptSlug = o.perStepPromptSlug;
-    if (typeof o.collapsed === 'boolean') state.collapsed = o.collapsed;
-  } catch (e) { log('TaskSplitter: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+    if (typeof o.bigText === 'string') {
+      state.bigText = o.bigText;
+    }
+
+    if (typeof o.stepCount === 'number') {
+      state.stepCount = clamp(o.stepCount, STEP_MIN, STEP_MAX);
+    }
+
+    if (typeof o.delaySec === 'number') {
+      state.delaySec = clamp(o.delaySec, 1, 3600);
+    }
+
+    if (typeof o.splitPromptSlug === 'string') {
+      state.splitPromptSlug = o.splitPromptSlug;
+    }
+
+    if (typeof o.perStepPromptSlug === 'string') {
+      state.perStepPromptSlug = o.perStepPromptSlug;
+    }
+
+    if (typeof o.collapsed === 'boolean') {
+      state.collapsed = o.collapsed;
+    }
+  } catch (e) {
+    log('TaskSplitter: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 }
+
 hydrate();
 
 function clamp(n: number, lo: number, hi: number): number {
@@ -110,11 +141,17 @@ function clamp(n: number, lo: number, hi: number): number {
 
 function notify(): void {
   for (const s of state.subscribers) {
-    try { s(); } catch (e) { log('TaskSplitter: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+    try {
+      s(); 
+    } catch (e) {
+      log('TaskSplitter: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+    }
   }
 }
 
-function sleep(ms: number): Promise<void> { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms: number): Promise<void> {
+  return new Promise(r => setTimeout(r, ms)); 
+}
 
 // ── prompt resolution ───────────────────────────────────────────────
 
@@ -122,11 +159,16 @@ function findPromptBySlug(slug: string): PromptEntry | null {
   const entries = getPromptsConfig().entries || [];
   const target = slug.toLowerCase();
   for (const e of entries) {
-    if ((e.slug || '').toLowerCase() === target) return e;
+    if ((e.slug || '').toLowerCase() === target) {
+      return e;
+    }
   }
+
   // Substring fallback for legacy/derived slugs
   for (const e of entries) {
-    if ((e.slug || '').toLowerCase().indexOf(target) !== -1) return e;
+    if ((e.slug || '').toLowerCase().indexOf(target) !== -1) {
+      return e;
+    }
   }
 
   return null;
@@ -135,8 +177,11 @@ function findPromptBySlug(slug: string): PromptEntry | null {
 function resolvePerStepPrompt(): PromptEntry | null {
   if (state.perStepPromptSlug) {
     const p = findPromptBySlug(state.perStepPromptSlug);
-    if (p) return p;
+    if (p) {
+      return p;
+    }
   }
+
   // Auto: next-${N}-steps (cap at 8 — the dropdown's max variant)
   const n = Math.min(state.stepCount, 8);
 
@@ -146,7 +191,9 @@ function resolvePerStepPrompt(): PromptEntry | null {
 
 function resolvePerStepPromptText(): string | null {
   const per = resolvePerStepPrompt();
-  if (!per || !per.text) return null;
+  if (!per || !per.text) {
+    return null;
+  }
 
   return substituteToken(per.text, per.replaceKey || REPLACE_KEY_DEFAULT, state.stepCount);
 }
@@ -158,8 +205,9 @@ function errMsg(e: unknown): string {
 }
 
 function getChatForm(TAG: string): HTMLElement | null {
-  try { return document.getElementById('chat-input'); }
-  catch (e) {
+  try {
+    return document.getElementById('chat-input'); 
+  } catch (e) {
     const m = errMsg(e);
     showPasteToast('⚠ ' + TAG + ': getElementById threw (' + m + ') — trying button', true);
     log('TaskSplitter: getElementById threw — ' + m, 'warn');
@@ -171,8 +219,9 @@ function getChatForm(TAG: string): HTMLElement | null {
 function trySubmitForm(TAG: string, form: HTMLElement | null): boolean {
   if (form instanceof HTMLFormElement) {
     try {
-      if (typeof form.requestSubmit === 'function') form.requestSubmit();
-      else {
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
         showPasteToast('⚠ ' + TAG + ': requestSubmit unsupported — using submit event', false);
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
@@ -195,13 +244,18 @@ function trySubmitForm(TAG: string, form: HTMLElement | null): boolean {
 
 function trySubmitButton(TAG: string): boolean {
   let btn: HTMLElement | null = null;
-  try { btn = findAddToTasksButton(); }
-  catch (e) { logError('TaskSplitter', 'findAddToTasksButton threw', e); }
+  try {
+    btn = findAddToTasksButton(); 
+  } catch (e) {
+    logError('TaskSplitter', 'findAddToTasksButton threw', e); 
+  }
+
   if (!btn || (btn as HTMLButtonElement).disabled) {
     showPasteToast('❌ ' + TAG + ': no enabled submit button found — submit failed', true);
 
     return false;
   }
+
   try {
     btn.click();
     showPasteToast('✅ ' + TAG + ': submitted via submit-button fallback', false);
@@ -224,9 +278,16 @@ function dispatchSubmit(): boolean {
 
     return false;
   }
+
   const form = getChatForm(TAG);
-  if (trySubmitForm(TAG, form)) return true;
-  if (trySubmitButton(TAG)) return true;
+  if (trySubmitForm(TAG, form)) {
+    return true;
+  }
+
+  if (trySubmitButton(TAG)) {
+    return true;
+  }
+
   log('TaskSplitter: submit failed — no form#chat-input and no enabled submit button', 'warn');
 
   return false;
@@ -241,6 +302,7 @@ async function pasteAndSubmit(text: string): Promise<boolean> {
 
       return false;
     }
+
     // small grace for editor to settle, then submit
     await sleep(200);
 
@@ -256,10 +318,16 @@ async function waitForCompletion(maxMs: number): Promise<void> {
   const deadline = Date.now() + maxMs;
   await sleep(800);
   while (Date.now() < deadline) {
-    if (state.cancelled) return;
+    if (state.cancelled) {
+      return;
+    }
+
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
-    if (!processing) return;
+    if (!processing) {
+      return;
+    }
+
     await sleep(POLL_MS);
   }
 }
@@ -269,13 +337,20 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 function readEditorText(): string {
   try {
     const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-    if (!target) return '';
-    if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
+    if (!target) {
+      return '';
+    }
+
+    if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) {
+      return target.value || '';
+    }
 
     return (target.textContent || '');
-  } catch (e) { log('TaskSplitter: readEditorText failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');
+  } catch (e) {
+    log('TaskSplitter: readEditorText failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');
 
- return ''; }
+    return ''; 
+  }
 }
 
 async function breakIntoSteps(): Promise<void> {
@@ -284,12 +359,14 @@ async function breakIntoSteps(): Promise<void> {
 
     return;
   }
+
   const text = readEditorText().trim();
   if (!text) {
     showPasteToast('❌ Task Splitter: type your instruction in the Lovable chat box first', true);
 
     return;
   }
+
   state.bigText = text;
   state.running = true;
   state.cancelled = false;
@@ -307,14 +384,22 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   const prompt = getSplitterPrompt({ rawInstruction: text, n: expectedN });
   log('TaskSplitter: sending split JSON prompt (' + prompt.length + ' chars, n=' + expectedN + ')', 'info');
   const ok = await pasteAndSubmit(prompt);
-  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
+  if (!ok) {
+    showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
- return; }
+    return; 
+  }
+
   showPasteToast('✂ Task Splitter: split sent — waiting for JSON reply', false);
-  const idle = await waitForLovableIdle({ isCancelled: function () { return state.cancelled; } });
-  if (idle !== 'idle') { showPasteToast('❌ Task Splitter: idle wait ' + idle, true);
+  const idle = await waitForLovableIdle({ isCancelled: function () {
+    return state.cancelled; 
+  } });
+  if (idle !== 'idle') {
+    showPasteToast('❌ Task Splitter: idle wait ' + idle, true);
 
- return; }
+    return; 
+  }
+
   await parseAndEnqueueLatestReply(expectedN);
 }
 
@@ -329,6 +414,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
 
       return;
     }
+
     const projectId = resolveTaskQueueProjectId();
     const maxQueueSize = overrides.maxQueueSize;
     const added = await getPersistentTaskQueue().enqueueMany(
@@ -351,6 +437,7 @@ function reportSplitterParseFailure(caught: CaughtError, expectedN: number): voi
 
     return;
   }
+
   logError('TaskSplitter.parse', 'Unexpected splitter queue failure for ExpectedN=' + expectedN, caught);
   showPasteToast('❌ Splitter parse failed (got 0 of ' + expectedN + ')', true);
 }
@@ -363,10 +450,14 @@ async function sendOneStep(): Promise<boolean> {
 
     return false;
   }
-  const ok = await pasteAndSubmit(perText);
-  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
- return false; }
+  const ok = await pasteAndSubmit(perText);
+  if (!ok) {
+    showPasteToast('❌ Task Splitter: paste/submit failed', true);
+
+    return false; 
+  }
+
   state.completed++;
   notify();
   showPasteToast('▶ Task Splitter: ' + state.completed + '/' + state.stepCount, false);
@@ -375,14 +466,20 @@ async function sendOneStep(): Promise<boolean> {
 }
 
 async function manualNext(): Promise<void> {
-  if (state.running) { showPasteToast('⏸ Auto-run is active — stop it first', true);
+  if (state.running) {
+    showPasteToast('⏸ Auto-run is active — stop it first', true);
 
- return; }
+    return; 
+  }
+
   await sendOneStep();
 }
 
 async function runAuto(): Promise<void> {
-  if (state.running) return;
+  if (state.running) {
+    return;
+  }
+
   state.running = true;
   state.cancelled = false;
   notify();
@@ -390,11 +487,20 @@ async function runAuto(): Promise<void> {
   try {
     while (state.completed < state.stepCount && !state.cancelled) {
       const ok = await sendOneStep();
-      if (!ok) break;
-      if (state.completed >= state.stepCount) break;
+      if (!ok) {
+        break;
+      }
+
+      if (state.completed >= state.stepCount) {
+        break;
+      }
+
       // Wait for Lovable to finish, then fixed delay
       await waitForCompletion(MAX_WAIT_MS);
-      if (state.cancelled) break;
+      if (state.cancelled) {
+        break;
+      }
+
       const delayMs = state.delaySec * 1000;
       state.phaseDeadlineAt = Date.now() + delayMs;
       notify();
@@ -412,19 +518,28 @@ async function runAuto(): Promise<void> {
     state.cancelled = false;
     state.phaseDeadlineAt = 0;
     notify();
-    if (cancelled) showPasteToast('⏹ Task Splitter: stopped at ' + done + '/' + total, false);
-    else if (done >= total) showPasteToast('✅ Task Splitter: completed ' + total + ' steps', false);
+    if (cancelled) {
+      showPasteToast('⏹ Task Splitter: stopped at ' + done + '/' + total, false);
+    } else if (done >= total) {
+      showPasteToast('✅ Task Splitter: completed ' + total + ' steps', false);
+    }
   }
 }
 
 function stopAuto(): void {
-  if (!state.running) return;
+  if (!state.running) {
+    return;
+  }
+
   state.cancelled = true;
   notify();
 }
 
 function resetCounter(): void {
-  if (state.running) return;
+  if (state.running) {
+    return;
+  }
+
   state.completed = 0;
   notify();
 }
@@ -472,7 +587,10 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
   const seenParents = new Set<string>();
   for (const e of entries) {
     const slug = e.slug || '';
-    if (!slug) continue;
+    if (!slug) {
+      continue;
+    }
+
     const o = document.createElement('option');
     o.value = slug;
     const label = e.parentTitle && e.variantValue
@@ -480,8 +598,11 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
       : (e.name || slug);
     o.textContent = label;
     sel.appendChild(o);
-    if (e.parentSlug) seenParents.add(e.parentSlug);
+    if (e.parentSlug) {
+      seenParents.add(e.parentSlug);
+    }
   }
+
   sel.value = currentSlug;
 }
 
@@ -503,7 +624,10 @@ function buildControl(): HTMLElement {
   header.appendChild(title);
   header.appendChild(progress);
   header.appendChild(chevron);
-  header.onclick = function () { state.collapsed = !state.collapsed; persist(); notify(); };
+  header.onclick = function () {
+    state.collapsed = !state.collapsed; persist(); notify(); 
+  };
+
   root.appendChild(header);
 
   // Body
@@ -526,13 +650,18 @@ function buildControl(): HTMLElement {
     state.stepCount = clamp(parseInt(nInput.value, 10), STEP_MIN, STEP_MAX);
     persist(); notify();
   };
+
   const dLbl = document.createElement('span'); dLbl.textContent = 'Delay'; dLbl.style.opacity = '0.8'; dLbl.style.marginLeft = '6px';
   const dSel = makeSelect();
   for (const s of DELAY_PRESETS_SEC) {
     const o = document.createElement('option'); o.value = String(s); o.textContent = s + 's'; dSel.appendChild(o);
   }
+
   dSel.value = String(state.delaySec);
-  dSel.onchange = function () { state.delaySec = parseInt(dSel.value, 10) || DELAY_DEFAULT; persist(); };
+  dSel.onchange = function () {
+    state.delaySec = parseInt(dSel.value, 10) || DELAY_DEFAULT; persist(); 
+  };
+
   row1.appendChild(nLbl); row1.appendChild(nInput);
   row1.appendChild(dLbl); row1.appendChild(dSel);
   body.appendChild(row1);
@@ -544,7 +673,10 @@ function buildControl(): HTMLElement {
   const sSel = makeSelect();
   sSel.style.flex = '1';
   populatePromptSelect(sSel, state.splitPromptSlug, '⚙ Auto: PlanTierType ${N}');
-  sSel.onchange = function () { state.splitPromptSlug = sSel.value; persist(); };
+  sSel.onchange = function () {
+    state.splitPromptSlug = sSel.value; persist(); 
+  };
+
   row2.appendChild(sLbl); row2.appendChild(sSel);
   body.appendChild(row2);
 
@@ -555,7 +687,10 @@ function buildControl(): HTMLElement {
   const pSel = makeSelect();
   pSel.style.flex = '1';
   populatePromptSelect(pSel, state.perStepPromptSlug, '⚙ Auto: Next ${N} steps');
-  pSel.onchange = function () { state.perStepPromptSlug = pSel.value; persist(); };
+  pSel.onchange = function () {
+    state.perStepPromptSlug = pSel.value; persist(); 
+  };
+
   row3.appendChild(pLbl); row3.appendChild(pSel);
   body.appendChild(row3);
 
@@ -563,17 +698,30 @@ function buildControl(): HTMLElement {
   const row4 = document.createElement('div');
   row4.style.cssText = ROW_STYLE;
   const breakBtn = makeBtn('✂ Break into steps', true);
-  breakBtn.onclick = function () { void breakIntoSteps(); };
+  breakBtn.onclick = function () {
+    void breakIntoSteps(); 
+  };
+
   const nextBtn = makeBtn('▶ Next', false);
-  nextBtn.onclick = function () { void manualNext(); };
+  nextBtn.onclick = function () {
+    void manualNext(); 
+  };
+
   const autoBtn = makeBtn('⏱ Start auto-run', false);
   autoBtn.onclick = function () {
-    if (state.running) stopAuto();
-    else void runAuto();
+    if (state.running) {
+      stopAuto();
+    } else {
+      void runAuto();
+    }
   };
+
   const resetBtn = makeBtn('↺', false);
   resetBtn.title = 'Reset step counter';
-  resetBtn.onclick = function () { resetCounter(); };
+  resetBtn.onclick = function () {
+    resetCounter(); 
+  };
+
   row4.appendChild(breakBtn);
   row4.appendChild(nextBtn);
   row4.appendChild(autoBtn);
@@ -603,6 +751,7 @@ function buildControl(): HTMLElement {
         : '';
     }
   };
+
   render();
   state.subscribers.add(render);
 
@@ -612,7 +761,10 @@ function buildControl(): HTMLElement {
 
       return;
     }
-    if (state.running) render();
+
+    if (state.running) {
+      render();
+    }
   }, Timings.TIMEOUT_SHORT);
 
   return root;
@@ -636,18 +788,23 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
     persist();
     notify();
   }
+
   if (state.running) {
     showPasteToast('⏸ Task Splitter is already running', true);
 
     return;
   }
+
   state.running = true;
   notify();
   try {
     const prompt = await resolvePlanPromptDbFirst(n);
     const ok = await pasteAndSubmit(prompt);
-    if (ok) showPasteToast('✂ Split: sent "PlanTierType ' + n + '"', false);
-    else showPasteToast('❌ Split: paste/submit failed', true);
+    if (ok) {
+      showPasteToast('✂ Split: sent "PlanTierType ' + n + '"', false);
+    } else {
+      showPasteToast('❌ Split: paste/submit failed', true);
+    }
   } finally {
     state.running = false;
     notify();
@@ -657,7 +814,9 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
 type PlanPromptEntry = Pick<PromptEntry, PromptFieldKeyType>;
 export type PlanPromptSource = PlanPromptSourceType;
 let lastPlanPromptSource: PlanPromptSource = 'not-found';
-export function getLastPlanPromptSource(): PlanPromptSource { return lastPlanPromptSource; }
+export function getLastPlanPromptSource(): PlanPromptSource {
+  return lastPlanPromptSource; 
+}
 
 function logPlanSource(n: number, source: PlanPromptSource, detail: string): void {
   lastPlanPromptSource = source;
@@ -672,7 +831,10 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.isFail || !result.value || result.value.Body.length === 0) return null;
+    if (result.isFail || !result.value || result.value.Body.length === 0) {
+      return null;
+    }
+
     const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
     logPlanSource(n, 'db-default', 'Prompt table plan default');
 
@@ -733,20 +895,32 @@ function resolvePlanPrompt(n: number): string | null {
   const rawCfg = (window.__MARCO_CONFIG__ || {}).prompts || {};
   const rawWindowEntries = (rawCfg.entries || rawCfg.prompts || []) as PlanPromptEntry[];
   const fromWindow = resolveRawPlanTemplate(rawWindowEntries, n, 'window-config', '__MARCO_CONFIG__.prompts raw entry');
-  if (fromWindow) return fromWindow;
+  if (fromWindow) {
+    return fromWindow;
+  }
 
   const preambleEntries = (window.__MARCO_PROMPTS__ || []) as PlanPromptEntry[];
   const fromPreamble = resolveRawPlanTemplate(preambleEntries, n, 'preamble-prompts', '__MARCO_PROMPTS__ raw entry');
-  if (fromPreamble) return fromPreamble;
+  if (fromPreamble) {
+    return fromPreamble;
+  }
 
   const fromDefaults = resolveRawPlanTemplate(DEFAULT_PROMPTS, n, 'default-prompts', 'DEFAULT_PROMPTS raw entry');
-  if (fromDefaults) return fromDefaults;
+  if (fromDefaults) {
+    return fromDefaults;
+  }
 
   const entries = (getPromptsConfig().entries || []) as PlanPromptEntry[];
   const fromParent = resolveExpandedPlanVariant(entries, n);
-  if (fromParent) return fromParent;
+  if (fromParent) {
+    return fromParent;
+  }
+
   const fromSlug = resolveSlugPlanVariant(entries, n);
-  if (fromSlug) return fromSlug;
+  if (fromSlug) {
+    return fromSlug;
+  }
+
   logPlanSource(n, 'not-found', 'no raw template or expanded variant found');
 
   return null;
@@ -754,9 +928,15 @@ function resolvePlanPrompt(n: number): string | null {
 
 async function resolvePlanPromptDbFirst(n: number): Promise<string> {
   const dbBody = await resolvePlanPromptFromDb(n);
-  if (dbBody) return dbBody;
+  if (dbBody) {
+    return dbBody;
+  }
+
   const libraryBody = resolvePlanPrompt(n);
-  if (libraryBody) return libraryBody;
+  if (libraryBody) {
+    return libraryBody;
+  }
+
   logPlanSource(n, 'default-prompts', 'PLAN_DEFAULT_BODY static fallback');
 
   return substitutePlanN(PLAN_DEFAULT_BODY, REPLACE_KEY_DEFAULT, n);
@@ -778,6 +958,7 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
 
     return;
   }
+
   const planText = await resolvePlanPromptDbFirst(n);
   const existing = readEditorText();
   const combined = existing.trim().length > 0
@@ -791,6 +972,7 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
 
       return;
     }
+
     showPasteToast('📋 PlanTierType ' + n + ' appended [src:' + getLastPlanPromptSource() + '] — review and Send manually', false);
   } catch (e) {
     logError('TaskSplitter', 'triggerPlanPasteFromInline threw', e);

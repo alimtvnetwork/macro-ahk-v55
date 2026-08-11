@@ -34,7 +34,9 @@ import { TaskQueueManager } from './task-manager';
 export { runCheck } from './loop-check';
 
 /** Shorthand for MacroController singleton */
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // CQ4: Extracted helpers from startLoop
@@ -131,7 +133,11 @@ function startLoopTimers(): void {
   }
 
   log('=== LOOP STARTED (post-check) ===', 'success');
-  state.countdownIntervalId = trackedSetInterval('LoopControls.countdown', function() { if (state.countdown > 0) state.countdown--; }, TIMING.COUNTDOWN_INTERVAL);
+  state.countdownIntervalId = trackedSetInterval('LoopControls.countdown', function() {
+    if (state.countdown > 0) {
+      state.countdown--;
+    } 
+  }, TIMING.COUNTDOWN_INTERVAL);
   state.loopIntervalId = trackedSetInterval('LoopControls.cycle', runCycle, TIMING.LOOP_INTERVAL);
   setTimeout(runCycle, TIMING.FIRST_CYCLE_DELAY);
   mc().updateUI();
@@ -144,13 +150,17 @@ async function handleAuthAndStartCheck(): Promise<void> {
 
   refreshBearerTokenFromBestSource(function(authToken: string, authSource: string) {
     logAuthResult(authToken, authSource);
-    if (!state.running) { log('Loop was stopped during auth resolution — aborting', 'warn');
+    if (!state.running) {
+      log('Loop was stopped during auth resolution — aborting', 'warn');
 
- return; }
+      return; 
+    }
 
     log('Step 2: Running initial workspace check...', 'check');
     let checkPromise;
-    try { checkPromise = runCheckFn(); } catch(e) {
+    try {
+      checkPromise = runCheckFn(); 
+    } catch(e) {
       log('Initial check threw error: ' + (e as Error).message + ' — starting loop anyway', 'warn');
     }
 
@@ -189,13 +199,20 @@ function scheduleTimersAfterCheck(checkPromise: Promise<void> | undefined): void
 // ============================================
 export function startLoop(direction: LoopDirectionType | string): boolean {
   // No-autorun guard: refuse any startLoop() that isn't backed by a recent user gesture.
-  if (!requireUserGesture('startLoop')) return false;
-  if (!validateLoopPreconditions()) return false;
+  if (!requireUserGesture('startLoop')) {
+    return false;
+  }
+
+  if (!validateLoopPreconditions()) {
+    return false;
+  }
 
   initLoopState(direction);
   logLoopStartInfo();
 
-  if (!verifyControllerInjection()) return false;
+  if (!verifyControllerInjection()) {
+    return false;
+  }
 
   mc().updateUI();
   handleAuthAndStartCheck();
@@ -207,7 +224,9 @@ export function startLoop(direction: LoopDirectionType | string): boolean {
 // stopLoop
 // ============================================
 export function stopLoop(): boolean {
-  if (!state.running) return false;
+  if (!state.running) {
+    return false;
+  }
 
   state.running = false;
   state.isDelegating = false;
@@ -215,8 +234,13 @@ export function stopLoop(): boolean {
   state.__cycleInFlight = false;
   state.__cycleRetryPending = false;
 
-  if (state.loopIntervalId) { trackedClearInterval(state.loopIntervalId); state.loopIntervalId = null; }
-  if (state.countdownIntervalId) { trackedClearInterval(state.countdownIntervalId); state.countdownIntervalId = null; }
+  if (state.loopIntervalId) {
+    trackedClearInterval(state.loopIntervalId); state.loopIntervalId = null; 
+  }
+
+  if (state.countdownIntervalId) {
+    trackedClearInterval(state.countdownIntervalId); state.countdownIntervalId = null; 
+  }
 
   log('=== LOOP STOPPED ===', 'success');
   log('Total cycles completed: ' + state.cycleCount);
@@ -247,7 +271,9 @@ function refreshStatusStopped(): void {
 
 function triggerBackgroundCreditFetch(): void {
   const token = resolveToken();
-  if (!token) return;
+  if (!token) {
+    return;
+  }
 
   logSub('No workspace + no credits — triggering background credit fetch', 1);
   fetchLoopCreditsAsync(false).then(function() {
@@ -313,6 +339,7 @@ export function refreshStatus(): void {
 
     return;
   }
+
   // Issue 128 — auto-resume the Lovable Queue if it's paused with pending tasks.
   // Single click attempt per tick; no retries (mem://constraints/no-retry-policy).
   try {

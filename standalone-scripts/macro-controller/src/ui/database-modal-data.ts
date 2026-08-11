@@ -79,7 +79,9 @@ function parseTableList(
 ): Array<{ name: string; rowCount?: number }> {
   return (response.tables || []).map((table: Record<string, unknown>) => {
     const out: { name: string; rowCount?: number } = { name: (table.name as string) || '' };
-    if (typeof table.rowCount === 'number') out.rowCount = table.rowCount;
+    if (typeof table.rowCount === 'number') {
+      out.rowCount = table.rowCount;
+    }
 
     return out;
   });
@@ -137,7 +139,10 @@ function renderTableListItems(
     const item = createTableListItem(table);
 
     item.onclick = () => {
-      if (activeItem) activeItem.classList.remove('active');
+      if (activeItem) {
+        activeItem.classList.remove('active');
+      }
+
       item.classList.add('active');
       activeItem = item;
       loadTableData(table.name, 0, content, statusBar);

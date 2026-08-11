@@ -53,6 +53,7 @@ describe('repeat-loop-ui More ▾ popover', () => {
       const btn = popover!.querySelector('button[data-repeat-preset="' + n + '"]');
       expect(btn, 'overflow preset ' + n + ' missing from popover').not.toBeNull();
     }
+
     expect(host.querySelector('[data-testid="repeat-scheme-legend"]')).toBeNull();
     expect(popover!.querySelector('[data-testid="repeat-more-scheme-details"]')).not.toBeNull();
   });

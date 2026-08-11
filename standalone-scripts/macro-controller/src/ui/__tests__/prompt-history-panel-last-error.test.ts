@@ -14,9 +14,9 @@ vi.mock('../../db/prompt-revision-db', () => ({
   deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
 }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   listPromptsByRole: vi.fn(),
   getDefaultPromptForRole: vi.fn(),
   upsertPrompt: vi.fn(),

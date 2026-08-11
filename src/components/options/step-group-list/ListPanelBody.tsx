@@ -27,36 +27,38 @@ export interface ListPanelBodyProps {
 }
 
 export function ListPanelBody({ state: s, mutations: m }: ListPanelBodyProps) {
-    return (
-        <div className="flex h-full min-h-[600px] w-full flex-col gap-4 p-6">
-            <Toaster />
-            <ListPanelHeader
-                projectName={s.projectName}
-                filteredCount={s.filtered.length}
-                totalCount={s.allGroups.length}
-                selectedCount={s.selected.size}
-                onClearSelection={s.clearSelection}
-                onOpenBatchRename={() => s.setBatchRenameOpen(true)}
-                onOpenBatchDelete={() => s.setBatchDeleteOpen(true)}
-                onExportSelected={s.exportSelected}
-                onOpenCreate={m.openCreate}
-                onPickImportFile={() => s.fileInputRef.current?.click()}
-                fileInputRef={s.fileInputRef}
-                onImportFileChange={(file) => { void s.importApi.importFile(file); }}
-            />
-            <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    value={s.query}
-                    onChange={(event) => s.setQuery(event.target.value)}
-                    placeholder="Search by name or description…"
-                    className="pl-9"
-                    aria-label="Search step groups"
-                />
-            </div>
-            <Separator />
-            <ListPanelGrid state={s} mutations={m} />
-            <ListPanelDialogsGroup state={s} mutations={m} />
-        </div>
-    );
+  return (
+    <div className="flex h-full min-h-[600px] w-full flex-col gap-4 p-6">
+      <Toaster />
+      <ListPanelHeader
+        projectName={s.projectName}
+        filteredCount={s.filtered.length}
+        totalCount={s.allGroups.length}
+        selectedCount={s.selected.size}
+        onClearSelection={s.clearSelection}
+        onOpenBatchRename={() => s.setBatchRenameOpen(true)}
+        onOpenBatchDelete={() => s.setBatchDeleteOpen(true)}
+        onExportSelected={s.exportSelected}
+        onOpenCreate={m.openCreate}
+        onPickImportFile={() => s.fileInputRef.current?.click()}
+        fileInputRef={s.fileInputRef}
+        onImportFileChange={(file) => {
+          void s.importApi.importFile(file); 
+        }}
+      />
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={s.query}
+          onChange={(event) => s.setQuery(event.target.value)}
+          placeholder="Search by name or description…"
+          className="pl-9"
+          aria-label="Search step groups"
+        />
+      </div>
+      <Separator />
+      <ListPanelGrid state={s} mutations={m} />
+      <ListPanelDialogsGroup state={s} mutations={m} />
+    </div>
+  );
 }

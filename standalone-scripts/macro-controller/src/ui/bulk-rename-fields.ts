@@ -70,9 +70,13 @@ export function buildPresetRow(
     const opt = document.createElement('option');
     opt.value = name;
     opt.textContent = name;
-    if (name === activePresetName) { opt.selected = true; }
+    if (name === activePresetName) {
+      opt.selected = true; 
+    }
+
     select.appendChild(opt);
   }
+
   const newOpt = document.createElement('option');
   newOpt.value = '__new__';
   newOpt.textContent = '+ New...';
@@ -90,13 +94,17 @@ export function buildPresetRow(
       onSwitch(select.value);
     }
   };
+
   row.appendChild(select);
 
   const saveBtn = document.createElement('button');
   saveBtn.textContent = '💾';
   saveBtn.title = 'Save preset';
   saveBtn.style.cssText = 'padding:2px 6px;background:' + cPrimaryBgA + ';color:' + cPrimaryLighter + ';border:1px solid ' + cPrimaryBorderA + ';border-radius:3px;font-size:10px;cursor:pointer;';
-  saveBtn.onclick = function () { onSave(); };
+  saveBtn.onclick = function () {
+    onSave(); 
+  };
+
   row.appendChild(saveBtn);
 
   // v2.195.0: Clone button — duplicates the currently-selected preset under
@@ -106,14 +114,20 @@ export function buildPresetRow(
   cloneBtn.textContent = '📋';
   cloneBtn.title = 'Clone selected preset';
   cloneBtn.style.cssText = 'padding:2px 6px;background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);border-radius:3px;font-size:10px;cursor:pointer;';
-  cloneBtn.onclick = function () { onClone(select.value); };
+  cloneBtn.onclick = function () {
+    onClone(select.value); 
+  };
+
   row.appendChild(cloneBtn);
 
   const deleteBtn = document.createElement('button');
   deleteBtn.textContent = '🗑';
   deleteBtn.title = 'Delete preset';
   deleteBtn.style.cssText = 'padding:2px 6px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:3px;font-size:10px;cursor:pointer;';
-  deleteBtn.onclick = function () { onDelete(select.value); };
+  deleteBtn.onclick = function () {
+    onDelete(select.value); 
+  };
+
   row.appendChild(deleteBtn);
 
   return {
@@ -128,9 +142,15 @@ export function buildPresetRow(
 // ── ETA Formatting ──
 
 export function formatEta(ms: number): string {
-  if (ms < 1000) return ms + 'ms';
+  if (ms < 1000) {
+    return ms + 'ms';
+  }
+
   const secs = Math.ceil(ms / 1000);
-  if (secs < 60) return secs + 's';
+  if (secs < 60) {
+    return secs + 's';
+  }
+
   const mins = Math.floor(secs / 60);
   const remSecs = secs % 60;
 
@@ -155,6 +175,7 @@ export function buildInputRow(
     checkbox.style.cssText = 'width:12px;height:12px;accent-color:' + cPrimaryLight + ';';
     row.appendChild(checkbox);
   }
+
   const lbl = document.createElement('span');
   lbl.style.cssText = 'font-size:9px;color:#94a3b8;min-width:40px;';
   lbl.textContent = label;
@@ -225,13 +246,18 @@ export function buildTokenRow(): HTMLElement {
         log('[Rename] Token refresh failed (bridge + cookie fallback)', 'warn');
         showToast('No session token found — login may be required', 'warn');
       }
+
       resolveToken();
       const lbl = document.getElementById('rename-auth-label');
-      if (lbl) lbl.textContent = 'Auth: ' + getLastTokenSource();
+      if (lbl) {
+        lbl.textContent = 'Auth: ' + getLastTokenSource();
+      }
+
       (tokenRefreshBtn as HTMLButtonElement).disabled = false;
       tokenRefreshBtn.style.opacity = '1';
     });
   };
+
   tokenRow.appendChild(tokenLabel);
   tokenRow.appendChild(tokenRefreshBtn);
 

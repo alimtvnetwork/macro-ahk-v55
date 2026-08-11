@@ -13,16 +13,16 @@ const PROJECT_NAMESPACE = "LovableOwnerSwitch";
 const PHASE_LABEL = "P4-scaffold";
 
 export class LovableOwnerSwitch {
-    public readonly namespace: string = PROJECT_NAMESPACE;
+  public readonly namespace: string = PROJECT_NAMESPACE;
 
-    public start(): void {
-        this.logBootstrap();
-    }
+  public start(): void {
+    this.logBootstrap();
+  }
 
-    private logBootstrap(): void {
-        const logger = globalThis.console;
-        logger.info(`[${PROJECT_NAMESPACE}] ${PHASE_LABEL} loaded — flow wiring pending P5+.`);
-    }
+  private logBootstrap(): void {
+    const logger = globalThis.console;
+    logger.info(`[${PROJECT_NAMESPACE}] ${PHASE_LABEL} loaded — flow wiring pending P5+.`);
+  }
 }
 
 export default LovableOwnerSwitch;

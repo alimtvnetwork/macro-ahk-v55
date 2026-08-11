@@ -28,18 +28,18 @@ import { runSdkSelfTest } from "./self-test";
 /* ------------------------------------------------------------------ */
 
 const marco = Object.freeze({
-    auth: Object.freeze(createAuthApi()),
-    authUtils: Object.freeze(AuthTokenUtils),
-    cookies: Object.freeze(createCookiesApi()),
-    config: Object.freeze(createConfigApi()),
-    xpath: Object.freeze(createXPathApi()),
-    kv: Object.freeze(createKvApi()),
-    files: Object.freeze(createFilesApi()),
-    notify: Object.freeze(createNotifyApi()),
-    utils: Object.freeze(createUtilsApi()),
-    prompts: Object.freeze(createPromptsApi()),
-    api: Object.freeze(createApiModule()),
-    version: "4.245.0",
+  auth: Object.freeze(createAuthApi()),
+  authUtils: Object.freeze(AuthTokenUtils),
+  cookies: Object.freeze(createCookiesApi()),
+  config: Object.freeze(createConfigApi()),
+  xpath: Object.freeze(createXPathApi()),
+  kv: Object.freeze(createKvApi()),
+  files: Object.freeze(createFilesApi()),
+  notify: Object.freeze(createNotifyApi()),
+  utils: Object.freeze(createUtilsApi()),
+  prompts: Object.freeze(createPromptsApi()),
+  api: Object.freeze(createApiModule()),
+  version: "4.245.0",
 });
 
 /* ------------------------------------------------------------------ */
@@ -56,9 +56,9 @@ const marco = Object.freeze({
 
 const win = window as unknown as Record<string, unknown>;
 if (!win.RiseupAsiaMacroExt) {
-    win.RiseupAsiaMacroExt = { Projects: {}, Logger: NamespaceLogger };
+  win.RiseupAsiaMacroExt = { Projects: {}, Logger: NamespaceLogger };
 } else {
-    (win.RiseupAsiaMacroExt as Record<string, unknown>).Logger = NamespaceLogger;
+  (win.RiseupAsiaMacroExt as Record<string, unknown>).Logger = NamespaceLogger;
 }
 
 /* Register the SDK's own per-project namespace so the documented
@@ -69,13 +69,13 @@ registerSdkSelfNamespace(marco, "4.245.0");
 /* Runtime self-test — validates Projects.RiseupMacroSdk on every page load.
    Logs PASS/FAIL via NamespaceLogger so regressions surface immediately. */
 try {
-    runSdkSelfTest("4.245.0");
+  runSdkSelfTest("4.245.0");
 } catch (err) {
-    NamespaceLogger.error(
-        "index",
-        "SDK self-test threw unexpectedly. Path: standalone-scripts/marco-sdk/src/index.ts. Missing: Passing SDK self-test. Reason: runSdkSelfTest threw.",
-        err,
-    );
+  NamespaceLogger.error(
+    "index",
+    "SDK self-test threw unexpectedly. Path: standalone-scripts/marco-sdk/src/index.ts. Missing: Passing SDK self-test. Reason: runSdkSelfTest threw.",
+    err,
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -83,13 +83,18 @@ try {
 /* ------------------------------------------------------------------ */
 
 window.addEventListener("message", (event) => {
-    if (event.source !== window) return;
-    const data = event.data;
-    if (!data || data.source !== "marco-sdk-event") return;
+  if (event.source !== window) {
+    return;
+  }
 
-    if (data.type === "CONFIG_CHANGED" && data.key) {
-        notifyConfigChange(data.key, data.value);
-    }
+  const data = event.data;
+  if (!data || data.source !== "marco-sdk-event") {
+    return;
+  }
+
+  if (data.type === "CONFIG_CHANGED" && data.key) {
+    notifyConfigChange(data.key, data.value);
+  }
 });
 
 /* ------------------------------------------------------------------ */
@@ -97,7 +102,7 @@ window.addEventListener("message", (event) => {
 /* ------------------------------------------------------------------ */
 
 initXPathCache().catch((caught: unknown) => {
-    NamespaceLogger.error("initXPathCache", "XPath cache warm-up failed — cache will be empty until first explicit call (non-fatal)", caught);
+  NamespaceLogger.error("initXPathCache", "XPath cache warm-up failed — cache will be empty until first explicit call (non-fatal)", caught);
 });
 
 console.log("[marco-sdk] Riseup Macro SDK v4.245.0 initialized (RiseupAsiaMacroExt root + Logger + Projects.RiseupMacroSdk self-namespace + runtime self-test)");

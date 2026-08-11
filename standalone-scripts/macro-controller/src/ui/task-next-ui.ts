@@ -76,9 +76,13 @@ export function loadTaskNextSettings(deps: TaskNextDeps, cb?: () => void) {
             taskNextState.settings[k] = saved[k];
           }
         }
+
         taskNextState.settings.requireStartForMultiRun = true;
-      } catch (e) { log('Task Next: failed to parse saved settings — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+      } catch (e) {
+        log('Task Next: failed to parse saved settings — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+      }
     }
+
     if (cb) {
       cb();
     }
@@ -94,7 +98,9 @@ export function saveTaskNextSettings(deps: TaskNextDeps) {
 function matchPromptBySlug<T extends { slug?: string }>(entries: ReadonlyArray<T>, aliases: Set<string>): T | null {
   for (const entry of entries) {
     const entrySlug = (entry.slug || '').toLowerCase();
-    if (aliases.has(entrySlug)) return entry;
+    if (aliases.has(entrySlug)) {
+      return entry;
+    }
   }
 
   return null;
@@ -104,7 +110,9 @@ function matchPromptById<T extends { id?: string }>(entries: ReadonlyArray<T>, a
   for (const entry of entries) {
     const id = (entry.id || '').toLowerCase();
     for (const alias of aliases) {
-      if (id === alias || id === 'default-' + alias || id.indexOf(alias) !== -1) return entry;
+      if (id === alias || id === 'default-' + alias || id.indexOf(alias) !== -1) {
+        return entry;
+      }
     }
   }
 
@@ -114,11 +122,16 @@ function matchPromptById<T extends { id?: string }>(entries: ReadonlyArray<T>, a
 function matchPromptByDerivedSlugOrKeywords<T extends { name?: string }>(entries: ReadonlyArray<T>, aliases: Set<string>): T | null {
   for (const entry of entries) {
     const derivedSlug = (entry.name || '').toLowerCase().replace(/\s+/g, '-');
-    if (aliases.has(derivedSlug)) return entry;
+    if (aliases.has(derivedSlug)) {
+      return entry;
+    }
   }
+
   for (const entry of entries) {
     const name = (entry.name || '').toLowerCase();
-    if (name.indexOf('next') !== -1 && (name.indexOf('task') !== -1 || name.indexOf('step') !== -1)) return entry;
+    if (name.indexOf('next') !== -1 && (name.indexOf('task') !== -1 || name.indexOf('step') !== -1)) {
+      return entry;
+    }
   }
 
   return null;
@@ -130,7 +143,9 @@ export function findNextTasksPrompt(deps: TaskNextDeps) {
   const targetSlug = taskNextState.settings.promptSlug || LabelType.NextTasks;
   const aliases = new Set<string>([targetSlug, 'next-tasks', 'next-steps']);
 
-  const slugMap = entries.map(function(e) { return e.name + ' → slug=' + (e.slug || '⚠️ MISSING') + ', id=' + (e.id || '—'); });
+  const slugMap = entries.map(function(e) {
+    return e.name + ' → slug=' + (e.slug || '⚠️ MISSING') + ', id=' + (e.id || '—'); 
+  });
   log('Task Next: Resolving target="' + targetSlug + '" (aliases=' + Array.from(aliases).join(',') + ') across ' + entries.length + ' entries:\n  ' + slugMap.join('\n  '), 'info');
 
   const found = matchPromptBySlug(entries, aliases)
@@ -153,8 +168,12 @@ function findButtonByXPath(): HTMLElement | null {
   try {
     const result = document.evaluate(taskNextState.settings.buttonXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     const btn = result.singleNodeValue;
-    if (btn && (btn as HTMLElement).tagName && !(btn as HTMLButtonElement).disabled) return btn as HTMLElement;
-  } catch (e) { log('Task Next: XPath evaluation failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+    if (btn && (btn as HTMLElement).tagName && !(btn as HTMLButtonElement).disabled) {
+      return btn as HTMLElement;
+    }
+  } catch (e) {
+    log('Task Next: XPath evaluation failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 
   return null;
 }
@@ -175,10 +194,14 @@ function findButtonBySelectors(): HTMLElement | null {
   for (const selector of sendSelectors) {
     try {
       const el = document.querySelector(selector);
-      if (!el) continue;
+      if (!el) {
+        continue;
+      }
 
       const btn = el.tagName === 'BUTTON' ? el : el.closest('button');
-      if (!btn || (btn as HTMLButtonElement).disabled) continue;
+      if (!btn || (btn as HTMLButtonElement).disabled) {
+        continue;
+      }
 
       log('Task Next: Found submit button via selector: ' + selector, 'info');
 
@@ -214,7 +237,10 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
     const projectId = resolveTaskQueueProjectId();
     const queue = getPersistentTaskQueue();
     const item = await queue.dequeue(projectId);
-    if (!item) return { selection: null, failed: false };
+    if (!item) {
+      return { selection: null, failed: false };
+    }
+
     const remaining = await queue.count(projectId);
     log('Task Next: dequeued splitter task for project ' + projectId + ' (' + remaining + ' left)', 'info');
 
@@ -233,7 +259,9 @@ export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, PromptSub
 
 function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextPromptSelection | null {
   const prompt = findNextTasksPrompt(deps);
-  if (!prompt || !prompt.text) return null;
+  if (!prompt || !prompt.text) {
+    return null;
+  }
 
   return { text: substituteTaskNextPromptText(prompt, n), source: 'legacy', remaining: 0 };
 }
@@ -248,13 +276,25 @@ function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextProm
  */
 async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelection | null> {
   const res = await runWithBridgeRetry(
-    function() { return listPromptsByRole('next'); },
-    function(r) { return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
+    function() {
+      return listPromptsByRole('next'); 
+    },
+    function(r) {
+      return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); 
+    },
   );
-  if (res.isFail || !res.value || res.value.length === 0) return null;
+  if (res.isFail || !res.value || res.value.length === 0) {
+    return null;
+  }
+
   const rows = res.value;
-  const active = rows.find(function(r) { return r.IsDefault === 1; }) ?? rows[0];
-  if (!active || !active.Body) return null;
+  const active = rows.find(function(r) {
+    return r.IsDefault === 1; 
+  }) ?? rows[0];
+  if (!active || !active.Body) {
+    return null;
+  }
+
   const text = substituteToken(active.Body, active.ReplaceKey || REPLACE_KEY_DEFAULT, n);
 
   return { text, source: 'legacy', remaining: 0 };
@@ -262,11 +302,20 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
 
 async function selectTaskNextPrompt(deps: TaskNextDeps, n: number): Promise<TaskNextPromptResult> {
   const queued = await dequeueTaskNextPrompt();
-  if (queued.failed || queued.selection) return queued;
+  if (queued.failed || queued.selection) {
+    return queued;
+  }
+
   const legacy = selectLegacyTaskNextPrompt(deps, n);
-  if (legacy) return { selection: legacy, failed: false };
+  if (legacy) {
+    return { selection: legacy, failed: false };
+  }
+
   const dbSel = await selectDbTaskNextPrompt(n);
-  if (dbSel) return { selection: dbSel, failed: false };
+  if (dbSel) {
+    return { selection: dbSel, failed: false };
+  }
+
   logError('Task Next', '"Next Tasks" prompt not found in cache or DB — aborting');
   showPasteToast('❌ "Next Tasks" prompt not found', true);
 
@@ -279,6 +328,7 @@ function reportTaskNextPaste(selection: TaskNextPromptSelection): void {
 
     return;
   }
+
   showPasteToast('⏭ Task Next: pasted — click Submit to send', false);
 }
 
@@ -297,6 +347,7 @@ export async function runTaskNextLoop(deps: TaskNextDeps, count: number): Promis
   if (requested > 1) {
     log('Task Next: multi-run blocked; pasting once only. Use Repeat Start for repeats.', 'warn');
   }
+
   const result = await selectTaskNextPrompt(deps, requested);
   if (result.failed || !result.selection) {
     return;
@@ -326,8 +377,9 @@ function tnErrMsg(e: unknown): string {
 }
 
 function getTaskNextForm(TAG: string): HTMLElement | null {
-  try { return document.getElementById('chat-input'); }
-  catch (e) {
+  try {
+    return document.getElementById('chat-input'); 
+  } catch (e) {
     const msg = tnErrMsg(e);
     showPasteToast('⚠ ' + TAG + ': getElementById threw (' + msg + ')', true);
     log('Task Next: getElementById threw — ' + msg, 'warn');
@@ -339,8 +391,9 @@ function getTaskNextForm(TAG: string): HTMLElement | null {
 function tryTaskNextSubmitForm(TAG: string, form: HTMLElement | null): boolean {
   if (form instanceof HTMLFormElement) {
     try {
-      if (typeof form.requestSubmit === 'function') form.requestSubmit();
-      else {
+      if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+      } else {
         showPasteToast('⚠ ' + TAG + ': requestSubmit unsupported — using submit event', false);
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
@@ -363,13 +416,18 @@ function tryTaskNextSubmitForm(TAG: string, form: HTMLElement | null): boolean {
 
 function tryTaskNextSubmitButton(TAG: string): boolean {
   let btn: HTMLElement | null = null;
-  try { btn = findAddToTasksButton(); }
-  catch (e) { logError('Task Next', 'findAddToTasksButton threw', e); }
+  try {
+    btn = findAddToTasksButton(); 
+  } catch (e) {
+    logError('Task Next', 'findAddToTasksButton threw', e); 
+  }
+
   if (!btn || (btn as HTMLButtonElement).disabled) {
     showPasteToast('❌ ' + TAG + ': no enabled submit button — submit failed', true);
 
     return false;
   }
+
   try {
     btn.click();
     showPasteToast('✅ ' + TAG + ': submitted via submit-button fallback', false);
@@ -392,8 +450,11 @@ export function dispatchTaskNextSubmit(): boolean {
 
     return false;
   }
+
   const form = getTaskNextForm(TAG);
-  if (tryTaskNextSubmitForm(TAG, form)) return true;
+  if (tryTaskNextSubmitForm(TAG, form)) {
+    return true;
+  }
 
   return tryTaskNextSubmitButton(TAG);
 }
@@ -414,8 +475,13 @@ const TASK_NEXT_QUEUE_LABEL = 'Task Next queue';
 
 async function resolveCyclePrompt(_deps: TaskNextDeps, legacyText: string): Promise<{ text: string; source: TaskNextPromptSource; remaining: number }> {
   const dequeued = await dequeueTaskNextPrompt();
-  if (dequeued.failed) return { text: '', source: 'queue', remaining: -1 };
-  if (dequeued.selection) return { text: dequeued.selection.text, source: 'queue', remaining: dequeued.selection.remaining };
+  if (dequeued.failed) {
+    return { text: '', source: 'queue', remaining: -1 };
+  }
+
+  if (dequeued.selection) {
+    return { text: dequeued.selection.text, source: 'queue', remaining: dequeued.selection.remaining };
+  }
 
   return { text: legacyText, source: 'legacy', remaining: 0 };
 }
@@ -427,20 +493,43 @@ async function runTaskNextCycle(
   n: number,
   waitForLovableIdle: typeof import('./lovable-idle').waitForLovableIdle,
 ): Promise<CycleStatusType> {
-  if (taskNextState.cancelled) return 'cancelled';
+  if (taskNextState.cancelled) {
+    return 'cancelled';
+  }
+
   const cycleStart = Date.now();
   const chosen = await resolveCyclePrompt(deps, legacyPromptText);
-  if (chosen.remaining === -1) return 'paste-failed';
-  if (!chosen.text) return 'queue-empty';
+  if (chosen.remaining === -1) {
+    return 'paste-failed';
+  }
+
+  if (!chosen.text) {
+    return 'queue-empty';
+  }
+
   const promptsCfg = deps.getPromptsConfig();
   const outcome = pasteIntoEditor(chosen.text, promptsCfg, deps.getByXPath);
-  if (String(outcome) === 'failed') return 'paste-failed';
-  if (!dispatchTaskNextSubmit()) return 'submit-failed';
+  if (String(outcome) === 'failed') {
+    return 'paste-failed';
+  }
+
+  if (!dispatchTaskNextSubmit()) {
+    return 'submit-failed';
+  }
+
   const idleResult = await waitForLovableIdle({
-    isCancelled: function() { return taskNextState.cancelled; },
+    isCancelled: function() {
+      return taskNextState.cancelled; 
+    },
   });
-  if (idleResult === 'cancelled') return 'idle-cancelled';
-  if (idleResult === 'timeout') return 'idle-timeout';
+  if (idleResult === 'cancelled') {
+    return 'idle-cancelled';
+  }
+
+  if (idleResult === 'timeout') {
+    return 'idle-timeout';
+  }
+
   taskNextState.queue.completed = k + 1;
   log('[TaskNextQueue] cycle ' + (k + 1) + '/' + n + ' done in ' + (Date.now() - cycleStart) + 'ms (source=' + chosen.source + ')', 'info');
   showPasteToast('🔁 Task Next queue: ' + (k + 1) + '/' + n + ' (' + chosen.source + ')', false);
@@ -473,14 +562,18 @@ function reportCycleStatus(status: CycleStatusType, k: number, n: number): void 
 
 export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promise<void> {
   const n = Math.max(1, Math.floor(count) || 1);
-  if (n === 1) { runTaskNextLoop(deps, 1);
+  if (n === 1) {
+    runTaskNextLoop(deps, 1);
 
- return; }
+    return; 
+  }
+
   if (taskNextState.running) {
     log('Task Next queue: already running — ignoring re-entry', 'warn');
 
     return;
   }
+
   const prompt = findNextTasksPrompt(deps);
   const legacyText = prompt && prompt.text ? substituteTaskNextPromptText(prompt, 1) : '';
   let queuedCount = 0;
@@ -489,12 +582,14 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
   } catch (caught: CaughtError) {
     logError(TASK_NEXT_QUEUE_LABEL, 'queue count probe failed before drain', caught);
   }
+
   if (!legacyText && queuedCount === 0) {
     logError(TASK_NEXT_QUEUE_LABEL, '"Next Tasks" prompt not found AND splitter queue empty — aborting queue of ' + n);
     showPasteToast('❌ No queued tasks and no "Next Tasks" prompt', true);
 
     return;
   }
+
   // Lazy import to dodge a circular dep (lovable-idle.ts → task-next-ui.ts for findAddToTasksButton).
   const { waitForLovableIdle } = await import('./lovable-idle');
 
@@ -507,8 +602,11 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
   try {
     for (let k = 0; k < n; k++) {
       const status = await runTaskNextCycle(deps, legacyText, k, n, waitForLovableIdle);
-      if (status !== 'ok') { reportCycleStatus(status, k, n); break; }
+      if (status !== 'ok') {
+        reportCycleStatus(status, k, n); break; 
+      }
     }
+
     if (!taskNextState.cancelled && taskNextState.queue.completed >= n) {
       showPasteToast('✅ Task Next queue finished ' + n + '/' + n, false);
       log('[TaskNextQueue] completed ' + n + '/' + n + ' in ' + (Date.now() - taskNextState.queue.startedAt) + 'ms', 'info');
@@ -531,7 +629,10 @@ let _taskNextEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
 let _taskNextPagehideHandler: (() => void) | null = null;
 
 export function setupTaskNextCancelHandler(): void {
-  if (_taskNextEscapeInstalled) return;
+  if (_taskNextEscapeInstalled) {
+    return;
+  }
+
   _taskNextEscapeInstalled = true;
   _taskNextEscapeHandler = function (e: KeyboardEvent): void {
     if (e.key === 'Escape' && taskNextState.running) {
@@ -539,18 +640,22 @@ export function setupTaskNextCancelHandler(): void {
       log('Task Next: Cancel requested via Escape', 'info');
     }
   };
+
   document.addEventListener('keydown', _taskNextEscapeHandler);
   _taskNextPagehideHandler = function (): void {
     if (_taskNextEscapeHandler) {
       document.removeEventListener('keydown', _taskNextEscapeHandler);
       _taskNextEscapeHandler = null;
     }
+
     if (_taskNextPagehideHandler && typeof window !== 'undefined') {
       window.removeEventListener('pagehide', _taskNextPagehideHandler);
     }
+
     _taskNextEscapeInstalled = false;
     _taskNextPagehideHandler = null;
   };
+
   if (typeof window !== 'undefined') {
     window.addEventListener('pagehide', _taskNextPagehideHandler);
   }
@@ -561,9 +666,11 @@ export function __resetTaskNextCancelHandlerForTests(): void {
   if (_taskNextEscapeHandler) {
     document.removeEventListener('keydown', _taskNextEscapeHandler);
   }
+
   if (_taskNextPagehideHandler && typeof window !== 'undefined') {
     window.removeEventListener('pagehide', _taskNextPagehideHandler);
   }
+
   _taskNextEscapeInstalled = false;
   _taskNextEscapeHandler = null;
   _taskNextPagehideHandler = null;

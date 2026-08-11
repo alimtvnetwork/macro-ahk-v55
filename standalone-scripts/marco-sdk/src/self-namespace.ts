@@ -57,160 +57,163 @@ const SDK_PROJECT_ID = "marco-sdk";
 
 // eslint-disable-next-line max-lines-per-function -- SDK self-registration: one declarative manifest assembled in-place; splitting would obscure the contract
 export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): void {
-    const win = window as unknown as Record<string, unknown>;
-    const root = win.RiseupAsiaMacroExt as
+  const win = window as unknown as Record<string, unknown>;
+  const root = win.RiseupAsiaMacroExt as
         | { Projects?: Record<string, unknown>; Settings?: { Broadcast?: { BaseUrl?: string } } }
         | undefined;
 
-    if (!root) {
-        NamespaceLogger.warn(
-            "registerSdkSelfNamespace",
-            "RiseupAsiaMacroExt root missing — cannot register RiseupMacroSdk namespace",
-        );
+  if (!root) {
+    NamespaceLogger.warn(
+      "registerSdkSelfNamespace",
+      "RiseupAsiaMacroExt root missing — cannot register RiseupMacroSdk namespace",
+    );
 
-        return;
-    }
-    if (!root.Projects) root.Projects = {};
+    return;
+  }
 
-    /* If a real project namespace already registered itself (rare collision),
+  if (!root.Projects) {
+    root.Projects = {};
+  }
+
+  /* If a real project namespace already registered itself (rare collision),
        respect it — never clobber a fully-built per-project runtime. */
-    const existing = root.Projects[SDK_CODE_NAME] as { _internal?: unknown } | undefined;
-    if (existing && existing._internal) {
-        console.log(
-            "[marco-sdk] Preserved existing RiseupAsiaMacroExt.Projects.RiseupMacroSdk runtime namespace",
-        );
+  const existing = root.Projects[SDK_CODE_NAME] as { _internal?: unknown } | undefined;
+  if (existing && existing._internal) {
+    console.log(
+      "[marco-sdk] Preserved existing RiseupAsiaMacroExt.Projects.RiseupMacroSdk runtime namespace",
+    );
 
-        return;
-    }
+    return;
+  }
 
-    const apiBase =
+  const apiBase =
         (root.Settings && root.Settings.Broadcast && root.Settings.Broadcast.BaseUrl) ||
         "http://localhost:19280";
 
-    const NO_CONFIG_ERR = "no config";
-    const NO_KV_ERR = "no kv api";
+  const NO_CONFIG_ERR = "no config";
+  const NO_KV_ERR = "no kv api";
     
-    const NO_FILES_ERR = "no files api";
-    const SDK_NO_DB_ERR = "SDK has no project DB";
-    const LOG_PREFIX = "[RiseupMacroSdk]";
-    const ns: ProjectNamespace = Object.freeze({
-        vars: Object.freeze({
-            get: (k: string) =>
-                marco.config ? marco.config.get(k) : Promise.reject(new Error(NO_CONFIG_ERR)),
-            set: (k: string, v: unknown) =>
-                marco.config ? marco.config.set(k, v) : Promise.reject(new Error(NO_CONFIG_ERR)),
-            getAll: () =>
-                marco.config ? marco.config.getAll() : Promise.reject(new Error(NO_CONFIG_ERR)),
+  const NO_FILES_ERR = "no files api";
+  const SDK_NO_DB_ERR = "SDK has no project DB";
+  const LOG_PREFIX = "[RiseupMacroSdk]";
+  const ns: ProjectNamespace = Object.freeze({
+    vars: Object.freeze({
+      get: (k: string) =>
+        marco.config ? marco.config.get(k) : Promise.reject(new Error(NO_CONFIG_ERR)),
+      set: (k: string, v: unknown) =>
+        marco.config ? marco.config.set(k, v) : Promise.reject(new Error(NO_CONFIG_ERR)),
+      getAll: () =>
+        marco.config ? marco.config.getAll() : Promise.reject(new Error(NO_CONFIG_ERR)),
+    }),
+    urls: Object.freeze({
+      getMatched: () => null,
+      listOpen: () => [],
+      getVariables: () => ({}),
+    }),
+    xpath: Object.freeze({
+      getChatBox: () => (marco.xpath?.resolve ? marco.xpath.resolve("chatBox") : null),
+    }),
+    cookies: Object.freeze({
+      bindings: Object.freeze([] as Array<{ cookieName: string; url: string; role: string }>),
+      get: (name: string) =>
+        marco.cookies ? marco.cookies.get(name) : Promise.resolve(null),
+      getByRole: () => Promise.resolve(null),
+      getSessionToken: () => Promise.resolve(null),
+      getAll: () => (marco.cookies ? marco.cookies.getAll() : Promise.resolve({})),
+    }),
+    kv: Object.freeze({
+      get: (k: string) => (marco.kv ? marco.kv.get(k) : Promise.reject(new Error(NO_KV_ERR))),
+      set: (k: string, v: unknown) => (marco.kv ? marco.kv.set(k, v) : Promise.reject(new Error(NO_KV_ERR))),
+      delete: (k: string) => (marco.kv ? marco.kv.delete(k) : Promise.reject(new Error(NO_KV_ERR))),
+      list: () => (marco.kv ? marco.kv.list() : Promise.reject(new Error(NO_KV_ERR))),
+    }),
+    files: Object.freeze({
+      save: (n: string, d: string) =>
+        marco.files ? marco.files.save(n, d) : Promise.reject(new Error(NO_FILES_ERR)),
+      read: (n: string) =>
+        marco.files ? marco.files.read(n) : Promise.reject(new Error(NO_FILES_ERR)),
+      list: () =>
+        marco.files ? marco.files.list() : Promise.reject(new Error(NO_FILES_ERR)),
+      cache: Object.freeze({}),
+    }),
+    meta: Object.freeze({
+      name: "Rise Up Macro SDK",
+      version: version,
+      slug: SDK_SLUG,
+      codeName: SDK_CODE_NAME,
+      id: SDK_PROJECT_ID,
+      description: "Core SDK — creates and freezes window.marco namespace",
+      dependencies: Object.freeze([]),
+    }),
+    log: Object.freeze({
+      info: (msg: string) => console.log(LOG_PREFIX, msg),
+      warn: (msg: string) => console.warn(LOG_PREFIX, msg),
+      error: (msg: string) => NamespaceLogger.error("selfNamespace", msg),
+    }),
+    scripts: Object.freeze([]),
+    db: Object.freeze({
+      table: () =>
+        Object.freeze({
+          findMany: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
+          create: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
+          update: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
+          delete: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
+          count: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
         }),
-        urls: Object.freeze({
-            getMatched: () => null,
-            listOpen: () => [],
-            getVariables: () => ({}),
-        }),
-        xpath: Object.freeze({
-            getChatBox: () => (marco.xpath?.resolve ? marco.xpath.resolve("chatBox") : null),
-        }),
-        cookies: Object.freeze({
-            bindings: Object.freeze([] as Array<{ cookieName: string; url: string; role: string }>),
-            get: (name: string) =>
-                marco.cookies ? marco.cookies.get(name) : Promise.resolve(null),
-            getByRole: () => Promise.resolve(null),
-            getSessionToken: () => Promise.resolve(null),
-            getAll: () => (marco.cookies ? marco.cookies.getAll() : Promise.resolve({})),
-        }),
-        kv: Object.freeze({
-            get: (k: string) => (marco.kv ? marco.kv.get(k) : Promise.reject(new Error(NO_KV_ERR))),
-            set: (k: string, v: unknown) => (marco.kv ? marco.kv.set(k, v) : Promise.reject(new Error(NO_KV_ERR))),
-            delete: (k: string) => (marco.kv ? marco.kv.delete(k) : Promise.reject(new Error(NO_KV_ERR))),
-            list: () => (marco.kv ? marco.kv.list() : Promise.reject(new Error(NO_KV_ERR))),
-        }),
-        files: Object.freeze({
-            save: (n: string, d: string) =>
-                marco.files ? marco.files.save(n, d) : Promise.reject(new Error(NO_FILES_ERR)),
-            read: (n: string) =>
-                marco.files ? marco.files.read(n) : Promise.reject(new Error(NO_FILES_ERR)),
-            list: () =>
-                marco.files ? marco.files.list() : Promise.reject(new Error(NO_FILES_ERR)),
-            cache: Object.freeze({}),
-        }),
-        meta: Object.freeze({
-            name: "Rise Up Macro SDK",
-            version: version,
-            slug: SDK_SLUG,
-            codeName: SDK_CODE_NAME,
-            id: SDK_PROJECT_ID,
-            description: "Core SDK — creates and freezes window.marco namespace",
-            dependencies: Object.freeze([]),
-        }),
-        log: Object.freeze({
-            info: (msg: string) => console.log(LOG_PREFIX, msg),
-            warn: (msg: string) => console.warn(LOG_PREFIX, msg),
-            error: (msg: string) => NamespaceLogger.error("selfNamespace", msg),
-        }),
-        scripts: Object.freeze([]),
-        db: Object.freeze({
-            table: () =>
-                Object.freeze({
-                    findMany: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
-                    create: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
-                    update: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
-                    delete: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
-                    count: () => Promise.reject(new Error(SDK_NO_DB_ERR)),
-                }),
-        }),
-        api: Object.freeze({
-            kv: Object.freeze({
-                get: (k: string) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`).then(r => r.json()),
-                set: (k: string, v: unknown) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ value: v }),
-                    }).then(r => r.json()),
-                delete: (k: string) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`, {
-                        method: "DELETE",
-                    }).then(r => r.json()),
-                list: () =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv`).then(r => r.json()),
-            }),
-            files: Object.freeze({
-                save: (n: string, d: string) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files/${encodeURIComponent(n)}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ data: d }),
-                    }).then(r => r.json()),
-                read: (n: string) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files/${encodeURIComponent(n)}`).then(r => r.json()),
-                list: () =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files`).then(r => r.json()),
-            }),
-            db: Object.freeze({
-                query: (table: string, method: string, params: unknown) =>
-                    fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/db/${encodeURIComponent(table)}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ method, params }),
-                    }).then(r => r.json()),
-            }),
-        }),
-        notify: Object.freeze({
-            toast: (msg: string, level?: string, opts?: unknown) =>
-                marco.notify ? marco.notify.toast(msg, level, opts) : console.log(LOG_PREFIX, msg),
-            dismiss: (id: string) => (marco.notify?.dismiss ? marco.notify.dismiss(id) : undefined),
-            dismissAll: () => (marco.notify?.dismissAll ? marco.notify.dismissAll() : undefined),
-            onError: (cb: (e: unknown) => void) =>
-                marco.notify?.onError ? marco.notify.onError(cb) : undefined,
-            getRecentErrors: () => (marco.notify?.getRecentErrors ? marco.notify.getRecentErrors() : []),
-        }),
-        docs: Object.freeze({
-            overview:
+    }),
+    api: Object.freeze({
+      kv: Object.freeze({
+        get: (k: string) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`).then(r => r.json()),
+        set: (k: string, v: unknown) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: v }),
+          }).then(r => r.json()),
+        delete: (k: string) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv/${encodeURIComponent(k)}`, {
+            method: "DELETE",
+          }).then(r => r.json()),
+        list: () =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/kv`).then(r => r.json()),
+      }),
+      files: Object.freeze({
+        save: (n: string, d: string) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files/${encodeURIComponent(n)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: d }),
+          }).then(r => r.json()),
+        read: (n: string) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files/${encodeURIComponent(n)}`).then(r => r.json()),
+        list: () =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/files`).then(r => r.json()),
+      }),
+      db: Object.freeze({
+        query: (table: string, method: string, params: unknown) =>
+          fetch(`${apiBase}/projects/${SDK_PROJECT_ID}/db/${encodeURIComponent(table)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ method, params }),
+          }).then(r => r.json()),
+      }),
+    }),
+    notify: Object.freeze({
+      toast: (msg: string, level?: string, opts?: unknown) =>
+        marco.notify ? marco.notify.toast(msg, level, opts) : console.log(LOG_PREFIX, msg),
+      dismiss: (id: string) => (marco.notify?.dismiss ? marco.notify.dismiss(id) : undefined),
+      dismissAll: () => (marco.notify?.dismissAll ? marco.notify.dismissAll() : undefined),
+      onError: (cb: (e: unknown) => void) =>
+        marco.notify?.onError ? marco.notify.onError(cb) : undefined,
+      getRecentErrors: () => (marco.notify?.getRecentErrors ? marco.notify.getRecentErrors() : []),
+    }),
+    docs: Object.freeze({
+      overview:
                 "RiseupAsiaMacroExt.Projects.RiseupMacroSdk — Self-registered SDK namespace exposing the same surface as user-project namespaces, backed directly by window.marco.*",
-        }),
-    });
+    }),
+  });
 
-    root.Projects[SDK_CODE_NAME] = ns;
-    console.log("[marco-sdk] Registered RiseupAsiaMacroExt.Projects.RiseupMacroSdk");
+  root.Projects[SDK_CODE_NAME] = ns;
+  console.log("[marco-sdk] Registered RiseupAsiaMacroExt.Projects.RiseupMacroSdk");
 }

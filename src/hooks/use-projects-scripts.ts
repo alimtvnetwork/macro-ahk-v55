@@ -148,7 +148,9 @@ export function useScripts() {
   }, [refresh]);
 
   const ensureLoaded = useCallback(async () => {
-    if (!hasFetched) await refresh();
+    if (!hasFetched) {
+      await refresh();
+    }
   }, [hasFetched, refresh]);
 
   useEffect(() => {
@@ -188,7 +190,9 @@ export function useConfigs() {
   }, [refresh]);
 
   const ensureLoaded = useCallback(async () => {
-    if (!hasFetched) await refresh();
+    if (!hasFetched) {
+      await refresh();
+    }
   }, [hasFetched, refresh]);
 
   useEffect(() => {

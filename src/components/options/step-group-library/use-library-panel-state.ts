@@ -18,24 +18,24 @@ import { useEffect, useRef, useState } from "react";
 
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
 import {
-    decodeNullableNumber,
-    decodeNumberSet,
-    usePersistedState,
+  decodeNullableNumber,
+  decodeNumberSet,
+  usePersistedState,
 } from "@/hooks/use-persisted-state";
 import { useRecorderSelection } from "@/hooks/use-recorder-selection";
 import {
-    readAllStepWaits,
-    type WaitConfig,
+  readAllStepWaits,
+  type WaitConfig,
 } from "@/background/recorder/step-library/step-wait";
 
 import type {
-    CreateDialogState,
-    RenameDialogState,
-    GroupTargetDialogState,
-    StepEditorDialogState,
-    DeleteStepDialogState,
-    WaitDialogState,
-    RunGroupDialogState,
+  CreateDialogState,
+  RenameDialogState,
+  GroupTargetDialogState,
+  StepEditorDialogState,
+  DeleteStepDialogState,
+  WaitDialogState,
+  RunGroupDialogState,
 } from "./dialog-state";
 
 interface UseLibraryPanelStateArgs {
@@ -43,116 +43,119 @@ interface UseLibraryPanelStateArgs {
 }
 
 export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
-    const projectKey = args.projectRow?.ProjectId ?? "__noproject__";
+  const projectKey = args.projectRow?.ProjectId ?? "__noproject__";
 
-    // Selection ---------------------------------------------------------
-    const [selected, setSelected] = useState<Set<number>>(new Set());
-    const [selectionOrder, setSelectionOrder] = useState<ReadonlyArray<number>>([]);
+  // Selection ---------------------------------------------------------
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selectionOrder, setSelectionOrder] = useState<ReadonlyArray<number>>([]);
 
-    // Persisted per-project ---------------------------------------------
-    const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
-        `marco.library.activeGroup.${projectKey}`,
-        null,
-        decodeNullableNumber,
-    );
-    const [expanded, setExpanded] = usePersistedState<Set<number>>(
-        `marco.library.expanded.${projectKey}`,
-        new Set(),
-        decodeNumberSet,
-    );
+  // Persisted per-project ---------------------------------------------
+  const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
+    `marco.library.activeGroup.${projectKey}`,
+    null,
+    decodeNullableNumber,
+  );
+  const [expanded, setExpanded] = usePersistedState<Set<number>>(
+    `marco.library.expanded.${projectKey}`,
+    new Set(),
+    decodeNumberSet,
+  );
 
-    // Bi-directional selection sync with in-page controller --------------
-    const recorderSel = useRecorderSelection("options");
-    useEffect(() => {
-        recorderSel.select({ StepGroupId: activeGroupId, StepId: null });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeGroupId]);
-    useEffect(() => {
-        if (recorderSel.selection.StepGroupId === activeGroupId) return;
-        setActiveGroupId(recorderSel.selection.StepGroupId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [recorderSel.selection.StepGroupId]);
+  // Bi-directional selection sync with in-page controller --------------
+  const recorderSel = useRecorderSelection("options");
+  useEffect(() => {
+    recorderSel.select({ StepGroupId: activeGroupId, StepId: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGroupId]);
+  useEffect(() => {
+    if (recorderSel.selection.StepGroupId === activeGroupId) {
+      return;
+    }
 
-    // Toolbar toggles + top-level dialogs -------------------------------
-    const [showArchived, setShowArchived] = useState(false);
-    const [batchOpen, setBatchOpen] = useState(false);
-    const [runGroupDialog, setRunGroupDialog] = useState<RunGroupDialogState>({
-        open: false, group: null,
-    });
-    const [batchRenameOpen, setBatchRenameOpen] = useState(false);
-    const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
-    const [webhookOpen, setWebhookOpen] = useState(false);
-    const [inputSourceOpen, setInputSourceOpen] = useState(false);
-    const [waitDialog, setWaitDialog] = useState<WaitDialogState>({
-        open: false, stepId: null, stepLabel: null,
-    });
+    setActiveGroupId(recorderSel.selection.StepGroupId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recorderSel.selection.StepGroupId]);
 
-    // Step wait snapshot -------------------------------------------------
-    const [stepWaits, setStepWaits] = useState<ReadonlyMap<number, WaitConfig>>(
-        () => readAllStepWaits(),
-    );
-    const refreshStepWaits = () => setStepWaits(readAllStepWaits());
+  // Toolbar toggles + top-level dialogs -------------------------------
+  const [showArchived, setShowArchived] = useState(false);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [runGroupDialog, setRunGroupDialog] = useState<RunGroupDialogState>({
+    open: false, group: null,
+  });
+  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+  const [webhookOpen, setWebhookOpen] = useState(false);
+  const [inputSourceOpen, setInputSourceOpen] = useState(false);
+  const [waitDialog, setWaitDialog] = useState<WaitDialogState>({
+    open: false, stepId: null, stepLabel: null,
+  });
 
-    // Hover + tree dialogs ----------------------------------------------
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
-    const [createDialog, setCreateDialog] = useState<CreateDialogState>({
-        open: false, parent: null, name: "",
-    });
-    const [renameDialog, setRenameDialog] = useState<RenameDialogState>({
-        open: false, group: null, name: "",
-    });
-    const [deleteDialog, setDeleteDialog] = useState<GroupTargetDialogState>({
-        open: false, group: null,
-    });
-    const [inputsDialog, setInputsDialog] = useState<GroupTargetDialogState>({
-        open: false, group: null,
-    });
-    const [csvDialog, setCsvDialog] = useState<GroupTargetDialogState>({
-        open: false, group: null,
-    });
-    const [stepEditor, setStepEditor] = useState<StepEditorDialogState>({
-        open: false, mode: null,
-    });
-    const [deleteStepDialog, setDeleteStepDialog] = useState<DeleteStepDialogState>({
-        open: false, step: null,
-    });
+  // Step wait snapshot -------------------------------------------------
+  const [stepWaits, setStepWaits] = useState<ReadonlyMap<number, WaitConfig>>(
+    () => readAllStepWaits(),
+  );
+  const refreshStepWaits = () => setStepWaits(readAllStepWaits());
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  // Hover + tree dialogs ----------------------------------------------
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [createDialog, setCreateDialog] = useState<CreateDialogState>({
+    open: false, parent: null, name: "",
+  });
+  const [renameDialog, setRenameDialog] = useState<RenameDialogState>({
+    open: false, group: null, name: "",
+  });
+  const [deleteDialog, setDeleteDialog] = useState<GroupTargetDialogState>({
+    open: false, group: null,
+  });
+  const [inputsDialog, setInputsDialog] = useState<GroupTargetDialogState>({
+    open: false, group: null,
+  });
+  const [csvDialog, setCsvDialog] = useState<GroupTargetDialogState>({
+    open: false, group: null,
+  });
+  const [stepEditor, setStepEditor] = useState<StepEditorDialogState>({
+    open: false, mode: null,
+  });
+  const [deleteStepDialog, setDeleteStepDialog] = useState<DeleteStepDialogState>({
+    open: false, step: null,
+  });
 
-    // Optimistic reorder overrides --------------------------------------
-    const [pendingGroupOrder, setPendingGroupOrder] = useState<
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Optimistic reorder overrides --------------------------------------
+  const [pendingGroupOrder, setPendingGroupOrder] = useState<
         ReadonlyMap<number | "root", ReadonlyArray<number>>
     >(() => new Map());
-    const [pendingStepOrder, setPendingStepOrder] = useState<
+  const [pendingStepOrder, setPendingStepOrder] = useState<
         ReadonlyMap<number, ReadonlyArray<number>>
     >(() => new Map());
 
-    return {
-        selected, setSelected,
-        selectionOrder, setSelectionOrder,
-        activeGroupId, setActiveGroupId,
-        expanded, setExpanded,
-        showArchived, setShowArchived,
-        batchOpen, setBatchOpen,
-        runGroupDialog, setRunGroupDialog,
-        batchRenameOpen, setBatchRenameOpen,
-        batchDeleteOpen, setBatchDeleteOpen,
-        webhookOpen, setWebhookOpen,
-        inputSourceOpen, setInputSourceOpen,
-        waitDialog, setWaitDialog,
-        stepWaits, refreshStepWaits,
-        hoveredId, setHoveredId,
-        createDialog, setCreateDialog,
-        renameDialog, setRenameDialog,
-        deleteDialog, setDeleteDialog,
-        inputsDialog, setInputsDialog,
-        csvDialog, setCsvDialog,
-        stepEditor, setStepEditor,
-        deleteStepDialog, setDeleteStepDialog,
-        fileInputRef,
-        pendingGroupOrder, setPendingGroupOrder,
-        pendingStepOrder, setPendingStepOrder,
-    };
+  return {
+    selected, setSelected,
+    selectionOrder, setSelectionOrder,
+    activeGroupId, setActiveGroupId,
+    expanded, setExpanded,
+    showArchived, setShowArchived,
+    batchOpen, setBatchOpen,
+    runGroupDialog, setRunGroupDialog,
+    batchRenameOpen, setBatchRenameOpen,
+    batchDeleteOpen, setBatchDeleteOpen,
+    webhookOpen, setWebhookOpen,
+    inputSourceOpen, setInputSourceOpen,
+    waitDialog, setWaitDialog,
+    stepWaits, refreshStepWaits,
+    hoveredId, setHoveredId,
+    createDialog, setCreateDialog,
+    renameDialog, setRenameDialog,
+    deleteDialog, setDeleteDialog,
+    inputsDialog, setInputsDialog,
+    csvDialog, setCsvDialog,
+    stepEditor, setStepEditor,
+    deleteStepDialog, setDeleteStepDialog,
+    fileInputRef,
+    pendingGroupOrder, setPendingGroupOrder,
+    pendingStepOrder, setPendingStepOrder,
+  };
 }
 
 /**
@@ -168,26 +171,36 @@ export function useLibraryStatePrune(deps: {
     readonly expanded: ReadonlySet<number>;
     readonly setExpanded: (next: Set<number>) => void;
 }) {
-    const {
-        libProjectReady, groupsById,
-        activeGroupId, setActiveGroupId,
-        expanded, setExpanded,
-    } = deps;
-    useEffect(() => {
-        if (!libProjectReady) return;
-        if (activeGroupId !== null && !groupsById.has(activeGroupId)) {
-            setActiveGroupId(null);
+  const {
+    libProjectReady, groupsById,
+    activeGroupId, setActiveGroupId,
+    expanded, setExpanded,
+  } = deps;
+  useEffect(() => {
+    if (!libProjectReady) {
+      return;
+    }
+
+    if (activeGroupId !== null && !groupsById.has(activeGroupId)) {
+      setActiveGroupId(null);
+    }
+
+    let needsPrune = false;
+    for (const id of expanded) {
+      if (!groupsById.has(id)) {
+        needsPrune = true; break; 
+      }
+    }
+
+    if (needsPrune) {
+      const next = new Set<number>();
+      for (const id of expanded) {
+        if (groupsById.has(id)) {
+          next.add(id);
         }
-        let needsPrune = false;
-        for (const id of expanded) {
-            if (!groupsById.has(id)) { needsPrune = true; break; }
-        }
-        if (needsPrune) {
-            const next = new Set<number>();
-            for (const id of expanded) {
-                if (groupsById.has(id)) next.add(id);
-            }
-            setExpanded(next);
-        }
-    }, [libProjectReady, groupsById, activeGroupId, expanded, setActiveGroupId, setExpanded]);
+      }
+
+      setExpanded(next);
+    }
+  }, [libProjectReady, groupsById, activeGroupId, expanded, setActiveGroupId, setExpanded]);
 }

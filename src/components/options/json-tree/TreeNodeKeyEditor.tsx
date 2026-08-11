@@ -32,10 +32,14 @@ export function TreeNodeKeyEditor({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const isEnter = e.key === "Enter";
-    if (isEnter) handleCommit();
+    if (isEnter) {
+      handleCommit();
+    }
 
     const isEscape = e.key === "Escape";
-    if (isEscape) onCancelRename();
+    if (isEscape) {
+      onCancelRename();
+    }
   };
 
   if (isRenamingKey) {

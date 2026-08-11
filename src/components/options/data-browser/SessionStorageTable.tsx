@@ -30,7 +30,10 @@ export function SessionStorageTable({ entries, loading, onRefresh, searchTerm = 
   const effectiveSearch = searchTerm || localSearch;
 
   const filtered = useMemo(() => {
-    if (!effectiveSearch.trim()) return entries;
+    if (!effectiveSearch.trim()) {
+      return entries;
+    }
+
     const q = effectiveSearch.toLowerCase();
 
     return entries.filter(
@@ -128,8 +131,13 @@ export function SessionStorageTable({ entries, loading, onRefresh, searchTerm = 
 }
 
 function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
 
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

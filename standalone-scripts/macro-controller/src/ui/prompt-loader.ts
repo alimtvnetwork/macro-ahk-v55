@@ -70,20 +70,40 @@ class PromptLoaderState {
   private _renderDropdownFn: ((ctx: PromptContext, deps: TaskNextDeps) => void) | null = null;
   private _pendingCallbacks: Array<(prompts: PromptEntry[] | null) => void> = [];
 
-  get loadedJsonPrompts(): PromptEntry[] | null { return this._loadedJsonPrompts; }
-  set loadedJsonPrompts(value: PromptEntry[] | null) { this._loadedJsonPrompts = value; }
+  get loadedJsonPrompts(): PromptEntry[] | null {
+    return this._loadedJsonPrompts; 
+  }
+  set loadedJsonPrompts(value: PromptEntry[] | null) {
+    this._loadedJsonPrompts = value; 
+  }
 
-  get jsonPromptsLoading(): boolean { return this._jsonPromptsLoading; }
-  set jsonPromptsLoading(value: boolean) { this._jsonPromptsLoading = value; }
+  get jsonPromptsLoading(): boolean {
+    return this._jsonPromptsLoading; 
+  }
+  set jsonPromptsLoading(value: boolean) {
+    this._jsonPromptsLoading = value; 
+  }
 
-  get promptCategoryFilter(): string | null { return this._promptCategoryFilter; }
-  set promptCategoryFilter(value: string | null) { this._promptCategoryFilter = value; }
+  get promptCategoryFilter(): string | null {
+    return this._promptCategoryFilter; 
+  }
+  set promptCategoryFilter(value: string | null) {
+    this._promptCategoryFilter = value; 
+  }
 
-  get revalidateCtx(): { ctx: PromptContext; taskNextDeps: TaskNextDeps } | null { return this._revalidateCtx; }
-  set revalidateCtx(value: { ctx: PromptContext; taskNextDeps: TaskNextDeps } | null) { this._revalidateCtx = value; }
+  get revalidateCtx(): { ctx: PromptContext; taskNextDeps: TaskNextDeps } | null {
+    return this._revalidateCtx; 
+  }
+  set revalidateCtx(value: { ctx: PromptContext; taskNextDeps: TaskNextDeps } | null) {
+    this._revalidateCtx = value; 
+  }
 
-  get renderDropdownFn(): ((ctx: PromptContext, deps: TaskNextDeps) => void) | null { return this._renderDropdownFn; }
-  set renderDropdownFn(value: ((ctx: PromptContext, deps: TaskNextDeps) => void) | null) { this._renderDropdownFn = value; }
+  get renderDropdownFn(): ((ctx: PromptContext, deps: TaskNextDeps) => void) | null {
+    return this._renderDropdownFn; 
+  }
+  set renderDropdownFn(value: ((ctx: PromptContext, deps: TaskNextDeps) => void) | null) {
+    this._renderDropdownFn = value; 
+  }
 
   enqueuePendingCallback(callback: (prompts: PromptEntry[] | null) => void): void {
     this._pendingCallbacks.push(callback);
@@ -107,7 +127,10 @@ const promptLoaderState = new PromptLoaderState();
 
 /** @deprecated Use promptLoaderState.promptCategoryFilter directly. */
 export const _promptCategoryFilter: string | null = null;
-export function getPromptCategoryFilter(): string | null { return promptLoaderState.promptCategoryFilter; }
+export function getPromptCategoryFilter(): string | null {
+  return promptLoaderState.promptCategoryFilter; 
+}
+
 export function setPromptCategoryFilter(value: string | null): void {
   promptLoaderState.promptCategoryFilter = value;
 }
@@ -115,14 +138,23 @@ export function setPromptCategoryFilter(value: string | null): void {
 // ── Multi-select category filter (new — used by Filter button menu) ──
 const promptCategoryFilterSet: Set<string> = new Set<string>();
 /** Read current multi-select category filter (lowercased values). */
-export function getPromptCategoryFilterSet(): Set<string> { return promptCategoryFilterSet; }
+export function getPromptCategoryFilterSet(): Set<string> {
+  return promptCategoryFilterSet; 
+}
+
 /** Toggle one category in the filter set. */
 export function togglePromptCategoryFilter(catLower: string): void {
-  if (promptCategoryFilterSet.has(catLower)) promptCategoryFilterSet.delete(catLower);
-  else promptCategoryFilterSet.add(catLower);
+  if (promptCategoryFilterSet.has(catLower)) {
+    promptCategoryFilterSet.delete(catLower);
+  } else {
+    promptCategoryFilterSet.add(catLower);
+  }
 }
+
 /** Remove every category from the filter set. */
-export function clearPromptCategoryFilterSet(): void { promptCategoryFilterSet.clear(); }
+export function clearPromptCategoryFilterSet(): void {
+  promptCategoryFilterSet.clear(); 
+}
 
 /** Invalidate prompt cache (e.g. after save/delete) */
 export function invalidatePromptCache(): void {
@@ -130,8 +162,11 @@ export function invalidatePromptCache(): void {
   // Also invalidate SDK cache if available
   const sdk = window.marco as { prompts?: { invalidateCache(): Promise<void> } } | undefined;
   if (sdk && sdk.prompts && typeof sdk.prompts.invalidateCache === 'function') {
-    sdk.prompts.invalidateCache().catch(function(e: unknown) { log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); });
+    sdk.prompts.invalidateCache().catch(function(e: unknown) {
+      log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+    });
   }
+
   clearPromptCache().then(function() {
     log('[PromptCache] Cache cleared (invalidated)', 'info');
   });
@@ -151,7 +186,9 @@ export function clearLoadedPrompts(): void {
   // Also invalidate SDK cache
   const sdk = window.marco as { prompts?: { invalidateCache(): Promise<void> } } | undefined;
   if (sdk && sdk.prompts && typeof sdk.prompts.invalidateCache === 'function') {
-    sdk.prompts.invalidateCache().catch(function(e: unknown) { log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); });
+    sdk.prompts.invalidateCache().catch(function(e: unknown) {
+      log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+    });
   }
 }
 
@@ -172,7 +209,10 @@ export { sendToExtension };
  */
 function tryLoadByMessage(type: string): Promise<PromptEntry[] | null> {
   return sendToExtension(type, {}).then(function(response: ExtensionResponse) {
-    if (!response) return null;
+    if (!response) {
+      return null;
+    }
+
     const prompts = normalizePromptEntries((response.prompts) as Partial<PromptEntry>[]);
 
     return prompts.length > 0 ? prompts : null;
@@ -206,9 +246,15 @@ export function setRenderDropdownFn(fn: (ctx: PromptContext, deps: TaskNextDeps)
 export function rerenderPromptsDropdown(): void {
   const fn = promptLoaderState.renderDropdownFn;
   const c = promptLoaderState.revalidateCtx;
-  if (!fn || !c) return;
-  try { fn(c.ctx, c.taskNextDeps); }
-  catch (e) { logError('rerenderPromptsDropdown', 'Re-render failed', e); }
+  if (!fn || !c) {
+    return;
+  }
+
+  try {
+    fn(c.ctx, c.taskNextDeps); 
+  } catch (e) {
+    logError('rerenderPromptsDropdown', 'Re-render failed', e); 
+  }
 }
 
 // CQ16: Extracted from loadPromptsFromJson legacy path closure
@@ -227,6 +273,7 @@ function finishLegacyLoad(
 
     return promptLoaderState.loadedJsonPrompts;
   }
+
   promptLoaderState.flushPendingCallbacks(null);
 
   return null;
@@ -245,6 +292,7 @@ function handleSdkSuccess(entries: unknown[], loadStartMs: number): PromptEntry[
 
     return prompts;
   }
+
   log('[PromptLoad] ⚠️ SDK returned empty, falling back to defaults (' + elapsed + 'ms)', 'warn');
   const defaults = loadFallbackPromptEntries();
   promptLoaderState.loadedJsonPrompts = defaults;
@@ -272,11 +320,16 @@ function loadViaSdk(sdkPrompts: { getAll(): Promise<unknown[]> }, loadStartMs: n
 
     return Promise.resolve(promptLoaderState.loadedJsonPrompts);
   }
+
   log('[PromptLoad] Fetching via SDK marco.prompts.getAll()...', 'info');
 
   return sdkPrompts.getAll()
-    .then(function(entries: unknown[]) { return handleSdkSuccess(entries, loadStartMs); })
-    .catch(function(e: unknown) { return handleSdkFailure(e, loadStartMs); });
+    .then(function(entries: unknown[]) {
+      return handleSdkSuccess(entries, loadStartMs); 
+    })
+    .catch(function(e: unknown) {
+      return handleSdkFailure(e, loadStartMs); 
+    });
 }
 
 export function loadPromptsFromJson(): Promise<PromptEntry[] | null> {
@@ -296,11 +349,13 @@ export function loadPromptsFromJson(): Promise<PromptEntry[] | null> {
 
     return Promise.resolve(promptLoaderState.loadedJsonPrompts);
   }
+
   if (promptLoaderState.jsonPromptsLoading) {
     return new Promise<PromptEntry[] | null>(function(resolve) {
       promptLoaderState.enqueuePendingCallback(resolve);
     });
   }
+
   promptLoaderState.jsonPromptsLoading = true;
 
   // 2. Try IndexedDB cache first (instant) — no SWR, no background revalidation
@@ -370,8 +425,12 @@ export function forceLoadFromDb(): Promise<PromptEntry[] | null> {
   promptLoaderState.jsonPromptsLoading = false;
 
   return clearPromptCache()
-    .then(function() { return clearUISnapshot(); })
-    .then(function() { return tryLoadByMessage('GET_PROMPTS'); })
+    .then(function() {
+      return clearUISnapshot(); 
+    })
+    .then(function() {
+      return tryLoadByMessage('GET_PROMPTS'); 
+    })
     .then(function(prompts: PromptEntry[] | null) {
       return handleForceLoadResult(prompts);
     });
@@ -422,6 +481,7 @@ export function getPromptsConfig(): ResolvedPromptsConfig {
         seen[key] = true;
       }
     }
+
     entries = merged;
   }
 
@@ -446,7 +506,9 @@ export function getSuggestedPrompts(allEntries: PromptEntry[]): PromptEntry[] {
   }
 
   return allEntries.filter(p => {
-    if (!p.tags || p.tags.length === 0) return false;
+    if (!p.tags || p.tags.length === 0) {
+      return false;
+    }
 
     return p.tags.some((t: string) => currentTags.includes(t.toLowerCase()));
   }).slice(0, 5);

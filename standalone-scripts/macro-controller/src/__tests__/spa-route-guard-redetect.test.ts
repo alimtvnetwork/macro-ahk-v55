@@ -58,7 +58,9 @@ describe('spa-route-guard — workspace re-detection on project switch', () => {
   });
 
   afterEach(() => {
-    if (teardown) teardown();
+    if (teardown) {
+      teardown();
+    }
   });
 
   it('does NOT re-detect when same project URL changes (no project switch)', async () => {

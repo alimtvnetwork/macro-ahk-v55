@@ -109,13 +109,15 @@ export interface UpdateCheckResult {
 let dbManager: DbManager | null = null;
 
 export function bindUpdaterDbManager(manager: DbManager): void {
-    dbManager = manager;
+  dbManager = manager;
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[updater] DbManager not bound");
+  if (!dbManager) {
+    throw new Error("[updater] DbManager not bound");
+  }
 
-    return dbManager.getLogsDb();
+  return dbManager.getLogsDb();
 }
 
 /* ------------------------------------------------------------------ */
@@ -124,26 +126,27 @@ function getDb(): SqlJsDatabase {
 
 /** List all updater entries via the UpdaterDetails view. */
 export function handleListUpdaters(): UpdaterEntry[] {
-    const db = getDb();
-    const stmt = db.prepare("SELECT * FROM UpdaterDetails ORDER BY Name");
-    const rows: UpdaterEntry[] = [];
-    while (stmt.step()) {
-        rows.push(stmt.getAsObject() as UpdaterEntry);
-    }
-    stmt.free();
+  const db = getDb();
+  const stmt = db.prepare("SELECT * FROM UpdaterDetails ORDER BY Name");
+  const rows: UpdaterEntry[] = [];
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject() as UpdaterEntry);
+  }
 
-    return rows;
+  stmt.free();
+
+  return rows;
 }
 
 /** Get a single updater by ID. */
 export function handleGetUpdater(updaterId: number): UpdaterEntry | null {
-    const db = getDb();
-    const stmt = db.prepare("SELECT * FROM UpdaterDetails WHERE UpdaterId = ?");
-    stmt.bind([updaterId]);
-    const row = stmt.step() ? (stmt.getAsObject() as UpdaterEntry) : null;
-    stmt.free();
+  const db = getDb();
+  const stmt = db.prepare("SELECT * FROM UpdaterDetails WHERE UpdaterId = ?");
+  stmt.bind([updaterId]);
+  const row = stmt.step() ? (stmt.getAsObject() as UpdaterEntry) : null;
+  stmt.free();
 
-    return row;
+  return row;
 }
 
 /* ------------------------------------------------------------------ */
@@ -165,40 +168,45 @@ export function handleCreateUpdater(data: {
     autoCheckIntervalMinutes?: number;
     cacheExpiryMinutes?: number;
 }): number {
-    const name = requireField(data?.name);
-    const scriptUrl = requireField(data?.scriptUrl);
-    if (name === null) throw new Error("[updater] CREATE_UPDATER missing required field: name");
-    if (scriptUrl === null) throw new Error("[updater] CREATE_UPDATER missing required field: scriptUrl");
+  const name = requireField(data?.name);
+  const scriptUrl = requireField(data?.scriptUrl);
+  if (name === null) {
+    throw new Error("[updater] CREATE_UPDATER missing required field: name");
+  }
 
-    const db = getDb();
-    const now = new Date().toISOString();
-    db.run(
-        `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
+  if (scriptUrl === null) {
+    throw new Error("[updater] CREATE_UPDATER missing required field: scriptUrl");
+  }
+
+  const db = getDb();
+  const now = new Date().toISOString();
+  db.run(
+    `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-            name,
-            scriptUrl,
-            bindOpt(data.versionInfoUrl),
-            bindOpt(data.instructionUrl),
-            bindOpt(data.changelogUrl),
-            data.isGit ? 1 : 0,
-            data.isRedirectable !== false ? 1 : 0,
-            data.maxRedirectDepth ?? 2,
-            data.instructionUrl ? 1 : 0,
-            data.hasChangelogFromVersionInfo !== false ? 1 : 0,
-            data.hasUserConfirmBeforeUpdate ? 1 : 0,
-            data.autoCheckIntervalMinutes ?? 1440,
-            data.cacheExpiryMinutes ?? 10080,
-            now,
-            now,
-        ],
-    );
+    [
+      name,
+      scriptUrl,
+      bindOpt(data.versionInfoUrl),
+      bindOpt(data.instructionUrl),
+      bindOpt(data.changelogUrl),
+      data.isGit ? 1 : 0,
+      data.isRedirectable !== false ? 1 : 0,
+      data.maxRedirectDepth ?? 2,
+      data.instructionUrl ? 1 : 0,
+      data.hasChangelogFromVersionInfo !== false ? 1 : 0,
+      data.hasUserConfirmBeforeUpdate ? 1 : 0,
+      data.autoCheckIntervalMinutes ?? 1440,
+      data.cacheExpiryMinutes ?? 10080,
+      now,
+      now,
+    ],
+  );
 
-    const result = db.exec("SELECT last_insert_rowid() AS Id");
-    const newId = result[0]?.values[0]?.[0] as number;
-    dbManager?.markDirty();
+  const result = db.exec("SELECT last_insert_rowid() AS Id");
+  const newId = result[0]?.values[0]?.[0] as number;
+  dbManager?.markDirty();
 
-    return newId;
+  return newId;
 }
 
 /* ------------------------------------------------------------------ */
@@ -206,9 +214,9 @@ export function handleCreateUpdater(data: {
 /* ------------------------------------------------------------------ */
 
 export function handleDeleteUpdater(updaterId: number): void {
-    const db = getDb();
-    db.run("DELETE FROM UpdaterInfo WHERE Id = ?", [updaterId]);
-    dbManager?.markDirty();
+  const db = getDb();
+  db.run("DELETE FROM UpdaterInfo WHERE Id = ?", [updaterId]);
+  dbManager?.markDirty();
 }
 
 /* ------------------------------------------------------------------ */
@@ -220,46 +228,46 @@ export function handleDeleteUpdater(updaterId: number): void {
  * and update the local record.
  */
 export async function handleCheckForUpdate(updaterId: number): Promise<UpdateCheckResult> {
-    const entry = handleGetUpdater(updaterId);
-    if (!entry) {
-        return { updaterId, name: "Unknown", currentVersion: null, latestVersion: null, hasUpdate: false, errorMessage: "Updater not found" };
-    }
+  const entry = handleGetUpdater(updaterId);
+  if (!entry) {
+    return { updaterId, name: "Unknown", currentVersion: null, latestVersion: null, hasUpdate: false, errorMessage: "Updater not found" };
+  }
 
-    if (!entry.VersionInfoUrl) {
-        return { updaterId, name: entry.Name, currentVersion: entry.CurrentVersion, latestVersion: null, hasUpdate: false, errorMessage: "No VersionInfoUrl configured" };
-    }
+  if (!entry.VersionInfoUrl) {
+    return { updaterId, name: entry.Name, currentVersion: entry.CurrentVersion, latestVersion: null, hasUpdate: false, errorMessage: "No VersionInfoUrl configured" };
+  }
 
-    try {
-        const versionInfo = await fetchVersionInfo(entry.VersionInfoUrl, entry.IsRedirectable === 1, entry.MaxRedirectDepth);
-        const now = new Date().toISOString();
+  try {
+    const versionInfo = await fetchVersionInfo(entry.VersionInfoUrl, entry.IsRedirectable === 1, entry.MaxRedirectDepth);
+    const now = new Date().toISOString();
 
-        // Update local record
-        const db = getDb();
-        db.run(
-            "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
-            [versionInfo.Version, now, now, updaterId],
-        );
-        dbManager?.markDirty();
+    // Update local record
+    const db = getDb();
+    db.run(
+      "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
+      [versionInfo.Version, now, now, updaterId],
+    );
+    dbManager?.markDirty();
 
-        const hasUpdate = entry.CurrentVersion !== versionInfo.Version;
+    const hasUpdate = entry.CurrentVersion !== versionInfo.Version;
 
-        return {
-            updaterId,
-            name: entry.Name,
-            currentVersion: entry.CurrentVersion,
-            latestVersion: versionInfo.Version,
-            hasUpdate,
-        };
-    } catch (err) {
-        return {
-            updaterId,
-            name: entry.Name,
-            currentVersion: entry.CurrentVersion,
-            latestVersion: null,
-            hasUpdate: false,
-            errorMessage: err instanceof Error ? err.message : "Fetch failed",
-        };
-    }
+    return {
+      updaterId,
+      name: entry.Name,
+      currentVersion: entry.CurrentVersion,
+      latestVersion: versionInfo.Version,
+      hasUpdate,
+    };
+  } catch (err) {
+    return {
+      updaterId,
+      name: entry.Name,
+      currentVersion: entry.CurrentVersion,
+      latestVersion: null,
+      hasUpdate: false,
+      errorMessage: err instanceof Error ? err.message : "Fetch failed",
+    };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -267,59 +275,59 @@ export async function handleCheckForUpdate(updaterId: number): Promise<UpdateChe
 /* ------------------------------------------------------------------ */
 
 async function fetchVersionInfo(
-    url: string,
-    isRedirectable: boolean,
-    maxRedirectDepth: number,
+  url: string,
+  isRedirectable: boolean,
+  maxRedirectDepth: number,
 ): Promise<VersionInfoResponse> {
-    const response = ServiceResult.wrapFetch(await fetch(url, {
-        redirect: isRedirectable ? "follow" : "error",
-        signal: AbortSignal.timeout(10_000),
-    }));
+  const response = ServiceResult.wrapFetch(await fetch(url, {
+    redirect: isRedirectable ? "follow" : "error",
+    signal: AbortSignal.timeout(10_000),
+  }));
 
-    if (response.isFail) {
-        // HEFF: single attempt, no retry.
-        throw new Error(
-            `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
+  if (response.isFail) {
+    // HEFF: single attempt, no retry.
+    throw new Error(
+      `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
             `Loop halted. Awaiting user instruction.`,
-        );
-    }
+    );
+  }
 
-    const json = await response.json() as VersionInfoResponse;
+  const json = await response.json() as VersionInfoResponse;
 
-    if (!json.Version || typeof json.Version !== "string") {
-        throw new Error("Invalid VersionInfoSchema: missing Version field");
-    }
+  if (!json.Version || typeof json.Version !== "string") {
+    throw new Error("Invalid VersionInfoSchema: missing Version field");
+  }
 
-    return json;
+  return json;
 }
 
 /**
  * Fetch InstructionSchema from a URL.
  */
 export async function fetchInstructions(
-    url: string,
-    isRedirectable: boolean,
+  url: string,
+  isRedirectable: boolean,
 ): Promise<InstructionResponse> {
-    const response = ServiceResult.wrapFetch(await fetch(url, {
-        redirect: isRedirectable ? "follow" : "error",
-        signal: AbortSignal.timeout(15_000),
-    }));
+  const response = ServiceResult.wrapFetch(await fetch(url, {
+    redirect: isRedirectable ? "follow" : "error",
+    signal: AbortSignal.timeout(15_000),
+  }));
 
-    if (response.isFail) {
-        // HEFF: single attempt, no retry.
-        throw new Error(
-            `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +
+  if (response.isFail) {
+    // HEFF: single attempt, no retry.
+    throw new Error(
+      `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +
             `Loop halted. Awaiting user instruction.`,
-        );
-    }
+    );
+  }
 
-    const json = await response.json() as InstructionResponse;
+  const json = await response.json() as InstructionResponse;
 
-    if (!json.Steps || !Array.isArray(json.Steps)) {
-        throw new Error("Invalid InstructionSchema: missing Steps array");
-    }
+  if (!json.Steps || !Array.isArray(json.Steps)) {
+    throw new Error("Invalid InstructionSchema: missing Steps array");
+  }
 
-    return json;
+  return json;
 }
 
 /* ------------------------------------------------------------------ */
@@ -328,37 +336,39 @@ export async function fetchInstructions(
 
 /** Ensure a category exists, return its ID. */
 export function ensureUpdaterCategory(name: string): number {
-    const trimmed = requireField(name);
-    if (trimmed === null) throw new Error("[updater] ensureUpdaterCategory called with empty name");
+  const trimmed = requireField(name);
+  if (trimmed === null) {
+    throw new Error("[updater] ensureUpdaterCategory called with empty name");
+  }
 
-    const db = getDb();
+  const db = getDb();
 
-    const existing = db.exec("SELECT Id FROM UpdaterCategory WHERE Name = ?", [trimmed]);
-    if (existing.length > 0 && existing[0].values.length > 0) {
-        return existing[0].values[0][0] as number;
-    }
+  const existing = db.exec("SELECT Id FROM UpdaterCategory WHERE Name = ?", [trimmed]);
+  if (existing.length > 0 && existing[0].values.length > 0) {
+    return existing[0].values[0][0] as number;
+  }
 
-    db.run("INSERT INTO UpdaterCategory (Name, CreatedAt) VALUES (?, datetime('now'))", [trimmed]);
-    const result = db.exec("SELECT last_insert_rowid() AS Id");
-    dbManager?.markDirty();
+  db.run("INSERT INTO UpdaterCategory (Name, CreatedAt) VALUES (?, datetime('now'))", [trimmed]);
+  const result = db.exec("SELECT last_insert_rowid() AS Id");
+  dbManager?.markDirty();
 
-    return result[0]?.values[0]?.[0] as number;
+  return result[0]?.values[0]?.[0] as number;
 }
 
 /** Link an updater to a category. */
 export function linkUpdaterToCategory(updaterId: number, categoryName: string): void {
-    const categoryId = ensureUpdaterCategory(categoryName);
-    const db = getDb();
+  const categoryId = ensureUpdaterCategory(categoryName);
+  const db = getDb();
 
-    try {
-        db.run(
-            "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
-            [updaterId, categoryId],
-        );
-        dbManager?.markDirty();
-    } catch (err) {
+  try {
+    db.run(
+      "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
+      [updaterId, categoryId],
+    );
+    dbManager?.markDirty();
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -375,18 +385,18 @@ export interface GlobalUpdateSettings {
 
 /** Get the global update settings (first row). */
 export function handleGetUpdateSettings(): GlobalUpdateSettings {
-    const db = getDb();
-    const stmt = db.prepare("SELECT * FROM UpdateSettings LIMIT 1");
-    const row = stmt.step() ? (stmt.getAsObject() as GlobalUpdateSettings) : null;
-    stmt.free();
+  const db = getDb();
+  const stmt = db.prepare("SELECT * FROM UpdateSettings LIMIT 1");
+  const row = stmt.step() ? (stmt.getAsObject() as GlobalUpdateSettings) : null;
+  stmt.free();
 
-    return row ?? {
-        Id: 0,
-        AutoCheckIntervalMinutes: 1440,
-        HasUserConfirmBeforeUpdate: 0,
-        HasChangelogFromVersionInfo: 1,
-        CacheExpiryMinutes: 10080,
-    };
+  return row ?? {
+    Id: 0,
+    AutoCheckIntervalMinutes: 1440,
+    HasUserConfirmBeforeUpdate: 0,
+    HasChangelogFromVersionInfo: 1,
+    CacheExpiryMinutes: 10080,
+  };
 }
 
 /** Update global update settings. */
@@ -396,21 +406,22 @@ export function handleSaveUpdateSettings(data: {
     hasChangelogFromVersionInfo: boolean;
     cacheExpiryMinutes: number;
 }): void {
-    const db = getDb();
-    const now = new Date().toISOString();
-    const existing = db.exec("SELECT COUNT(*) FROM UpdateSettings");
-    const count = existing.length > 0 ? (existing[0].values[0][0] as number) : 0;
+  const db = getDb();
+  const now = new Date().toISOString();
+  const existing = db.exec("SELECT COUNT(*) FROM UpdateSettings");
+  const count = existing.length > 0 ? (existing[0].values[0][0] as number) : 0;
 
-    if (count === 0) {
-        db.run(
-            "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
-            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
-        );
-    } else {
-        db.run(
-            "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
-            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
-        );
-    }
-    dbManager?.markDirty();
+  if (count === 0) {
+    db.run(
+      "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
+      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
+    );
+  } else {
+    db.run(
+      "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
+      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
+    );
+  }
+
+  dbManager?.markDirty();
 }

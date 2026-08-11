@@ -86,6 +86,6 @@ interface GlobalWithChrome {
 
 /** Returns globalThis.chrome typed as ChromeRef. */
 export function getChromeRef(): ChromeRef {
-    // Double-cast necessary: globalThis shape doesn't overlap with ChromeRef
-    return (globalThis as unknown as GlobalWithChrome).chrome;
+  // Double-cast necessary: globalThis shape doesn't overlap with ChromeRef
+  return (globalThis as unknown as GlobalWithChrome).chrome;
 }

@@ -29,7 +29,11 @@ export function renderFilterMenu(
   for (const cat of categories) {
     sub.appendChild(buildCategoryRow(cat, ctx, taskNextDeps, rerender));
   }
-  if (categories.length === 0) appendEmpty(sub);
+
+  if (categories.length === 0) {
+    appendEmpty(sub);
+  }
+
   container.appendChild(item);
 }
 
@@ -63,15 +67,24 @@ function wireToggle(row: HTMLElement, arrow: HTMLElement, sub: HTMLElement, drop
     sub.style.display = 'block';
     keepInView(dropdown, sub);
   };
+
   const hide = function(): void {
     row.style.background = 'transparent';
     arrow.textContent = '▸';
     sub.style.display = 'none';
   };
+
   row.onclick = function(e: Event) {
     e.stopPropagation();
-    if (count === 0) return;
-    if (sub.style.display === 'none') show(); else hide();
+    if (count === 0) {
+      return;
+    }
+
+    if (sub.style.display === 'none') {
+      show();
+    } else {
+      hide();
+    }
   };
 }
 
@@ -79,7 +92,9 @@ function keepInView(dropdown: HTMLElement, sub: HTMLElement): void {
   window.requestAnimationFrame(function() {
     const dr = dropdown.getBoundingClientRect();
     const sr = sub.getBoundingClientRect();
-    if (sr.bottom > dr.bottom) dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
+    if (sr.bottom > dr.bottom) {
+      dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
+    }
   });
 }
 
@@ -87,13 +102,20 @@ function appendClearRow(sub: HTMLElement, ctx: PromptContext, deps: TaskNextDeps
   const it = document.createElement('div');
   it.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:' + cPrimaryLight + ';border-bottom:1px solid rgba(124,58,237,0.2);';
   it.textContent = '✖ Clear all (show every category)';
-  it.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-  it.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  it.onmouseover = function() {
+    (this as HTMLElement).style.background = cBtnMenuHover; 
+  };
+
+  it.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   it.onclick = function(e: Event) {
     e.stopPropagation();
     clearPromptCategoryFilterSet();
     rerender(ctx, deps);
   };
+
   sub.appendChild(it);
 }
 
@@ -108,8 +130,14 @@ function buildCategoryRow(cat: string, ctx: PromptContext, deps: TaskNextDeps, r
   const lbl = document.createElement('span');
   lbl.textContent = cat;
   it.appendChild(lbl);
-  it.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-  it.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  it.onmouseover = function() {
+    (this as HTMLElement).style.background = cBtnMenuHover; 
+  };
+
+  it.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   it.onclick = function(e: Event) {
     e.stopPropagation();
     togglePromptCategoryFilter(cat.toLowerCase());

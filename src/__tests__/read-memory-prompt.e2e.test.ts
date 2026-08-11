@@ -60,50 +60,50 @@ const generatedPrompts = readJson<GeneratedPrompts>(GENERATED_PROMPTS);
 const EXPECTED_SLUG = 'read-memory-enhanced';
 
 const getMirrorSlug = (): string | undefined =>
-    mirrorManifest.mirrors.find((entry) => entry.canonical === '16-read-memory')?.slug;
+  mirrorManifest.mirrors.find((entry) => entry.canonical === '16-read-memory')?.slug;
 
 const getGeneratedSlug = (): string | undefined =>
-    generatedPrompts.prompts.find((entry) => entry.id === 'default-read-memory')?.slug;
+  generatedPrompts.prompts.find((entry) => entry.id === 'default-read-memory')?.slug;
 
 describe('read-memory prompt v1.7', () => {
-    it('canonical and mirror are byte-identical', () => {
-        expect(mirrorBody).toBe(canonicalBody);
-    });
+  it('canonical and mirror are byte-identical', () => {
+    expect(mirrorBody).toBe(canonicalBody);
+  });
 
-    it('info.json is marked v1.7.0 and static (no ReplaceKey)', () => {
-        expect(info.Version).toBe('1.7.0');
-        expect(info.Slug).toBe(EXPECTED_SLUG);
-        expect('ReplaceKey' in info).toBe(false);
-    });
+  it('info.json is marked v1.7.0 and static (no ReplaceKey)', () => {
+    expect(info.Version).toBe('1.7.0');
+    expect(info.Slug).toBe(EXPECTED_SLUG);
+    expect('ReplaceKey' in info).toBe(false);
+  });
 
-    it('uses the same canonical slug across metadata, mirror manifest, body, and generated prompts', () => {
-        expect(info.Slug).toBe(EXPECTED_SLUG);
-        expect(getMirrorSlug()).toBe(EXPECTED_SLUG);
-        expect(canonicalBody).toContain(`slug: ${EXPECTED_SLUG}`);
-        expect(getGeneratedSlug()).toBe(EXPECTED_SLUG);
-    });
+  it('uses the same canonical slug across metadata, mirror manifest, body, and generated prompts', () => {
+    expect(info.Slug).toBe(EXPECTED_SLUG);
+    expect(getMirrorSlug()).toBe(EXPECTED_SLUG);
+    expect(canonicalBody).toContain(`slug: ${EXPECTED_SLUG}`);
+    expect(getGeneratedSlug()).toBe(EXPECTED_SLUG);
+  });
 
-    it('body has the v1.7 anchors (ambiguity paths + Completion Confirmation)', () => {
-        expect(canonicalBody).toContain('version: 1.7');
-        expect(canonicalBody).toContain('.lovable/ambiguous-questions/01-new-ambiguity/');
-        expect(canonicalBody).toContain('.lovable/ambiguous-questions/02-ambiguity-resolved/');
-        expect(canonicalBody).toContain('## Completion Confirmation');
-        expect(canonicalBody).toContain('✅ Onboarding complete.');
-    });
+  it('body has the v1.7 anchors (ambiguity paths + Completion Confirmation)', () => {
+    expect(canonicalBody).toContain('version: 1.7');
+    expect(canonicalBody).toContain('.lovable/ambiguous-questions/01-new-ambiguity/');
+    expect(canonicalBody).toContain('.lovable/ambiguous-questions/02-ambiguity-resolved/');
+    expect(canonicalBody).toContain('## Completion Confirmation');
+    expect(canonicalBody).toContain('✅ Onboarding complete.');
+  });
 
-    it('is a STATIC prompt: no {{...}} or ${...} substitution tokens present', () => {
-        // Guards against accidental token injection. If someone adds a
-        // dynamic token here, they must also add ReplaceKey to info.json
-        // and rewire the chip; the failing assertion forces that review.
-        expect(canonicalBody).not.toMatch(/\{\{\s*[A-Za-z0-9_.:-]+\s*\}\}/);
-        expect(canonicalBody).not.toMatch(/\$\{\s*[A-Za-z0-9_.:-]+\s*\}/);
-    });
+  it('is a STATIC prompt: no {{...}} or ${...} substitution tokens present', () => {
+    // Guards against accidental token injection. If someone adds a
+    // dynamic token here, they must also add ReplaceKey to info.json
+    // and rewire the chip; the failing assertion forces that review.
+    expect(canonicalBody).not.toMatch(/\{\{\s*[A-Za-z0-9_.:-]+\s*\}\}/);
+    expect(canonicalBody).not.toMatch(/\$\{\s*[A-Za-z0-9_.:-]+\s*\}/);
+  });
 
-    it.each(['n', 'N', 'count', 'x'])(
-        'substituteToken with key %s is a no-op on a static prompt',
-        (key) => {
-            const rendered = substituteToken(canonicalBody, key, 42);
-            expect(rendered).toBe(canonicalBody);
-        },
-    );
+  it.each(['n', 'N', 'count', 'x'])(
+    'substituteToken with key %s is a no-op on a static prompt',
+    (key) => {
+      const rendered = substituteToken(canonicalBody, key, 42);
+      expect(rendered).toBe(canonicalBody);
+    },
+  );
 });

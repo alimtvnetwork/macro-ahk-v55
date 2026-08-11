@@ -37,7 +37,10 @@ class FakeDir {
   async getDirectoryHandle(name: string, opts?: { create?: boolean }): Promise<FakeDir> {
     let child = this.dirs.get(name);
     if (!child) {
-      if (!opts?.create) throw new Error(`NotFoundError: ${name}`);
+      if (!opts?.create) {
+        throw new Error(`NotFoundError: ${name}`);
+      }
+
       child = new FakeDir(name);
       this.dirs.set(name, child);
     }
@@ -48,10 +51,14 @@ class FakeDir {
   async getFileHandle(name: string, opts?: { create?: boolean }) {
     let file = this.files.get(name);
     if (!file) {
-      if (!opts?.create) throw new Error(`NotFoundError: ${name}`);
+      if (!opts?.create) {
+        throw new Error(`NotFoundError: ${name}`);
+      }
+
       file = { name, contents: '' };
       this.files.set(name, file);
     }
+
     const capture = file;
 
     return {
@@ -59,24 +66,37 @@ class FakeDir {
       name,
       getFile: async () => ({ text: async () => capture.contents }),
       createWritable: async () => ({
-        write: async (data: string) => { capture.contents = data; },
+        write: async (data: string) => {
+          capture.contents = data; 
+        },
         close: async () => { /* no-op */ },
       }),
     };
   }
 
   async removeEntry(name: string, opts?: { recursive?: boolean }): Promise<void> {
-    if (this.files.delete(name)) return;
+    if (this.files.delete(name)) {
+      return;
+    }
+
     const hadDir = this.dirs.delete(name);
-    if (!hadDir) throw new Error(`NotFoundError: ${name}`);
+    if (!hadDir) {
+      throw new Error(`NotFoundError: ${name}`);
+    }
+
     if (!opts?.recursive && (this.dirs.get(name)?.files.size ?? 0) > 0) {
       throw new Error('InvalidModificationError');
     }
   }
 
   async *[Symbol.asyncIterator](): AsyncGenerator<[string, { kind: string }]> {
-    for (const [n, f] of this.files) yield [n, { kind: 'file', name: f.name }];
-    for (const [n] of this.dirs) yield [n, { kind: 'directory' }];
+    for (const [n, f] of this.files) {
+      yield [n, { kind: 'file', name: f.name }];
+    }
+
+    for (const [n] of this.dirs) {
+      yield [n, { kind: 'directory' }];
+    }
   }
 }
 

@@ -163,7 +163,9 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
   };
 
   const handleDelete = async (entry: KvEntry) => {
-    if (!confirm(`Delete key "${entry.Key}" from namespace "${entry.Namespace}"?`)) return;
+    if (!confirm(`Delete key "${entry.Key}" from namespace "${entry.Namespace}"?`)) {
+      return;
+    }
 
     try {
       await sendMessage({
@@ -181,7 +183,9 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
   };
 
   const truncateValue = (displayValue: string | null, max = 60): string => {
-    if (!displayValue) return "—";
+    if (!displayValue) {
+      return "—";
+    }
 
     return displayValue.length > max ? displayValue.slice(0, max) + "…" : displayValue;
   };

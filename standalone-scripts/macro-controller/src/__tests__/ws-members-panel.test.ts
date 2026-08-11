@@ -34,7 +34,9 @@ import { showWsMembersPanel, hideWsMembersPanel } from '../ws-members-panel';
 const PANEL_ID = 'marco-ws-members-panel';
 
 describe('ws-members-panel dispatch', () => {
-  beforeEach(() => { vi.useFakeTimers(); document.body.innerHTML = ''; });
+  beforeEach(() => {
+    vi.useFakeTimers(); document.body.innerHTML = ''; 
+  });
   afterEach(() => {
     hideWsMembersPanel();
     vi.clearAllTimers();

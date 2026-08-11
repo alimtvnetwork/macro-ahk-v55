@@ -24,13 +24,13 @@
  */
 
 import {
-    buildFailureReport,
-    type FailureReport,
+  buildFailureReport,
+  type FailureReport,
 } from "./failure-logger";
 import type {
-    Condition,
-    ConditionWaitOutcome,
-    PredicateEvaluation,
+  Condition,
+  ConditionWaitOutcome,
+  PredicateEvaluation,
 } from "./condition-evaluator";
 import { resolveSelectorKind } from "./condition-evaluator";
 import { UrlTabClickReasonType, UrlMatchType, UrlTabClickFailureModeType, SelectorKindType, ConditionFailureSourceType, BuildSelectorPredicateReportInputReasonType, PredicateEvaluationKindType } from "../../types/enums";
@@ -70,42 +70,51 @@ export interface BuildUrlTabClickReportInput {
  * a `SourceFile` of the runtime that raised it.
  */
 export function buildUrlTabClickFailureReport(
-    input: BuildUrlTabClickReportInput,
+  input: BuildUrlTabClickReportInput,
 ): FailureReport {
-    const f = input.Failure;
-    const isTimeout = f.Reason === "UrlTabClickTimeout";
+  const f = input.Failure;
+  const isTimeout = f.Reason === "UrlTabClickTimeout";
 
-    return buildFailureReport({
-        Phase: "Replay",
-        Error: new Error(`${f.Reason}: ${f.Detail}`),
-        StepId: input.StepId,
-        Index: input.Index,
-        StepKind: "UrlTabClick",
-        Reason: isTimeout ? "Timeout" : "Unknown",
-        ReasonDetail: serializeUrlTabClickDetail(f),
-        SourceFile: "src/background/recorder/url-tab-click.ts",
-        DataRow: input.DataRow,
-        Verbose: input.Verbose,
-        FormSnapshot: null,
-        Now: input.Now,
-    });
+  return buildFailureReport({
+    Phase: "Replay",
+    Error: new Error(`${f.Reason}: ${f.Detail}`),
+    StepId: input.StepId,
+    Index: input.Index,
+    StepKind: "UrlTabClick",
+    Reason: isTimeout ? "Timeout" : "Unknown",
+    ReasonDetail: serializeUrlTabClickDetail(f),
+    SourceFile: "src/background/recorder/url-tab-click.ts",
+    DataRow: input.DataRow,
+    Verbose: input.Verbose,
+    FormSnapshot: null,
+    Now: input.Now,
+  });
 }
 
 function serializeUrlTabClickDetail(f: UrlTabClickFailure): string {
-    const parts: string[] = [
-        `Reason=${f.Reason}`,
-        `Mode=${f.OperationModeType}`,
-        `UrlMatch=${f.UrlMatch}`,
-        `Pattern=${f.UrlPattern}`,
-        `TimeoutMs=${f.TimeoutMs}`,
-        `DurationMs=${f.DurationMs}`,
-    ];
-    if (f.ObservedUrl !== undefined) parts.push(`ObservedUrl=${f.ObservedUrl}`);
-    if (f.Selector !== undefined) parts.push(`Selector=${f.Selector}`);
-    if (f.SelectorKind !== undefined) parts.push(`SelectorKind=${f.SelectorKind}`);
-    parts.push(`Detail=${f.Detail}`);
+  const parts: string[] = [
+    `Reason=${f.Reason}`,
+    `Mode=${f.OperationModeType}`,
+    `UrlMatch=${f.UrlMatch}`,
+    `Pattern=${f.UrlPattern}`,
+    `TimeoutMs=${f.TimeoutMs}`,
+    `DurationMs=${f.DurationMs}`,
+  ];
+  if (f.ObservedUrl !== undefined) {
+    parts.push(`ObservedUrl=${f.ObservedUrl}`);
+  }
 
-    return parts.join(" | ");
+  if (f.Selector !== undefined) {
+    parts.push(`Selector=${f.Selector}`);
+  }
+
+  if (f.SelectorKind !== undefined) {
+    parts.push(`SelectorKind=${f.SelectorKind}`);
+  }
+
+  parts.push(`Detail=${f.Detail}`);
+
+  return parts.join(" | ");
 }
 
 /* ------------------------------------------------------------------ */
@@ -134,57 +143,62 @@ export interface BuildConditionFailureReportInput {
  * into `ReasonDetail` so AI debuggers can replay it offline.
  */
 export function buildConditionFailureReport(
-    input: BuildConditionFailureReportInput,
+  input: BuildConditionFailureReportInput,
 ): FailureReport {
-    const o = input.Outcome;
-    const isTimeout = o.Reason === "ConditionTimeout";
+  const o = input.Outcome;
+  const isTimeout = o.Reason === "ConditionTimeout";
 
-    return buildFailureReport({
-        Phase: "Replay",
-        Error: new Error(`${o.Reason}: ${o.Detail}`),
-        StepId: input.StepId,
-        Index: input.Index,
-        StepKind: input.StepKind,
-        Reason: isTimeout ? "Timeout" : "Unknown",
-        ReasonDetail: serializeConditionDetail(input, o.LastEvaluation),
-        SourceFile: sourceFileForSource(input.Source),
-        DataRow: input.DataRow,
-        Verbose: input.Verbose,
-        FormSnapshot: null,
-        Now: input.Now,
-    });
+  return buildFailureReport({
+    Phase: "Replay",
+    Error: new Error(`${o.Reason}: ${o.Detail}`),
+    StepId: input.StepId,
+    Index: input.Index,
+    StepKind: input.StepKind,
+    Reason: isTimeout ? "Timeout" : "Unknown",
+    ReasonDetail: serializeConditionDetail(input, o.LastEvaluation),
+    SourceFile: sourceFileForSource(input.Source),
+    DataRow: input.DataRow,
+    Verbose: input.Verbose,
+    FormSnapshot: null,
+    Now: input.Now,
+  });
 }
 
 function serializeConditionDetail(
-    input: BuildConditionFailureReportInput,
-    trace: ReadonlyArray<PredicateEvaluation>,
+  input: BuildConditionFailureReportInput,
+  trace: ReadonlyArray<PredicateEvaluation>,
 ): string {
-    const o = input.Outcome;
-    const traceLines = trace.map(
-        (p, i) =>
-            `  [${i}] ${p.Kind} '${p.Selector}' ${p.Matcher}=${String(p.Result)}` +
+  const o = input.Outcome;
+  const traceLines = trace.map(
+    (p, i) =>
+      `  [${i}] ${p.Kind} '${p.Selector}' ${p.Matcher}=${String(p.Result)}` +
             (p.Detail !== undefined ? ` (${p.Detail})` : ""),
-    );
-    const condJson = JSON.stringify(input.Condition, null, 2);
+  );
+  const condJson = JSON.stringify(input.Condition, null, 2);
 
-    return [
-        `Reason=${o.Reason}`,
-        `Source=${input.Source}`,
-        `Polls=${o.Polls}`,
-        `DurationMs=${o.DurationMs}`,
-        `Detail=${o.Detail}`,
-        `LastEvaluation:`,
-        ...(traceLines.length > 0 ? traceLines : ["  (empty)"]),
-        `ConditionSerialized:`,
-        condJson,
-    ].join("\n");
+  return [
+    `Reason=${o.Reason}`,
+    `Source=${input.Source}`,
+    `Polls=${o.Polls}`,
+    `DurationMs=${o.DurationMs}`,
+    `Detail=${o.Detail}`,
+    `LastEvaluation:`,
+    ...(traceLines.length > 0 ? traceLines : ["  (empty)"]),
+    `ConditionSerialized:`,
+    condJson,
+  ].join("\n");
 }
 
 function sourceFileForSource(s: ConditionFailureSource): string {
-    if (s === "Gate") return "src/background/recorder/condition-evaluator.ts";
-    if (s === "ConditionStep") return "src/background/recorder/condition-step.ts";
+  if (s === "Gate") {
+    return "src/background/recorder/condition-evaluator.ts";
+  }
 
-    return "src/background/recorder/wait-for-element.ts";
+  if (s === "ConditionStep") {
+    return "src/background/recorder/condition-step.ts";
+  }
+
+  return "src/background/recorder/wait-for-element.ts";
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,41 +225,46 @@ export interface BuildSelectorPredicateReportInput {
  * string still includes a serialized `ConditionSerialized` block.
  */
 function classifyPredicateReason(rawReason: string, kind: PredicateEvaluationKindType): string {
-    if (rawReason === "ConditionTimeout") return "Timeout";
-    if (rawReason === "InvalidSelector") return kind === "XPath" ? "XPathSyntaxError" : "CssSyntaxError";
+  if (rawReason === "ConditionTimeout") {
+    return "Timeout";
+  }
 
-    return "ZeroMatches";
+  if (rawReason === "InvalidSelector") {
+    return kind === "XPath" ? "XPathSyntaxError" : "CssSyntaxError";
+  }
+
+  return "ZeroMatches";
 }
 
 function formatPredicateDetail(input: BuildSelectorPredicateReportInput, kind: PredicateEvaluationKindType, trace: PredicateEvaluation): string {
-    return [
-        `Reason=${input.Reason}`,
-        `Selector=${input.Selector}`,
-        `Kind=${kind}`,
-        `Detail=${input.Detail}`,
-        `LastEvaluation:`,
-        `  [0] ${trace.Kind} '${trace.Selector}' ${trace.Matcher}=false (${input.Detail})`,
-    ].join("\n");
+  return [
+    `Reason=${input.Reason}`,
+    `Selector=${input.Selector}`,
+    `Kind=${kind}`,
+    `Detail=${input.Detail}`,
+    `LastEvaluation:`,
+    `  [0] ${trace.Kind} '${trace.Selector}' ${trace.Matcher}=false (${input.Detail})`,
+  ].join("\n");
 }
 
 export function buildSelectorPredicateFailureReport(
-    input: BuildSelectorPredicateReportInput,
+  input: BuildSelectorPredicateReportInput,
 ): FailureReport {
-    const kind = resolveSelectorKind(input.SelectorKind ?? "Auto", input.Selector);
-    const trace: PredicateEvaluation = { Selector: input.Selector, Kind: kind, Matcher: "Exists", Result: false, Detail: input.Detail };
+  const kind = resolveSelectorKind(input.SelectorKind ?? "Auto", input.Selector);
+  const trace: PredicateEvaluation = { Selector: input.Selector, Kind: kind, Matcher: "Exists", Result: false, Detail: input.Detail };
 
-    return buildFailureReport({
-        Phase: "Replay",
-        Error: new Error(`${input.Reason}: ${input.Detail}`),
-        StepId: input.StepId,
-        Index: input.Index,
-        StepKind: input.StepKind,
-        Reason: classifyPredicateReason(input.Reason, kind),
-        ReasonDetail: formatPredicateDetail(input, kind, trace),
-        SourceFile: "src/background/recorder/condition-evaluator.ts",
-        DataRow: input.DataRow,
-        Verbose: input.Verbose,
-        FormSnapshot: null,
-        Now: input.Now,
-    });
+  return buildFailureReport({
+    Phase: "Replay",
+    Error: new Error(`${input.Reason}: ${input.Detail}`),
+    StepId: input.StepId,
+    Index: input.Index,
+    StepKind: input.StepKind,
+    Reason: classifyPredicateReason(input.Reason, kind),
+    ReasonDetail: formatPredicateDetail(input, kind, trace),
+    SourceFile: "src/background/recorder/condition-evaluator.ts",
+    DataRow: input.DataRow,
+    Verbose: input.Verbose,
+    FormSnapshot: null,
+    Now: input.Now,
+  });
 }

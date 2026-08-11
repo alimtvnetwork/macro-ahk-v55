@@ -34,52 +34,67 @@ function createTimerControls(tickRef: TickRef, intervalMs: number): {
     start: () => void;
     stop: () => void;
 } {
-    let timerId: ReturnType<typeof setInterval> | null = null;
-    const start = (): void => {
-        if (timerId !== null) { return; }
-        timerId = setInterval(() => tickRef.current(), intervalMs);
-    };
-    const stop = (): void => {
-        if (timerId !== null) { clearInterval(timerId); timerId = null; }
-    };
+  let timerId: ReturnType<typeof setInterval> | null = null;
+  const start = (): void => {
+    if (timerId !== null) {
+      return; 
+    }
 
-    return { start, stop };
+    timerId = setInterval(() => tickRef.current(), intervalMs);
+  };
+
+  const stop = (): void => {
+    if (timerId !== null) {
+      clearInterval(timerId); timerId = null; 
+    }
+  };
+
+  return { start, stop };
 }
 
 function installVisibilityLoop(tickRef: TickRef, intervalMs: number): () => void {
-    const { start, stop } = createTimerControls(tickRef, intervalMs);
-    const handleVisibility = (): void => {
-        if (document.hidden) { stop();
+  const { start, stop } = createTimerControls(tickRef, intervalMs);
+  const handleVisibility = (): void => {
+    if (document.hidden) {
+      stop();
 
- return; }
-        tickRef.current();
-        start();
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    if (!document.hidden) { tickRef.current(); start(); }
+      return; 
+    }
 
-    return () => {
-        document.removeEventListener("visibilitychange", handleVisibility);
-        stop();
-    };
+    tickRef.current();
+    start();
+  };
+
+  document.addEventListener("visibilitychange", handleVisibility);
+  if (!document.hidden) {
+    tickRef.current(); start(); 
+  }
+
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibility);
+    stop();
+  };
 }
 
 export function useVisibilityPausedInterval(
-    tickFn: () => void,
-    intervalMs: number,
-    enabled = true,
+  tickFn: () => void,
+  intervalMs: number,
+  enabled = true,
 ): void {
-    const tickRef = useRef(tickFn);
-    tickRef.current = tickFn;
+  const tickRef = useRef(tickFn);
+  tickRef.current = tickFn;
 
-    useEffect(() => {
-        if (!enabled) { return; }
-        if (typeof document === "undefined") {
-            const id = setInterval(() => tickRef.current(), intervalMs);
+  useEffect(() => {
+    if (!enabled) {
+      return; 
+    }
 
-            return () => clearInterval(id);
-        }
+    if (typeof document === "undefined") {
+      const id = setInterval(() => tickRef.current(), intervalMs);
 
-        return installVisibilityLoop(tickRef, intervalMs);
-    }, [intervalMs, enabled]);
+      return () => clearInterval(id);
+    }
+
+    return installVisibilityLoop(tickRef, intervalMs);
+  }, [intervalMs, enabled]);
 }

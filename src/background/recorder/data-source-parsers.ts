@@ -32,10 +32,10 @@ export interface ParsedDataSource {
 
 /** Extended kind ids used by spec 17 §2.2. Mirrors planned migration 003. */
 export const ExtendedDataSourceKindId = {
-    Csv: 1,
-    Json: 2,
-    Js: 3,
-    Endpoint: 4,
+  Csv: 1,
+  Json: 2,
+  Js: 3,
+  Endpoint: 4,
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -43,66 +43,85 @@ export const ExtendedDataSourceKindId = {
 /* ------------------------------------------------------------------ */
 
 export function parseCsv(text: string): ParsedDataSource {
-    const lines = splitNonEmptyLines(text);
-    const noLines = lines.length === 0;
+  const lines = splitNonEmptyLines(text);
+  const noLines = lines.length === 0;
 
-    if (noLines) {
-        throw new Error("CSV is empty — no header row found");
-    }
+  if (noLines) {
+    throw new Error("CSV is empty — no header row found");
+  }
 
-    const headerLine = lines[0]!;
-    const columns = parseCsvLine(headerLine);
-    const rowCount = lines.length - 1;
+  const headerLine = lines[0]!;
+  const columns = parseCsvLine(headerLine);
+  const rowCount = lines.length - 1;
 
-    return {
-        DataSourceKindId: DataSourceKindId.Csv,
-        Columns: columns,
-        RowCount: rowCount,
-    };
+  return {
+    DataSourceKindId: DataSourceKindId.Csv,
+    Columns: columns,
+    RowCount: rowCount,
+  };
 }
 
 function splitNonEmptyLines(text: string): string[] {
-    return text
-        .replace(/\r\n/g, "\n")
-        .split("\n")
-        .filter((line) => line.trim() !== "");
+  return text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .filter((line) => line.trim() !== "");
 }
 
 interface CsvScanState { current: string; inQuotes: boolean; skipNext: boolean }
 
 function scanQuotedChar(ch: string, next: string | undefined, state: CsvScanState): void {
-    if (ch === '"' && next === '"') { state.current += '"'; state.skipNext = true;
+  if (ch === '"' && next === '"') {
+    state.current += '"'; state.skipNext = true;
 
- return; }
-    if (ch === '"') { state.inQuotes = false;
+    return; 
+  }
 
- return; }
-    state.current += ch;
+  if (ch === '"') {
+    state.inQuotes = false;
+
+    return; 
+  }
+
+  state.current += ch;
 }
 
 function scanCsvChar(ch: string, next: string | undefined, state: CsvScanState, out: string[]): void {
-    if (state.inQuotes) { scanQuotedChar(ch, next, state);
+  if (state.inQuotes) {
+    scanQuotedChar(ch, next, state);
 
- return; }
-    if (ch === '"') { state.inQuotes = true;
+    return; 
+  }
 
- return; }
-    if (ch === ",") { out.push(state.current.trim()); state.current = "";
+  if (ch === '"') {
+    state.inQuotes = true;
 
- return; }
-    state.current += ch;
+    return; 
+  }
+
+  if (ch === ",") {
+    out.push(state.current.trim()); state.current = "";
+
+    return; 
+  }
+
+  state.current += ch;
 }
 
 function parseCsvLine(line: string): string[] {
-    const out: string[] = [];
-    const state: CsvScanState = { current: "", inQuotes: false, skipNext: false };
-    for (let i = 0; i < line.length; i++) {
-        if (state.skipNext) { state.skipNext = false; continue; }
-        scanCsvChar(line[i]!, line[i + 1], state, out);
+  const out: string[] = [];
+  const state: CsvScanState = { current: "", inQuotes: false, skipNext: false };
+  for (let i = 0; i < line.length; i++) {
+    if (state.skipNext) {
+      state.skipNext = false; continue; 
     }
-    out.push(state.current.trim());
 
-    return out;
+    scanCsvChar(line[i]!, line[i + 1], state, out);
+  }
+
+  out.push(state.current.trim());
+
+  return out;
 }
 
 /* ------------------------------------------------------------------ */
@@ -110,52 +129,52 @@ function parseCsvLine(line: string): string[] {
 /* ------------------------------------------------------------------ */
 
 export function parseJsonRows(text: string): ParsedDataSource {
-    const parsed = JSON.parse(text) as unknown;
-    const isArray = Array.isArray(parsed);
+  const parsed = JSON.parse(text) as unknown;
+  const isArray = Array.isArray(parsed);
 
-    if (isArray === false) {
-        throw new Error("JSON data source must be an array of objects");
-    }
+  if (isArray === false) {
+    throw new Error("JSON data source must be an array of objects");
+  }
 
-    const rows = parsed as ReadonlyArray<unknown>;
-    const isEmpty = rows.length === 0;
+  const rows = parsed as ReadonlyArray<unknown>;
+  const isEmpty = rows.length === 0;
 
-    if (isEmpty) {
-        throw new Error("JSON array is empty — at least one row required");
-    }
+  if (isEmpty) {
+    throw new Error("JSON array is empty — at least one row required");
+  }
 
-    const columns = collectJsonColumns(rows);
+  const columns = collectJsonColumns(rows);
 
-    return {
-        DataSourceKindId: DataSourceKindId.Json,
-        Columns: columns,
-        RowCount: rows.length,
-    };
+  return {
+    DataSourceKindId: DataSourceKindId.Json,
+    Columns: columns,
+    RowCount: rows.length,
+  };
 }
 
 export const parseJson = parseJsonRows;
 
 function collectJsonColumns(rows: ReadonlyArray<unknown>): string[] {
-    const seen = new Set<string>();
-    const ordered: string[] = [];
+  const seen = new Set<string>();
+  const ordered: string[] = [];
 
-    for (const row of rows) {
-        const isPlainObject =
+  for (const row of rows) {
+    const isPlainObject =
             row !== null && typeof row === "object" && Array.isArray(row) === false;
 
-        if (isPlainObject === false) {
-            throw new Error("JSON rows must be plain objects");
-        }
-
-        for (const key of Object.keys(row as Record<string, unknown>)) {
-            if (seen.has(key) === false) {
-                seen.add(key);
-                ordered.push(key);
-            }
-        }
+    if (isPlainObject === false) {
+      throw new Error("JSON rows must be plain objects");
     }
 
-    return ordered;
+    for (const key of Object.keys(row as Record<string, unknown>)) {
+      if (seen.has(key) === false) {
+        seen.add(key);
+        ordered.push(key);
+      }
+    }
+  }
+
+  return ordered;
 }
 
 /* ------------------------------------------------------------------ */
@@ -169,42 +188,44 @@ function collectJsonColumns(rows: ReadonlyArray<unknown>): string[] {
  * `Reason = "JsDataSourceThrew"` semantics.
  */
 function runJsEvaluator(body: string): unknown {
-    try {
-        const evaluator = new Function(`"use strict"; ${body}`);
+  try {
+    const evaluator = new Function(`"use strict"; ${body}`);
 
-        return evaluator();
-    } catch (caughtError) {
-        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
-        throw new Error(`JsDataSourceThrew: ${message}`);
-    }
+    return evaluator();
+  } catch (caughtError) {
+    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+    throw new Error(`JsDataSourceThrew: ${message}`);
+  }
 }
 
 export function evaluateJsDataSource(body: string): ParsedDataSource {
-    const result = runJsEvaluator(body);
-    if (Array.isArray(result) === false) {
-        throw new Error("JsDataSourceThrew: function must return an array of objects");
-    }
-    const rows = result as ReadonlyArray<unknown>;
-    if (rows.length === 0) {
-        throw new Error("JsDataSourceThrew: returned array is empty");
-    }
-    const columns = collectJsonColumns(rows);
-    const normalized = rows.map((r) => normalizeRow(r as Record<string, unknown>));
+  const result = runJsEvaluator(body);
+  if (Array.isArray(result) === false) {
+    throw new Error("JsDataSourceThrew: function must return an array of objects");
+  }
 
-    return {
-        DataSourceKindId: ExtendedDataSourceKindId.Js,
-        Columns: columns, RowCount: rows.length, Rows: normalized,
-    };
+  const rows = result as ReadonlyArray<unknown>;
+  if (rows.length === 0) {
+    throw new Error("JsDataSourceThrew: returned array is empty");
+  }
+
+  const columns = collectJsonColumns(rows);
+  const normalized = rows.map((r) => normalizeRow(r as Record<string, unknown>));
+
+  return {
+    DataSourceKindId: ExtendedDataSourceKindId.Js,
+    Columns: columns, RowCount: rows.length, Rows: normalized,
+  };
 }
 
 function normalizeRow(row: Record<string, unknown>): Record<string, string> {
-    const out: Record<string, string> = {};
-    for (const key of Object.keys(row)) {
-        const v = row[key];
-        out[key] = v === null || v === undefined ? "" : String(v);
-    }
+  const out: Record<string, string> = {};
+  for (const key of Object.keys(row)) {
+    const v = row[key];
+    out[key] = v === null || v === undefined ? "" : String(v);
+  }
 
-    return out;
+  return out;
 }
 
 /* ------------------------------------------------------------------ */
@@ -222,91 +243,91 @@ export interface EndpointFetchInit {
 }
 
 export async function fetchEndpointDataSource(
-    init: EndpointFetchInit,
+  init: EndpointFetchInit,
 ): Promise<ParsedDataSource> {
-    const fetchImpl = init.FetchImpl ?? fetch;
-    const timeoutMs = init.TimeoutMs ?? 15_000;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const response = await requestEndpointData(init, fetchImpl, controller, timer);
-    const payload = await readEndpointPayload(response);
-    const rows = assertPayloadRows(payload);
-    const columns = collectJsonColumns(rows);
-    const normalized = rows.map((row) => normalizeRow(row as Record<string, unknown>));
+  const fetchImpl = init.FetchImpl ?? fetch;
+  const timeoutMs = init.TimeoutMs ?? 15_000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const response = await requestEndpointData(init, fetchImpl, controller, timer);
+  const payload = await readEndpointPayload(response);
+  const rows = assertPayloadRows(payload);
+  const columns = collectJsonColumns(rows);
+  const normalized = rows.map((row) => normalizeRow(row as Record<string, unknown>));
 
-    return {
-        DataSourceKindId: ExtendedDataSourceKindId.Endpoint,
-        Columns: columns,
-        RowCount: rows.length,
-        Rows: normalized,
-    };
+  return {
+    DataSourceKindId: ExtendedDataSourceKindId.Endpoint,
+    Columns: columns,
+    RowCount: rows.length,
+    Rows: normalized,
+  };
 }
 
 async function requestEndpointData(
-    init: EndpointFetchInit,
-    fetchImpl: typeof fetch,
-    controller: AbortController,
-    timer: ReturnType<typeof setTimeout>,
+  init: EndpointFetchInit,
+  fetchImpl: typeof fetch,
+  controller: AbortController,
+  timer: ReturnType<typeof setTimeout>,
 ): Promise<Response> {
-    try {
-        return await fetchImpl(init.Url, {
-            method: init.Method ?? "GET",
-            headers: { Accept: "application/json", ...(init.Headers ?? {}) },
-            body: init.Body,
-            signal: controller.signal,
-        });
-    } catch (caughtError) {
-        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
-        const isAbort = controller.signal.aborted;
-        const reason = isAbort ? "EndpointTimeout" : "EndpointHttpError";
-        throw new Error(`${reason}: ${message}`);
-    } finally {
-        clearTimeout(timer);
-    }
+  try {
+    return await fetchImpl(init.Url, {
+      method: init.Method ?? "GET",
+      headers: { Accept: "application/json", ...(init.Headers ?? {}) },
+      body: init.Body,
+      signal: controller.signal,
+    });
+  } catch (caughtError) {
+    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+    const isAbort = controller.signal.aborted;
+    const reason = isAbort ? "EndpointTimeout" : "EndpointHttpError";
+    throw new Error(`${reason}: ${message}`);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function readEndpointPayload(response: Response): Promise<unknown> {
-    await assertResponseOk(response);
+  await assertResponseOk(response);
 
-    try {
-        return await response.json();
-    } catch (caughtError) {
-        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
-        throw new Error(`EndpointParseError: ${message}`);
-    }
+  try {
+    return await response.json();
+  } catch (caughtError) {
+    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+    throw new Error(`EndpointParseError: ${message}`);
+  }
 }
 
 async function assertResponseOk(response: Response): Promise<void> {
-    if (response.ok) {
-        return;
-    }
+  if (response.ok) {
+    return;
+  }
 
-    const snippet = await safeReadSnippet(response);
-    throw new Error(
-        `EndpointHttpError: ${response.status} ${response.statusText} — ${snippet}`,
-    );
+  const snippet = await safeReadSnippet(response);
+  throw new Error(
+    `EndpointHttpError: ${response.status} ${response.statusText} — ${snippet}`,
+  );
 }
 
 function assertPayloadRows(payload: unknown): ReadonlyArray<unknown> {
-    if (Array.isArray(payload) === false) {
-        throw new Error("EndpointParseError: response must be a JSON array of objects");
-    }
+  if (Array.isArray(payload) === false) {
+    throw new Error("EndpointParseError: response must be a JSON array of objects");
+  }
 
-    if (payload.length === 0) {
-        throw new Error("EndpointParseError: response array is empty");
-    }
+  if (payload.length === 0) {
+    throw new Error("EndpointParseError: response array is empty");
+  }
 
-    return payload;
+  return payload;
 }
 
 async function safeReadSnippet(response: Response): Promise<string> {
-    try {
-        const text = await response.text();
+  try {
+    const text = await response.text();
 
-        return text.slice(0, 2048);
-    } catch (caughtError) {
-        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+    return text.slice(0, 2048);
+  } catch (caughtError) {
+    const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
 
-        return `<unreadable body: ${message}>`;
-    }
+    return `<unreadable body: ${message}>`;
+  }
 }

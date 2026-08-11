@@ -177,7 +177,10 @@ function _buildCreditFetchDelaySlider(initialValue: number): { row: HTMLDivEleme
   const valLabel = document.createElement('span');
   valLabel.style.cssText = 'font-size:11px;color:' + cPanelText + ';min-width:48px;text-align:right;font-family:monospace;';
   valLabel.textContent = slider.value + 'ms';
-  slider.oninput = function() { valLabel.textContent = slider.value + 'ms'; };
+  slider.oninput = function() {
+    valLabel.textContent = slider.value + 'ms'; 
+  };
+
   sliderRow.appendChild(slider);
   sliderRow.appendChild(valLabel);
   row.appendChild(sliderRow);
@@ -252,7 +255,9 @@ function _buildDelaySlider(initialValue: number): { row: HTMLDivElement; input: 
   valLabel.style.cssText = 'font-size:11px;color:' + cPanelText + ';min-width:36px;text-align:right;font-family:monospace;';
   valLabel.textContent = slider.value + 's';
 
-  slider.oninput = function() { valLabel.textContent = slider.value + 's'; };
+  slider.oninput = function() {
+    valLabel.textContent = slider.value + 's'; 
+  };
 
   sliderRow.appendChild(slider);
   sliderRow.appendChild(valLabel);
@@ -352,10 +357,15 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   resetLogBtn.onclick = function() {
     resetLogConfig();
     const fresh = getLogConfig();
-    masterFields.forEach(function(f) { logToggles[f.key].checked = Boolean(fresh[f.key as keyof LogManagerConfig]); });
-    levelKeys.forEach(function(k) { levelToggles[k].checked = fresh.levels[k] !== false; });
+    masterFields.forEach(function(f) {
+      logToggles[f.key].checked = Boolean(fresh[f.key as keyof LogManagerConfig]); 
+    });
+    levelKeys.forEach(function(k) {
+      levelToggles[k].checked = fresh.levels[k] !== false; 
+    });
     showToast('Logging reset to defaults', 'info');
   };
+
   panel.appendChild(resetLogBtn);
 
   return { panel, logToggles, levelToggles, masterFields, levelKeys };
@@ -391,7 +401,10 @@ export function buildConfigDbPanel(
     const sections: Record<string, Array<{ key: string; value: string; valueType: string }>> = {};
     for (const row of (rows || [])) {
       const r = row as { section: string; key: string; value: string; valueType: string };
-      if (!sections[r.section]) sections[r.section] = [];
+      if (!sections[r.section]) {
+        sections[r.section] = [];
+      }
+
       sections[r.section].push({ key: r.key, value: r.value, valueType: r.valueType });
     }
 
@@ -423,9 +436,18 @@ function renderConfigSection(
   for (const entry of entries) {
     const isMultiline = entry.valueType === 'object' || entry.valueType === 'array' || entry.value.length > 80;
     const fieldOpts: { type?: string; hint?: string; multiline?: boolean } = {};
-    if (isMultiline) fieldOpts.multiline = true;
-    if (entry.valueType === 'number') fieldOpts.type = 'number';
-    if (entry.valueType === 'boolean') fieldOpts.type = 'text';
+    if (isMultiline) {
+      fieldOpts.multiline = true;
+    }
+
+    if (entry.valueType === 'number') {
+      fieldOpts.type = 'number';
+    }
+
+    if (entry.valueType === 'boolean') {
+      fieldOpts.type = 'text';
+    }
+
     fieldOpts.hint = entry.valueType;
 
     const field = makeField(entry.key, entry.value, fieldOpts);
@@ -491,7 +513,9 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
     const { getCommunicationHistory } = await import('../db/macro-db');
     const { extractProjectIdFromUrl } = await import('../workspace-detection');
     const projectId = extractProjectIdFromUrl();
-    if (!projectId) return;
+    if (!projectId) {
+      return;
+    }
 
     const rows = await getCommunicationHistory(projectId, 100);
     const filtered = filter 
@@ -512,8 +536,13 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
     filtered.forEach(row => {
       const item = document.createElement('div');
       item.style.cssText = 'padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s;';
-      item.onmouseenter = () => { item.style.background = 'rgba(255,255,255,0.03)'; };
-      item.onmouseleave = () => { item.style.background = 'transparent'; };
+      item.onmouseenter = () => {
+        item.style.background = 'rgba(255,255,255,0.03)'; 
+      };
+
+      item.onmouseleave = () => {
+        item.style.background = 'transparent'; 
+      };
       
       const r = row as { Timestamp: string; Prompt: string; Response?: string };
       const time = new Date(r.Timestamp).toLocaleString();
@@ -561,6 +590,7 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
 
         return;
       }
+
       const { openProjectHistoryPanel } = await import('./project-history-panel');
       openProjectHistoryPanel(submitMount, activeProjectId);
     } catch (err) {
@@ -585,7 +615,11 @@ function _showHistoryDetailModal(row: Record<string, unknown>): void {
 function buildModalOverlay(): HTMLElement {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
 
   return overlay;
 }
@@ -629,6 +663,7 @@ function buildHistoryModalFooter(row: Record<string, unknown>): HTMLElement {
     navigator.clipboard.writeText((row as { Prompt?: string }).Prompt || '');
     showToast('✅ Prompt copied to clipboard', 'info');
   };
+
   footer.appendChild(copyBtn);
 
   return footer;
@@ -657,7 +692,9 @@ function _buildPerWorkspaceEditor(): HTMLElement {
   list.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
   section.appendChild(list);
 
-  const addRow = _buildPerWsAddRow(function () { _renderPerWsList(list); });
+  const addRow = _buildPerWsAddRow(function () {
+    _renderPerWsList(list); 
+  });
   section.appendChild(addRow);
 
   _renderPerWsList(list);
@@ -678,8 +715,11 @@ function _renderPerWsList(list: HTMLElement): void {
 
     return;
   }
+
   for (const wsId of ids) {
-    list.appendChild(_buildPerWsRow(wsId, map[wsId], function () { _renderPerWsList(list); }));
+    list.appendChild(_buildPerWsRow(wsId, map[wsId], function () {
+      _renderPerWsList(list); 
+    }));
   }
 }
 
@@ -711,9 +751,14 @@ function _buildPerWsRow(
   removeBtn.style.cssText = 'background:transparent;border:1px solid ' + cPanelBorder
     + ';color:' + cWarning + ';font-size:11px;padding:2px 7px;border-radius:4px;cursor:pointer;';
   removeBtn.onclick = function (): void {
-    void _persistPerWs(function (map) { delete map[wsId]; })
-      .then(function () { showToast('Removed override for ' + wsId, 'info'); onChange(); });
+    void _persistPerWs(function (map) {
+      delete map[wsId]; 
+    })
+      .then(function () {
+        showToast('Removed override for ' + wsId, 'info'); onChange(); 
+      });
   };
+
   row.appendChild(removeBtn);
 
   const commit = function (): void {
@@ -724,9 +769,11 @@ function _buildPerWsRow(
       if (typeof grace === 'number' && Number.isFinite(grace) && grace >= 0) {
         next.expiryGracePeriodDays = Math.floor(grace);
       }
+
       if (typeof refill === 'number' && Number.isFinite(refill) && refill >= 0) {
         next.refillWarningThresholdDays = Math.floor(refill);
       }
+
       if (next.expiryGracePeriodDays === undefined && next.refillWarningThresholdDays === undefined) {
         delete map[wsId];
       } else {
@@ -734,6 +781,7 @@ function _buildPerWsRow(
       }
     });
   };
+
   graceInp.onchange = commit;
   refillInp.onchange = commit;
 
@@ -765,9 +813,12 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
     + 'padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
   addBtn.onclick = function (): void {
     const wsId = idInp.value.trim();
-    if (!wsId) { showToast('Enter a workspace id first', 'warn');
+    if (!wsId) {
+      showToast('Enter a workspace id first', 'warn');
 
- return; }
+      return; 
+    }
+
     const grace = graceInp.value.trim() === '' ? undefined : Number(graceInp.value);
     const refill = refillInp.value.trim() === '' ? undefined : Number(refillInp.value);
     if (grace === undefined && refill === undefined) {
@@ -775,14 +826,17 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
 
       return;
     }
+
     void _persistPerWs(function (map) {
       const next: PerWorkspaceLifecycleOverride = {};
       if (typeof grace === 'number' && Number.isFinite(grace) && grace >= 0) {
         next.expiryGracePeriodDays = Math.floor(grace);
       }
+
       if (typeof refill === 'number' && Number.isFinite(refill) && refill >= 0) {
         next.refillWarningThresholdDays = Math.floor(refill);
       }
+
       map[wsId] = next;
     }).then(function () {
       showToast('Added override for ' + wsId, 'success');
@@ -792,6 +846,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
       onAdded();
     });
   };
+
   row.appendChild(addBtn);
 
   return row;
@@ -909,6 +964,7 @@ function _buildDbMaintenancePanel(): HTMLDivElement {
     await exportDatabaseDump();
     showToast('✅ Database dump triggered', 'info');
   };
+
   btnContainer.appendChild(dumpBtn);
 
   row.appendChild(btnContainer);

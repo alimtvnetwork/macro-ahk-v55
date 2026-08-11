@@ -81,6 +81,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
 
       return;
     }
+
     await onSave({ id: project.id, name: editName.trim(), version: editVersion.trim(), description: editDescription.trim() || undefined });
     toast.success("Project identity saved");
   }, [onSave, project.id, editName, editVersion, editDescription, isVersionValid]);
@@ -96,6 +97,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
       s[key] = value;
       await onSave({ id: project.id, settings: s as StoredProject["settings"] });
     }
+
     toast.success(`${key} updated`);
   }, [onSave, project.id, project.settings]);
 

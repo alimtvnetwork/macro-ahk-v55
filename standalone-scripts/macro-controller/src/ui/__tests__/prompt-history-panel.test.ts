@@ -18,9 +18,9 @@ vi.mock('../../db/prompt-revision-db', () => ({
   deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
 }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   listPromptsByRole: vi.fn(),
   getDefaultPromptForRole: vi.fn(),
   upsertPrompt: vi.fn(),
@@ -160,13 +160,18 @@ describe('openPromptHistoryPanel', () => {
     const created: string[] = [];
     const originalCreate = URL.createObjectURL;
     const originalRevoke = URL.revokeObjectURL;
-    URL.createObjectURL = vi.fn(() => { const u = 'blob:mock-' + created.length; created.push(u);
+    URL.createObjectURL = vi.fn(() => {
+      const u = 'blob:mock-' + created.length; created.push(u);
 
- return u; });
+      return u; 
+    });
     URL.revokeObjectURL = vi.fn();
     const clicked: string[] = [];
     const originalAnchorClick = HTMLAnchorElement.prototype.click;
-    HTMLAnchorElement.prototype.click = function () { clicked.push(this.getAttribute('download') ?? ''); };
+    HTMLAnchorElement.prototype.click = function () {
+      clicked.push(this.getAttribute('download') ?? ''); 
+    };
+
     try {
       await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions });
       const exportBtn = document.querySelector('[data-action="export-history"]') as HTMLButtonElement;
@@ -318,6 +323,7 @@ describe('openPromptHistoryPanel', () => {
       input.dispatchEvent(new Event('change'));
       await new Promise((r) => setTimeout(r, 0));
     }
+
     const oversizedCalls = logDiag.mock.calls.filter((c: unknown[]) =>
       c[0] === 'HISTORY_IMPORT_E001'
       && typeof c[1] === 'object' && c[1] !== null
@@ -348,6 +354,7 @@ describe('openPromptHistoryPanel', () => {
     } finally {
       spy.mockRestore();
     }
+
     const oversizedCalls = logDiag.mock.calls.filter((c: unknown[]) =>
       c[0] === 'HISTORY_IMPORT_E001'
       && typeof c[1] === 'object' && c[1] !== null

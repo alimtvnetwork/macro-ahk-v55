@@ -51,19 +51,25 @@ export interface InvalidateSentinelResult {
 /* ------------------------------------------------------------------ */
 
 function removeDomSentinel(): boolean {
-    try {
-        if (typeof document === 'undefined') return false;
-        const element = document.getElementById(MARCO_SENTINEL_DOM_ID);
-        if (!element) return false;
-        element.remove();
-
-        return true;
-    } catch (err: unknown) {
-        logError('SentinelInvalidate',
-            'removeDomSentinel failed (id=' + MARCO_SENTINEL_DOM_ID + ')', err);
-
-        return false;
+  try {
+    if (typeof document === 'undefined') {
+      return false;
     }
+
+    const element = document.getElementById(MARCO_SENTINEL_DOM_ID);
+    if (!element) {
+      return false;
+    }
+
+    element.remove();
+
+    return true;
+  } catch (err: unknown) {
+    logError('SentinelInvalidate',
+      'removeDomSentinel failed (id=' + MARCO_SENTINEL_DOM_ID + ')', err);
+
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,19 +77,25 @@ function removeDomSentinel(): boolean {
 /* ------------------------------------------------------------------ */
 
 function clearRelayFlag(): boolean {
-    try {
-        if (typeof window === 'undefined') return false;
-        const bag = window as unknown as Record<string, unknown>;
-        if (!(MARCO_RELAY_ACTIVE_KEY in bag)) return false;
-        delete bag[MARCO_RELAY_ACTIVE_KEY];
-
-        return true;
-    } catch (err: unknown) {
-        logError('SentinelInvalidate',
-            'clearRelayFlag failed (key=' + MARCO_RELAY_ACTIVE_KEY + ')', err);
-
-        return false;
+  try {
+    if (typeof window === 'undefined') {
+      return false;
     }
+
+    const bag = window as unknown as Record<string, unknown>;
+    if (!(MARCO_RELAY_ACTIVE_KEY in bag)) {
+      return false;
+    }
+
+    delete bag[MARCO_RELAY_ACTIVE_KEY];
+
+    return true;
+  } catch (err: unknown) {
+    logError('SentinelInvalidate',
+      'clearRelayFlag failed (key=' + MARCO_RELAY_ACTIVE_KEY + ')', err);
+
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -91,16 +103,16 @@ function clearRelayFlag(): boolean {
 /* ------------------------------------------------------------------ */
 
 async function sendInvalidateCache(): Promise<boolean> {
-    try {
-        await sendToExtension(INVALIDATE_CACHE_MSG, {});
+  try {
+    await sendToExtension(INVALIDATE_CACHE_MSG, {});
 
-        return true;
-    } catch (err: unknown) {
-        logError('SentinelInvalidate',
-            'sendToExtension(INVALIDATE_CACHE) failed — background may be sleeping', err);
+    return true;
+  } catch (err: unknown) {
+    logError('SentinelInvalidate',
+      'sendToExtension(INVALIDATE_CACHE) failed — background may be sleeping', err);
 
-        return false;
-    }
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -114,13 +126,13 @@ async function sendInvalidateCache(): Promise<boolean> {
  * for the calling toast.
  */
 export async function invalidateInjectionSentinel(): Promise<InvalidateSentinelResult> {
-    const removedDomSentinel = removeDomSentinel();
-    const clearedRelayFlag = clearRelayFlag();
-    const sentInvalidateMessage = await sendInvalidateCache();
+  const removedDomSentinel = removeDomSentinel();
+  const clearedRelayFlag = clearRelayFlag();
+  const sentInvalidateMessage = await sendInvalidateCache();
 
-    log('[SentinelInvalidate] dom=' + removedDomSentinel
+  log('[SentinelInvalidate] dom=' + removedDomSentinel
         + ' relay=' + clearedRelayFlag
         + ' bgMsg=' + sentInvalidateMessage, 'info');
 
-    return { removedDomSentinel, clearedRelayFlag, sentInvalidateMessage };
+  return { removedDomSentinel, clearedRelayFlag, sentInvalidateMessage };
 }

@@ -16,36 +16,36 @@ import { describe, it, expect } from 'vitest';
 import { getRequiredTokensForRole, PLAN_DEFAULT_BODY, NEXT_DEFAULT_BODY } from '../plan-next-prompts';
 
 describe('getRequiredTokensForRole', () => {
-    it('returns ["n"] for role=plan (matches PLAN_DEFAULT_BODY)', () => {
-        const tokens = getRequiredTokensForRole('plan');
-        expect(tokens).toEqual(['n']);
-        // Guard: if the seed body itself lost the token, this test still fails.
-        expect(PLAN_DEFAULT_BODY).toContain('{{n}}');
-    });
+  it('returns ["n"] for role=plan (matches PLAN_DEFAULT_BODY)', () => {
+    const tokens = getRequiredTokensForRole('plan');
+    expect(tokens).toEqual(['n']);
+    // Guard: if the seed body itself lost the token, this test still fails.
+    expect(PLAN_DEFAULT_BODY).toContain('{{n}}');
+  });
 
-    it('returns ["n"] for role=next (matches NEXT_DEFAULT_BODY)', () => {
-        const tokens = getRequiredTokensForRole('next');
-        expect(tokens).toEqual(['n']);
-        expect(NEXT_DEFAULT_BODY).toContain('{{n}}');
-    });
+  it('returns ["n"] for role=next (matches NEXT_DEFAULT_BODY)', () => {
+    const tokens = getRequiredTokensForRole('next');
+    expect(tokens).toEqual(['n']);
+    expect(NEXT_DEFAULT_BODY).toContain('{{n}}');
+  });
 
-    it('returns [] for role=generic (no required tokens by contract)', () => {
-        expect(getRequiredTokensForRole('generic')).toEqual([]);
-    });
+  it('returns [] for role=generic (no required tokens by contract)', () => {
+    expect(getRequiredTokensForRole('generic')).toEqual([]);
+  });
 
-    it('deduplicates tokens even though the seed body mentions {{n}} many times', () => {
-        // NEXT_DEFAULT_BODY intentionally uses {{n}} multiple times; the helper
-        // must collapse them to a single required-token entry.
-        const occurrences = (NEXT_DEFAULT_BODY.match(/\{\{n\}\}/g) ?? []).length;
-        expect(occurrences).toBeGreaterThan(1);
-        expect(getRequiredTokensForRole('next')).toHaveLength(1);
-    });
+  it('deduplicates tokens even though the seed body mentions {{n}} many times', () => {
+    // NEXT_DEFAULT_BODY intentionally uses {{n}} multiple times; the helper
+    // must collapse them to a single required-token entry.
+    const occurrences = (NEXT_DEFAULT_BODY.match(/\{\{n\}\}/g) ?? []).length;
+    expect(occurrences).toBeGreaterThan(1);
+    expect(getRequiredTokensForRole('next')).toHaveLength(1);
+  });
 
-    it('is a pure synchronous function (no Promise, no throw for known roles)', () => {
-        // The chip strip re-runs this on every keystroke; a stray async or throw
-        // would freeze the editor. Locking the sync contract here.
-        expect(() => getRequiredTokensForRole('plan')).not.toThrow();
-        const result: string[] = getRequiredTokensForRole('plan');
-        expect(Array.isArray(result)).toBe(true);
-    });
+  it('is a pure synchronous function (no Promise, no throw for known roles)', () => {
+    // The chip strip re-runs this on every keystroke; a stray async or throw
+    // would freeze the editor. Locking the sync contract here.
+    expect(() => getRequiredTokensForRole('plan')).not.toThrow();
+    const result: string[] = getRequiredTokensForRole('plan');
+    expect(Array.isArray(result)).toBe(true);
+  });
 });

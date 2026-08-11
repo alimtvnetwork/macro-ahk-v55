@@ -21,16 +21,16 @@ interface SdkBridge {
 }
 
 function getSdk(stage: string): SdkBridge {
-    const sdk = (window as unknown as { marco?: SdkBridge }).marco;
-    if (!sdk || !sdk.api || !sdk.api.credits) {
-        throwDiagnostic('PROZERO_ADAPTER_E001', { stage });
-    }
+  const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+  if (!sdk || !sdk.api || !sdk.api.credits) {
+    throwDiagnostic('PROZERO_ADAPTER_E001', { stage });
+  }
 
-    return sdk;
+  return sdk;
 }
 
 export async function callFetchBalance(workspaceId: string): Promise<SdkBalanceResponse> {
-    const sdk = getSdk('callFetchBalance');
+  const sdk = getSdk('callFetchBalance');
 
-    return sdk.api.credits.fetchBalance(workspaceId, { baseUrl: CREDIT_API_BASE });
+  return sdk.api.credits.fetchBalance(workspaceId, { baseUrl: CREDIT_API_BASE });
 }

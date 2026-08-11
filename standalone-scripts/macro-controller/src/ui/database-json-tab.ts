@@ -24,7 +24,10 @@ const STYLE_ID = StyleIdType.DbJson;
 /* ------------------------------------------------------------------ */
 
 function injectJsonStyles(): void {
-  if (document.getElementById(STYLE_ID)) return;
+  if (document.getElementById(STYLE_ID)) {
+    return;
+  }
+
   const s = document.createElement('style');
   s.id = STYLE_ID;
   s.textContent = `
@@ -80,8 +83,13 @@ function injectJsonStyles(): void {
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (text) e.textContent = text;
+  if (cls) {
+    e.className = cls;
+  }
+
+  if (text) {
+    e.textContent = text;
+  }
 
   return e;
 }
@@ -136,10 +144,14 @@ export function buildJsonTab(
     editor.value = JSON.stringify(SAMPLE_SCHEMA, null, 2);
     appendLog(logEl, 'info', 'Loaded sample schema');
   };
+
   actions.appendChild(sampleBtn);
 
   const clearBtn = el('button', DomIdType.JsonBtn, '🗑️ Clear');
-  clearBtn.onclick = () => { editor.value = ''; logEl.textContent = ''; };
+  clearBtn.onclick = () => {
+    editor.value = ''; logEl.textContent = ''; 
+  };
+
   actions.appendChild(clearBtn);
 
   wrap.appendChild(actions);

@@ -16,33 +16,33 @@ export interface HotkeyFieldsProps {
 }
 
 export function HotkeyFields(props: HotkeyFieldsProps): JSX.Element {
-    const { chords, waitMs, onChordsChange, onWaitMsChange } = props;
+  const { chords, waitMs, onChordsChange, onWaitMsChange } = props;
 
-    return (
-        <div className="space-y-3">
-            <div className="space-y-1">
-                <LabelType htmlFor="hotkey-capture">Key combinations</LabelType>
-                <HotkeyChordCapture
-                    id="hotkey-capture"
-                    value={chords}
-                    onChange={onChordsChange}
-                />
-                <p className="text-[11px] text-muted-foreground">
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1">
+        <LabelType htmlFor="hotkey-capture">Key combinations</LabelType>
+        <HotkeyChordCapture
+          id="hotkey-capture"
+          value={chords}
+          onChange={onChordsChange}
+        />
+        <p className="text-[11px] text-muted-foreground">
                     Each chord is dispatched in order during playback (AutoHotkey-style).
                     Backspace removes the last chord; Esc stops listening.
-                </p>
-            </div>
-            <div className="space-y-1">
-                <LabelType htmlFor="hotkey-wait">Wait after (ms, optional)</LabelType>
-                <Input
-                    id="hotkey-wait"
-                    type="number"
-                    min={0}
-                    value={waitMs}
-                    placeholder="e.g. 500"
-                    onChange={(event) => onWaitMsChange(event.target.value)}
-                />
-            </div>
-        </div>
-    );
+        </p>
+      </div>
+      <div className="space-y-1">
+        <LabelType htmlFor="hotkey-wait">Wait after (ms, optional)</LabelType>
+        <Input
+          id="hotkey-wait"
+          type="number"
+          min={0}
+          value={waitMs}
+          placeholder="e.g. 500"
+          onChange={(event) => onWaitMsChange(event.target.value)}
+        />
+      </div>
+    </div>
+  );
 }

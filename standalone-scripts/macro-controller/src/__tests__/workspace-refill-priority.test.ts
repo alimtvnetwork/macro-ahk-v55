@@ -76,6 +76,8 @@ describe('sortByRefillPriority', () => {
       { ws: makeWs({ id: 'd', nextRefillAt: daysFromNow(1), available: 50 }) },  // 9*50=450 tie with b
     ];
     const sorted = sortByRefillPriority(rows, 10, NOW);
-    expect(sorted.map(function (r) { return r.ws.id; })).toEqual(['b', 'd', 'a', 'c']);
+    expect(sorted.map(function (r) {
+      return r.ws.id; 
+    })).toEqual(['b', 'd', 'a', 'c']);
   });
 });

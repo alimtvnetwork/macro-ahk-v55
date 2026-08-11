@@ -193,6 +193,7 @@ function validateSchemaVersion(label: string, version: unknown, supported: numbe
 
     return;
   }
+
   if (version > supported) {
     warn(label + ': schemaVersion ' + version + ' is newer than supported (' + supported + ') — some fields may be ignored');
   }
@@ -205,7 +206,10 @@ function validateFieldType(
   label: string,
 ): void {
   const fieldValue = obj[field];
-  if (fieldValue === undefined || fieldValue === null) return;
+  if (fieldValue === undefined || fieldValue === null) {
+    return;
+  }
+
   const actual = Array.isArray(fieldValue) ? 'array' : typeof fieldValue;
   if (actual !== expected) {
     warn(label + '.' + field + ': expected ' + expected + ', got ' + actual + ' — using default');

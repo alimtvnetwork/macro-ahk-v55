@@ -51,7 +51,9 @@ function normalizeStartNumbers(startNums: number | Record<string, number>): Vari
 
 function applyVars(text: string, starts: VariableStartNumbers, index: number): string {
   const isEmpty = !text;
-  if (isEmpty) return text;
+  if (isEmpty) {
+    return text;
+  }
 
   text = text.replace(/(\$+)/, function (m: string) {
     return zeroPad((starts.dollar || 1) + index, m.length);
@@ -70,7 +72,9 @@ function applyVars(text: string, starts: VariableStartNumbers, index: number): s
 
 function zeroPad(n: number, minLength: number): string {
   let s = String(n);
-  while (s.length < minLength) s = '0' + s;
+  while (s.length < minLength) {
+    s = '0' + s;
+  }
 
   return s;
 }

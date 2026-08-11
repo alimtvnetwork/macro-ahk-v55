@@ -31,10 +31,12 @@ export function getProjectStorageChangeArea(): ProjectStorageChangeArea | undefi
 async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Record<string, unknown> | null> {
   try {
     const out = await storage.get("marco_projects");
-    if (out && typeof out === "object") return out;
+    if (out && typeof out === "object") {
+      return out;
+    }
   } catch (err) {
     logError("AutoCatch", "Automatically caught swallowed error", err); 
-}
+  }
 
   return new Promise((resolve) => {
     try {
@@ -94,19 +96,23 @@ async function loadRosterAfterDelay(
   if (shouldCancel) {
     return true;
   }
+
   const hasDelay = delayMs > 0;
   if (hasDelay) {
     await new Promise((r) => setTimeout(r, delayMs));
   }
+
   const projects = await loadProjectRosterSnapshot();
   const shouldCancelAfterLoad = isCancelled();
   if (shouldCancelAfterLoad) {
     return true;
   }
+
   const isEmpty = projects.length === 0;
   if (isEmpty) {
     return false;
   }
+
   onLoaded(projects);
 
   return true;

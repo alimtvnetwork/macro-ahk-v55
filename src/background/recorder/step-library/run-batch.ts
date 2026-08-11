@@ -28,9 +28,9 @@ import { ServiceResult } from '../../../utils/result-wrapper';
 
 import type { StepLibraryDb } from "./db";
 import {
-    runGroup,
-    type LeafStepExecutor,
-    type RunGroupResult,
+  runGroup,
+  type LeafStepExecutor,
+  type RunGroupResult,
 } from "./run-group-runner";
 import { BatchGroupStatusType, BatchFailurePolicyType } from "../../../types/enums";
 
@@ -80,67 +80,69 @@ export interface RunBatchResult {
 const NO_DURATION = 0;
 
 function defaultNow(): Date {
-    return new Date();
+  return new Date();
 }
 
 function emptyReport(stepGroupId: number): BatchGroupReport {
-    return {
-        StepGroupId: stepGroupId,
-        Status: "Pending",
-        StartedAt: null,
-        EndedAt: null,
-        DurationMs: NO_DURATION,
-        Result: null,
-    };
+  return {
+    StepGroupId: stepGroupId,
+    Status: "Pending",
+    StartedAt: null,
+    EndedAt: null,
+    DurationMs: NO_DURATION,
+    Result: null,
+  };
 }
 
 function emit(
-    cb: RunBatchOptions["onGroupStatus"],
-    report: BatchGroupReport,
-    index: number,
+  cb: RunBatchOptions["onGroupStatus"],
+  report: BatchGroupReport,
+  index: number,
 ): void {
-    if (cb !== undefined) cb(report, index);
+  if (cb !== undefined) {
+    cb(report, index);
+  }
 }
 
 async function runOneGroup(
-    opts: RunBatchOptions,
-    reports: BatchGroupReport[],
-    i: number,
-    now: () => Date,
+  opts: RunBatchOptions,
+  reports: BatchGroupReport[],
+  i: number,
+  now: () => Date,
 ): Promise<{ ok: boolean }> {
-    const startDate = now();
-    reports[i] = { ...reports[i], Status: "Running", StartedAt: startDate.toISOString() };
-    emit(opts.onGroupStatus, reports[i], i);
+  const startDate = now();
+  reports[i] = { ...reports[i], Status: "Running", StartedAt: startDate.toISOString() };
+  emit(opts.onGroupStatus, reports[i], i);
 
-    const result = await runGroup({
-        db: opts.db,
-        projectId: opts.projectId,
-        rootGroupId: reports[i].StepGroupId,
-        executeLeafStep: opts.executeLeafStep,
-        now: opts.now,
-    });
+  const result = await runGroup({
+    db: opts.db,
+    projectId: opts.projectId,
+    rootGroupId: reports[i].StepGroupId,
+    executeLeafStep: opts.executeLeafStep,
+    now: opts.now,
+  });
 
-    const endDate = now();
-    const final: BatchGroupReport = {
-        ...reports[i],
-        Status: result.Ok ? "Succeeded" : "Failed",
-        EndedAt: endDate.toISOString(),
-        DurationMs: endDate.getTime() - startDate.getTime(),
-        Result: result,
-    };
-    reports[i] = final;
-    emit(opts.onGroupStatus, final, i);
+  const endDate = now();
+  const final: BatchGroupReport = {
+    ...reports[i],
+    Status: result.Ok ? "Succeeded" : "Failed",
+    EndedAt: endDate.toISOString(),
+    DurationMs: endDate.getTime() - startDate.getTime(),
+    Result: result,
+  };
+  reports[i] = final;
+  emit(opts.onGroupStatus, final, i);
 
-    return { ok: result.Ok };
+  return { ok: result.Ok };
 }
 
 function markSkipped(
-    opts: RunBatchOptions,
-    reports: BatchGroupReport[],
-    i: number,
+  opts: RunBatchOptions,
+  reports: BatchGroupReport[],
+  i: number,
 ): void {
-    reports[i] = { ...reports[i], Status: "Skipped" };
-    emit(opts.onGroupStatus, reports[i], i);
+  reports[i] = { ...reports[i], Status: "Skipped" };
+  emit(opts.onGroupStatus, reports[i], i);
 }
 
 interface BatchTotals {
@@ -149,51 +151,59 @@ interface BatchTotals {
 }
 
 async function iterateGroups(
-    opts: RunBatchOptions,
-    reports: BatchGroupReport[],
-    now: () => Date,
-    policy: BatchFailurePolicy,
+  opts: RunBatchOptions,
+  reports: BatchGroupReport[],
+  now: () => Date,
+  policy: BatchFailurePolicy,
 ): Promise<BatchTotals> {
-    let succeeded = 0;
-    let failed = 0;
-    let aborted = false;
-    for (let i = 0; i < reports.length; i++) {
-        if (aborted) {
-            markSkipped(opts, reports, i);
-            continue;
-        }
-        const outcome = await runOneGroup(opts, reports, i, now);
-        if (outcome.ok) succeeded++; else failed++;
-        if (!outcome.ok && policy === 'StopOnFailure') aborted = true;
+  let succeeded = 0;
+  let failed = 0;
+  let aborted = false;
+  for (let i = 0; i < reports.length; i++) {
+    if (aborted) {
+      markSkipped(opts, reports, i);
+      continue;
     }
 
-    return { succeeded, failed };
+    const outcome = await runOneGroup(opts, reports, i, now);
+    if (outcome.ok) {
+      succeeded++;
+    } else {
+      failed++;
+    }
+
+    if (!outcome.ok && policy === 'StopOnFailure') {
+      aborted = true;
+    }
+  }
+
+  return { succeeded, failed };
 }
 
 function summarize(
-    reports: BatchGroupReport[],
-    totals: BatchTotals,
-    durationMs: number,
+  reports: BatchGroupReport[],
+  totals: BatchTotals,
+  durationMs: number,
 ): RunBatchResult {
-    const skipped = reports.length - totals.succeeded - totals.failed;
+  const skipped = reports.length - totals.succeeded - totals.failed;
 
-    return {
-        Ok: totals.failed === 0 && skipped === 0,
-        TotalGroups: reports.length,
-        Succeeded: totals.succeeded,
-        Failed: totals.failed,
-        Skipped: skipped,
-        Reports: reports,
-        DurationMs: durationMs,
-    };
+  return {
+    Ok: totals.failed === 0 && skipped === 0,
+    TotalGroups: reports.length,
+    Succeeded: totals.succeeded,
+    Failed: totals.failed,
+    Skipped: skipped,
+    Reports: reports,
+    DurationMs: durationMs,
+  };
 }
 
 export async function runBatch(opts: RunBatchOptions): Promise<RunBatchResult> {
-    const now = opts.now ?? defaultNow;
-    const policy: BatchFailurePolicy = opts.failurePolicy ?? "StopOnFailure";
-    const reports: BatchGroupReport[] = opts.orderedGroupIds.map(emptyReport);
-    const batchStart = now();
-    const totals = await iterateGroups(opts, reports, now, policy);
+  const now = opts.now ?? defaultNow;
+  const policy: BatchFailurePolicy = opts.failurePolicy ?? "StopOnFailure";
+  const reports: BatchGroupReport[] = opts.orderedGroupIds.map(emptyReport);
+  const batchStart = now();
+  const totals = await iterateGroups(opts, reports, now, policy);
 
-    return summarize(reports, totals, now().getTime() - batchStart.getTime());
+  return summarize(reports, totals, now().getTime() - batchStart.getTime());
 }

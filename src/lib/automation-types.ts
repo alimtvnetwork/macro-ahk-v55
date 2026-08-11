@@ -178,8 +178,13 @@ export function flattenSteps(steps: ChainStep[], depth = 0): FlattenedStep[] {
   for (const step of steps) {
     result.push({ step, depth });
     if (step.type === "condition") {
-      for (const s of step.then) result.push({ step: s, depth: depth + 1, branchLabel: "then" });
-      for (const s of step.else) result.push({ step: s, depth: depth + 1, branchLabel: "else" });
+      for (const s of step.then) {
+        result.push({ step: s, depth: depth + 1, branchLabel: "then" });
+      }
+
+      for (const s of step.else) {
+        result.push({ step: s, depth: depth + 1, branchLabel: "else" });
+      }
     }
   }
 

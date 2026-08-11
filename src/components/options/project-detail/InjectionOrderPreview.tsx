@@ -59,14 +59,24 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
     const visited = new Set<string>();
     const collectDeps = (depList: Array<{ projectId: string; version: string }>) => {
       for (const dep of depList) {
-        if (visited.has(dep.projectId)) continue;
+        if (visited.has(dep.projectId)) {
+          continue;
+        }
+
         visited.add(dep.projectId);
         const depProject = allProjects.find((p) => p.id === dep.projectId);
-        if (!depProject) continue;
-        if (depProject.isGlobal) continue;
+        if (!depProject) {
+          continue;
+        }
+
+        if (depProject.isGlobal) {
+          continue;
+        }
+
         if (depProject.dependencies?.length) {
           collectDeps(depProject.dependencies);
         }
+
         const scripts = depProject.scripts ?? [];
         if (scripts.length === 0) {
           result.push({ step: step++, label: depProject.name, scriptName: depProject.name, stage: "dependency", projectName: depProject.name, isEnabled: true, order: -500 });
@@ -77,6 +87,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
         }
       }
     };
+
     collectDeps(deps);
 
     for (const s of project.scripts ?? []) {
@@ -142,7 +153,10 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
             <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Stages:</span>
             {(["global", "dependency", "project"] as const).map((stage) => {
               const count = entries.filter((e) => e.stage === stage).length;
-              if (count === 0) return null;
+              if (count === 0) {
+                return null;
+              }
+
               const Icon = stageIcon(stage);
 
               return (

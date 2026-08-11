@@ -27,18 +27,18 @@ import { logBgWarnError, BgLogTag } from "../bg-logger";
  * are surfaced to the popup for the per-script results table.
  */
 export function buildSuccessResult(
-    scriptId: string,
-    startTime: number,
-    injectionPath?: string,
-    domTarget?: string,
+  scriptId: string,
+  startTime: number,
+  injectionPath?: string,
+  domTarget?: string,
 ): InjectionResult {
-    return {
-        scriptId,
-        isSuccess: true,
-        durationMs: Date.now() - startTime,
-        injectionPath,
-        domTarget,
-    };
+  return {
+    scriptId,
+    isSuccess: true,
+    durationMs: Date.now() - startTime,
+    injectionPath,
+    domTarget,
+  };
 }
 
 /**
@@ -47,22 +47,22 @@ export function buildSuccessResult(
  * without scraping the per-script results table.
  */
 export function buildErrorResult(
-    scriptId: string,
-    startTime: number,
-    error: unknown,
+  scriptId: string,
+  startTime: number,
+  error: unknown,
 ): InjectionResult {
-    const errorMessage = error instanceof Error
-        ? error.message
-        : String(error);
+  const errorMessage = error instanceof Error
+    ? error.message
+    : String(error);
 
-    logBgWarnError(BgLogTag.INJECTION, `Script ${scriptId} failed: ${errorMessage}`);
+  logBgWarnError(BgLogTag.INJECTION, `Script ${scriptId} failed: ${errorMessage}`);
 
-    return {
-        scriptId,
-        isSuccess: false,
-        errorMessage,
-        durationMs: Date.now() - startTime,
-    };
+  return {
+    scriptId,
+    isSuccess: false,
+    errorMessage,
+    durationMs: Date.now() - startTime,
+  };
 }
 
 /**
@@ -72,10 +72,15 @@ export function buildErrorResult(
  * `spec/05-chrome-extension/20-user-script-error-isolation.md`.
  */
 export function resolveInjectionPath(result: CspInjectionResult): string {
-    if (result.world === "USER_SCRIPT") return "userScripts";
-    if (result.isFallback && result.world === "ISOLATED") return "isolated-blob";
+  if (result.world === "USER_SCRIPT") {
+    return "userScripts";
+  }
 
-    return "main-blob";
+  if (result.isFallback && result.world === "ISOLATED") {
+    return "isolated-blob";
+  }
+
+  return "main-blob";
 }
 
 /**
@@ -84,18 +89,18 @@ export function resolveInjectionPath(result: CspInjectionResult): string {
  * tuned to read clearly in the popup without operator context.
  */
 export function buildSkipMessage(reason: SkipReason, scriptName: string): string {
-    switch (reason) {
-        case "disabled":
-            return `Script "${scriptName}" is disabled — enable it in the Scripts panel to inject.`;
-        case "missing":
-            return `Script "${scriptName}" not found in storage — it may have been deleted or not yet seeded.`;
-        case "resolver_mismatch":
-            return `Script "${scriptName}" could not be resolved — the format doesn't match any known script type.`;
-        case "empty_code":
-            return `Script "${scriptName}" was skipped — its code is empty.`;
-        default:
-            return `Script "${scriptName}" was skipped (unknown reason).`;
-    }
+  switch (reason) {
+    case "disabled":
+      return `Script "${scriptName}" is disabled — enable it in the Scripts panel to inject.`;
+    case "missing":
+      return `Script "${scriptName}" not found in storage — it may have been deleted or not yet seeded.`;
+    case "resolver_mismatch":
+      return `Script "${scriptName}" could not be resolved — the format doesn't match any known script type.`;
+    case "empty_code":
+      return `Script "${scriptName}" was skipped — its code is empty.`;
+    default:
+      return `Script "${scriptName}" was skipped (unknown reason).`;
+  }
 }
 
 /**
@@ -105,9 +110,9 @@ export function buildSkipMessage(reason: SkipReason, scriptName: string): string
  * Returns null when the pattern is not present.
  */
 export function extractMacroVersion(code: string): string | null {
-    const match = code.match(/VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/);
+  const match = code.match(/VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/);
 
-    return match?.[1] ?? null;
+  return match?.[1] ?? null;
 }
 
 /**
@@ -116,16 +121,16 @@ export function extractMacroVersion(code: string): string | null {
  * keeps the failure record in lockstep with `buildErrorResult`.
  */
 export function buildSyntaxFailureResult(
-    scriptId: string,
-    scriptName: string | undefined,
-    errorMessage: string,
-    startTime: number,
+  scriptId: string,
+  scriptName: string | undefined,
+  errorMessage: string,
+  startTime: number,
 ): InjectionResult {
-    return {
-        scriptId,
-        scriptName,
-        isSuccess: false,
-        durationMs: Date.now() - startTime,
-        errorMessage,
-    };
+  return {
+    scriptId,
+    scriptName,
+    isSuccess: false,
+    durationMs: Date.now() - startTime,
+    errorMessage,
+  };
 }

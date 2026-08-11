@@ -6,52 +6,54 @@ import { ALLOWED_HOME_URLS } from "./allowed-home-url.enum";
 import { logError } from "./logger";
 
 export function isHomeUrlAllowed(href: string): boolean {
-    return ALLOWED_HOME_URLS.includes(href);
+  return ALLOWED_HOME_URLS.includes(href);
 }
 
 export function shouldActivateHomeScreen(): boolean {
-    try {
-        return isHomeUrlAllowed(window.location.href);
-    } catch (caught) {
-        logError("UrlGuard", caught);
+  try {
+    return isHomeUrlAllowed(window.location.href);
+  } catch (caught) {
+    logError("UrlGuard", caught);
 
-        return false;
-    }
+    return false;
+  }
 }
 
 export function watchSpaNavigation(onNavigate: () => void): () => void {
-    try {
-        return installNavWatchers(onNavigate);
-    } catch (caught) {
-        logError("UrlGuard.watch", caught);
+  try {
+    return installNavWatchers(onNavigate);
+  } catch (caught) {
+    logError("UrlGuard.watch", caught);
 
-        return () => undefined;
-    }
+    return () => undefined;
+  }
 }
 
 function installNavWatchers(onNavigate: () => void): () => void {
-    const handler = () => onNavigate();
-    window.addEventListener("popstate", handler);
-    const restorePush = patchHistoryMethod("pushState", handler);
-    const restoreReplace = patchHistoryMethod("replaceState", handler);
+  const handler = () => onNavigate();
+  window.addEventListener("popstate", handler);
+  const restorePush = patchHistoryMethod("pushState", handler);
+  const restoreReplace = patchHistoryMethod("replaceState", handler);
 
-    return () => detach(handler, restorePush, restoreReplace);
+  return () => detach(handler, restorePush, restoreReplace);
 }
 
 function patchHistoryMethod(name: "pushState" | "replaceState", handler: () => void): () => void {
-    const original = history[name].bind(history);
-    history[name] = function patched(...args: Parameters<typeof history[typeof name]>) {
-        const result = original.apply(history, args);
-        handler();
+  const original = history[name].bind(history);
+  history[name] = function patched(...args: Parameters<typeof history[typeof name]>) {
+    const result = original.apply(history, args);
+    handler();
 
-        return result;
-    } as typeof history[typeof name];
+    return result;
+  } as typeof history[typeof name];
 
-    return () => { history[name] = original; };
+  return () => {
+    history[name] = original; 
+  };
 }
 
 function detach(handler: () => void, restorePush: () => void, restoreReplace: () => void): void {
-    window.removeEventListener("popstate", handler);
-    restorePush();
-    restoreReplace();
+  window.removeEventListener("popstate", handler);
+  restorePush();
+  restoreReplace();
 }

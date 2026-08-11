@@ -60,10 +60,18 @@ export interface DeleteHistoryResult {
 }
 
 function clampLimit(limit: number | undefined): number {
-  if (typeof limit !== 'number' || !Number.isFinite(limit)) return DEFAULT_HISTORY_LIMIT;
+  if (typeof limit !== 'number' || !Number.isFinite(limit)) {
+    return DEFAULT_HISTORY_LIMIT;
+  }
+
   const floored = Math.floor(limit);
-  if (floored < 1) return 1;
-  if (floored > MAX_HISTORY_LIMIT) return MAX_HISTORY_LIMIT;
+  if (floored < 1) {
+    return 1;
+  }
+
+  if (floored > MAX_HISTORY_LIMIT) {
+    return MAX_HISTORY_LIMIT;
+  }
 
   return floored;
 }
@@ -78,6 +86,7 @@ async function hydrateBodies(projectId: string, rows: ChatSubmitRow[]): Promise<
       logError(SCOPE, `hydrateBodies read failed (projectId=${projectId}, fileId=${row.FileId})`, err);
       body = null;
     }
+
     entries.push({
       id: row.Id,
       projectId: row.ProjectId,
@@ -126,6 +135,7 @@ export async function deleteHistoryEntry(
   if (!opfsRemoved) {
     return { isDeleted: false, opfsRemoved: false, rowRemoved: false };
   }
+
   const rowRemoved = await deleteChatSubmit(id);
 
   return { isDeleted: rowRemoved, opfsRemoved, rowRemoved };

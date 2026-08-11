@@ -9,9 +9,9 @@
 
 import { getSettingsOverrides } from '../settings-store';
 import {
-    PRO_ZERO_CACHE_TTL_DEFAULT_MIN,
-    PRO_ZERO_CACHE_TTL_MIN_BOUND,
-    PRO_ZERO_CACHE_TTL_MAX_BOUND,
+  PRO_ZERO_CACHE_TTL_DEFAULT_MIN,
+  PRO_ZERO_CACHE_TTL_MIN_BOUND,
+  PRO_ZERO_CACHE_TTL_MAX_BOUND,
 } from './pro-zero-constants';
 
 interface ProZeroOverridesShape {
@@ -19,26 +19,33 @@ interface ProZeroOverridesShape {
 }
 
 function readOverrideMinutes(): number | undefined {
-    const ovr = getSettingsOverrides() as unknown as ProZeroOverridesShape;
-    const v = ovr.proZeroCreditBalanceCacheTtlMinutes;
+  const ovr = getSettingsOverrides() as unknown as ProZeroOverridesShape;
+  const v = ovr.proZeroCreditBalanceCacheTtlMinutes;
 
-    return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }
 
 function clamp(min: number): number {
-    if (min < PRO_ZERO_CACHE_TTL_MIN_BOUND) return PRO_ZERO_CACHE_TTL_MIN_BOUND;
-    if (min > PRO_ZERO_CACHE_TTL_MAX_BOUND) return PRO_ZERO_CACHE_TTL_MAX_BOUND;
+  if (min < PRO_ZERO_CACHE_TTL_MIN_BOUND) {
+    return PRO_ZERO_CACHE_TTL_MIN_BOUND;
+  }
 
-    return Math.floor(min);
+  if (min > PRO_ZERO_CACHE_TTL_MAX_BOUND) {
+    return PRO_ZERO_CACHE_TTL_MAX_BOUND;
+  }
+
+  return Math.floor(min);
 }
 
 export function getProZeroCacheTtlMinutes(): number {
-    const override = readOverrideMinutes();
-    if (override !== undefined) return clamp(override);
+  const override = readOverrideMinutes();
+  if (override !== undefined) {
+    return clamp(override);
+  }
 
-    return PRO_ZERO_CACHE_TTL_DEFAULT_MIN;
+  return PRO_ZERO_CACHE_TTL_DEFAULT_MIN;
 }
 
 export function getProZeroCacheTtlMs(): number {
-    return getProZeroCacheTtlMinutes() * 60_000;
+  return getProZeroCacheTtlMinutes() * 60_000;
 }

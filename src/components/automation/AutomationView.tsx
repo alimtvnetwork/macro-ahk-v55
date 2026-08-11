@@ -44,7 +44,8 @@ async function loadChains(project: string): Promise<AutomationChain[]> {
     });
 
     return result.isOk && result.chains ? result.chains : [];
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     return [];
   }
@@ -104,7 +105,8 @@ async function loadProjects(): Promise<Array<{ id: string; name: string; slug: s
     }
 
     return [];
-  } catch (err) { void 0;
+  } catch (err) {
+    void 0;
 
     return [];
   }
@@ -135,7 +137,10 @@ export function AutomationView() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshChains = useCallback(async () => {
-    if (!selectedProject) return;
+    if (!selectedProject) {
+      return;
+    }
+
     setLoading(true);
     const loaded = await loadChains(selectedProject);
     setChains(loaded);
@@ -154,10 +159,11 @@ export function AutomationView() {
       const detail = (e as CustomEvent).detail as { message: string; level: string };
       const notify = detail.level === "error" ? toast.error
         : detail.level === "warning" ? toast.warning
-        : detail.level === "success" ? toast.success
-        : toast.info;
+          : detail.level === "success" ? toast.success
+            : toast.info;
       notify(detail.message);
     };
+
     window.addEventListener("automation-notify", handler);
 
     return () => window.removeEventListener("automation-notify", handler);
@@ -195,8 +201,12 @@ export function AutomationView() {
 
   const handlePause = useCallback(() => runnerRef.current?.pause(), []);
   const handleResume = useCallback(() => runnerRef.current?.resume(), []);
-  const handleCancel = useCallback(() => { runnerRef.current?.cancel(); }, []);
-  const handleDismiss = useCallback(() => { setExecution(null); runnerRef.current = null; }, []);
+  const handleCancel = useCallback(() => {
+    runnerRef.current?.cancel(); 
+  }, []);
+  const handleDismiss = useCallback(() => {
+    setExecution(null); runnerRef.current = null; 
+  }, []);
 
   const handleExport = useCallback(() => {
     const blob = new Blob([JSON.stringify(chains, null, 2)], { type: "application/json" });
@@ -215,18 +225,26 @@ export function AutomationView() {
     input.accept = ".json";
     input.onchange = async () => {
       const file = input.files?.[0];
-      if (!file) return;
+      if (!file) {
+        return;
+      }
+
       try {
         const text = await file.text();
         const imported = JSON.parse(text) as AutomationChain[];
-        if (!Array.isArray(imported)) throw new Error("Invalid format");
+        if (!Array.isArray(imported)) {
+          throw new Error("Invalid format");
+        }
+
         const count = await importChainsToDb(imported, selectedProject);
         toast.success(`Imported ${count} chain(s)`);
         void refreshChains();
-      } catch (err) { void 0;
+      } catch (err) {
+        void 0;
         toast.error("Failed to import chains");
       }
     };
+
     input.click();
   }, [refreshChains, selectedProject]);
 

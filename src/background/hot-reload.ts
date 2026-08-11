@@ -37,42 +37,43 @@ let pollingTimerId: ReturnType<typeof setInterval> | null = null;
  * (see vite.config.extension.ts → copyManifest()).
  */
 function isDevBuild(): boolean {
-    try {
-        const manifest = chrome.runtime.getManifest() as chrome.runtime.Manifest & { version_name?: string };
-        const versionName = manifest.version_name ?? "";
+  try {
+    const manifest = chrome.runtime.getManifest() as chrome.runtime.Manifest & { version_name?: string };
+    const versionName = manifest.version_name ?? "";
 
-        return versionName.toLowerCase().includes("dev");
-    } catch (err) { 
-        // If we cannot read the manifest, fail safe and treat as production.
-        return false;
-    }
+    return versionName.toLowerCase().includes("dev");
+  } catch (err) { 
+    // If we cannot read the manifest, fail safe and treat as production.
+    return false;
+  }
 }
 
 /** Starts the hot-reload polling loop (no-op in production). */
 export function startHotReload(): void {
-    if (pollingTimerId !== null) {
-        return;
-    }
+  if (pollingTimerId !== null) {
+    return;
+  }
 
-    if (!isDevBuild()) {
-        console.log("[hot-reload] Disabled (production build) — not polling build-meta.json");
+  if (!isDevBuild()) {
+    console.log("[hot-reload] Disabled (production build) — not polling build-meta.json");
 
-        return;
-    }
+    return;
+  }
 
-    void pollBuildMeta();
-    pollingTimerId = setInterval(() => void pollBuildMeta(), HOT_RELOAD_INTERVAL_MS);
-    console.log("[hot-reload] Polling started (every %dms, dev build only)", HOT_RELOAD_INTERVAL_MS);
+  void pollBuildMeta();
+  pollingTimerId = setInterval(() => void pollBuildMeta(), HOT_RELOAD_INTERVAL_MS);
+  console.log("[hot-reload] Polling started (every %dms, dev build only)", HOT_RELOAD_INTERVAL_MS);
 }
 
 /** Stops the polling loop. Safe to call when not started. */
 export function stopHotReload(): void {
-    if (pollingTimerId === null) {
-        return;
-    }
-    clearInterval(pollingTimerId);
-    pollingTimerId = null;
-    console.log("[hot-reload] Polling stopped");
+  if (pollingTimerId === null) {
+    return;
+  }
+
+  clearInterval(pollingTimerId);
+  pollingTimerId = null;
+  console.log("[hot-reload] Polling stopped");
 }
 
 /* ------------------------------------------------------------------ */
@@ -81,55 +82,55 @@ export function stopHotReload(): void {
 
 /** Fetches build-meta.json and triggers reload if buildId changed. */
 async function pollBuildMeta(): Promise<void> {
-    try {
-        const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
-        const response = ServiceResult.wrapFetch(await fetch(metaUrl, { cache: "no-store" }));
+  try {
+    const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
+    const response = ServiceResult.wrapFetch(await fetch(metaUrl, { cache: "no-store" }));
 
-        if (response.isFail) {
-            // HEFF: a non-2xx from build-meta.json means the file is gone or
-            // mis-served. Do NOT keep polling once per second — stop the loop
-            // and surface the status so the dev sees it.
-            console.warn(
-                `[HEFF] HTTP ${response.status} on GET ${metaUrl} — build-meta poll halted. ` +
+    if (response.isFail) {
+      // HEFF: a non-2xx from build-meta.json means the file is gone or
+      // mis-served. Do NOT keep polling once per second — stop the loop
+      // and surface the status so the dev sees it.
+      console.warn(
+        `[HEFF] HTTP ${response.status} on GET ${metaUrl} — build-meta poll halted. ` +
                 `Awaiting user instruction (reload extension after rebuild).`,
-            );
-            stopHotReload();
+      );
+      stopHotReload();
 
-            return;
-        }
+      return;
+    }
 
-        const meta = await response.json() as { buildId?: string };
-        const currentBuildId = meta.buildId ?? null;
-        const hasBuildId = currentBuildId !== null;
+    const meta = await response.json() as { buildId?: string };
+    const currentBuildId = meta.buildId ?? null;
+    const hasBuildId = currentBuildId !== null;
 
-        if (!hasBuildId) {
-            return;
-        }
+    if (!hasBuildId) {
+      return;
+    }
 
-        const isFirstPoll = lastKnownBuildId === null;
+    const isFirstPoll = lastKnownBuildId === null;
 
-        if (isFirstPoll) {
-            lastKnownBuildId = currentBuildId;
-            console.log("[hot-reload] Baseline buildId: %s", currentBuildId);
+    if (isFirstPoll) {
+      lastKnownBuildId = currentBuildId;
+      console.log("[hot-reload] Baseline buildId: %s", currentBuildId);
 
-            return;
-        }
+      return;
+    }
 
-        const isBuildChanged = currentBuildId !== lastKnownBuildId;
+    const isBuildChanged = currentBuildId !== lastKnownBuildId;
 
-        if (isBuildChanged) {
-            const previousBuildId = lastKnownBuildId;
-            lastKnownBuildId = currentBuildId;
-            const cacheSyncResult = await syncCacheWithBuildId(currentBuildId);
-            console.log(
-                "[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!",
-                previousBuildId,
-                currentBuildId,
-                cacheSyncResult.cleared,
-            );
-            chrome.runtime.reload();
-        }
-    } catch (err) {
+    if (isBuildChanged) {
+      const previousBuildId = lastKnownBuildId;
+      lastKnownBuildId = currentBuildId;
+      const cacheSyncResult = await syncCacheWithBuildId(currentBuildId);
+      console.log(
+        "[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!",
+        previousBuildId,
+        currentBuildId,
+        cacheSyncResult.cleared,
+      );
+      chrome.runtime.reload();
+    }
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }

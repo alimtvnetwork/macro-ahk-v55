@@ -26,7 +26,9 @@ import { extractUserIdFromBearer } from './ws-move-user-id';
 
 import { LabelType } from './types';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // Helper — auth failure check
@@ -44,8 +46,14 @@ function isAuthFailure(status: number): boolean {
  * security challenge on lovable.dev (verify email / 2FA / wait for cooldown).
  */
 function isCastleDenied(status: number, data: unknown): boolean {
-  if (status !== 403) return false;
-  if (!data || typeof data !== 'object') return false;
+  if (status !== 403) {
+    return false;
+  }
+
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
   const body = data as Record<string, unknown>;
 
   return body.type === 'castle_denied';
@@ -88,7 +96,9 @@ export function updateLoopMoveStatus(statusState: string, message: string): void
   el.textContent = message;
 
   if (statusState === 'success') {
-    setTimeout(function () { el.textContent = ''; }, 5000);
+    setTimeout(function () {
+      el.textContent = ''; 
+    }, 5000);
   }
 }
 
@@ -200,9 +210,19 @@ function confirmMove(targetWorkspaceName: string): Promise<boolean> {
       resolve(result);
     };
 
-    cancelBtn.onclick = function () { cleanup(false); };
-    confirmBtn.onclick = function () { cleanup(true); };
-    overlay.onclick = function (e: Event) { if (e.target === overlay) { cleanup(false); } };
+    cancelBtn.onclick = function () {
+      cleanup(false); 
+    };
+
+    confirmBtn.onclick = function () {
+      cleanup(true); 
+    };
+
+    overlay.onclick = function (e: Event) {
+      if (e.target === overlay) {
+        cleanup(false); 
+      } 
+    };
 
     btnRow.appendChild(cancelBtn);
     btnRow.appendChild(confirmBtn);
@@ -307,7 +327,10 @@ async function resolveMoveToken(isRetry: boolean): Promise<string> {
 async function buildMoveHeaders(): Promise<Record<string, string>> {
   const castleToken = await getCastleRequestToken();
   const headers: Record<string, string> = {};
-  if (castleToken) headers['x-castle-request-token'] = castleToken;
+  if (castleToken) {
+    headers['x-castle-request-token'] = castleToken;
+  }
+
   logSub('Castle token: ' + (castleToken ? 'present (len=' + castleToken.length + ')' : 'MISSING — request may be blocked'), 1);
 
   return headers;
@@ -331,17 +354,20 @@ async function handleMoveResponse(
 
     return;
   }
+
   if (isAuthFailure(resp.status) && !isRetry) {
     await handleMoveAuthFailure(projectId, targetWorkspaceId, targetWorkspaceName, token, resp.status);
 
     return;
   }
+
   if (resp.ok) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
 
     return;
   }
+
   logError('ws-move', 'Move response: ' + resp.status + label);
   const bodyPreview = JSON.stringify(resp.data).substring(0, 500);
   logError('Move failed', 'HTTP ' + resp.status + ' | body: ' + bodyPreview);
@@ -357,9 +383,11 @@ async function executeMove(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveMoveToken(isRetry);
-  if (!token) { handleMoveNoToken();
+  if (!token) {
+    handleMoveNoToken();
 
- return; }
+    return; 
+  }
 
   const currentUserId = extractUserIdFromBearer(token);
   if (!currentUserId) {
@@ -436,6 +464,7 @@ async function handleSwitchAuthFailure(
   } catch { // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
     // fall through to handleMoveNoToken
   }
+
   handleMoveNoToken();
 }
 
@@ -566,6 +595,7 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
   } catch (caught: unknown) {
     logError('moveToWorkspace.creditRefresh', 'post-move /credit-balance refresh failed', caught);
   }
+
   try {
     await mc().credits.fetchAsync(false);
   } catch (caught: unknown) {

@@ -26,129 +26,129 @@ const MACRO_LOOPING_FILE = "standalone-scripts/macro-controller/src/macro-loopin
 const MACROCONTROLLER_FILE = "standalone-scripts/macro-controller/src/core/MacroController.ts";
 
 function readFile(relPath: string): string {
-    return fs.readFileSync(path.resolve(process.cwd(), relPath), "utf-8");
+  return fs.readFileSync(path.resolve(process.cwd(), relPath), "utf-8");
 }
 
 describe("MacroController namespace registration", () => {
-    it("installWindowFacade exposes MacroController on window", () => {
-        const content = readFile(MACROCONTROLLER_FILE);
-        // Must assign MacroController to window for recovery
-        expect(content).toMatch(/window\s*(as\s*any)?\s*\.\s*MacroController\s*=/);
-    });
+  it("installWindowFacade exposes MacroController on window", () => {
+    const content = readFile(MACROCONTROLLER_FILE);
+    // Must assign MacroController to window for recovery
+    expect(content).toMatch(/window\s*(as\s*any)?\s*\.\s*MacroController\s*=/);
+  });
 
-    it("installWindowFacade calls markInitialized()", () => {
-        const content = readFile(MACROCONTROLLER_FILE);
-        expect(content).toContain("markInitialized()");
-    });
+  it("installWindowFacade calls markInitialized()", () => {
+    const content = readFile(MACROCONTROLLER_FILE);
+    expect(content).toContain("markInitialized()");
+  });
 });
  
 describe("Startup recovery hooks are wired", () => {
-    it("startup.ts imports setupPersistenceObserver", () => {
-        const content = readFile(STARTUP_FILE);
-        expect(content).toContain("setupPersistenceObserver");
-    });
+  it("startup.ts imports setupPersistenceObserver", () => {
+    const content = readFile(STARTUP_FILE);
+    expect(content).toContain("setupPersistenceObserver");
+  });
 
-    it("startup.ts imports setupGlobalErrorHandlers", () => {
-        const content = readFile(STARTUP_FILE);
-        expect(content).toContain("setupGlobalErrorHandlers");
-    });
+  it("startup.ts imports setupGlobalErrorHandlers", () => {
+    const content = readFile(STARTUP_FILE);
+    expect(content).toContain("setupGlobalErrorHandlers");
+  });
 
-    it("startup.ts imports setupDiagnosticDump", () => {
-        const content = readFile(STARTUP_FILE);
-        expect(content).toContain("setupDiagnosticDump");
-    });
+  it("startup.ts imports setupDiagnosticDump", () => {
+    const content = readFile(STARTUP_FILE);
+    expect(content).toContain("setupDiagnosticDump");
+  });
 
-    it("bootstrap() calls setupPersistenceObserver", () => {
-        const content = readFile(STARTUP_FILE);
-        // Must be invoked, not just imported
-        expect(content).toMatch(/setupPersistenceObserver\s*\(/);
-    });
+  it("bootstrap() calls setupPersistenceObserver", () => {
+    const content = readFile(STARTUP_FILE);
+    // Must be invoked, not just imported
+    expect(content).toMatch(/setupPersistenceObserver\s*\(/);
+  });
 
-    it("bootstrap() calls setupGlobalErrorHandlers", () => {
-        const content = readFile(STARTUP_FILE);
-        expect(content).toMatch(/setupGlobalErrorHandlers\s*\(/);
-    });
+  it("bootstrap() calls setupGlobalErrorHandlers", () => {
+    const content = readFile(STARTUP_FILE);
+    expect(content).toMatch(/setupGlobalErrorHandlers\s*\(/);
+  });
 
-    it("bootstrap() calls setupDiagnosticDump", () => {
-        const content = readFile(STARTUP_FILE);
-        expect(content).toMatch(/setupDiagnosticDump\s*\(/);
-    });
+  it("bootstrap() calls setupDiagnosticDump", () => {
+    const content = readFile(STARTUP_FILE);
+    expect(content).toMatch(/setupDiagnosticDump\s*\(/);
+  });
 });
 
 describe("Post-injection verification exists", () => {
-    it("injection-handler has verifyPostInjectionGlobals", () => {
-        const content = readFile("src/background/handlers/injection-handler.ts");
-        expect(content).toContain("verifyPostInjectionGlobals");
-    });
+  it("injection-handler has verifyPostInjectionGlobals", () => {
+    const content = readFile("src/background/handlers/injection-handler.ts");
+    expect(content).toContain("verifyPostInjectionGlobals");
+  });
 
-    it("verification checks for marco SDK, MacroController, and UI container", () => {
-        const content = readFile("src/background/handlers/injection-handler.ts");
-        expect(content).toContain("window.marco");
-        expect(content).toContain("RiseupAsiaMacroExt");
-        expect(content).toContain("MacroController");
-        expect(content).toContain("macro-loop-container");
-    });
+  it("verification checks for marco SDK, MacroController, and UI container", () => {
+    const content = readFile("src/background/handlers/injection-handler.ts");
+    expect(content).toContain("window.marco");
+    expect(content).toContain("RiseupAsiaMacroExt");
+    expect(content).toContain("MacroController");
+    expect(content).toContain("macro-loop-container");
+  });
 });
 
 describe("MacroController runtime namespace healing", () => {
-    it("api-namespace.ts heals frozen sub-branches and writes a structured diagnostic", () => {
-        const content = readFile("standalone-scripts/macro-controller/src/api-namespace.ts");
-        // Deep healing pass replaces frozen sub-branches (api, _internal, meta).
-        expect(content).toContain("ensureMutableBranch");
-        expect(content).toContain("Object.isExtensible(child)");
-        // Per-branch defensive checks — were previously only typeof checks.
-        expect(content).toContain("!Object.isExtensible(api.loop)");
-        expect(content).toContain("!Object.isExtensible(mc._internal)");
-        // Structured diagnostic contract: version, lookup, missing, calledBy, reason, stack.
-        expect(content).toContain("buildNamespaceDiagnostic");
-        expect(content).toContain("MacroController v");
-        expect(content).toContain("Lookup:");
-        expect(content).toContain("Missing:");
-        expect(content).toContain("CalledBy:");
-        expect(content).toContain("Reason:");
-        // Toast must NOT use the old generic message — must include version + the location hint.
-        expect(content).not.toContain("'❌ Failed to access MacroController namespace'");
-        expect(content).toContain("Namespace blocked at Projects.MacroController");
-    });
+  it("api-namespace.ts heals frozen sub-branches and writes a structured diagnostic", () => {
+    const content = readFile("standalone-scripts/macro-controller/src/api-namespace.ts");
+    // Deep healing pass replaces frozen sub-branches (api, _internal, meta).
+    expect(content).toContain("ensureMutableBranch");
+    expect(content).toContain("Object.isExtensible(child)");
+    // Per-branch defensive checks — were previously only typeof checks.
+    expect(content).toContain("!Object.isExtensible(api.loop)");
+    expect(content).toContain("!Object.isExtensible(mc._internal)");
+    // Structured diagnostic contract: version, lookup, missing, calledBy, reason, stack.
+    expect(content).toContain("buildNamespaceDiagnostic");
+    expect(content).toContain("MacroController v");
+    expect(content).toContain("Lookup:");
+    expect(content).toContain("Missing:");
+    expect(content).toContain("CalledBy:");
+    expect(content).toContain("Reason:");
+    // Toast must NOT use the old generic message — must include version + the location hint.
+    expect(content).not.toContain("'❌ Failed to access MacroController namespace'");
+    expect(content).toContain("Namespace blocked at Projects.MacroController");
+  });
 
-    it("shared global types live in standalone-scripts/types/riseup-namespace.d.ts", () => {
-        const content = readFile("standalone-scripts/types/riseup-namespace.d.ts");
-        expect(content).toContain("RiseupAsiaMacroExtNamespace");
-        expect(content).toContain("RiseupAsiaProjectBase");
-        // No `any` and no bare `unknown` index signatures in the public surface.
-        expect(content).not.toMatch(/:\s*any\b/);
-        expect(content).not.toMatch(/\[key:\s*string\]:\s*unknown/);
-    });
+  it("shared global types live in standalone-scripts/types/riseup-namespace.d.ts", () => {
+    const content = readFile("standalone-scripts/types/riseup-namespace.d.ts");
+    expect(content).toContain("RiseupAsiaMacroExtNamespace");
+    expect(content).toContain("RiseupAsiaProjectBase");
+    // No `any` and no bare `unknown` index signatures in the public surface.
+    expect(content).not.toMatch(/:\s*any\b/);
+    expect(content).not.toMatch(/\[key:\s*string\]:\s*unknown/);
+  });
 });
 
 describe("Version alignment", () => {
-    it("macro-controller shared-version and extension constants both derive from version.json", () => {
-        const pkg = JSON.parse(readFile("version.json")) as { version: string };
-        // version.json is a build-time artifact regenerated by
-        // scripts/write-version-from-tag.mjs. Accept the `0.0.0-dev` local
-        // fallback and prerelease suffixes; strict X.Y.Z is only guaranteed
-        // on tag-triggered CI runs. See
-        // .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md
-        expect(pkg.version).toMatch(/^\d+\.\d+\.\d+([.-].+)?$/);
+  it("macro-controller shared-version and extension constants both derive from version.json", () => {
+    const pkg = JSON.parse(readFile("version.json")) as { version: string };
+    // version.json is a build-time artifact regenerated by
+    // scripts/write-version-from-tag.mjs. Accept the `0.0.0-dev` local
+    // fallback and prerelease suffixes; strict X.Y.Z is only guaranteed
+    // on tag-triggered CI runs. See
+    // .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md
+    expect(pkg.version).toMatch(/^\d+\.\d+\.\d+([.-].+)?$/);
 
-        // Both modules must import from the canonical source rather than hard-coding a literal.
-        const constants = readFile("src/shared/constants.ts");
-        expect(constants).toMatch(/from\s+["']\.\/version["']/);
+    // Both modules must import from the canonical source rather than hard-coding a literal.
+    const constants = readFile("src/shared/constants.ts");
+    expect(constants).toMatch(/from\s+["']\.\/version["']/);
 
-        const sharedVersion = readFile("standalone-scripts/shared-version.ts");
-        expect(sharedVersion).toMatch(/from\s+["']\.\.\/version\.json["']/);
+    const sharedVersion = readFile("standalone-scripts/shared-version.ts");
+    expect(sharedVersion).toMatch(/from\s+["']\.\.\/version\.json["']/);
 
-        const sharedState = readFile("standalone-scripts/macro-controller/src/shared-state.ts");
-        expect(sharedState).toMatch(/from\s+['"]\.\.\/\.\.\/shared-version['"]/);
+    const sharedState = readFile("standalone-scripts/macro-controller/src/shared-state.ts");
+    expect(sharedState).toMatch(/from\s+['"]\.\.\/\.\.\/shared-version['"]/);
 
-        const extensionConfig = readFile("vite.config.extension.ts");
-        expect(extensionConfig).toContain('resolve(EXT_DIR, "version.json")');
-        expect(extensionConfig).toMatch(/manifest\.version\s*=\s*rootVersion/);
+    const extensionConfig = readFile("vite.config.extension.ts");
+    expect(extensionConfig).toContain('resolve(EXT_DIR, "version.json")');
+    expect(extensionConfig).toMatch(/manifest\.version\s*=\s*rootVersion/);
 
-        const builtManifestCheck = readFile("scripts/check-built-manifest-csp.mjs");
-        expect(builtManifestCheck).toContain("Built manifest version matches version.json");
+    const builtManifestCheck = readFile("scripts/check-built-manifest-csp.mjs");
+    expect(builtManifestCheck).toContain("Built manifest version matches version.json");
 
-        const packageJson = readFile("package.json");
-        expect(packageJson).toContain("node scripts/sync-manifest-version.mjs && node scripts/check-manifest-permissions.mjs");
-    });
+    const packageJson = readFile("package.json");
+    expect(packageJson).toContain("node scripts/sync-manifest-version.mjs && node scripts/check-manifest-permissions.mjs");
+  });
 });

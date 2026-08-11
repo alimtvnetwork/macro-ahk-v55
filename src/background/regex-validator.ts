@@ -14,8 +14,8 @@ import type { RegexValidation } from "../shared/types";
 /* ------------------------------------------------------------------ */
 
 const REDOS_PATTERNS: RegExp[] = [
-    /\([^)]*[+*][^)]*\)[+*]/,
-    /\([^)]*\.\*[^)]*\)\{/,
+  /\([^)]*[+*][^)]*\)[+*]/,
+  /\([^)]*\.\*[^)]*\)\{/,
 ];
 
 /* ------------------------------------------------------------------ */
@@ -24,36 +24,36 @@ const REDOS_PATTERNS: RegExp[] = [
 
 /** Validates a regex pattern for safety and correctness. */
 export function validateRegexPattern(pattern: string): RegexValidation {
-    const isTooLong = pattern.length > MAX_REGEX_LENGTH;
+  const isTooLong = pattern.length > MAX_REGEX_LENGTH;
 
-    if (isTooLong) {
-        return {
-            isValid: false,
-            errorMessage: `Pattern too long (max ${MAX_REGEX_LENGTH} characters)`,
-        };
-    }
+  if (isTooLong) {
+    return {
+      isValid: false,
+      errorMessage: `Pattern too long (max ${MAX_REGEX_LENGTH} characters)`,
+    };
+  }
 
-    const syntaxResult = checkSyntax(pattern);
-    const hasSyntaxError = syntaxResult !== null;
+  const syntaxResult = checkSyntax(pattern);
+  const hasSyntaxError = syntaxResult !== null;
 
-    if (hasSyntaxError) {
-        return {
-            isValid: false,
-            errorMessage: syntaxResult!,
-        };
-    }
+  if (hasSyntaxError) {
+    return {
+      isValid: false,
+      errorMessage: syntaxResult!,
+    };
+  }
 
-    const redosWarning = checkRedosHeuristics(pattern);
-    const hasWarning = redosWarning !== null;
+  const redosWarning = checkRedosHeuristics(pattern);
+  const hasWarning = redosWarning !== null;
 
-    if (hasWarning) {
-        return {
-            isValid: true,
-            warningMessage: redosWarning!,
-        };
-    }
+  if (hasWarning) {
+    return {
+      isValid: true,
+      warningMessage: redosWarning!,
+    };
+  }
 
-    return { isValid: true };
+  return { isValid: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -62,28 +62,28 @@ export function validateRegexPattern(pattern: string): RegexValidation {
 
 /** Checks if the pattern is syntactically valid. */
 function checkSyntax(pattern: string): string | null {
-    try {
-        new RegExp(pattern);
+  try {
+    new RegExp(pattern);
 
-        return null;
-    } catch (syntaxError) {
-        const errorMessage = syntaxError instanceof Error
-            ? syntaxError.message
-            : String(syntaxError);
+    return null;
+  } catch (syntaxError) {
+    const errorMessage = syntaxError instanceof Error
+      ? syntaxError.message
+      : String(syntaxError);
 
-        return `Invalid regex: ${errorMessage}`;
-    }
+    return `Invalid regex: ${errorMessage}`;
+  }
 }
 
 /** Checks for common ReDoS-prone patterns. */
 function checkRedosHeuristics(pattern: string): string | null {
-    for (const check of REDOS_PATTERNS) {
-        const isRedosRisk = check.test(pattern);
+  for (const check of REDOS_PATTERNS) {
+    const isRedosRisk = check.test(pattern);
 
-        if (isRedosRisk) {
-            return "This pattern may be slow on long URLs. Consider simplifying.";
-        }
+    if (isRedosRisk) {
+      return "This pattern may be slow on long URLs. Consider simplifying.";
     }
+  }
 
-    return null;
+  return null;
 }

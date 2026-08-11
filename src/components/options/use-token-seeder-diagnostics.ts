@@ -11,8 +11,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { logError } from "./options-logger";
 import {
-    loadDiagnosticsCache,
-    saveDiagnosticsCache,
+  loadDiagnosticsCache,
+  saveDiagnosticsCache,
 } from "./token-seeder-diagnostics-cache";
 import { ErrorCategoryType } from "../../types/enums";
 
@@ -36,31 +36,31 @@ export interface TokenSeederDiagnostics {
 export type ErrorCategory = ErrorCategoryType;
 
 export const CATEGORY_LABELS: Record<ErrorCategory, string> = {
-    "host-permission": "Host permission",
-    "scripting-blocked": "Scripting blocked",
-    "restricted-scheme": "Restricted scheme",
-    other: "Other",
+  "host-permission": "Host permission",
+  "scripting-blocked": "Scripting blocked",
+  "restricted-scheme": "Restricted scheme",
+  other: "Other",
 };
 
 const POLL_INTERVAL_MS = 5_000;
 const TICK_INTERVAL_MS = 500;
 
 export function categorizeCode(code: string): ErrorCategory {
-    switch (code) {
-        case "RESPECTIVE_HOST_PERMISSION":
-        case "MISSING_HOST_PERMISSION":
-        case "NO_HOST_PATTERN":
-        case "PERMISSION_NOT_GRANTED":
-            return "host-permission";
-        case "PAGE_CONTENTS_BLOCKED":
-        case "EXTENSIONS_GALLERY_BLOCKED":
-        case "GENERIC_CANNOT_SCRIPT":
-            return "scripting-blocked";
-        case "RESTRICTED_SCHEME":
-            return "restricted-scheme";
-        default:
-            return "other";
-    }
+  switch (code) {
+    case "RESPECTIVE_HOST_PERMISSION":
+    case "MISSING_HOST_PERMISSION":
+    case "NO_HOST_PATTERN":
+    case "PERMISSION_NOT_GRANTED":
+      return "host-permission";
+    case "PAGE_CONTENTS_BLOCKED":
+    case "EXTENSIONS_GALLERY_BLOCKED":
+    case "GENERIC_CANNOT_SCRIPT":
+      return "scripting-blocked";
+    case "RESTRICTED_SCHEME":
+      return "restricted-scheme";
+    default:
+      return "other";
+  }
 }
 
 export interface TokenSeederDiagnosticsBag {
@@ -72,119 +72,132 @@ export interface TokenSeederDiagnosticsBag {
 }
 
 function computeNextRetry(
-    targets: ReadonlyArray<InaccessibleSeedTarget>,
-    now: number,
+  targets: ReadonlyArray<InaccessibleSeedTarget>,
+  now: number,
 ): { nextRetryMs: number; nextRetryAt: number } {
-    if (targets.length === 0) return { nextRetryMs: 0, nextRetryAt: 0 };
-    let minRemaining = Number.POSITIVE_INFINITY;
-    let minRetryAt = 0;
-    for (const t of targets) {
-        const retryAt = t.lastFailureAt + t.cooldownMs;
-        const remaining = Math.max(0, retryAt - now);
-        if (remaining < minRemaining) {
-            minRemaining = remaining;
-            minRetryAt = retryAt;
-        }
-    }
+  if (targets.length === 0) {
+    return { nextRetryMs: 0, nextRetryAt: 0 };
+  }
 
-    return {
-        nextRetryMs: minRemaining === Number.POSITIVE_INFINITY ? 0 : minRemaining,
-        nextRetryAt: minRetryAt,
-    };
+  let minRemaining = Number.POSITIVE_INFINITY;
+  let minRetryAt = 0;
+  for (const t of targets) {
+    const retryAt = t.lastFailureAt + t.cooldownMs;
+    const remaining = Math.max(0, retryAt - now);
+    if (remaining < minRemaining) {
+      minRemaining = remaining;
+      minRetryAt = retryAt;
+    }
+  }
+
+  return {
+    nextRetryMs: minRemaining === Number.POSITIVE_INFINITY ? 0 : minRemaining,
+    nextRetryAt: minRetryAt,
+  };
 }
 
 function computeCategoryCounts(
-    targets: ReadonlyArray<InaccessibleSeedTarget>,
+  targets: ReadonlyArray<InaccessibleSeedTarget>,
 ): ReadonlyMap<ErrorCategory, number> {
-    const counts = new Map<ErrorCategory, number>();
-    for (const t of targets) {
-        const cat = categorizeCode(t.code);
-        counts.set(cat, (counts.get(cat) ?? 0) + 1);
-    }
+  const counts = new Map<ErrorCategory, number>();
+  for (const t of targets) {
+    const cat = categorizeCode(t.code);
+    counts.set(cat, (counts.get(cat) ?? 0) + 1);
+  }
 
-    return counts;
+  return counts;
 }
 
 function useFetchDiagnostics(
-    setData: (d: TokenSeederDiagnostics) => void,
+  setData: (d: TokenSeederDiagnostics) => void,
 ): () => Promise<void> {
-    return useCallback(async () => {
-        try {
-            const res = await sendMessage<TokenSeederDiagnostics>({
-                type: "GET_TOKEN_SEEDER_DIAGNOSTICS",
-            });
-            setData(res);
-            saveDiagnosticsCache(res);
-        } catch (caught) {
-            logError(
-                "TokenSeederStatusIndicator.fetchDiagnostics",
-                "GET_TOKEN_SEEDER_DIAGNOSTICS failed, background may not be ready, will retry on next poll",
-                caught,
-            );
-        }
-    }, [setData]);
+  return useCallback(async () => {
+    try {
+      const res = await sendMessage<TokenSeederDiagnostics>({
+        type: "GET_TOKEN_SEEDER_DIAGNOSTICS",
+      });
+      setData(res);
+      saveDiagnosticsCache(res);
+    } catch (caught) {
+      logError(
+        "TokenSeederStatusIndicator.fetchDiagnostics",
+        "GET_TOKEN_SEEDER_DIAGNOSTICS failed, background may not be ready, will retry on next poll",
+        caught,
+      );
+    }
+  }, [setData]);
 }
 
 function useDiagnosticsPolling(): {
     readonly data: TokenSeederDiagnostics | null;
     readonly now: number;
-} {
-    const [data, setData] = useState<TokenSeederDiagnostics | null>(() => loadDiagnosticsCache());
-    const [now, setNow] = useState<number>(() => Date.now());
-    const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const fetchDiagnostics = useFetchDiagnostics(setData);
+    } {
+  const [data, setData] = useState<TokenSeederDiagnostics | null>(() => loadDiagnosticsCache());
+  const [now, setNow] = useState<number>(() => Date.now());
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fetchDiagnostics = useFetchDiagnostics(setData);
 
-    useEffect(() => {
-        void fetchDiagnostics();
-        pollRef.current = setInterval(() => void fetchDiagnostics(), POLL_INTERVAL_MS);
-        tickRef.current = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
+  useEffect(() => {
+    void fetchDiagnostics();
+    pollRef.current = setInterval(() => void fetchDiagnostics(), POLL_INTERVAL_MS);
+    tickRef.current = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
 
-        return () => {
-            if (pollRef.current) clearInterval(pollRef.current);
-            if (tickRef.current) clearInterval(tickRef.current);
-        };
-    }, [fetchDiagnostics]);
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+      }
 
-    return { data, now };
+      if (tickRef.current) {
+        clearInterval(tickRef.current);
+      }
+    };
+  }, [fetchDiagnostics]);
+
+  return { data, now };
 }
 
 export function useTokenSeederDiagnostics(): TokenSeederDiagnosticsBag {
-    const { data, now } = useDiagnosticsPolling();
-    const targets = useMemo(() => data?.targets ?? [], [data]);
-    const retry = useMemo(() => computeNextRetry(targets, now), [targets, now]);
-    const categoryCounts = useMemo(() => computeCategoryCounts(targets), [targets]);
+  const { data, now } = useDiagnosticsPolling();
+  const targets = useMemo(() => data?.targets ?? [], [data]);
+  const retry = useMemo(() => computeNextRetry(targets, now), [targets, now]);
+  const categoryCounts = useMemo(() => computeCategoryCounts(targets), [targets]);
 
-    return { targets, now, ...retry, categoryCounts };
+  return { targets, now, ...retry, categoryCounts };
 }
 
 export function formatRemaining(ms: number): string {
-    if (ms <= 0) return "ready";
+  if (ms <= 0) {
+    return "ready";
+  }
 
-    return `${Math.ceil(ms / 1000)}s`;
+  return `${Math.ceil(ms / 1000)}s`;
 }
 
 export function formatRetryTimestamp(ts: number): string {
-    try {
-        return new Intl.DateTimeFormat("en-GB", {
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        }).format(new Date(ts));
-    } catch (err) { /* swallowed */
-        return new Date(ts).toISOString();
-    }
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(new Date(ts));
+  } catch (err) { /* swallowed */
+    return new Date(ts).toISOString();
+  }
 }
 
 export function formatOrigin(url: string): string {
-    if (!url) return "(unknown)";
-    try {
-        const u = new URL(url);
+  if (!url) {
+    return "(unknown)";
+  }
 
-        return u.origin;
-    } catch (err) { /* swallowed */
-        return url.length > 48 ? `${url.slice(0, 48)}...` : url;
-    }
+  try {
+    const u = new URL(url);
+
+    return u.origin;
+  } catch (err) { /* swallowed */
+    return url.length > 48 ? `${url.slice(0, 48)}...` : url;
+  }
 }

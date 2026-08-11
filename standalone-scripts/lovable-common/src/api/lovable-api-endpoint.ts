@@ -6,21 +6,21 @@
 const API_BASE_DEFAULT = "https://api.lovable.dev";
 
 export class LovableApiEndpoint {
-    private readonly apiBase: string;
+  private readonly apiBase: string;
 
-    public constructor(apiBase: string = API_BASE_DEFAULT) {
-        this.apiBase = apiBase.replace(/\/+$/, "");
-    }
+  public constructor(apiBase: string = API_BASE_DEFAULT) {
+    this.apiBase = apiBase.replace(/\/+$/, "");
+  }
 
-    public workspaces(): string {
-        return `${this.apiBase}/workspaces`;
-    }
+  public workspaces(): string {
+    return `${this.apiBase}/workspaces`;
+  }
 
-    public memberships(workspaceId: string): string {
-        return `${this.apiBase}/workspaces/${workspaceId}/memberships`;
-    }
+  public memberships(workspaceId: string): string {
+    return `${this.apiBase}/workspaces/${workspaceId}/memberships`;
+  }
 
-    public membership(workspaceId: string, userId: string): string {
-        return `${this.apiBase}/workspaces/${workspaceId}/memberships/${userId}`;
-    }
+  public membership(workspaceId: string, userId: string): string {
+    return `${this.apiBase}/workspaces/${workspaceId}/memberships/${userId}`;
+  }
 }

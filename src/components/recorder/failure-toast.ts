@@ -14,8 +14,8 @@
 
 import { toast } from "sonner";
 import {
-    formatFailureReport,
-    type FailureReport,
+  formatFailureReport,
+  type FailureReport,
 } from "@/background/recorder/failure-logger";
 import { logError } from "@/components/recorder/recorder-logger";
 
@@ -24,20 +24,23 @@ interface CopyOpts {
 }
 
 export async function copyFailureReportToClipboard(
-    report: FailureReport,
-    opts: CopyOpts = {},
+  report: FailureReport,
+  opts: CopyOpts = {},
 ): Promise<boolean> {
-    const target = opts.Clipboard
+  const target = opts.Clipboard
         ?? (typeof navigator !== "undefined" ? navigator.clipboard : undefined);
-    if (target === undefined) { return false; }
-    const blob = `${formatFailureReport(report)}\n\n--- JSON ---\n${JSON.stringify(report, null, 2)}`;
-    try {
-        await target.writeText(blob);
+  if (target === undefined) {
+    return false; 
+  }
 
-        return true;
-    } catch (err) { /* swallowed */
-        return false;
-    }
+  const blob = `${formatFailureReport(report)}\n\n--- JSON ---\n${JSON.stringify(report, null, 2)}`;
+  try {
+    await target.writeText(blob);
+
+    return true;
+  } catch (err) { /* swallowed */
+    return false;
+  }
 }
 
 export interface ShowFailureToastOpts {
@@ -51,45 +54,54 @@ export interface ShowFailureToastOpts {
 }
 
 export function showFailureToast(
-    report: FailureReport,
-    opts: ShowFailureToastOpts = {},
+  report: FailureReport,
+  opts: ShowFailureToastOpts = {},
 ): string | number {
-    const where = formatFailureLocation(report);
-    const copyAction = buildCopyReportAction(report);
-    if (opts.OnRetry === undefined) {
-        return showCopyOnlyFailureToast(report, where, copyAction);
-    }
-    const onRetry = opts.OnRetry;
+  const where = formatFailureLocation(report);
+  const copyAction = buildCopyReportAction(report);
+  if (opts.OnRetry === undefined) {
+    return showCopyOnlyFailureToast(report, where, copyAction);
+  }
 
-    return showRetryFailureToast(report, where, copyAction, onRetry);
+  const onRetry = opts.OnRetry;
+
+  return showRetryFailureToast(report, where, copyAction, onRetry);
 }
 
 function formatFailureLocation(report: FailureReport): string {
-    const kindSuffix = report.StepKind !== null ? ` (${report.StepKind})` : "";
+  const kindSuffix = report.StepKind !== null ? ` (${report.StepKind})` : "";
 
-    return report.StepId !== null ? `Step #${report.StepId}${kindSuffix}` : `${report.Phase} failure`;
+  return report.StepId !== null ? `Step #${report.StepId}${kindSuffix}` : `${report.Phase} failure`;
 }
 
 function buildCopyReportAction(report: FailureReport): { label: string; onClick: () => void } {
-    return { label: "Copy report", onClick: () => { void copyFailureReportToClipboard(report).then(showCopyResult); } };
+  return { label: "Copy report", onClick: () => {
+    void copyFailureReportToClipboard(report).then(showCopyResult); 
+  } };
 }
 
 function showCopyResult(ok: boolean): void {
-    if (ok) { toast.success("Failure report copied to clipboard"); } else { toast.error("Clipboard unavailable, see DevTools console"); }
+  if (ok) {
+    toast.success("Failure report copied to clipboard"); 
+  } else {
+    toast.error("Clipboard unavailable, see DevTools console"); 
+  }
 }
 
 function showCopyOnlyFailureToast(report: FailureReport, where: string, copyAction: { label: string; onClick: () => void }): string | number {
-    return toast.error(`${where}: ${report.Message}`, { description: `Phase: ${report.Phase}, ${report.Timestamp}`, duration: 12000, action: copyAction });
+  return toast.error(`${where}: ${report.Message}`, { description: `Phase: ${report.Phase}, ${report.Timestamp}`, duration: 12000, action: copyAction });
 }
 
 function showRetryFailureToast(report: FailureReport, where: string, copyAction: { label: string; onClick: () => void }, onRetry: () => void | Promise<void>): string | number {
-    return toast.error(`${where}: ${report.Message}`, {
-        description: `Phase: ${report.Phase}, ${report.Timestamp}`,
-        duration: 12000,
-        action: {
-            label: "Retry step",
-            onClick: () => { void onRetry(); },
-        },
-        cancel: copyAction,
-    });
+  return toast.error(`${where}: ${report.Message}`, {
+    description: `Phase: ${report.Phase}, ${report.Timestamp}`,
+    duration: 12000,
+    action: {
+      label: "Retry step",
+      onClick: () => {
+        void onRetry(); 
+      },
+    },
+    cancel: copyAction,
+  });
 }

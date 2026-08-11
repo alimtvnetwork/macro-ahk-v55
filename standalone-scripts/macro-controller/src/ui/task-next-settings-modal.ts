@@ -52,6 +52,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     } else {
       inp.value = String(taskNextState.settings[field.key]);
     }
+
     inp.style.cssText = 'width:100%;padding:6px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:6px;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
     row.appendChild(inp);
     modal.appendChild(row);
@@ -64,7 +65,10 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = 'padding:6px 16px;border:1px solid rgba(124,58,237,0.3);border-radius:6px;background:transparent;color:' + cPanelFg + ';cursor:pointer;font-size:11px;';
-  cancelBtn.onclick = function() { overlay.remove(); };
+  cancelBtn.onclick = function() {
+    overlay.remove(); 
+  };
+
   btnRow.appendChild(cancelBtn);
 
   const saveBtn = document.createElement('button');
@@ -82,6 +86,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     overlay.remove();
     showPasteToast('✅ Task Next settings saved', false);
   };
+
   btnRow.appendChild(saveBtn);
   modal.appendChild(btnRow);
 
@@ -91,5 +96,6 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
       overlay.remove();
     }
   };
+
   document.body.appendChild(overlay);
 }

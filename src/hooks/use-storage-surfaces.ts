@@ -30,10 +30,13 @@ export function useSessionStorage() {
     } catch (err) {
       setEntries([]);
     }
+
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   const totalSize = (entries ?? []).reduce((s, e) => s + e.sizeBytes, 0);
 
@@ -66,10 +69,13 @@ export function useCookies() {
     } catch (err) {
       setEntries([]);
     }
+
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   const totalSize = (entries ?? []).reduce((s, e) => s + new Blob([`${e.name}=${e.value}`]).size, 0);
 
@@ -99,10 +105,13 @@ export function useLocalStorage() {
     } catch (err) {
       setEntries([]);
     }
+
     setLoading(false);
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
   const totalSize = (entries ?? []).reduce((s, e) => s + e.sizeBytes, 0);
 

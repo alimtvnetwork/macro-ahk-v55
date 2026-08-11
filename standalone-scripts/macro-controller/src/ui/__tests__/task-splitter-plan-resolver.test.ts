@@ -38,9 +38,9 @@ vi.mock('../prompt-manager', () => ({
   getPromptsConfig: () => ({ entries: [] }),
 }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   getDefaultPromptForRole: mocks.getDefaultPromptForRole,
 }));
 

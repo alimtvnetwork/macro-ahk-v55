@@ -67,8 +67,13 @@ export interface CreditTotals {
 
 /** Safe number-or-zero coercion. */
 function n(value: number | undefined | null): number {
-  if (typeof value !== 'number') return 0;
-  if (!Number.isFinite(value)) return 0;
+  if (typeof value !== 'number') {
+    return 0;
+  }
+
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
 
   return value;
 }
@@ -118,6 +123,7 @@ function hasCreditData(ws: WorkspaceCredit): boolean {
   if (resolveCreditSummary(ws).renderDash) {
     return false;
   }
+
   if (isProZeroPlan(ws)) {
     const hasUsed = typeof ws.totalCreditsUsed === 'number' && Number.isFinite(ws.totalCreditsUsed);
     const hasAvail = typeof ws.available === 'number' && Number.isFinite(ws.available);
@@ -125,6 +131,7 @@ function hasCreditData(ws: WorkspaceCredit): boolean {
 
     return hasUsed || hasAvail || hasGranted;
   }
+
   const hasUsed = typeof ws.used === 'number' && Number.isFinite(ws.used);
   const hasAvail = typeof ws.billingAvailable === 'number' && Number.isFinite(ws.billingAvailable);
   const hasLimit = typeof ws.limit === 'number' && Number.isFinite(ws.limit);
@@ -160,22 +167,30 @@ export function aggregateCreditTotals(
     // dailyFree is per-account; sample it on every row (incl. FREE) so the
     // free-daily card populates even when the user only has FREE workspaces.
     const dailyFree = n(ws.dailyFree);
-    if (dailyFree > freeDailyRemaining) freeDailyRemaining = dailyFree;
+    if (dailyFree > freeDailyRemaining) {
+      freeDailyRemaining = dailyFree;
+    }
 
-    if (isFreeTierWorkspace(ws)) continue;
+    if (isFreeTierWorkspace(ws)) {
+      continue;
+    }
+
     consideredCount += 1;
 
     if (!hasCreditData(ws)) {
       missingCount += 1;
       continue;
     }
+
     const triple = readCreditTriple(ws);
     used += triple.used;
     remaining += triple.remaining;
     granted += triple.granted;
   }
 
-  if (freeDailyRemaining > FREE_DAILY_CAP) freeDailyRemaining = FREE_DAILY_CAP;
+  if (freeDailyRemaining > FREE_DAILY_CAP) {
+    freeDailyRemaining = FREE_DAILY_CAP;
+  }
 
   return {
     used: Math.round(used),

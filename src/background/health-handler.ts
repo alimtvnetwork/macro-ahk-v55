@@ -8,9 +8,9 @@
 
 import type { HealthStatusResponse } from "../shared/messages";
 import {
-    getHealthState,
-    setHealthState,
-    type TransientState,
+  getHealthState,
+  setHealthState,
+  type TransientState,
 } from "./state-manager";
 import { countTable, getLogsDb, getErrorsDb, getCurrentSessionId } from "./handlers/logging-handler";
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
@@ -36,53 +36,56 @@ const ERROR_RATE_ERROR = 50;
 
 /** Builds the health status response from subsystem checks. */
 export async function buildHealthResponse(): Promise<HealthStatusResponse> {
-    const details: string[] = [];
+  const details: string[] = [];
 
-    const storageResult = await checkStorageAvailability();
-    const quotaResult = checkStorageQuota();
-    const errorRateResult = checkErrorRate();
+  const storageResult = await checkStorageAvailability();
+  const quotaResult = checkStorageQuota();
+  const errorRateResult = checkErrorRate();
 
-    applyStorageResult(storageResult, details);
-    applyQuotaResult(quotaResult, details);
-    applyErrorRateResult(errorRateResult, details);
+  applyStorageResult(storageResult, details);
+  applyQuotaResult(quotaResult, details);
+  applyErrorRateResult(errorRateResult, details);
 
-    const computedState = computeOverallState(details);
-    const previousState = getHealthState();
+  const computedState = computeOverallState(details);
+  const previousState = getHealthState();
 
-    if (computedState !== previousState) {
-        setHealthState(computedState);
-        if (computedState === "HEALTHY") {
-            console.log("[health] %s → HEALTHY (recovered)", previousState);
-        } else {
-            logBgWarnError(BgLogTag.HEALTH, `${previousState} → ${computedState}: ${details.join("; ")}`);
-        }
+  if (computedState !== previousState) {
+    setHealthState(computedState);
+    if (computedState === "HEALTHY") {
+      console.log("[health] %s → HEALTHY (recovered)", previousState);
     } else {
-        setHealthState(computedState);
+      logBgWarnError(BgLogTag.HEALTH, `${previousState} → ${computedState}: ${details.join("; ")}`);
     }
+  } else {
+    setHealthState(computedState);
+  }
 
-    return { state: computedState, details };
+  return { state: computedState, details };
 }
 
 /** Transitions health to a specific state with a reason. */
 export function transitionHealth(
-    newState: TransientState["healthState"],
-    reason: string,
+  newState: TransientState["healthState"],
+  reason: string,
 ): void {
-    const currentState = getHealthState();
-    const isDowngrade = severityOf(newState) > severityOf(currentState);
+  const currentState = getHealthState();
+  const isDowngrade = severityOf(newState) > severityOf(currentState);
 
-    if (isDowngrade) {
-        setHealthState(newState);
-        logBgWarnError(BgLogTag.HEALTH, `${currentState} → ${newState}: ${reason}`);
-    }
+  if (isDowngrade) {
+    setHealthState(newState);
+    logBgWarnError(BgLogTag.HEALTH, `${currentState} → ${newState}: ${reason}`);
+  }
 }
 
 /** Resets health to HEALTHY when recovery conditions are met. */
 export function recoverHealth(): void {
-    const previousState = getHealthState();
-    if (previousState === "HEALTHY") return;
-    setHealthState("HEALTHY");
-    console.log("[health] %s → HEALTHY", previousState);
+  const previousState = getHealthState();
+  if (previousState === "HEALTHY") {
+    return;
+  }
+
+  setHealthState("HEALTHY");
+  console.log("[health] %s → HEALTHY", previousState);
 }
 
 /* ------------------------------------------------------------------ */
@@ -91,69 +94,80 @@ export function recoverHealth(): void {
 
 /** Checks if chrome.storage.local is responsive. */
 async function checkStorageAvailability(): Promise<boolean> {
-    try {
-        await _chr.storage.local.get("__health_check__");
+  try {
+    await _chr.storage.local.get("__health_check__");
 
-        return true;
-    } catch (storageError) {
-        const errorMessage = storageError instanceof Error
-            ? storageError.message
-            : String(storageError);
+    return true;
+  } catch (storageError) {
+    const errorMessage = storageError instanceof Error
+      ? storageError.message
+      : String(storageError);
 
-        logCaughtError(BgLogTag.HEALTH, "Storage check failed", storageError);
+    logCaughtError(BgLogTag.HEALTH, "Storage check failed", storageError);
 
-        return false;
-    }
+    return false;
+  }
 }
 
 /** Checks total row count against storage thresholds. */
 function checkStorageQuota(): ApplyQuotaResultType {
-    try {
-        const logCount = countTable(getLogsDb(), "Logs");
-        const errorCount = countTable(getErrorsDb(), "Errors");
-        const totalRows = logCount + errorCount;
+  try {
+    const logCount = countTable(getLogsDb(), "Logs");
+    const errorCount = countTable(getErrorsDb(), "Errors");
+    const totalRows = logCount + errorCount;
 
-        const isCritical = totalRows >= STORAGE_CRITICAL_THRESHOLD;
-        const isWarning = totalRows >= STORAGE_WARNING_THRESHOLD;
+    const isCritical = totalRows >= STORAGE_CRITICAL_THRESHOLD;
+    const isWarning = totalRows >= STORAGE_WARNING_THRESHOLD;
 
-        if (isCritical) return "critical";
-        if (isWarning) return "warning";
-
-        return "ok";
-    } catch (err) { 
-        return "ok";
+    if (isCritical) {
+      return "critical";
     }
+
+    if (isWarning) {
+      return "warning";
+    }
+
+    return "ok";
+  } catch (err) { 
+    return "ok";
+  }
 }
 
 /** Checks recent error rate for the CURRENT session only. */
 function checkErrorRate(): ApplyErrorRateResultType {
-    try {
-        const currentSessionId = getCurrentSessionId();
-        if (currentSessionId === null) {
-            return "ok";
-        }
-
-        const db = getErrorsDb();
-        const stmt = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE SessionId = ?");
-        stmt.bind([currentSessionId]);
-        let errorCount = 0;
-
-        if (stmt.step()) {
-            const row = stmt.getAsObject() as { cnt?: number };
-            errorCount = Number(row.cnt ?? 0);
-        }
-        stmt.free();
-
-        const isError = errorCount >= ERROR_RATE_ERROR;
-        const isDegraded = errorCount >= ERROR_RATE_DEGRADED;
-
-        if (isError) return "error";
-        if (isDegraded) return "degraded";
-
-        return "ok";
-    } catch (err) { 
-        return "ok";
+  try {
+    const currentSessionId = getCurrentSessionId();
+    if (currentSessionId === null) {
+      return "ok";
     }
+
+    const db = getErrorsDb();
+    const stmt = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE SessionId = ?");
+    stmt.bind([currentSessionId]);
+    let errorCount = 0;
+
+    if (stmt.step()) {
+      const row = stmt.getAsObject() as { cnt?: number };
+      errorCount = Number(row.cnt ?? 0);
+    }
+
+    stmt.free();
+
+    const isError = errorCount >= ERROR_RATE_ERROR;
+    const isDegraded = errorCount >= ERROR_RATE_DEGRADED;
+
+    if (isError) {
+      return "error";
+    }
+
+    if (isDegraded) {
+      return "degraded";
+    }
+
+    return "ok";
+  } catch (err) { 
+    return "ok";
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -162,41 +176,41 @@ function checkErrorRate(): ApplyErrorRateResultType {
 
 /** Applies storage availability result to details. */
 function applyStorageResult(isAvailable: boolean, details: string[]): void {
-    const isUnavailable = !isAvailable;
+  const isUnavailable = !isAvailable;
 
-    if (isUnavailable) {
-        details.push("Storage API unavailable");
-    }
+  if (isUnavailable) {
+    details.push("Storage API unavailable");
+  }
 }
 
 /** Applies quota check result to details. */
 function applyQuotaResult(
-    result: ApplyQuotaResultType,
-    details: string[],
+  result: ApplyQuotaResultType,
+  details: string[],
 ): void {
-    const isWarning = result === "warning";
-    const isCritical = result === "critical";
+  const isWarning = result === "warning";
+  const isCritical = result === "critical";
 
-    if (isCritical) {
-        details.push("Storage near capacity — auto-prune recommended");
-    } else if (isWarning) {
-        details.push("Storage usage elevated");
-    }
+  if (isCritical) {
+    details.push("Storage near capacity — auto-prune recommended");
+  } else if (isWarning) {
+    details.push("Storage usage elevated");
+  }
 }
 
 /** Applies error rate result to details. */
 function applyErrorRateResult(
-    result: ApplyErrorRateResultType,
-    details: string[],
+  result: ApplyErrorRateResultType,
+  details: string[],
 ): void {
-    const isDegraded = result === "degraded";
-    const isError = result === "error";
+  const isDegraded = result === "degraded";
+  const isError = result === "error";
 
-    if (isError) {
-        details.push("High error rate detected");
-    } else if (isDegraded) {
-        details.push("Elevated error rate");
-    }
+  if (isError) {
+    details.push("High error rate detected");
+  } else if (isDegraded) {
+    details.push("Elevated error rate");
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -205,35 +219,46 @@ function applyErrorRateResult(
 
 /** Computes the overall health state from collected details. */
 function computeOverallState(
-    details: string[],
+  details: string[],
 ): TransientState["healthState"] {
-    const hasStorageUnavailable = details.some(
-        (d) => d === "Storage API unavailable",
-    );
-    const hasHighErrors = details.some(
-        (d) => d === "High error rate detected",
-    );
-    const hasCriticalStorage = details.some(
-        (d) => d.includes("auto-prune"),
-    );
-    const hasAnyIssue = details.length > 0;
+  const hasStorageUnavailable = details.some(
+    (d) => d === "Storage API unavailable",
+  );
+  const hasHighErrors = details.some(
+    (d) => d === "High error rate detected",
+  );
+  const hasCriticalStorage = details.some(
+    (d) => d.includes("auto-prune"),
+  );
+  const hasAnyIssue = details.length > 0;
 
-    if (hasStorageUnavailable) return "ERROR";
-    if (hasHighErrors) return "ERROR";
-    if (hasCriticalStorage) return "DEGRADED";
-    if (hasAnyIssue) return "DEGRADED";
+  if (hasStorageUnavailable) {
+    return "ERROR";
+  }
 
-    return "HEALTHY";
+  if (hasHighErrors) {
+    return "ERROR";
+  }
+
+  if (hasCriticalStorage) {
+    return "DEGRADED";
+  }
+
+  if (hasAnyIssue) {
+    return "DEGRADED";
+  }
+
+  return "HEALTHY";
 }
 
 /** Returns severity rank for health state comparison. */
 function severityOf(state: TransientState["healthState"]): number {
-    const ranks: Record<string, number> = {
-        HEALTHY: 0,
-        DEGRADED: 1,
-        ERROR: 2,
-        FATAL: 3,
-    };
+  const ranks: Record<string, number> = {
+    HEALTHY: 0,
+    DEGRADED: 1,
+    ERROR: 2,
+    FATAL: 3,
+  };
 
-    return ranks[state] ?? 0;
+  return ranks[state] ?? 0;
 }

@@ -32,33 +32,33 @@ interface CookieEntry {
 }
 
 function estimateBytes(value: JsonValue): number {
-    try {
-        return new TextEncoder().encode(JSON.stringify(value)).length;
-    } catch (err) { 
-        return 0;
-    }
+  try {
+    return new TextEncoder().encode(JSON.stringify(value)).length;
+  } catch (err) { 
+    return 0;
+  }
 }
 
 function toCookieUrl(cookie: chrome.cookies.Cookie): string {
-    const protocol = cookie.secure ? "https" : "http";
-    const domain = cookie.domain.startsWith(".") ? cookie.domain.slice(1) : cookie.domain;
+  const protocol = cookie.secure ? "https" : "http";
+  const domain = cookie.domain.startsWith(".") ? cookie.domain.slice(1) : cookie.domain;
 
-    return `${protocol}://${domain}${cookie.path}`;
+  return `${protocol}://${domain}${cookie.path}`;
 }
 
 function toCookieEntry(cookie: chrome.cookies.Cookie): CookieEntry {
-    return {
-        name: cookie.name,
-        value: cookie.value,
-        domain: cookie.domain,
-        path: cookie.path,
-        secure: cookie.secure,
-        httpOnly: cookie.httpOnly,
-        sameSite: cookie.sameSite,
-        session: cookie.session,
-        expirationDate: cookie.expirationDate,
-        storeId: cookie.storeId,
-    };
+  return {
+    name: cookie.name,
+    value: cookie.value,
+    domain: cookie.domain,
+    path: cookie.path,
+    secure: cookie.secure,
+    httpOnly: cookie.httpOnly,
+    sameSite: cookie.sameSite,
+    session: cookie.session,
+    expirationDate: cookie.expirationDate,
+    storeId: cookie.storeId,
+  };
 }
 
 function resolveSetCookieUrl(input: {
@@ -67,124 +67,128 @@ function resolveSetCookieUrl(input: {
     path?: string;
     secure?: boolean;
 }): string {
-    if (typeof input.url === "string" && input.url.trim().length > 0) {
-        return input.url.trim();
-    }
+  if (typeof input.url === "string" && input.url.trim().length > 0) {
+    return input.url.trim();
+  }
 
-    const domain = (input.domain ?? "").trim();
-    if (!domain) {
-        throw new Error("[Storage] Cookie set requires url or domain");
-    }
+  const domain = (input.domain ?? "").trim();
+  if (!domain) {
+    throw new Error("[Storage] Cookie set requires url or domain");
+  }
 
-    const protocol = input.secure ? "https" : "http";
-    const normalizedDomain = domain.startsWith(".") ? domain.slice(1) : domain;
-    const path = input.path && input.path.startsWith("/") ? input.path : "/";
+  const protocol = input.secure ? "https" : "http";
+  const normalizedDomain = domain.startsWith(".") ? domain.slice(1) : domain;
+  const path = input.path && input.path.startsWith("/") ? input.path : "/";
 
-    return `${protocol}://${normalizedDomain}${path}`;
+  return `${protocol}://${normalizedDomain}${path}`;
 }
 
 export async function handleStorageSessionList(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ entries: SessionEntry[]; total: number }> {
-    const { prefix } = message as { prefix?: string };
-    const raw = await chrome.storage.session.get(null);
+  const { prefix } = message as { prefix?: string };
+  const raw = await chrome.storage.session.get(null);
 
-    const entries = Object.entries(raw)
-        .filter(([key]) => !prefix || key.startsWith(prefix))
-        .map(([key, value]) => ({
-            key,
-            value,
-            valueType: Array.isArray(value) ? "array" : typeof value,
-            sizeBytes: estimateBytes(value),
-        }))
-        .sort((a, b) => a.key.localeCompare(b.key));
+  const entries = Object.entries(raw)
+    .filter(([key]) => !prefix || key.startsWith(prefix))
+    .map(([key, value]) => ({
+      key,
+      value,
+      valueType: Array.isArray(value) ? "array" : typeof value,
+      sizeBytes: estimateBytes(value),
+    }))
+    .sort((a, b) => a.key.localeCompare(b.key));
 
-    return { entries, total: entries.length };
+  return { entries, total: entries.length };
 }
 
 export async function handleStorageSessionSet(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true }> {
-    const { key, value } = message as { key: string; value: JsonValue };
-    if (!key || typeof key !== "string") {
-        throw new Error("[Storage] Session key is required");
-    }
+  const { key, value } = message as { key: string; value: JsonValue };
+  if (!key || typeof key !== "string") {
+    throw new Error("[Storage] Session key is required");
+  }
 
-    await chrome.storage.session.set({ [key]: value });
+  await chrome.storage.session.set({ [key]: value });
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 export async function handleStorageSessionDelete(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true }> {
-    const { key } = message as { key: string };
-    if (!key || typeof key !== "string") {
-        throw new Error("[Storage] Session key is required");
-    }
+  const { key } = message as { key: string };
+  if (!key || typeof key !== "string") {
+    throw new Error("[Storage] Session key is required");
+  }
 
-    await chrome.storage.session.remove(key);
+  await chrome.storage.session.remove(key);
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 export async function handleStorageSessionClear(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true; cleared: number }> {
-    const { prefix } = message as { prefix?: string };
+  const { prefix } = message as { prefix?: string };
 
-    if (!prefix) {
-        const raw = await chrome.storage.session.get(null);
-        const total = Object.keys(raw).length;
-        await chrome.storage.session.clear();
-
-        return { isOk: true, cleared: total };
-    }
-
+  if (!prefix) {
     const raw = await chrome.storage.session.get(null);
-    const keys = Object.keys(raw).filter((key) => key.startsWith(prefix));
-    if (keys.length > 0) {
-        await chrome.storage.session.remove(keys);
-    }
+    const total = Object.keys(raw).length;
+    await chrome.storage.session.clear();
 
-    return { isOk: true, cleared: keys.length };
+    return { isOk: true, cleared: total };
+  }
+
+  const raw = await chrome.storage.session.get(null);
+  const keys = Object.keys(raw).filter((key) => key.startsWith(prefix));
+  if (keys.length > 0) {
+    await chrome.storage.session.remove(keys);
+  }
+
+  return { isOk: true, cleared: keys.length };
 }
 
 export async function handleStorageCookiesList(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ cookies: CookieEntry[]; total: number }> {
-    const { domain, nameContains } = message as {
+  const { domain, nameContains } = message as {
         domain?: string;
         nameContains?: string;
     };
 
-    const query: chrome.cookies.GetAllDetails = {};
-    if (domain && domain.trim()) {
-        query.domain = domain.trim();
-    }
+  const query: chrome.cookies.GetAllDetails = {};
+  if (domain && domain.trim()) {
+    query.domain = domain.trim();
+  }
 
-    const cookies = await chrome.cookies.getAll(query);
-    const filtered = cookies
-        .filter((cookie) => {
-            if (!nameContains || !nameContains.trim()) return true;
+  const cookies = await chrome.cookies.getAll(query);
+  const filtered = cookies
+    .filter((cookie) => {
+      if (!nameContains || !nameContains.trim()) {
+        return true;
+      }
 
-            return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
-        })
-        .map(toCookieEntry)
-        .sort((a, b) => {
-            const byDomain = a.domain.localeCompare(b.domain);
-            if (byDomain !== 0) return byDomain;
+      return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
+    })
+    .map(toCookieEntry)
+    .sort((a, b) => {
+      const byDomain = a.domain.localeCompare(b.domain);
+      if (byDomain !== 0) {
+        return byDomain;
+      }
 
-            return a.name.localeCompare(b.name);
-        });
+      return a.name.localeCompare(b.name);
+    });
 
-    return { cookies: filtered, total: filtered.length };
+  return { cookies: filtered, total: filtered.length };
 }
 
 export async function handleStorageCookiesSet(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true; cookie: CookieEntry }> {
-    const input = message as {
+  const input = message as {
         name: string;
         value: string;
         url?: string;
@@ -196,85 +200,87 @@ export async function handleStorageCookiesSet(
         expirationDate?: number;
     };
 
-    if (!input.name || typeof input.name !== "string") {
-        throw new Error("[Storage] Cookie name is required");
-    }
+  if (!input.name || typeof input.name !== "string") {
+    throw new Error("[Storage] Cookie name is required");
+  }
 
-    const details: chrome.cookies.SetDetails = {
-        name: input.name,
-        value: input.value ?? "",
-        url: resolveSetCookieUrl(input),
-        path: input.path,
-        secure: input.secure,
-        httpOnly: input.httpOnly,
-        expirationDate: input.expirationDate,
-    };
+  const details: chrome.cookies.SetDetails = {
+    name: input.name,
+    value: input.value ?? "",
+    url: resolveSetCookieUrl(input),
+    path: input.path,
+    secure: input.secure,
+    httpOnly: input.httpOnly,
+    expirationDate: input.expirationDate,
+  };
 
-    if (input.domain && input.domain.trim()) {
-        details.domain = input.domain.trim();
-    }
+  if (input.domain && input.domain.trim()) {
+    details.domain = input.domain.trim();
+  }
 
-    if (input.sameSite === "lax" || input.sameSite === "strict" || input.sameSite === "no_restriction") {
-        details.sameSite = input.sameSite;
-    }
+  if (input.sameSite === "lax" || input.sameSite === "strict" || input.sameSite === "no_restriction") {
+    details.sameSite = input.sameSite;
+  }
 
-    const cookie = await chrome.cookies.set(details);
-    if (!cookie) {
-        throw new Error("[Storage] Failed to set cookie");
-    }
+  const cookie = await chrome.cookies.set(details);
+  if (!cookie) {
+    throw new Error("[Storage] Failed to set cookie");
+  }
 
-    return { isOk: true, cookie: toCookieEntry(cookie) };
+  return { isOk: true, cookie: toCookieEntry(cookie) };
 }
 
 export async function handleStorageCookiesDelete(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true }> {
-    const { name, url, storeId } = message as {
+  const { name, url, storeId } = message as {
         name: string;
         url: string;
         storeId?: string;
     };
 
-    if (!name || !url) {
-        throw new Error("[Storage] Cookie delete requires name + url");
-    }
+  if (!name || !url) {
+    throw new Error("[Storage] Cookie delete requires name + url");
+  }
 
-    await chrome.cookies.remove({ name, url, storeId });
+  await chrome.cookies.remove({ name, url, storeId });
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 export async function handleStorageCookiesClear(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: true; cleared: number }> {
-    const { domain, nameContains } = message as {
+  const { domain, nameContains } = message as {
         domain?: string;
         nameContains?: string;
     };
 
-    const query: chrome.cookies.GetAllDetails = {};
-    if (domain && domain.trim()) {
-        query.domain = domain.trim();
+  const query: chrome.cookies.GetAllDetails = {};
+  if (domain && domain.trim()) {
+    query.domain = domain.trim();
+  }
+
+  const allCookies = await chrome.cookies.getAll(query);
+  const targetCookies = allCookies.filter((cookie) => {
+    if (!nameContains || !nameContains.trim()) {
+      return true;
     }
 
-    const allCookies = await chrome.cookies.getAll(query);
-    const targetCookies = allCookies.filter((cookie) => {
-        if (!nameContains || !nameContains.trim()) return true;
+    return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
+  });
 
-        return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
-    });
+  const removals = await Promise.all(
+    targetCookies.map((cookie) =>
+      chrome.cookies.remove({
+        name: cookie.name,
+        url: toCookieUrl(cookie),
+        storeId: cookie.storeId,
+      }),
+    ),
+  );
 
-    const removals = await Promise.all(
-        targetCookies.map((cookie) =>
-            chrome.cookies.remove({
-                name: cookie.name,
-                url: toCookieUrl(cookie),
-                storeId: cookie.storeId,
-            }),
-        ),
-    );
+  const cleared = removals.filter((entry) => entry !== null).length;
 
-    const cleared = removals.filter((entry) => entry !== null).length;
-
-    return { isOk: true, cleared };
+  return { isOk: true, cleared };
 }

@@ -40,54 +40,62 @@ let persistentHydrated = false;
 
 /** Normalizes a URL to its origin; returns "" when unparseable. */
 function safeOrigin(url: string): string {
-    try {
-        return new URL(url).origin;
-    } catch (err) { 
-        return "";
-    }
+  try {
+    return new URL(url).origin;
+  } catch (err) { 
+    return "";
+  }
 }
 
 /** Lazy hydrate of the persistent set. Idempotent; safe to call often. */
 async function hydratePersistent(): Promise<void> {
-    if (persistentHydrated) return;
-    try {
-        const raw = await chrome.storage.local.get(STORAGE_KEY_DISMISSED_ORIGINS);
-        const list = raw[STORAGE_KEY_DISMISSED_ORIGINS];
-        if (Array.isArray(list)) {
-            for (const origin of list) {
-                if (typeof origin === "string" && origin.length > 0) {
-                    dismissedPersistent.add(origin);
-                }
-            }
+  if (persistentHydrated) {
+    return;
+  }
+
+  try {
+    const raw = await chrome.storage.local.get(STORAGE_KEY_DISMISSED_ORIGINS);
+    const list = raw[STORAGE_KEY_DISMISSED_ORIGINS];
+    if (Array.isArray(list)) {
+      for (const origin of list) {
+        if (typeof origin === "string" && origin.length > 0) {
+          dismissedPersistent.add(origin);
         }
-        persistentHydrated = true;
-    } catch (err) {
-        logCaughtError(
-            BgLogTag.MARCO,
-            "[dismissed-origins] hydrate failed; falling back to in-memory only",
-            err as Error,
-        );
-        // Mark hydrated anyway — we don't retry. Next persist call will
-        // overwrite with whatever we currently know.
-        persistentHydrated = true;
+      }
     }
+
+    persistentHydrated = true;
+  } catch (err) {
+    logCaughtError(
+      BgLogTag.MARCO,
+      "[dismissed-origins] hydrate failed; falling back to in-memory only",
+            err as Error,
+    );
+    // Mark hydrated anyway — we don't retry. Next persist call will
+    // overwrite with whatever we currently know.
+    persistentHydrated = true;
+  }
 }
 
 /** Eagerly preload the persistent set (e.g. from boot.ts). */
 export async function preloadDismissedOrigins(): Promise<void> {
-    await hydratePersistent();
+  await hydratePersistent();
 }
 
 /** Records that the user dismissed the auto-attach prompt for this (tab, origin). */
 export function dismissOriginForTab(tabId: number, url: string): void {
-    const origin = safeOrigin(url);
-    if (origin === "") return;
-    let set = dismissedByTab.get(tabId);
-    if (set === undefined) {
-        set = new Set<string>();
-        dismissedByTab.set(tabId, set);
-    }
-    set.add(origin);
+  const origin = safeOrigin(url);
+  if (origin === "") {
+    return;
+  }
+
+  let set = dismissedByTab.get(tabId);
+  if (set === undefined) {
+    set = new Set<string>();
+    dismissedByTab.set(tabId, set);
+  }
+
+  set.add(origin);
 }
 
 /**
@@ -97,82 +105,100 @@ export function dismissOriginForTab(tabId: number, url: string): void {
  * silently falls back to the tab-scoped layer only — never blocks.
  */
 export function isOriginDismissedForTab(tabId: number, url: string): boolean {
-    const origin = safeOrigin(url);
-    if (origin === "") return false;
-    if (dismissedPersistent.has(origin)) return true;
-    const set = dismissedByTab.get(tabId);
+  const origin = safeOrigin(url);
+  if (origin === "") {
+    return false;
+  }
 
-    return set !== undefined && set.has(origin);
+  if (dismissedPersistent.has(origin)) {
+    return true;
+  }
+
+  const set = dismissedByTab.get(tabId);
+
+  return set !== undefined && set.has(origin);
 }
 
 /** "Don't ask for this site" — promote origin to the persistent layer. */
 export async function persistDismissOrigin(url: string): Promise<void> {
-    const origin = safeOrigin(url);
-    if (origin === "") return;
-    await hydratePersistent();
-    if (dismissedPersistent.has(origin)) return;
-    dismissedPersistent.add(origin);
-    try {
-        await chrome.storage.local.set({
-            [STORAGE_KEY_DISMISSED_ORIGINS]: Array.from(dismissedPersistent),
-        });
-    } catch (err) {
-        logCaughtError(
-            BgLogTag.MARCO,
-            `[dismissed-origins] persist failed for origin=${origin}`,
+  const origin = safeOrigin(url);
+  if (origin === "") {
+    return;
+  }
+
+  await hydratePersistent();
+  if (dismissedPersistent.has(origin)) {
+    return;
+  }
+
+  dismissedPersistent.add(origin);
+  try {
+    await chrome.storage.local.set({
+      [STORAGE_KEY_DISMISSED_ORIGINS]: Array.from(dismissedPersistent),
+    });
+  } catch (err) {
+    logCaughtError(
+      BgLogTag.MARCO,
+      `[dismissed-origins] persist failed for origin=${origin}`,
             err as Error,
-        );
-    }
+    );
+  }
 }
 
 /** Reverses `persistDismissOrigin` (used by Options "Forget site"). */
 export async function unpersistDismissOrigin(url: string): Promise<void> {
-    const origin = safeOrigin(url);
-    if (origin === "") return;
-    await hydratePersistent();
-    if (!dismissedPersistent.has(origin)) return;
-    dismissedPersistent.delete(origin);
-    try {
-        await chrome.storage.local.set({
-            [STORAGE_KEY_DISMISSED_ORIGINS]: Array.from(dismissedPersistent),
-        });
-    } catch (err) {
-        logCaughtError(
-            BgLogTag.MARCO,
-            `[dismissed-origins] unpersist failed for origin=${origin}`,
+  const origin = safeOrigin(url);
+  if (origin === "") {
+    return;
+  }
+
+  await hydratePersistent();
+  if (!dismissedPersistent.has(origin)) {
+    return;
+  }
+
+  dismissedPersistent.delete(origin);
+  try {
+    await chrome.storage.local.set({
+      [STORAGE_KEY_DISMISSED_ORIGINS]: Array.from(dismissedPersistent),
+    });
+  } catch (err) {
+    logCaughtError(
+      BgLogTag.MARCO,
+      `[dismissed-origins] unpersist failed for origin=${origin}`,
             err as Error,
-        );
-    }
+    );
+  }
 }
 
 /** Read-only snapshot of persisted origins (for Options UI listings). */
 export async function listPersistedDismissedOrigins(): Promise<string[]> {
-    await hydratePersistent();
+  await hydratePersistent();
 
-    return Array.from(dismissedPersistent).sort();
+  return Array.from(dismissedPersistent).sort();
 }
 
 /** Clears all dismissed origins for a tab (call from tabs.onRemoved). */
 export function clearDismissedOriginsForTab(tabId: number): void {
-    dismissedByTab.delete(tabId);
+  dismissedByTab.delete(tabId);
 }
 
 /** Test-only reset of all in-memory state. */
 export function _resetDismissedOriginsForTests(): void {
-    dismissedByTab.clear();
-    dismissedPersistent.clear();
-    persistentHydrated = false;
+  dismissedByTab.clear();
+  dismissedPersistent.clear();
+  persistentHydrated = false;
 }
 
 /** Test-only inspector. */
 export function _debugDumpDismissed(): {
     perTab: Record<number, string[]>;
     persistent: string[];
-} {
-    const perTab: Record<number, string[]> = {};
-    for (const [tabId, set] of dismissedByTab.entries()) {
-        perTab[tabId] = Array.from(set);
-    }
+    } {
+  const perTab: Record<number, string[]> = {};
+  for (const [tabId, set] of dismissedByTab.entries()) {
+    perTab[tabId] = Array.from(set);
+  }
 
-    return { perTab, persistent: Array.from(dismissedPersistent) };
+  return { perTab, persistent: Array.from(dismissedPersistent) };
 }

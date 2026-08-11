@@ -23,6 +23,7 @@ export function buildTokenRow(initialKey: string): TokenRowEls {
     preview.textContent = err ? '{{ ? }}' : '{{' + key + '}}';
     error.textContent = err ?? '';
   };
+
   input.addEventListener('input', update);
   update();
   row.appendChild(label); row.appendChild(input); row.appendChild(preview); row.appendChild(error);
@@ -49,6 +50,7 @@ export function buildValuesRow(initialValues: string[]): ValuesRowEls {
     const parsed = input.value.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
     error.textContent = normalizeReplaceValues(parsed) === null ? 'Enter one or more comma-separated values' : '';
   };
+
   input.addEventListener('input', update);
   update();
   row.appendChild(label); row.appendChild(input); row.appendChild(error);

@@ -41,27 +41,27 @@ type StoreData = Record<string, StoreEntry>;
 
 /** Reads the full data store from chrome.storage.local. */
 async function readStore(): Promise<StoreData> {
-    const stored = await chrome.storage.local.get(STORE_KEY);
-    const data = stored[STORE_KEY] as StoreData | undefined;
+  const stored = await chrome.storage.local.get(STORE_KEY);
+  const data = stored[STORE_KEY] as StoreData | undefined;
 
-    return data ?? {};
+  return data ?? {};
 }
 
 /** Writes the full data store to chrome.storage.local. */
 async function writeStore(data: StoreData): Promise<void> {
-    await chrome.storage.local.set({ [STORE_KEY]: data });
-    checkStoreSizeWarning(data);
+  await chrome.storage.local.set({ [STORE_KEY]: data });
+  checkStoreSizeWarning(data);
 }
 
 /** Logs a warning if the store size exceeds the threshold. */
 function checkStoreSizeWarning(data: StoreData): void {
-    const serialized = JSON.stringify(data);
-    const sizeBytes = new Blob([serialized]).size;
-    const isOverThreshold = sizeBytes > WARN_TOTAL_SIZE_BYTES;
+  const serialized = JSON.stringify(data);
+  const sizeBytes = new Blob([serialized]).size;
+  const isOverThreshold = sizeBytes > WARN_TOTAL_SIZE_BYTES;
 
-    if (isOverThreshold) {
-        logBgWarnError(BgLogTag.DATA_BRIDGE, `Store size ${sizeBytes} bytes exceeds warning threshold (${WARN_TOTAL_SIZE_BYTES})`);
-    }
+  if (isOverThreshold) {
+    logBgWarnError(BgLogTag.DATA_BRIDGE, `Store size ${sizeBytes} bytes exceeds warning threshold (${WARN_TOTAL_SIZE_BYTES})`);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -70,48 +70,48 @@ function checkStoreSizeWarning(data: StoreData): void {
 
 /** Validates a key for length and character constraints. */
 function validateKey(key: string): string | null {
-    const isTooLong = key.length > MAX_KEY_LENGTH;
+  const isTooLong = key.length > MAX_KEY_LENGTH;
 
-    if (isTooLong) {
-        return `Key exceeds ${MAX_KEY_LENGTH} character limit`;
-    }
+  if (isTooLong) {
+    return `Key exceeds ${MAX_KEY_LENGTH} character limit`;
+  }
 
-    // eslint-disable-next-line no-control-regex
-    const hasControlChars = /[\x00-\x1f]/.test(key);
+  // eslint-disable-next-line no-control-regex
+  const hasControlChars = /[\x00-\x1f]/.test(key);
 
-    if (hasControlChars) {
-        return "Key contains control characters";
-    }
+  if (hasControlChars) {
+    return "Key contains control characters";
+  }
 
-    return null;
+  return null;
 }
 
 /** Validates a value for size constraints. */
 function validateValue(value: JsonValue): string | null {
-    const serialized = JSON.stringify(value);
-    const sizeBytes = new Blob([serialized]).size;
-    const isTooLarge = sizeBytes > MAX_VALUE_SIZE_BYTES;
+  const serialized = JSON.stringify(value);
+  const sizeBytes = new Blob([serialized]).size;
+  const isTooLarge = sizeBytes > MAX_VALUE_SIZE_BYTES;
 
-    if (isTooLarge) {
-        return `Value exceeds ${MAX_VALUE_SIZE_BYTES} byte limit (${sizeBytes} bytes)`;
-    }
+  if (isTooLarge) {
+    return `Value exceeds ${MAX_VALUE_SIZE_BYTES} byte limit (${sizeBytes} bytes)`;
+  }
 
-    return null;
+  return null;
 }
 
 /** Counts keys matching a prefix. */
 function countKeysWithPrefix(data: StoreData, prefix: string): number {
-    let count = 0;
+  let count = 0;
 
-    for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(prefix);
+  for (const key of Object.keys(data)) {
+    const hasPrefix = key.startsWith(prefix);
 
-        if (hasPrefix) {
-            count++;
-        }
+    if (hasPrefix) {
+      count++;
     }
+  }
 
-    return count;
+  return count;
 }
 
 /* ------------------------------------------------------------------ */
@@ -120,51 +120,51 @@ function countKeysWithPrefix(data: StoreData, prefix: string): number {
 
 /** Handles USER_SCRIPT_DATA_SET — stores a key-value pair. */
 export async function handleDataSet(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: boolean; errorMessage?: string }> {
-    const request = message as MessageRequest & {
+  const request = message as MessageRequest & {
         key: string;
         value: JsonValue;
         projectId: string;
         scriptId: string;
     };
 
-    const keyError = validateKey(request.key);
-    const hasKeyError = keyError !== null;
+  const keyError = validateKey(request.key);
+  const hasKeyError = keyError !== null;
 
-    if (hasKeyError) {
-        return { isOk: false, errorMessage: keyError! };
-    }
+  if (hasKeyError) {
+    return { isOk: false, errorMessage: keyError! };
+  }
 
-    const valueError = validateValue(request.value);
-    const hasValueError = valueError !== null;
+  const valueError = validateValue(request.value);
+  const hasValueError = valueError !== null;
 
-    if (hasValueError) {
-        return { isOk: false, errorMessage: valueError! };
-    }
+  if (hasValueError) {
+    return { isOk: false, errorMessage: valueError! };
+  }
 
-    const data = await readStore();
-    const prefix = extractPrefix(request.key);
-    const existingCount = countKeysWithPrefix(data, prefix);
-    const isNewKey = data[request.key] === undefined;
-    const isOverKeyLimit = isNewKey && existingCount >= MAX_KEYS_PER_PREFIX;
+  const data = await readStore();
+  const prefix = extractPrefix(request.key);
+  const existingCount = countKeysWithPrefix(data, prefix);
+  const isNewKey = data[request.key] === undefined;
+  const isOverKeyLimit = isNewKey && existingCount >= MAX_KEYS_PER_PREFIX;
 
-    if (isOverKeyLimit) {
-        return { isOk: false, errorMessage: `Exceeded ${MAX_KEYS_PER_PREFIX} keys per project` };
-    }
+  if (isOverKeyLimit) {
+    return { isOk: false, errorMessage: `Exceeded ${MAX_KEYS_PER_PREFIX} keys per project` };
+  }
 
-    const sanitizedValue = JSON.parse(JSON.stringify(request.value));
+  const sanitizedValue = JSON.parse(JSON.stringify(request.value));
 
-    data[request.key] = {
-        value: sanitizedValue,
-        updatedAt: new Date().toISOString(),
-        projectId: request.projectId,
-        scriptId: request.scriptId,
-    };
+  data[request.key] = {
+    value: sanitizedValue,
+    updatedAt: new Date().toISOString(),
+    projectId: request.projectId,
+    scriptId: request.scriptId,
+  };
 
-    await writeStore(data);
+  await writeStore(data);
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -173,14 +173,14 @@ export async function handleDataSet(
 
 /** Handles USER_SCRIPT_DATA_GET — retrieves a value by key. */
 export async function handleDataGet(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ value: JsonValue }> {
-    const request = message as MessageRequest & { key: string };
-    const data = await readStore();
-    const entry = data[request.key];
-    const hasEntry = entry !== undefined;
+  const request = message as MessageRequest & { key: string };
+  const data = await readStore();
+  const entry = data[request.key];
+  const hasEntry = entry !== undefined;
 
-    return { value: hasEntry ? entry.value : undefined };
+  return { value: hasEntry ? entry.value : undefined };
 }
 
 /* ------------------------------------------------------------------ */
@@ -189,15 +189,15 @@ export async function handleDataGet(
 
 /** Handles USER_SCRIPT_DATA_DELETE — removes a key. */
 export async function handleDataDelete(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: boolean }> {
-    const request = message as MessageRequest & { key: string };
-    const data = await readStore();
+  const request = message as MessageRequest & { key: string };
+  const data = await readStore();
 
-    delete data[request.key];
-    await writeStore(data);
+  delete data[request.key];
+  await writeStore(data);
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -206,23 +206,23 @@ export async function handleDataDelete(
 
 /** Handles USER_SCRIPT_DATA_KEYS — lists keys matching a prefix. */
 export async function handleDataKeys(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ keys: string[] }> {
-    const request = message as MessageRequest & { prefix: string };
-    const data = await readStore();
-    const matchingKeys: string[] = [];
+  const request = message as MessageRequest & { prefix: string };
+  const data = await readStore();
+  const matchingKeys: string[] = [];
 
-    for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(request.prefix);
+  for (const key of Object.keys(data)) {
+    const hasPrefix = key.startsWith(request.prefix);
 
-        if (hasPrefix) {
-            const strippedKey = key.slice(request.prefix.length);
+    if (hasPrefix) {
+      const strippedKey = key.slice(request.prefix.length);
 
-            matchingKeys.push(strippedKey);
-        }
+      matchingKeys.push(strippedKey);
     }
+  }
 
-    return { keys: matchingKeys };
+  return { keys: matchingKeys };
 }
 
 /* ------------------------------------------------------------------ */
@@ -231,23 +231,23 @@ export async function handleDataKeys(
 
 /** Handles USER_SCRIPT_DATA_GET_ALL — returns all entries for a prefix. */
 export async function handleDataGetAll(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ entries: Record<string, unknown> }> {
-    const request = message as MessageRequest & { prefix: string };
-    const data = await readStore();
-    const entries: Record<string, unknown> = {};
+  const request = message as MessageRequest & { prefix: string };
+  const data = await readStore();
+  const entries: Record<string, unknown> = {};
 
-    for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(request.prefix);
+  for (const key of Object.keys(data)) {
+    const hasPrefix = key.startsWith(request.prefix);
 
-        if (hasPrefix) {
-            const strippedKey = key.slice(request.prefix.length);
+    if (hasPrefix) {
+      const strippedKey = key.slice(request.prefix.length);
 
-            entries[strippedKey] = data[key].value;
-        }
+      entries[strippedKey] = data[key].value;
     }
+  }
 
-    return { entries };
+  return { entries };
 }
 
 /* ------------------------------------------------------------------ */
@@ -256,24 +256,24 @@ export async function handleDataGetAll(
 
 /** Handles USER_SCRIPT_DATA_CLEAR — removes all entries for a prefix. */
 export async function handleDataClear(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: boolean; cleared: number }> {
-    const request = message as MessageRequest & { prefix: string };
-    const data = await readStore();
-    let cleared = 0;
+  const request = message as MessageRequest & { prefix: string };
+  const data = await readStore();
+  let cleared = 0;
 
-    for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(request.prefix);
+  for (const key of Object.keys(data)) {
+    const hasPrefix = key.startsWith(request.prefix);
 
-        if (hasPrefix) {
-            delete data[key];
-            cleared++;
-        }
+    if (hasPrefix) {
+      delete data[key];
+      cleared++;
     }
+  }
 
-    await writeStore(data);
+  await writeStore(data);
 
-    return { isOk: true, cleared };
+  return { isOk: true, cleared };
 }
 
 /* ------------------------------------------------------------------ */
@@ -296,38 +296,38 @@ export interface DataStoreEntry {
 
 /** Returns every entry in the data store with metadata for the Options UI. */
 export async function handleGetDataStoreAll(): Promise<{ entries: DataStoreEntry[] }> {
-    const data = await readStore();
-    const entries: DataStoreEntry[] = [];
+  const data = await readStore();
+  const entries: DataStoreEntry[] = [];
 
-    for (const [key, entry] of Object.entries(data)) {
-        const serialized = JSON.stringify(entry.value);
-        const sizeBytes = new Blob([serialized]).size;
-        const valuePreview = serialized.length > 120
-            ? serialized.slice(0, 120) + "…"
-            : serialized;
+  for (const [key, entry] of Object.entries(data)) {
+    const serialized = JSON.stringify(entry.value);
+    const sizeBytes = new Blob([serialized]).size;
+    const valuePreview = serialized.length > 120
+      ? serialized.slice(0, 120) + "…"
+      : serialized;
 
-        entries.push({
-            key,
-            value: entry.value,
-            valuePreview,
-            sizeBytes,
-            projectId: entry.projectId,
-            scriptId: entry.scriptId,
-            updatedAt: entry.updatedAt,
-        });
-    }
+    entries.push({
+      key,
+      value: entry.value,
+      valuePreview,
+      sizeBytes,
+      projectId: entry.projectId,
+      scriptId: entry.scriptId,
+      updatedAt: entry.updatedAt,
+    });
+  }
 
-    return { entries };
+  return { entries };
 }
 
 /** Extracts the namespace prefix from a namespaced key. */
 function extractPrefix(key: string): string {
-    const separatorIndex = key.indexOf("::");
-    const hasSeparator = separatorIndex !== -1;
+  const separatorIndex = key.indexOf("::");
+  const hasSeparator = separatorIndex !== -1;
 
-    if (hasSeparator) {
-        return key.slice(0, separatorIndex + 2);
-    }
+  if (hasSeparator) {
+    return key.slice(0, separatorIndex + 2);
+  }
 
-    return "";
+  return "";
 }

@@ -130,6 +130,7 @@ export function validateNamespace(namespace: string): NamespaceValidationResult 
   if (trimmed.length < 3) {
     return { valid: false, error: "Namespace must be at least 3 characters" };
   }
+
   if (trimmed.length > 100) {
     return { valid: false, error: "Namespace must be 100 characters or less" };
   }
@@ -156,10 +157,12 @@ export function validateDatabaseName(name: string): NamespaceValidationResult {
   if (!name || name.trim().length === 0) {
     return { valid: false, error: "Database name is required" };
   }
+
   const trimmed = name.trim();
   if (trimmed.length > 50) {
     return { valid: false, error: "Database name must be 50 characters or less" };
   }
+
   if (!/^[A-Z][a-zA-Z0-9]*$/.test(trimmed)) {
     return { valid: false, error: "Database name must be PascalCase (e.g. MyStore)" };
   }

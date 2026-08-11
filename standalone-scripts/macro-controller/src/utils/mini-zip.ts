@@ -19,6 +19,7 @@ function buildCrc32Table(): Uint32Array {
     for (let bit = 0; bit < 8; bit++) {
       value = (value & 1) !== 0 ? (0xedb88320 ^ (value >>> 1)) : (value >>> 1);
     }
+
     table[index] = value >>> 0;
   }
 
@@ -135,6 +136,7 @@ export function buildStoredZip(entries: MiniZipEntry[]): Blob {
     offset += header.length + contentBytes.length;
     records.push(record);
   }
+
   const cdOffset = offset;
   let cdSize = 0;
   for (const record of records) {
@@ -142,6 +144,7 @@ export function buildStoredZip(entries: MiniZipEntry[]): Blob {
     chunks.push(central);
     cdSize += central.length;
   }
+
   chunks.push(buildEndOfCentral(records.length, cdSize, cdOffset));
 
   return new Blob(chunks as BlobPart[], { type: 'application/zip' });

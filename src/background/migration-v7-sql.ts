@@ -8,10 +8,10 @@
  */
 
 import {
-    SHARED_ASSET_SCHEMA,
-    ASSET_LINK_SCHEMA,
-    PROJECT_GROUP_SCHEMA,
-    PROJECT_GROUP_MEMBER_SCHEMA,
+  SHARED_ASSET_SCHEMA,
+  ASSET_LINK_SCHEMA,
+  PROJECT_GROUP_SCHEMA,
+  PROJECT_GROUP_MEMBER_SCHEMA,
 } from "./db-schemas";
 
 /**
@@ -19,16 +19,16 @@ import {
  * Each schema constant may contain multiple statements separated by semicolons.
  */
 export function getV7Statements(): string[] {
-    const allSql = [
-        SHARED_ASSET_SCHEMA,
-        ASSET_LINK_SCHEMA,
-        PROJECT_GROUP_SCHEMA,
-        PROJECT_GROUP_MEMBER_SCHEMA,
-    ].join("\n");
+  const allSql = [
+    SHARED_ASSET_SCHEMA,
+    ASSET_LINK_SCHEMA,
+    PROJECT_GROUP_SCHEMA,
+    PROJECT_GROUP_MEMBER_SCHEMA,
+  ].join("\n");
 
-    return allSql
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
-        .map((s) => s + ";");
+  return allSql
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => s + ";");
 }

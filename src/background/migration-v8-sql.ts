@@ -13,9 +13,9 @@ import { ASSET_VERSION_SCHEMA } from "./db-schemas";
  * Returns all v8 SQL statements for runIgnoringDuplicates.
  */
 export function getV8Statements(): string[] {
-    return ASSET_VERSION_SCHEMA
-        .split(";")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
-        .map((s) => s + ";");
+  return ASSET_VERSION_SCHEMA
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((s) => s + ";");
 }

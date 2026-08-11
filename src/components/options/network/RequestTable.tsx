@@ -37,14 +37,14 @@ export function RequestTable({
         <TableBody>
           {hasRows
             ? filtered.map((req, i) => (
-                <RequestRow
-                  key={`${req.timestamp}-${i}`}
-                  request={req}
-                  index={i}
-                  isExpanded={expandedIndex === i}
-                  onToggle={onToggleExpand}
-                />
-              ))
+              <RequestRow
+                key={`${req.timestamp}-${i}`}
+                request={req}
+                index={i}
+                isExpanded={expandedIndex === i}
+                onToggle={onToggleExpand}
+              />
+            ))
             : <EmptyRow isLoading={isLoading} />}
         </TableBody>
       </Table>

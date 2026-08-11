@@ -25,6 +25,7 @@ async function writeToClipboard(text: string): Promise<boolean> {
   } catch (err) {
     console.warn("[CopyLogButton] navigator.clipboard.writeText failed, falling back to execCommand", err);
   }
+
   try {
     const textarea = document.createElement("textarea");
     textarea.value = text;
@@ -54,7 +55,9 @@ export function CopyLogButton({ entry, className, size = "sm" }: CopyLogButtonPr
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => () => {
-    if (timerRef.current !== null) clearTimeout(timerRef.current);
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+    }
   }, []);
 
   const handleCopy = useCallback(async () => {
@@ -63,7 +66,10 @@ export function CopyLogButton({ entry, className, size = "sm" }: CopyLogButtonPr
     if (ok) {
       setCopied(true);
       toast.success("Webhook log copied");
-      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
+      }
+
       timerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } else {
       toast.error("Failed to copy log to clipboard");

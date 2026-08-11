@@ -28,9 +28,9 @@ import { resolveCreditSummary } from '../../credit-balance-update/credit-summary
 export type DisplayKindResolver = (ws: WorkspaceCredit) => WorkspaceDisplayKind;
 
 function num0(value: unknown): number {
-    const n = typeof value === 'number' ? value : Number(value ?? 0);
+  const n = typeof value === 'number' ? value : Number(value ?? 0);
 
-    return Number.isFinite(n) ? n : 0;
+  return Number.isFinite(n) ? n : 0;
 }
 
 /**
@@ -46,72 +46,74 @@ function num0(value: unknown): number {
  * credits and break every consumer of `DashboardSummary`.
  */
 function isProPlan(plan: string | undefined): boolean {
-    if (typeof plan !== 'string') {
-        return false;
-    }
+  if (typeof plan !== 'string') {
+    return false;
+  }
 
-    return plan.trim().toLowerCase().startsWith('pro_');
+  return plan.trim().toLowerCase().startsWith('pro_');
 }
 
 const EMPTY: DashboardSummary = {
-    proCount: 0,
-    proExpiringCount: 0,
-    proCreditsAvailable: 0,
-    proCreditsTotal: 0,
-    freeCreditsAvailable: 0,
+  proCount: 0,
+  proExpiringCount: 0,
+  proCreditsAvailable: 0,
+  proCreditsTotal: 0,
+  freeCreditsAvailable: 0,
 };
 
 export function computeDashboardSummary(
-    rows: ReadonlyArray<WorkspaceCredit>,
-    getDisplayKind: DisplayKindResolver = () => 'normal',
+  rows: ReadonlyArray<WorkspaceCredit>,
+  getDisplayKind: DisplayKindResolver = () => 'normal',
 ): DashboardSummary {
-    if (!Array.isArray(rows) || rows.length === 0) {
-        return EMPTY;
-    }
-    let proCount = 0;
-    let proExpiringCount = 0;
-    let proCreditsAvailable = 0;
-    let proCreditsTotal = 0;
-    let freeCreditsAvailable = 0;
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return EMPTY;
+  }
 
-    for (const ws of rows) {
-        freeCreditsAvailable += num0(ws.dailyFree);
+  let proCount = 0;
+  let proExpiringCount = 0;
+  let proCreditsAvailable = 0;
+  let proCreditsTotal = 0;
+  let freeCreditsAvailable = 0;
 
-        if (!isProPlan(ws.plan)) {
-            continue;
-        }
-        proCount += 1;
-        const summary = resolveCreditSummary(ws);
-        proCreditsAvailable += summary.available;
-        proCreditsTotal += summary.total;
+  for (const ws of rows) {
+    freeCreditsAvailable += num0(ws.dailyFree);
 
-        const kind = getDisplayKind(ws);
-        if (PRO_EXPIRING_KINDS.has(kind)) {
-            proExpiringCount += 1;
-        }
+    if (!isProPlan(ws.plan)) {
+      continue;
     }
 
-    return {
-        proCount,
-        proExpiringCount,
-        proCreditsAvailable: Math.round(proCreditsAvailable),
-        proCreditsTotal: Math.round(proCreditsTotal),
-        freeCreditsAvailable: Math.round(freeCreditsAvailable),
-    };
+    proCount += 1;
+    const summary = resolveCreditSummary(ws);
+    proCreditsAvailable += summary.available;
+    proCreditsTotal += summary.total;
+
+    const kind = getDisplayKind(ws);
+    if (PRO_EXPIRING_KINDS.has(kind)) {
+      proExpiringCount += 1;
+    }
+  }
+
+  return {
+    proCount,
+    proExpiringCount,
+    proCreditsAvailable: Math.round(proCreditsAvailable),
+    proCreditsTotal: Math.round(proCreditsTotal),
+    freeCreditsAvailable: Math.round(freeCreditsAvailable),
+  };
 }
 
 const EMPTY_DETAILS: SummaryDetails = {
-    pro: {
-        count: 0,
-        expiringCount: 0,
-        expiringByKind: {},
-        byPlan: {},
-        creditsAvailable: 0,
-        creditsTotal: 0,
-        creditsExpiringAvailable: 0,
-    },
-    free: { dailyAvailable: 0, workspacesWithFree: 0 },
-    grand: { availableSpendable: 0 },
+  pro: {
+    count: 0,
+    expiringCount: 0,
+    expiringByKind: {},
+    byPlan: {},
+    creditsAvailable: 0,
+    creditsTotal: 0,
+    creditsExpiringAvailable: 0,
+  },
+  free: { dailyAvailable: 0, workspacesWithFree: 0 },
+  grand: { availableSpendable: 0 },
 };
 
 /**
@@ -120,60 +122,63 @@ const EMPTY_DETAILS: SummaryDetails = {
  * in a single pass over the visible workspaces.
  */
 export function computeSummaryDetails(
-    rows: ReadonlyArray<WorkspaceCredit>,
-    getDisplayKind: DisplayKindResolver = () => 'normal',
+  rows: ReadonlyArray<WorkspaceCredit>,
+  getDisplayKind: DisplayKindResolver = () => 'normal',
 ): SummaryDetails {
-    if (!Array.isArray(rows) || rows.length === 0) {
-        return EMPTY_DETAILS;
-    }
-    let proCount = 0;
-    let proExpiringCount = 0;
-    let proCreditsAvailable = 0;
-    let proCreditsTotal = 0;
-    let proExpiringAvailable = 0;
-    let freeDaily = 0;
-    let freeWorkspaces = 0;
-    const expiringByKind: Record<string, number> = {};
-    const byPlan: Record<string, number> = {};
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return EMPTY_DETAILS;
+  }
 
-    for (const ws of rows) {
-        const daily = num0(ws.dailyFree);
-        freeDaily += daily;
-        if (daily > 0) {
-            freeWorkspaces += 1;
-        }
-        if (!isProPlan(ws.plan)) {
-            continue;
-        }
-        proCount += 1;
-        const summary = resolveCreditSummary(ws);
-        const avail = summary.available;
-        proCreditsAvailable += avail;
-        proCreditsTotal += summary.total;
-        const planKey = String(ws.plan).trim().toLowerCase();
-        byPlan[planKey] = (byPlan[planKey] ?? 0) + 1;
-        const kind = getDisplayKind(ws);
-        if (PRO_EXPIRING_KINDS.has(kind)) {
-            proExpiringCount += 1;
-            proExpiringAvailable += avail;
-            expiringByKind[kind] = (expiringByKind[kind] ?? 0) + 1;
-        }
+  let proCount = 0;
+  let proExpiringCount = 0;
+  let proCreditsAvailable = 0;
+  let proCreditsTotal = 0;
+  let proExpiringAvailable = 0;
+  let freeDaily = 0;
+  let freeWorkspaces = 0;
+  const expiringByKind: Record<string, number> = {};
+  const byPlan: Record<string, number> = {};
+
+  for (const ws of rows) {
+    const daily = num0(ws.dailyFree);
+    freeDaily += daily;
+    if (daily > 0) {
+      freeWorkspaces += 1;
     }
 
-    const proAvail = Math.round(proCreditsAvailable);
-    const freeAvail = Math.round(freeDaily);
+    if (!isProPlan(ws.plan)) {
+      continue;
+    }
 
-    return {
-        pro: {
-            count: proCount,
-            expiringCount: proExpiringCount,
-            expiringByKind,
-            byPlan,
-            creditsAvailable: proAvail,
-            creditsTotal: Math.round(proCreditsTotal),
-            creditsExpiringAvailable: Math.round(proExpiringAvailable),
-        },
-        free: { dailyAvailable: freeAvail, workspacesWithFree: freeWorkspaces },
-        grand: { availableSpendable: proAvail + freeAvail },
-    };
+    proCount += 1;
+    const summary = resolveCreditSummary(ws);
+    const avail = summary.available;
+    proCreditsAvailable += avail;
+    proCreditsTotal += summary.total;
+    const planKey = String(ws.plan).trim().toLowerCase();
+    byPlan[planKey] = (byPlan[planKey] ?? 0) + 1;
+    const kind = getDisplayKind(ws);
+    if (PRO_EXPIRING_KINDS.has(kind)) {
+      proExpiringCount += 1;
+      proExpiringAvailable += avail;
+      expiringByKind[kind] = (expiringByKind[kind] ?? 0) + 1;
+    }
+  }
+
+  const proAvail = Math.round(proCreditsAvailable);
+  const freeAvail = Math.round(freeDaily);
+
+  return {
+    pro: {
+      count: proCount,
+      expiringCount: proExpiringCount,
+      expiringByKind,
+      byPlan,
+      creditsAvailable: proAvail,
+      creditsTotal: Math.round(proCreditsTotal),
+      creditsExpiringAvailable: Math.round(proExpiringAvailable),
+    },
+    free: { dailyAvailable: freeAvail, workspacesWithFree: freeWorkspaces },
+    grand: { availableSpendable: proAvail + freeAvail },
+  };
 }

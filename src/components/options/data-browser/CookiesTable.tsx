@@ -29,7 +29,10 @@ export function CookiesTable({ entries, loading, onRefresh, searchTerm = "" }: C
   const effectiveSearch = searchTerm || localSearch;
 
   const filtered = useMemo(() => {
-    if (!effectiveSearch.trim()) return entries;
+    if (!effectiveSearch.trim()) {
+      return entries;
+    }
+
     const q = effectiveSearch.toLowerCase();
 
     return entries.filter(

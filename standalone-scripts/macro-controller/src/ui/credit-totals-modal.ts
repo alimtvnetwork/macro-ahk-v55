@@ -30,16 +30,24 @@ const ATTR_ARIA_LABEL = 'aria-label';
 
 /** Format a number with thousands separators (en-US, no decimals). */
 export function formatCount(n: number): string {
-  if (!Number.isFinite(n)) return '—';
+  if (!Number.isFinite(n)) {
+    return '—';
+  }
 
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
 /** Convert an ISO timestamp into a short local clock string ("Tue 00:00"). */
 export function formatLocalReset(iso: string): string {
-  if (!iso) return '—';
+  if (!iso) {
+    return '—';
+  }
+
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) {
+    return '—';
+  }
+
   const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
@@ -92,7 +100,9 @@ const TONE_COLOR: Record<CreditTone, string> = {
   muted: cPanelFgDim,
 };
 function toneColor(tone: CreditTone | undefined): string {
-  if (tone && TONE_COLOR[tone]) return TONE_COLOR[tone];
+  if (tone && TONE_COLOR[tone]) {
+    return TONE_COLOR[tone];
+  }
 
   return '#e0e0e0';
 }
@@ -130,8 +140,14 @@ export function buildCard(heading: string, rows: ReadonlyArray<{ label: string; 
 /** One-time injection of row hover + zebra stripe CSS (Step 8). */
 const ZEBRA_STYLE_ID = 'marco-credit-totals-style';
 function ensureRowStyles(): void {
-  if (typeof document === 'undefined') return;
-  if (document.getElementById(ZEBRA_STYLE_ID)) return;
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  if (document.getElementById(ZEBRA_STYLE_ID)) {
+    return;
+  }
+
   const s = document.createElement('style');
   s.id = ZEBRA_STYLE_ID;
   s.textContent =
@@ -154,7 +170,10 @@ export function sortWorkspaces(
   workspaces: ReadonlyArray<WorkspaceCredit>,
   state: SortState,
 ): ReadonlyArray<WorkspaceCredit> {
-  if (state.dir === 'none') return workspaces;
+  if (state.dir === 'none') {
+    return workspaces;
+  }
+
   const mult = state.dir === 'asc' ? 1 : -1;
   const values = workspaces.slice();
   values.sort((a, b) => {
@@ -171,12 +190,26 @@ export function sortWorkspaces(
 }
 
 function pickSortValue(ws: WorkspaceCredit, key: SortKey): number | string {
-  if (key === 'name') return (ws.fullName || ws.name || ws.id || '').toString();
-  if (key === 'plan') return (ws.plan || '').toString();
-  if (key === 'projects') return Number(ws.numProjects) || 0;
+  if (key === 'name') {
+    return (ws.fullName || ws.name || ws.id || '').toString();
+  }
+
+  if (key === 'plan') {
+    return (ws.plan || '').toString();
+  }
+
+  if (key === 'projects') {
+    return Number(ws.numProjects) || 0;
+  }
+
   const summary = resolveCreditSummary(ws);
-  if (key === 'used') return summary.totalUsed;
-  if (key === 'rem') return summary.available;
+  if (key === 'used') {
+    return summary.totalUsed;
+  }
+
+  if (key === 'rem') {
+    return summary.available;
+  }
 
   return summary.total;
 }
@@ -187,8 +220,14 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
   if (current.key !== key) {
     return { key, dir: isNumeric ? 'desc' : 'asc' };
   }
-  if (current.dir === 'none') return { key, dir: isNumeric ? 'desc' : 'asc' };
-  if (current.dir === (isNumeric ? 'desc' : 'asc')) return { key, dir: isNumeric ? 'asc' : 'desc' };
+
+  if (current.dir === 'none') {
+    return { key, dir: isNumeric ? 'desc' : 'asc' };
+  }
+
+  if (current.dir === (isNumeric ? 'desc' : 'asc')) {
+    return { key, dir: isNumeric ? 'asc' : 'desc' };
+  }
 
   return { key, dir: 'none' };
 }
@@ -204,8 +243,14 @@ const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: LeftRightType
 
 /** Pure: move element at `from` to `to`, returning a new array. (Step 10) */
 export function reorderArray<T>(values: ReadonlyArray<T>, from: number, to: number): ReadonlyArray<T> {
-  if (from === to) return values.slice();
-  if (from < 0 || from >= values.length || to < 0 || to >= values.length) return values.slice();
+  if (from === to) {
+    return values.slice();
+  }
+
+  if (from < 0 || from >= values.length || to < 0 || to >= values.length) {
+    return values.slice();
+  }
+
   const next = values.slice();
   const [moved] = next.splice(from, 1);
   next.splice(to, 0, moved);
@@ -223,9 +268,15 @@ export interface FilterState {
 }
 
 function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
-  if (!q) return true;
+  if (!q) {
+    return true;
+  }
+
   const needle = q.trim().toLowerCase();
-  if (!needle) return true;
+  if (!needle) {
+    return true;
+  }
+
   const hay = (
     (ws.fullName || '') + ' ' +
     (ws.name || '') + ' ' +
@@ -243,15 +294,31 @@ export function applyFilters(
 ): ReadonlyArray<WorkspaceCredit> {
   const anyChipActive = filters.low || filters.empty || filters.free;
   const hasQuery = (filters.query || '').trim().length > 0;
-  if (!anyChipActive && !hasQuery) return workspaces;
+  if (!anyChipActive && !hasQuery) {
+    return workspaces;
+  }
 
   return workspaces.filter((ws) => {
-    if (hasQuery && !wsMatchesQuery(ws, filters.query)) return false;
-    if (!anyChipActive) return true;
+    if (hasQuery && !wsMatchesQuery(ws, filters.query)) {
+      return false;
+    }
+
+    if (!anyChipActive) {
+      return true;
+    }
+
     const rem = resolveCreditSummary(ws).available;
-    if (filters.low && rem < 100 && rem > 0) return true;
-    if (filters.empty && rem <= 0) return true;
-    if (filters.free && ws.hasFree) return true;
+    if (filters.low && rem < 100 && rem > 0) {
+      return true;
+    }
+
+    if (filters.empty && rem <= 0) {
+      return true;
+    }
+
+    if (filters.free && ws.hasFree) {
+      return true;
+    }
 
     return false;
   });
@@ -274,12 +341,20 @@ function buildChip(
     ';color:' + fg +
     ';padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;font-family:monospace;transition:background 120ms,color 120ms;';
   btn.onmouseover = function () {
-    if (!active) btn.style.background = 'rgba(124,58,237,0.15)';
+    if (!active) {
+      btn.style.background = 'rgba(124,58,237,0.15)';
+    }
   };
+
   btn.onmouseout = function () {
-    if (!active) btn.style.background = 'transparent';
+    if (!active) {
+      btn.style.background = 'transparent';
+    }
   };
-  btn.onclick = function () { onToggle(); };
+
+  btn.onclick = function () {
+    onToggle(); 
+  };
 
   return btn;
 }
@@ -363,7 +438,10 @@ interface TableCtx {
 const EMPTY_CSS = 'padding:14px 10px;text-align:center;font-size:11px;font-style:italic;color:';
 
 function renderHeaderCells(ctx: TableCtx): void {
-  while (ctx.header.firstChild) ctx.header.removeChild(ctx.header.firstChild);
+  while (ctx.header.firstChild) {
+    ctx.header.removeChild(ctx.header.firstChild);
+  }
+
   for (const col of COLUMNS) {
     const cell = document.createElement('span');
     cell.setAttribute('data-sort-key', col.key);
@@ -373,12 +451,16 @@ function renderHeaderCells(ctx: TableCtx): void {
     const isActive = ctx.sortState.key === col.key && ctx.sortState.dir !== 'none';
     const arrow = isActive ? (ctx.sortState.dir === 'asc' ? ' ▲' : ' ▼') : '';
     cell.textContent = col.label + arrow;
-    if (isActive) cell.style.color = '#ffffff';
+    if (isActive) {
+      cell.style.color = '#ffffff';
+    }
+
     cell.onclick = function (): void {
       ctx.sortState = nextSortDir(col.key, ctx.sortState);
       renderHeaderCells(ctx);
       renderBodyRows(ctx);
     };
+
     ctx.header.appendChild(cell);
   }
 }
@@ -388,7 +470,9 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   row.draggable = isManualOrder;
   row.style.cursor = isManualOrder ? 'grab' : 'default';
   row.setAttribute('data-row-index', String(dispIdx));
-  if (!isManualOrder) return;
+  if (!isManualOrder) {
+    return;
+  }
 
   row.addEventListener('dragstart', (e: DragEvent) => {
     row.style.opacity = '0.4';
@@ -406,7 +490,10 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   });
   row.addEventListener('dragover', (e: DragEvent) => {
     e.preventDefault();
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
+
     row.setAttribute('data-drop-target', '1');
     row.style.borderTop = '2px solid ' + cPrimaryLighter;
   });
@@ -419,7 +506,10 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
     const fromStr = e.dataTransfer?.getData('text/plain') || '';
     const from = Number(fromStr);
     const to = dispIdx;
-    if (!Number.isFinite(from) || from === to) return;
+    if (!Number.isFinite(from) || from === to) {
+      return;
+    }
+
     ctx.order = reorderArray(ctx.order, from, to);
     renderBodyRows(ctx);
   });
@@ -433,12 +523,16 @@ function appendEmptyState(body: HTMLElement, text: string): void {
 }
 
 function renderBodyRows(ctx: TableCtx): void {
-  while (ctx.body.firstChild) ctx.body.removeChild(ctx.body.firstChild);
+  while (ctx.body.firstChild) {
+    ctx.body.removeChild(ctx.body.firstChild);
+  }
+
   if (ctx.order.length === 0) {
     appendEmptyState(ctx.body, 'No workspaces cached. Open the workspace panel to sync.');
 
     return;
   }
+
   const filtered = applyFilters(ctx.order, ctx.filters);
   const sorted = sortWorkspaces(filtered, ctx.sortState);
   if (sorted.length === 0) {
@@ -446,6 +540,7 @@ function renderBodyRows(ctx: TableCtx): void {
 
     return;
   }
+
   sorted.forEach((ws, idx) => {
     const row = buildRow(ws, idx);
     attachDragHandlers(ctx, row, idx);
@@ -484,6 +579,7 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
     ctx.filterBar = newBar;
     renderBodyRows(ctx);
   }
+
   ctx.filterBar = buildFilterBar(ctx.filters, handleFilterChange);
 
   const searchBar = buildSearchBar(ctx.filters.query, function (q: string): void {
@@ -504,12 +600,18 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
 function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   const row = document.createElement('div');
   row.setAttribute('data-credit-totals-row', '1');
-  if (index % 2 === 1) row.setAttribute('data-zebra', '1');
+  if (index % 2 === 1) {
+    row.setAttribute('data-zebra', '1');
+  }
+
   row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.5fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
   row.title = 'Double-click to open workspace projects';
   row.ondblclick = function (): void {
-    try { window.open(DomainConstants.PROJECTS_URL, '_blank', 'noopener'); }
-    catch (err) { logError('creditTotalsModal.openProjects', 'window.open failed for https://lovable.dev/projects', err); }
+    try {
+      window.open(DomainConstants.PROJECTS_URL, '_blank', 'noopener'); 
+    } catch (err) {
+      logError('creditTotalsModal.openProjects', 'window.open failed for https://lovable.dev/projects', err); 
+    }
   };
 
   const name = document.createElement('span');
@@ -621,7 +723,9 @@ export function showCreditTotalsModal(): void {
   installA11yHandlers(panel);
   // Focus the panel so ESC works immediately.
   // allow-swallow: panel may not be focusable in headless test contexts; ESC still works via document-level listener
-  try { panel.focus(); } catch (err) {
+  try {
+    panel.focus(); 
+  } catch (err) {
     logError('MacroController', 'Unknown error');
   }
 }
@@ -635,11 +739,18 @@ function installA11yHandlers(panel: HTMLElement): void {
 
       return;
     }
-    if (e.key !== 'Tab') return;
+
+    if (e.key !== 'Tab') {
+      return;
+    }
+
     const focusables = panel.querySelectorAll<HTMLElement>(
       'button, [href], [tabindex]:not([tabindex="-1"])'
     );
-    if (focusables.length === 0) return;
+    if (focusables.length === 0) {
+      return;
+    }
+
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     const active = document.activeElement as HTMLElement | null;
@@ -651,6 +762,7 @@ function installA11yHandlers(panel: HTMLElement): void {
       first.focus();
     }
   }
+
   document.addEventListener('keydown', onKey, true);
   // Stash cleanup on the element so removeCreditTotalsModal can run it.
   (panel as HTMLElement & { __marcoCleanup?: () => void }).__marcoCleanup = function (): void {
@@ -663,7 +775,10 @@ export function removeCreditTotalsModal(): void {
   const existing = document.getElementById(DIALOG_ID);
   if (existing && existing.parentNode) {
     const cleanup = (existing as HTMLElement & { __marcoCleanup?: () => void }).__marcoCleanup;
-    if (typeof cleanup === 'function') cleanup();
+    if (typeof cleanup === 'function') {
+      cleanup();
+    }
+
     existing.parentNode.removeChild(existing);
   }
 }
@@ -681,7 +796,10 @@ function buildTitleBar(): HTMLElement {
   closeBtn.textContent = '✕';
   closeBtn.setAttribute('role', 'button');
   closeBtn.setAttribute(ATTR_ARIA_LABEL, 'Close');
-  closeBtn.onclick = function (): void { removeCreditTotalsModal(); };
+  closeBtn.onclick = function (): void {
+    removeCreditTotalsModal(); 
+  };
+
   bar.appendChild(title);
   bar.appendChild(closeBtn);
 
@@ -705,16 +823,23 @@ function buildFooter(totals: CreditTotals, workspaces: ReadonlyArray<WorkspaceCr
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
     downloadCsv('credit-totals-' + timestamp + '.csv', csv);
   };
+
   const refresh = document.createElement('button');
   refresh.textContent = '↻ Refresh';
   refresh.setAttribute(ATTR_ARIA_LABEL, 'Refresh credit snapshot');
   refresh.style.cssText = 'background:transparent;border:1px solid ' + cPrimary + ';color:' + cPrimaryLighter + ';padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;';
-  refresh.onclick = function (): void { showCreditTotalsModal(); };
+  refresh.onclick = function (): void {
+    showCreditTotalsModal(); 
+  };
+
   const close = document.createElement('button');
   close.textContent = 'Close';
   close.setAttribute(ATTR_ARIA_LABEL, 'Close dialog');
   close.style.cssText = 'background:rgba(124,58,237,0.20);border:1px solid ' + cPrimary + ';color:' + cPrimaryLighter + ';padding:3px 10px;border-radius:4px;font-size:10px;cursor:pointer;';
-  close.onclick = function (): void { removeCreditTotalsModal(); };
+  close.onclick = function (): void {
+    removeCreditTotalsModal(); 
+  };
+
   right.appendChild(csvBtn);
   right.appendChild(refresh);
   right.appendChild(close);
@@ -725,13 +850,25 @@ function buildFooter(totals: CreditTotals, workspaces: ReadonlyArray<WorkspaceCr
 }
 
 export function formatSnapshotAge(lastCheckedAt: number | null): string {
-  if (lastCheckedAt === null || !Number.isFinite(lastCheckedAt)) return 'never';
+  if (lastCheckedAt === null || !Number.isFinite(lastCheckedAt)) {
+    return 'never';
+  }
+
   const ageMs = Date.now() - lastCheckedAt;
-  if (ageMs < 0) return 'just now';
+  if (ageMs < 0) {
+    return 'just now';
+  }
+
   const sec = Math.floor(ageMs / 1000);
-  if (sec < 60) return sec + 's ago';
+  if (sec < 60) {
+    return sec + 's ago';
+  }
+
   const min = Math.floor(sec / 60);
-  if (min < 60) return min + 'm ago';
+  if (min < 60) {
+    return min + 'm ago';
+  }
+
   const hr = Math.floor(min / 60);
 
   return hr + 'h ago';

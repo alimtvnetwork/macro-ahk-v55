@@ -205,10 +205,15 @@ export function VersionHistory({ assetId, currentHash, currentVersion, onRollbac
     }
   }, [assetId]);
 
-  useEffect(() => { loadVersions(); }, [loadVersions]);
+  useEffect(() => {
+    loadVersions(); 
+  }, [loadVersions]);
 
   const handleRollback = useCallback(async () => {
-    if (rollbackTarget === null) return;
+    if (rollbackTarget === null) {
+      return;
+    }
+
     setRolling(true);
     try {
       const result = await sendMessage<{ rolledBackTo: string }>({
@@ -272,7 +277,11 @@ export function VersionHistory({ assetId, currentHash, currentVersion, onRollbac
       )}
 
       {/* Rollback confirmation */}
-      <AlertDialog open={rollbackTarget !== null} onOpenChange={(v) => { if (!v) setRollbackTarget(null); }}>
+      <AlertDialog open={rollbackTarget !== null} onOpenChange={(v) => {
+        if (!v) {
+          setRollbackTarget(null);
+        } 
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rollback to v{targetVersion?.Version}?</AlertDialogTitle>

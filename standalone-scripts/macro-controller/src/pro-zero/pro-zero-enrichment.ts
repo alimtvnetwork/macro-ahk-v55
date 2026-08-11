@@ -33,43 +33,49 @@ export const PRO_ZERO_ROLLOVER_REMAINING_FIELD = 'proZeroRolloverRemaining';
 export const PRO_ZERO_DAILY_REMAINING_FIELD = 'proZeroDailyRemaining';
 
 export function applySummaryToRow(ws: WorkspaceCredit, summary: MacroCreditSummary, balanceJson: string): void {
-    ws.totalCredits = summary.Total;
-    ws.available = summary.AvailableCredits;
-    ws.totalCreditsUsed = summary.TotalUsed;
-    ws.billingAvailable = summary.BillingRemaining;
-    ws[PRO_ZERO_BILLING_REMAINING_FIELD] = summary.BillingRemaining;
-    ws[PRO_ZERO_TOPUP_REMAINING_FIELD] = summary.TopupRemaining;
-    ws[PRO_ZERO_BONUS_REMAINING_FIELD] = summary.BonusRemaining;
-    ws[PRO_ZERO_ROLLOVER_REMAINING_FIELD] = summary.RolloverRemaining;
-    ws[PRO_ZERO_DAILY_REMAINING_FIELD] = summary.DailyRemaining;
-    ws[PRO_ZERO_BALANCE_JSON_FIELD] = balanceJson;
-    ws[PRO_ZERO_SOURCE_FIELD] = summary.Source;
-    // Issue 118: sync direct fields so credit-bar segments and hover card
-    // read the enriched values instead of stale workspace-API estimates.
-    ws.rollover = summary.RolloverRemaining;
-    ws.dailyFree = summary.DailyRemaining;
-    ws.dailyLimit = summary.DailyLimit;
+  ws.totalCredits = summary.Total;
+  ws.available = summary.AvailableCredits;
+  ws.totalCreditsUsed = summary.TotalUsed;
+  ws.billingAvailable = summary.BillingRemaining;
+  ws[PRO_ZERO_BILLING_REMAINING_FIELD] = summary.BillingRemaining;
+  ws[PRO_ZERO_TOPUP_REMAINING_FIELD] = summary.TopupRemaining;
+  ws[PRO_ZERO_BONUS_REMAINING_FIELD] = summary.BonusRemaining;
+  ws[PRO_ZERO_ROLLOVER_REMAINING_FIELD] = summary.RolloverRemaining;
+  ws[PRO_ZERO_DAILY_REMAINING_FIELD] = summary.DailyRemaining;
+  ws[PRO_ZERO_BALANCE_JSON_FIELD] = balanceJson;
+  ws[PRO_ZERO_SOURCE_FIELD] = summary.Source;
+  // Issue 118: sync direct fields so credit-bar segments and hover card
+  // read the enriched values instead of stale workspace-API estimates.
+  ws.rollover = summary.RolloverRemaining;
+  ws.dailyFree = summary.DailyRemaining;
+  ws.dailyLimit = summary.DailyLimit;
 }
 
 async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
-    if (!isProZeroPlan(mapWorkspacePlan(ws.plan))) return false;
-    try {
-        const typed = adaptWorkspaceInfoTyped(ws.rawApi || {});
-        const outcome = await buildProZeroCreditSummary(typed);
-        if (!outcome.isOk) return false;
-        applySummaryToRow(ws, outcome.summary, JSON.stringify(outcome.balance, null, 2));
+  if (!isProZeroPlan(mapWorkspacePlan(ws.plan))) {
+    return false;
+  }
 
-        return true;
-    } catch (caught: unknown) {
-        logError('ProZeroEnrichment', 'enrichOne failed for ws=' + ws.id, caught);
-
-        return false;
+  try {
+    const typed = adaptWorkspaceInfoTyped(ws.rawApi || {});
+    const outcome = await buildProZeroCreditSummary(typed);
+    if (!outcome.isOk) {
+      return false;
     }
+
+    applySummaryToRow(ws, outcome.summary, JSON.stringify(outcome.balance, null, 2));
+
+    return true;
+  } catch (caught: unknown) {
+    logError('ProZeroEnrichment', 'enrichOne failed for ws=' + ws.id, caught);
+
+    return false;
+  }
 }
 
 /** Enrich every pro_0 workspace in the list. Returns number of rows mutated. */
 export async function enrichProZeroWorkspaces(perWs: WorkspaceCredit[]): Promise<number> {
-    const results = await Promise.all(perWs.map(enrichOne));
+  const results = await Promise.all(perWs.map(enrichOne));
 
-    return results.filter(Boolean).length;
+  return results.filter(Boolean).length;
 }

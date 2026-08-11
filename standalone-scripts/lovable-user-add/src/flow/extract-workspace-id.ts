@@ -14,29 +14,29 @@
 const VALID_PATH_SEGMENTS: ReadonlyArray<string> = ["projects", "workspaces"];
 
 const findWorkspaceSegment = (segments: ReadonlyArray<string>): number => {
-    for (let i = 0; i < segments.length; i += 1) {
-        if (VALID_PATH_SEGMENTS.includes(segments[i])) {
-            return i;
-        }
+  for (let i = 0; i < segments.length; i += 1) {
+    if (VALID_PATH_SEGMENTS.includes(segments[i])) {
+      return i;
     }
+  }
 
-    return -1;
+  return -1;
 };
 
 export const extractWorkspaceId = (workspaceUrl: string): string => {
-    const parsed = new URL(workspaceUrl);
-    const segments = parsed.pathname.split("/").filter((s) => s.length > 0);
-    const idx = findWorkspaceSegment(segments);
+  const parsed = new URL(workspaceUrl);
+  const segments = parsed.pathname.split("/").filter((s) => s.length > 0);
+  const idx = findWorkspaceSegment(segments);
 
-    if (idx === -1 || idx + 1 >= segments.length) {
-        throw new Error(`Workspace URL missing /projects/{id} or /workspaces/{id}: ${workspaceUrl}`);
-    }
+  if (idx === -1 || idx + 1 >= segments.length) {
+    throw new Error(`Workspace URL missing /projects/{id} or /workspaces/{id}: ${workspaceUrl}`);
+  }
 
-    const id = segments[idx + 1];
+  const id = segments[idx + 1];
 
-    if (id.length === 0) {
-        throw new Error(`Workspace URL has empty id segment: ${workspaceUrl}`);
-    }
+  if (id.length === 0) {
+    throw new Error(`Workspace URL has empty id segment: ${workspaceUrl}`);
+  }
 
-    return id;
+  return id;
 };

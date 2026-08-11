@@ -38,13 +38,13 @@
 import type { PersistedSelector } from "./step-persistence";
 import type { FieldRow, VariableContext } from "./field-reference-resolver";
 import type {
-    EvaluatedAttempt,
-    AttemptFailureReason,
+  EvaluatedAttempt,
+  AttemptFailureReason,
 } from "./selector-attempt-evaluator";
 import { xpathOfElement } from "./xpath-of-element";
 import {
-    captureFormSnapshot,
-    type FormSnapshot,
+  captureFormSnapshot,
+  type FormSnapshot,
 } from "./form-snapshot";
 import { FailurePhaseType, FailureReasonCodeType, Semantic3f9bType } from "../../types/enums";
 import { logBgError } from "@/background/bg-logger";
@@ -200,10 +200,10 @@ export interface BuildFailureReportInput {
 }
 
 const SELECTOR_KIND_NAMES: Readonly<Record<number, string>> = {
-    1: "XPathFull",
-    2: "XPathRelative",
-    3: "Css",
-    4: "Aria",
+  1: "XPathFull",
+  2: "XPathRelative",
+  3: "Css",
+  4: "Aria",
 };
 
 /* ------------------------------------------------------------------ */
@@ -224,54 +224,54 @@ interface FailureReportContext {
 }
 
 function buildContextCore(
-    input: BuildFailureReportInput,
-    now: () => Date,
+  input: BuildFailureReportInput,
+  now: () => Date,
 ): Pick<FailureReportContext, Semantic3f9bType> {
-    const message = extractMessage(input.Error);
-    const attempts = resolveAttempts(input);
-    const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];
-    const { Reason, ReasonDetail } = classifyReason(input, attempts, variables, message);
+  const message = extractMessage(input.Error);
+  const attempts = resolveAttempts(input);
+  const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];
+  const { Reason, ReasonDetail } = classifyReason(input, attempts, variables, message);
 
-    return {
-        Message: message, Stack: extractStack(input.Error), Attempts: attempts,
-        Reason, ReasonDetail, Verbose: input.Verbose === true,
-    };
+  return {
+    Message: message, Stack: extractStack(input.Error), Attempts: attempts,
+    Reason, ReasonDetail, Verbose: input.Verbose === true,
+  };
 }
 
 function resolveFailureReportContext(input: BuildFailureReportInput): FailureReportContext {
-    const now = input.Now ?? defaultNow;
-    const core = buildContextCore(input, now);
-    const domContext = input.Target ? readDomContext(input.Target, core.Verbose) : null;
+  const now = input.Now ?? defaultNow;
+  const core = buildContextCore(input, now);
+  const domContext = input.Target ? readDomContext(input.Target, core.Verbose) : null;
 
-    return {
-        ...core, DomContext: domContext,
-        CapturedHtml: core.Verbose && domContext !== null ? (domContext.OuterHtml ?? null) : null,
-        FormSnapshot: resolveFormSnapshot(input, core.Verbose, now), Now: now,
-    };
+  return {
+    ...core, DomContext: domContext,
+    CapturedHtml: core.Verbose && domContext !== null ? (domContext.OuterHtml ?? null) : null,
+    FormSnapshot: resolveFormSnapshot(input, core.Verbose, now), Now: now,
+  };
 }
 
 function finalizeReport(input: BuildFailureReportInput, ctx: FailureReportContext): FailureReport {
-    return {
-        Phase: input.Phase, Message: ctx.Message, Reason: ctx.Reason, ReasonDetail: ctx.ReasonDetail,
-        StackTrace: ctx.Stack, StepId: input.StepId ?? null, Index: input.Index ?? null,
-        StepKind: input.StepKind ?? null, Selectors: ctx.Attempts, Variables: input.Variables ?? [],
-        DomContext: ctx.DomContext, DataRow: input.DataRow ?? null,
-        ResolvedXPath: input.ResolvedXPath ?? null, Timestamp: ctx.Now().toISOString(),
-        SourceFile: input.SourceFile, Verbose: ctx.Verbose,
-        CapturedHtml: ctx.CapturedHtml, FormSnapshot: ctx.FormSnapshot,
-    };
+  return {
+    Phase: input.Phase, Message: ctx.Message, Reason: ctx.Reason, ReasonDetail: ctx.ReasonDetail,
+    StackTrace: ctx.Stack, StepId: input.StepId ?? null, Index: input.Index ?? null,
+    StepKind: input.StepKind ?? null, Selectors: ctx.Attempts, Variables: input.Variables ?? [],
+    DomContext: ctx.DomContext, DataRow: input.DataRow ?? null,
+    ResolvedXPath: input.ResolvedXPath ?? null, Timestamp: ctx.Now().toISOString(),
+    SourceFile: input.SourceFile, Verbose: ctx.Verbose,
+    CapturedHtml: ctx.CapturedHtml, FormSnapshot: ctx.FormSnapshot,
+  };
 }
 
 export function buildFailureReport(input: BuildFailureReportInput): FailureReport {
-    return finalizeReport(input, resolveFailureReportContext(input));
+  return finalizeReport(input, resolveFailureReportContext(input));
 }
 
 function resolveAttempts(input: BuildFailureReportInput): ReadonlyArray<SelectorAttempt> {
-    if (input.EvaluatedAttempts !== undefined) {
-        return input.EvaluatedAttempts.map(toAttemptFromEvaluated);
-    }
+  if (input.EvaluatedAttempts !== undefined) {
+    return input.EvaluatedAttempts.map(toAttemptFromEvaluated);
+  }
 
-    return (input.Selectors ?? []).map(toAttemptFromPersisted);
+  return (input.Selectors ?? []).map(toAttemptFromPersisted);
 }
 
 // Form snapshot precedence:
@@ -279,18 +279,19 @@ function resolveAttempts(input: BuildFailureReportInput): ReadonlyArray<Selector
 //   2. Caller passed `null` - explicit suppression.
 //   3. Otherwise capture fresh from the live Target using the same verbose flag.
 function resolveFormSnapshot(
-    input: BuildFailureReportInput,
-    verbose: boolean,
-    now: () => Date,
+  input: BuildFailureReportInput,
+  verbose: boolean,
+  now: () => Date,
 ): FormSnapshot | null {
-    if (input.FormSnapshot !== undefined) {
-        return input.FormSnapshot;
-    }
-    if (input.Target) {
-        return captureFormSnapshot(input.Target, { Verbose: verbose, Now: now });
-    }
+  if (input.FormSnapshot !== undefined) {
+    return input.FormSnapshot;
+  }
 
-    return null;
+  if (input.Target) {
+    return captureFormSnapshot(input.Target, { Verbose: verbose, Now: now });
+  }
+
+  return null;
 }
 
 /**
@@ -311,109 +312,149 @@ function resolveFormSnapshot(
  *   - Otherwise                    → "Unknown"
  */
 function classifyReason(
-    input: BuildFailureReportInput,
-    attempts: ReadonlyArray<SelectorAttempt>,
-    variables: ReadonlyArray<VariableContext>,
-    message: string,
+  input: BuildFailureReportInput,
+  attempts: ReadonlyArray<SelectorAttempt>,
+  variables: ReadonlyArray<VariableContext>,
+  message: string,
 ): { Reason: FailureReasonCode; ReasonDetail: string } {
-    if (input.Reason !== undefined) {
-        return { Reason: input.Reason, ReasonDetail: input.ReasonDetail ?? message };
-    }
-    const varClass = classifyVariableFailure(variables);
-    if (varClass !== null) { return varClass; }
-    if (attempts.length === 0) {
-        return { Reason: "NoSelectors", ReasonDetail: "Step has no persisted selectors to try." };
-    }
-    const syntaxClass = classifySelectorSyntaxFailure(attempts);
-    if (syntaxClass !== null) { return syntaxClass; }
-    const primaryFallbackClass = classifyPrimaryFallback(attempts);
-    if (primaryFallbackClass !== null) { return primaryFallbackClass; }
-    const zeroClass = classifyZeroMatches(attempts);
-    if (zeroClass !== null) { return zeroClass; }
+  if (input.Reason !== undefined) {
+    return { Reason: input.Reason, ReasonDetail: input.ReasonDetail ?? message };
+  }
 
-    return { Reason: "Unknown", ReasonDetail: message };
+  const varClass = classifyVariableFailure(variables);
+  if (varClass !== null) {
+    return varClass; 
+  }
+
+  if (attempts.length === 0) {
+    return { Reason: "NoSelectors", ReasonDetail: "Step has no persisted selectors to try." };
+  }
+
+  const syntaxClass = classifySelectorSyntaxFailure(attempts);
+  if (syntaxClass !== null) {
+    return syntaxClass; 
+  }
+
+  const primaryFallbackClass = classifyPrimaryFallback(attempts);
+  if (primaryFallbackClass !== null) {
+    return primaryFallbackClass; 
+  }
+
+  const zeroClass = classifyZeroMatches(attempts);
+  if (zeroClass !== null) {
+    return zeroClass; 
+  }
+
+  return { Reason: "Unknown", ReasonDetail: message };
 }
 
 // Variable failures explain WHY the step's inputs were wrong before we
 // even tried the DOM, so we surface them first.
 function classifyVariableFailure(
-    variables: ReadonlyArray<VariableContext>,
+  variables: ReadonlyArray<VariableContext>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
-    const failedVar = variables.find((v) => v.FailureReason !== "Resolved");
-    if (failedVar === undefined) { return null; }
-    const code = variableReasonToCode(failedVar.FailureReason);
-    const detail = failedVar.FailureDetail ?? `Variable {{${failedVar.Name}}} failed.`;
+  const failedVar = variables.find((v) => v.FailureReason !== "Resolved");
+  if (failedVar === undefined) {
+    return null; 
+  }
 
-    return { Reason: code, ReasonDetail: detail };
+  const code = variableReasonToCode(failedVar.FailureReason);
+  const detail = failedVar.FailureDetail ?? `Variable {{${failedVar.Name}}} failed.`;
+
+  return { Reason: code, ReasonDetail: detail };
 }
 
 function classifySelectorSyntaxFailure(
-    attempts: ReadonlyArray<SelectorAttempt>,
+  attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
-    const reasons = new Set(attempts.map((a) => a.FailureReason));
-    if (reasons.has("XPathSyntaxError")) {
-        return { Reason: "XPathSyntaxError", ReasonDetail: firstDetail(attempts, "XPathSyntaxError") };
-    }
-    if (reasons.has("CssSyntaxError")) {
-        return { Reason: "CssSyntaxError", ReasonDetail: firstDetail(attempts, "CssSyntaxError") };
-    }
-    if (reasons.has("UnresolvedAnchor")) {
-        return { Reason: "UnresolvedAnchor", ReasonDetail: firstDetail(attempts, "UnresolvedAnchor") };
-    }
-    if (reasons.has("EmptyExpression")) {
-        return { Reason: "EmptyExpression", ReasonDetail: firstDetail(attempts, "EmptyExpression") };
-    }
+  const reasons = new Set(attempts.map((a) => a.FailureReason));
+  if (reasons.has("XPathSyntaxError")) {
+    return { Reason: "XPathSyntaxError", ReasonDetail: firstDetail(attempts, "XPathSyntaxError") };
+  }
 
-    return null;
+  if (reasons.has("CssSyntaxError")) {
+    return { Reason: "CssSyntaxError", ReasonDetail: firstDetail(attempts, "CssSyntaxError") };
+  }
+
+  if (reasons.has("UnresolvedAnchor")) {
+    return { Reason: "UnresolvedAnchor", ReasonDetail: firstDetail(attempts, "UnresolvedAnchor") };
+  }
+
+  if (reasons.has("EmptyExpression")) {
+    return { Reason: "EmptyExpression", ReasonDetail: firstDetail(attempts, "EmptyExpression") };
+  }
+
+  return null;
 }
 
 function classifyPrimaryFallback(
-    attempts: ReadonlyArray<SelectorAttempt>,
+  attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
-    const primary = attempts.find((a) => a.IsPrimary) ?? null;
-    const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
-    if (primary === null || primary.Matched || !anyFallbackMatched) { return null; }
+  const primary = attempts.find((a) => a.IsPrimary) ?? null;
+  const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
+  if (primary === null || primary.Matched || !anyFallbackMatched) {
+    return null; 
+  }
 
-    return {
-        Reason: "PrimaryMissedFallbackOk",
-        ReasonDetail:
+  return {
+    Reason: "PrimaryMissedFallbackOk",
+    ReasonDetail:
             `Primary selector '${primary.ResolvedExpression}' missed; ` +
             `${attempts.filter((a) => !a.IsPrimary && a.Matched).length} fallback(s) matched.`,
-    };
+  };
 }
 
 // Only claim ZeroMatches when at least one attempt was actually
 // evaluated against the live DOM. Pure persisted selectors have
 // FailureReason === "NotEvaluated" and must not be misreported.
 function classifyZeroMatches(
-    attempts: ReadonlyArray<SelectorAttempt>,
+  attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
-    const anyEvaluated = attempts.some((a) => a.FailureReason !== "NotEvaluated");
-    if (!anyEvaluated) { return null; }
-    if (!attempts.every((a) => !a.Matched && a.MatchCount === 0)) { return null; }
+  const anyEvaluated = attempts.some((a) => a.FailureReason !== "NotEvaluated");
+  if (!anyEvaluated) {
+    return null; 
+  }
 
-    return {
-        Reason: "ZeroMatches",
-        ReasonDetail:
+  if (!attempts.every((a) => !a.Matched && a.MatchCount === 0)) {
+    return null; 
+  }
+
+  return {
+    Reason: "ZeroMatches",
+    ReasonDetail:
             `All ${attempts.length} selector(s) returned 0 nodes. ` +
             `Tried: ${attempts.map((a) => a.ResolvedExpression).join(" | ")}`,
-    };
+  };
 }
 
 function firstDetail(attempts: ReadonlyArray<SelectorAttempt>, code: AttemptFailureReason | "NotEvaluated"): string {
-    const hit = attempts.find((a) => a.FailureReason === code);
+  const hit = attempts.find((a) => a.FailureReason === code);
 
-    return hit?.FailureDetail ?? `Attempt failed with ${code}.`;
+  return hit?.FailureDetail ?? `Attempt failed with ${code}.`;
 }
 
 function variableReasonToCode(reason: VariableContext["FailureReason"]): FailureReasonCode {
-    if (reason === "MissingColumn")   { return "VariableMissing"; }
-    if (reason === "NullValue")       { return "VariableNull"; }
-    if (reason === "UndefinedValue")  { return "VariableUndefined"; }
-    if (reason === "EmptyString")     { return "VariableEmpty"; }
-    if (reason === "TypeMismatch")    { return "VariableTypeMismatch"; }
+  if (reason === "MissingColumn")   {
+    return "VariableMissing"; 
+  }
 
-    return "Unknown";
+  if (reason === "NullValue")       {
+    return "VariableNull"; 
+  }
+
+  if (reason === "UndefinedValue")  {
+    return "VariableUndefined"; 
+  }
+
+  if (reason === "EmptyString")     {
+    return "VariableEmpty"; 
+  }
+
+  if (reason === "TypeMismatch")    {
+    return "VariableTypeMismatch"; 
+  }
+
+  return "Unknown";
 }
 
 /**
@@ -434,100 +475,141 @@ function variableReasonToCode(reason: VariableContext["FailureReason"]): Failure
  * ```
  */
 function appendOptionalSections(lines: string[], report: FailureReport): void {
-    if (report.ResolvedXPath !== null) lines.push(`  ResolvedXPath: ${report.ResolvedXPath}`);
-    appendDomContextSection(lines, report.DomContext);
-    if (report.Verbose && report.CapturedHtml !== null) {
-        lines.push(`  CapturedHtml (verbose):`);
-        lines.push(`    ${report.CapturedHtml}`);
-    }
-    if (report.DataRow !== null) lines.push(`  DataRow: ${JSON.stringify(report.DataRow)}`);
+  if (report.ResolvedXPath !== null) {
+    lines.push(`  ResolvedXPath: ${report.ResolvedXPath}`);
+  }
+
+  appendDomContextSection(lines, report.DomContext);
+  if (report.Verbose && report.CapturedHtml !== null) {
+    lines.push(`  CapturedHtml (verbose):`);
+    lines.push(`    ${report.CapturedHtml}`);
+  }
+
+  if (report.DataRow !== null) {
+    lines.push(`  DataRow: ${JSON.stringify(report.DataRow)}`);
+  }
 }
 
 export function formatFailureReport(report: FailureReport): string {
-    const tag = `[Marco${report.Phase}]`;
-    const lines: string[] = [];
-    lines.push(`${tag} ${report.Message}`);
-    lines.push(`  Reason: ${report.Reason}, ${report.ReasonDetail}`);
-    lines.push(`  ${formatWhere(report)}`);
-    appendSelectorsSection(lines, report.Selectors);
-    appendVariablesSection(lines, report.Variables);
-    appendOptionalSections(lines, report);
-    appendStackSection(lines, report.StackTrace);
+  const tag = `[Marco${report.Phase}]`;
+  const lines: string[] = [];
+  lines.push(`${tag} ${report.Message}`);
+  lines.push(`  Reason: ${report.Reason}, ${report.ReasonDetail}`);
+  lines.push(`  ${formatWhere(report)}`);
+  appendSelectorsSection(lines, report.Selectors);
+  appendVariablesSection(lines, report.Variables);
+  appendOptionalSections(lines, report);
+  appendStackSection(lines, report.StackTrace);
 
-    return lines.join("\n");
+  return lines.join("\n");
 }
 
 function formatWhere(report: FailureReport): string {
-    const where: string[] = [`at ${report.SourceFile}`];
-    if (report.StepId !== null) where.push(`StepId=${report.StepId}`);
-    if (report.Index !== null) where.push(`Index=${report.Index}`);
-    if (report.StepKind !== null) where.push(`Kind=${report.StepKind}`);
+  const where: string[] = [`at ${report.SourceFile}`];
+  if (report.StepId !== null) {
+    where.push(`StepId=${report.StepId}`);
+  }
 
-    return where.join(" ");
+  if (report.Index !== null) {
+    where.push(`Index=${report.Index}`);
+  }
+
+  if (report.StepKind !== null) {
+    where.push(`Kind=${report.StepKind}`);
+  }
+
+  return where.join(" ");
 }
 
 function appendSelectorsSection(lines: string[], selectors: ReadonlyArray<SelectorAttempt>): void {
-    if (selectors.length === 0) { return; }
-    lines.push("  Selectors:");
-    for (const s of selectors) {
-        lines.push(`    ${formatSelectorLine(s)}`);
-    }
+  if (selectors.length === 0) {
+    return; 
+  }
+
+  lines.push("  Selectors:");
+  for (const s of selectors) {
+    lines.push(`    ${formatSelectorLine(s)}`);
+  }
 }
 
 function formatSelectorLine(s: SelectorAttempt): string {
-    const matchMark = s.Matched ? "✓" : "✗";
-    const primaryMark = s.IsPrimary ? "✓" : "·";
-    const expr = s.ResolvedExpression.length > 0 ? s.ResolvedExpression : s.Expression;
-    const detailSuffix = s.FailureDetail !== null ? `: ${s.FailureDetail}` : "";
-    const tail = s.Matched
-        ? `→ ${s.MatchCount} match${s.MatchCount === 1 ? "" : "es"}`
-        : `→ ${s.MatchCount} matches (${s.FailureReason}${detailSuffix})`;
+  const matchMark = s.Matched ? "✓" : "✗";
+  const primaryMark = s.IsPrimary ? "✓" : "·";
+  const expr = s.ResolvedExpression.length > 0 ? s.ResolvedExpression : s.Expression;
+  const detailSuffix = s.FailureDetail !== null ? `: ${s.FailureDetail}` : "";
+  const tail = s.Matched
+    ? `→ ${s.MatchCount} match${s.MatchCount === 1 ? "" : "es"}`
+    : `→ ${s.MatchCount} matches (${s.FailureReason}${detailSuffix})`;
 
-    return `${matchMark} ${primaryMark} ${s.Strategy.padEnd(13)} ${expr} ${tail}`;
+  return `${matchMark} ${primaryMark} ${s.Strategy.padEnd(13)} ${expr} ${tail}`;
 }
 
 function appendVariablesSection(lines: string[], variables: ReadonlyArray<VariableContext>): void {
-    if (variables.length === 0) { return; }
-    lines.push("  Variables:");
-    for (const v of variables) {
-        lines.push(`    ${formatVariableLine(v)}`);
-    }
+  if (variables.length === 0) {
+    return; 
+  }
+
+  lines.push("  Variables:");
+  for (const v of variables) {
+    lines.push(`    ${formatVariableLine(v)}`);
+  }
 }
 
 function formatVariableLine(v: VariableContext): string {
-    const ok = v.FailureReason === "Resolved";
-    const mark = ok ? "✓" : "✗";
-    const valueLabel = v.ResolvedValue === null ? "<null>" : JSON.stringify(v.ResolvedValue);
-    const detailSuffix = v.FailureDetail !== null ? `: ${v.FailureDetail}` : "";
-    const tail = ok
-        ? `${valueLabel} [${v.ValueType}] from ${v.Source}`
-        : `${valueLabel} [${v.ValueType}] from ${v.Source}, ${v.FailureReason}${detailSuffix}`;
+  const ok = v.FailureReason === "Resolved";
+  const mark = ok ? "✓" : "✗";
+  const valueLabel = v.ResolvedValue === null ? "<null>" : JSON.stringify(v.ResolvedValue);
+  const detailSuffix = v.FailureDetail !== null ? `: ${v.FailureDetail}` : "";
+  const tail = ok
+    ? `${valueLabel} [${v.ValueType}] from ${v.Source}`
+    : `${valueLabel} [${v.ValueType}] from ${v.Source}, ${v.FailureReason}${detailSuffix}`;
 
-    return `${mark} {{${v.Name}}} = ${tail}`;
+  return `${mark} {{${v.Name}}} = ${tail}`;
 }
 
 function appendDomContextSection(lines: string[], ctx: DomContext | null): void {
-    if (ctx === null) { return; }
-    const attrs: string[] = [];
-    if (ctx.Id !== null) attrs.push(`id="${ctx.Id}"`);
-    if (ctx.ClassName !== null) attrs.push(`class="${ctx.ClassName}"`);
-    if (ctx.Name !== null) attrs.push(`name="${ctx.Name}"`);
-    if (ctx.Type !== null) attrs.push(`type="${ctx.Type}"`);
-    if (ctx.AriaLabel !== null) attrs.push(`aria-label="${ctx.AriaLabel}"`);
-    const attrStr = attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
-    const text = ctx.TextSnippet.length > 0 ? ` "${ctx.TextSnippet}"` : "";
-    lines.push(`  DomContext: <${ctx.TagName}${attrStr}>${text}`);
-    if (ctx.XPath !== undefined && ctx.XPath.length > 0) {
-        lines.push(`    XPath: ${ctx.XPath}`);
-    }
+  if (ctx === null) {
+    return; 
+  }
+
+  const attrs: string[] = [];
+  if (ctx.Id !== null) {
+    attrs.push(`id="${ctx.Id}"`);
+  }
+
+  if (ctx.ClassName !== null) {
+    attrs.push(`class="${ctx.ClassName}"`);
+  }
+
+  if (ctx.Name !== null) {
+    attrs.push(`name="${ctx.Name}"`);
+  }
+
+  if (ctx.Type !== null) {
+    attrs.push(`type="${ctx.Type}"`);
+  }
+
+  if (ctx.AriaLabel !== null) {
+    attrs.push(`aria-label="${ctx.AriaLabel}"`);
+  }
+
+  const attrStr = attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
+  const text = ctx.TextSnippet.length > 0 ? ` "${ctx.TextSnippet}"` : "";
+  lines.push(`  DomContext: <${ctx.TagName}${attrStr}>${text}`);
+  if (ctx.XPath !== undefined && ctx.XPath.length > 0) {
+    lines.push(`    XPath: ${ctx.XPath}`);
+  }
 }
 
 function appendStackSection(lines: string[], stack: string | null): void {
-    if (stack === null) { return; }
-    lines.push("  Stack:");
-    for (const line of stack.split("\n")) {
-        lines.push(`    ${line.trim()}`);
-    }
+  if (stack === null) {
+    return; 
+  }
+
+  lines.push("  Stack:");
+  for (const line of stack.split("\n")) {
+    lines.push(`    ${line.trim()}`);
+  }
 }
 
 /**
@@ -537,10 +619,10 @@ function appendStackSection(lines: string[], stack: string | null): void {
  * surface a copy-to-clipboard toast.
  */
 export function logFailure(input: BuildFailureReportInput): FailureReport {
-    const report = buildFailureReport(input);
-    console.error(formatFailureReport(report));
+  const report = buildFailureReport(input);
+  console.error(formatFailureReport(report));
 
-    return report;
+  return report;
 }
 
 /* ------------------------------------------------------------------ */
@@ -548,77 +630,88 @@ export function logFailure(input: BuildFailureReportInput): FailureReport {
 /* ------------------------------------------------------------------ */
 
 function extractMessage(err: unknown): string {
-    if (err instanceof Error) return err.message;
-    if (typeof err === "string") return err;
-    try { return JSON.stringify(err); } catch (err) { 
- return String(err); }
+  if (err instanceof Error) {
+    return err.message;
+  }
+
+  if (typeof err === "string") {
+    return err;
+  }
+
+  try {
+    return JSON.stringify(err); 
+  } catch (err) { 
+    return String(err); 
+  }
 }
 
 function extractStack(err: unknown): string | null {
-    if (err instanceof Error && typeof err.stack === "string") return err.stack;
+  if (err instanceof Error && typeof err.stack === "string") {
+    return err.stack;
+  }
 
-    return null;
+  return null;
 }
 
 function toAttemptFromPersisted(s: PersistedSelector): SelectorAttempt {
-    // Record-phase fallback: no live evaluation happened, so Matched /
-    // MatchCount / FailureReason are reported as "NotEvaluated" so the
-    // consumer can tell apart "we tried and it missed" vs "we never tried".
-    return {
-        SelectorId: s.SelectorId,
-        Strategy: SELECTOR_KIND_NAMES[s.SelectorKindId] ?? `Kind${s.SelectorKindId}`,
-        Expression: s.Expression,
-        ResolvedExpression: s.Expression,
-        IsPrimary: s.IsPrimary === 1,
-        Matched: false,
-        MatchCount: 0,
-        FailureReason: "NotEvaluated",
-        FailureDetail: null,
-    };
+  // Record-phase fallback: no live evaluation happened, so Matched /
+  // MatchCount / FailureReason are reported as "NotEvaluated" so the
+  // consumer can tell apart "we tried and it missed" vs "we never tried".
+  return {
+    SelectorId: s.SelectorId,
+    Strategy: SELECTOR_KIND_NAMES[s.SelectorKindId] ?? `Kind${s.SelectorKindId}`,
+    Expression: s.Expression,
+    ResolvedExpression: s.Expression,
+    IsPrimary: s.IsPrimary === 1,
+    Matched: false,
+    MatchCount: 0,
+    FailureReason: "NotEvaluated",
+    FailureDetail: null,
+  };
 }
 
 function toAttemptFromEvaluated(a: EvaluatedAttempt): SelectorAttempt {
-    return {
-        SelectorId: a.SelectorId,
-        Strategy: a.Strategy,
-        Expression: a.Expression,
-        ResolvedExpression: a.ResolvedExpression,
-        IsPrimary: a.IsPrimary,
-        Matched: a.Matched,
-        MatchCount: a.MatchCount,
-        FailureReason: a.FailureReason,
-        FailureDetail: a.FailureDetail,
-    };
+  return {
+    SelectorId: a.SelectorId,
+    Strategy: a.Strategy,
+    Expression: a.Expression,
+    ResolvedExpression: a.ResolvedExpression,
+    IsPrimary: a.IsPrimary,
+    Matched: a.Matched,
+    MatchCount: a.MatchCount,
+    FailureReason: a.FailureReason,
+    FailureDetail: a.FailureDetail,
+  };
 }
 
 function nonEmptyAttr(el: Element, attr: string): string | null {
-    const v = el.getAttribute(attr);
+  const v = el.getAttribute(attr);
 
-    return v !== null && v.length > 0 ? v : null;
+  return v !== null && v.length > 0 ? v : null;
 }
 
 function readBaseDomContext(el: Element, fullText: string, fullOuter: string): DomContext {
-    return {
-        TagName: el.tagName.toLowerCase(),
-        Id: nonEmptyAttr(el, "id"),
-        ClassName: nonEmptyAttr(el, "class"),
-        AriaLabel: nonEmptyAttr(el, "aria-label"),
-        Name: nonEmptyAttr(el, "name"),
-        Type: nonEmptyAttr(el, "type"),
-        TextSnippet: fullText.slice(0, 120),
-        OuterHtmlSnippet: fullOuter.slice(0, 240),
-        XPath: xpathOfElement(el),
-    };
+  return {
+    TagName: el.tagName.toLowerCase(),
+    Id: nonEmptyAttr(el, "id"),
+    ClassName: nonEmptyAttr(el, "class"),
+    AriaLabel: nonEmptyAttr(el, "aria-label"),
+    Name: nonEmptyAttr(el, "name"),
+    Type: nonEmptyAttr(el, "type"),
+    TextSnippet: fullText.slice(0, 120),
+    OuterHtmlSnippet: fullOuter.slice(0, 240),
+    XPath: xpathOfElement(el),
+  };
 }
 
 function readDomContext(el: Element, verbose: boolean): DomContext {
-    const fullText = (el.textContent ?? "").trim();
-    const fullOuter = el.outerHTML ?? "";
-    const base = readBaseDomContext(el, fullText, fullOuter);
+  const fullText = (el.textContent ?? "").trim();
+  const fullOuter = el.outerHTML ?? "";
+  const base = readBaseDomContext(el, fullText, fullOuter);
 
-    return verbose ? { ...base, OuterHtml: fullOuter, Text: fullText } : base;
+  return verbose ? { ...base, OuterHtml: fullOuter, Text: fullText } : base;
 }
 
 function defaultNow(): Date {
-    return new Date();
+  return new Date();
 }

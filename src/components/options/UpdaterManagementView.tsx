@@ -167,7 +167,9 @@ export function UpdaterManagementView() {
   const loadSettings = useCallback(async () => {
     try {
       const res = await sendMessage<{ settings: GlobalSettings }>({ type: "GET_UPDATE_SETTINGS" });
-      if (res.settings) setGlobalSettings(res.settings);
+      if (res.settings) {
+        setGlobalSettings(res.settings);
+      }
     } catch (caught) {
       logError("UpdaterManagementView.loadSettings", "GET_UPDATE_SETTINGS failed — keeping default globalSettings", caught);
     }
@@ -189,11 +191,16 @@ export function UpdaterManagementView() {
   const filtered = updaters.filter((u) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      if (!u.Name.toLowerCase().includes(q) && !u.ScriptUrl.toLowerCase().includes(q)) return false;
+      if (!u.Name.toLowerCase().includes(q) && !u.ScriptUrl.toLowerCase().includes(q)) {
+        return false;
+      }
     }
+
     if (filterCategory) {
       const cats = (u.Categories ?? "").split(",").map((c) => c.trim());
-      if (!cats.includes(filterCategory)) return false;
+      if (!cats.includes(filterCategory)) {
+        return false;
+      }
     }
 
     return true;
@@ -205,6 +212,7 @@ export function UpdaterManagementView() {
 
       return;
     }
+
     try {
       await sendMessage({
         type: "CREATE_UPDATER",
@@ -253,6 +261,7 @@ export function UpdaterManagementView() {
       } else {
         toast.success("Already up to date");
       }
+
       await loadUpdaters();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Check failed");
@@ -304,9 +313,17 @@ export function UpdaterManagementView() {
   const STATUS_UPDATE_AVAILABLE = "update-available";
 
   const getStatus = (u: UpdaterEntry) => {
-    if (!u.LastCheckedAt) return "unchecked";
-    if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
-    if (u.LastCheckedAt) return STATUS_UP_TO_DATE;
+    if (!u.LastCheckedAt) {
+      return "unchecked";
+    }
+
+    if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) {
+      return STATUS_UPDATE_AVAILABLE;
+    }
+
+    if (u.LastCheckedAt) {
+      return STATUS_UP_TO_DATE;
+    }
 
     return "unchecked";
   };

@@ -48,83 +48,83 @@ interface DynamicRequireMessage extends MessageRequest {
  */
 // eslint-disable-next-line max-lines-per-function
 export async function handleDynamicRequire(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<{ isOk: boolean; namespace?: string; errorMessage?: string }> {
-    const request = message as DynamicRequireMessage;
-    const { target, requesterProjectId, tabId } = request;
+  const request = message as DynamicRequireMessage;
+  const { target, requesterProjectId, tabId } = request;
 
-    if (!target || !requesterProjectId || !tabId) {
-        logDynamicLoad(requesterProjectId ?? "unknown", target ?? "unknown", "error", "Missing required fields");
+  if (!target || !requesterProjectId || !tabId) {
+    logDynamicLoad(requesterProjectId ?? "unknown", target ?? "unknown", "error", "Missing required fields");
 
-        return { isOk: false, errorMessage: "DYNAMIC_REQUIRE: missing target, requesterProjectId, or tabId" };
+    return { isOk: false, errorMessage: "DYNAMIC_REQUIRE: missing target, requesterProjectId, or tabId" };
+  }
+
+  const allProjects = await readAllProjects().catch(() => [] as StoredProject[]);
+
+  // --- Resolve requester project ---
+  const requester = allProjects.find((p) => p.id === requesterProjectId);
+  if (!requester) {
+    logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
+
+    return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
+  }
+
+  // --- Check allowDynamicRequests flag ---
+  if (!requester.settings?.allowDynamicRequests) {
+    logDynamicLoad(requesterProjectId, target, "denied", "allowDynamicRequests is disabled");
+
+    return {
+      isOk: false,
+      errorMessage: `Project "${requester.name}" does not have allowDynamicRequests enabled`,
+    };
+  }
+
+  // --- Resolve target project + script ---
+  const resolved = resolveTarget(target, allProjects);
+  if (!resolved) {
+    logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
+
+    return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
+  }
+
+  const { project: targetProject, script: targetScript } = resolved;
+
+  // --- Check isGlobal flag on target ---
+  if (!targetProject.isGlobal && targetProject.id !== requesterProjectId) {
+    logDynamicLoad(requesterProjectId, target, "denied", `Target project "${targetProject.name}" is not global`);
+
+    return {
+      isOk: false,
+      errorMessage: `Project "${targetProject.name}" is not marked as global — cannot be dynamically loaded`,
+    };
+  }
+
+  // --- Load script code ---
+  try {
+    const code = await loadScriptCode(targetProject.id, targetScript);
+    if (!code) {
+      logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
+
+      return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };
     }
 
-    const allProjects = await readAllProjects().catch(() => [] as StoredProject[]);
+    const wrapped = wrapWithIsolation(code, targetScript.path, targetProject.id);
 
-    // --- Resolve requester project ---
-    const requester = allProjects.find((p) => p.id === requesterProjectId);
-    if (!requester) {
-        logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
+    await injectWithCspFallback(tabId, wrapped);
 
-        return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
-    }
+    const namespace = `RiseupAsiaMacroExt.Projects.${targetProject.codeName ?? targetProject.name}`;
+    logDynamicLoad(requesterProjectId, target, "loaded", `Injected into tab ${tabId}`);
 
-    // --- Check allowDynamicRequests flag ---
-    if (!requester.settings?.allowDynamicRequests) {
-        logDynamicLoad(requesterProjectId, target, "denied", "allowDynamicRequests is disabled");
+    console.log("[dynamic-require] ✅ %s → %s injected successfully", requester.name, target);
 
-        return {
-            isOk: false,
-            errorMessage: `Project "${requester.name}" does not have allowDynamicRequests enabled`,
-        };
-    }
+    return { isOk: true, namespace };
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    logDynamicLoad(requesterProjectId, target, "error", errMsg);
+    logCaughtError(BgLogTag.DYNAMIC_REQUIRE, `${requester.name} → ${target} failed`, err);
 
-    // --- Resolve target project + script ---
-    const resolved = resolveTarget(target, allProjects);
-    if (!resolved) {
-        logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
-
-        return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
-    }
-
-    const { project: targetProject, script: targetScript } = resolved;
-
-    // --- Check isGlobal flag on target ---
-    if (!targetProject.isGlobal && targetProject.id !== requesterProjectId) {
-        logDynamicLoad(requesterProjectId, target, "denied", `Target project "${targetProject.name}" is not global`);
-
-        return {
-            isOk: false,
-            errorMessage: `Project "${targetProject.name}" is not marked as global — cannot be dynamically loaded`,
-        };
-    }
-
-    // --- Load script code ---
-    try {
-        const code = await loadScriptCode(targetProject.id, targetScript);
-        if (!code) {
-            logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
-
-            return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };
-        }
-
-        const wrapped = wrapWithIsolation(code, targetScript.path, targetProject.id);
-
-        await injectWithCspFallback(tabId, wrapped);
-
-        const namespace = `RiseupAsiaMacroExt.Projects.${targetProject.codeName ?? targetProject.name}`;
-        logDynamicLoad(requesterProjectId, target, "loaded", `Injected into tab ${tabId}`);
-
-        console.log("[dynamic-require] ✅ %s → %s injected successfully", requester.name, target);
-
-        return { isOk: true, namespace };
-    } catch (err) {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        logDynamicLoad(requesterProjectId, target, "error", errMsg);
-        logCaughtError(BgLogTag.DYNAMIC_REQUIRE, `${requester.name} → ${target} failed`, err);
-
-        return { isOk: false, errorMessage: errMsg };
-    }
+    return { isOk: false, errorMessage: errMsg };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -136,45 +136,47 @@ export async function handleDynamicRequire(
  * "ProjectName.scriptName" to a project + script entry.
  */
 function resolveTarget(
-    target: string,
-    allProjects: StoredProject[],
+  target: string,
+  allProjects: StoredProject[],
 ): { project: StoredProject; script: ScriptEntry } | null {
-    // Strip "Projects." prefix if present
-    const cleaned = target.startsWith("Projects.") ? target.slice(9) : target;
+  // Strip "Projects." prefix if present
+  const cleaned = target.startsWith("Projects.") ? target.slice(9) : target;
 
-    // Try "ProjectName.scriptName" format
-    const dotIdx = cleaned.indexOf(".");
-    if (dotIdx > 0) {
-        const projectPart = cleaned.slice(0, dotIdx);
-        const scriptPart = cleaned.slice(dotIdx + 1);
-        const project = findProject(projectPart, allProjects);
-        if (project) {
-            const script = project.scripts.find(
-                (s) => s.path.includes(scriptPart) || s.description === scriptPart,
-            );
-            if (script) return { project, script };
-        }
+  // Try "ProjectName.scriptName" format
+  const dotIdx = cleaned.indexOf(".");
+  if (dotIdx > 0) {
+    const projectPart = cleaned.slice(0, dotIdx);
+    const scriptPart = cleaned.slice(dotIdx + 1);
+    const project = findProject(projectPart, allProjects);
+    if (project) {
+      const script = project.scripts.find(
+        (s) => s.path.includes(scriptPart) || s.description === scriptPart,
+      );
+      if (script) {
+        return { project, script };
+      }
     }
+  }
 
-    // Try matching just project name — return first script
-    const project = findProject(cleaned, allProjects);
-    if (project && project.scripts.length > 0) {
-        return { project, script: project.scripts[0] };
-    }
+  // Try matching just project name — return first script
+  const project = findProject(cleaned, allProjects);
+  if (project && project.scripts.length > 0) {
+    return { project, script: project.scripts[0] };
+  }
 
-    return null;
+  return null;
 }
 
 /** Finds a project by codeName, name, or slug (case-insensitive). */
 function findProject(name: string, projects: StoredProject[]): StoredProject | undefined {
-    const lower = name.toLowerCase();
+  const lower = name.toLowerCase();
 
-    return projects.find(
-        (p) =>
-            p.codeName?.toLowerCase() === lower ||
+  return projects.find(
+    (p) =>
+      p.codeName?.toLowerCase() === lower ||
             p.name.toLowerCase() === lower ||
             p.slug?.toLowerCase() === lower,
-    );
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -183,18 +185,20 @@ function findProject(name: string, projects: StoredProject[]): StoredProject | u
 
 /** Loads the script code from file storage or inline code. */
 async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<string | null> {
-    // Prefer inline code if available
-    if (script.code) return script.code;
+  // Prefer inline code if available
+  if (script.code) {
+    return script.code;
+  }
 
-    // Try loading from file storage
-    try {
-        const files = await getFilesByProject(projectId);
-        const file = files.find((f: { path: string; content: string }) => f.path === script.path);
+  // Try loading from file storage
+  try {
+    const files = await getFilesByProject(projectId);
+    const file = files.find((f: { path: string; content: string }) => f.path === script.path);
 
-        return file?.content ?? null;
-    } catch (err) { 
-        return null;
-    }
+    return file?.content ?? null;
+  } catch (err) { 
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -203,28 +207,28 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
 
 /** Logs a dynamic loading event to SQLite. */
 function logDynamicLoad(
-    requester: string,
-    target: string,
-    status: RequireStatusType,
-    detail: string,
+  requester: string,
+  target: string,
+  status: RequireStatusType,
+  detail: string,
 ): void {
+  try {
+    const db = getLogsDb();
+    const now = new Date().toISOString();
+    let version = "unknown";
     try {
-        const db = getLogsDb();
-        const now = new Date().toISOString();
-        let version = "unknown";
-        try {
-            version = chrome.runtime.getManifest().version;
-        } catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
-
-        db.run(
-            `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [now, requester, target, status, detail, version],
-        );
-        markLoggingDirty();
+      version = chrome.runtime.getManifest().version;
     } catch (err) {
-        logCaughtError(BgLogTag.DYNAMIC_REQUIRE, "Failed to log dynamic load", err);
+      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
     }
+
+    db.run(
+      `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+      [now, requester, target, status, detail, version],
+    );
+    markLoggingDirty();
+  } catch (err) {
+    logCaughtError(BgLogTag.DYNAMIC_REQUIRE, "Failed to log dynamic load", err);
+  }
 }

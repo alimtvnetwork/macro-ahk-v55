@@ -17,10 +17,10 @@ import { logError } from "./hook-logger";
 import type { RecordingSession } from "@/background/recorder/recorder-session-types";
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
 import {
-    runKeywordEventChain,
-    type ChainRunOptions,
-    type ChainRunResult,
-    type KeywordEventChainSettings,
+  runKeywordEventChain,
+  type ChainRunOptions,
+  type ChainRunResult,
+  type KeywordEventChainSettings,
 } from "@/lib/keyword-event-chain";
 
 export interface UseAutoRunChainOptions {
@@ -58,60 +58,87 @@ export interface UseAutoRunChainOptions {
  * mounting React.
  */
 export function shouldAutoRun(
-    prev: RecordingSession | null,
-    next: RecordingSession | null,
+  prev: RecordingSession | null,
+  next: RecordingSession | null,
 ): boolean {
-    if (prev === null) { return false; }
-    const wasActive = prev.Phase === "Recording" || prev.Phase === "Paused";
-    if (!wasActive) { return false; }
+  if (prev === null) {
+    return false; 
+  }
 
-    return next === null || next.Phase === "Idle";
+  const wasActive = prev.Phase === "Recording" || prev.Phase === "Paused";
+  if (!wasActive) {
+    return false; 
+  }
+
+  return next === null || next.Phase === "Idle";
 }
 
 export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): void {
-    const { settings, events, session, onAutoRunStart, onAutoRunEnd, chainRunner } = opts;
-    const prevSessionRef = useRef<RecordingSession | null>(null);
-    // Keep the *latest* values in refs so the effect closes over only
-    // `session` — we don't want to re-fire the chain just because the
-    // settings or events list changed mid-recording.
-    const settingsRef = useRef<KeywordEventChainSettings>(settings);
-    const eventsRef = useRef<ReadonlyArray<KeywordEvent>>(events);
-    const startCbRef = useRef<UseAutoRunChainOptions["onAutoRunStart"]>(onAutoRunStart);
-    const endCbRef = useRef<UseAutoRunChainOptions["onAutoRunEnd"]>(onAutoRunEnd);
-    const runnerRef = useRef<UseAutoRunChainOptions["chainRunner"]>(chainRunner);
+  const { settings, events, session, onAutoRunStart, onAutoRunEnd, chainRunner } = opts;
+  const prevSessionRef = useRef<RecordingSession | null>(null);
+  // Keep the *latest* values in refs so the effect closes over only
+  // `session` — we don't want to re-fire the chain just because the
+  // settings or events list changed mid-recording.
+  const settingsRef = useRef<KeywordEventChainSettings>(settings);
+  const eventsRef = useRef<ReadonlyArray<KeywordEvent>>(events);
+  const startCbRef = useRef<UseAutoRunChainOptions["onAutoRunStart"]>(onAutoRunStart);
+  const endCbRef = useRef<UseAutoRunChainOptions["onAutoRunEnd"]>(onAutoRunEnd);
+  const runnerRef = useRef<UseAutoRunChainOptions["chainRunner"]>(chainRunner);
 
-    useEffect(() => { settingsRef.current = settings; }, [settings]);
-    useEffect(() => { eventsRef.current = events; }, [events]);
-    useEffect(() => { startCbRef.current = onAutoRunStart; }, [onAutoRunStart]);
-    useEffect(() => { endCbRef.current = onAutoRunEnd; }, [onAutoRunEnd]);
-    useEffect(() => { runnerRef.current = chainRunner; }, [chainRunner]);
+  useEffect(() => {
+    settingsRef.current = settings; 
+  }, [settings]);
+  useEffect(() => {
+    eventsRef.current = events; 
+  }, [events]);
+  useEffect(() => {
+    startCbRef.current = onAutoRunStart; 
+  }, [onAutoRunStart]);
+  useEffect(() => {
+    endCbRef.current = onAutoRunEnd; 
+  }, [onAutoRunEnd]);
+  useEffect(() => {
+    runnerRef.current = chainRunner; 
+  }, [chainRunner]);
 
-    useEffect(() => {
-        const prev = prevSessionRef.current;
-        prevSessionRef.current = session;
+  useEffect(() => {
+    const prev = prevSessionRef.current;
+    prevSessionRef.current = session;
 
-        if (!shouldAutoRun(prev, session)) { return; }
-        if (!settingsRef.current.RunAfterRecording) { return; }
+    if (!shouldAutoRun(prev, session)) {
+      return; 
+    }
 
-        const runnable = eventsRef.current.filter((e) => e.Enabled && e.Steps.length > 0);
-        if (runnable.length === 0) { return; }
+    if (!settingsRef.current.RunAfterRecording) {
+      return; 
+    }
 
-        const runner = runnerRef.current ?? runKeywordEventChain;
-        let cancelled = false;
+    const runnable = eventsRef.current.filter((e) => e.Enabled && e.Steps.length > 0);
+    if (runnable.length === 0) {
+      return; 
+    }
 
-        startCbRef.current?.(runnable);
-        runner(runnable, { pauseMs: settingsRef.current.PauseMs })
-            .then((result) => {
-                if (cancelled) { return; }
-                endCbRef.current?.(result);
-            })
-            .catch((caught: unknown) => {
-                // The chain runner traps its own errors and resolves with a
-                // result; this catch is purely defensive against custom
-                // runners passed in by tests.
-                logError("useAutoRunChainAfterRecording", "Custom runner rejected — default runner always resolves; investigate test/runner injection", caught);
-            });
+    const runner = runnerRef.current ?? runKeywordEventChain;
+    let cancelled = false;
 
-        return () => { cancelled = true; };
-    }, [session]);
+    startCbRef.current?.(runnable);
+    runner(runnable, { pauseMs: settingsRef.current.PauseMs })
+      .then((result) => {
+        if (cancelled) {
+          return; 
+        }
+
+        endCbRef.current?.(result);
+      })
+      .catch((caught: unknown) => {
+        // The chain runner traps its own errors and resolves with a
+        // result; this catch is purely defensive against custom
+        // runners passed in by tests.
+        logError("useAutoRunChainAfterRecording", "Custom runner rejected — default runner always resolves; investigate test/runner injection", caught);
+      });
+
+    return () => {
+      cancelled = true; 
+    };
+  }, [session]);
 }

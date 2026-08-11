@@ -37,15 +37,25 @@ interface Props {
 }
 
 function reasonBadge(reason: string, ok: boolean): { label: string; cls: string } {
-  if (ok) return { label: "OK", cls: "bg-green-500/15 text-green-300 border-green-500/30" };
-  if (reason === "AUTOATTACH_SKIPPED_AUTOSTART_OFF")
+  if (ok) {
+    return { label: "OK", cls: "bg-green-500/15 text-green-300 border-green-500/30" };
+  }
+
+  if (reason === "AUTOATTACH_SKIPPED_AUTOSTART_OFF") {
     return { label: "autoStart off", cls: "bg-muted/40 text-muted-foreground border-border" };
-  if (reason === "AUTOATTACH_SKIPPED_URL_NO_MATCH")
+  }
+
+  if (reason === "AUTOATTACH_SKIPPED_URL_NO_MATCH") {
     return { label: "URL no match", cls: "bg-amber-500/10 text-amber-300 border-amber-500/30" };
-  if (reason === "AUTOATTACH_ALREADY_ATTACHED")
+  }
+
+  if (reason === "AUTOATTACH_ALREADY_ATTACHED") {
     return { label: "Already attached", cls: "bg-blue-500/10 text-blue-300 border-blue-500/30" };
-  if (reason === "AUTOATTACH_SKIPPED_OPT_OUT")
+  }
+
+  if (reason === "AUTOATTACH_SKIPPED_OPT_OUT") {
     return { label: "Opted out", cls: "bg-muted/40 text-muted-foreground border-border" };
+  }
 
   return { label: reason.replace("AUTOATTACH_SKIPPED_", "").toLowerCase(), cls: "bg-red-500/10 text-red-300 border-red-500/30" };
 }
@@ -60,13 +70,19 @@ export function AutoAttachDiagnosticsPanel({ projectId, autoStart, refreshKey }:
     getPlatform()
       .sendMessage<{ record: Record | null }>({ type: MessageType.GET_AUTO_ATTACH_DECISIONS, projectId })
       .then((res) => {
-        if (alive) setRecord(res?.record ?? null);
+        if (alive) {
+          setRecord(res?.record ?? null);
+        }
       })
       .catch(() => {
-        if (alive) setRecord(null);
+        if (alive) {
+          setRecord(null);
+        }
       })
       .finally(() => {
-        if (alive) setLoading(false);
+        if (alive) {
+          setLoading(false);
+        }
       });
 
     return () => {
@@ -105,10 +121,21 @@ function formatEvaluatedAt(evaluatedAt: string | null): string {
 
 function AutoAttachBody(props: { autoStart: boolean; loading: boolean; record: Record | null }): JSX.Element {
   const { autoStart, loading, record } = props;
-  if (!autoStart) return <AutoStartOffMessage />;
-  if (loading) return <p className="text-xs text-muted-foreground">Loading...</p>;
-  if (record === null) return <EmptyRecordMessage />;
-  if (record.decisions.length === 0) return <NoDecisionsMessage />;
+  if (!autoStart) {
+    return <AutoStartOffMessage />;
+  }
+
+  if (loading) {
+    return <p className="text-xs text-muted-foreground">Loading...</p>;
+  }
+
+  if (record === null) {
+    return <EmptyRecordMessage />;
+  }
+
+  if (record.decisions.length === 0) {
+    return <NoDecisionsMessage />;
+  }
 
   return <DecisionList decisions={record.decisions} />;
 }

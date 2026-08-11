@@ -35,7 +35,9 @@ describe('openPromptImportModal — DOM contract', () => {
 
   it('appends exactly one overlay carrying the modal marker attribute', () => {
     let committedCalls = 0;
-    openPromptImportModal({ onCommitted: async () => { committedCalls += 1; } });
+    openPromptImportModal({ onCommitted: async () => {
+      committedCalls += 1; 
+    } });
     expect(queryOverlays()).toHaveLength(1);
     // Guard the side channel: onCommitted is not fired just by opening.
     expect(committedCalls).toBe(0);

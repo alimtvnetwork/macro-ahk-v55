@@ -26,9 +26,12 @@ const PLAN_STEPS_SLUG = 'plan-steps';
 const NEXT_STEPS_SLUG = 'next-steps';
 
 function findBundledPromptText(slug: string): string {
-    const entry = PROMPT_BUNDLE.prompts?.find(candidate => candidate.slug === slug);
-    if (typeof entry?.text === 'string' && entry.text.length > 0) return entry.text;
-    throw new DiagnosticError('SEED_BUNDLE_E001', { slug, reason: 'prompt text missing' });
+  const entry = PROMPT_BUNDLE.prompts?.find(candidate => candidate.slug === slug);
+  if (typeof entry?.text === 'string' && entry.text.length > 0) {
+    return entry.text;
+  }
+
+  throw new DiagnosticError('SEED_BUNDLE_E001', { slug, reason: 'prompt text missing' });
 }
 
 export const PLAN_DEFAULT_BODY: string = findBundledPromptText(PLAN_STEPS_SLUG);
@@ -39,28 +42,28 @@ export const NEXT_DEFAULT_BODY: string = findBundledPromptText(NEXT_STEPS_SLUG);
  * the single source for chip defaults. Newest legacy last.
  */
 export const PLAN_DEFAULT_LEGACY_BODIES: string[] = [
-    [
-        '# {{n}} number of steps plan, maximum enforcement',
-        '',
-        '## RULE 0, step count is law',
-        '',
-        'Produce EXACTLY `{{n}}` steps. Not `{{n}}-1`, not `{{n}}+1`.',
-        '',
-        '## Hard rules (non-negotiable, auto-reject on violation)',
-        '',
-        '1. Nothing executes this turn. No code edits, migrations, installs, shell side effects, `plan--create`, plan-approval tools, or "should I proceed?" prompts. Files only.',
-        '2. Spec first, then plan. Order is fixed.',
-        '3. `XX` is the next free 2-digit sequence across `pending/` + `completed/` combined.',
-    ].join('\n'),
-    [
-        '# {{n}} steps PlanTierType, Maximal Enforcement',
-        '',
-        'Parse the number {{n}} in this prompt\'s header. That number is the EXACT count of steps in the plan you must write.',
-        '',
-        '## Rules - non-negotiable',
-        '',
-        '1. DO NOT execute anything this turn. No code edits, no migrations, no installs.',
-    ].join('\n'),
+  [
+    '# {{n}} number of steps plan, maximum enforcement',
+    '',
+    '## RULE 0, step count is law',
+    '',
+    'Produce EXACTLY `{{n}}` steps. Not `{{n}}-1`, not `{{n}}+1`.',
+    '',
+    '## Hard rules (non-negotiable, auto-reject on violation)',
+    '',
+    '1. Nothing executes this turn. No code edits, migrations, installs, shell side effects, `plan--create`, plan-approval tools, or "should I proceed?" prompts. Files only.',
+    '2. Spec first, then plan. Order is fixed.',
+    '3. `XX` is the next free 2-digit sequence across `pending/` + `completed/` combined.',
+  ].join('\n'),
+  [
+    '# {{n}} steps PlanTierType, Maximal Enforcement',
+    '',
+    'Parse the number {{n}} in this prompt\'s header. That number is the EXACT count of steps in the plan you must write.',
+    '',
+    '## Rules - non-negotiable',
+    '',
+    '1. DO NOT execute anything this turn. No code edits, no migrations, no installs.',
+  ].join('\n'),
 ];
 
 /**
@@ -68,25 +71,25 @@ export const PLAN_DEFAULT_LEGACY_BODIES: string[] = [
  * the single source for chip defaults. Newest legacy last.
  */
 export const NEXT_DEFAULT_LEGACY_BODIES: string[] = [
-    [
-        '# Next {{n}} Steps or Tasks',
-        '',
-        '## Source of truth',
-        '',
-        'Locate the relevant plan file under `.lovable/plans/pending/XX-<slug>.md`.',
-        '',
-        '## What I want',
-        '',
-        '1. Give me the NEXT {{n}} STEPS from that plan.',
-        '2. Then list every remaining item after those {{n}}.',
-    ].join('\n'),
-    [
-        '# Next {{n}} steps or tasks (v3.2)',
-        '',
-        '## RULE 0 - EXACTLY `{{n}}` NEXT STEPS (MUST)',
-        '',
-        'Give exactly {{n}} next steps and every remaining item after that.',
-    ].join('\n'),
+  [
+    '# Next {{n}} Steps or Tasks',
+    '',
+    '## Source of truth',
+    '',
+    'Locate the relevant plan file under `.lovable/plans/pending/XX-<slug>.md`.',
+    '',
+    '## What I want',
+    '',
+    '1. Give me the NEXT {{n}} STEPS from that plan.',
+    '2. Then list every remaining item after those {{n}}.',
+  ].join('\n'),
+  [
+    '# Next {{n}} steps or tasks (v3.2)',
+    '',
+    '## RULE 0 - EXACTLY `{{n}}` NEXT STEPS (MUST)',
+    '',
+    'Give exactly {{n}} next steps and every remaining item after that.',
+  ].join('\n'),
 ];
 
 export interface SeedPromptRow {
@@ -98,28 +101,35 @@ export interface SeedPromptRow {
 }
 
 export const PLAN_NEXT_SEED_ROWS: SeedPromptRow[] = [
-    { slug: 'plan-default', name: 'PlanTierType (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true },
-    { slug: 'plan-concise', name: 'PlanTierType (concise)', body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false },
-    { slug: 'plan-with-evidence', name: 'PlanTierType (evidence-first)', body: '# PlanTierType in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false },
-    { slug: 'plan-risk-annotated', name: 'PlanTierType (risk-annotated)', body: '# PlanTierType in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false },
-    { slug: 'next-default', name: 'Next (default)', body: NEXT_DEFAULT_BODY, role: 'next', isDefault: true },
-    { slug: 'next-concise', name: 'Next (concise)', body: 'Give me the next {{n}} steps from the current pending plan. One line each, no rationale. TODO(user): replace with final concise variant.', role: 'next', isDefault: false },
-    { slug: 'next-with-time', name: 'Next (time-estimate)', body: 'Give me the next {{n}} steps from the current pending plan, each with a realistic time estimate and what it unblocks. TODO(user): replace with final time-estimate variant.', role: 'next', isDefault: false },
-    { slug: 'next-with-risk', name: 'Next (risk-first)', body: 'Give me the next {{n}} steps from the current pending plan, sorted by risk descending, with a rollback note per step. TODO(user): replace with final risk-first variant.', role: 'next', isDefault: false },
+  { slug: 'plan-default', name: 'PlanTierType (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true },
+  { slug: 'plan-concise', name: 'PlanTierType (concise)', body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false },
+  { slug: 'plan-with-evidence', name: 'PlanTierType (evidence-first)', body: '# PlanTierType in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false },
+  { slug: 'plan-risk-annotated', name: 'PlanTierType (risk-annotated)', body: '# PlanTierType in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false },
+  { slug: 'next-default', name: 'Next (default)', body: NEXT_DEFAULT_BODY, role: 'next', isDefault: true },
+  { slug: 'next-concise', name: 'Next (concise)', body: 'Give me the next {{n}} steps from the current pending plan. One line each, no rationale. TODO(user): replace with final concise variant.', role: 'next', isDefault: false },
+  { slug: 'next-with-time', name: 'Next (time-estimate)', body: 'Give me the next {{n}} steps from the current pending plan, each with a realistic time estimate and what it unblocks. TODO(user): replace with final time-estimate variant.', role: 'next', isDefault: false },
+  { slug: 'next-with-risk', name: 'Next (risk-first)', body: 'Give me the next {{n}} steps from the current pending plan, sorted by risk descending, with a rollback note per step. TODO(user): replace with final risk-first variant.', role: 'next', isDefault: false },
 ];
 
 export function getSeedBodyForSlug(slug: string): string | null {
-    for (const row of PLAN_NEXT_SEED_ROWS) {
-        if (row.slug === slug) return row.body;
+  for (const row of PLAN_NEXT_SEED_ROWS) {
+    if (row.slug === slug) {
+      return row.body;
     }
+  }
 
-    return null;
+  return null;
 }
 
 export function getRequiredTokensForRole(role: PromptRole): string[] {
-    if (role === 'generic') return [];
-    const defaultRow = PLAN_NEXT_SEED_ROWS.find(row => row.role === role && row.isDefault);
-    if (!defaultRow) return [];
+  if (role === 'generic') {
+    return [];
+  }
 
-    return Array.from(new Set(extractParamTokens(defaultRow.body)));
+  const defaultRow = PLAN_NEXT_SEED_ROWS.find(row => row.role === role && row.isDefault);
+  if (!defaultRow) {
+    return [];
+  }
+
+  return Array.from(new Set(extractParamTokens(defaultRow.body)));
 }

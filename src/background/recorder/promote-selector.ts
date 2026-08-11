@@ -50,63 +50,75 @@ export interface PromotionResult {
  * knows the click had no effect.
  */
 function validatePromotion(
-    selectors: ReadonlyArray<PersistedSelector>,
-    targetSelectorId: number,
+  selectors: ReadonlyArray<PersistedSelector>,
+  targetSelectorId: number,
 ): PromotionResult | PersistedSelector {
-    if (selectors.length === 0) {
-        return fail("EmptyInput", "No selectors to promote.");
-    }
-    const target = selectors.find((s) => s.SelectorId === targetSelectorId);
-    if (target === undefined) {
-        return fail("TargetNotFound", `Selector ${targetSelectorId} is not part of this step's selector list.`);
-    }
-    if (target.IsPrimary === 1) {
-        return fail("AlreadyPrimary", `Selector ${targetSelectorId} is already the primary selector.`);
-    }
+  if (selectors.length === 0) {
+    return fail("EmptyInput", "No selectors to promote.");
+  }
 
-    return target;
+  const target = selectors.find((s) => s.SelectorId === targetSelectorId);
+  if (target === undefined) {
+    return fail("TargetNotFound", `Selector ${targetSelectorId} is not part of this step's selector list.`);
+  }
+
+  if (target.IsPrimary === 1) {
+    return fail("AlreadyPrimary", `Selector ${targetSelectorId} is already the primary selector.`);
+  }
+
+  return target;
 }
 
 function applyPromotion(
-    selectors: ReadonlyArray<PersistedSelector>,
-    targetSelectorId: number,
+  selectors: ReadonlyArray<PersistedSelector>,
+  targetSelectorId: number,
 ): PersistedSelector[] {
-    const updated: PersistedSelector[] = selectors.map((s) => {
-        if (s.SelectorId === targetSelectorId) return { ...s, IsPrimary: 1 };
-        if (s.IsPrimary === 1) return { ...s, IsPrimary: 0 };
+  const updated: PersistedSelector[] = selectors.map((s) => {
+    if (s.SelectorId === targetSelectorId) {
+      return { ...s, IsPrimary: 1 };
+    }
 
-        return s;
-    });
-    updated.sort((a, b) => {
-        if (a.IsPrimary !== b.IsPrimary) return a.IsPrimary === 1 ? -1 : 1;
+    if (s.IsPrimary === 1) {
+      return { ...s, IsPrimary: 0 };
+    }
 
-        return a.SelectorId - b.SelectorId;
-    });
+    return s;
+  });
+  updated.sort((a, b) => {
+    if (a.IsPrimary !== b.IsPrimary) {
+      return a.IsPrimary === 1 ? -1 : 1;
+    }
 
-    return updated;
+    return a.SelectorId - b.SelectorId;
+  });
+
+  return updated;
 }
 
 export function promoteSelectorToPrimary(
-    selectors: ReadonlyArray<PersistedSelector>,
-    targetSelectorId: number,
+  selectors: ReadonlyArray<PersistedSelector>,
+  targetSelectorId: number,
 ): PromotionResult {
-    const validated = validatePromotion(selectors, targetSelectorId);
-    if ("Error" in validated) return validated;
-    const previousPrimary = selectors.find((s) => s.IsPrimary === 1) ?? null;
+  const validated = validatePromotion(selectors, targetSelectorId);
+  if ("Error" in validated) {
+    return validated;
+  }
 
-    return {
-        Selectors: applyPromotion(selectors, targetSelectorId),
-        DemotedSelectorId: previousPrimary?.SelectorId ?? null,
-        PromotedSelectorId: validated.SelectorId,
-        Error: null,
-    };
+  const previousPrimary = selectors.find((s) => s.IsPrimary === 1) ?? null;
+
+  return {
+    Selectors: applyPromotion(selectors, targetSelectorId),
+    DemotedSelectorId: previousPrimary?.SelectorId ?? null,
+    PromotedSelectorId: validated.SelectorId,
+    Error: null,
+  };
 }
 
 function fail(code: PromotionErrorCode, message: string): PromotionResult {
-    return {
-        Selectors: null,
-        DemotedSelectorId: null,
-        PromotedSelectorId: null,
-        Error: { Code: code, Message: message },
-    };
+  return {
+    Selectors: null,
+    DemotedSelectorId: null,
+    PromotedSelectorId: null,
+    Error: { Code: code, Message: message },
+  };
 }

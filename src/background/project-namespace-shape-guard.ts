@@ -19,19 +19,19 @@
  * Mirrors `keyof ProjectNamespace` exactly. Update both together.
  */
 export const PROJECT_NAMESPACE_KEYS: ReadonlyArray<keyof ProjectNamespace> = [
-    "vars",
-    "urls",
-    "xpath",
-    "cookies",
-    "kv",
-    "files",
-    "meta",
-    "log",
-    "scripts",
-    "db",
-    "api",
-    "notify",
-    "docs",
+  "vars",
+  "urls",
+  "xpath",
+  "cookies",
+  "kv",
+  "files",
+  "meta",
+  "log",
+  "scripts",
+  "db",
+  "api",
+  "notify",
+  "docs",
 ] as const;
 
 /**
@@ -41,18 +41,21 @@ export const PROJECT_NAMESPACE_KEYS: ReadonlyArray<keyof ProjectNamespace> = [
  * Throws with an exact missing-key list — code-red friendly.
  */
 export function assertEmittedShape(emittedSource: string, where: string): void {
-    const missing: string[] = [];
-    for (const key of PROJECT_NAMESPACE_KEYS) {
-        // Match `key: ` at the start of an object property — tolerant of
-        // surrounding whitespace and Object.freeze(...) wrapping.
-        const re = new RegExp(`(^|[\\s,{])${key}\\s*:`, "m");
-        if (!re.test(emittedSource)) missing.push(key);
+  const missing: string[] = [];
+  for (const key of PROJECT_NAMESPACE_KEYS) {
+    // Match `key: ` at the start of an object property — tolerant of
+    // surrounding whitespace and Object.freeze(...) wrapping.
+    const re = new RegExp(`(^|[\\s,{])${key}\\s*:`, "m");
+    if (!re.test(emittedSource)) {
+      missing.push(key);
     }
-    if (missing.length > 0) {
-        throw new Error(
-            `[project-namespace-shape] Emitted IIFE in ${where} is missing required sub-namespaces: ${missing.join(", ")}. ` +
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `[project-namespace-shape] Emitted IIFE in ${where} is missing required sub-namespaces: ${missing.join(", ")}. ` +
                 `Required keys: ${PROJECT_NAMESPACE_KEYS.join(", ")}. ` +
                 `Update the generator and the matching self-namespace.ts implementation together.`,
-        );
-    }
+    );
+  }
 }

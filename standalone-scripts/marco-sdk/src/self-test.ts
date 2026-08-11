@@ -47,8 +47,8 @@ const RT_GKV_KEY = "selftest";
 const RT_GKV_VALUE = "ok";
 
 const REQUIRED_KEYS = [
-    "vars", "urls", "xpath", "cookies", "kv", "files",
-    "meta", "log", "scripts", "db", "api", "notify", "docs",
+  "vars", "urls", "xpath", "cookies", "kv", "files",
+  "meta", "log", "scripts", "db", "api", "notify", "docs",
 ] as const;
 
 interface SelfTestResult {
@@ -72,116 +72,123 @@ interface FilesApi {
 }
 
 export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
-    const failures: string[] = [];
-    let checks = 0;
+  const failures: string[] = [];
+  let checks = 0;
 
-    const win = window as unknown as Record<string, unknown>;
-    const root = win.RiseupAsiaMacroExt as
+  const win = window as unknown as Record<string, unknown>;
+  const root = win.RiseupAsiaMacroExt as
         | { Projects?: Record<string, unknown> }
         | undefined;
 
-    /* Check 1 — Root + Projects map */
-    checks++;
-    if (!root || !root.Projects) {
-        failures.push("RiseupAsiaMacroExt.Projects missing");
+  /* Check 1 — Root + Projects map */
+  checks++;
+  if (!root || !root.Projects) {
+    failures.push("RiseupAsiaMacroExt.Projects missing");
 
-        return finalize(FN, failures, checks, expectedVersion);
-    }
+    return finalize(FN, failures, checks, expectedVersion);
+  }
 
-    /* Check 2 — Self-namespace registered */
-    checks++;
-    const ns = root.Projects[SDK_CODE_NAME] as Record<string, unknown> | undefined;
-    if (!ns) {
-        failures.push(`Projects.${SDK_CODE_NAME} not registered`);
+  /* Check 2 — Self-namespace registered */
+  checks++;
+  const ns = root.Projects[SDK_CODE_NAME] as Record<string, unknown> | undefined;
+  if (!ns) {
+    failures.push(`Projects.${SDK_CODE_NAME} not registered`);
 
-        return finalize(FN, failures, checks, expectedVersion);
-    }
+    return finalize(FN, failures, checks, expectedVersion);
+  }
 
-    /* Check 3 — Shape coverage (all 13 sub-namespaces) */
-    checks++;
-    checkShape(ns, failures);
+  /* Check 3 — Shape coverage (all 13 sub-namespaces) */
+  checks++;
+  checkShape(ns, failures);
 
-    /* Check 4 — meta fields + version match */
-    checks++;
-    checkMeta(ns.meta, expectedVersion, failures);
+  /* Check 4 — meta fields + version match */
+  checks++;
+  checkMeta(ns.meta, expectedVersion, failures);
 
-    /* Check 5 — kv.list() returns a Promise without throwing */
-    checks++;
-    const kv = ns.kv as KvApi | undefined;
-    checkKvListSync(kv, failures);
+  /* Check 5 — kv.list() returns a Promise without throwing */
+  checks++;
+  const kv = ns.kv as KvApi | undefined;
+  checkKvListSync(kv, failures);
 
-    const syncResult = finalize(FN, failures, checks, expectedVersion);
+  const syncResult = finalize(FN, failures, checks, expectedVersion);
 
-    /* Async round-trips — each one logs its own PASS/FAIL line so a backend
+  /* Async round-trips — each one logs its own PASS/FAIL line so a backend
        failure on one surface doesn't pretend the others are broken. */
-    if (syncResult.pass) {
-        if (kv) {
-            void runKvRoundTrip(kv);
-        }
-        const files = ns.files as FilesApi | undefined;
-        if (files) {
-            void runFilesRoundTrip(files);
-        }
-        void runGkvRoundTrip();
+  if (syncResult.pass) {
+    if (kv) {
+      void runKvRoundTrip(kv);
     }
 
-    return syncResult;
+    const files = ns.files as FilesApi | undefined;
+    if (files) {
+      void runFilesRoundTrip(files);
+    }
+
+    void runGkvRoundTrip();
+  }
+
+  return syncResult;
 }
 
 function checkShape(ns: Record<string, unknown>, failures: string[]): void {
-    const missingKeys = REQUIRED_KEYS.filter((k) => !(k in ns));
-    if (missingKeys.length > 0) {
-        failures.push(`missing sub-namespaces: ${missingKeys.join(", ")}`);
-    }
+  const missingKeys = REQUIRED_KEYS.filter((k) => !(k in ns));
+  if (missingKeys.length > 0) {
+    failures.push(`missing sub-namespaces: ${missingKeys.join(", ")}`);
+  }
 }
 
 function checkMeta(
-    metaUnknown: unknown,
-    expectedVersion: string,
-    failures: string[],
+  metaUnknown: unknown,
+  expectedVersion: string,
+  failures: string[],
 ): void {
-    const meta = metaUnknown as
+  const meta = metaUnknown as
         | { version?: string; codeName?: string; id?: string; name?: string }
         | undefined;
-    if (!meta) {
-        failures.push(".meta missing");
+  if (!meta) {
+    failures.push(".meta missing");
 
-        return;
-    }
-    if (meta.version !== expectedVersion) {
-        failures.push(`.meta.version ${meta.version} ≠ expected ${expectedVersion}`);
-    }
-    if (meta.codeName !== SDK_CODE_NAME) {
-        failures.push(`.meta.codeName ${meta.codeName} ≠ ${SDK_CODE_NAME}`);
-    }
-    if (!meta.id || !meta.name) {
-        failures.push(".meta.id or .meta.name missing");
-    }
+    return;
+  }
+
+  if (meta.version !== expectedVersion) {
+    failures.push(`.meta.version ${meta.version} ≠ expected ${expectedVersion}`);
+  }
+
+  if (meta.codeName !== SDK_CODE_NAME) {
+    failures.push(`.meta.codeName ${meta.codeName} ≠ ${SDK_CODE_NAME}`);
+  }
+
+  if (!meta.id || !meta.name) {
+    failures.push(".meta.id or .meta.name missing");
+  }
 }
 
 function checkKvListSync(kv: KvApi | undefined, failures: string[]): void {
-    if (!kv || typeof kv.list !== "function") {
-        failures.push(".kv.list is not a function");
+  if (!kv || typeof kv.list !== "function") {
+    failures.push(".kv.list is not a function");
 
-        return;
+    return;
+  }
+
+  try {
+    const result = kv.list();
+    if (!result || typeof (result as { then?: unknown }).then !== "function") {
+      failures.push(".kv.list() did not return a Promise");
+
+      return;
     }
-    try {
-        const result = kv.list();
-        if (!result || typeof (result as { then?: unknown }).then !== "function") {
-            failures.push(".kv.list() did not return a Promise");
 
-            return;
-        }
-        /* Swallow rejection — the contract is "returns a Promise without
+    /* Swallow rejection — the contract is "returns a Promise without
            throwing synchronously". A rejected promise (e.g. no KV API in
            this context) is not a self-test failure. Still log to NamespaceLogger
            so the rejection is auditable in diagnostics. */
-        (result as Promise<unknown>).catch((caught: unknown) => {
-            NamespaceLogger.error("selfTest.kv.list", "kv.list() promise rejected — expected in environments without backend KV; not counted as a self-test failure", caught);
-        });
-    } catch (err) {
-        failures.push(`.kv.list() threw synchronously: ${(err as Error).message}`);
-    }
+    (result as Promise<unknown>).catch((caught: unknown) => {
+      NamespaceLogger.error("selfTest.kv.list", "kv.list() promise rejected — expected in environments without backend KV; not counted as a self-test failure", caught);
+    });
+  } catch (err) {
+    failures.push(`.kv.list() threw synchronously: ${(err as Error).message}`);
+  }
 }
 
 /* ================================================================== */
@@ -189,59 +196,60 @@ function checkKvListSync(kv: KvApi | undefined, failures: string[]): void {
 /* ================================================================== */
 
 async function runKvRoundTrip(kv: KvApi): Promise<void> {
-    if (!hasFullKvSurface(kv)) {
-        NamespaceLogger.error(
-            FN_KV,
-            "FAIL — kv.set/get/delete missing on RiseupMacroSdk.kv (cannot round-trip)",
-        );
+  if (!hasFullKvSurface(kv)) {
+    NamespaceLogger.error(
+      FN_KV,
+      "FAIL — kv.set/get/delete missing on RiseupMacroSdk.kv (cannot round-trip)",
+    );
 
-        return;
-    }
+    return;
+  }
 
-    const failures: string[] = [];
-    const checks = 4;
+  const failures: string[] = [];
+  const checks = 4;
 
-    await tryStep(() => kv.set!(RT_KEY, RT_VALUE), "kv.set", failures);
-    await verifyKvGetEquals(kv, RT_VALUE, failures);
-    await tryStep(() => kv.delete!(RT_KEY), "kv.delete", failures);
-    await verifyKvGetCleared(kv, failures);
+  await tryStep(() => kv.set!(RT_KEY, RT_VALUE), "kv.set", failures);
+  await verifyKvGetEquals(kv, RT_VALUE, failures);
+  await tryStep(() => kv.delete!(RT_KEY), "kv.delete", failures);
+  await verifyKvGetCleared(kv, failures);
 
-    reportRoundTrip(FN_KV, "set/get/delete/verify", failures, checks);
+  reportRoundTrip(FN_KV, "set/get/delete/verify", failures, checks);
 }
 
 function hasFullKvSurface(kv: KvApi): boolean {
-    return typeof kv.set === "function"
+  return typeof kv.set === "function"
         && typeof kv.get === "function"
         && typeof kv.delete === "function";
 }
 
 async function verifyKvGetEquals(
-    kv: KvApi,
-    expected: string,
-    failures: string[],
+  kv: KvApi,
+  expected: string,
+  failures: string[],
 ): Promise<void> {
-    let observed: unknown = undefined;
-    try {
-        observed = await kv.get!(RT_KEY);
-    } catch (err) {
-        failures.push(`kv.get threw: ${(err as Error).message}`);
+  let observed: unknown = undefined;
+  try {
+    observed = await kv.get!(RT_KEY);
+  } catch (err) {
+    failures.push(`kv.get threw: ${(err as Error).message}`);
 
-        return;
-    }
-    if (observed !== expected) {
-        failures.push(`kv.get returned ${JSON.stringify(observed)} ≠ ${JSON.stringify(expected)}`);
-    }
+    return;
+  }
+
+  if (observed !== expected) {
+    failures.push(`kv.get returned ${JSON.stringify(observed)} ≠ ${JSON.stringify(expected)}`);
+  }
 }
 
 async function verifyKvGetCleared(kv: KvApi, failures: string[]): Promise<void> {
-    try {
-        const after = await kv.get!(RT_KEY);
-        if (after !== null && after !== undefined) {
-            failures.push(`kv.get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
-        }
-    } catch (err) {
-        failures.push(`kv.get-after-delete threw: ${(err as Error).message}`);
+  try {
+    const after = await kv.get!(RT_KEY);
+    if (after !== null && after !== undefined) {
+      failures.push(`kv.get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
     }
+  } catch (err) {
+    failures.push(`kv.get-after-delete threw: ${(err as Error).message}`);
+  }
 }
 
 /* ================================================================== */
@@ -249,87 +257,91 @@ async function verifyKvGetCleared(kv: KvApi, failures: string[]): Promise<void> 
 /* ================================================================== */
 
 async function runFilesRoundTrip(files: FilesApi): Promise<void> {
-    if (!hasFullFilesSurface(files)) {
-        NamespaceLogger.error(
-            FN_FILES,
-            "FAIL — files.save/read/delete/list missing on RiseupMacroSdk.files (cannot round-trip)",
-        );
-
-        return;
-    }
-
-    const failures: string[] = [];
-    const checks = 5;
-
-    await tryStep(
-        () => files.save!(RT_FILE_PATH, RT_FILE_CONTENT, RT_FILE_MIME),
-        "files.save",
-        failures,
+  if (!hasFullFilesSurface(files)) {
+    NamespaceLogger.error(
+      FN_FILES,
+      "FAIL — files.save/read/delete/list missing on RiseupMacroSdk.files (cannot round-trip)",
     );
-    await verifyFilesListIncludes(files, true, "files.list-after-save", failures);
-    await verifyFilesReadEquals(files, RT_FILE_CONTENT, failures);
-    await tryStep(() => files.delete!(RT_FILE_PATH), "files.delete", failures);
-    await verifyFilesListIncludes(files, false, "files.list-after-delete", failures);
 
-    reportRoundTrip(FN_FILES, "save/list/read/delete/verify", failures, checks);
+    return;
+  }
+
+  const failures: string[] = [];
+  const checks = 5;
+
+  await tryStep(
+    () => files.save!(RT_FILE_PATH, RT_FILE_CONTENT, RT_FILE_MIME),
+    "files.save",
+    failures,
+  );
+  await verifyFilesListIncludes(files, true, "files.list-after-save", failures);
+  await verifyFilesReadEquals(files, RT_FILE_CONTENT, failures);
+  await tryStep(() => files.delete!(RT_FILE_PATH), "files.delete", failures);
+  await verifyFilesListIncludes(files, false, "files.list-after-delete", failures);
+
+  reportRoundTrip(FN_FILES, "save/list/read/delete/verify", failures, checks);
 }
 
 function hasFullFilesSurface(files: FilesApi): boolean {
-    return typeof files.save === "function"
+  return typeof files.save === "function"
         && typeof files.read === "function"
         && typeof files.delete === "function"
         && typeof files.list === "function";
 }
 
 async function verifyFilesListIncludes(
-    files: FilesApi,
-    expectPresent: boolean,
-    label: string,
-    failures: string[],
+  files: FilesApi,
+  expectPresent: boolean,
+  label: string,
+  failures: string[],
 ): Promise<void> {
-    let listed: unknown = undefined;
-    try {
-        listed = await files.list!();
-    } catch (err) {
-        failures.push(`${label} threw: ${(err as Error).message}`);
+  let listed: unknown = undefined;
+  try {
+    listed = await files.list!();
+  } catch (err) {
+    failures.push(`${label} threw: ${(err as Error).message}`);
 
-        return;
-    }
-    if (!Array.isArray(listed)) {
-        failures.push(`${label} returned non-array: ${JSON.stringify(listed)}`);
+    return;
+  }
 
-        return;
-    }
-    const found = listed.some((entry) => {
-        const e = entry as { filename?: string; path?: string } | null;
+  if (!Array.isArray(listed)) {
+    failures.push(`${label} returned non-array: ${JSON.stringify(listed)}`);
 
-        return e !== null && (e.filename === RT_FILE_PATH || e.path === RT_FILE_PATH);
-    });
-    if (expectPresent && !found) {
-        failures.push(`${label} missing test file ${RT_FILE_PATH}`);
-    }
-    if (!expectPresent && found) {
-        failures.push(`${label} still contains test file ${RT_FILE_PATH} after delete`);
-    }
+    return;
+  }
+
+  const found = listed.some((entry) => {
+    const e = entry as { filename?: string; path?: string } | null;
+
+    return e !== null && (e.filename === RT_FILE_PATH || e.path === RT_FILE_PATH);
+  });
+  if (expectPresent && !found) {
+    failures.push(`${label} missing test file ${RT_FILE_PATH}`);
+  }
+
+  if (!expectPresent && found) {
+    failures.push(`${label} still contains test file ${RT_FILE_PATH} after delete`);
+  }
 }
 
 async function verifyFilesReadEquals(
-    files: FilesApi,
-    expected: string,
-    failures: string[],
+  files: FilesApi,
+  expected: string,
+  failures: string[],
 ): Promise<void> {
-    let observed: unknown = undefined;
-    try {
-        observed = await files.read!(RT_FILE_PATH);
-    } catch (err) {
-        failures.push(`files.read threw: ${(err as Error).message}`);
+  let observed: unknown = undefined;
+  try {
+    observed = await files.read!(RT_FILE_PATH);
+  } catch (err) {
+    failures.push(`files.read threw: ${(err as Error).message}`);
 
-        return;
-    }
-    const content = (observed as { content?: unknown } | null)?.content;
-    if (content !== expected) {
-        failures.push(`files.read returned content ${JSON.stringify(content)} ≠ ${JSON.stringify(expected)}`);
-    }
+    return;
+  }
+
+  const content = (observed as { content?: unknown } | null)?.content;
+  if (content !== expected) {
+    failures.push(`files.read returned content ${JSON.stringify(content)} ≠ ${JSON.stringify(expected)}`);
+  }
 }
 
 /* ================================================================== */
@@ -337,56 +349,57 @@ async function verifyFilesReadEquals(
 /* ================================================================== */
 
 async function runGkvRoundTrip(): Promise<void> {
-    const failures: string[] = [];
-    const checks = 4;
+  const failures: string[] = [];
+  const checks = 4;
 
-    await tryStep(
-        () => sendMessage("GKV_SET", { group: RT_GKV_GROUP, key: RT_GKV_KEY, value: RT_GKV_VALUE }),
-        "gkv:set",
-        failures,
-    );
-    await verifyGkvGetEquals(RT_GKV_VALUE, failures);
-    await tryStep(
-        () => sendMessage("GKV_DELETE", { group: RT_GKV_GROUP, key: RT_GKV_KEY }),
-        "gkv:delete",
-        failures,
-    );
-    await verifyGkvGetCleared(failures);
+  await tryStep(
+    () => sendMessage("GKV_SET", { group: RT_GKV_GROUP, key: RT_GKV_KEY, value: RT_GKV_VALUE }),
+    "gkv:set",
+    failures,
+  );
+  await verifyGkvGetEquals(RT_GKV_VALUE, failures);
+  await tryStep(
+    () => sendMessage("GKV_DELETE", { group: RT_GKV_GROUP, key: RT_GKV_KEY }),
+    "gkv:delete",
+    failures,
+  );
+  await verifyGkvGetCleared(failures);
 
-    reportRoundTrip(FN_GKV, "set/get/delete/verify", failures, checks);
+  reportRoundTrip(FN_GKV, "set/get/delete/verify", failures, checks);
 }
 
 async function verifyGkvGetEquals(expected: string, failures: string[]): Promise<void> {
-    let observed: unknown = undefined;
-    try {
-        observed = await sendMessage("GKV_GET", { group: RT_GKV_GROUP, key: RT_GKV_KEY });
-    } catch (err) {
-        failures.push(`gkv:get threw: ${(err as Error).message}`);
+  let observed: unknown = undefined;
+  try {
+    observed = await sendMessage("GKV_GET", { group: RT_GKV_GROUP, key: RT_GKV_KEY });
+  } catch (err) {
+    failures.push(`gkv:get threw: ${(err as Error).message}`);
 
-        return;
-    }
-    /* Background may return either the raw string or an object envelope —
+    return;
+  }
+
+  /* Background may return either the raw string or an object envelope —
        accept both shapes so a future refactor doesn't false-fail. */
-    const raw = typeof observed === "string"
-        ? observed
-        : (observed as { value?: unknown } | null)?.value;
-    if (raw !== expected) {
-        failures.push(`gkv:get returned ${JSON.stringify(observed)} ≠ ${JSON.stringify(expected)}`);
-    }
+  const raw = typeof observed === "string"
+    ? observed
+    : (observed as { value?: unknown } | null)?.value;
+  if (raw !== expected) {
+    failures.push(`gkv:get returned ${JSON.stringify(observed)} ≠ ${JSON.stringify(expected)}`);
+  }
 }
 
 async function verifyGkvGetCleared(failures: string[]): Promise<void> {
-    try {
-        const after = await sendMessage("GKV_GET", { group: RT_GKV_GROUP, key: RT_GKV_KEY });
-        const raw = typeof after === "string"
-            ? after
-            : (after as { value?: unknown } | null)?.value;
-        if (raw !== null && raw !== undefined) {
-            failures.push(`gkv:get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
-        }
-    } catch (err) {
-        failures.push(`gkv:get-after-delete threw: ${(err as Error).message}`);
+  try {
+    const after = await sendMessage("GKV_GET", { group: RT_GKV_GROUP, key: RT_GKV_KEY });
+    const raw = typeof after === "string"
+      ? after
+      : (after as { value?: unknown } | null)?.value;
+    if (raw !== null && raw !== undefined) {
+      failures.push(`gkv:get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
     }
+  } catch (err) {
+    failures.push(`gkv:get-after-delete threw: ${(err as Error).message}`);
+  }
 }
 
 /* ================================================================== */
@@ -394,68 +407,75 @@ async function verifyGkvGetCleared(failures: string[]): Promise<void> {
 /* ================================================================== */
 
 async function tryStep(
-    op: () => Promise<unknown>,
-    label: string,
-    failures: string[],
+  op: () => Promise<unknown>,
+  label: string,
+  failures: string[],
 ): Promise<void> {
-    try {
-        await op();
-    } catch (err) {
-        failures.push(`${label} threw: ${(err as Error).message}`);
-    }
+  try {
+    await op();
+  } catch (err) {
+    failures.push(`${label} threw: ${(err as Error).message}`);
+  }
 }
 
 function reportRoundTrip(
-    fn: string,
-    pattern: string,
-    failures: string[],
-    checks: number,
+  fn: string,
+  pattern: string,
+  failures: string[],
+  checks: number,
 ): void {
-    if (failures.length === 0) {
-        NamespaceLogger.info(
-            fn,
-            `PASS — ${pattern} round-trip OK (${checks} checks)`,
-        );
-    } else {
-        NamespaceLogger.error(
-            fn,
-            `FAIL — ${failures.length}/${checks} round-trip checks failed: ${failures.join("; ")}`,
-        );
-    }
-    /* Mirror to background so the popup can render the latest result. */
-    void sendSelfTestReport(roundTripSurfaceFromFn(fn), failures.length === 0, failures);
+  if (failures.length === 0) {
+    NamespaceLogger.info(
+      fn,
+      `PASS — ${pattern} round-trip OK (${checks} checks)`,
+    );
+  } else {
+    NamespaceLogger.error(
+      fn,
+      `FAIL — ${failures.length}/${checks} round-trip checks failed: ${failures.join("; ")}`,
+    );
+  }
+
+  /* Mirror to background so the popup can render the latest result. */
+  void sendSelfTestReport(roundTripSurfaceFromFn(fn), failures.length === 0, failures);
 }
 
 function roundTripSurfaceFromFn(fn: string): "kv" | "files" | "gkv" {
-    if (fn === FN_KV) return "kv";
-    if (fn === FN_FILES) return "files";
+  if (fn === FN_KV) {
+    return "kv";
+  }
 
-    return "gkv";
+  if (fn === FN_FILES) {
+    return "files";
+  }
+
+  return "gkv";
 }
 
 function finalize(
-    fn: string,
-    failures: string[],
-    checks: number,
-    version: string,
+  fn: string,
+  failures: string[],
+  checks: number,
+  version: string,
 ): SelfTestResult {
-    const pass = failures.length === 0;
-    if (pass) {
-        NamespaceLogger.info(
-            fn,
-            `PASS — Projects.${SDK_CODE_NAME} v${version} (${checks} checks)`,
-        );
-    } else {
-        NamespaceLogger.error(
-            fn,
-            `FAIL — ${failures.length}/${checks} checks failed: ${failures.join("; ")}`,
-        );
-    }
-    /* Mirror sync result to background — pass version only here so the
-       popup can show the SDK build that produced the latest snapshot. */
-    void sendSelfTestReport("sync", pass, failures, version);
+  const pass = failures.length === 0;
+  if (pass) {
+    NamespaceLogger.info(
+      fn,
+      `PASS — Projects.${SDK_CODE_NAME} v${version} (${checks} checks)`,
+    );
+  } else {
+    NamespaceLogger.error(
+      fn,
+      `FAIL — ${failures.length}/${checks} checks failed: ${failures.join("; ")}`,
+    );
+  }
 
-    return { pass, failures, checks };
+  /* Mirror sync result to background — pass version only here so the
+       popup can show the SDK build that produced the latest snapshot. */
+  void sendSelfTestReport("sync", pass, failures, version);
+
+  return { pass, failures, checks };
 }
 
 /* ================================================================== */
@@ -471,20 +491,20 @@ function finalize(
  * itself look like a self-test failure to the user.
  */
 async function sendSelfTestReport(
-    surface: "sync" | "kv" | "files" | "gkv",
-    pass: boolean,
-    failures: string[],
-    version?: string,
+  surface: "sync" | "kv" | "files" | "gkv",
+  pass: boolean,
+  failures: string[],
+  version?: string,
 ): Promise<void> {
-    try {
-        await sendMessage("SDK_SELFTEST_REPORT", {
-            surface,
-            pass,
-            failures,
-            version: version ?? "",
-        });
-    } catch (caught) {
-        NamespaceLogger.error("reportSelfTest", `SDK_SELFTEST_REPORT sendMessage failed for surface="${surface}" — background may be unreachable; report not delivered (see jsdoc)`, caught);
-    }
+  try {
+    await sendMessage("SDK_SELFTEST_REPORT", {
+      surface,
+      pass,
+      failures,
+      version: version ?? "",
+    });
+  } catch (caught) {
+    NamespaceLogger.error("reportSelfTest", `SDK_SELFTEST_REPORT sendMessage failed for surface="${surface}" — background may be unreachable; report not delivered (see jsdoc)`, caught);
+  }
 }
 

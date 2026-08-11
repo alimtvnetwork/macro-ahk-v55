@@ -34,7 +34,10 @@ export function isWsSelected(wsId: string): boolean {
 
 export function setSelectedWsIds(ids: string[]): void {
   selectedIds.clear();
-  for (const id of ids) selectedIds.add(id);
+  for (const id of ids) {
+    selectedIds.add(id);
+  }
+
   notify();
 }
 
@@ -44,6 +47,7 @@ export function toggleWsSelection(wsId: string): void {
   } else {
     selectedIds.add(wsId);
   }
+
   notify();
 }
 

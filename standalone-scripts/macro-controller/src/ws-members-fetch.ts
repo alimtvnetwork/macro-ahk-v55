@@ -38,7 +38,9 @@ interface MarcoSdkShape {
 function getMemberships(op: string) {
   const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
   const api = sdk?.api?.memberships;
-  if (!api) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
+  if (!api) {
+    throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
+  }
 
   return api;
 }
@@ -72,8 +74,11 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
 }
 
 export function clearMembersCache(wsId?: string): void {
-  if (wsId) membersCache.delete(wsId);
-  else membersCache.clear();
+  if (wsId) {
+    membersCache.delete(wsId);
+  } else {
+    membersCache.clear();
+  }
 }
 
 /** 
@@ -124,10 +129,10 @@ export async function fetchMembersForMany(
 
 export function invalidateMembersCache(wsId?: string): void {
   if (wsId) {
-      bulkCache.delete(wsId);
-      membersCache.delete(wsId);
+    bulkCache.delete(wsId);
+    membersCache.delete(wsId);
   } else {
-      bulkCache.clear();
-      membersCache.clear();
+    bulkCache.clear();
+    membersCache.clear();
   }
 }

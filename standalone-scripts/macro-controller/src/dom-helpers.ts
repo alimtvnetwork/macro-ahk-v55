@@ -238,7 +238,9 @@ export function ensureProjectDialogOpen(): boolean {
 
   for (const [buttonIndex, btn] of buttons.entries()) {
     const clickResult = tryClickVisibleButton(btn as Element, buttonIndex);
-    if (clickResult !== null) return clickResult;
+    if (clickResult !== null) {
+      return clickResult;
+    }
   }
 
   logError('PROJECT', 'BUTTON NOT FOUND! (\' + buttons.length + \' matches but none are valid)');
@@ -264,6 +266,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
   if (btn.textContent) {
     btnInfo += ', text: "' + btn.textContent.substring(0, 30) + '"';
   }
+
   log(btnInfo, 'check');
 
   const isExpanded = btn.getAttribute('aria-expanded') === 'true' || btn.getAttribute('data-state') === 'open';

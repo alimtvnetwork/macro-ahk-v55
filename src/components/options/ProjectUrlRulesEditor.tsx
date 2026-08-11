@@ -331,7 +331,9 @@ function ProjectUrlsSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; on
   };
 
   const handleOpenUrl = (url: string) => {
-    if (url) window.open(url, "_blank");
+    if (url) {
+      window.open(url, "_blank");
+    }
   };
 
   const handleUpdate = (index: number, field: string, value: string) => {
@@ -450,7 +452,9 @@ function UrlVariablesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; o
 
   const handleCopyAllAsJson = () => {
     const obj: Record<string, string> = {};
-    variables.forEach((v) => { obj[v.name] = v.value; });
+    variables.forEach((v) => {
+      obj[v.name] = v.value; 
+    });
     navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
     toast.success("Copied all variables as JSON");
   };

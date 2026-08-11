@@ -67,106 +67,111 @@ export const MAX_TIMELINE_ENTRIES = 500;
 
 let entryCounter = 0;
 const nextEntryId = (): string => {
-    entryCounter += 1;
+  entryCounter += 1;
 
-    return `tl_${entryCounter.toString(36)}`;
+  return `tl_${entryCounter.toString(36)}`;
 };
 
 function append(state: TimelineState, entry: TimelineEntry): TimelineState {
-    const next = state.Entries.length >= MAX_TIMELINE_ENTRIES
-        ? [...state.Entries.slice(state.Entries.length - MAX_TIMELINE_ENTRIES + 1), entry]
-        : [...state.Entries, entry];
+  const next = state.Entries.length >= MAX_TIMELINE_ENTRIES
+    ? [...state.Entries.slice(state.Entries.length - MAX_TIMELINE_ENTRIES + 1), entry]
+    : [...state.Entries, entry];
 
-    return { StartedAtMs: state.StartedAtMs, Entries: next };
+  return { StartedAtMs: state.StartedAtMs, Entries: next };
 }
 
 export function startTimeline(now: number = Date.now()): TimelineState {
-    return { StartedAtMs: now, Entries: [] };
+  return { StartedAtMs: now, Entries: [] };
 }
 
 function offsetMs(state: TimelineState, now: number): number {
-    if (state.StartedAtMs === null) { return 0; }
-    const delta = now - state.StartedAtMs;
+  if (state.StartedAtMs === null) {
+    return 0; 
+  }
 
-    return delta < 0 ? 0 : delta;
+  const delta = now - state.StartedAtMs;
+
+  return delta < 0 ? 0 : delta;
 }
 
 export function recordEventStart(
-    state: TimelineState,
-    event: KeywordEvent,
-    index: number,
-    total: number,
-    now: number = Date.now(),
+  state: TimelineState,
+  event: KeywordEvent,
+  index: number,
+  total: number,
+  now: number = Date.now(),
 ): TimelineState {
-    return append(state, {
-        Kind: "EventStart",
-        Id: nextEntryId(),
-        AtMs: offsetMs(state, now),
-        EventId: event.Id,
-        Keyword: event.Keyword,
-        Index: index,
-        Total: total,
-    });
+  return append(state, {
+    Kind: "EventStart",
+    Id: nextEntryId(),
+    AtMs: offsetMs(state, now),
+    EventId: event.Id,
+    Keyword: event.Keyword,
+    Index: index,
+    Total: total,
+  });
 }
 
 export function describeStep(step: KeywordEventStep): string {
-    if (step.Kind === "Key") {
-        const combo = step.Combo.trim();
+  if (step.Kind === "Key") {
+    const combo = step.Combo.trim();
 
-        return combo.length === 0 ? "Key (empty)" : `Key ${combo}`;
-    }
+    return combo.length === 0 ? "Key (empty)" : `Key ${combo}`;
+  }
 
-    return `Wait ${step.DurationMs}ms`;
+  return `Wait ${step.DurationMs}ms`;
 }
 
 export function recordStep(
-    state: TimelineState,
-    event: KeywordEvent,
-    step: KeywordEventStep,
-    stepIndex: number,
-    now: number = Date.now(),
+  state: TimelineState,
+  event: KeywordEvent,
+  step: KeywordEventStep,
+  stepIndex: number,
+  now: number = Date.now(),
 ): TimelineState {
-    return append(state, {
-        Kind: "Step",
-        Id: nextEntryId(),
-        AtMs: offsetMs(state, now),
-        EventId: event.Id,
-        StepIndex: stepIndex,
-        LabelType: describeStep(step),
-    });
+  return append(state, {
+    Kind: "Step",
+    Id: nextEntryId(),
+    AtMs: offsetMs(state, now),
+    EventId: event.Id,
+    StepIndex: stepIndex,
+    LabelType: describeStep(step),
+  });
 }
 
 export function recordEventEnd(
-    state: TimelineState,
-    event: KeywordEvent,
-    result: PlaybackResult,
-    now: number = Date.now(),
+  state: TimelineState,
+  event: KeywordEvent,
+  result: PlaybackResult,
+  now: number = Date.now(),
 ): TimelineState {
-    return append(state, {
-        Kind: "EventEnd",
-        Id: nextEntryId(),
-        AtMs: offsetMs(state, now),
-        EventId: event.Id,
-        Keyword: event.Keyword,
-        Completed: result.Completed,
-        Aborted: result.Aborted,
-    });
+  return append(state, {
+    Kind: "EventEnd",
+    Id: nextEntryId(),
+    AtMs: offsetMs(state, now),
+    EventId: event.Id,
+    Keyword: event.Keyword,
+    Completed: result.Completed,
+    Aborted: result.Aborted,
+  });
 }
 
 export function recordChainEnd(
-    state: TimelineState,
-    summary: { readonly Completed: number; readonly Attempted: number; readonly Aborted: boolean },
-    now: number = Date.now(),
+  state: TimelineState,
+  summary: { readonly Completed: number; readonly Attempted: number; readonly Aborted: boolean },
+  now: number = Date.now(),
 ): TimelineState {
-    return append(state, {
-        Kind: "ChainEnd",
-        Id: nextEntryId(),
-        AtMs: offsetMs(state, now),
-        Completed: summary.Completed,
-        Attempted: summary.Attempted,
-        Aborted: summary.Aborted,
-    });
+  return append(state, {
+    Kind: "ChainEnd",
+    Id: nextEntryId(),
+    AtMs: offsetMs(state, now),
+    Completed: summary.Completed,
+    Attempted: summary.Attempted,
+    Aborted: summary.Aborted,
+  });
 }
 
 /** Test-only helper — resets the monotonic id counter. */
-export function __resetTimelineIdsForTests(): void { entryCounter = 0; }
+export function __resetTimelineIdsForTests(): void {
+  entryCounter = 0; 
+}

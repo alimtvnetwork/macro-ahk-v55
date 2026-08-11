@@ -93,9 +93,15 @@ describe('Issue 118 — pickPastDueTone', () => {
 });
 
 describe('Issue 118 — formatPassedLabel', () => {
-  it('0 → Today', () => { expect(formatPassedLabel(0)).toBe('Today'); });
-  it('1 → Passed 1d', () => { expect(formatPassedLabel(1)).toBe('Passed 1d'); });
-  it('clamps at 99d', () => { expect(formatPassedLabel(500)).toBe('Passed 99d'); });
+  it('0 → Today', () => {
+    expect(formatPassedLabel(0)).toBe('Today'); 
+  });
+  it('1 → Passed 1d', () => {
+    expect(formatPassedLabel(1)).toBe('Passed 1d'); 
+  });
+  it('clamps at 99d', () => {
+    expect(formatPassedLabel(500)).toBe('Passed 99d'); 
+  });
 });
 
 describe('Issue 118 — classifyWorkspaceDisplayStatus past-due', () => {

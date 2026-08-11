@@ -35,7 +35,9 @@ export function isWireWorkspaceRaw(candidate: unknown): candidate is WireWorkspa
  * an object; callers MUST log and stop, never coerce.
  */
 export function toWireWorkspaceRaw(raw: unknown): WireWorkspaceRaw | null {
-  if (!isWireWorkspaceRaw(raw)) { return null; }
+  if (!isWireWorkspaceRaw(raw)) {
+    return null; 
+  }
 
   return raw;
 }

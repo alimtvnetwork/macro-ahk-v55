@@ -59,7 +59,9 @@ export function needsBalanceEnrichment(
   input: NeedsBalanceEnrichmentInput,
 ): NeedsBalanceEnrichmentResult {
   const wsId = normalize(input.workspace.id);
-  if (wsId.length === 0) return { needs: false, reason: 'no-id' };
+  if (wsId.length === 0) {
+    return { needs: false, reason: 'no-id' };
+  }
 
   const tier = normalize(input.workspace.tier);
   const plan = normalize(input.workspace.plan);

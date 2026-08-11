@@ -24,6 +24,7 @@ export function loadForbiddenRenameCache(): void {
       for (const entry of resp.entries!) {
         forbiddenWsIds.add(entry.key);
       }
+
       const hasLoaded = forbiddenWsIds.size > 0;
       if (hasLoaded) {
         log('[Rename] Loaded ' + forbiddenWsIds.size + ' forbidden workspace(s) from cache', 'info');

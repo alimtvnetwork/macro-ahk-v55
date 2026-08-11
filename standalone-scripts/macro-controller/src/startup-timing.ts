@@ -32,7 +32,10 @@ export function timingEnd(
   detail?: string,
 ): void {
   const p = _pending.get(phase);
-  if (!p) return;
+  if (!p) {
+    return;
+  }
+
   _pending.delete(phase);
   _entries.push({
     phase,
@@ -53,7 +56,9 @@ export function getTimingEntries(): TimingEntry[] {
     all.push({ phase: k, label: v.label, startMs: v.startMs, endMs: now, status: 'pending' });
   });
 
-  return all.sort(function(a, b) { return a.startMs - b.startMs; });
+  return all.sort(function(a, b) {
+    return a.startMs - b.startMs; 
+  });
 }
 
 /** Total elapsed time since module load. */

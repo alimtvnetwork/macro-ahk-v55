@@ -33,79 +33,95 @@ export interface ResolvedSelector {
 const MAX_ANCHOR_DEPTH = 16;
 
 export function resolveStepSelector(
-    selectors: ReadonlyArray<PersistedSelector>,
+  selectors: ReadonlyArray<PersistedSelector>,
 ): ResolvedSelector {
-    const primary = selectors.find((s) => s.IsPrimary === 1);
-    if (primary === undefined) {
-        throw new Error("No primary selector found for Step");
-    }
-    const byId = new Map(selectors.map((s) => [s.SelectorId, s]));
-    const chain: number[] = [];
-    const expression = resolveOne(primary, byId, chain, 0);
+  const primary = selectors.find((s) => s.IsPrimary === 1);
+  if (primary === undefined) {
+    throw new Error("No primary selector found for Step");
+  }
 
-    return {
-        Kind: kindOf(primary.SelectorKindId),
-        Expression: expression,
-        AnchorChain: chain,
-    };
+  const byId = new Map(selectors.map((s) => [s.SelectorId, s]));
+  const chain: number[] = [];
+  const expression = resolveOne(primary, byId, chain, 0);
+
+  return {
+    Kind: kindOf(primary.SelectorKindId),
+    Expression: expression,
+    AnchorChain: chain,
+  };
 }
 
 function guardDepthAndCycle(selector: PersistedSelector, chain: number[], depth: number): void {
-    if (depth > MAX_ANCHOR_DEPTH) {
-        throw new Error(`Anchor chain exceeded max depth ${MAX_ANCHOR_DEPTH}, cycle suspected`);
-    }
-    if (chain.includes(selector.SelectorId)) {
-        throw new Error(`Cycle detected in anchor chain at SelectorId ${selector.SelectorId}`);
-    }
+  if (depth > MAX_ANCHOR_DEPTH) {
+    throw new Error(`Anchor chain exceeded max depth ${MAX_ANCHOR_DEPTH}, cycle suspected`);
+  }
+
+  if (chain.includes(selector.SelectorId)) {
+    throw new Error(`Cycle detected in anchor chain at SelectorId ${selector.SelectorId}`);
+  }
 }
 
 function resolveAnchoredRelative(
-    selector: PersistedSelector,
-    byId: Map<number, PersistedSelector>,
-    chain: number[],
-    depth: number,
+  selector: PersistedSelector,
+  byId: Map<number, PersistedSelector>,
+  chain: number[],
+  depth: number,
 ): string {
-    if (selector.AnchorSelectorId === null) {
-        throw new Error(`XPathRelative selector ${selector.SelectorId} has no AnchorSelectorId`);
-    }
-    const anchor = byId.get(selector.AnchorSelectorId);
-    if (anchor === undefined) {
-        throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set`);
-    }
+  if (selector.AnchorSelectorId === null) {
+    throw new Error(`XPathRelative selector ${selector.SelectorId} has no AnchorSelectorId`);
+  }
 
-    return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
+  const anchor = byId.get(selector.AnchorSelectorId);
+  if (anchor === undefined) {
+    throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set`);
+  }
+
+  return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
 }
 
 function resolveOne(
-    selector: PersistedSelector,
-    byId: Map<number, PersistedSelector>,
-    chain: number[],
-    depth: number,
+  selector: PersistedSelector,
+  byId: Map<number, PersistedSelector>,
+  chain: number[],
+  depth: number,
 ): string {
-    guardDepthAndCycle(selector, chain, depth);
-    chain.push(selector.SelectorId);
-    if (selector.SelectorKindId === SelectorKindId.XPathFull) return selector.Expression;
-    if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
-        return resolveAnchoredRelative(selector, byId, chain, depth);
-    }
-
-    // Css / Aria selectors return raw expression; replay engine routes on Kind.
+  guardDepthAndCycle(selector, chain, depth);
+  chain.push(selector.SelectorId);
+  if (selector.SelectorKindId === SelectorKindId.XPathFull) {
     return selector.Expression;
+  }
+
+  if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
+    return resolveAnchoredRelative(selector, byId, chain, depth);
+  }
+
+  // Css / Aria selectors return raw expression; replay engine routes on Kind.
+  return selector.Expression;
 }
 
 function joinRelative(anchor: string, relative: string): string {
-    const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
-    if (stripped.length === 0) return anchor;
-    if (stripped.startsWith("/")) return `${anchor}${stripped}`;
+  const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
+  if (stripped.length === 0) {
+    return anchor;
+  }
 
-    return `${anchor}/${stripped}`;
+  if (stripped.startsWith("/")) {
+    return `${anchor}${stripped}`;
+  }
+
+  return `${anchor}/${stripped}`;
 }
 
 function kindOf(selectorKindId: number): ResolvedSelector["Kind"] {
-    if (selectorKindId === SelectorKindId.Css) return "Css";
-    if (selectorKindId === SelectorKindId.Aria) return "Aria";
+  if (selectorKindId === SelectorKindId.Css) {
+    return "Css";
+  }
 
-    return "XPath";
+  if (selectorKindId === SelectorKindId.Aria) {
+    return "Aria";
+  }
+
+  return "XPath";
 }
 
 export type { PersistedSelector };

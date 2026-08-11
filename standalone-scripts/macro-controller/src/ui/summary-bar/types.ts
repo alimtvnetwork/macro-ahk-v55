@@ -20,11 +20,11 @@ export interface DashboardSummary {
 
 /** Display kinds that count toward `proExpiringCount`. */
 export const PRO_EXPIRING_KINDS: ReadonlySet<WorkspaceDisplayKind> = new Set<WorkspaceDisplayKind>([
-    'canceled',
-    'expired',
-    'expired-hard',
-    'expire-soon',
-    'past-due-expiring',
+  'canceled',
+  'expired',
+  'expired-hard',
+  'expire-soon',
+  'past-due-expiring',
 ]);
 
 /**

@@ -15,24 +15,33 @@ function focusableNodesIn(root: HTMLElement): HTMLElement[] {
 
 function closeExisting(): void {
   const ex = document.getElementById(MODAL_ID);
-  if (ex) ex.remove();
+  if (ex) {
+    ex.remove();
+  }
 }
 
 function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
   if (!refs.root.isConnected) {
-    if (refs.keyHandler) document.removeEventListener('keydown', refs.keyHandler, true);
+    if (refs.keyHandler) {
+      document.removeEventListener('keydown', refs.keyHandler, true);
+    }
 
     return;
   }
-  if (e.key === 'Escape') {
-    if (refs.activeEditor) { e.preventDefault(); refs.activeEditor.cancel();
 
- return; }
+  if (e.key === 'Escape') {
+    if (refs.activeEditor) {
+      e.preventDefault(); refs.activeEditor.cancel();
+
+      return; 
+    }
+
     e.preventDefault();
     closeExisting();
 
     return;
   }
+
   const saveCombo = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
   if (saveCombo && refs.activeEditor) {
     e.preventDefault();
@@ -40,23 +49,37 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
 
     return;
   }
-  if (e.key === 'Tab') applyTabTrap(refs.root, e);
+
+  if (e.key === 'Tab') {
+    applyTabTrap(refs.root, e);
+  }
 }
 
 function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const nodes = focusableNodesIn(root);
-  if (nodes.length === 0) return;
+  if (nodes.length === 0) {
+    return;
+  }
+
   const first = nodes[0]!;
   const last = nodes[nodes.length - 1]!;
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
-  if (!insideModal) { e.preventDefault(); first.focus();
+  if (!insideModal) {
+    e.preventDefault(); first.focus();
 
- return; }
-  if (e.shiftKey && active === first) { e.preventDefault(); last.focus();
+    return; 
+  }
 
- return; }
-  if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+  if (e.shiftKey && active === first) {
+    e.preventDefault(); last.focus();
+
+    return; 
+  }
+
+  if (!e.shiftKey && active === last) {
+    e.preventDefault(); first.focus(); 
+  }
 }
 
 export async function openPromptLibraryModal(): Promise<void> {
@@ -99,7 +122,11 @@ export async function openPromptLibraryModal(): Promise<void> {
   document.body.appendChild(shell.root);
 
   // Click on scrim (not panel) closes.
-  shell.root.addEventListener('click', (e) => { if (e.target === shell.root) closeExisting(); });
+  shell.root.addEventListener('click', (e) => {
+    if (e.target === shell.root) {
+      closeExisting();
+    } 
+  });
 
   const closeBtn = shell.root.querySelector<HTMLButtonElement>('button[data-testid="library-close"]');
   if (closeBtn) {

@@ -70,9 +70,9 @@ export interface RunSummary {
 }
 
 const STATUS_LABEL: Readonly<Record<RunSummaryRowStatus, string>> = Object.freeze({
-    [RunSummaryRowStatus.Succeeded]: "✓",
-    [RunSummaryRowStatus.Failed]: "✗",
-    [RunSummaryRowStatus.PartiallySucceeded]: "◐",
+  [RunSummaryRowStatus.Succeeded]: "✓",
+  [RunSummaryRowStatus.Failed]: "✗",
+  [RunSummaryRowStatus.PartiallySucceeded]: "◐",
 });
 
 /**
@@ -130,58 +130,58 @@ const STATUS_LABEL: Readonly<Record<RunSummaryRowStatus, string>> = Object.freez
  */
 
 export const renderRunSummaryAsJson = (summary: RunSummary): string => {
-    return JSON.stringify(summary, null, 2);
+  return JSON.stringify(summary, null, 2);
 };
 
 const renderActions = (actions: ReadonlyArray<RunSummaryAction>): string => {
-    if (actions.length === 0) {
-        return "    (no actions recorded)";
-    }
+  if (actions.length === 0) {
+    return "    (no actions recorded)";
+  }
 
-    return actions
-        .map((a) => {
-            const detailSuffix = a.Detail === null ? "" : ` — ${a.Detail}`;
+  return actions
+    .map((a) => {
+      const detailSuffix = a.Detail === null ? "" : ` — ${a.Detail}`;
 
-            return `    - [${a.Outcome}] ${a.Code}${detailSuffix}`;
-        })
-        .join("\n");
+      return `    - [${a.Outcome}] ${a.Code}${detailSuffix}`;
+    })
+    .join("\n");
 };
 
 const renderReplayHint = (hint: RunSummaryRow["ReplayHint"]): string => {
-    const keys = Object.keys(hint);
+  const keys = Object.keys(hint);
 
-    if (keys.length === 0) {
-        return "    (none)";
-    }
+  if (keys.length === 0) {
+    return "    (none)";
+  }
 
-    return keys.map((k) => `    - ${k}: ${String(hint[k])}`).join("\n");
+  return keys.map((k) => `    - ${k}: ${String(hint[k])}`).join("\n");
 };
 
 const renderRow = (row: RunSummaryRow): string => {
-    const header = `### Row ${row.RowIndex} ${STATUS_LABEL[row.Status]} ${row.OutcomeCode} (${row.DurationMs}ms)`;
-    const error = row.LastError === null ? "" : `\n  Error: ${row.LastError}`;
+  const header = `### Row ${row.RowIndex} ${STATUS_LABEL[row.Status]} ${row.OutcomeCode} (${row.DurationMs}ms)`;
+  const error = row.LastError === null ? "" : `\n  Error: ${row.LastError}`;
 
-    return `${header}${error}\n  Actions:\n${renderActions(row.Actions)}\n  Replay hint:\n${renderReplayHint(row.ReplayHint)}`;
+  return `${header}${error}\n  Actions:\n${renderActions(row.Actions)}\n  Replay hint:\n${renderReplayHint(row.ReplayHint)}`;
 };
 
 export const renderRunSummaryAsText = (summary: RunSummary): string => {
-    const head = [
-        `# Run Summary — ${summary.Script}`,
-        `Task: ${summary.TaskId}`,
-        `Generated: ${summary.GeneratedAtUtc}`,
-        "",
-        `Total: ${summary.Counts.Total} | ` +
+  const head = [
+    `# Run Summary — ${summary.Script}`,
+    `Task: ${summary.TaskId}`,
+    `Generated: ${summary.GeneratedAtUtc}`,
+    "",
+    `Total: ${summary.Counts.Total} | ` +
         `Succeeded: ${summary.Counts.Succeeded} | ` +
         `Failed: ${summary.Counts.Failed} | ` +
         `Partial: ${summary.Counts.PartiallySucceeded}`,
-        "",
-    ].join("\n");
+    "",
+  ].join("\n");
 
-    const body = summary.Rows.map(renderRow).join("\n\n");
-    const noticeLines = summary.Notices.map((n) => `- ${n}`).join("\n");
-    const notices = summary.Notices.length === 0
-        ? ""
-        : `\n\n## Notices\n${noticeLines}`;
+  const body = summary.Rows.map(renderRow).join("\n\n");
+  const noticeLines = summary.Notices.map((n) => `- ${n}`).join("\n");
+  const notices = summary.Notices.length === 0
+    ? ""
+    : `\n\n## Notices\n${noticeLines}`;
 
-    return `${head}\n${body}${notices}\n`;
+  return `${head}\n${body}${notices}\n`;
 };

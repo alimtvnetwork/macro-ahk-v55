@@ -40,13 +40,13 @@ export const DEFAULT_PROJECT_CACHE_TTL_MS = DEFAULT_PROJECTS_CACHE_TTL_HOURS * 6
  * default 48 h constant when unset / invalid.
  */
 export function getProjectsCacheTtlMs(): number {
-    const o = getSettingsOverrides();
-    const h = o.projectsCacheTtlHours;
-    if (typeof h === 'number' && Number.isFinite(h) && h >= 0) {
-        return Math.floor(h) * 60 * 60 * 1000;
-    }
+  const o = getSettingsOverrides();
+  const h = o.projectsCacheTtlHours;
+  if (typeof h === 'number' && Number.isFinite(h) && h >= 0) {
+    return Math.floor(h) * 60 * 60 * 1000;
+  }
 
-    return DEFAULT_PROJECT_CACHE_TTL_MS;
+  return DEFAULT_PROJECT_CACHE_TTL_MS;
 }
 
 export interface CachedProject {
@@ -73,13 +73,13 @@ interface KvBridge {
 }
 
 function getKv(): KvBridge['kv'] | null {
-    const sdk = (window as unknown as { marco?: KvBridge }).marco;
+  const sdk = (window as unknown as { marco?: KvBridge }).marco;
 
-    return sdk && sdk.kv ? sdk.kv : null;
+  return sdk && sdk.kv ? sdk.kv : null;
 }
 
 function buildKey(workspaceId: string): string {
-    return KEY_PREFIX + workspaceId;
+  return KEY_PREFIX + workspaceId;
 }
 
 /**
@@ -90,27 +90,40 @@ function buildKey(workspaceId: string): string {
  * back to the network.
  */
 export async function readProjectListCache(workspaceId: string): Promise<ProjectListCacheRow | null> {
-    if (!workspaceId) return null;
-    const kv = getKv();
-    if (!kv) return null;
-    try {
-        const raw = await kv.get(buildKey(workspaceId));
-        if (!raw) return null;
-        const parsed = JSON.parse(raw) as Partial<ProjectListCacheRow>;
-        if (typeof parsed.ExpiresAt !== 'number' || !Array.isArray(parsed.Projects)) return null;
-        if (parsed.ExpiresAt <= Date.now()) {
-            log('ProjectsCache: expired for ws=' + workspaceId, 'info');
+  if (!workspaceId) {
+    return null;
+  }
 
-            return null;
-        }
-        log('ProjectsCache: hit for ws=' + workspaceId + ' (' + parsed.Projects.length + ' projects)', 'info');
+  const kv = getKv();
+  if (!kv) {
+    return null;
+  }
 
-        return parsed as ProjectListCacheRow;
-    } catch (err: unknown) {
-        logError('ProjectsCache.read', 'kv.get failed for ws=' + workspaceId, err);
-
-        return null;
+  try {
+    const raw = await kv.get(buildKey(workspaceId));
+    if (!raw) {
+      return null;
     }
+
+    const parsed = JSON.parse(raw) as Partial<ProjectListCacheRow>;
+    if (typeof parsed.ExpiresAt !== 'number' || !Array.isArray(parsed.Projects)) {
+      return null;
+    }
+
+    if (parsed.ExpiresAt <= Date.now()) {
+      log('ProjectsCache: expired for ws=' + workspaceId, 'info');
+
+      return null;
+    }
+
+    log('ProjectsCache: hit for ws=' + workspaceId + ' (' + parsed.Projects.length + ' projects)', 'info');
+
+    return parsed as ProjectListCacheRow;
+  } catch (err: unknown) {
+    logError('ProjectsCache.read', 'kv.get failed for ws=' + workspaceId, err);
+
+    return null;
+  }
 }
 
 /**
@@ -118,37 +131,47 @@ export async function readProjectListCache(workspaceId: string): Promise<Project
  * resolves immediately while the SQLite write happens in the background.
  */
 export function writeProjectListCache(
-    workspaceId: string,
-    projects: ReadonlyArray<CachedProject>,
-    ttlMs: number = DEFAULT_PROJECT_CACHE_TTL_MS,
+  workspaceId: string,
+  projects: ReadonlyArray<CachedProject>,
+  ttlMs: number = DEFAULT_PROJECT_CACHE_TTL_MS,
 ): void {
-    if (!workspaceId) return;
-    const kv = getKv();
-    if (!kv) {
-        logError('ProjectsCache.write', 'marco.kv unavailable — skipping SQLite upsert for ws=' + workspaceId);
+  if (!workspaceId) {
+    return;
+  }
 
-        return;
-    }
-    const now = Date.now();
-    const row: ProjectListCacheRow = {
-        WorkspaceId: workspaceId,
-        FetchedAt: new Date(now).toISOString(),
-        ExpiresAt: now + Math.max(0, ttlMs),
-        Projects: projects,
-    };
-    kv.set(buildKey(workspaceId), JSON.stringify(row)).then(function (): void {
-        log('ProjectsCache: wrote ws=' + workspaceId + ' (' + projects.length + ' projects, ttl=' + Math.round(ttlMs / 60000) + 'min)', 'info');
-    }).catch(function (caught: unknown): void {
-        logError('ProjectsCache.write', 'kv.set failed for ws=' + workspaceId, caught);
-    });
+  const kv = getKv();
+  if (!kv) {
+    logError('ProjectsCache.write', 'marco.kv unavailable — skipping SQLite upsert for ws=' + workspaceId);
+
+    return;
+  }
+
+  const now = Date.now();
+  const row: ProjectListCacheRow = {
+    WorkspaceId: workspaceId,
+    FetchedAt: new Date(now).toISOString(),
+    ExpiresAt: now + Math.max(0, ttlMs),
+    Projects: projects,
+  };
+  kv.set(buildKey(workspaceId), JSON.stringify(row)).then(function (): void {
+    log('ProjectsCache: wrote ws=' + workspaceId + ' (' + projects.length + ' projects, ttl=' + Math.round(ttlMs / 60000) + 'min)', 'info');
+  }).catch(function (caught: unknown): void {
+    logError('ProjectsCache.write', 'kv.set failed for ws=' + workspaceId, caught);
+  });
 }
 
 /** Drop a workspace's cache row (used by the Refresh button). */
 export function clearProjectListCache(workspaceId: string): void {
-    if (!workspaceId) return;
-    const kv = getKv();
-    if (!kv) return;
-    kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {
-        logError('ProjectsCache.clear', 'kv.delete failed for ws=' + workspaceId, caught);
-    });
+  if (!workspaceId) {
+    return;
+  }
+
+  const kv = getKv();
+  if (!kv) {
+    return;
+  }
+
+  kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {
+    logError('ProjectsCache.clear', 'kv.delete failed for ws=' + workspaceId, caught);
+  });
 }

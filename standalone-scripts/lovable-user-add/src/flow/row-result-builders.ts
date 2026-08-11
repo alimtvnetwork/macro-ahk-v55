@@ -25,10 +25,10 @@ export interface RowFailureInputs {
 }
 
 export const buildRowFailure = (inputs: RowFailureInputs): UserAddRowResult => ({
-    RowIndex: inputs.rowIndex, Outcome: inputs.outcome, IsDone: false, HasError: true,
-    LastError: inputs.error, DurationMs: Date.now() - inputs.startedAt,
-    StepBRan: inputs.stepBRan, StepASucceeded: inputs.stepASucceeded,
-    WorkspaceId: inputs.workspaceId, UserId: inputs.userId,
+  RowIndex: inputs.rowIndex, Outcome: inputs.outcome, IsDone: false, HasError: true,
+  LastError: inputs.error, DurationMs: Date.now() - inputs.startedAt,
+  StepBRan: inputs.stepBRan, StepASucceeded: inputs.stepASucceeded,
+  WorkspaceId: inputs.workspaceId, UserId: inputs.userId,
 });
 
 export interface RowSuccessInputs {
@@ -40,8 +40,8 @@ export interface RowSuccessInputs {
 }
 
 export const buildRowSuccess = (inputs: RowSuccessInputs): UserAddRowResult => ({
-    RowIndex: inputs.rowIndex, Outcome: UserAddRowOutcomeCodeType.Succeeded,
-    IsDone: true, HasError: false, LastError: null,
-    DurationMs: Date.now() - inputs.startedAt, StepBRan: inputs.stepBRan,
-    StepASucceeded: true, WorkspaceId: inputs.workspaceId, UserId: inputs.userId,
+  RowIndex: inputs.rowIndex, Outcome: UserAddRowOutcomeCodeType.Succeeded,
+  IsDone: true, HasError: false, LastError: null,
+  DurationMs: Date.now() - inputs.startedAt, StepBRan: inputs.stepBRan,
+  StepASucceeded: true, WorkspaceId: inputs.workspaceId, UserId: inputs.userId,
 });

@@ -143,6 +143,7 @@ export function SettingsView() {
         setLoading(false);
       }
     };
+
     void load();
   }, []);
 

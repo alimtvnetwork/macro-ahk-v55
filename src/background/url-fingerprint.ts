@@ -24,44 +24,44 @@ import { logBgError } from "@/background/bg-logger";
 
 /** Returns a stable fingerprint for URL dedup. */
 export function urlFingerprint(rawUrl: string): string {
-    try {
-        const parsed = new URL(rawUrl);
-        const sortedSearch = sortSearchParams(parsed.searchParams);
+  try {
+    const parsed = new URL(rawUrl);
+    const sortedSearch = sortSearchParams(parsed.searchParams);
 
-        return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
-    } catch (err) { 
-        return rawUrl;
-    }
+    return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
+  } catch (err) { 
+    return rawUrl;
+  }
 }
 
 /** Sorts URLSearchParams alphabetically and serializes back to a leading-`?` string (or empty). */
 function sortSearchParams(params: URLSearchParams): string {
-    const entries: Array<[string, string]> = [];
-    params.forEach((value, key) => {
-        entries.push([key, value]);
-    });
+  const entries: Array<[string, string]> = [];
+  params.forEach((value, key) => {
+    entries.push([key, value]);
+  });
 
-    const hasParams = entries.length > 0;
-    if (!hasParams) {
-        return "";
-    }
+  const hasParams = entries.length > 0;
+  if (!hasParams) {
+    return "";
+  }
 
-    entries.sort(compareEntries);
+  entries.sort(compareEntries);
 
-    const sorted = new URLSearchParams();
-    for (const [key, value] of entries) {
-        sorted.append(key, value);
-    }
+  const sorted = new URLSearchParams();
+  for (const [key, value] of entries) {
+    sorted.append(key, value);
+  }
 
-    return `?${sorted.toString()}`;
+  return `?${sorted.toString()}`;
 }
 
 /** Tuple comparator: key first, then value, both lexicographic. */
 function compareEntries(a: [string, string], b: [string, string]): number {
-    const keyDelta = a[0].localeCompare(b[0]);
-    if (keyDelta !== 0) {
-        return keyDelta;
-    }
+  const keyDelta = a[0].localeCompare(b[0]);
+  if (keyDelta !== 0) {
+    return keyDelta;
+  }
 
-    return a[1].localeCompare(b[1]);
+  return a[1].localeCompare(b[1]);
 }

@@ -16,61 +16,62 @@ let responsesQueue: QueuedResponse[] = [];
 const clearPromptCacheSpy = vi.fn(async () => { /* void */ });
 
 vi.mock('../extension-bridge', () => ({
-    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
+  }),
 }));
 vi.mock('../../ui/prompt-cache', () => ({
-    clearPromptCache: clearPromptCacheSpy,
+  clearPromptCache: clearPromptCacheSpy,
 }));
 vi.mock('../../error-utils', async () => {
-    const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+  const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
 
-    return { ...actual, logDiagnosticFromCode: vi.fn() };
+  return { ...actual, logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 
 import { migrateRemoveLegacyReadMemoryDuplicates, LEGACY_READ_MEMORY_SLUGS_FOR_TEST } from '../migrate-legacy-read-memory';
 
 beforeEach(() => {
-    captured.length = 0;
-    responsesQueue = [];
-    clearPromptCacheSpy.mockClear();
+  captured.length = 0;
+  responsesQueue = [];
+  clearPromptCacheSpy.mockClear();
 });
 
 describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
-    it('is a no-op when no legacy rows exist', async () => {
-        responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [{ c: 0 }] }];
-        await migrateRemoveLegacyReadMemoryDuplicates();
-        expect(captured).toHaveLength(1);
-        expect(captured[0]?.method).toBe('QUERY');
-        expect(clearPromptCacheSpy).not.toHaveBeenCalled();
-    });
+  it('is a no-op when no legacy rows exist', async () => {
+    responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [{ c: 0 }] }];
+    await migrateRemoveLegacyReadMemoryDuplicates();
+    expect(captured).toHaveLength(1);
+    expect(captured[0]?.method).toBe('QUERY');
+    expect(clearPromptCacheSpy).not.toHaveBeenCalled();
+  });
 
-    it('deletes legacy Prompt + PromptRevision rows and clears cache', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [{ c: 2 }] },
-            { ok: true, isFail: false, isSuccess: true },
-        ];
-        await migrateRemoveLegacyReadMemoryDuplicates();
-        expect(captured).toHaveLength(2);
-        expect(captured[1]?.method).toBe('SCHEMA');
-        const deleteSql = captured[1]?.sql ?? '';
-        expect(deleteSql).toContain('DELETE FROM PromptRevision');
-        expect(deleteSql).toContain('DELETE FROM Prompt');
-        for (const slug of LEGACY_READ_MEMORY_SLUGS_FOR_TEST) {
-            expect(deleteSql).toContain("'" + slug + "'");
-        }
-        expect(deleteSql).toContain("'read-memory-imported'");
-        expect(deleteSql).toContain("'read-memory-v2'");
-        expect(deleteSql).not.toContain("'read-memory-enhanced'");
-        expect(clearPromptCacheSpy).toHaveBeenCalledOnce();
-    });
+  it('deletes legacy Prompt + PromptRevision rows and clears cache', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [{ c: 2 }] },
+      { ok: true, isFail: false, isSuccess: true },
+    ];
+    await migrateRemoveLegacyReadMemoryDuplicates();
+    expect(captured).toHaveLength(2);
+    expect(captured[1]?.method).toBe('SCHEMA');
+    const deleteSql = captured[1]?.sql ?? '';
+    expect(deleteSql).toContain('DELETE FROM PromptRevision');
+    expect(deleteSql).toContain('DELETE FROM Prompt');
+    for (const slug of LEGACY_READ_MEMORY_SLUGS_FOR_TEST) {
+      expect(deleteSql).toContain("'" + slug + "'");
+    }
 
-    it('does not throw when the count query fails', async () => {
-        responsesQueue = [{ ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' }];
-        await expect(migrateRemoveLegacyReadMemoryDuplicates()).resolves.toBeUndefined();
-    });
+    expect(deleteSql).toContain("'read-memory-imported'");
+    expect(deleteSql).toContain("'read-memory-v2'");
+    expect(deleteSql).not.toContain("'read-memory-enhanced'");
+    expect(clearPromptCacheSpy).toHaveBeenCalledOnce();
+  });
+
+  it('does not throw when the count query fails', async () => {
+    responsesQueue = [{ ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' }];
+    await expect(migrateRemoveLegacyReadMemoryDuplicates()).resolves.toBeUndefined();
+  });
 });

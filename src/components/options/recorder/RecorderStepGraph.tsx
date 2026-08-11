@@ -12,18 +12,18 @@ import type { StepRow } from "@/hooks/use-recorder-project-data";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Trash2 } from "lucide-react";
 import {
-    buildExecutionNextPreview,
-    type ProjectSummary,
-    type StepLinks,
+  buildExecutionNextPreview,
+  type ProjectSummary,
+  type StepLinks,
 } from "@/background/recorder/execution-next-preview";
 import { ExecutionNextBadge } from "@/components/recorder/ExecutionNextBadge";
 
 const STEP_KIND_LABEL: Record<number, string> = {
-    1: "Click",
-    2: "Type",
-    3: "Select",
-    4: "JsInline",
-    5: "Wait",
+  1: "Click",
+  2: "Type",
+  3: "Select",
+  4: "JsInline",
+  5: "Wait",
 };
 
 interface Props {
@@ -38,75 +38,75 @@ interface Props {
 }
 
 export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, links, projects }: Props) {
-    const previewByStepId = useMemo(() => {
-        const list = buildExecutionNextPreview({
-            steps: steps.map((s) => ({
-                StepId: s.StepId,
-                OrderIndex: s.OrderIndex,
-                VariableName: s.VariableName,
-                LabelType: s.LabelType,
-            })),
-            links,
-            projects,
-        });
+  const previewByStepId = useMemo(() => {
+    const list = buildExecutionNextPreview({
+      steps: steps.map((s) => ({
+        StepId: s.StepId,
+        OrderIndex: s.OrderIndex,
+        VariableName: s.VariableName,
+        LabelType: s.LabelType,
+      })),
+      links,
+      projects,
+    });
 
-        return new Map(list.map((p) => [p.StepId, p]));
-    }, [steps, links, projects]);
+    return new Map(list.map((p) => [p.StepId, p]));
+  }, [steps, links, projects]);
 
-    if (steps.length === 0) {
-        return (
-            <div className="text-xs text-muted-foreground p-4 border border-dashed border-border rounded-md">
+  if (steps.length === 0) {
+    return (
+      <div className="text-xs text-muted-foreground p-4 border border-dashed border-border rounded-md">
                 No recorded steps yet. Use the recorder shortcut
                 (<kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">Ctrl/Cmd+Shift+R</kbd>)
                 to start capturing.
-            </div>
-        );
-    }
-
-    return (
-        <ol className="space-y-1">
-            {steps.map((step) => {
-                const isSelected = step.StepId === selectedStepId;
-                const preview = previewByStepId.get(step.StepId);
-
-                return (
-                    <li key={step.StepId}>
-                        <div
-                            className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs transition-colors ${
-                                isSelected
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border bg-card hover:bg-primary/5"
-                            }`}
-                        >
-                            <button
-                                type="button"
-                                onClick={() => onSelect(step.StepId)}
-                                className="flex-1 flex items-center gap-2 text-left"
-                            >
-                                <span className="font-mono text-[10px] text-muted-foreground w-6 shrink-0">
-                                    {step.OrderIndex}
-                                </span>
-                                <span className="font-mono text-primary shrink-0 w-16 truncate">
-                                    {STEP_KIND_LABEL[step.StepKindId] ?? `Kind${step.StepKindId}`}
-                                </span>
-                                <span className="font-medium truncate">{step.VariableName}</span>
-                                <span className="text-muted-foreground truncate">— {step.LabelType}</span>
-                                <ChevronRight className="h-3 w-3 ml-auto shrink-0 text-muted-foreground" />
-                            </button>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                                onClick={() => onDelete(step.StepId)}
-                                title="Delete step"
-                            >
-                                <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                        </div>
-                        {preview !== undefined && <ExecutionNextBadge preview={preview} />}
-                    </li>
-                );
-            })}
-        </ol>
+      </div>
     );
+  }
+
+  return (
+    <ol className="space-y-1">
+      {steps.map((step) => {
+        const isSelected = step.StepId === selectedStepId;
+        const preview = previewByStepId.get(step.StepId);
+
+        return (
+          <li key={step.StepId}>
+            <div
+              className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs transition-colors ${
+                isSelected
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-card hover:bg-primary/5"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => onSelect(step.StepId)}
+                className="flex-1 flex items-center gap-2 text-left"
+              >
+                <span className="font-mono text-[10px] text-muted-foreground w-6 shrink-0">
+                  {step.OrderIndex}
+                </span>
+                <span className="font-mono text-primary shrink-0 w-16 truncate">
+                  {STEP_KIND_LABEL[step.StepKindId] ?? `Kind${step.StepKindId}`}
+                </span>
+                <span className="font-medium truncate">{step.VariableName}</span>
+                <span className="text-muted-foreground truncate">— {step.LabelType}</span>
+                <ChevronRight className="h-3 w-3 ml-auto shrink-0 text-muted-foreground" />
+              </button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                onClick={() => onDelete(step.StepId)}
+                title="Delete step"
+              >
+                <Trash2 className="h-3 w-3 text-destructive" />
+              </Button>
+            </div>
+            {preview !== undefined && <ExecutionNextBadge preview={preview} />}
+          </li>
+        );
+      })}
+    </ol>
+  );
 }

@@ -44,8 +44,14 @@ export function readFilterState(filter: string, dataAttrActive: string): WsFilte
 }
 
 export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): boolean {
-  if (!currentName) return false;
-  if (ws.fullName === currentName || ws.name === currentName) return true;
+  if (!currentName) {
+    return false;
+  }
+
+  if (ws.fullName === currentName || ws.name === currentName) {
+    return true;
+  }
+
   const lcn = currentName.toLowerCase();
 
   return (ws.fullName || '').toLowerCase().indexOf(lcn) !== -1 ||
@@ -53,7 +59,9 @@ export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): bo
 }
 
 export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
-  if (!filter) return true;
+  if (!filter) {
+    return true;
+  }
 
   return ws.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
     ws.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
@@ -61,11 +69,22 @@ export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean 
 
 export function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
   const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
-  if (tier === WsTierValueType.FREE) return false;
+  if (tier === WsTierValueType.FREE) {
+    return false;
+  }
+
   const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
-  if (sub === 'canceled' || sub === 'cancelled') return false;
-  if (!isExpiredWs(ws)) return false;
-  if (resolveCreditSummary(ws).available <= EXPIRED_WITH_CREDITS_MIN) return false;
+  if (sub === 'canceled' || sub === 'cancelled') {
+    return false;
+  }
+
+  if (!isExpiredWs(ws)) {
+    return false;
+  }
+
+  if (resolveCreditSummary(ws).available <= EXPIRED_WITH_CREDITS_MIN) {
+    return false;
+  }
 
   return true;
 }
@@ -75,20 +94,45 @@ export function isProOnlySortMode(mode: WsFilterState['creditSortMode']): boolea
 }
 
 export function passesCreditFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
-  if (fs.minCredits > 0 && resolveCreditSummary(ws).available < fs.minCredits) return false;
-  if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) return false;
-  if (fs.expiring && !isExpiringWs(ws)) return false;
-  if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
-  if (isProOnlySortMode(fs.creditSortMode) && !isProExpiringWs(ws)) return false;
+  if (fs.minCredits > 0 && resolveCreditSummary(ws).available < fs.minCredits) {
+    return false;
+  }
+
+  if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) {
+    return false;
+  }
+
+  if (fs.expiring && !isExpiringWs(ws)) {
+    return false;
+  }
+
+  if (fs.refillSoon && !isRefillSoonWs(ws)) {
+    return false;
+  }
+
+  if (isProOnlySortMode(fs.creditSortMode) && !isProExpiringWs(ws)) {
+    return false;
+  }
 
   return true;
 }
 
 export function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
-  if (!matchesTextFilter(ws, fs.filter || '')) return false;
-  if (fs.freeOnly && (ws.dailyFree || 0) <= 0) return false;
-  if (fs.rolloverOnly && (ws.rollover || 0) <= 0) return false;
-  if (fs.billingOnly && resolveCreditSummary(ws).billingAvailable <= 0) return false;
+  if (!matchesTextFilter(ws, fs.filter || '')) {
+    return false;
+  }
+
+  if (fs.freeOnly && (ws.dailyFree || 0) <= 0) {
+    return false;
+  }
+
+  if (fs.rolloverOnly && (ws.rollover || 0) <= 0) {
+    return false;
+  }
+
+  if (fs.billingOnly && resolveCreditSummary(ws).billingAvailable <= 0) {
+    return false;
+  }
 
   return passesCreditFilters(ws, fs);
 }

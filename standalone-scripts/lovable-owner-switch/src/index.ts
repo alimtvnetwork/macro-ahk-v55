@@ -19,9 +19,9 @@ export type { OwnerSwitchCsvRow, OwnerSwitchCsvParseResult } from "./csv";
 export { mountPopup } from "./ui";
 export { runLogin, LoginStepCodeType, runPromote, PromoteStepCodeType, TtlCache } from "./flow";
 export type {
-    LoginFlowOptions,
-    LoginRunResult,
-    PromoteRowRequest,
-    PromoteRowResult,
-    PromoteCaches,
+  LoginFlowOptions,
+  LoginRunResult,
+  PromoteRowRequest,
+  PromoteRowResult,
+  PromoteCaches,
 } from "./flow";

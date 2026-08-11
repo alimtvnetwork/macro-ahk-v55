@@ -45,8 +45,11 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
   for (const row of defaults) {
     const entry = await repairSingleOrphan(row);
     entries.push(entry);
-    if (entry.outcome === 'adopted') adopted += 1;
-    else if (entry.outcome === 'failed-upsert' || entry.outcome === 'skipped-lookup-failed') failures += 1;
+    if (entry.outcome === 'adopted') {
+      adopted += 1;
+    } else if (entry.outcome === 'failed-upsert' || entry.outcome === 'skipped-lookup-failed') {
+      failures += 1;
+    }
   }
 
   return { inspected: defaults.length, adopted, failures, entries };
@@ -62,9 +65,16 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
 
     return { slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role, outcome: 'skipped-lookup-failed', reason: lookup.error ?? 'lookup failed' };
   }
+
   const existing = lookup.value;
-  if (!existing) return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
-  if (existing.Role === seedRow.role) return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'skipped-role-ok' };
+  if (!existing) {
+    return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
+  }
+
+  if (existing.Role === seedRow.role) {
+    return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'skipped-role-ok' };
+  }
+
   const saved = await upsertPrompt({
     id: existing.Id, slug: seedRow.slug, name: existing.Name || seedRow.name,
     body: existing.Body || seedRow.body, role: seedRow.role, previousBody: existing.Body,

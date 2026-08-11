@@ -84,7 +84,10 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
     padding:8px;background:${cPrimary};color:white;border:none;
     border-radius:4px;cursor:pointer;font-weight:bold;
   `;
-  exportBtn.onclick = () => { void exportPromptsToJson(); };
+  exportBtn.onclick = () => {
+    void exportPromptsToJson(); 
+  };
+
   body.appendChild(exportBtn);
 
   // LLM Authoring Guide download (v4.49.0)
@@ -105,6 +108,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
       showToast('Guide download failed', 'error');
     }
   };
+
   body.appendChild(guideBtn);
 
   // Hidden file input — accepts JSON, Markdown, SQLite, ZIP (v4.49.0)
@@ -114,9 +118,13 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   fileInput.style.display = 'none';
   fileInput.onchange = () => {
     const file = fileInput.files?.[0];
-    if (file) void _handleFile(file, overwriteCheck.checked);
+    if (file) {
+      void _handleFile(file, overwriteCheck.checked);
+    }
+
     fileInput.value = '';
   };
+
   body.appendChild(fileInput);
 
   // Drop Zone (clickable)
@@ -140,6 +148,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
       ? `border-color:${cPrimaryLighter};background:rgba(124,58,237,0.15);color:${cPrimaryLighter};`
       : '');
   }
+
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     setActive(true);
@@ -149,7 +158,9 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
     e.preventDefault();
     setActive(false);
     const file = e.dataTransfer?.files?.[0];
-    if (file) void _handleFile(file, overwriteCheck.checked);
+    if (file) {
+      void _handleFile(file, overwriteCheck.checked);
+    }
   });
   body.appendChild(dropZone);
 
@@ -160,8 +171,14 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   const clearBtn = document.createElement('button');
   clearBtn.textContent = '🗑 Clear All Prompts';
   clearBtn.style.cssText = 'background:transparent;border:none;color:#ef4444;font-size:10px;cursor:pointer;padding:4px 8px;border-radius:4px;opacity:0.7;';
-  clearBtn.onmouseenter = () => { clearBtn.style.opacity = '1'; clearBtn.style.background = 'rgba(239,68,68,0.1)'; };
-  clearBtn.onmouseleave = () => { clearBtn.style.opacity = '0.7'; clearBtn.style.background = 'transparent'; };
+  clearBtn.onmouseenter = () => {
+    clearBtn.style.opacity = '1'; clearBtn.style.background = 'rgba(239,68,68,0.1)'; 
+  };
+
+  clearBtn.onmouseleave = () => {
+    clearBtn.style.opacity = '0.7'; clearBtn.style.background = 'transparent'; 
+  };
+
   clearBtn.onclick = async () => {
     if (confirm('DANGEROUS: This will delete ALL custom prompts from your local cache. Are you sure?')) {
       await performClearAllPrompts();
@@ -169,6 +186,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
       rerenderPromptsDropdown();
     }
   };
+
   footer.appendChild(clearBtn);
   body.appendChild(footer);
 
@@ -186,13 +204,18 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     if (errors.length > 0) {
       log('[PromptIO] Import validation issues: ' + errors.join('; '), 'warn');
     }
+
     if (valid.length === 0) {
       showToast('No valid prompts in file', 'error');
 
       return;
     }
+
     const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite };
-    if (parsed.promptOrder && parsed.promptOrder.length > 0) importOpts.promptOrder = parsed.promptOrder;
+    if (parsed.promptOrder && parsed.promptOrder.length > 0) {
+      importOpts.promptOrder = parsed.promptOrder;
+    }
+
     const results = await performPromptImport(valid, importOpts);
     const errCount = results.errors ? results.errors.length : 0;
     if (errCount > 0) {
@@ -208,6 +231,7 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     } else {
       showToast('Imported ' + results.total + ' prompts (' + results.added + ' added, ' + results.updated + ' updated)', 'success');
     }
+
     rerenderPromptsDropdown();
   } catch (err) {
     log('[PromptIO] Import failed: ' + String(err), 'error');
@@ -217,7 +241,9 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
 
 export function removePromptIODialog(): void {
   const existing = document.getElementById('ahk-loop-prompt-io-dialog');
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 }
 
 function _makeDraggable(panel: HTMLElement, handle: HTMLElement): void {
@@ -233,16 +259,24 @@ function _makeDraggable(panel: HTMLElement, handle: HTMLElement): void {
   });
 
   function onMove(e: MouseEvent): void {
-    if (!isDragging) return;
+    if (!isDragging) {
+      return;
+    }
+
     panel.style.left = (e.clientX - dragOffX) + 'px';
     panel.style.top = (e.clientY - dragOffY) + 'px';
     panel.style.right = 'auto';
   }
+
   function onUp(): void {
-    if (!isDragging) return;
+    if (!isDragging) {
+      return;
+    }
+
     isDragging = false;
     handle.style.cursor = 'grab';
   }
+
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
 }

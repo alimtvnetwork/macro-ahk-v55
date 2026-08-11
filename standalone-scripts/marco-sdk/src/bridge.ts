@@ -16,52 +16,58 @@ const pendingRequests = new Map<string, { resolve: (v: unknown) => void; reject:
  * Returns a Promise that resolves when the background responds.
  */
 export function sendMessage<T = unknown>(type: string, payload?: Record<string, unknown>): Promise<T> {
-    const requestId = `${SDK_SOURCE}-${++requestCounter}-${Date.now()}`;
+  const requestId = `${SDK_SOURCE}-${++requestCounter}-${Date.now()}`;
 
-    return new Promise<T>((resolve, reject) => {
-        pendingRequests.set(requestId, { resolve: resolve as (v: unknown) => void, reject });
+  return new Promise<T>((resolve, reject) => {
+    pendingRequests.set(requestId, { resolve: resolve as (v: unknown) => void, reject });
 
-        window.postMessage(
-            {
-                source: SDK_SOURCE,
-                type,
-                requestId,
-                payload: payload ?? {},
-            },
-            "*",
-        );
+    window.postMessage(
+      {
+        source: SDK_SOURCE,
+        type,
+        requestId,
+        payload: payload ?? {},
+      },
+      "*",
+    );
 
-        // Timeout after 15s
-        setTimeout(() => {
-            if (pendingRequests.has(requestId)) {
-                pendingRequests.delete(requestId);
-                reject(new Error(`[marco-sdk] Timeout waiting for ${type}`));
-            }
-        }, 15_000);
-    });
+    // Timeout after 15s
+    setTimeout(() => {
+      if (pendingRequests.has(requestId)) {
+        pendingRequests.delete(requestId);
+        reject(new Error(`[marco-sdk] Timeout waiting for ${type}`));
+      }
+    }, 15_000);
+  });
 }
 
 /**
  * Listen for responses from the content script relay.
  */
 function initResponseListener(): void {
-    window.addEventListener("message", (event) => {
-        if (event.source !== window) return;
+  window.addEventListener("message", (event) => {
+    if (event.source !== window) {
+      return;
+    }
 
-        const data = event.data;
-        if (!data || data.source !== `${SDK_SOURCE}-response`) return;
+    const data = event.data;
+    if (!data || data.source !== `${SDK_SOURCE}-response`) {
+      return;
+    }
 
-        const pending = pendingRequests.get(data.requestId);
-        if (!pending) return;
+    const pending = pendingRequests.get(data.requestId);
+    if (!pending) {
+      return;
+    }
 
-        pendingRequests.delete(data.requestId);
+    pendingRequests.delete(data.requestId);
 
-        if (data.error) {
-            pending.reject(new Error(data.error));
-        } else {
-            pending.resolve(data.result);
-        }
-    });
+    if (data.error) {
+      pending.reject(new Error(data.error));
+    } else {
+      pending.resolve(data.result);
+    }
+  });
 }
 
 // Initialize listener immediately

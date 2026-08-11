@@ -44,9 +44,9 @@ vi.mock('../xpath-utils', () => ({
 // Return `undefined` so the code path exercises the hardcoded fallback,
 // preserving the pre-existing PasteOutcome behaviour these tests assert.
 vi.mock('../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   getDefaultPromptForRole: async () => (new DbResult(true, undefined)),
 }));
 

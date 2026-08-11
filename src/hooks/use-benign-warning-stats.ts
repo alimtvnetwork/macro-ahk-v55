@@ -37,44 +37,45 @@ const EMPTY_TALLY: BenignWarningTally = { total: 0, matched: [] };
  * stay aligned with what the activity timeline currently filters out.
  */
 export function useBenignWarningStats(bumpKey: number, limit = 500): BenignWarningTally {
-    const [tally, setTally] = useState<BenignWarningTally>(EMPTY_TALLY);
+  const [tally, setTally] = useState<BenignWarningTally>(EMPTY_TALLY);
 
-    useEffect(() => {
-        let cancelled = false;
-        const run = async (): Promise<void> => {
-            try {
-                const [logRes, errRes] = await Promise.all([
-                    sendMessage<{ logs: RawLog[] }>({ type: "GET_RECENT_LOGS", limit }),
-                    sendMessage<{ errors: RawError[] }>({ type: "GET_ACTIVE_ERRORS" }),
-                ]);
-                const merged = [
-                    ...(logRes.logs ?? []).map((l) => ({
-                        level: (l.level ?? "info").toLowerCase() === "warning" ? "warn" : (l.level ?? "info").toLowerCase(),
-                        message: l.message ?? l.detail ?? l.action ?? "",
-                        detail: l.detail,
-                    })),
-                    ...(errRes.errors ?? []).map((e) => ({
-                        level: (e.level ?? "info").toLowerCase() === "warning" ? "warn" : (e.level ?? "info").toLowerCase(),
-                        message: e.message ?? "",
-                    })),
-                ];
-                if (cancelled === false) {
-                    setTally(tallyBenignWarnings(merged));
-                }
-            } catch (err) {
-                // Preview / SW-unavailable — leave tally empty so the report
-                // simply omits the section.
-                if (cancelled === false) {
-                    setTally(EMPTY_TALLY);
-                }
-            }
-        };
-        void run();
+  useEffect(() => {
+    let cancelled = false;
+    const run = async (): Promise<void> => {
+      try {
+        const [logRes, errRes] = await Promise.all([
+          sendMessage<{ logs: RawLog[] }>({ type: "GET_RECENT_LOGS", limit }),
+          sendMessage<{ errors: RawError[] }>({ type: "GET_ACTIVE_ERRORS" }),
+        ]);
+        const merged = [
+          ...(logRes.logs ?? []).map((l) => ({
+            level: (l.level ?? "info").toLowerCase() === "warning" ? "warn" : (l.level ?? "info").toLowerCase(),
+            message: l.message ?? l.detail ?? l.action ?? "",
+            detail: l.detail,
+          })),
+          ...(errRes.errors ?? []).map((e) => ({
+            level: (e.level ?? "info").toLowerCase() === "warning" ? "warn" : (e.level ?? "info").toLowerCase(),
+            message: e.message ?? "",
+          })),
+        ];
+        if (cancelled === false) {
+          setTally(tallyBenignWarnings(merged));
+        }
+      } catch (err) {
+        // Preview / SW-unavailable — leave tally empty so the report
+        // simply omits the section.
+        if (cancelled === false) {
+          setTally(EMPTY_TALLY);
+        }
+      }
+    };
 
-        return () => {
-            cancelled = true;
-        };
-    }, [bumpKey, limit]);
+    void run();
 
-    return tally;
+    return () => {
+      cancelled = true;
+    };
+  }, [bumpKey, limit]);
+
+  return tally;
 }

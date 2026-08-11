@@ -22,61 +22,75 @@ const FALLBACK_NAME = "Element";
 
 /** Resolves the raw label text for an element, or null when none is found. */
 export function resolveLabelText(element: Element): string | null {
-    const fromForLabel = readForLabel(element);
-    if (fromForLabel !== null) return fromForLabel;
+  const fromForLabel = readForLabel(element);
+  if (fromForLabel !== null) {
+    return fromForLabel;
+  }
 
-    const fromWrapLabel = readWrappingLabel(element);
-    if (fromWrapLabel !== null) return fromWrapLabel;
+  const fromWrapLabel = readWrappingLabel(element);
+  if (fromWrapLabel !== null) {
+    return fromWrapLabel;
+  }
 
-    const aria = element.getAttribute("aria-label");
-    if (aria !== null && aria.trim() !== "") return aria;
+  const aria = element.getAttribute("aria-label");
+  if (aria !== null && aria.trim() !== "") {
+    return aria;
+  }
 
-    const placeholder = element.getAttribute("placeholder");
-    if (placeholder !== null && placeholder.trim() !== "") return placeholder;
+  const placeholder = element.getAttribute("placeholder");
+  if (placeholder !== null && placeholder.trim() !== "") {
+    return placeholder;
+  }
 
-    const id = element.getAttribute("id");
-    if (id !== null && id.trim() !== "") return id;
+  const id = element.getAttribute("id");
+  if (id !== null && id.trim() !== "") {
+    return id;
+  }
 
-    return null;
+  return null;
 }
 
 function readForLabel(element: Element): string | null {
-    const id = element.getAttribute("id");
-    const hasId = id !== null && id !== "";
+  const id = element.getAttribute("id");
+  const hasId = id !== null && id !== "";
 
-    if (hasId === false) return null;
+  if (hasId === false) {
+    return null;
+  }
 
-    const label = element.ownerDocument.querySelector(`label[for="${id}"]`);
-    const text = label?.textContent?.trim() ?? "";
+  const label = element.ownerDocument.querySelector(`label[for="${id}"]`);
+  const text = label?.textContent?.trim() ?? "";
 
-    return text === "" ? null : text;
+  return text === "" ? null : text;
 }
 
 function readWrappingLabel(element: Element): string | null {
-    const label = element.closest("label");
-    const text = label?.textContent?.trim() ?? "";
+  const label = element.closest("label");
+  const text = label?.textContent?.trim() ?? "";
 
-    return text === "" ? null : text;
+  return text === "" ? null : text;
 }
 
 /** Converts an arbitrary string to PascalCase ASCII (letters + digits). */
 export function toPascalCase(raw: string): string {
-    const cleaned = raw.replace(/[^a-zA-Z0-9]+/g, " ").trim();
+  const cleaned = raw.replace(/[^a-zA-Z0-9]+/g, " ").trim();
 
-    if (cleaned === "") return FALLBACK_NAME;
+  if (cleaned === "") {
+    return FALLBACK_NAME;
+  }
 
-    const words = cleaned.split(/\s+/);
-    const joined = words.map(capitaliseWord).join("");
-    const startsWithDigit = /^[0-9]/.test(joined);
+  const words = cleaned.split(/\s+/);
+  const joined = words.map(capitaliseWord).join("");
+  const startsWithDigit = /^[0-9]/.test(joined);
 
-    return startsWithDigit ? FALLBACK_NAME + joined : joined;
+  return startsWithDigit ? FALLBACK_NAME + joined : joined;
 }
 
 function capitaliseWord(word: string): string {
-    const first = word.charAt(0).toUpperCase();
-    const rest = word.slice(1).toLowerCase();
+  const first = word.charAt(0).toUpperCase();
+  const rest = word.slice(1).toLowerCase();
 
-    return first + rest;
+  return first + rest;
 }
 
 /**
@@ -94,15 +108,17 @@ const labelCache: WeakMap<Element, string> = new WeakMap();
 
 /** End-to-end: element → suggested PascalCase variable name (cached). */
 export function suggestVariableName(element: Element): string {
-    const cached = labelCache.get(element);
-    if (cached !== undefined) return cached;
+  const cached = labelCache.get(element);
+  if (cached !== undefined) {
+    return cached;
+  }
 
-    const raw = resolveLabelText(element);
-    const tagFallback = element.tagName.toLowerCase();
-    const source = raw ?? tagFallback;
-    const result = toPascalCase(source);
+  const raw = resolveLabelText(element);
+  const tagFallback = element.tagName.toLowerCase();
+  const source = raw ?? tagFallback;
+  const result = toPascalCase(source);
 
-    labelCache.set(element, result);
+  labelCache.set(element, result);
 
-    return result;
+  return result;
 }

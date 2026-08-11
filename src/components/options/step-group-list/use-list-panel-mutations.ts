@@ -15,11 +15,11 @@ import { useStepGroupBatchActions } from "@/hooks/use-step-group-batch-actions";
 import type { BatchRenameChange } from "../BatchRenameDialog";
 import { applyBatchRenameWithToast, runBatchDelete } from "./batch-handlers";
 import {
-    makeSubmitCreate,
-    makeSubmitDelete,
-    makeSubmitRename,
-    useDialogStates,
-    useValidationErrors,
+  makeSubmitCreate,
+  makeSubmitDelete,
+  makeSubmitRename,
+  useDialogStates,
+  useValidationErrors,
 } from "./list-panel-mutation-helpers";
 
 export interface CreateDialogState { readonly open: boolean; readonly name: string; }
@@ -53,24 +53,24 @@ export interface UseListPanelMutationsApi {
 }
 
 export function useListPanelMutations(input: UseListPanelMutationsInput): UseListPanelMutationsApi {
-    const { lib, activeGroupId, setActiveGroupId, setSelected } = input;
-    const dialogs = useDialogStates();
-    const { createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog } = dialogs;
-    const { createError, renameError } = useValidationErrors(lib, createDialog.name, renameDialog.group, renameDialog.name);
-    const deps = { lib, activeGroupId, setActiveGroupId };
-    const submitCreate = makeSubmitCreate(deps, createDialog, createError, setCreateDialog);
-    const submitRename = makeSubmitRename(deps, renameDialog, renameError, setRenameDialog);
-    const submitDelete = makeSubmitDelete(deps, deleteDialog, setDeleteDialog);
-    const batchActions = useStepGroupBatchActions(lib);
+  const { lib, activeGroupId, setActiveGroupId, setSelected } = input;
+  const dialogs = useDialogStates();
+  const { createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog } = dialogs;
+  const { createError, renameError } = useValidationErrors(lib, createDialog.name, renameDialog.group, renameDialog.name);
+  const deps = { lib, activeGroupId, setActiveGroupId };
+  const submitCreate = makeSubmitCreate(deps, createDialog, createError, setCreateDialog);
+  const submitRename = makeSubmitRename(deps, renameDialog, renameError, setRenameDialog);
+  const submitDelete = makeSubmitDelete(deps, deleteDialog, setDeleteDialog);
+  const batchActions = useStepGroupBatchActions(lib);
 
-    return {
-        createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog,
-        createError, renameError,
-        openCreate: () => setCreateDialog({ open: true, name: "" }),
-        openRename: (g) => setRenameDialog({ open: true, group: g, name: g.Name }),
-        openDelete: (g) => setDeleteDialog({ open: true, group: g }),
-        submitCreate, submitRename, submitDelete,
-        handleBatchRenameApply: (changes) => applyBatchRenameWithToast(batchActions, changes),
-        handleBatchDeleteConfirm: (ids) => runBatchDelete({ ids, lib, activeGroupId, setActiveGroupId, setSelected }),
-    };
+  return {
+    createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog,
+    createError, renameError,
+    openCreate: () => setCreateDialog({ open: true, name: "" }),
+    openRename: (g) => setRenameDialog({ open: true, group: g, name: g.Name }),
+    openDelete: (g) => setDeleteDialog({ open: true, group: g }),
+    submitCreate, submitRename, submitDelete,
+    handleBatchRenameApply: (changes) => applyBatchRenameWithToast(batchActions, changes),
+    handleBatchDeleteConfirm: (ids) => runBatchDelete({ ids, lib, activeGroupId, setActiveGroupId, setSelected }),
+  };
 }

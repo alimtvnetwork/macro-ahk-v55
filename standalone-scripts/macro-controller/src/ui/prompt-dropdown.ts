@@ -85,6 +85,7 @@ function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLEl
 
       return;
     }
+
     if (subRect.top < dropRect.top) {
       promptsDropdown.scrollTop -= Math.ceil(dropRect.top - subRect.top + PAD);
     }
@@ -178,7 +179,10 @@ let _memHydrated = false;
 let _currentSearchQuery = '';
 
 function _hydrateMemSnapshotOnce(): void {
-  if (_memHydrated) return;
+  if (_memHydrated) {
+    return;
+  }
+
   _memHydrated = true;
   readUISnapshot().then(function(snapshot) {
     if (snapshot && !_memSnapshot) {
@@ -283,9 +287,14 @@ export function isHiddenBySlug(entry: { slug?: string; parentSlug?: string; id?:
   const parentSlug = (entry.parentSlug || '').toLowerCase();
   const id = (entry.id || '').toLowerCase();
   const name = (entry.name || '').toLowerCase();
-  if (HIDDEN_EXACT_SLUGS.includes(slug) || HIDDEN_EXACT_SLUGS.includes(parentSlug)) return true;
+  if (HIDDEN_EXACT_SLUGS.includes(slug) || HIDDEN_EXACT_SLUGS.includes(parentSlug)) {
+    return true;
+  }
+
   for (const frag of HIDDEN_SLUG_FRAGMENTS) {
-    if (slug.includes(frag) || parentSlug.includes(frag) || id.includes(frag) || name.includes(frag)) return true;
+    if (slug.includes(frag) || parentSlug.includes(frag) || id.includes(frag) || name.includes(frag)) {
+      return true;
+    }
   }
 
   return false;
@@ -356,10 +365,16 @@ function _appendHeaderAndSubmenu(
   taskNextDeps: TaskNextDeps,
 ): void {
   // Mark dropdown so the Tasks toggle can find the group from any descendant click.
-  if (!container.hasAttribute('data-prompts-dropdown')) container.setAttribute('data-prompts-dropdown', '1');
+  if (!container.hasAttribute('data-prompts-dropdown')) {
+    container.setAttribute('data-prompts-dropdown', '1');
+  }
+
   const isMissingPosition = !container.style.position;
   // Ensure the container can host an absolutely-positioned right-anchored Tasks panel.
-  if (isMissingPosition) container.style.position = 'relative';
+  if (isMissingPosition) {
+    container.style.position = 'relative';
+  }
+
   container.appendChild(buildDropdownHeader(ctx, taskNextDeps, () => renderPromptsDropdown(ctx, taskNextDeps)));
 
   // v4.x: PlanTierType Task submenu removed from this dropdown — it lives elsewhere
@@ -411,6 +426,7 @@ function _appendFilteredItems(
     for (const [idx, p] of favorites.entries()) {
       container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
     }
+
     const sep = document.createElement('div');
     sep.style.cssText = 'height:1px;background:rgba(124,58,237,0.2);margin:4px 0;';
     container.appendChild(sep);
@@ -517,7 +533,10 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
 /** Re-attach the Load button handler in the dropdown header. */
 function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const header = container.firstElementChild as HTMLElement;
-  if (!header) return;
+  if (!header) {
+    return;
+  }
+
   const oldLoadBtn = header.querySelector('span[title="Reload prompts from database"]') as HTMLElement | null;
   if (oldLoadBtn) {
     // Rebuild the whole header (5 pills) rather than reach into the extracted
@@ -539,7 +558,9 @@ function _rebindTaskNextSubmenu(container: HTMLElement, ctx: PromptContext, task
 /** Remove stale Task Next sub-menus from DOM. */
 function _cleanupTaskNextSubs(): void {
   const subs = document.querySelectorAll('[data-task-next-sub]');
-  subs.forEach(function(el) { el.remove(); });
+  subs.forEach(function(el) {
+    el.remove(); 
+  });
 }
 
 /** Rebuild the inline Filter menu in the dropdown after snapshot restore. */
@@ -587,8 +608,13 @@ function _rebindPromptItems(
   const bySlug = new Map<string, LoaderPromptEntry>();
   const byId = new Map<string, LoaderPromptEntry>();
   filtered.forEach(entry => {
-    if (entry.slug) bySlug.set(entry.slug, entry);
-    if (entry.id) byId.set(String(entry.id), entry);
+    if (entry.slug) {
+      bySlug.set(entry.slug, entry);
+    }
+
+    if (entry.id) {
+      byId.set(String(entry.id), entry);
+    }
   });
 
   for (let i = 0; i < items.length; i++) {
@@ -601,7 +627,10 @@ function _rebindPromptItems(
       || (id && byId.get(id))
       || (idxAttr !== null ? filtered[parseInt(idxAttr, 10)] : undefined)
       || filtered[i];
-    if (!resolved) continue;
+    if (!resolved) {
+      continue;
+    }
+
     _bindSinglePromptItem(dom, resolved, container, promptsCfg, ctx, taskNextDeps);
   }
 }
@@ -616,17 +645,29 @@ function _bindSinglePromptItem(
   item: HTMLElement, p: PromptEntry, container: HTMLElement,
   promptsCfg: ReturnType<typeof getPromptsConfig>, ctx: PromptContext, taskNextDeps: TaskNextDeps,
 ): void {
-  item.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-  item.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
-  if (!p.text) return;
+  item.onmouseover = function() {
+    (this as HTMLElement).style.background = cBtnMenuHover; 
+  };
+
+  item.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
+  if (!p.text) {
+    return;
+  }
 
   const actionsSpan = (item.querySelector('[data-prompt-actions]') as HTMLElement)
     || (item.querySelector('span:last-child') as HTMLElement);
   item.onclick = function(e: Event) {
-    if (actionsSpan && actionsSpan.contains(e.target as Node)) return;
+    if (actionsSpan && actionsSpan.contains(e.target as Node)) {
+      return;
+    }
+
     pasteIntoEditor(p.text, promptsCfg, getByXPathAsElement);
     container.style.display = 'none';
   };
+
   if (actionsSpan) {
     _rebindActionIcons(actionsSpan, p, container, ctx, taskNextDeps);
   }
@@ -635,9 +676,18 @@ function _bindSinglePromptItem(
 /** Re-attach the Add New Prompt button handler. */
 function _rebindAddButton(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const lastChild = container.lastElementChild as HTMLElement;
-  if (!lastChild || !lastChild.textContent?.includes('Add New Prompt')) return;
-  lastChild.onmouseover = function() { (this as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; };
-  lastChild.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  if (!lastChild || !lastChild.textContent?.includes('Add New Prompt')) {
+    return;
+  }
+
+  lastChild.onmouseover = function() {
+    (this as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; 
+  };
+
+  lastChild.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   lastChild.onclick = function(e: Event) {
     e.stopPropagation();
     container.style.display = 'none';
@@ -655,8 +705,14 @@ function _rebindActionIcons(
   const icons = actionsSpan.querySelectorAll('span');
   for (const icon of icons) {
     const el = icon as HTMLElement;
-    el.onmouseover = function() { (this as HTMLElement).style.opacity = '1'; };
-    el.onmouseout = function() { (this as HTMLElement).style.opacity = el.style.opacity; };
+    el.onmouseover = function() {
+      (this as HTMLElement).style.opacity = '1'; 
+    };
+
+    el.onmouseout = function() {
+      (this as HTMLElement).style.opacity = el.style.opacity; 
+    };
+
     if (el.title === 'Edit prompt') {
       el.onclick = function(e: Event) {
         e.stopPropagation();
@@ -666,12 +722,17 @@ function _rebindActionIcons(
     } else if (el.title === 'Delete prompt') {
       el.onclick = function(e: Event) {
         e.stopPropagation();
-        if (!confirm('Delete prompt "' + p.name + '"?')) return;
+        if (!confirm('Delete prompt "' + p.name + '"?')) {
+          return;
+        }
+
         sendToExtension('DELETE_PROMPT', { promptId: p.id }).then(function(resp: Record<string, unknown>) {
           if (resp && resp.ok) {
             clearLoadedPrompts();
             clearUISnapshot();
-            loadPromptsFromJson().then(function() { renderPromptsDropdown(ctx, taskNextDeps); });
+            loadPromptsFromJson().then(function() {
+              renderPromptsDropdown(ctx, taskNextDeps); 
+            });
           }
         });
       };
@@ -680,7 +741,9 @@ function _rebindActionIcons(
         e.stopPropagation();
         navigator.clipboard.writeText(p.text).then(function() {
           el.textContent = '✅';
-          setTimeout(function() { el.textContent = '📋'; }, 1500);
+          setTimeout(function() {
+            el.textContent = '📋'; 
+          }, 1500);
         });
       };
     }
@@ -712,11 +775,17 @@ function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDe
  */
 function normalizeCategory(raw: string | undefined): string {
   const cat = (raw || '').trim().toLowerCase();
-  if (!cat) return '';
+  if (!cat) {
+    return '';
+  }
+
   if (cat.includes('audit') || cat.includes('spec') || cat.includes('proofread') || cat.includes('true feed') || cat.includes('true-feed')) {
     return 'audit';
   }
-  if (cat.includes('bump') || cat.includes('release')) return 'release';
+
+  if (cat.includes('bump') || cat.includes('release')) {
+    return 'release';
+  }
 
   return cat;
 }
@@ -811,11 +880,13 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement, taskNextDeps: Tas
     taskNextSub.style.display = 'block';
     anchorTaskNextSub(taskNextRow, taskNextSub, promptsDropdown);
   };
+
   const hideSub = function(): void {
     taskNextRow.style.background = 'transparent';
     taskNextArrow.textContent = '▸';
     taskNextSub.style.display = 'none';
   };
+
   taskNextRow.onmouseover = showSub;
   // Split-button pattern: clicking the label area pastes the Next Tasks prompt
   // once (count=1) and closes the dropdown — matches user expectation that
@@ -829,14 +900,22 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement, taskNextDeps: Tas
     hideSub();
     runTaskNextLoop(taskNextDeps, 1);
   };
+
   taskNextArrow.style.cursor = 'pointer';
   taskNextArrow.onclick = function(e: Event) {
     e.stopPropagation();
-    if (taskNextSub.style.display === 'none') showSub(); else hideSub();
+    if (taskNextSub.style.display === 'none') {
+      showSub();
+    } else {
+      hideSub();
+    }
   };
+
   taskNextItem.onmouseout = function() {
     setTimeout(function() {
-      if (!taskNextItem.matches(':hover')) hideSub();
+      if (!taskNextItem.matches(':hover')) {
+        hideSub();
+      }
     }, Timings.POLL_INTERVAL_FAST);
   };
 
@@ -865,10 +944,12 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
 
         return;
       }
+
       const projectName = getDisplayProjectName();
       for (let i = 0; i < count; i++) {
         await addTaskToQueue(substituteTaskNextPromptText(prompt, 1), projectName);
       }
+
       showPasteToast(`✅ Queued ${count} tasks`, false);
       const queueList = document.getElementById('task-queue-list');
       if (queueList) {
@@ -876,18 +957,28 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
         queueList.dispatchEvent(new CustomEvent('refresh-queue'));
       }
     };
+
     subItem.appendChild(queueBtn);
 
-    subItem.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; queueBtn.style.opacity = '1'; };
-    subItem.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; queueBtn.style.opacity = '0.6'; };
+    subItem.onmouseover = function() {
+      (this as HTMLElement).style.background = cBtnMenuHover; queueBtn.style.opacity = '1'; 
+    };
+
+    subItem.onmouseout = function() {
+      (this as HTMLElement).style.background = 'transparent'; queueBtn.style.opacity = '0.6'; 
+    };
     
     label.onclick = function(e: Event) {
       e.stopPropagation();
       promptsDropdown.style.display = 'none';
       taskNextSub.style.display = 'none';
-      if (count <= 1) runTaskNextLoop(taskNextDeps, count);
-      else void runTaskNextQueue(taskNextDeps, count);
+      if (count <= 1) {
+        runTaskNextLoop(taskNextDeps, count);
+      } else {
+        void runTaskNextQueue(taskNextDeps, count);
+      }
     };
+
     taskNextSub.appendChild(subItem);
   }
 }
@@ -902,7 +993,10 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
   const customInput = document.createElement('input');
   customInput.type = 'number'; customInput.min = '1'; customInput.max = '999'; customInput.placeholder = '#';
   customInput.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:12px;';
-  customInput.onclick = function(e: Event) { e.stopPropagation(); };
+  customInput.onclick = function(e: Event) {
+    e.stopPropagation(); 
+  };
+
   customRow.appendChild(customInput);
   const goBtn = document.createElement('span');
   goBtn.textContent = '▶'; goBtn.title = 'Go';
@@ -910,15 +1004,27 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
   goBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(customInput.value);
-    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true);
+    if (!n || n < 1 || n > 999) {
+      showPasteToast('⚠️ Enter 1–999', true);
 
- return; }
+      return; 
+    }
+
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
-    if (n <= 1) runTaskNextLoop(taskNextDeps, n);
-    else void runTaskNextQueue(taskNextDeps, n);
+    if (n <= 1) {
+      runTaskNextLoop(taskNextDeps, n);
+    } else {
+      void runTaskNextQueue(taskNextDeps, n);
+    }
   };
-  customInput.onkeydown = function(e: KeyboardEvent) { if (e.key === 'Enter') { e.stopPropagation(); goBtn.click(); } };
+
+  customInput.onkeydown = function(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.stopPropagation(); goBtn.click(); 
+    } 
+  };
+
   customRow.appendChild(goBtn);
   taskNextSub.appendChild(customRow);
 }
@@ -927,14 +1033,21 @@ function _appendTaskNextSettings(taskNextSub: HTMLElement, promptsDropdown: HTML
   const settingsItem = document.createElement('div');
   settingsItem.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:12px;color:' + cPrimaryLight + ';border-top:1px solid rgba(124,58,237,0.2);';
   settingsItem.textContent = '⚙ Settings';
-  settingsItem.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-  settingsItem.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  settingsItem.onmouseover = function() {
+    (this as HTMLElement).style.background = cBtnMenuHover; 
+  };
+
+  settingsItem.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   settingsItem.onclick = function(e: Event) {
     e.stopPropagation();
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
     openTaskNextSettingsModal(taskNextDeps);
   };
+
   taskNextSub.appendChild(settingsItem);
 }
 
@@ -958,7 +1071,9 @@ function getPromptVariantValue(p: PromptEntry): number | null {
 
 function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
-  if (!variantValue) return p.text;
+  if (!variantValue) {
+    return p.text;
+  }
 
   return substituteToken(p.text, p.replaceKey || REPLACE_KEY_DEFAULT, variantValue);
 }
@@ -983,7 +1098,10 @@ function resolveTags(p: PromptEntry): string[] {
 }
 
 function renderTagsWrap(rawTags: string[]): HTMLElement | null {
-  if (rawTags.length === 0) return null;
+  if (rawTags.length === 0) {
+    return null;
+  }
+
   const tagsWrap = document.createElement('div');
   tagsWrap.style.cssText = 'display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;flex-shrink:0;';
   const MAX_INLINE_TAGS = 2;
@@ -1000,6 +1118,7 @@ function renderTagsWrap(rawTags: string[]): HTMLElement | null {
       overflowTags.forEach(tag => tagsWrap.insertBefore(makeTagEl(tag), moreTag));
       moreTag.remove();
     };
+
     tagsWrap.appendChild(moreTag);
   }
 
@@ -1011,13 +1130,17 @@ function bindPromptItemClick(
   promptsCfg: ReturnType<typeof getPromptsConfig>, ctx: PromptContext, taskNextDeps: TaskNextDeps
 ): void {
   item.onclick = async function(e: MouseEvent) {
-    if (actions.contains(e.target as Node)) return;
+    if (actions.contains(e.target as Node)) {
+      return;
+    }
+
     if (e.altKey) {
       e.stopPropagation();
       _openInlinePromptEditor(item, p, ctx, taskNextDeps);
 
       return;
     }
+
     log('Prompt clicked: "' + p.name + '" (' + p.text.length + ' chars)', 'info');
     const outcome = await pasteIntoEditor(resolvePromptPasteText(p), promptsCfg, getByXPathAsElement);
     if (outcome === 'injected' || outcome === 'clipboard') {
@@ -1032,12 +1155,23 @@ function renderPromptItem(
 ): HTMLElement {
   const item = document.createElement('div');
   item.setAttribute('data-prompt-idx', String(idx));
-  if (p.slug) item.setAttribute('data-prompt-slug', p.slug);
-  if (p.id) item.setAttribute('data-prompt-id', String(p.id));
+  if (p.slug) {
+    item.setAttribute('data-prompt-slug', p.slug);
+  }
+
+  if (p.id) {
+    item.setAttribute('data-prompt-id', String(p.id));
+  }
+
   const hasText = Boolean(p.text);
   item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 10px;cursor:pointer;font-size:12px;line-height:1.4;color:' + (hasText ? '#c9a8ef' : '#6b5a8a') + ';border-bottom:1px solid rgba(124,58,237,0.12);' + (hasText ? '' : 'opacity:0.6;');
-  item.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
-  item.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  item.onmouseover = function() {
+    (this as HTMLElement).style.background = cBtnMenuHover; 
+  };
+
+  item.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
 
   const badge = document.createElement('span');
   badge.textContent = String(idx + 1);
@@ -1068,7 +1202,10 @@ function renderPromptItem(
   contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:row;align-items:center;gap:6px;overflow:hidden;min-width:0;';
   contentWrap.appendChild(nameSpan);
   const tagsWrap = renderTagsWrap(resolveTags(p));
-  if (tagsWrap) contentWrap.appendChild(tagsWrap);
+  if (tagsWrap) {
+    contentWrap.appendChild(tagsWrap);
+  }
+
   item.appendChild(contentWrap);
 
   const actions = document.createElement('span');
@@ -1083,6 +1220,7 @@ function renderPromptItem(
       showPasteToast('⚠️ Prompt text not loaded, click ↻ Load to refresh', true);
     };
   }
+
   item.appendChild(actions);
   attachDragHandlers(item, p, () => {
     _memSnapshot = null;
@@ -1100,7 +1238,10 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
   // A DocumentFragment holds the real child nodes; `replaceChildren(...)`
   // moves them back on Cancel with identical listeners still attached.
   const savedChildren = document.createDocumentFragment();
-  while (item.firstChild) savedChildren.appendChild(item.firstChild);
+  while (item.firstChild) {
+    savedChildren.appendChild(item.firstChild);
+  }
+
   const savedBg = item.style.background;
   const savedPad = item.style.padding;
   item.style.background = 'rgba(0,0,0,0.3)';
@@ -1136,7 +1277,9 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
   save.style.cssText = 'padding:2px 10px;font-size:9px;background:#6d28d9;border:none;color:#fff;border-radius:3px;cursor:pointer;font-weight:600;';
   save.onclick = () => {
     const updated = { ...p, name: nameInput.value.trim(), text: textInput.value.trim() };
-    if (!updated.name || !updated.text) return;
+    if (!updated.name || !updated.text) {
+      return;
+    }
     
     sendToExtension('SAVE_PROMPT', { prompt: updated }).then(function(resp: Record<string, unknown>) {
       if (resp && resp.ok) {
@@ -1144,7 +1287,9 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
         showPasteToast('✏️ Prompt updated: ' + updated.name, false);
         clearLoadedPrompts();
         clearUISnapshot();
-        loadPromptsFromJson().then(function() { renderPromptsDropdown(ctx, taskNextDeps); });
+        loadPromptsFromJson().then(function() {
+          renderPromptsDropdown(ctx, taskNextDeps); 
+        });
       }
     });
   };
@@ -1181,7 +1326,9 @@ function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: P
         showPasteToast((!isFav ? '⭐ Favorited: ' : '☆ Unfavorited: ') + p.name, false);
         clearLoadedPrompts();
         clearUISnapshot();
-        loadPromptsFromJson().then(function() { renderPromptsDropdown(ctx, taskNextDeps); });
+        loadPromptsFromJson().then(function() {
+          renderPromptsDropdown(ctx, taskNextDeps); 
+        });
       }
     });
   };
@@ -1192,11 +1339,22 @@ function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: P
 /** Assemble an EditablePrompt object, omitting optional keys when their source value is undefined (required by exactOptionalPropertyTypes). */
 function _buildEditablePromptFromEntry(p: PromptEntry): EditablePrompt {
   const out: EditablePrompt = { name: p.name, text: p.text };
-  if (typeof p.id === 'string') out.id = p.id;
-  if (typeof p.category === 'string') out.category = p.category;
-  if (typeof p.isDefault === 'boolean') out.isDefault = p.isDefault;
+  if (typeof p.id === 'string') {
+    out.id = p.id;
+  }
+
+  if (typeof p.category === 'string') {
+    out.category = p.category;
+  }
+
+  if (typeof p.isDefault === 'boolean') {
+    out.isDefault = p.isDefault;
+  }
+
   const exc = (p as { excludeFromExport?: boolean }).excludeFromExport;
-  if (typeof exc === 'boolean') out.excludeFromExport = exc;
+  if (typeof exc === 'boolean') {
+    out.excludeFromExport = exc;
+  }
 
   return out;
 }
@@ -1218,7 +1376,10 @@ function _buildDeleteIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptCont
   const icon = _makeActionIcon('🗑️', 'Delete prompt', '0.6');
   icon.onclick = function(e: Event) {
     e.stopPropagation();
-    if (!confirm('Delete prompt "' + p.name + '"?')) return;
+    if (!confirm('Delete prompt "' + p.name + '"?')) {
+      return;
+    }
+
     _executeDeletePrompt(p, dropdown, ctx, taskNextDeps);
   };
 
@@ -1233,8 +1394,11 @@ function _executeDeletePrompt(p: PromptEntry, _dropdown: HTMLElement, ctx: Promp
 
       return;
     }
+
     handlePromptDeleteFailure(p, resp?.errorMessage ?? 'DELETE_PROMPT returned no success flag');
-  }).catch(function(caught: CaughtError) { handlePromptDeleteFailure(p, toErrorMessage(caught), caught); });
+  }).catch(function(caught: CaughtError) {
+    handlePromptDeleteFailure(p, toErrorMessage(caught), caught); 
+  });
 }
 
 function handlePromptDeleteSuccess(p: PromptEntry, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
@@ -1247,11 +1411,22 @@ function handlePromptDeleteSuccess(p: PromptEntry, ctx: PromptContext, taskNextD
   // into the download. Matching is defensive: id → slug → name.
   void import('./prompt-cache').then(function(mod) {
     return mod.readJsonCopy().then(function(record) {
-      if (!record || !record.entries || record.entries.length === 0) return;
+      if (!record || !record.entries || record.entries.length === 0) {
+        return;
+      }
+
       const filtered = record.entries.filter(function(e) {
-        if (p.id && e.id === p.id) return false;
-        if (p.slug && e.slug === p.slug) return false;
-        if (!p.id && !p.slug && e.name === p.name) return false;
+        if (p.id && e.id === p.id) {
+          return false;
+        }
+
+        if (p.slug && e.slug === p.slug) {
+          return false;
+        }
+
+        if (!p.id && !p.slug && e.name === p.name) {
+          return false;
+        }
 
         return true;
       });
@@ -1264,7 +1439,9 @@ function handlePromptDeleteSuccess(p: PromptEntry, ctx: PromptContext, taskNextD
   }).catch(function(cacheErr: unknown) {
     log('[PromptDelete] JsonCopy purge failed: ' + String(cacheErr), 'warn');
   });
-  loadPromptsFromJson().then(function() { renderPromptsDropdown(ctx, taskNextDeps); });
+  loadPromptsFromJson().then(function() {
+    renderPromptsDropdown(ctx, taskNextDeps); 
+  });
 }
 
 export function handlePromptDeleteFailure(p: PromptEntry, reason: string, caught?: CaughtError): void {
@@ -1281,7 +1458,9 @@ function _buildCopyIcon(p: PromptEntry): HTMLElement {
     navigator.clipboard.writeText(p.text).then(function() {
       log('Prompt copied: ' + p.name, 'success');
       icon.textContent = '✅';
-      setTimeout(function() { icon.textContent = '📋'; }, 1500);
+      setTimeout(function() {
+        icon.textContent = '📋'; 
+      }, 1500);
     });
   };
 
@@ -1294,8 +1473,13 @@ function _makeActionIcon(emoji: string, title: string, baseOpacity: string): HTM
   icon.textContent = emoji;
   icon.title = title;
   icon.style.cssText = 'cursor:pointer;font-size:13px;opacity:' + baseOpacity + ';';
-  icon.onmouseover = function() { (this as HTMLElement).style.opacity = '1'; };
-  icon.onmouseout = function() { (this as HTMLElement).style.opacity = baseOpacity + ';'; };
+  icon.onmouseover = function() {
+    (this as HTMLElement).style.opacity = '1'; 
+  };
+
+  icon.onmouseout = function() {
+    (this as HTMLElement).style.opacity = baseOpacity + ';'; 
+  };
 
   return icon;
 }
@@ -1304,8 +1488,14 @@ function buildAddPromptButton(promptsDropdown: HTMLElement, ctx: PromptContext, 
   const addBtn = document.createElement('div');
   addBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;padding:8px;cursor:pointer;font-size:13px;color:' + cPrimaryLight + ';border-top:1px solid rgba(124,58,237,0.3);';
   addBtn.textContent = '➕ Add New Prompt';
-  addBtn.onmouseover = function() { (this as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; };
-  addBtn.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
+  addBtn.onmouseover = function() {
+    (this as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; 
+  };
+
+  addBtn.onmouseout = function() {
+    (this as HTMLElement).style.background = 'transparent'; 
+  };
+
   addBtn.onclick = function(e: Event) {
     e.stopPropagation();
     promptsDropdown.style.display = 'none';

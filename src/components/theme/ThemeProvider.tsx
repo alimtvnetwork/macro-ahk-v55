@@ -29,6 +29,7 @@ function enforceDarkClass() {
   if (!root.classList.contains("dark")) {
     root.classList.add("dark");
   }
+
   root.classList.remove("light");
 }
 

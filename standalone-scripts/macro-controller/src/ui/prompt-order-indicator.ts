@@ -56,6 +56,7 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
 
       return;
     }
+
     const knownPos = known.indexOf(slug);
     const outOfOrder = !isMonotonicAt(knownRanks, knownPos);
     rows.push({
@@ -84,15 +85,27 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
 function isMonotonicAt(ranks: number[], pos: number): boolean {
   const prev = pos > 0 ? ranks[pos - 1] : undefined;
   const curr = ranks[pos];
-  if (curr === undefined) return true;
-  if (prev !== undefined && prev >= curr) return false;
+  if (curr === undefined) {
+    return true;
+  }
+
+  if (prev !== undefined && prev >= curr) {
+    return false;
+  }
 
   return true;
 }
 
 function arraysEqual(a: readonly string[], b: readonly string[]): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
 
   return true;
 }
@@ -119,7 +132,9 @@ export function buildPromptOrderIndicator(): HTMLElement {
     openOrderPopover(badge);
   });
   badge.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openOrderPopover(badge); }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); openOrderPopover(badge); 
+    }
   });
 
   return badge;
@@ -226,9 +241,17 @@ function buildRow(row: OrderRow): HTMLElement {
 }
 
 function statusPalette(status: ViolationKind): { bg: string; fg: string; icon: string } {
-  if (status === 'ok') return { bg: 'transparent', fg: '#d1d5db', icon: '·' };
-  if (status === 'out-of-order') return { bg: 'rgba(234,179,8,0.15)', fg: '#fde68a', icon: '↕' };
-  if (status === 'unknown') return { bg: 'rgba(107,114,128,0.18)', fg: '#e5e7eb', icon: '?' };
+  if (status === 'ok') {
+    return { bg: 'transparent', fg: '#d1d5db', icon: '·' };
+  }
+
+  if (status === 'out-of-order') {
+    return { bg: 'rgba(234,179,8,0.15)', fg: '#fde68a', icon: '↕' };
+  }
+
+  if (status === 'unknown') {
+    return { bg: 'rgba(107,114,128,0.18)', fg: '#e5e7eb', icon: '?' };
+  }
 
   return { bg: 'rgba(239,68,68,0.16)', fg: '#fecaca', icon: '×' };
 }
@@ -238,6 +261,9 @@ function outsideClickHandler(): void {
 }
 
 function closeOrderPopover(): void {
-  if (openPopover && openPopover.parentNode) openPopover.parentNode.removeChild(openPopover);
+  if (openPopover && openPopover.parentNode) {
+    openPopover.parentNode.removeChild(openPopover);
+  }
+
   openPopover = null;
 }

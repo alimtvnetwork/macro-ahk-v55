@@ -19,44 +19,44 @@ export interface MountedEditor {
 }
 
 const replaceTable = (
-    mounted: MountedEditor, doc: Document, rows: ReadonlyArray<XPathEditorRow>,
+  mounted: MountedEditor, doc: Document, rows: ReadonlyArray<XPathEditorRow>,
 ): void => {
-    const fresh = buildEditorTable(doc, rows);
-    mounted.Table.replaceWith(fresh);
-    mounted.Table = fresh;
-    mounted.CurrentRows = [...rows];
+  const fresh = buildEditorTable(doc, rows);
+  mounted.Table.replaceWith(fresh);
+  mounted.Table = fresh;
+  mounted.CurrentRows = [...rows];
 };
 
 const wireReset = (mounted: MountedEditor, doc: Document, options: XPathEditorOptions): void => {
-    const reset = mounted.Root.querySelector(`#${ID_RESET_BUTTON}`);
+  const reset = mounted.Root.querySelector(`#${ID_RESET_BUTTON}`);
 
-    if (!(reset instanceof HTMLButtonElement)) {
-        return;
-    }
+  if (!(reset instanceof HTMLButtonElement)) {
+    return;
+  }
 
-    reset.addEventListener("click", () => {
-        replaceTable(mounted, doc, options.DefaultRows);
-        options.OnReset?.();
-    });
+  reset.addEventListener("click", () => {
+    replaceTable(mounted, doc, options.DefaultRows);
+    options.OnReset?.();
+  });
 };
 
 const wireSave = (mounted: MountedEditor, options: XPathEditorOptions): void => {
-    const save = mounted.Root.querySelector(`#${ID_SAVE_BUTTON}`);
+  const save = mounted.Root.querySelector(`#${ID_SAVE_BUTTON}`);
 
-    if (!(save instanceof HTMLButtonElement)) {
-        return;
-    }
+  if (!(save instanceof HTMLButtonElement)) {
+    return;
+  }
 
-    save.addEventListener("click", () => {
-        const next = readEditorRows(mounted.Table, mounted.CurrentRows);
-        mounted.CurrentRows = [...next];
-        options.OnSave(next);
-    });
+  save.addEventListener("click", () => {
+    const next = readEditorRows(mounted.Table, mounted.CurrentRows);
+    mounted.CurrentRows = [...next];
+    options.OnSave(next);
+  });
 };
 
 export const wireEditorButtons = (
-    mounted: MountedEditor, doc: Document, options: XPathEditorOptions,
+  mounted: MountedEditor, doc: Document, options: XPathEditorOptions,
 ): void => {
-    wireReset(mounted, doc, options);
-    wireSave(mounted, options);
+  wireReset(mounted, doc, options);
+  wireSave(mounted, options);
 };

@@ -28,7 +28,10 @@ function resolvedAvailable(ws: WorkspaceCredit): number {
  */
 export function daysToRefillForWs(ws: WorkspaceCredit, nowMs?: number): number | null {
   const iso = ws.nextRefillAt || ws.billingPeriodEndAt || '';
-  if (!iso) return null;
+  if (!iso) {
+    return null;
+  }
+
   const d = daysUntil(iso, nowMs);
 
   return d < 0 ? null : d;
@@ -47,7 +50,10 @@ export function computeRefillScore(
   nowMs?: number,
 ): number {
   const days = daysToRefillForWs(ws, nowMs);
-  if (days === null) return 0;
+  if (days === null) {
+    return 0;
+  }
+
   const urgency = Math.max(0, windowDays - days);
   const available = resolvedAvailable(ws);
 
@@ -73,12 +79,22 @@ export function sortByRefillPriority<T extends { ws: WorkspaceCredit }>(
     };
   });
   decorated.sort(function (a, b) {
-    if (b.score !== a.score) return b.score - a.score;
-    if (b.available !== a.available) return b.available - a.available;
-    if (a.id !== b.id) return a.id < b.id ? -1 : 1;
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+
+    if (b.available !== a.available) {
+      return b.available - a.available;
+    }
+
+    if (a.id !== b.id) {
+      return a.id < b.id ? -1 : 1;
+    }
 
     return a.idx - b.idx;
   });
 
-  return decorated.map(function (d) { return d.row; });
+  return decorated.map(function (d) {
+    return d.row; 
+  });
 }

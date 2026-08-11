@@ -18,9 +18,9 @@ import { Events } from "@/constants/events";
  */
 
 import {
-    IDLE_SESSION,
-    type RecorderAction,
-    recorderReducer,
+  IDLE_SESSION,
+  type RecorderAction,
+  recorderReducer,
 } from "./recorder-store";
 import type { RecordingPhase, RecordingSession } from "./recorder-session-types";
 import { ErrorIdleType, MakeButtonActionType } from "../../types/enums";
@@ -156,51 +156,52 @@ interface ToolbarLifecycle {
 }
 
 export function mountRecorderToolbar(
-    options: RecorderToolbarOptions,
-    container: ParentNode = (typeof document !== "undefined" ? document.body : (null as unknown as ParentNode)),
+  options: RecorderToolbarOptions,
+  container: ParentNode = (typeof document !== "undefined" ? document.body : (null as unknown as ParentNode)),
 ): RecorderToolbarHandle {
-    if (container === null || container === undefined) {
-        throw new Error("mountRecorderToolbar: no container available (document.body missing)");
-    }
-    const sessionRef: SessionRef = { current: IDLE_SESSION };
-    const nodes = buildToolbarNodes(options, container);
-    const render = (): void => renderToolbar(nodes, sessionRef.current, options);
-    const actions = createToolbarActions(options, sessionRef, render);
-    wireToolbarButtons(nodes, actions, sessionRef);
-    render();
-    const lifecycle = installToolbarLifecycle(nodes, render);
+  if (container === null || container === undefined) {
+    throw new Error("mountRecorderToolbar: no container available (document.body missing)");
+  }
 
-    return buildToolbarHandle(nodes, sessionRef, actions, lifecycle);
+  const sessionRef: SessionRef = { current: IDLE_SESSION };
+  const nodes = buildToolbarNodes(options, container);
+  const render = (): void => renderToolbar(nodes, sessionRef.current, options);
+  const actions = createToolbarActions(options, sessionRef, render);
+  wireToolbarButtons(nodes, actions, sessionRef);
+  render();
+  const lifecycle = installToolbarLifecycle(nodes, render);
+
+  return buildToolbarHandle(nodes, sessionRef, actions, lifecycle);
 }
 
 function buildToolbarNodes(options: RecorderToolbarOptions, container: ParentNode): ToolbarNodes {
-    const host = document.createElement("div");
-    host.id = RECORDER_TOOLBAR_HOST_ID;
-    const root = host.attachShadow({ mode: "closed" });
-    appendToolbarStyle(root);
-    const bar = createToolbarBar();
-    const chips = buildToolbarChips(options);
-    const buttons = buildToolbarButtons();
-    bar.append(chips.phaseLabel, chips.projectChip, chips.healthChip, buttons.startBtn, buttons.pauseBtn, buttons.stopBtn);
-    root.appendChild(bar);
-    container.appendChild(host);
+  const host = document.createElement("div");
+  host.id = RECORDER_TOOLBAR_HOST_ID;
+  const root = host.attachShadow({ mode: "closed" });
+  appendToolbarStyle(root);
+  const bar = createToolbarBar();
+  const chips = buildToolbarChips(options);
+  const buttons = buildToolbarButtons();
+  bar.append(chips.phaseLabel, chips.projectChip, chips.healthChip, buttons.startBtn, buttons.pauseBtn, buttons.stopBtn);
+  root.appendChild(bar);
+  container.appendChild(host);
 
-    return { host, root, ...chips, ...buttons };
+  return { host, root, ...chips, ...buttons };
 }
 
 function appendToolbarStyle(root: ShadowRoot): void {
-    const style = document.createElement("style");
-    style.textContent = TOOLBAR_CSS;
-    root.appendChild(style);
+  const style = document.createElement("style");
+  style.textContent = TOOLBAR_CSS;
+  root.appendChild(style);
 }
 
 function createToolbarBar(): HTMLDivElement {
-    const bar = document.createElement("div");
-    bar.className = "toolbar";
-    bar.setAttribute("role", "toolbar");
-    bar.setAttribute("aria-label", "Marco Recorder");
+  const bar = document.createElement("div");
+  bar.className = "toolbar";
+  bar.setAttribute("role", "toolbar");
+  bar.setAttribute("aria-label", "Marco Recorder");
 
-    return bar;
+  return bar;
 }
 
 interface ToolbarChips {
@@ -212,167 +213,183 @@ interface ToolbarChips {
 }
 
 function buildToolbarChips(options: RecorderToolbarOptions): ToolbarChips {
-    const phaseLabel = document.createElement("span");
-    phaseLabel.className = "phase";
-    const projectChip = buildProjectChip(options.ProjectSlug);
-    const { healthChip, healthText, healthCapture } = buildHealthChip();
+  const phaseLabel = document.createElement("span");
+  phaseLabel.className = "phase";
+  const projectChip = buildProjectChip(options.ProjectSlug);
+  const { healthChip, healthText, healthCapture } = buildHealthChip();
 
-    return { phaseLabel, projectChip, healthChip, healthText, healthCapture };
+  return { phaseLabel, projectChip, healthChip, healthText, healthCapture };
 }
 
 function buildProjectChip(slug: string): HTMLSpanElement {
-    const projectChip = document.createElement("span");
-    projectChip.className = "project";
-    projectChip.setAttribute("aria-label", "Active recording project");
-    projectChip.title = `Steps will be saved to project: ${slug}`;
-    const dot = document.createElement("span");
-    dot.className = "dot";
-    const text = document.createElement("span");
-    text.className = "label";
-    text.textContent = slug;
-    projectChip.append(dot, text);
+  const projectChip = document.createElement("span");
+  projectChip.className = "project";
+  projectChip.setAttribute("aria-label", "Active recording project");
+  projectChip.title = `Steps will be saved to project: ${slug}`;
+  const dot = document.createElement("span");
+  dot.className = "dot";
+  const text = document.createElement("span");
+  text.className = "label";
+  text.textContent = slug;
+  projectChip.append(dot, text);
 
-    return projectChip;
+  return projectChip;
 }
 
 function buildHealthChip(): {
     healthChip: HTMLSpanElement; healthText: HTMLSpanElement; healthCapture: HTMLSpanElement;
-} {
-    const healthChip = document.createElement("span");
-    healthChip.className = "health";
-    healthChip.setAttribute("aria-label", "Recorder health");
-    const dot = document.createElement("span");
-    dot.className = "hdot";
-    const healthText = document.createElement("span");
-    healthText.className = "htext";
-    const sep = document.createElement("span");
-    sep.className = "sep";
-    sep.textContent = "·";
-    const healthCapture = document.createElement("span");
-    healthCapture.className = "muted";
-    healthChip.append(dot, healthText, sep, healthCapture);
+    } {
+  const healthChip = document.createElement("span");
+  healthChip.className = "health";
+  healthChip.setAttribute("aria-label", "Recorder health");
+  const dot = document.createElement("span");
+  dot.className = "hdot";
+  const healthText = document.createElement("span");
+  healthText.className = "htext";
+  const sep = document.createElement("span");
+  sep.className = "sep";
+  sep.textContent = "·";
+  const healthCapture = document.createElement("span");
+  healthCapture.className = "muted";
+  healthChip.append(dot, healthText, sep, healthCapture);
 
-    return { healthChip, healthText, healthCapture };
+  return { healthChip, healthText, healthCapture };
 }
 
 function buildToolbarButtons(): {
     startBtn: HTMLButtonElement; pauseBtn: HTMLButtonElement; stopBtn: HTMLButtonElement;
-} {
-    return {
-        startBtn: makeButton("start", "Start"),
-        pauseBtn: makeButton("pause", "Pause"),
-        stopBtn:  makeButton("stop",  "Stop"),
-    };
+    } {
+  return {
+    startBtn: makeButton("start", "Start"),
+    pauseBtn: makeButton("pause", "Pause"),
+    stopBtn:  makeButton("stop",  "Stop"),
+  };
 }
 
 function createToolbarActions(
-    options: RecorderToolbarOptions, sessionRef: SessionRef, render: () => void,
+  options: RecorderToolbarOptions, sessionRef: SessionRef, render: () => void,
 ): ToolbarActions {
-    const dispatch = (action: RecorderAction): void => {
-        const next = recorderReducer(sessionRef.current, action);
-        sessionRef.current = next;
-        render();
-        options.OnPhaseChange?.(next.Phase, next);
-    };
+  const dispatch = (action: RecorderAction): void => {
+    const next = recorderReducer(sessionRef.current, action);
+    sessionRef.current = next;
+    render();
+    options.OnPhaseChange?.(next.Phase, next);
+  };
 
-    return {
-        start: () => dispatch({
-            Kind: "Start",
-            ProjectSlug: options.ProjectSlug,
-            SessionId: options.NewSessionId(),
-            StartedAt: options.Now(),
-        }),
-        pause:  () => dispatch({ Kind: "Pause"  }),
-        resume: () => dispatch({ Kind: "Resume" }),
-        stop:   () => dispatch({ Kind: "Stop"   }),
-    };
+  return {
+    start: () => dispatch({
+      Kind: "Start",
+      ProjectSlug: options.ProjectSlug,
+      SessionId: options.NewSessionId(),
+      StartedAt: options.Now(),
+    }),
+    pause:  () => dispatch({ Kind: "Pause"  }),
+    resume: () => dispatch({ Kind: "Resume" }),
+    stop:   () => dispatch({ Kind: "Stop"   }),
+  };
 }
 
 function wireToolbarButtons(
-    nodes: ToolbarNodes, actions: ToolbarActions, sessionRef: SessionRef,
+  nodes: ToolbarNodes, actions: ToolbarActions, sessionRef: SessionRef,
 ): void {
-    nodes.startBtn.addEventListener(Events.CLICK, () => actions.start());
-    nodes.stopBtn.addEventListener(Events.CLICK,  () => actions.stop());
-    nodes.pauseBtn.addEventListener(Events.CLICK, () => {
-        const phase = sessionRef.current.Phase;
-        if (phase === "Recording") { actions.pause();
+  nodes.startBtn.addEventListener(Events.CLICK, () => actions.start());
+  nodes.stopBtn.addEventListener(Events.CLICK,  () => actions.stop());
+  nodes.pauseBtn.addEventListener(Events.CLICK, () => {
+    const phase = sessionRef.current.Phase;
+    if (phase === "Recording") {
+      actions.pause();
 
- return; }
-        if (phase === "Paused") { actions.resume(); }
-    });
+      return; 
+    }
+
+    if (phase === "Paused") {
+      actions.resume(); 
+    }
+  });
 }
 
 function renderToolbar(nodes: ToolbarNodes, session: RecordingSession, options: RecorderToolbarOptions): void {
-    const phase = session.Phase;
-    nodes.phaseLabel.textContent = phase;
-    renderProjectChip(nodes.projectChip, phase);
-    renderStartStop(nodes, phase);
-    renderPauseButton(nodes.pauseBtn, phase);
-    renderHealthChip(nodes, session, options);
+  const phase = session.Phase;
+  nodes.phaseLabel.textContent = phase;
+  renderProjectChip(nodes.projectChip, phase);
+  renderStartStop(nodes, phase);
+  renderPauseButton(nodes.pauseBtn, phase);
+  renderHealthChip(nodes, session, options);
 }
 
 function renderProjectChip(projectChip: HTMLSpanElement, phase: RecordingPhase): void {
-    const isActive = phase === "Recording" || phase === "Paused";
-    projectChip.dataset.active = isActive ? "true" : "false";
-    projectChip.dataset.phase = phase;
+  const isActive = phase === "Recording" || phase === "Paused";
+  projectChip.dataset.active = isActive ? "true" : "false";
+  projectChip.dataset.phase = phase;
 }
 
 function renderStartStop(nodes: ToolbarNodes, phase: RecordingPhase): void {
-    nodes.startBtn.disabled = phase !== "Idle";
-    nodes.stopBtn.disabled  = phase === "Idle";
+  nodes.startBtn.disabled = phase !== "Idle";
+  nodes.stopBtn.disabled  = phase === "Idle";
 }
 
 function renderPauseButton(pauseBtn: HTMLButtonElement, phase: RecordingPhase): void {
-    if (phase === "Paused") {
-        pauseBtn.textContent = "Resume";
-        pauseBtn.dataset.action = "resume";
-        pauseBtn.disabled = false;
+  if (phase === "Paused") {
+    pauseBtn.textContent = "Resume";
+    pauseBtn.dataset.action = "resume";
+    pauseBtn.disabled = false;
 
-        return;
-    }
-    pauseBtn.textContent = "Pause";
-    pauseBtn.dataset.action = "pause";
-    pauseBtn.disabled = phase !== "Recording";
+    return;
+  }
+
+  pauseBtn.textContent = "Pause";
+  pauseBtn.dataset.action = "pause";
+  pauseBtn.disabled = phase !== "Recording";
 }
 
 function renderHealthChip(
-    nodes: ToolbarNodes, session: RecordingSession, options: RecorderToolbarOptions,
+  nodes: ToolbarNodes, session: RecordingSession, options: RecorderToolbarOptions,
 ): void {
-    const projectOk = options.ProjectSlug.length > 0;
-    const stepCount = session.Steps.length;
-    const lastStep = stepCount > 0 ? session.Steps[stepCount - 1] : null;
-    nodes.healthChip.dataset.status = computeHealthStatus(session.Phase, stepCount, projectOk);
-    const projectLabel = projectOk ? options.ProjectSlug : "no project";
-    nodes.healthText.textContent = `${projectLabel} · ${stepCount} step${stepCount === 1 ? "" : "s"}`;
-    nodes.healthCapture.textContent = formatCaptureLabel(session.Phase, lastStep, options.Now());
-    nodes.healthChip.title = formatHealthTitle(projectLabel, session.Phase, stepCount, lastStep);
+  const projectOk = options.ProjectSlug.length > 0;
+  const stepCount = session.Steps.length;
+  const lastStep = stepCount > 0 ? session.Steps[stepCount - 1] : null;
+  nodes.healthChip.dataset.status = computeHealthStatus(session.Phase, stepCount, projectOk);
+  const projectLabel = projectOk ? options.ProjectSlug : "no project";
+  nodes.healthText.textContent = `${projectLabel} · ${stepCount} step${stepCount === 1 ? "" : "s"}`;
+  nodes.healthCapture.textContent = formatCaptureLabel(session.Phase, lastStep, options.Now());
+  nodes.healthChip.title = formatHealthTitle(projectLabel, session.Phase, stepCount, lastStep);
 }
 
 function computeHealthStatus(
-    phase: RecordingPhase, stepCount: number, projectOk: boolean,
+  phase: RecordingPhase, stepCount: number, projectOk: boolean,
 ): ErrorIdleType {
-    if (!projectOk) { return "error"; }
-    if (phase === "Recording") { return stepCount > 0 ? "ok" : "warn"; }
-    if (phase === "Paused") { return "warn"; }
+  if (!projectOk) {
+    return "error"; 
+  }
 
-    return "idle";
+  if (phase === "Recording") {
+    return stepCount > 0 ? "ok" : "warn"; 
+  }
+
+  if (phase === "Paused") {
+    return "warn"; 
+  }
+
+  return "idle";
 }
 
 function formatCaptureLabel(
-    phase: RecordingPhase, lastStep: RecordingSession["Steps"][number] | null, nowIso: string,
+  phase: RecordingPhase, lastStep: RecordingSession["Steps"][number] | null, nowIso: string,
 ): string {
-    if (lastStep === null) { return phase === "Idle" ? "not recording" : "awaiting capture"; }
+  if (lastStep === null) {
+    return phase === "Idle" ? "not recording" : "awaiting capture"; 
+  }
 
-    return `last ${formatRelative(lastStep.CapturedAt, nowIso)}`;
+  return `last ${formatRelative(lastStep.CapturedAt, nowIso)}`;
 }
 
 function formatHealthTitle(
-    projectLabel: string,
-    phase: RecordingPhase,
-    stepCount: number,
-    lastStep: RecordingSession["Steps"][number] | null,
+  projectLabel: string,
+  phase: RecordingPhase,
+  stepCount: number,
+  lastStep: RecordingSession["Steps"][number] | null,
 ): string {
-    return `Project: ${projectLabel}\n`
+  return `Project: ${projectLabel}\n`
         + `Phase: ${phase}\n`
         + `Steps captured: ${stepCount}\n`
         + `Last capture: ${lastStep?.CapturedAt ?? "—"}`;
@@ -382,72 +399,111 @@ function formatHealthTitle(
 const TICK_INTERVAL_MS = 5000;
 
 function installToolbarLifecycle(nodes: ToolbarNodes, render: () => void): ToolbarLifecycle {
-    const hasWindow = typeof window !== "undefined";
-    const hasDocument = typeof document !== "undefined";
-    const tick = (): void => { if (!(hasDocument && document.hidden)) { render(); } };
-    const tickInterval = hasWindow ? window.setInterval(tick, TICK_INTERVAL_MS) : 0;
-    const onVisibilityChange = (): void => { if (hasDocument && !document.hidden) { render(); } };
-    if (hasDocument) { document.addEventListener("visibilitychange", onVisibilityChange); }
-    const state = { destroyed: false };
-    const destroy = (): void => teardownToolbar(state, nodes.host, tickInterval, onVisibilityChange, onPageHide, hasWindow, hasDocument);
-    const onPageHide = (): void => destroy();
-    if (hasWindow) { window.addEventListener("pagehide", onPageHide, { once: true }); }
+  const hasWindow = typeof window !== "undefined";
+  const hasDocument = typeof document !== "undefined";
+  const tick = (): void => {
+    if (!(hasDocument && document.hidden)) {
+      render(); 
+    } 
+  };
 
-    return { destroy };
+  const tickInterval = hasWindow ? window.setInterval(tick, TICK_INTERVAL_MS) : 0;
+  const onVisibilityChange = (): void => {
+    if (hasDocument && !document.hidden) {
+      render(); 
+    } 
+  };
+
+  if (hasDocument) {
+    document.addEventListener("visibilitychange", onVisibilityChange); 
+  }
+
+  const state = { destroyed: false };
+  const destroy = (): void => teardownToolbar(state, nodes.host, tickInterval, onVisibilityChange, onPageHide, hasWindow, hasDocument);
+  const onPageHide = (): void => destroy();
+  if (hasWindow) {
+    window.addEventListener("pagehide", onPageHide, { once: true }); 
+  }
+
+  return { destroy };
 }
 
 function teardownToolbar(
-    state: { destroyed: boolean },
-    host: HTMLElement,
-    tickInterval: number,
-    onVisibilityChange: () => void,
-    onPageHide: () => void,
-    hasWindow: boolean,
-    hasDocument: boolean,
+  state: { destroyed: boolean },
+  host: HTMLElement,
+  tickInterval: number,
+  onVisibilityChange: () => void,
+  onPageHide: () => void,
+  hasWindow: boolean,
+  hasDocument: boolean,
 ): void {
-    if (state.destroyed) { return; }
-    state.destroyed = true;
-    if (tickInterval !== 0 && hasWindow) { window.clearInterval(tickInterval); }
-    if (hasDocument) { document.removeEventListener("visibilitychange", onVisibilityChange); }
-    if (hasWindow) { window.removeEventListener("pagehide", onPageHide); }
-    host.remove();
+  if (state.destroyed) {
+    return; 
+  }
+
+  state.destroyed = true;
+  if (tickInterval !== 0 && hasWindow) {
+    window.clearInterval(tickInterval); 
+  }
+
+  if (hasDocument) {
+    document.removeEventListener("visibilitychange", onVisibilityChange); 
+  }
+
+  if (hasWindow) {
+    window.removeEventListener("pagehide", onPageHide); 
+  }
+
+  host.remove();
 }
 
 function buildToolbarHandle(
-    nodes: ToolbarNodes, sessionRef: SessionRef, actions: ToolbarActions, lifecycle: ToolbarLifecycle,
+  nodes: ToolbarNodes, sessionRef: SessionRef, actions: ToolbarActions, lifecycle: ToolbarLifecycle,
 ): RecorderToolbarHandle {
-    return {
-        Host: nodes.host,
-        Root: nodes.root,
-        GetSession: () => sessionRef.current,
-        Start: actions.start,
-        Pause: actions.pause,
-        Resume: actions.resume,
-        Stop: actions.stop,
-        Destroy: lifecycle.destroy,
-    };
+  return {
+    Host: nodes.host,
+    Root: nodes.root,
+    GetSession: () => sessionRef.current,
+    Start: actions.start,
+    Pause: actions.pause,
+    Resume: actions.resume,
+    Stop: actions.stop,
+    Destroy: lifecycle.destroy,
+  };
 }
 
 function makeButton(action: MakeButtonActionType, label: string): HTMLButtonElement {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn";
-    btn.dataset.action = action;
-    btn.textContent = label;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn";
+  btn.dataset.action = action;
+  btn.textContent = label;
 
-    return btn;
+  return btn;
 }
 
 function formatRelative(thenIso: string, nowIso: string): string {
-    const then = Date.parse(thenIso);
-    const now = Date.parse(nowIso);
-    if (Number.isNaN(then) || Number.isNaN(now)) { return "just now"; }
-    const deltaSec = Math.max(0, Math.round((now - then) / 1000));
-    if (deltaSec < 5) { return "just now"; }
-    if (deltaSec < 60) { return `${deltaSec}s ago`; }
-    const min = Math.floor(deltaSec / 60);
-    if (min < 60) { return `${min}m ago`; }
-    const hr = Math.floor(min / 60);
+  const then = Date.parse(thenIso);
+  const now = Date.parse(nowIso);
+  if (Number.isNaN(then) || Number.isNaN(now)) {
+    return "just now"; 
+  }
 
-    return `${hr}h ago`;
+  const deltaSec = Math.max(0, Math.round((now - then) / 1000));
+  if (deltaSec < 5) {
+    return "just now"; 
+  }
+
+  if (deltaSec < 60) {
+    return `${deltaSec}s ago`; 
+  }
+
+  const min = Math.floor(deltaSec / 60);
+  if (min < 60) {
+    return `${min}m ago`; 
+  }
+
+  const hr = Math.floor(min / 60);
+
+  return `${hr}h ago`;
 }

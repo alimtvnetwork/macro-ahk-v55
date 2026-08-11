@@ -14,8 +14,8 @@
  */
 
 import {
-    RECORDER_SESSION_STORAGE_KEY,
-    type RecordingSession,
+  RECORDER_SESSION_STORAGE_KEY,
+  type RecordingSession,
 } from "./recorder-session-types";
 
 interface ChromeStorageLike {
@@ -25,54 +25,60 @@ interface ChromeStorageLike {
 }
 
 function getStorage(): ChromeStorageLike {
-    const api = (globalThis as { chrome?: { storage?: { local?: ChromeStorageLike } } }).chrome;
-    const local = api?.storage?.local;
-    if (local === undefined) {
-        throw new Error(
-            "[recorder-session-storage] chrome.storage.local unavailable. " +
+  const api = (globalThis as { chrome?: { storage?: { local?: ChromeStorageLike } } }).chrome;
+  const local = api?.storage?.local;
+  if (local === undefined) {
+    throw new Error(
+      "[recorder-session-storage] chrome.storage.local unavailable. " +
             "This module must run in an extension context (service worker, content script, or popup).",
-        );
-    }
+    );
+  }
 
-    return local;
+  return local;
 }
 
 /** Writes the session if Phase is non-Idle; clears the draft when Idle. */
 export async function persistSession(session: RecordingSession): Promise<void> {
-    const storage = getStorage();
-    if (session.Phase === "Idle") {
-        await storage.remove(RECORDER_SESSION_STORAGE_KEY);
+  const storage = getStorage();
+  if (session.Phase === "Idle") {
+    await storage.remove(RECORDER_SESSION_STORAGE_KEY);
 
-        return;
-    }
-    await storage.set({ [RECORDER_SESSION_STORAGE_KEY]: session });
+    return;
+  }
+
+  await storage.set({ [RECORDER_SESSION_STORAGE_KEY]: session });
 }
 
 /** Returns the persisted draft, or null if none exists / shape is unrecognisable. */
 export async function loadSession(): Promise<RecordingSession | null> {
-    const storage = getStorage();
-    const result = await storage.get(RECORDER_SESSION_STORAGE_KEY);
-    const value = result[RECORDER_SESSION_STORAGE_KEY];
-    if (!isRecordingSession(value)) { return null; }
+  const storage = getStorage();
+  const result = await storage.get(RECORDER_SESSION_STORAGE_KEY);
+  const value = result[RECORDER_SESSION_STORAGE_KEY];
+  if (!isRecordingSession(value)) {
+    return null; 
+  }
 
-    return value;
+  return value;
 }
 
 export async function clearSession(): Promise<void> {
-    const storage = getStorage();
-    await storage.remove(RECORDER_SESSION_STORAGE_KEY);
+  const storage = getStorage();
+  await storage.remove(RECORDER_SESSION_STORAGE_KEY);
 }
 
 function isRecordingSession(value: unknown): value is RecordingSession {
-    if (typeof value !== "object" || value === null) { return false; }
-    const v = value as Record<string, unknown>;
-    const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
+  if (typeof value !== "object" || value === null) {
+    return false; 
+  }
 
-    return (
-        typeof v.SessionId === "string" &&
+  const v = value as Record<string, unknown>;
+  const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
+
+  return (
+    typeof v.SessionId === "string" &&
         typeof v.ProjectSlug === "string" &&
         typeof v.StartedAt === "string" &&
         Array.isArray(v.Steps) &&
         phaseOk
-    );
+  );
 }

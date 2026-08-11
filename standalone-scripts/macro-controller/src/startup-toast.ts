@@ -100,7 +100,9 @@ export function showStartupToast(version: string): void {
  */
 export function updateStartupToast(message: string): void {
   const el = document.getElementById(DomIdType.StartupToast);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   const textSpan = el.querySelector('span:last-child');
   if (textSpan) {
@@ -119,7 +121,9 @@ export function removeStartupToast(): void {
   }
 
   const el = document.getElementById(DomIdType.StartupToast);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   el.style.opacity = '0';
   setTimeout(function () {

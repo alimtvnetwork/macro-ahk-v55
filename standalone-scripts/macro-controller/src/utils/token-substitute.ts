@@ -21,14 +21,14 @@ import { logError } from '../error-utils';
 const KEY_RE_SAFE = /^[A-Za-z0-9_.:-]+$/;
 
 function escapeForRegex(key: string): string {
-    return key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function buildTokenRegex(key: string): RegExp {
-    const k = escapeForRegex(key);
+  const k = escapeForRegex(key);
 
-    // {{  key  }}  OR  ${  key  }
-    return new RegExp('\\{\\{\\s*' + k + '\\s*\\}\\}|\\$\\{\\s*' + k + '\\s*\\}', 'g');
+  // {{  key  }}  OR  ${  key  }
+  return new RegExp('\\{\\{\\s*' + k + '\\s*\\}\\}|\\$\\{\\s*' + k + '\\s*\\}', 'g');
 }
 
 /**
@@ -40,16 +40,20 @@ function buildTokenRegex(key: string): RegExp {
  * kill the chip.
  */
 export function substituteToken(body: string, key: string, value: string | number): string {
-    if (typeof body !== 'string' || body.length === 0) return body ?? '';
-    if (typeof key !== 'string' || key.length === 0 || !KEY_RE_SAFE.test(key)) {
-        logError('TokenSubstitute', 'invalid replace key; returning body unchanged', { key });
+  if (typeof body !== 'string' || body.length === 0) {
+    return body ?? '';
+  }
 
-        return body;
-    }
-    const valueText = String(value);
-    const primary = body.replace(buildTokenRegex(key), valueText);
-    // n/N alias substitution (case-insensitive) for legacy DB rows.
-    const alternateKey = key === 'n' ? 'N' : key === 'N' ? 'n' : '';
+  if (typeof key !== 'string' || key.length === 0 || !KEY_RE_SAFE.test(key)) {
+    logError('TokenSubstitute', 'invalid replace key; returning body unchanged', { key });
 
-    return alternateKey ? primary.replace(buildTokenRegex(alternateKey), valueText) : primary;
+    return body;
+  }
+
+  const valueText = String(value);
+  const primary = body.replace(buildTokenRegex(key), valueText);
+  // n/N alias substitution (case-insensitive) for legacy DB rows.
+  const alternateKey = key === 'n' ? 'N' : key === 'N' ? 'n' : '';
+
+  return alternateKey ? primary.replace(buildTokenRegex(alternateKey), valueText) : primary;
 }

@@ -6,15 +6,22 @@ import { ModalRefs, ROLES, ROLE_TOOLTIPS, SortMode, LOG_SCOPE } from './prompt-l
 import { buildRowContainer } from './prompt-library-row';
 
 export function rolesToRender(view: ModalRefs['view']): PromptRole[] {
-  if (view.filterRole === 'all') return ROLES;
+  if (view.filterRole === 'all') {
+    return ROLES;
+  }
 
   return [view.filterRole];
 }
 
 export function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[] {
   const copy = rows.slice();
-  if (mode === 'name') return copy.sort((a, b) => a.Name.localeCompare(b.Name));
-  if (mode === 'length') return copy.sort((a, b) => b.Body.length - a.Body.length);
+  if (mode === 'name') {
+    return copy.sort((a, b) => a.Name.localeCompare(b.Name));
+  }
+
+  if (mode === 'length') {
+    return copy.sort((a, b) => b.Body.length - a.Body.length);
+  }
 
   return copy.sort((a, b) => (b.IsDefault - a.IsDefault) || a.Name.localeCompare(b.Name));
 }
@@ -29,6 +36,7 @@ export async function renderAllRoles(refs: ModalRefs): Promise<void> {
       const section = await buildRoleSection(refs, role, renderAllRoles);
       refs.body.appendChild(section);
     }
+
     refs.status.textContent = 'Loaded (' + refs.view.filterRole + ', sort=' + refs.view.sortMode + ').';
   } catch (err) {
     logError(LOG_SCOPE, 'renderAllRoles failed', err);
@@ -55,6 +63,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
 
     return wrap;
   }
+
   const rows = result.value;
   if (rows.length === 0) {
     const empty = document.createElement('div');
@@ -64,8 +73,11 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
 
     return wrap;
   }
+
   const sortedRows = sortRows(rows, refs.view.sortMode);
-  for (const row of sortedRows) wrap.appendChild(buildRowContainer(refs, row, refreshAllRoles));
+  for (const row of sortedRows) {
+    wrap.appendChild(buildRowContainer(refs, row, refreshAllRoles));
+  }
 
   return wrap;
 }

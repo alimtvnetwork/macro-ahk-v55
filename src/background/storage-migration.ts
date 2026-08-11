@@ -44,13 +44,13 @@ export const MAX_ALLOWED_STORAGE_SCHEMA_VERSION = 1;
  * `chrome.storage.local` keys from camelCase to PascalCase. Always throws.
  */
 export function assertNoPascalCaseStorageMigration(context: string): never {
-    const message =
+  const message =
         `BLOCKED: Storage PascalCase migration attempted from "${context}". ` +
         `Phase 2c-storage v2 is permanently forbidden — see ` +
         `mem://constraints/no-storage-pascalcase-migration. ` +
         `StoredProject in chrome.storage.local MUST remain camelCase.`;
-    logBgWarnError(BgLogTag.BOOT, message);
-    throw new Error(message);
+  logBgWarnError(BgLogTag.BOOT, message);
+  throw new Error(message);
 }
 
 /* ------------------------------------------------------------------ */
@@ -76,14 +76,14 @@ export interface StorageMigrationResult {
 /* ------------------------------------------------------------------ */
 
 const MIGRATIONS: StorageMigration[] = [
-    {
-        version: 1,
-        description: "Baseline — establish storage schema version key (no payload changes)",
-        up: async () => {
-            // Identity migration. Stamps the version so subsequent installs
-            // skip straight to v2+ once those migrations land.
-        },
+  {
+    version: 1,
+    description: "Baseline — establish storage schema version key (no payload changes)",
+    up: async () => {
+      // Identity migration. Stamps the version so subsequent installs
+      // skip straight to v2+ once those migrations land.
     },
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -94,21 +94,21 @@ const MIGRATIONS: StorageMigration[] = [
  * Reads the current persisted storage schema version (0 if never stamped).
  */
 export async function readStorageSchemaVersion(): Promise<number> {
-    try {
-        const result = await chrome.storage.local.get(STORAGE_SCHEMA_VERSION_KEY);
-        const version = result[STORAGE_SCHEMA_VERSION_KEY];
-        const isNumber = typeof version === "number" && Number.isFinite(version);
+  try {
+    const result = await chrome.storage.local.get(STORAGE_SCHEMA_VERSION_KEY);
+    const version = result[STORAGE_SCHEMA_VERSION_KEY];
+    const isNumber = typeof version === "number" && Number.isFinite(version);
 
-        return isNumber ? version : 0;
-    } catch (err) {
-        logCaughtError(
-            BgLogTag.BOOT,
-            `Failed to read storage schema version\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Persisted numeric version\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
-            err,
-        );
+    return isNumber ? version : 0;
+  } catch (err) {
+    logCaughtError(
+      BgLogTag.BOOT,
+      `Failed to read storage schema version\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Persisted numeric version\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
+      err,
+    );
 
-        return 0;
-    }
+    return 0;
+  }
 }
 
 /**
@@ -116,56 +116,57 @@ export async function readStorageSchemaVersion(): Promise<number> {
  * Stamps the new version only after every migration succeeds.
  */
 function assertMigrationCeiling(): void {
-    const overCeiling = MIGRATIONS.filter(
-        (m) => m.version > MAX_ALLOWED_STORAGE_SCHEMA_VERSION,
+  const overCeiling = MIGRATIONS.filter(
+    (m) => m.version > MAX_ALLOWED_STORAGE_SCHEMA_VERSION,
+  );
+  if (overCeiling.length > 0) {
+    const versions = overCeiling.map((m) => `v${m.version}`).join(", ");
+    assertNoPascalCaseStorageMigration(
+      `runStorageMigrations registry (forbidden migrations: ${versions})`,
     );
-    if (overCeiling.length > 0) {
-        const versions = overCeiling.map((m) => `v${m.version}`).join(", ");
-        assertNoPascalCaseStorageMigration(
-            `runStorageMigrations registry (forbidden migrations: ${versions})`,
-        );
-    }
+  }
 }
 
 async function applyMigration(
-    migration: (typeof MIGRATIONS)[number],
+  migration: (typeof MIGRATIONS)[number],
 ): Promise<{ ok: true } | { ok: false; err: unknown }> {
-    try {
-        await migration.up();
-        await chrome.storage.local.set({ [STORAGE_SCHEMA_VERSION_KEY]: migration.version });
+  try {
+    await migration.up();
+    await chrome.storage.local.set({ [STORAGE_SCHEMA_VERSION_KEY]: migration.version });
 
-        return { ok: true };
-    } catch (err) {
-        logBgWarnError(
-            BgLogTag.BOOT,
-            `Storage migration v${migration.version} failed\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Successful migration "${migration.description}"\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
-        );
+    return { ok: true };
+  } catch (err) {
+    logBgWarnError(
+      BgLogTag.BOOT,
+      `Storage migration v${migration.version} failed\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Successful migration "${migration.description}"\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
+    );
 
-        return { ok: false, err };
-    }
+    return { ok: false, err };
+  }
 }
 
 export async function runStorageMigrations(): Promise<StorageMigrationResult> {
-    assertMigrationCeiling();
-    const fromVersion = await readStorageSchemaVersion();
-    const pending = MIGRATIONS.filter((m) => m.version > fromVersion);
-    if (pending.length === 0) {
-        return { fromVersion, toVersion: fromVersion, applied: 0, failed: false };
+  assertMigrationCeiling();
+  const fromVersion = await readStorageSchemaVersion();
+  const pending = MIGRATIONS.filter((m) => m.version > fromVersion);
+  if (pending.length === 0) {
+    return { fromVersion, toVersion: fromVersion, applied: 0, failed: false };
+  }
+
+  let lastApplied = fromVersion;
+  for (const migration of pending) {
+    const outcome = await applyMigration(migration);
+    if (outcome.isFail) {
+      return {
+        fromVersion,
+        toVersion: lastApplied,
+        applied: lastApplied - fromVersion,
+        failed: true,
+      };
     }
 
-    let lastApplied = fromVersion;
-    for (const migration of pending) {
-        const outcome = await applyMigration(migration);
-        if (outcome.isFail) {
-            return {
-                fromVersion,
-                toVersion: lastApplied,
-                applied: lastApplied - fromVersion,
-                failed: true,
-            };
-        }
-        lastApplied = migration.version;
-    }
+    lastApplied = migration.version;
+  }
 
-    return { fromVersion, toVersion: lastApplied, applied: pending.length, failed: false };
+  return { fromVersion, toVersion: lastApplied, applied: pending.length, failed: false };
 }

@@ -182,15 +182,21 @@ export function AssetCard({ asset, links, onSync, onDelete, onViewDetail }: Asse
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onClick={e => { e.stopPropagation(); onSync(asset.Id); }}>
+                <DropdownMenuItem onClick={e => {
+                  e.stopPropagation(); onSync(asset.Id); 
+                }}>
                   <RefreshCw className="h-3.5 w-3.5 mr-2" />
                   Sync to projects
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(asset.Slug); toast.success("Slug copied"); }}>
+                <DropdownMenuItem onClick={e => {
+                  e.stopPropagation(); navigator.clipboard.writeText(asset.Slug); toast.success("Slug copied"); 
+                }}>
                   <Copy className="h-3.5 w-3.5 mr-2" />
                   Copy slug
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive" onClick={e => { e.stopPropagation(); setDeleteOpen(true); }}>
+                <DropdownMenuItem className="text-destructive" onClick={e => {
+                  e.stopPropagation(); setDeleteOpen(true); 
+                }}>
                   <Trash2 className="h-3.5 w-3.5 mr-2" />
                   Delete
                 </DropdownMenuItem>
@@ -314,7 +320,10 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
   }, [name, slug, type, content, resetForm, onOpenChange, onPromoted]);
 
   const handleReplace = useCallback(async () => {
-    if (!conflict) return;
+    if (!conflict) {
+      return;
+    }
+
     setPromoting(true);
     try {
       await sendMessage({
@@ -334,7 +343,10 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
   }, [conflict, content, name, resetForm, onOpenChange, onPromoted]);
 
   const handleFork = useCallback(async () => {
-    if (!conflict) return;
+    if (!conflict) {
+      return;
+    }
+
     setPromoting(true);
     try {
       const result = await sendMessage<{ slug: string }>({
@@ -355,7 +367,13 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
   }, [conflict, slug, name, type, content, resetForm, onOpenChange, onPromoted]);
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) resetForm(); onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => {
+      if (!v) {
+        resetForm();
+      }
+
+      onOpenChange(v); 
+    }}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -592,8 +610,11 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
           <ScrollArea className="h-[200px]">
             <pre className="text-xs font-mono whitespace-pre-wrap text-muted-foreground p-2 bg-muted/30 rounded-md">
               {(() => {
-                try { return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); } catch (err) { /* swallowed */
- return asset.ContentJson; }
+                try {
+                  return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); 
+                } catch (err) { /* swallowed */
+                  return asset.ContentJson; 
+                }
               })()}
             </pre>
           </ScrollArea>
@@ -606,7 +627,9 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
           <RefreshCw className="h-3.5 w-3.5 mr-1" />
           Sync to projects
         </Button>
-        <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(asset.ContentJson); toast.success("Content copied"); }}>
+        <Button size="sm" variant="outline" onClick={() => {
+          navigator.clipboard.writeText(asset.ContentJson); toast.success("Content copied"); 
+        }}>
           <Copy className="h-3.5 w-3.5 mr-1" />
           Copy content
         </Button>
@@ -625,7 +648,11 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
       />
 
       {/* Link State Change Confirmation Dialog */}
-      <AlertDialog open={!!confirmState} onOpenChange={open => { if (!open) setConfirmState(null); }}>
+      <AlertDialog open={!!confirmState} onOpenChange={open => {
+        if (!open) {
+          setConfirmState(null);
+        } 
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmCfg?.title ?? "Change link state?"}</AlertDialogTitle>
@@ -686,7 +713,9 @@ export function LibraryView() {
     }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData(); 
+  }, [loadData]);
 
   // Cross-tab sync: any Options/popup tab that mutates a library row triggers
   // a LIBRARY_CHANGED broadcast from the background. Re-pull data so this tab
@@ -696,26 +725,39 @@ export function LibraryView() {
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
       | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
-    if (!runtime?.onMessage) return;
+    if (!runtime?.onMessage) {
+      return;
+    }
+
     let timer: ReturnType<typeof setTimeout> | null = null;
     const listener = (message: unknown) => {
       const msg = message as { type?: string; syncedCount?: number; pinnedNotified?: number } | null;
       if (msg?.type === "LIBRARY_CHANGED") {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => { void loadData(); }, 150);
+        if (timer) {
+          clearTimeout(timer);
+        }
+
+        timer = setTimeout(() => {
+          void loadData(); 
+        }, 150);
 
         return;
       }
+
       if (msg?.type === "LIBRARY_SYNC_BROADCAST") {
         const synced = msg.syncedCount ?? 0;
         const pinned = msg.pinnedNotified ?? 0;
         toast.info(`Library synced in another tab — ${synced} project(s) updated, ${pinned} pinned notified.`);
       }
     };
+
     runtime.onMessage.addListener(listener);
 
     return () => {
-      if (timer) clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
+
       runtime.onMessage!.removeListener(listener);
     };
   }, [loadData]);
@@ -772,7 +814,10 @@ export function LibraryView() {
     input.accept = ".json";
     input.onchange = async () => {
       const file = input.files?.[0];
-      if (!file) return;
+      if (!file) {
+        return;
+      }
+
       setImportExportLoading(true);
       try {
         const text = await file.text();
@@ -789,14 +834,20 @@ export function LibraryView() {
         setImportExportLoading(false);
       }
     };
+
     input.click();
   }, [loadData]);
 
   // Filter + paginate assets
   const PAGE_SIZE = 50;
   const filtered = assets.filter(a => {
-    if (filterType !== "all" && a.Type !== filterType) return false;
-    if (search && !a.Name.toLowerCase().includes(search.toLowerCase()) && !a.Slug.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterType !== "all" && a.Type !== filterType) {
+      return false;
+    }
+
+    if (search && !a.Name.toLowerCase().includes(search.toLowerCase()) && !a.Slug.toLowerCase().includes(search.toLowerCase())) {
+      return false;
+    }
 
     return true;
   });
@@ -824,7 +875,9 @@ export function LibraryView() {
         return;
       }
 
-      if (isInput) return;
+      if (isInput) {
+        return;
+      }
 
       if (e.key === "ArrowLeft" && safePage > 0) {
         setPage(p => p - 1);
@@ -836,6 +889,7 @@ export function LibraryView() {
         setPromoteOpen(true);
       }
     };
+
     window.addEventListener(Events.KEYDOWN, handler);
 
     return () => window.removeEventListener(Events.KEYDOWN, handler);
@@ -931,12 +985,16 @@ export function LibraryView() {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 value={search}
-                onChange={e => { setSearch(e.target.value); setPage(0); }}
+                onChange={e => {
+                  setSearch(e.target.value); setPage(0); 
+                }}
                 placeholder="Search assets…"
                 className="h-8 text-sm pl-8"
               />
             </div>
-            <Tabs value={filterType} onValueChange={v => { setFilterType(v as AssetType | "all"); setPage(0); }}>
+            <Tabs value={filterType} onValueChange={v => {
+              setFilterType(v as AssetType | "all"); setPage(0); 
+            }}>
               <TabsList className="h-8">
                 <TabsTrigger value="all" className="text-xs px-2 h-6">All</TabsTrigger>
                 <TabsTrigger value="prompt" className="text-xs px-2 h-6">Prompts</TabsTrigger>
@@ -994,7 +1052,9 @@ export function LibraryView() {
               ) : (
                 <>
                   <p className="text-sm">No assets match your filter.</p>
-                  <Button size="sm" variant="ghost" onClick={() => { setSearch(""); setFilterType("all"); setPage(0); }}>
+                  <Button size="sm" variant="ghost" onClick={() => {
+                    setSearch(""); setFilterType("all"); setPage(0); 
+                  }}>
                     Clear filters
                   </Button>
                 </>

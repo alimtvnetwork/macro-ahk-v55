@@ -12,15 +12,15 @@ import { XPathKeyCodeType } from "../xpath/xpath-key-code";
 import type { XPathEditorRow } from "./xpath-editor-types";
 
 export const buildDefaultEditorRows = (): ReadonlyArray<XPathEditorRow> => {
-    const out: XPathEditorRow[] = [];
+  const out: XPathEditorRow[] = [];
 
-    for (const key of Object.values(XPathKeyCodeType)) {
-        out.push({
-            KeyCode: key,
-            XPath: DefaultXPaths[key],
-            DelayMs: DefaultDelaysMs[key],
-        });
-    }
+  for (const key of Object.values(XPathKeyCodeType)) {
+    out.push({
+      KeyCode: key,
+      XPath: DefaultXPaths[key],
+      DelayMs: DefaultDelaysMs[key],
+    });
+  }
 
-    return Object.freeze(out);
+  return Object.freeze(out);
 };

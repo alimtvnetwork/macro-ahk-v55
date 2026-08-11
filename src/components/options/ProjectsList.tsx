@@ -75,27 +75,27 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
     const isEditing = project !== undefined;
     const bindings: ScriptBinding[] = isEditing
       ? (project.scripts ?? []).map((s) => {
-          const matched = availableScripts.find((as) => as.name === s.path);
-          const bindingIds = s.configBinding
-            ? s.configBinding.split(",").map((id) => id.trim()).filter(Boolean)
-            : [];
-          const cfgBindings = bindingIds
-            .map((id, i) => {
-              const config = availableConfigs.find((c) => c.id === id);
+        const matched = availableScripts.find((as) => as.name === s.path);
+        const bindingIds = s.configBinding
+          ? s.configBinding.split(",").map((id) => id.trim()).filter(Boolean)
+          : [];
+        const cfgBindings = bindingIds
+          .map((id, i) => {
+            const config = availableConfigs.find((c) => c.id === id);
 
-              return config ? { configId: config.id, configName: config.name, json: typeof config.json === "string" ? config.json : "{}", order: i } : null;
-            })
-            .filter((x): x is { configId: string; configName: string; json: string; order: number } => x !== null);
+            return config ? { configId: config.id, configName: config.name, json: typeof config.json === "string" ? config.json : "{}", order: i } : null;
+          })
+          .filter((x): x is { configId: string; configName: string; json: string; order: number } => x !== null);
 
-          return {
-            scriptId: matched?.id ?? "",
-            scriptName: s.path,
-            order: s.order,
-            runAt: s.runAt ?? "document_idle",
-            code: matched?.code ?? "",
-            configBindings: cfgBindings,
-          };
-        })
+        return {
+          scriptId: matched?.id ?? "",
+          scriptName: s.path,
+          order: s.order,
+          runAt: s.runAt ?? "document_idle",
+          code: matched?.code ?? "",
+          configBindings: cfgBindings,
+        };
+      })
       : [];
 
     setForm({
@@ -326,8 +326,13 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                 Injection Variables
                 {form.variables !== "{}" && (
                   <Badge variant="secondary" className="text-[9px] ml-1 px-1 py-0">
-                    {(() => { try { return Object.keys(JSON.parse(form.variables)).length; } catch (err) { /* swallowed */
- return 0; } })()}
+                    {(() => {
+                      try {
+                        return Object.keys(JSON.parse(form.variables)).length; 
+                      } catch (err) { /* swallowed */
+                        return 0; 
+                      } 
+                    })()}
                   </Badge>
                 )}
               </CollapsibleTrigger>
@@ -355,9 +360,11 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                       placeholder='{ "key": "value" }'
                     />
                     {(() => {
-                      try { JSON.parse(form.variables);
+                      try {
+                        JSON.parse(form.variables);
 
- return null; } catch (err) { /* swallowed */
+                        return null; 
+                      } catch (err) { /* swallowed */
                         return (
                           <p className="text-[10px] text-destructive mt-1">Invalid JSON</p>
                         );
@@ -370,15 +377,17 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 
             {/* Folder drop zone */}
             <div
-              onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault(); setIsDragOver(true); 
+              }}
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleFolderDrop}
               className={`
                 border-2 border-dashed rounded-md p-4 text-center transition-colors cursor-pointer
                 ${isDragOver
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-muted-foreground/20 text-muted-foreground hover:border-primary/40"
-                }
+          ? "border-primary bg-primary/5 text-primary"
+          : "border-muted-foreground/20 text-muted-foreground hover:border-primary/40"
+        }
               `}
             >
               <Upload className="h-4 w-4 mx-auto mb-1" />
@@ -480,12 +489,16 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 /** Displays a badge with variable count for a project. */
 function VariablesBadge({ variables }: { variables?: string }) {
   const isAbsent = !variables || variables === "{}";
-  if (isAbsent) return null;
+  if (isAbsent) {
+    return null;
+  }
 
   try {
     const count = Object.keys(JSON.parse(variables)).length;
     const isEmpty = count === 0;
-    if (isEmpty) return null;
+    if (isEmpty) {
+      return null;
+    }
 
     return (
       <Badge variant="outline" className="text-[10px]">

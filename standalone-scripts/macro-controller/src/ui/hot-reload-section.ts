@@ -61,6 +61,7 @@ function saveStateBeforeReinject(): void {
       logError('MacroController', 'Unknown error');
       logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
+
     localStorage.setItem(REINJECT_KEYS.timestamp, String(Date.now()));
     log('Re-inject: state saved to localStorage', 'info');
   } catch (e) {
@@ -75,14 +76,18 @@ function saveStateBeforeReinject(): void {
 export function restoreReinjectState(): { restored: boolean; loopWasRunning: boolean } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    if (!tsStr) return { restored: false, loopWasRunning: false };
+    if (!tsStr) {
+      return { restored: false, loopWasRunning: false };
+    }
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
 
     // Clear all keys regardless
     Object.values(REINJECT_KEYS).forEach(function(k) {
-      try { localStorage.removeItem(k); } catch (_e) {
+      try {
+        localStorage.removeItem(k); 
+      } catch (_e) {
         logError('MacroController', 'Unknown error');
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
@@ -110,7 +115,9 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
 export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunning: boolean; wsName: string; wsId: string } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    if (!tsStr) return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
+    if (!tsStr) {
+      return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
+    }
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
@@ -122,7 +129,9 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
 
     // Clear all keys
     Object.values(REINJECT_KEYS).forEach(function(k) {
-      try { localStorage.removeItem(k); } catch (_e) {
+      try {
+        localStorage.removeItem(k); 
+      } catch (_e) {
         logError('MacroController', 'Unknown error');
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
@@ -135,8 +144,13 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
     }
 
     log('Re-inject: restored state (ws=' + wsName + ', loopWas=' + loopWasRunning + ')', 'success');
-    if (wsName) state.workspaceName = wsName;
-    if (wsId && loopCreditState.currentWs) loopCreditState.currentWs.id = wsId;
+    if (wsName) {
+      state.workspaceName = wsName;
+    }
+
+    if (wsId && loopCreditState.currentWs) {
+      loopCreditState.currentWs.id = wsId;
+    }
 
     if (loopWasRunning) {
       showToast('Script re-injected. Loop was running — click Start to resume.', 'info');
@@ -180,7 +194,9 @@ function executeReinject(scriptSource: string, version: string): void {
 
   // 3. Remove old injected script elements
   const oldScripts = document.querySelectorAll('[data-marco-injection]');
-  oldScripts.forEach(function(el) { el.remove(); });
+  oldScripts.forEach(function(el) {
+    el.remove(); 
+  });
   log('Re-inject: removed ' + oldScripts.length + ' old injection elements', 'info');
 
   // 4. Create new blob and inject
@@ -195,11 +211,13 @@ function executeReinject(scriptSource: string, version: string): void {
       URL.revokeObjectURL(blobUrl);
       log('Re-inject: v' + version + ' loaded successfully', 'success');
     };
+
     script.onerror = function() {
       URL.revokeObjectURL(blobUrl);
       logError('Re-inject', 'script load FAILED');
       showToast('Re-inject failed — script load error', 'error');
     };
+
     document.head.appendChild(script);
   } catch (e) {
     logError('Re-inject', 'blob creation failed — ' + (e instanceof Error ? e.message : String(e)));
@@ -232,12 +250,14 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
     logError('MacroController', 'Unknown error');
     resultPromise = undefined;
   }
+
   if (!resultPromise || typeof resultPromise.then !== 'function') {
     ctx.checkBtn.disabled = false;
     ctx.statusRow.textContent = '❌ Extension unavailable';
 
     return;
   }
+
   resultPromise.then(function(resp: ExtensionResponse) {
     ctx.checkBtn.disabled = false;
 
@@ -261,7 +281,9 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
       ctx.statusRow.textContent = '⚠️ Update available · ' + now;
       ctx.reinjectBtn.style.display = '';
       ctx.availVal.style.color = cPrimaryLight;
-      if (ctx.onVersionMismatch) { ctx.onVersionMismatch(ctx.availableVersion); }
+      if (ctx.onVersionMismatch) {
+        ctx.onVersionMismatch(ctx.availableVersion); 
+      }
     }
   }).catch(function() {
     ctx.checkBtn.disabled = false;
@@ -299,9 +321,17 @@ export function buildHotReloadSection(onVersionMismatch?: (available: string) =>
     onVersionMismatch: onVersionMismatch || null,
   };
 
-  const checkVersion = function(): void { performVersionCheck(checkCtx); };
-  checkBtn.onclick = function() { checkVersion(); };
-  reinjectBtn.onclick = function() { _handleReinject(reinjectBtn, statusRow); };
+  const checkVersion = function(): void {
+    performVersionCheck(checkCtx); 
+  };
+
+  checkBtn.onclick = function() {
+    checkVersion(); 
+  };
+
+  reinjectBtn.onclick = function() {
+    _handleReinject(reinjectBtn, statusRow); 
+  };
 
   setTimeout(checkVersion, Timings.POLL_INTERVAL_NORMAL);
 
@@ -354,14 +384,24 @@ function _buildActionButtons(): { actionRow: HTMLElement; checkBtn: HTMLElement;
   const checkBtn = document.createElement('button');
   checkBtn.textContent = '🔍 Check';
   checkBtn.style.cssText = 'padding:3px 8px;border:1px solid ' + cPanelBorder + ';border-radius:4px;background:' + cSectionBg + ';color:' + cPanelFg + ';font-size:' + tFontTiny + ';cursor:pointer;transition:all ' + trNormal + ';';
-  checkBtn.onmouseenter = function() { checkBtn.style.background = 'rgba(255,255,255,0.1)'; };
-  checkBtn.onmouseleave = function() { checkBtn.style.background = cSectionBg; };
+  checkBtn.onmouseenter = function() {
+    checkBtn.style.background = 'rgba(255,255,255,0.1)'; 
+  };
+
+  checkBtn.onmouseleave = function() {
+    checkBtn.style.background = cSectionBg; 
+  };
 
   const reinjectBtn = document.createElement('button');
   reinjectBtn.textContent = '🔄 Re-Inject';
   reinjectBtn.style.cssText = 'padding:3px 8px;border:1px solid ' + cPrimaryLight + ';border-radius:4px;background:rgba(100,200,255,0.1);color:' + cPrimaryLight + ';font-size:' + tFontTiny + ';cursor:pointer;font-weight:600;display:none;transition:all ' + trNormal + ';';
-  reinjectBtn.onmouseenter = function() { reinjectBtn.style.background = 'rgba(100,200,255,0.2)'; };
-  reinjectBtn.onmouseleave = function() { reinjectBtn.style.background = 'rgba(100,200,255,0.1)'; };
+  reinjectBtn.onmouseenter = function() {
+    reinjectBtn.style.background = 'rgba(100,200,255,0.2)'; 
+  };
+
+  reinjectBtn.onmouseleave = function() {
+    reinjectBtn.style.background = 'rgba(100,200,255,0.1)'; 
+  };
 
   actionRow.appendChild(checkBtn);
   actionRow.appendChild(reinjectBtn);

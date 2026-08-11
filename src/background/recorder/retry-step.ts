@@ -17,11 +17,11 @@
  */
 
 import {
-    executeReplay,
-    type ReplayOptions,
-    type ReplayPersistOptions,
-    type ReplayStepInput,
-    type ReplayStepResult,
+  executeReplay,
+  type ReplayOptions,
+  type ReplayPersistOptions,
+  type ReplayStepInput,
+  type ReplayStepResult,
 } from "./live-dom-replay";
 
 export interface RetryStepOptions extends Omit<ReplayOptions, "Persist"> {
@@ -46,30 +46,32 @@ export interface RetryStepOutcome {
  * can update toasts / UI rows in place.
  */
 export async function retryStep(
-    step: ReplayStepInput,
-    options: RetryStepOptions,
+  step: ReplayStepInput,
+  options: RetryStepOptions,
 ): Promise<RetryStepOutcome> {
-    const persist: ReplayPersistOptions | undefined = options.Persist === undefined
-        ? undefined
-        : {
-            ProjectSlug: options.Persist.ProjectSlug,
-            Notes: buildRetryNotes(step.StepId, options.Persist.Notes),
-        };
-
-    const outcome = await executeReplay([step], { ...options, Persist: persist });
-    const result = outcome.Results[0];
-
-    return {
-        Result: result,
-        StartedAt: outcome.StartedAt,
-        FinishedAt: outcome.FinishedAt,
-        PersistedRunId: outcome.PersistedRun?.ReplayRunId ?? null,
+  const persist: ReplayPersistOptions | undefined = options.Persist === undefined
+    ? undefined
+    : {
+      ProjectSlug: options.Persist.ProjectSlug,
+      Notes: buildRetryNotes(step.StepId, options.Persist.Notes),
     };
+
+  const outcome = await executeReplay([step], { ...options, Persist: persist });
+  const result = outcome.Results[0];
+
+  return {
+    Result: result,
+    StartedAt: outcome.StartedAt,
+    FinishedAt: outcome.FinishedAt,
+    PersistedRunId: outcome.PersistedRun?.ReplayRunId ?? null,
+  };
 }
 
 function buildRetryNotes(stepId: number, callerNotes: string | undefined): string {
-    const tag = `Retry of step #${stepId}`;
-    if (callerNotes === undefined || callerNotes.trim() === "") { return tag; }
+  const tag = `Retry of step #${stepId}`;
+  if (callerNotes === undefined || callerNotes.trim() === "") {
+    return tag; 
+  }
 
-    return `${tag}, ${callerNotes}`;
+  return `${tag}, ${callerNotes}`;
 }

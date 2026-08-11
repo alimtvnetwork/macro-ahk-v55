@@ -52,23 +52,31 @@ const REINJECT_DELAY_MS = 500;
 const IDLE_TIMEOUT_MS = 1000;
 
 function describeObserveTarget(target: Element): string {
-  if (target === document.body) return 'document.body';
+  if (target === document.body) {
+    return 'document.body';
+  }
 
   return target.tagName + (target.id ? '#' + target.id : '');
 }
 
 function attachVisibilityHandler(createUI: () => void): () => void {
   function onVisibilityChange(): void {
-    if (document.visibilityState !== 'visible') return;
+    if (document.visibilityState !== 'visible') {
+      return;
+    }
+
     const isPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
     if (!isPresent) {
       log('visibilitychange: UI missing — re-injecting', 'check');
       tryReinjectUI(createUI);
     }
   }
+
   document.addEventListener('visibilitychange', onVisibilityChange);
 
-  return function () { document.removeEventListener('visibilitychange', onVisibilityChange); };
+  return function () {
+    document.removeEventListener('visibilitychange', onVisibilityChange); 
+  };
 }
 
 /**
@@ -83,7 +91,10 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
   const idleWin = window as unknown as IdleCallbackWindow;
 
   function cancelPending(): void {
-    if (reinjectTimer) { clearTimeout(reinjectTimer); reinjectTimer = null; }
+    if (reinjectTimer) {
+      clearTimeout(reinjectTimer); reinjectTimer = null; 
+    }
+
     if (reinjectIdleHandle !== null && idleWin.cancelIdleCallback) {
       idleWin.cancelIdleCallback(reinjectIdleHandle);
       reinjectIdleHandle = null;
@@ -99,6 +110,7 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
         log('SPA navigation detected - checking UI state', 'check');
         tryReinjectUI(createUI);
       };
+
       if (idleWin.requestIdleCallback) {
         reinjectIdleHandle = idleWin.requestIdleCallback(run, { timeout: IDLE_TIMEOUT_MS });
       } else {
@@ -109,7 +121,10 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
 
   const observer = new MutationObserver(function (_mutations: MutationRecord[]) {
     const isBothPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
-    if (isBothPresent) return;
+    if (isBothPresent) {
+      return;
+    }
+
     scheduleReinject();
   });
 
@@ -120,6 +135,7 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
   if (!scopedTarget) {
     log('Persistence observer: no <main> or #root found — falling back to document.body (higher mutation volume)', 'warn');
   }
+
   observer.observe(observeTarget, { childList: true });
   log('MutationObserver installed on ' + describeObserveTarget(observeTarget) + ' (childList only) for UI persistence', 'success');
 
@@ -127,14 +143,21 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
 
   let torn = false;
   function teardown(): void {
-    if (torn) return;
+    if (torn) {
+      return;
+    }
+
     torn = true;
     observer.disconnect();
     cancelPending();
     detachVisibility();
     window.removeEventListener('pagehide', onPageHide);
   }
-  function onPageHide(): void { teardown(); }
+
+  function onPageHide(): void {
+    teardown(); 
+  }
+
   window.addEventListener('pagehide', onPageHide, { once: true });
 
   return teardown;

@@ -15,13 +15,13 @@ export enum UserAddCsvColumnType {
 }
 
 export const REQUIRED_COLUMNS: ReadonlyArray<UserAddCsvColumnType> = Object.freeze([
-    UserAddCsvColumnType.WorkspaceUrl,
-    UserAddCsvColumnType.MemberEmail,
+  UserAddCsvColumnType.WorkspaceUrl,
+  UserAddCsvColumnType.MemberEmail,
 ]);
 
 export const OPTIONAL_COLUMNS: ReadonlyArray<UserAddCsvColumnType> = Object.freeze([
-    UserAddCsvColumnType.Role,
-    UserAddCsvColumnType.Notes,
+  UserAddCsvColumnType.Role,
+  UserAddCsvColumnType.Notes,
 ]);
 
 export const ALL_COLUMNS: ReadonlyArray<UserAddCsvColumnType> =

@@ -10,49 +10,49 @@ import type { LovableApiClient } from "../../../lovable-common/src/api/lovable-a
 import type { TtlCache } from "./ttl-cache";
 
 export const resolveWorkspaceId = async (
-    api: LovableApiClient,
-    cache: TtlCache<string>,
-    loginEmail: string,
+  api: LovableApiClient,
+  cache: TtlCache<string>,
+  loginEmail: string,
 ): Promise<string> => {
-    const cached = cache.get(loginEmail);
+  const cached = cache.get(loginEmail);
 
-    if (cached !== null) {
-        return cached;
-    }
+  if (cached !== null) {
+    return cached;
+  }
 
-    const workspaces = await api.getWorkspaces();
+  const workspaces = await api.getWorkspaces();
 
-    if (workspaces.length === 0) {
-        throw new Error(`No workspaces visible to ${loginEmail}`);
-    }
+  if (workspaces.length === 0) {
+    throw new Error(`No workspaces visible to ${loginEmail}`);
+  }
 
-    const first = workspaces[0];
-    cache.set(loginEmail, first.Id);
+  const first = workspaces[0];
+  cache.set(loginEmail, first.Id);
 
-    return first.Id;
+  return first.Id;
 };
 
 export const resolveUserId = async (
-    api: LovableApiClient,
-    cache: TtlCache<string>,
-    workspaceId: string,
-    ownerEmail: string,
+  api: LovableApiClient,
+  cache: TtlCache<string>,
+  workspaceId: string,
+  ownerEmail: string,
 ): Promise<string> => {
-    const cacheKey = `${workspaceId}::${ownerEmail}`;
-    const cached = cache.get(cacheKey);
+  const cacheKey = `${workspaceId}::${ownerEmail}`;
+  const cached = cache.get(cacheKey);
 
-    if (cached !== null) {
-        return cached;
-    }
+  if (cached !== null) {
+    return cached;
+  }
 
-    const memberships = await api.getMemberships(workspaceId);
-    const match = memberships.find((m) => m.Email === ownerEmail);
+  const memberships = await api.getMemberships(workspaceId);
+  const match = memberships.find((m) => m.Email === ownerEmail);
 
-    if (match === undefined) {
-        throw new Error(`Membership not found for ${ownerEmail} in workspace ${workspaceId}`);
-    }
+  if (match === undefined) {
+    throw new Error(`Membership not found for ${ownerEmail} in workspace ${workspaceId}`);
+  }
 
-    cache.set(cacheKey, match.UserId);
+  cache.set(cacheKey, match.UserId);
 
-    return match.UserId;
+  return match.UserId;
 };

@@ -82,6 +82,7 @@ describe('diagnostic-toast-telemetry', () => {
     const handler = (e: Event): void => {
       seen.push((e as CustomEvent).detail);
     };
+
     window.addEventListener('marco:diagnostic-toast', handler);
     emitDiagnosticToastEvent({
       code: 'X_E001',
@@ -103,6 +104,7 @@ describe('diagnostic-toast-telemetry', () => {
         title: 't',
       });
     }
+
     const trace = readDiagnosticToastTrace();
     expect(trace.length).toBe(DIAGNOSTIC_TOAST_TRACE_MAX);
     // Oldest entries evicted → first code is offset by 10.
@@ -144,6 +146,7 @@ describe('diagnostic-toast-telemetry', () => {
     const handler = (e: Event): void => {
       dispatched = (e as CustomEvent<{ correlationId: string }>).detail.correlationId;
     };
+
     window.addEventListener('marco:diagnostic-toast', handler);
     const evt = emitDiagnosticToastEvent({
       code: 'X_E001',
@@ -161,7 +164,10 @@ describe('diagnostic-toast-telemetry', () => {
 
   it('T9: generateCorrelationId produces unique ids on rapid calls', () => {
     const ids = new Set<string>();
-    for (let i = 0; i < 50; i++) ids.add(generateCorrelationId());
+    for (let i = 0; i < 50; i++) {
+      ids.add(generateCorrelationId());
+    }
+
     expect(ids.size).toBe(50);
   });
 });

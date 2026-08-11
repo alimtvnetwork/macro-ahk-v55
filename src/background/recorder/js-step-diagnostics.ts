@@ -50,16 +50,16 @@
  */
 
 import {
-    buildFailureReport,
-    type FailureReport,
-    type FailurePhase,
+  buildFailureReport,
+  type FailureReport,
+  type FailurePhase,
 } from "./failure-logger";
 import type { VariableContext, FieldRow } from "./field-reference-resolver";
 import {
-    JsExecError,
-    JsValidationError,
-    type JsInlineContext,
-    type JsInlineResult,
+  JsExecError,
+  JsValidationError,
+  type JsInlineContext,
+  type JsInlineResult,
 } from "./js-step-sandbox";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
 import { BuildVarEntrySourceType } from "../../types/enums";
@@ -90,11 +90,11 @@ const JS_STEP_KIND = "JsInline";
 type VariableValueType = VariableContext["ValueType"];
 
 function classifyValue(v: string): { Type: VariableValueType; Display: string } {
-    if (v === "") {
-        return { Type: "string", Display: "" };
-    }
+  if (v === "") {
+    return { Type: "string", Display: "" };
+  }
 
-    return { Type: "string", Display: v };
+  return { Type: "string", Display: v };
 }
 
 /**
@@ -108,40 +108,41 @@ function classifyValue(v: string): { Type: VariableValueType; Display: string } 
  * keys are masked.
  */
 function buildVarEntry(
-    key: string,
-    raw: unknown,
-    source: BuildVarEntrySourceType,
-    column: string | null,
+  key: string,
+  raw: unknown,
+  source: BuildVarEntrySourceType,
+  column: string | null,
 ): VariableContext {
-    const sensitive = isSensitiveDiagnosticName(key);
-    const display = sensitive ? maskDiagnosticValue(raw) : classifyValue(raw).Display;
+  const sensitive = isSensitiveDiagnosticName(key);
+  const display = sensitive ? maskDiagnosticValue(raw) : classifyValue(raw).Display;
 
-    return {
-        Name: key,
-        Source: source,
-        RowIndex: null,
-        Column: column,
-        ResolvedValue: display,
-        ValueType: "string",
-        FailureReason: "Resolved",
-        FailureDetail: null,
-    };
+  return {
+    Name: key,
+    Source: source,
+    RowIndex: null,
+    Column: column,
+    ResolvedValue: display,
+    ValueType: "string",
+    FailureReason: "Resolved",
+    FailureDetail: null,
+  };
 }
 
 export function buildJsStepVariableContext(
-    ctx: JsInlineContext,
+  ctx: JsInlineContext,
 ): ReadonlyArray<VariableContext> {
-    const out: VariableContext[] = [];
-    for (const key of Object.keys(ctx.Vars).sort()) {
-        out.push(buildVarEntry(key, ctx.Vars[key], "Vars", null));
-    }
-    if (ctx.Row !== null) {
-        for (const key of Object.keys(ctx.Row).sort()) {
-            out.push(buildVarEntry(key, ctx.Row[key], "Row", key));
-        }
-    }
+  const out: VariableContext[] = [];
+  for (const key of Object.keys(ctx.Vars).sort()) {
+    out.push(buildVarEntry(key, ctx.Vars[key], "Vars", null));
+  }
 
-    return out;
+  if (ctx.Row !== null) {
+    for (const key of Object.keys(ctx.Row).sort()) {
+      out.push(buildVarEntry(key, ctx.Row[key], "Row", key));
+    }
+  }
+
+  return out;
 }
 
 /* ------------------------------------------------------------------ */
@@ -183,35 +184,39 @@ export interface BuildJsStepFailureReportInput {
  *   - non-Error throw     → "Runtime: <stringified>"
  */
 function jsStepReasonDetail(err: unknown, body: string): string {
-    if (err instanceof JsValidationError) {
-        return `Validation: ${err.message}`;
-    }
-    if (err instanceof JsExecError) {
-        // JsExecError prefixes "InlineJs execution failed: " — strip it for
-        // the human-readable detail; the original is still on StackTrace.
-        const msg = err.message.replace(/^InlineJs execution failed:\s*/, "");
+  if (err instanceof JsValidationError) {
+    return `Validation: ${err.message}`;
+  }
 
-        return `Runtime: ${msg}${bodyHint(body)}`;
-    }
-    if (err instanceof Error) {
-        return `Runtime: ${err.message}${bodyHint(body)}`;
-    }
-    try {
-        return `Runtime: ${JSON.stringify(err)}`;
-    } catch (err) { 
-        return `Runtime: ${String(err)}`;
-    }
+  if (err instanceof JsExecError) {
+    // JsExecError prefixes "InlineJs execution failed: " — strip it for
+    // the human-readable detail; the original is still on StackTrace.
+    const msg = err.message.replace(/^InlineJs execution failed:\s*/, "");
+
+    return `Runtime: ${msg}${bodyHint(body)}`;
+  }
+
+  if (err instanceof Error) {
+    return `Runtime: ${err.message}${bodyHint(body)}`;
+  }
+
+  try {
+    return `Runtime: ${JSON.stringify(err)}`;
+  } catch (err) { 
+    return `Runtime: ${String(err)}`;
+  }
 }
 
 /** First line of the body, capped at 80 chars, formatted as `(in: <line>)`. */
 function bodyHint(body: string): string {
-    const first = body.split("\n", 1)[0]?.trim() ?? "";
-    if (first.length === 0) {
-        return "";
-    }
-    const trimmed = first.length > 80 ? `${first.slice(0, 77)}…` : first;
+  const first = body.split("\n", 1)[0]?.trim() ?? "";
+  if (first.length === 0) {
+    return "";
+  }
 
-    return ` (in: ${trimmed})`;
+  const trimmed = first.length > 80 ? `${first.slice(0, 77)}…` : first;
+
+  return ` (in: ${trimmed})`;
 }
 
 /**
@@ -222,28 +227,29 @@ function bodyHint(body: string): string {
  * `OuterHtmlSnippet` truncation contract).
  */
 function logLinesAsVariables(
-    lines: ReadonlyArray<string>,
-    verbose: boolean,
+  lines: ReadonlyArray<string>,
+  verbose: boolean,
 ): ReadonlyArray<VariableContext> {
-    if (lines.length === 0) {
-        return [];
-    }
-    const limit = verbose ? Number.POSITIVE_INFINITY : 240;
+  if (lines.length === 0) {
+    return [];
+  }
 
-    return lines.map((line, i) => {
-        const value = line.length > limit ? `${line.slice(0, limit - 1)}…` : line;
+  const limit = verbose ? Number.POSITIVE_INFINITY : 240;
 
-        return {
-            Name: `Log[${i}]`,
-            Source: "JsLog",
-            RowIndex: null,
-            Column: null,
-            ResolvedValue: value,
-            ValueType: "string" as const,
-            FailureReason: "Resolved" as const,
-            FailureDetail: null,
-        };
-    });
+  return lines.map((line, i) => {
+    const value = line.length > limit ? `${line.slice(0, limit - 1)}…` : line;
+
+    return {
+      Name: `Log[${i}]`,
+      Source: "JsLog",
+      RowIndex: null,
+      Column: null,
+      ResolvedValue: value,
+      ValueType: "string" as const,
+      FailureReason: "Resolved" as const,
+      FailureDetail: null,
+    };
+  });
 }
 
 /**
@@ -259,37 +265,37 @@ function logLinesAsVariables(
  *     guard accepts an empty array — only the *field* must exist.
  */
 function buildJsStepVariables(
-    input: BuildJsStepFailureReportInput,
-    verbose: boolean,
+  input: BuildJsStepFailureReportInput,
+  verbose: boolean,
 ): ReadonlyArray<VariableContext> {
-    return [
-        ...buildJsStepVariableContext(input.Context),
-        ...logLinesAsVariables(input.LogLines ?? [], verbose),
-    ];
+  return [
+    ...buildJsStepVariableContext(input.Context),
+    ...logLinesAsVariables(input.LogLines ?? [], verbose),
+  ];
 }
 
 export function buildJsStepFailureReport(
-    input: BuildJsStepFailureReportInput,
+  input: BuildJsStepFailureReportInput,
 ): FailureReport {
-    const verbose = input.Verbose === true;
+  const verbose = input.Verbose === true;
 
-    return buildFailureReport({
-        Phase: JS_STEP_PHASE,
-        Error: input.Error,
-        StepId: input.StepId,
-        Index: input.Index,
-        StepKind: JS_STEP_KIND,
-        Reason: "JsThrew",
-        ReasonDetail: jsStepReasonDetail(input.Error, input.Body),
-        Variables: buildJsStepVariables(input, verbose),
-        DataRow: input.DataRow,
-        SourceFile: input.SourceFile,
-        Verbose: verbose,
-        Now: input.Now,
-        // JS steps have no selectors; empty array satisfies the schema either-of guard.
-        Selectors: [],
-        FormSnapshot: null,
-    });
+  return buildFailureReport({
+    Phase: JS_STEP_PHASE,
+    Error: input.Error,
+    StepId: input.StepId,
+    Index: input.Index,
+    StepKind: JS_STEP_KIND,
+    Reason: "JsThrew",
+    ReasonDetail: jsStepReasonDetail(input.Error, input.Body),
+    Variables: buildJsStepVariables(input, verbose),
+    DataRow: input.DataRow,
+    SourceFile: input.SourceFile,
+    Verbose: verbose,
+    Now: input.Now,
+    // JS steps have no selectors; empty array satisfies the schema either-of guard.
+    Selectors: [],
+    FormSnapshot: null,
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -320,9 +326,9 @@ export type JsStepRunOutcome = JsStepRunOk | JsStepRunErr;
  * the sandbox manually and pass them via `BuildJsStepFailureReportInput`.
  */
 export async function runJsStepWithDiagnostics(
-    body: string,
-    ctx: JsInlineContext,
-    options: {
+  body: string,
+  ctx: JsInlineContext,
+  options: {
         readonly StepId?: number;
         readonly Index?: number;
         readonly SourceFile: string;
@@ -335,24 +341,24 @@ export async function runJsStepWithDiagnostics(
         ) => Promise<JsInlineResult>;
     },
 ): Promise<JsStepRunOutcome> {
-    try {
-        const result = await options.Run(body, ctx);
+  try {
+    const result = await options.Run(body, ctx);
 
-        return { IsOk: true, Result: result };
-    } catch (err) {
-        const report = buildJsStepFailureReport({
-            Body: body,
-            Error: err,
-            Context: ctx,
-            LogLines: [],
-            StepId: options.StepId,
-            Index: options.Index,
-            SourceFile: options.SourceFile,
-            Verbose: options.Verbose,
-            Now: options.Now,
-            DataRow: options.DataRow,
-        });
+    return { IsOk: true, Result: result };
+  } catch (err) {
+    const report = buildJsStepFailureReport({
+      Body: body,
+      Error: err,
+      Context: ctx,
+      LogLines: [],
+      StepId: options.StepId,
+      Index: options.Index,
+      SourceFile: options.SourceFile,
+      Verbose: options.Verbose,
+      Now: options.Now,
+      DataRow: options.DataRow,
+    });
 
-        return { IsOk: false, FailureReport: report };
-    }
+    return { IsOk: false, FailureReport: report };
+  }
 }

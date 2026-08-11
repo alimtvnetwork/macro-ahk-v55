@@ -8,16 +8,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import {
-    parseCsv,
-    type CsvParseSuccess,
-    MAX_BYTES,
+  parseCsv,
+  type CsvParseSuccess,
+  MAX_BYTES,
 } from "@/background/recorder/step-library/csv-parse";
 import {
-    buildBagFromRow,
-    suggestVariableName,
-    type BuildBagResult,
-    type CoercionKind,
-    type ColumnMapping,
+  buildBagFromRow,
+  suggestVariableName,
+  type BuildBagResult,
+  type CoercionKind,
+  type ColumnMapping,
 } from "@/background/recorder/step-library/csv-mapping";
 import type { GroupInputBag } from "@/background/recorder/step-library/group-inputs";
 
@@ -54,16 +54,19 @@ export interface UseCsvInputControllerOptions {
 }
 
 function buildInitialMappings(headers: ReadonlyArray<string>): ColumnMapping[] {
-    const seen = new Set<string>();
+  const seen = new Set<string>();
 
-    return headers.map((header) => {
-        let candidate = suggestVariableName(header);
-        let index = 2;
-        while (seen.has(candidate)) candidate = `${suggestVariableName(header)}_${index++}`;
-        seen.add(candidate);
+  return headers.map((header) => {
+    let candidate = suggestVariableName(header);
+    let index = 2;
+    while (seen.has(candidate)) {
+      candidate = `${suggestVariableName(header)}_${index++}`;
+    }
 
-        return { Column: header, Variable: candidate, Coerce: "auto" as CoercionKind };
-    });
+    seen.add(candidate);
+
+    return { Column: header, Variable: candidate, Coerce: "auto" as CoercionKind };
+  });
 }
 
 interface ParseState {
@@ -78,40 +81,52 @@ interface ParseState {
 }
 
 function useCsvParseState(open: boolean): ParseState {
-    const [parsed, setParsed] = useState<ParsedCsvState | null>(null);
-    const [parseError, setParseError] = useState<string | null>(null);
-    const [mappings, setMappings] = useState<ReadonlyArray<ColumnMapping>>([]);
-    const [rowIndex, setRowIndex] = useState(0);
+  const [parsed, setParsed] = useState<ParsedCsvState | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
+  const [mappings, setMappings] = useState<ReadonlyArray<ColumnMapping>>([]);
+  const [rowIndex, setRowIndex] = useState(0);
 
-    useEffect(() => {
-        if (!open) return;
-        setParsed(null); setParseError(null); setMappings([]); setRowIndex(0);
-    }, [open]);
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
 
-    const acceptText = useCallback((text: string, fileName: string | null): void => {
-        const result = parseCsv(text);
+    setParsed(null);
+    setParseError(null);
+    setMappings([]);
+    setRowIndex(0);
+  }, [open]);
 
-        if (!result.Ok) {
-            setParsed(null);
-            setMappings([]);
-            setParseError(result.Reason);
+  const acceptText = useCallback((text: string, fileName: string | null): void => {
+    const result = parseCsv(text);
 
-            return;
-        }
+    if (!result.Ok) {
+      setParsed(null);
+      setMappings([]);
+      setParseError(result.Reason);
 
-        setParseError(null);
-        setParsed({ Csv: result, FileName: fileName });
-        setMappings(buildInitialMappings(result.Headers));
-        setRowIndex(0);
-    }, []);
+      return;
+    }
 
-    const updateMapping = useCallback((column: string, patch: Partial<Omit<ColumnMapping, "Column">>) => {
-        setMappings((prev) => prev.map((entry) => (entry.Column === column ? { ...entry, ...patch } : entry)));
-    }, []);
+    setParseError(null);
+    setParsed({ Csv: result, FileName: fileName });
+    setMappings(buildInitialMappings(result.Headers));
+    setRowIndex(0);
+  }, []);
 
-    const resetParsed = useCallback(() => { setParsed(null); setMappings([]); setRowIndex(0); }, []);
+  const updateMapping = useCallback((column: string, patch: Partial<Omit<ColumnMapping, "Column">>) => {
+    setMappings((prev) => prev.map((entry) => {
+      return entry.Column === column ? { ...entry, ...patch } : entry;
+    }));
+  }, []);
 
-    return { parsed, parseError, mappings, rowIndex, setRowIndex, acceptText, updateMapping, resetParsed };
+  const resetParsed = useCallback(() => {
+    setParsed(null);
+    setMappings([]);
+    setRowIndex(0); 
+  }, []);
+
+  return { parsed, parseError, mappings, rowIndex, setRowIndex, acceptText, updateMapping, resetParsed };
 }
 
 interface FileHandlers {
@@ -120,50 +135,55 @@ interface FileHandlers {
 }
 
 function useCsvFileReader(
-    acceptText: (text: string, fileName: string | null) => void,
-    setPasted: (value: string) => void,
+  acceptText: (text: string, fileName: string | null) => void,
+  setPasted: (value: string) => void,
 ): (file: File) => Promise<void> {
-    const { toast } = useToast();
+  const { toast } = useToast();
 
-    return useCallback(async (file: File): Promise<void> => {
-        if (file.size > MAX_BYTES) {
-            toast({ variant: "destructive", title: "File too large", description: "CSV files must be 5 MB or smaller." });
+  return useCallback(async (file: File): Promise<void> => {
+    if (file.size > MAX_BYTES) {
+      toast({ variant: "destructive", title: "File too large", description: "CSV files must be 5 MB or smaller." });
 
-            return;
-        }
-        try {
-            const text = await file.text();
-            setPasted("");
-            acceptText(text, file.name);
-        } catch (err) {
-            toast({
-                variant: "destructive",
-                title: "Could not read file",
-                description: err instanceof Error ? err.message : String(err),
-            });
-        }
-    }, [acceptText, setPasted, toast]);
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      setPasted("");
+      acceptText(text, file.name);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Could not read file",
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }, [acceptText, setPasted, toast]);
 }
 
 function useCsvFileHandlers(
-    acceptText: (text: string, fileName: string | null) => void,
-    setPasted: (value: string) => void,
-    setDragOver: (value: boolean) => void,
+  acceptText: (text: string, fileName: string | null) => void,
+  setPasted: (value: string) => void,
+  setDragOver: (value: boolean) => void,
 ): FileHandlers {
-    const handleFile = useCsvFileReader(acceptText, setPasted);
-    const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] ?? null;
-        event.target.value = "";
-        if (file !== null) void handleFile(file);
-    }, [handleFile]);
-    const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        setDragOver(false);
-        const file = event.dataTransfer.files[0] ?? null;
-        if (file !== null) void handleFile(file);
-    }, [handleFile, setDragOver]);
+  const handleFile = useCsvFileReader(acceptText, setPasted);
+  const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = "";
+    if (file !== null) {
+      void handleFile(file);
+    }
+  }, [handleFile]);
+  const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragOver(false);
+    const file = event.dataTransfer.files[0] ?? null;
+    if (file !== null) {
+      void handleFile(file);
+    }
+  }, [handleFile, setDragOver]);
 
-    return { handleFilePick, handleDrop };
+  return { handleFilePick, handleDrop };
 }
 
 interface ApplyHandler {
@@ -182,51 +202,64 @@ interface UseApplyOptions {
 }
 
 function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
-    const { parsed, mappings, rowIndex, groupId, groupName, onApply, onOpenChange } = options;
-    const { toast } = useToast();
+  const { parsed, mappings, rowIndex, groupId, groupName, onApply, onOpenChange } = options;
+  const { toast } = useToast();
 
-    const buildResult = useMemo<BuildBagResult | null>(() => {
-        if (parsed === null) return null;
-        const row = parsed.Csv.Rows[rowIndex] ?? null;
-        if (row === null) return null;
+  const buildResult = useMemo<BuildBagResult | null>(() => {
+    if (parsed === null) {
+      return null;
+    }
 
-        return buildBagFromRow({ Headers: parsed.Csv.Headers, Row: row, Mappings: mappings });
-    }, [parsed, mappings, rowIndex]);
+    const row = parsed.Csv.Rows[rowIndex] ?? null;
+    if (row === null) {
+      return null;
+    }
 
-    const handleApply = useCallback(() => {
-        if (groupId === null || buildResult === null || !buildResult.Ok) return;
-        onApply(groupId, buildResult.Bag);
-        toast({
-            title: "CSV input applied",
-            description: `Bound ${buildResult.UsedColumns} variable(s) from row ${rowIndex + 1} to "${groupName ?? "(unknown)"}".`,
-        });
-        onOpenChange(false);
-    }, [groupId, groupName, buildResult, rowIndex, onApply, onOpenChange, toast]);
+    return buildBagFromRow({ Headers: parsed.Csv.Headers, Row: row, Mappings: mappings });
+  }, [parsed, mappings, rowIndex]);
 
-    return { buildResult, handleApply };
+  const handleApply = useCallback(() => {
+    if (groupId === null || buildResult === null || !buildResult.Ok) {
+      return;
+    }
+
+    onApply(groupId, buildResult.Bag);
+    toast({
+      title: "CSV input applied",
+      description: `Bound ${buildResult.UsedColumns} variable(s) from row ${rowIndex + 1} to "${groupName ?? "(unknown)"}".`,
+    });
+    onOpenChange(false);
+  }, [groupId, groupName, buildResult, rowIndex, onApply, onOpenChange, toast]);
+
+  return { buildResult, handleApply };
 }
 
 export function useCsvInputController(opts: UseCsvInputControllerOptions): CsvInputController {
-    const { open, groupId, groupName, onApply, onOpenChange } = opts;
-    const [pasted, setPasted] = useState("");
-    const [dragOver, setDragOver] = useState(false);
-    useEffect(() => { if (open) { setPasted(""); setDragOver(false); } }, [open]);
+  const { open, groupId, groupName, onApply, onOpenChange } = opts;
+  const [pasted, setPasted] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setPasted("");
+      setDragOver(false); 
+    } 
+  }, [open]);
 
-    const parseState = useCsvParseState(open);
-    const fileHandlers = useCsvFileHandlers(parseState.acceptText, setPasted, setDragOver);
-    const apply = useCsvApplyHandler({
-        parsed: parseState.parsed, mappings: parseState.mappings, rowIndex: parseState.rowIndex,
-        groupId, groupName, onApply, onOpenChange,
-    });
-    const handleParseClick = useCallback(() => parseState.acceptText(pasted, null), [pasted, parseState]);
+  const parseState = useCsvParseState(open);
+  const fileHandlers = useCsvFileHandlers(parseState.acceptText, setPasted, setDragOver);
+  const apply = useCsvApplyHandler({
+    parsed: parseState.parsed, mappings: parseState.mappings, rowIndex: parseState.rowIndex,
+    groupId, groupName, onApply, onOpenChange,
+  });
+  const handleParseClick = useCallback(() => parseState.acceptText(pasted, null), [pasted, parseState]);
 
-    return {
-        pasted, parsed: parseState.parsed, parseError: parseState.parseError,
-        mappings: parseState.mappings, rowIndex: parseState.rowIndex, dragOver,
-        buildResult: apply.buildResult,
-        setPasted, setRowIndex: parseState.setRowIndex, setDragOver,
-        handleParseClick, handleFilePick: fileHandlers.handleFilePick, handleDrop: fileHandlers.handleDrop,
-        updateMapping: parseState.updateMapping, handleApply: apply.handleApply,
-        resetParsed: parseState.resetParsed,
-    };
+  return {
+    pasted, parsed: parseState.parsed, parseError: parseState.parseError,
+    mappings: parseState.mappings, rowIndex: parseState.rowIndex, dragOver,
+    buildResult: apply.buildResult,
+    setPasted, setRowIndex: parseState.setRowIndex, setDragOver,
+    handleParseClick, handleFilePick: fileHandlers.handleFilePick, handleDrop: fileHandlers.handleDrop,
+    updateMapping: parseState.updateMapping, handleApply: apply.handleApply,
+    resetParsed: parseState.resetParsed,
+  };
 }

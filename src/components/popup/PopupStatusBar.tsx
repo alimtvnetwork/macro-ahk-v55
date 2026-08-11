@@ -55,9 +55,9 @@ export function PopupStatusBar({ status, health, opfsStatus }: Props) {
             </TooltipTrigger>
             <TooltipContent>
               <p className="text-xs">
-                  {isOnline
-                    ? "Connected · " + (status.latencyMs != null ? `${status.latencyMs}ms` : "—")
-                    : "Service worker is unreachable — try reloading the extension"}
+                {isOnline
+                  ? "Connected · " + (status.latencyMs != null ? `${status.latencyMs}ms` : "—")
+                  : "Service worker is unreachable — try reloading the extension"}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -83,10 +83,10 @@ export function PopupStatusBar({ status, health, opfsStatus }: Props) {
             <TooltipContent>
               <p className="text-xs">
                 {tokenIsValid
-                    ? "Auth token active" + (status.token?.expiresIn ? ` · expires ${status.token.expiresIn}` : "")
-                    : tokenStatus === "missing"
-                      ? "No session cookie found — log in to the target site first"
-                      : `Token status: ${tokenStatus}`}
+                  ? "Auth token active" + (status.token?.expiresIn ? ` · expires ${status.token.expiresIn}` : "")
+                  : tokenStatus === "missing"
+                    ? "No session cookie found — log in to the target site first"
+                    : `Token status: ${tokenStatus}`}
               </p>
             </TooltipContent>
           </Tooltip>

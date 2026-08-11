@@ -29,6 +29,7 @@ export function buildFilterChips(refs: ModalRefs): HTMLElement {
       for (const other of Array.from(wrap.querySelectorAll<HTMLButtonElement>('button[data-role]'))) {
         other.style.cssText = chipCss(other.dataset.role === role);
       }
+
       void renderAllRoles(refs);
     });
     wrap.appendChild(chip);
@@ -52,6 +53,7 @@ export function buildSortSelect(refs: ModalRefs): HTMLElement {
     opt.textContent = mode;
     select.appendChild(opt);
   }
+
   select.value = refs.view.sortMode;
   select.addEventListener('change', () => {
     refs.view.sortMode = select.value as SortMode;
@@ -123,6 +125,7 @@ function buildHeaderImportGroup() {
     o.textContent = r;
     importRoleSelect.appendChild(o);
   }
+
   const importBtn = document.createElement('button');
   importBtn.type = 'button';
   importBtn.textContent = 'Import';
@@ -178,7 +181,7 @@ function buildHeaderMiscButtons() {
   sampleBtn.title = 'Download a reference prompts-sample.json you can edit and re-import';
   sampleBtn.style.cssText = 'background:#243050;color:#e6edf7;border:1px solid #3a465c;border-radius:6px;padding:4px 12px;font-size:11.5px;cursor:pointer;';
   sampleBtn.addEventListener('click', () => {
-      void import('./prompt-sample-json').then((m) => m.downloadSamplePromptsJson());
+    void import('./prompt-sample-json').then((m) => m.downloadSamplePromptsJson());
   });
 
   return { closeBtn, sampleBtn };
@@ -191,13 +194,13 @@ function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement
   dropZone.setAttribute('tabindex', '0');
   dropZone.setAttribute('aria-label', 'Import prompts: drop a JSON file here, or press Enter to choose a file');
   dropZone.style.cssText = [
-      CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12,
-      'border:1px dashed #3a4863', CSS_BORDER_RADIUS_6,
-      CSS_BG_MUTED_1, 'color:#9aa7bd',
-      CSS_FONT_SIZE_12, 'text-align:center', CSS_CURSOR_POINTER,
-      'outline:2px solid transparent', 'outline-offset:2px',
-      'transition:outline-color 120ms ease, box-shadow 120ms ease',
-      'display:flex', 'flex-direction:column', 'align-items:center', 'gap:8px',
+    CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12,
+    'border:1px dashed #3a4863', CSS_BORDER_RADIUS_6,
+    CSS_BG_MUTED_1, 'color:#9aa7bd',
+    CSS_FONT_SIZE_12, 'text-align:center', CSS_CURSOR_POINTER,
+    'outline:2px solid transparent', 'outline-offset:2px',
+    'transition:outline-color 120ms ease, box-shadow 120ms ease',
+    'display:flex', 'flex-direction:column', 'align-items:center', 'gap:8px',
   ].join(';');
   const dropZoneText = document.createElement('span');
   dropZoneText.textContent = 'Drop a JSON file here, or press Enter to choose a file';
@@ -209,22 +212,29 @@ function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement
   chooseFileBtn.setAttribute('aria-label', 'Choose a JSON file to import');
   chooseFileBtn.style.cssText = 'background:#243050;color:#e6edf7;border:1px solid #3a465c;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:6px;';
   chooseFileBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (importBtn.disabled) return;
-      fileInput.click();
+    e.stopPropagation();
+    if (importBtn.disabled) {
+      return;
+    }
+
+    fileInput.click();
   });
-  chooseFileBtn.addEventListener('keydown', (e) => { e.stopPropagation(); });
+  chooseFileBtn.addEventListener('keydown', (e) => {
+    e.stopPropagation(); 
+  });
   dropZone.appendChild(chooseFileBtn);
   const applyFocusRing = (): void => {
-      dropZone.style.outlineColor = '#7cc4ff';
-      dropZone.style.boxShadow = '0 0 0 4px rgba(124, 196, 255, 0.25)';
-      dropZone.style.borderColor = '#7cc4ff';
+    dropZone.style.outlineColor = '#7cc4ff';
+    dropZone.style.boxShadow = '0 0 0 4px rgba(124, 196, 255, 0.25)';
+    dropZone.style.borderColor = '#7cc4ff';
   };
+
   const clearFocusRing = (): void => {
-      dropZone.style.outlineColor = 'transparent';
-      dropZone.style.boxShadow = 'none';
-      dropZone.style.borderColor = '#3a4863';
+    dropZone.style.outlineColor = 'transparent';
+    dropZone.style.boxShadow = 'none';
+    dropZone.style.borderColor = '#3a4863';
   };
+
   dropZone.addEventListener('focus', applyFocusRing);
   dropZone.addEventListener('blur', clearFocusRing);
 

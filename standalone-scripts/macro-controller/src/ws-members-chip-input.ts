@@ -42,7 +42,9 @@ export function createChipInput(options: { // eslint-disable-line max-lines-per-
 
   function addEmail(email: string): void {
     const trimmed = email.trim().toLowerCase();
-    if (!trimmed || validEmails.has(trimmed)) return;
+    if (!trimmed || validEmails.has(trimmed)) {
+      return;
+    }
 
     const isValid = validateEmail(trimmed);
     if (isValid) {
@@ -50,6 +52,7 @@ export function createChipInput(options: { // eslint-disable-line max-lines-per-
       renderChips();
       options.onValidEmailsChange?.(Array.from(validEmails));
     }
+
     input.value = '';
   }
 

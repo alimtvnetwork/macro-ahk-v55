@@ -23,9 +23,14 @@ const SQLITE_MAGIC: readonly number[] = [
 ];
 
 function startsWith(bytes: Uint8Array, magic: readonly number[]): boolean {
-  if (bytes.length < magic.length) return false;
+  if (bytes.length < magic.length) {
+    return false;
+  }
+
   for (let i = 0; i < magic.length; i++) {
-    if (bytes[i] !== magic[i]) return false;
+    if (bytes[i] !== magic[i]) {
+      return false;
+    }
   }
 
   return true;
@@ -35,7 +40,9 @@ function isJsonPrefix(bytes: Uint8Array): boolean {
   for (let i = 0; i < Math.min(bytes.length, 64); i++) {
     const b = bytes[i];
     const isWhitespace = b === 0x20 || b === 0x09 || b === 0x0a || b === 0x0d || b === 0xef || b === 0xbb || b === 0xbf;
-    if (isWhitespace) continue;
+    if (isWhitespace) {
+      continue;
+    }
 
     return b === 0x7b || b === 0x5b; // `{` or `[`
   }
@@ -58,8 +65,17 @@ export interface FormatDetection {
  * Throws with a hex dump if no format matches. Never returns null.
  */
 export function detectBundleFormat(bytes: Uint8Array): FormatDetection {
-  if (startsWith(bytes, SQLITE_MAGIC)) return { format: 'sqlite' };
-  if (startsWith(bytes, ZIP_MAGIC)) return { format: 'zip' };
-  if (isJsonPrefix(bytes)) return { format: 'json' };
+  if (startsWith(bytes, SQLITE_MAGIC)) {
+    return { format: 'sqlite' };
+  }
+
+  if (startsWith(bytes, ZIP_MAGIC)) {
+    return { format: 'zip' };
+  }
+
+  if (isJsonPrefix(bytes)) {
+    return { format: 'json' };
+  }
+
   throwDiagnostic('PROMPT_IO_FORMAT_E001', { byteHexDump: hexDump(bytes, 16) });
 }

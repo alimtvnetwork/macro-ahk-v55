@@ -30,6 +30,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
 
       return xpathResult as Element;
     }
+
     warn("findElement", "  " + name + " XPath failed — trying fallbacks");
   }
 
@@ -88,6 +89,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
         }
       }
     }
+
     if (descriptor.role) {
       const roleResult = document.querySelector('[role="' + descriptor.role + '"]');
       if (roleResult) {

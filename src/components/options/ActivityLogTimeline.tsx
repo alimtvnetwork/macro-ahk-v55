@@ -376,7 +376,10 @@ function HistoricalSessionView({ sessionId }: { sessionId: string }) {
   }, [sessionId]);
 
   const handleCopy = async () => {
-    if (!report) return;
+    if (!report) {
+      return;
+    }
+
     await navigator.clipboard.writeText(report);
     toast.success("Report copied to clipboard");
   };
@@ -469,7 +472,8 @@ export function ActivityLogTimeline() {
 
             return g.chrome?.runtime?.getManifest?.().version ?? "?";
           } catch (err) { /* swallowed */
- return "?"; }
+            return "?"; 
+          }
         })();
 
         report = [

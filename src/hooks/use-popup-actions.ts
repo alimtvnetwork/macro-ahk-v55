@@ -113,6 +113,7 @@ export function usePopupActions() {
           "[popup:handleRun] Background did not return inlineSyntaxErrorDetected — falling back to false (older background build).",
         );
       }
+
       console.log("[popup:handleRun] Injection result: %d scripts, inlineSyntaxErrorDetected=%s (source=%s)",
         result.results.length, result.inlineSyntaxErrorDetected, result.inlineSyntaxFlagSource);
 
@@ -163,15 +164,15 @@ export function usePopupActions() {
     }
   }, []);
 
-function formatSkipReason(reason?: string): string {
-  switch (reason) {
-    case "disabled": return "script is disabled";
-    case "missing": return "script not found in store — try reinstalling the extension";
-    case "empty_code": return "script code is empty — filePath fetch may have failed";
-    case "resolver_mismatch": return "script format not recognized";
-    default: return reason ?? "unknown reason";
+  function formatSkipReason(reason?: string): string {
+    switch (reason) {
+      case "disabled": return "script is disabled";
+      case "missing": return "script not found in store — try reinstalling the extension";
+      case "empty_code": return "script code is empty — filePath fetch may have failed";
+      case "resolver_mismatch": return "script format not recognized";
+      default: return reason ?? "unknown reason";
+    }
   }
-}
 
   /** Re-inject: same as run — injection pipeline handles version-check teardown. */
   const handleReinject = useCallback(async () => {
@@ -281,7 +282,9 @@ function formatSkipReason(reason?: string): string {
   const handleFileSelected = useCallback(async (e: Event) => {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     fileRef.current = file;
     setPreviewLoading(true);
@@ -302,7 +305,9 @@ function formatSkipReason(reason?: string): string {
 
   const handleConfirmImport = useCallback(async () => {
     const file = fileRef.current;
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     const mode = importModeRef.current;
     setDbImportLoading(true);

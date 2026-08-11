@@ -158,12 +158,16 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 
     return;
   }
+
   log(`[MacroDb] Migrated Prompt: added column ${migration.column}`, 'success');
 }
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN}, 'context')`);
-  if (resp?.ok) return;
+  if (resp?.ok) {
+    return;
+  }
+
   logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: PROMPT_ROLE_DEFAULT_INDEX, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 }
 
@@ -179,8 +183,10 @@ export async function migratePromptReplaceColumns(): Promise<void> {
       if (existing.has(migration.column)) {
         continue;
       }
+
       await applyPromptColumnMigration(migration);
     }
+
     await ensurePromptRoleDefaultIndex();
   } catch (err) {
     logError('MacroController', 'Unknown error');
@@ -224,6 +230,7 @@ async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
 
     return;
   }
+
   stages.push({ stage: 'seed-plan-next', status: 'ok' });
 }
 
@@ -238,12 +245,14 @@ async function runAutoRepairStage(stages: Stage[]): Promise<void> {
 
     return;
   }
+
   if (health.repairAttempted) {
     log('[MacroDb] Prompt defaults auto-repaired on boot (initial issues=' + initialIssues + ')', 'success');
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'ok', metrics: { initialIssues, finalIssues: 0 } });
 
     return;
   }
+
   stages.push({ stage: STAGE_AUTO_REPAIR, status: 'ok', metrics: { initialIssues: 0, finalIssues: 0 } });
 }
 
@@ -258,6 +267,7 @@ async function runReadMemoryDuplicateStage(stages: Stage[]): Promise<void> {
 
     return;
   }
+
   stages.push({ stage: 'read-memory-duplicate-validation', status: 'ok', metrics });
 }
 
@@ -311,7 +321,9 @@ export async function initMacroDb(): Promise<void> {
  * Save project metadata.
  */
 export async function saveProjectMetadata(projectId: string, name: string, url: string): Promise<void> {
-  if (!projectId) return;
+  if (!projectId) {
+    return;
+  }
 
   const sql = `INSERT OR REPLACE INTO Projects (ProjectId, Name, Url, UpdatedAt) 
                VALUES ('${projectId.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${url.replace(/'/g, "''")}', CURRENT_TIMESTAMP)`;
@@ -328,7 +340,9 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
  * Save a communication (prompt/response).
  */
 export async function saveCommunication(projectId: string, prompt: string, response: string = ''): Promise<void> {
-  if (!projectId || !prompt) return;
+  if (!projectId || !prompt) {
+    return;
+  }
   
   // Also update Project metadata if we have it in state
   const { state } = await import('../shared-state');
@@ -351,7 +365,9 @@ export async function saveCommunication(projectId: string, prompt: string, respo
  * Sync the entire task queue for a project to SQLite.
  */
 export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Promise<void> {
-  if (!projectId) return;
+  if (!projectId) {
+    return;
+  }
 
   // Clear existing queue for this project
   const deleteSql = `DELETE FROM TaskQueue WHERE ProjectId = '${projectId.replace(/'/g, "''")}'`;
@@ -381,7 +397,9 @@ export async function forceSyncQueueToDb(): Promise<void> {
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
 
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return;
+  if (!projectId) {
+    return;
+  }
 
   const queueState = await loadTaskQueue();
   // const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';

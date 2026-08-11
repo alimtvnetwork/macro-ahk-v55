@@ -13,10 +13,10 @@
  * should `[...LOVABLE_TAB_PATTERNS, "http://localhost/*"]`.
  */
 export const LOVABLE_TAB_PATTERNS: string[] = [
-    "https://lovable.dev/*",
-    "https://*.lovable.dev/*",
-    "https://lovable.app/*",
-    "https://*.lovable.app/*",
-    "https://lovableproject.com/*",
-    "https://*.lovableproject.com/*",
+  "https://lovable.dev/*",
+  "https://*.lovable.dev/*",
+  "https://lovable.app/*",
+  "https://*.lovable.app/*",
+  "https://lovableproject.com/*",
+  "https://*.lovableproject.com/*",
 ];

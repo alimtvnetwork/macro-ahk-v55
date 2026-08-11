@@ -29,19 +29,31 @@ function buildHarness(): { btn: HTMLElement; group: HTMLElement; root: HTMLEleme
   root.appendChild(group);
   document.body.appendChild(root);
 
-  function open(): void { group.style.display = 'block'; btn.textContent = '🎯 Tasks ▾'; }
-  function close(): void { group.style.display = 'none'; btn.textContent = '🎯 Tasks ▸'; }
+  function open(): void {
+    group.style.display = 'block'; btn.textContent = '🎯 Tasks ▾'; 
+  }
+
+  function close(): void {
+    group.style.display = 'none'; btn.textContent = '🎯 Tasks ▸'; 
+  }
+
   btn.addEventListener('mouseenter', open);
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
-    if (group.style.display === 'none') open(); else close();
+    if (group.style.display === 'none') {
+      open();
+    } else {
+      close();
+    }
   });
 
   return { btn, group, root };
 }
 
 describe('Tasks toggle hover-open', () => {
-  beforeEach(() => { document.body.textContent = ''; });
+  beforeEach(() => {
+    document.body.textContent = ''; 
+  });
 
   it('opens the Tasks group on mouseenter without a click', () => {
     const { btn, group } = buildHarness();

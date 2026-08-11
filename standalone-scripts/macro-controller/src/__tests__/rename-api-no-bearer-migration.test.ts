@@ -28,29 +28,29 @@ const logErrorMock = vi.hoisted(() => vi.fn());
 const resolveTokenMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../errors/show-diagnostic-toast', () => ({
-    showDiagnosticToast: showDiagnosticToastMock,
+  showDiagnosticToast: showDiagnosticToastMock,
 }));
 vi.mock('../error-utils', () => ({
-    logError: logErrorMock,
-    reportDiagnostic: vi.fn().mockReturnValue({ toast: { severity: 'error', title: '', body: '', footerCode: '' } }),
+  logError: logErrorMock,
+  reportDiagnostic: vi.fn().mockReturnValue({ toast: { severity: 'error', title: '', body: '', footerCode: '' } }),
 }));
 vi.mock('../toast', () => ({
-    showToast: vi.fn(),
+  showToast: vi.fn(),
 }));
 vi.mock('../auth', () => ({
-    resolveToken: resolveTokenMock,
-    recoverAuthOnce: vi.fn(),
-    invalidateSessionBridgeKey: vi.fn(),
+  resolveToken: resolveTokenMock,
+  recoverAuthOnce: vi.fn(),
+  invalidateSessionBridgeKey: vi.fn(),
 }));
 vi.mock('../logging', () => ({ log: vi.fn(), logSub: vi.fn() }));
 vi.mock('../rename-forbidden-cache', () => ({
-    hasForbidden: () => false,
-    addForbidden: vi.fn(),
-    removeForbidden: vi.fn(),
+  hasForbidden: () => false,
+  addForbidden: vi.fn(),
+  removeForbidden: vi.fn(),
 }));
 vi.mock('../rename-auth-recovery-flag', () => ({
-    getAuthRecoveryExhausted: () => false,
-    setAuthRecoveryExhausted: vi.fn(),
+  getAuthRecoveryExhausted: () => false,
+  setAuthRecoveryExhausted: vi.fn(),
 }));
 vi.mock('../async-utils', () => ({ delay: vi.fn().mockResolvedValue(undefined) }));
 
@@ -58,44 +58,44 @@ import { DiagnosticError } from '../errors/diagnostic-error';
 import { renameWorkspace } from '../rename-api';
 
 beforeEach(() => {
-    showDiagnosticToastMock.mockReset();
-    logErrorMock.mockReset();
-    resolveTokenMock.mockReset();
+  showDiagnosticToastMock.mockReset();
+  logErrorMock.mockReset();
+  resolveTokenMock.mockReset();
 });
 
 afterEach(() => {
-    vi.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe('rename-api.rejectNoBearerToken — showDiagnosticToast migration', () => {
-    it('R1+R2+R3+R4: no-bearer path emits DiagnosticError via showDiagnosticToast with noStop+requestDetail, and logs via logError', async () => {
-        // Force the no-bearer branch: resolveToken() returns '' so executeRename
-        // hits `throw rejectNoBearerToken(wsId)` on its first line.
-        resolveTokenMock.mockReturnValue('');
+  it('R1+R2+R3+R4: no-bearer path emits DiagnosticError via showDiagnosticToast with noStop+requestDetail, and logs via logError', async () => {
+    // Force the no-bearer branch: resolveToken() returns '' so executeRename
+    // hits `throw rejectNoBearerToken(wsId)` on its first line.
+    resolveTokenMock.mockReturnValue('');
 
-        await expect(renameWorkspace('ws-123', 'new name')).rejects.toBeInstanceOf(DiagnosticError);
+    await expect(renameWorkspace('ws-123', 'new name')).rejects.toBeInstanceOf(DiagnosticError);
 
-        // R1: exactly one structured toast call
-        expect(showDiagnosticToastMock).toHaveBeenCalledTimes(1);
-        const [errArg, optsArg] = showDiagnosticToastMock.mock.calls[0];
+    // R1: exactly one structured toast call
+    expect(showDiagnosticToastMock).toHaveBeenCalledTimes(1);
+    const [errArg, optsArg] = showDiagnosticToastMock.mock.calls[0];
 
-        // R3: it IS a DiagnosticError with the registry code + context
-        expect(errArg).toBeInstanceOf(DiagnosticError);
-        expect((errArg as DiagnosticError).code).toBe('RENAME_NO_BEARER_E001');
-        expect((errArg as DiagnosticError).context).toEqual({ wsId: 'ws-123' });
+    // R3: it IS a DiagnosticError with the registry code + context
+    expect(errArg).toBeInstanceOf(DiagnosticError);
+    expect((errArg as DiagnosticError).code).toBe('RENAME_NO_BEARER_E001');
+    expect((errArg as DiagnosticError).context).toEqual({ wsId: 'ws-123' });
 
-        // R2: noStop + requestDetail preserved for persistent-toast + HTTP-detail UI
-        expect(optsArg).toBeDefined();
-        expect(optsArg.noStop).toBe(true);
-        expect(optsArg.requestDetail).toEqual({
-            method: 'PUT',
-            url: '/user/workspaces/ws-123',
-        });
-
-        // R4: logError still fires with the plain-text scope + wsId
-        expect(logErrorMock).toHaveBeenCalledWith(
-            'Rename',
-            expect.stringContaining('wsId=ws-123'),
-        );
+    // R2: noStop + requestDetail preserved for persistent-toast + HTTP-detail UI
+    expect(optsArg).toBeDefined();
+    expect(optsArg.noStop).toBe(true);
+    expect(optsArg.requestDetail).toEqual({
+      method: 'PUT',
+      url: '/user/workspaces/ws-123',
     });
+
+    // R4: logError still fires with the plain-text scope + wsId
+    expect(logErrorMock).toHaveBeenCalledWith(
+      'Rename',
+      expect.stringContaining('wsId=ws-123'),
+    );
+  });
 });

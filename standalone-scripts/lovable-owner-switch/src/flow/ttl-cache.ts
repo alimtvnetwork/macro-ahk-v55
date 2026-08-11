@@ -22,29 +22,29 @@ interface CacheEntry<V> {
 }
 
 export class TtlCache<V> {
-    private readonly store: Map<string, CacheEntry<V>>;
-    private readonly ttlMs: number;
+  private readonly store: Map<string, CacheEntry<V>>;
+  private readonly ttlMs: number;
 
-    public constructor(options: TtlCacheOptions = {}) {
-        this.store = new Map<string, CacheEntry<V>>();
-        this.ttlMs = options.TtlMs ?? DEFAULT_TTL_MS;
+  public constructor(options: TtlCacheOptions = {}) {
+    this.store = new Map<string, CacheEntry<V>>();
+    this.ttlMs = options.TtlMs ?? DEFAULT_TTL_MS;
+  }
+
+  public get(key: string): V | null {
+    const entry = this.store.get(key);
+
+    if (entry === undefined || entry.ExpiresAt <= Date.now()) {
+      return null;
     }
 
-    public get(key: string): V | null {
-        const entry = this.store.get(key);
+    return entry.Value;
+  }
 
-        if (entry === undefined || entry.ExpiresAt <= Date.now()) {
-            return null;
-        }
+  public set(key: string, value: V): void {
+    this.store.set(key, { Value: value, ExpiresAt: Date.now() + this.ttlMs });
+  }
 
-        return entry.Value;
-    }
-
-    public set(key: string, value: V): void {
-        this.store.set(key, { Value: value, ExpiresAt: Date.now() + this.ttlMs });
-    }
-
-    public clear(): void {
-        this.store.clear();
-    }
+  public clear(): void {
+    this.store.clear();
+  }
 }

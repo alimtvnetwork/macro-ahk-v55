@@ -92,14 +92,21 @@ function ScriptEntryCard({
   );
 
   const handleAddConfig = (configId: string) => {
-    if (configId === "__none__") return;
+    if (configId === "__none__") {
+      return;
+    }
+
     const config = availableConfigs.find((c) => c.id === configId);
-    if (!config) return;
+    if (!config) {
+      return;
+    }
+
     if (binding.configBindings.some((b) => b.configId === configId)) {
       toast.info("Config already bound");
 
       return;
     }
+
     onUpdate({
       configBindings: [
         ...binding.configBindings,
@@ -114,7 +121,9 @@ function ScriptEntryCard({
         .filter((b) => b.configId !== configId)
         .map((b, i) => ({ ...b, order: i })),
     });
-    if (activeTab === configId) setActiveTab("js");
+    if (activeTab === configId) {
+      setActiveTab("js");
+    }
   };
 
   const handleConfigJsonChange = (configId: string, json: string) => {
@@ -129,15 +138,21 @@ function ScriptEntryCard({
     const entries = [...binding.configBindings].sort((a, b) => a.order - b.order);
     const idx = entries.findIndex((e) => e.configId === configId);
     const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= entries.length) return;
+    if (newIdx < 0 || newIdx >= entries.length) {
+      return;
+    }
+
     [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
     onUpdate({ configBindings: entries.map((e, i) => ({ ...e, order: i })) });
   };
 
   const handleJsonFileDrop = (name: string, content: string) => {
-    if (!validateJson(content)) { toast.error("Invalid JSON file");
+    if (!validateJson(content)) {
+      toast.error("Invalid JSON file");
 
- return; }
+      return; 
+    }
+
     const inlineId = `inline_${crypto.randomUUID().slice(0, 8)}`;
     onUpdate({
       configBindings: [
@@ -289,7 +304,9 @@ function ScriptEntryCard({
                       <Badge
                         variant="secondary"
                         className="text-[10px] gap-1 cursor-pointer hover:bg-primary/20"
-                        onClick={() => { setActiveTab(b.configId); setExpanded(true); }}
+                        onClick={() => {
+                          setActiveTab(b.configId); setExpanded(true); 
+                        }}
                       >
                         <span className="text-[8px] font-mono text-muted-foreground">#{ci + 1}</span>
                         <FileJson className="h-2.5 w-2.5" />
@@ -297,7 +314,9 @@ function ScriptEntryCard({
                         <button
                           type="button"
                           className="ml-0.5 hover:text-destructive"
-                          onClick={(e) => { e.stopPropagation(); handleRemoveConfig(b.configId); }}
+                          onClick={(e) => {
+                            e.stopPropagation(); handleRemoveConfig(b.configId); 
+                          }}
                         >
                           <X className="h-2.5 w-2.5" />
                         </button>
@@ -366,7 +385,9 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 
   const handleAddFromLibrary = (scriptId: string) => {
     const script = availableScripts.find((s) => s.id === scriptId);
-    if (!script) return;
+    if (!script) {
+      return;
+    }
 
     if (selectedScripts.some((s) => s.scriptId === scriptId)) {
       toast.info("Script already added");
@@ -442,7 +463,10 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
     const entries = [...selectedScripts];
     const idx = entries.findIndex((s) => s.scriptId === scriptId);
     const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= entries.length) return;
+    if (newIdx < 0 || newIdx >= entries.length) {
+      return;
+    }
+
     [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
     onChange(entries.map((s, i) => ({ ...s, order: i })));
   };
@@ -544,17 +568,27 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw);
+  try {
+    JSON.parse(raw);
 
- return true; } catch (err) { /* swallowed */
- return false; }
+    return true; 
+  } catch (err) { /* swallowed */
+    return false; 
+  }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { /* swallowed */
- return input; }
+    try {
+      return JSON.stringify(JSON.parse(input), null, 2); 
+    } catch (err) { /* swallowed */
+      return input; 
+    }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { /* swallowed */
- return "{}"; }
+
+  try {
+    return JSON.stringify(input ?? {}, null, 2); 
+  } catch (err) { /* swallowed */
+    return "{}"; 
+  }
 }

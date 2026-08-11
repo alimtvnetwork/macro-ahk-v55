@@ -129,7 +129,9 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
     const isHidden = diagBody.style.display === 'none';
     diagBody.style.display = isHidden ? 'flex' : 'none';
     col.toggle.textContent = isHidden ? '[-]' : '[+]';
-    try { localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
+    try {
+      localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); 
+    } catch (_e: unknown) {
       logError('MacroController', 'Unknown error');
       logSub('Failed to persist auth diag collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
@@ -178,7 +180,9 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
   col.header.appendChild(headerBadge);
 
   const diagCtx: AuthDiagUpdateCtx = { deps, cookieRow, bridgeRow, srcRow, headerBadge, jwtRow, jwtDetailVal, refreshRow, wsCacheRow, renderWaterfall };
-  const updateAuthDiagRow = function(): void { performAuthDiagUpdate(diagCtx); };
+  const updateAuthDiagRow = function(): void {
+    performAuthDiagUpdate(diagCtx); 
+  };
 
   updateAuthDiagRow();
 
@@ -194,8 +198,11 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
 
         return;
       }
+
       const isVisible = diagBody.style.display !== 'none';
-      if (isVisible) updateAuthDiagRow();
+      if (isVisible) {
+        updateAuthDiagRow();
+      }
     }, 10000);
   }
 

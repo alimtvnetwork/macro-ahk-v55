@@ -9,21 +9,21 @@
  */
 
 import {
-    initProjectDb,
-    getProjectDb,
-    flushProjectDb,
-    hasProjectDb,
+  initProjectDb,
+  getProjectDb,
+  flushProjectDb,
+  hasProjectDb,
 } from "../project-db-manager";
 
 import {
-    ensureMetaTables,
-    applyJsonSchema,
-    generateMarkdownDocs,
-    generatePrismaSchema,
-    getMetaTables,
-    getMetaColumns,
-    getMetaRelations,
-    type JsonSchemaDef,
+  ensureMetaTables,
+  applyJsonSchema,
+  generateMarkdownDocs,
+  generatePrismaSchema,
+  getMetaTables,
+  getMetaColumns,
+  getMetaRelations,
+  type JsonSchemaDef,
 } from "../schema-meta-engine";
 
 import { type MessageRequest } from "../../shared/messages";
@@ -40,29 +40,31 @@ interface ApplyJsonSchemaMessage extends MessageRequest {
 }
 
 export async function handleApplyJsonSchema(message: MessageRequest): Promise<{ isOk: boolean; result?: ReturnType<typeof applyJsonSchema>; errorMessage?: string }> {
-    const { project, schema } = message as ApplyJsonSchemaMessage;
+  const { project, schema } = message as ApplyJsonSchemaMessage;
 
-    if (!project || typeof project !== "string") {
-        return { isOk: false, errorMessage: "Missing 'project' (slug)" };
-    }
-    if (!schema || !Array.isArray(schema.tables)) {
-        return { isOk: false, errorMessage: "Missing or invalid 'schema' (JsonSchemaDef)" };
-    }
+  if (!project || typeof project !== "string") {
+    return { isOk: false, errorMessage: "Missing 'project' (slug)" };
+  }
 
-    // Ensure project DB is initialized
-    if (!hasProjectDb(project)) {
-        await initProjectDb(project);
-    }
-    const db = getProjectDb(project);
-    ensureMetaTables(db);
+  if (!schema || !Array.isArray(schema.tables)) {
+    return { isOk: false, errorMessage: "Missing or invalid 'schema' (JsonSchemaDef)" };
+  }
 
-    const result = applyJsonSchema(db, schema);
-    await flushProjectDb(project);
+  // Ensure project DB is initialized
+  if (!hasProjectDb(project)) {
+    await initProjectDb(project);
+  }
 
-    return {
-        isOk: true,
-        result,
-    };
+  const db = getProjectDb(project);
+  ensureMetaTables(db);
+
+  const result = applyJsonSchema(db, schema);
+  await flushProjectDb(project);
+
+  return {
+    isOk: true,
+    result,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -85,33 +87,34 @@ interface SchemaDocsResponse {
 }
 
 export async function handleGenerateSchemaDocs(message: MessageRequest): Promise<SchemaDocsResponse> {
-    const { project, format = "both" } = message as GenerateSchemaDocsMessage;
+  const { project, format = "both" } = message as GenerateSchemaDocsMessage;
 
-    if (!project || typeof project !== "string") {
-        return { isOk: false, errorMessage: "Missing 'project' (slug)" };
-    }
+  if (!project || typeof project !== "string") {
+    return { isOk: false, errorMessage: "Missing 'project' (slug)" };
+  }
 
-    if (!hasProjectDb(project)) {
-        await initProjectDb(project);
-    }
-    const db = getProjectDb(project);
-    ensureMetaTables(db);
+  if (!hasProjectDb(project)) {
+    await initProjectDb(project);
+  }
 
-    const response: SchemaDocsResponse = { isOk: true };
+  const db = getProjectDb(project);
+  ensureMetaTables(db);
 
-    if (format === "markdown" || format === "both") {
-        response.markdown = generateMarkdownDocs(db);
-    }
+  const response: SchemaDocsResponse = { isOk: true };
 
-    if (format === "prisma" || format === "both") {
-        response.prisma = generatePrismaSchema(db);
-    }
+  if (format === "markdown" || format === "both") {
+    response.markdown = generateMarkdownDocs(db);
+  }
 
-    if (format === "meta") {
-        response.tables = getMetaTables(db);
-        response.columns = getMetaColumns(db);
-        response.relations = getMetaRelations(db);
-    }
+  if (format === "prisma" || format === "both") {
+    response.prisma = generatePrismaSchema(db);
+  }
 
-    return response;
+  if (format === "meta") {
+    response.tables = getMetaTables(db);
+    response.columns = getMetaColumns(db);
+    response.relations = getMetaRelations(db);
+  }
+
+  return response;
 }

@@ -37,6 +37,7 @@ export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: Grou
 
       return;
     }
+
     setSaving(true);
     try {
       const result = await sendMessage<{ groupId: number; cascadedCount: number }>({
@@ -52,6 +53,7 @@ export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: Grou
       if (hasCascaded) {
         cascadeMsg = ` — settings pushed to ${result.cascadedCount} project(s)`;
       }
+
       const actionMsg = isEdit ? `Group "${name}" updated` : `Group "${name}" created`;
       toast.success(actionMsg + cascadeMsg);
       onOpenChange(false);

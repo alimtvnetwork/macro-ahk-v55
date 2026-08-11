@@ -14,12 +14,12 @@ export interface RedactedHeaderMap {
 }
 
 export function redactBearer(_token: string): string {
-    return REDACTED_TOKEN_PLACEHOLDER;
+  return REDACTED_TOKEN_PLACEHOLDER;
 }
 
 export function buildRedactedHeaders(): RedactedHeaderMap {
-    const redacted: { [k: string]: string } = {};
-    redacted[HEADER_AUTHORIZATION] = REDACTED_TOKEN_PLACEHOLDER;
+  const redacted: { [k: string]: string } = {};
+  redacted[HEADER_AUTHORIZATION] = REDACTED_TOKEN_PLACEHOLDER;
 
-    return redacted;
+  return redacted;
 }

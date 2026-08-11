@@ -51,7 +51,10 @@ vi.mock('../../db/project-chat-submit-db', () => ({
       .sort((a, b) => a.CreatedAt - b.CreatedAt).slice(0, limit)),
   deleteChatSubmit: vi.fn(async (id: number) => {
     const idx = rows.findIndex((r) => r.Id === id);
-    if (idx < 0) return false;
+    if (idx < 0) {
+      return false;
+    }
+
     rows.splice(idx, 1);
 
     return true;
@@ -59,7 +62,9 @@ vi.mock('../../db/project-chat-submit-db', () => ({
   renameProjectChatSubmits: vi.fn(async (projectId: string, newName: string) => {
     let updated = 0;
     for (const row of rows) {
-      if (row.ProjectId === projectId) { row.ProjectName = newName; updated++; }
+      if (row.ProjectId === projectId) {
+        row.ProjectName = newName; updated++; 
+      }
     }
 
     return updated > 0;
@@ -70,7 +75,7 @@ vi.mock('../../storage/chat-submit-opfs-store', () => ({
   writeEntry: vi.fn(async (projectId: string, fileId: string, body: string) => {
     blobs.set(`${projectId}/${fileId}`, body);
 
- return true;
+    return true;
   }),
   readEntry: vi.fn(async (projectId: string, fileId: string) =>
     blobs.get(`${projectId}/${fileId}`) ?? null),
@@ -122,6 +127,7 @@ describe('300-row cap + rename backfill — panel integration', () => {
     for (let i = 0; i < 5; i++) {
       expect(blobs.has(`${PROJECT_ID}/f-${i.toString().padStart(4, '0')}`)).toBe(false);
     }
+
     // Newest 300 remain
     expect(blobs.size).toBe(300);
 

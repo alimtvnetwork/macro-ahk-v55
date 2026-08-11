@@ -16,20 +16,20 @@ const trackedMessages: TrackedMessageEvent[] = [];
 
 /** Records a handled message for diagnostics. */
 export function trackMessage(type: string, durationMs: number, ok: boolean): void {
-    trackedMessages.push({
-        type,
-        timestamp: new Date().toISOString(),
-        durationMs,
-        ok,
-    });
-    if (trackedMessages.length > MAX_TRACKED) {
-        trackedMessages.shift();
-    }
+  trackedMessages.push({
+    type,
+    timestamp: new Date().toISOString(),
+    durationMs,
+    ok,
+  });
+  if (trackedMessages.length > MAX_TRACKED) {
+    trackedMessages.shift();
+  }
 }
 
 /** Returns the most recent tracked messages (newest first). */
 export function getRecentTrackedMessages(limit = 10): TrackedMessageEvent[] {
-    const count = Math.min(limit, trackedMessages.length);
+  const count = Math.min(limit, trackedMessages.length);
 
-    return trackedMessages.slice(-count).reverse();
+  return trackedMessages.slice(-count).reverse();
 }

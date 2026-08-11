@@ -105,6 +105,7 @@ function setSubmenuOpen(submenu: HTMLElement, trigger: HTMLButtonElement, open: 
     submenu.style.display = 'none';
     submenu.hidden = true;
   }
+
   trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
@@ -119,12 +120,19 @@ function buildPromptActionRow(item: GearMenuItem, role: PromptRole): HTMLButtonE
   label.textContent = item.label;
   label.style.cssText = 'min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
   row.append(icon, label);
-  row.onmouseover = () => { row.style.background = 'rgba(124,58,237,0.25)'; };
-  row.onmouseout = () => { row.style.background = 'transparent'; };
+  row.onmouseover = () => {
+    row.style.background = 'rgba(124,58,237,0.25)'; 
+  };
+
+  row.onmouseout = () => {
+    row.style.background = 'transparent'; 
+  };
+
   row.onclick = (event: Event) => {
     event.stopPropagation();
     item.onSelect();
   };
+
   row.dataset.role = role + '-prompt-action';
 
   return row;
@@ -154,7 +162,9 @@ function buildPromptActionsSubmenu(
   submenu.setAttribute('aria-label', label + ' prompt actions');
   submenu.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:1px;padding:5px;background:#1a1a2e;border:1px solid ' + input.accent + ';border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.55);z-index:2147483647;min-width:' + String(SUBMENU_MIN_WIDTH) + 'px;max-width:280px;';
   submenu.dataset.role = role + '-prompt-actions-submenu';
-  for (const item of items) submenu.appendChild(buildPromptActionRow(item, role));
+  for (const item of items) {
+    submenu.appendChild(buildPromptActionRow(item, role));
+  }
 
   return submenu;
 }
@@ -162,18 +172,24 @@ function buildPromptActionsSubmenu(
 function wirePromptActionsSubmenu(trigger: HTMLButtonElement, submenu: HTMLElement): void {
   let closeTimer: number | null = null;
   const clearCloseTimer = (): void => {
-    if (closeTimer === null) return;
+    if (closeTimer === null) {
+      return;
+    }
+
     window.clearTimeout(closeTimer);
     closeTimer = null;
   };
+
   const open = (): void => {
     clearCloseTimer();
     setSubmenuOpen(submenu, trigger, true);
   };
+
   const scheduleClose = (): void => {
     clearCloseTimer();
     closeTimer = window.setTimeout(() => setSubmenuOpen(submenu, trigger, false), 160);
   };
+
   trigger.onmouseenter = open;
   trigger.onmouseleave = scheduleClose;
   trigger.onfocus = open;
@@ -181,14 +197,19 @@ function wirePromptActionsSubmenu(trigger: HTMLButtonElement, submenu: HTMLEleme
     event.stopPropagation();
     setSubmenuOpen(submenu, trigger, submenu.style.display !== 'flex');
   };
+
   trigger.onkeydown = (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       open();
       submenu.querySelector<HTMLButtonElement>('button')?.focus();
     }
-    if (event.key === 'Escape') setSubmenuOpen(submenu, trigger, false);
+
+    if (event.key === 'Escape') {
+      setSubmenuOpen(submenu, trigger, false);
+    }
   };
+
   submenu.onmouseenter = open;
   submenu.onmouseleave = scheduleClose;
   submenu.addEventListener('keydown', (event) => {
@@ -240,10 +261,13 @@ function wrapAction(name: string, role: PromptRole, action: () => Promise<void> 
       err,
     );
   };
+
   try {
     const r = action();
     if (r && typeof (r as Promise<void>).catch === 'function') {
-      (r as Promise<void>).catch((err: unknown) => { handleFailure('rejected', err); });
+      (r as Promise<void>).catch((err: unknown) => {
+        handleFailure('rejected', err); 
+      });
     }
   } catch (err) {
     handleFailure('threw', err);
@@ -270,6 +294,7 @@ async function openLibraryModal(): Promise<void> {
 
       return;
     }
+
     opener();
   } catch (err) {
     reportGearFailure(
@@ -287,8 +312,11 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
       'Force reset will overwrite the "plan-default" and "next-default" prompt bodies with the shipped canonical text. '
       + 'Any edits you made to those two rows will be lost. Custom prompts you added are untouched.\n\nProceed?'
     );
-    if (!ok) return;
+    if (!ok) {
+      return;
+    }
   }
+
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
   if (result.isFail) {
@@ -301,6 +329,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
 
     return;
   }
+
   const suffix = force && typeof result.forcedUpdates === 'number'
     ? ' (' + String(result.forcedUpdates) + ' rows reset)'
     : '';
@@ -338,22 +367,32 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
   } else {
     showToast('✅ Prompts already healthy — opening default row', 'info');
   }
+
   showRepairReportModal(report);
   await openDefaultPromptEditor(role);
 }
 
 async function editSpecific(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Edit which ' + roleLabel + ' prompt?', confirmLabel: 'Edit' });
-  if (!picked) return;
+  if (!picked) {
+    return;
+  }
+
   await openPromptEditor({ role, promptId: picked.Id });
 }
 
 async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Set active ' + roleLabel + ' prompt', confirmLabel: 'Set active' });
-  if (!picked) return;
-  if (picked.IsDefault === 1) { showToast('Already active', 'info');
+  if (!picked) {
+    return;
+  }
 
- return; }
+  if (picked.IsDefault === 1) {
+    showToast('Already active', 'info');
+
+    return; 
+  }
+
   const res = await setDefaultPromptForRole(picked.Id, role);
   if (res.isFail) {
     const reason = res.error ?? 'unknown';
@@ -365,6 +404,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
     return;
   }
+
   // v4.401.0: invalidate the in-memory prompt cache so the numbered Next/PlanTierType
   // chips (which read via `getPromptsConfig()`) see the newly-active row on
   // the next click instead of pasting the previous default's body.
@@ -377,7 +417,10 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Delete which custom ' + roleLabel + ' prompt?', excludeDefault: true, confirmLabel: 'Delete' });
-  if (!picked) return;
+  if (!picked) {
+    return;
+  }
+
   const { confirmDialog } = await import('./confirm-dialog');
   const ok = await confirmDialog({
     title: 'Delete prompt?',
@@ -386,7 +429,10 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
     cancelLabel: 'Cancel',
     destructive: true,
   });
-  if (!ok) return;
+  if (!ok) {
+    return;
+  }
+
   const res = await deletePromptById(picked.Id);
   if (res.isFail) {
     const reason = res.error ?? 'unknown';
@@ -398,6 +444,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
 
     return;
   }
+
   const loader = await import('./prompt-loader');
   loader.invalidatePromptCache();
   loader.clearLoadedPrompts();

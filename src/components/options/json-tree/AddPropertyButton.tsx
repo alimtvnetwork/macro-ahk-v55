@@ -31,7 +31,9 @@ export function AddPropertyButton({ onAdd }: AddPropertyButtonProps) {
   const handleAdd = () => {
     const trimmed = newKey.trim();
     const isKeyEmpty = trimmed === "";
-    if (isKeyEmpty) return;
+    if (isKeyEmpty) {
+      return;
+    }
 
     onAdd(trimmed, DEFAULT_VALUES[newType]);
     setNewKey("");
@@ -40,10 +42,14 @@ export function AddPropertyButton({ onAdd }: AddPropertyButtonProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const isEnter = e.key === "Enter";
-    if (isEnter) handleAdd();
+    if (isEnter) {
+      handleAdd();
+    }
 
     const isEscape = e.key === "Escape";
-    if (isEscape) setIsAdding(false);
+    if (isEscape) {
+      setIsAdding(false);
+    }
   };
 
   if (isAdding) {

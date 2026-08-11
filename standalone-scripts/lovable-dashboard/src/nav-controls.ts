@@ -5,7 +5,7 @@
 import { clickWorkspaceByXPath, HomepageDashboardVariables, resolveElement } from "./homepage-dashboard-variables";
 import { logError } from "./logger";
 import {
-    buildNavWrapper, NAV_ATTR, NAV_DOWN_VALUE, NAV_STEP_VALUE, NAV_UP_VALUE,
+  buildNavWrapper, NAV_ATTR, NAV_DOWN_VALUE, NAV_STEP_VALUE, NAV_UP_VALUE,
 } from "./nav-controls-dom";
 import { findByIndex, getSelected } from "./workspace-dictionary";
 import { NavDirectionType, type WorkspaceDictionary } from "./types";
@@ -13,79 +13,85 @@ import { NavDirectionType, type WorkspaceDictionary } from "./types";
 export { NavControlClasses } from "./nav-controls-dom";
 
 export function mountNavControls(getDict: () => WorkspaceDictionary): () => void {
-    try {
-        return doMount(getDict);
-    } catch (caught) {
-        logError("navControls.mount", caught);
+  try {
+    return doMount(getDict);
+  } catch (caught) {
+    logError("navControls.mount", caught);
 
-        return () => undefined;
-    }
+    return () => undefined;
+  }
 }
 
 function doMount(getDict: () => WorkspaceDictionary): () => void {
-    const anchor = resolveElement(HomepageDashboardVariables.LifetimeDeal.full);
-    if (!(anchor instanceof HTMLElement)) {
-        return () => undefined;
-    }
-    const wrap = buildNavWrapper();
-    anchor.insertAdjacentElement("afterend", wrap);
-    bindClicks(wrap, getDict);
+  const anchor = resolveElement(HomepageDashboardVariables.LifetimeDeal.full);
+  if (!(anchor instanceof HTMLElement)) {
+    return () => undefined;
+  }
 
-    return () => wrap.remove();
+  const wrap = buildNavWrapper();
+  anchor.insertAdjacentElement("afterend", wrap);
+  bindClicks(wrap, getDict);
+
+  return () => wrap.remove();
 }
 
 function bindClicks(wrap: HTMLElement, getDict: () => WorkspaceDictionary): void {
-    wrap.querySelector(`[${NAV_ATTR}="${NAV_UP_VALUE}"]`)?.addEventListener(
-        "click", () => onNavClick(NavDirectionType.UP, getDict()),
-    );
-    wrap.querySelector(`[${NAV_ATTR}="${NAV_DOWN_VALUE}"]`)?.addEventListener(
-        "click", () => onNavClick(NavDirectionType.DOWN, getDict()),
-    );
+  wrap.querySelector(`[${NAV_ATTR}="${NAV_UP_VALUE}"]`)?.addEventListener(
+    "click", () => onNavClick(NavDirectionType.UP, getDict()),
+  );
+  wrap.querySelector(`[${NAV_ATTR}="${NAV_DOWN_VALUE}"]`)?.addEventListener(
+    "click", () => onNavClick(NavDirectionType.DOWN, getDict()),
+  );
 }
 
 export function readStep(): number {
-    try {
-        const el = document.querySelector<HTMLInputElement>(`[${NAV_ATTR}="${NAV_STEP_VALUE}"]`);
-        const parsed = Number.parseInt(el?.value ?? "1", 10);
+  try {
+    const el = document.querySelector<HTMLInputElement>(`[${NAV_ATTR}="${NAV_STEP_VALUE}"]`);
+    const parsed = Number.parseInt(el?.value ?? "1", 10);
 
-        return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
-    } catch {
-        return 1;
-    }
+    return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
+  } catch {
+    return 1;
+  }
 }
 
 export function computeTargetIndex(currentOneBased: number, total: number, dir: NavDirectionType, step: number): number {
-    const delta = dir === NavDirectionType.UP ? -step : step;
-    const next = currentOneBased + delta;
-    if (next >= 1 && next <= total) {
-        return next;
-    }
+  const delta = dir === NavDirectionType.UP ? -step : step;
+  const next = currentOneBased + delta;
+  if (next >= 1 && next <= total) {
+    return next;
+  }
 
-    return clampToRange(next, total);
+  return clampToRange(next, total);
 }
 
 function clampToRange(n: number, total: number): number {
-    if (n < 1) return 1;
-    if (n > total) return total;
+  if (n < 1) {
+    return 1;
+  }
 
-    return n;
+  if (n > total) {
+    return total;
+  }
+
+  return n;
 }
 
 export function onNavClick(dir: NavDirectionType, dict: WorkspaceDictionary): void {
-    try {
-        const current = getSelected(dict);
-        if (current) {
-            jumpFromCurrent(current.index, dir, dict);
-        }
-    } catch (caught) {
-        logError("navClick", caught);
+  try {
+    const current = getSelected(dict);
+    if (current) {
+      jumpFromCurrent(current.index, dir, dict);
     }
+  } catch (caught) {
+    logError("navClick", caught);
+  }
 }
 
 function jumpFromCurrent(currentIndex: number, dir: NavDirectionType, dict: WorkspaceDictionary): void {
-    const target = computeTargetIndex(currentIndex, dict.byIndex.length, dir, readStep());
-    const record = findByIndex(dict, target);
-    if (record) {
-        clickWorkspaceByXPath(record.fullXPath);
-    }
+  const target = computeTargetIndex(currentIndex, dict.byIndex.length, dir, readStep());
+  const record = findByIndex(dict, target);
+  if (record) {
+    clickWorkspaceByXPath(record.fullXPath);
+  }
 }

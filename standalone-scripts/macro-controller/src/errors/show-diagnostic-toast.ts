@@ -23,8 +23,13 @@ export type ToastLevel = ToastLevelType;
  * collapse to `error` (persistent, red); `warn` and `info` map 1:1.
  */
 export function severityToToastLevel(severity: ErrorSeverity): ToastLevel {
-  if (severity === 'fatal' || severity === 'error') return 'error';
-  if (severity === 'warn') return 'warn';
+  if (severity === 'fatal' || severity === 'error') {
+    return 'error';
+  }
+
+  if (severity === 'warn') {
+    return 'warn';
+  }
 
   return 'info';
 }

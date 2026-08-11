@@ -14,25 +14,25 @@ import { formatEntriesAsText } from "./log-viewer-format";
 import type { LogViewerEntry } from "./log-viewer-types";
 
 const defaultCopy = async (text: string): Promise<boolean> => {
-    if (typeof navigator === "undefined" || navigator.clipboard === undefined) {
-        return false;
-    }
+  if (typeof navigator === "undefined" || navigator.clipboard === undefined) {
+    return false;
+  }
 
-    try {
-        await navigator.clipboard.writeText(text);
+  try {
+    await navigator.clipboard.writeText(text);
 
-        return true;
-    } catch {
-        return false;
-    }
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const copyEntriesToClipboard = async (
-    entries: ReadonlyArray<LogViewerEntry>,
-    onCopy?: (text: string) => Promise<boolean>,
+  entries: ReadonlyArray<LogViewerEntry>,
+  onCopy?: (text: string) => Promise<boolean>,
 ): Promise<boolean> => {
-    const text = formatEntriesAsText(entries);
-    const handler = onCopy ?? defaultCopy;
+  const text = formatEntriesAsText(entries);
+  const handler = onCopy ?? defaultCopy;
 
-    return handler(text);
+  return handler(text);
 };

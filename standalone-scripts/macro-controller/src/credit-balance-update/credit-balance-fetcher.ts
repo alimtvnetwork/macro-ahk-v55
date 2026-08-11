@@ -19,191 +19,199 @@ export interface FetchCreditBalanceOptions {
 }
 
 function buildCreditBalanceUrl(workspaceId: string): string {
-    return CREDIT_API_BASE + '/workspaces/' + encodeURIComponent(workspaceId) + CREDIT_BALANCE_PATH_SUFFIX;
+  return CREDIT_API_BASE + '/workspaces/' + encodeURIComponent(workspaceId) + CREDIT_BALANCE_PATH_SUFFIX;
 }
 
 function elapsedSince(startMs: number): number {
-    return Math.max(0, Date.now() - startMs);
+  return Math.max(0, Date.now() - startMs);
 }
 
 function isAbortError(caught: CaughtError): boolean {
-    return caught instanceof DOMException && caught.name === 'AbortError';
+  return caught instanceof DOMException && caught.name === 'AbortError';
 }
 
 function toCaughtMessage(caught: CaughtError): string {
-    if (caught instanceof Error) {
-        return caught.message;
-    }
-    if (typeof caught === 'string') {
-        return caught;
-    }
+  if (caught instanceof Error) {
+    return caught.message;
+  }
 
-    return String(caught);
+  if (typeof caught === 'string') {
+    return caught;
+  }
+
+  return String(caught);
 }
 
 function buildFailurePayload(
-    reason: string,
-    detail: string,
-    options: FetchCreditBalanceOptions,
-    sourceUrl: string,
-    token: string | null,
-    status: number | null,
-    bodyPreview: string | null,
-    startMs: number,
+  reason: string,
+  detail: string,
+  options: FetchCreditBalanceOptions,
+  sourceUrl: string,
+  token: string | null,
+  status: number | null,
+  bodyPreview: string | null,
+  startMs: number,
 ): CreditFailureLogPayload {
-    return {
-        Reason: reason,
-        ReasonDetail: detail,
-        SourceUrl: sourceUrl,
-        WorkspaceId: options.workspaceId,
-        PlanTierType: options.plan,
-        BearerPrefix: sanitizeBearerPrefix(token),
-        Status: status,
-        BodyPreview: bodyPreview,
-        TimeoutMs: options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS,
-        ElapsedMs: elapsedSince(startMs),
-    };
+  return {
+    Reason: reason,
+    ReasonDetail: detail,
+    SourceUrl: sourceUrl,
+    WorkspaceId: options.workspaceId,
+    PlanTierType: options.plan,
+    BearerPrefix: sanitizeBearerPrefix(token),
+    Status: status,
+    BodyPreview: bodyPreview,
+    TimeoutMs: options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS,
+    ElapsedMs: elapsedSince(startMs),
+  };
 }
 
 async function readBodyPreview(response: Response): Promise<string | null> {
-    try {
-        const text = await response.text();
+  try {
+    const text = await response.text();
 
-        return text ? text.substring(0, 500) : null;
-    } catch (caught: CaughtError) {
-        return 'Unable to read error body: ' + toCaughtMessage(caught);
-    }
+    return text ? text.substring(0, 500) : null;
+  } catch (caught: CaughtError) {
+    return 'Unable to read error body: ' + toCaughtMessage(caught);
+  }
 }
 
 export async function fetchWithTimeout(
-    url: string,
-    init: RequestInit,
-    timeoutMs: number,
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
 ): Promise<Response> {
-    const controller = new AbortController();
-    const timer = setTimeout(function (): void {
-        controller.abort();
-    }, timeoutMs);
+  const controller = new AbortController();
+  const timer = setTimeout(function (): void {
+    controller.abort();
+  }, timeoutMs);
 
-    try {
-        // no-bare-fetch-allow: caller performs the required immediate response.isSuccess classification and logs Reason/ReasonDetail.
-        return await fetch(url, { ...init, signal: controller.signal });
-    } finally {
-        clearTimeout(timer);
-    }
+  try {
+    // no-bare-fetch-allow: caller performs the required immediate response.isSuccess classification and logs Reason/ReasonDetail.
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function buildResult(
-    outcome: CreditFetchOutcomeType,
-    balance: CreditBalance | null,
-    sourceUrl: string,
-    errorDetail: string | null,
+  outcome: CreditFetchOutcomeType,
+  balance: CreditBalance | null,
+  sourceUrl: string,
+  errorDetail: string | null,
 ): CreditFetchResult {
-    return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
+  return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
 }
 
 function classifyHttpReason(status: number): CreditFetchOutcomeType {
-    if (status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN) return CreditFetchOutcomeType.AuthError;
-    if (status >= HttpCodes.INTERNAL_SERVER_ERROR) return CreditFetchOutcomeType.HttpError;
+  if (status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN) {
+    return CreditFetchOutcomeType.AuthError;
+  }
 
+  if (status >= HttpCodes.INTERNAL_SERVER_ERROR) {
     return CreditFetchOutcomeType.HttpError;
+  }
+
+  return CreditFetchOutcomeType.HttpError;
 }
 
 async function handleNonOkResponse(
-    response: Response,
-    options: FetchCreditBalanceOptions,
-    url: string,
-    token: string,
-    startMs: number,
+  response: Response,
+  options: FetchCreditBalanceOptions,
+  url: string,
+  token: string,
+  startMs: number,
 ): Promise<CreditFetchResult> {
-    const bodyPreview = await readBodyPreview(response);
-    const status = response.status;
-console.log("RESPONSE IN HANDLENONOK:", response);
-console.log("RESPONSE KEYS:", Object.keys(response));
+  const bodyPreview = await readBodyPreview(response);
+  const status = response.status;
+  console.log("RESPONSE IN HANDLENONOK:", response);
+  console.log("RESPONSE KEYS:", Object.keys(response));
 
-    const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
-    const reasonStr = status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN ? 'AuthError' : status >= HttpCodes.INTERNAL_SERVER_ERROR ? 'Http5xx' : 'HttpError';
-    if (reasonStr === 'AuthError') {
-        markBearerTokenExpired('credit-balance-update');
-    }
-    logCreditFetchFailure(buildFailurePayload(reasonStr, detail, options, url, token, status, bodyPreview, startMs));
-    const outcome = reasonStr === 'AuthError' ? CreditFetchOutcomeType.AuthError : CreditFetchOutcomeType.HttpError;
+  const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
+  const reasonStr = status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN ? 'AuthError' : status >= HttpCodes.INTERNAL_SERVER_ERROR ? 'Http5xx' : 'HttpError';
+  if (reasonStr === 'AuthError') {
+    markBearerTokenExpired('credit-balance-update');
+  }
 
-    return buildResult(outcome, null, url, detail);
+  logCreditFetchFailure(buildFailurePayload(reasonStr, detail, options, url, token, status, bodyPreview, startMs));
+  const outcome = reasonStr === 'AuthError' ? CreditFetchOutcomeType.AuthError : CreditFetchOutcomeType.HttpError;
+
+  return buildResult(outcome, null, url, detail);
 }
 
 async function parseOkResponse(
-    response: Response,
-    options: FetchCreditBalanceOptions,
-    url: string,
-    token: string,
-    startMs: number,
+  response: Response,
+  options: FetchCreditBalanceOptions,
+  url: string,
+  token: string,
+  startMs: number,
 ): Promise<CreditFetchResult> {
-    const raw = await response.json() as CreditBalanceWire;
-    try {
-        return buildResult(CreditFetchOutcomeType.ApiHit, parseCreditBalance(raw), url, null);
-    } catch (caught: CaughtError) {
-        const detail = 'ParseError: ' + toCaughtMessage(caught);
-        logCreditParseFailure(buildFailurePayload('ParseError', detail, options, url, token, response.status, null, startMs), caught);
+  const raw = await response.json() as CreditBalanceWire;
+  try {
+    return buildResult(CreditFetchOutcomeType.ApiHit, parseCreditBalance(raw), url, null);
+  } catch (caught: CaughtError) {
+    const detail = 'ParseError: ' + toCaughtMessage(caught);
+    logCreditParseFailure(buildFailurePayload('ParseError', detail, options, url, token, response.status, null, startMs), caught);
 
-        return buildResult(CreditFetchOutcomeType.ParseError, null, url, detail);
-    }
+    return buildResult(CreditFetchOutcomeType.ParseError, null, url, detail);
+  }
 }
 
 function handleCaughtError(
-    caught: CaughtError,
-    options: FetchCreditBalanceOptions,
-    url: string,
-    token: string | null,
-    startMs: number,
-    timeoutMs: number,
+  caught: CaughtError,
+  options: FetchCreditBalanceOptions,
+  url: string,
+  token: string | null,
+  startMs: number,
+  timeoutMs: number,
 ): CreditFetchResult {
-    if (isAbortError(caught)) {
-        const detail = 'Exceeded ' + timeoutMs + ' ms budget for workspace ' + options.workspaceId;
-        logCreditFetchFailure(buildFailurePayload('Timeout', detail, options, url, token, null, null, startMs), caught);
+  if (isAbortError(caught)) {
+    const detail = 'Exceeded ' + timeoutMs + ' ms budget for workspace ' + options.workspaceId;
+    logCreditFetchFailure(buildFailurePayload('Timeout', detail, options, url, token, null, null, startMs), caught);
 
-        return buildResult(CreditFetchOutcomeType.Timeout, null, url, detail);
-    }
-    const detail = 'Network error: ' + toCaughtMessage(caught);
-    logCreditFetchFailure(buildFailurePayload('NetworkError', detail, options, url, token, null, null, startMs), caught);
+    return buildResult(CreditFetchOutcomeType.Timeout, null, url, detail);
+  }
 
-    return buildResult(CreditFetchOutcomeType.HttpError, null, url, detail);
+  const detail = 'Network error: ' + toCaughtMessage(caught);
+  logCreditFetchFailure(buildFailurePayload('NetworkError', detail, options, url, token, null, null, startMs), caught);
+
+  return buildResult(CreditFetchOutcomeType.HttpError, null, url, detail);
 }
 
 export async function fetchWorkspaceCreditBalance(
-    options: FetchCreditBalanceOptions,
+  options: FetchCreditBalanceOptions,
 ): Promise<CreditFetchResult> {
-    const timeoutMs = options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
-    const url = buildCreditBalanceUrl(options.workspaceId);
-    const startMs = Date.now();
-    const token = await getBearerToken(options.forceTokenRefresh ? { force: true } : undefined);
+  const timeoutMs = options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
+  const url = buildCreditBalanceUrl(options.workspaceId);
+  const startMs = Date.now();
+  const token = await getBearerToken(options.forceTokenRefresh ? { force: true } : undefined);
 
-    if (!token) {
-        const detail = 'No bearer token returned by unified getBearerToken() contract';
-        logCreditFetchFailure(buildFailurePayload('MissingToken', detail, options, url, null, null, null, startMs));
+  if (!token) {
+    const detail = 'No bearer token returned by unified getBearerToken() contract';
+    logCreditFetchFailure(buildFailurePayload('MissingToken', detail, options, url, null, null, null, startMs));
 
-        return buildResult(CreditFetchOutcomeType.MissingToken, null, url, detail);
+    return buildResult(CreditFetchOutcomeType.MissingToken, null, url, detail);
+  }
+
+  try {
+    const response = await fetchWithTimeout(url, {
+      method: 'GET',
+      credentials: 'include',
+      mode: 'cors',
+      headers: {
+        Accept: '*/*',
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }, timeoutMs);
+
+    if (!response.ok) {
+      return await handleNonOkResponse(response, options, url, token, startMs);
     }
 
-    try {
-        const response = await fetchWithTimeout(url, {
-            method: 'GET',
-            credentials: 'include',
-            mode: 'cors',
-            headers: {
-                Accept: '*/*',
-                Authorization: 'Bearer ' + token,
-                'Content-Type': 'application/json',
-            },
-        }, timeoutMs);
-
-        if (!response.ok) {
-            return await handleNonOkResponse(response, options, url, token, startMs);
-        }
-
-        return await parseOkResponse(response, options, url, token, startMs);
-    } catch (caught: CaughtError) {
-        return handleCaughtError(caught, options, url, token, startMs, timeoutMs);
-    }
+    return await parseOkResponse(response, options, url, token, startMs);
+  } catch (caught: CaughtError) {
+    return handleCaughtError(caught, options, url, token, startMs, timeoutMs);
+  }
 }
 

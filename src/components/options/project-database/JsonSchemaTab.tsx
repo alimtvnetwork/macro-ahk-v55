@@ -224,12 +224,26 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((c) => c.TableName === t.TableName)
           .map((c) => {
             const col: Record<string, unknown> = { Name: c.Name, Type: c.Type };
-            if (c.Description) col.Description = c.Description;
-            if (c.NotNull) col.NotNull = true;
-            if (c.Unique) col.Unique = true;
-            if (c.Default) col.Default = c.Default;
+            if (c.Description) {
+              col.Description = c.Description;
+            }
+
+            if (c.NotNull) {
+              col.NotNull = true;
+            }
+
+            if (c.Unique) {
+              col.Unique = true;
+            }
+
+            if (c.Default) {
+              col.Default = c.Default;
+            }
+
             if (c.ValidationJson) {
-              try { col.Validation = JSON.parse(c.ValidationJson); } catch (caught) {
+              try {
+                col.Validation = JSON.parse(c.ValidationJson); 
+              } catch (caught) {
                 logError("JsonSchemaTab.exportDdl", `Column "${c.Name}" has invalid ValidationJson — skipping Validation field`, caught);
               }
             }
@@ -241,16 +255,26 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((r) => r.SourceTable === t.TableName)
           .map((r) => {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
-            if (r.TargetColumn && r.TargetColumn !== "Id") rel.TargetColumn = r.TargetColumn;
-            if (r.OnDelete) rel.OnDelete = r.OnDelete;
+            if (r.TargetColumn && r.TargetColumn !== "Id") {
+              rel.TargetColumn = r.TargetColumn;
+            }
+
+            if (r.OnDelete) {
+              rel.OnDelete = r.OnDelete;
+            }
 
             return rel;
           });
 
         const def: Record<string, unknown> = { TableName: t.TableName };
-        if (t.Description) def.Description = t.Description;
+        if (t.Description) {
+          def.Description = t.Description;
+        }
+
         def.Columns = cols;
-        if (rels.length > 0) def.Relations = rels;
+        if (rels.length > 0) {
+          def.Relations = rels;
+        }
 
         return def;
       });
@@ -307,12 +331,26 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((c) => c.TableName === t.TableName)
           .map((c) => {
             const col: Record<string, unknown> = { Name: c.Name, Type: c.Type };
-            if (c.Description) col.Description = c.Description;
-            if (c.NotNull) col.NotNull = true;
-            if (c.Unique) col.Unique = true;
-            if (c.Default) col.Default = c.Default;
+            if (c.Description) {
+              col.Description = c.Description;
+            }
+
+            if (c.NotNull) {
+              col.NotNull = true;
+            }
+
+            if (c.Unique) {
+              col.Unique = true;
+            }
+
+            if (c.Default) {
+              col.Default = c.Default;
+            }
+
             if (c.ValidationJson) {
-              try { col.Validation = JSON.parse(c.ValidationJson); } catch (caught) {
+              try {
+                col.Validation = JSON.parse(c.ValidationJson); 
+              } catch (caught) {
                 logError("JsonSchemaTab.exportCopy", `Column "${c.Name}" has invalid ValidationJson — skipping Validation field`, caught);
               }
             }
@@ -324,16 +362,26 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((r) => r.SourceTable === t.TableName)
           .map((r) => {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
-            if (r.TargetColumn && r.TargetColumn !== "Id") rel.TargetColumn = r.TargetColumn;
-            if (r.OnDelete) rel.OnDelete = r.OnDelete;
+            if (r.TargetColumn && r.TargetColumn !== "Id") {
+              rel.TargetColumn = r.TargetColumn;
+            }
+
+            if (r.OnDelete) {
+              rel.OnDelete = r.OnDelete;
+            }
 
             return rel;
           });
 
         const def: Record<string, unknown> = { TableName: t.TableName };
-        if (t.Description) def.Description = t.Description;
+        if (t.Description) {
+          def.Description = t.Description;
+        }
+
         def.Columns = cols;
-        if (rels.length > 0) def.Relations = rels;
+        if (rels.length > 0) {
+          def.Relations = rels;
+        }
 
         return def;
       });
@@ -364,10 +412,12 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
       if (!parsed || !Array.isArray(parsed.tables)) {
         return { valid: false, error: "Root must have a 'tables' array" };
       }
+
       for (const t of parsed.tables) {
         if (!t.TableName || typeof t.TableName !== "string") {
           return { valid: false, error: `Each table needs a 'TableName' string` };
         }
+
         if (!Array.isArray(t.Columns) || t.Columns.length === 0) {
           return { valid: false, error: `Table "${t.TableName}" needs at least one column` };
         }
@@ -530,7 +580,9 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
             variant="ghost"
             size="sm"
             className="h-7 text-xs gap-1"
-            onClick={() => { setSchemaJson(EXAMPLE_SCHEMA); setLastResult(null); setLastError(null); setDocsOutput(null); setDiffMode(false); }}
+            onClick={() => {
+              setSchemaJson(EXAMPLE_SCHEMA); setLastResult(null); setLastError(null); setDocsOutput(null); setDiffMode(false); 
+            }}
           >
             <RotateCcw className="h-3 w-3" /> Reset
           </Button>
@@ -562,7 +614,9 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
                 📖 Schema Definition Guide
               </p>
               <div className="flex gap-1">
-                <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => { navigator.clipboard.writeText(SCHEMA_GUIDE); toast.success("Guide copied"); }}>
+                <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => {
+                  navigator.clipboard.writeText(SCHEMA_GUIDE); toast.success("Guide copied"); 
+                }}>
                   <ClipboardCopy className="h-3 w-3" /> Copy
                 </Button>
                 <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => setShowGuide(false)}>

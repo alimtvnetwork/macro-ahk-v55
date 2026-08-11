@@ -30,10 +30,15 @@ export const REPLACE_KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,31}$/;
 
 /** Validate a candidate replace-token key. Returns null on success or an error message. */
 export function validateReplaceKey(key: string): string | null {
-    if (typeof key !== 'string') return 'replaceKey must be a string';
-    if (!REPLACE_KEY_RE.test(key)) return 'replaceKey must match ' + REPLACE_KEY_RE.source;
+  if (typeof key !== 'string') {
+    return 'replaceKey must be a string';
+  }
 
-    return null;
+  if (!REPLACE_KEY_RE.test(key)) {
+    return 'replaceKey must match ' + REPLACE_KEY_RE.source;
+  }
+
+  return null;
 }
 
 /**
@@ -41,34 +46,46 @@ export function validateReplaceKey(key: string): string | null {
  * order. Returns null when the resulting list is empty (invalid input).
  */
 export function normalizeReplaceValues(input: readonly unknown[]): string[] | null {
-    if (!Array.isArray(input)) return null;
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const raw of input) {
-        if (typeof raw !== 'string') continue;
-        const trimmed = raw.trim();
-        if (trimmed === '' || seen.has(trimmed)) continue;
-        seen.add(trimmed);
-        out.push(trimmed);
+  if (!Array.isArray(input)) {
+    return null;
+  }
+
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of input) {
+    if (typeof raw !== 'string') {
+      continue;
     }
 
-    return out.length > 0 ? out : null;
+    const trimmed = raw.trim();
+    if (trimmed === '' || seen.has(trimmed)) {
+      continue;
+    }
+
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+
+  return out.length > 0 ? out : null;
 }
 
 /** Encode replace-values array to SQLite TEXT JSON storage form. */
 export function encodeReplaceValues(values: readonly string[]): string {
-    return JSON.stringify(values);
+  return JSON.stringify(values);
 }
 
 /** Decode SQLite TEXT storage back to array, falling back to defaults on any parse error. */
 export function decodeReplaceValues(raw: unknown): string[] {
-    if (typeof raw !== 'string' || raw.trim() === '') return [...REPLACE_VALUES_DEFAULT];
-    try {
-        const parsed = JSON.parse(raw);
-        const normalized = normalizeReplaceValues(Array.isArray(parsed) ? parsed : []);
+  if (typeof raw !== 'string' || raw.trim() === '') {
+    return [...REPLACE_VALUES_DEFAULT];
+  }
 
-        return normalized ?? [...REPLACE_VALUES_DEFAULT];
-    } catch {
-        return [...REPLACE_VALUES_DEFAULT];
-    }
+  try {
+    const parsed = JSON.parse(raw);
+    const normalized = normalizeReplaceValues(Array.isArray(parsed) ? parsed : []);
+
+    return normalized ?? [...REPLACE_VALUES_DEFAULT];
+  } catch {
+    return [...REPLACE_VALUES_DEFAULT];
+  }
 }

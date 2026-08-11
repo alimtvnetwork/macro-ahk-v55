@@ -30,24 +30,24 @@ import { describe, it, expect, beforeEach } from "vitest";
 import type { Database as SqlJsDatabase } from "sql.js";
 
 import {
-    bindKvDbManager,
-    handleKvGet,
-    handleKvSet,
-    handleKvDelete,
-    handleKvList,
+  bindKvDbManager,
+  handleKvGet,
+  handleKvSet,
+  handleKvDelete,
+  handleKvList,
 } from "@/background/handlers/kv-handler";
 import {
-    bindGroupedKvDbManager,
-    handleGkvGet,
-    handleGkvSet,
-    handleGkvDelete,
+  bindGroupedKvDbManager,
+  handleGkvGet,
+  handleGkvSet,
+  handleGkvDelete,
 } from "@/background/handlers/grouped-kv-handler";
 import {
-    bindFileStorageDbManager,
-    handleFileSave,
-    handleFileGet,
-    handleFileList,
-    handleFileDelete,
+  bindFileStorageDbManager,
+  handleFileSave,
+  handleFileGet,
+  handleFileList,
+  handleFileDelete,
 } from "@/background/handlers/file-storage-handler";
 import { handleProjectApi } from "@/background/handlers/project-api-handler";
 
@@ -65,65 +65,65 @@ interface DbCallLog {
 }
 
 function makeFakeDb(log: DbCallLog): SqlJsDatabase {
-    const db = {
-        run: (sql: string, params?: unknown) => {
-            log.runs.push({ sql, params });
+  const db = {
+    run: (sql: string, params?: unknown) => {
+      log.runs.push({ sql, params });
 
-            return db;
-        },
-        exec: (sql: string, params?: unknown) => {
-            log.execs.push({ sql, params });
+      return db;
+    },
+    exec: (sql: string, params?: unknown) => {
+      log.execs.push({ sql, params });
 
-            return [] as ReturnType<SqlJsDatabase["exec"]>;
-        },
-        prepare: (sql: string) => {
-            log.prepares.push(sql);
+      return [] as ReturnType<SqlJsDatabase["exec"]>;
+    },
+    prepare: (sql: string) => {
+      log.prepares.push(sql);
 
-            // Returns a minimal Statement stub. Should never be reached in
-            // missing-field tests, if it is, the assertion below catches it.
-            return {
-                bind: () => true,
-                step: () => false,
-                getAsObject: () => ({}),
-                free: () => {},
-                run: () => {},
-            } as unknown as ReturnType<SqlJsDatabase["prepare"]>;
-        },
-    };
+      // Returns a minimal Statement stub. Should never be reached in
+      // missing-field tests, if it is, the assertion below catches it.
+      return {
+        bind: () => true,
+        step: () => false,
+        getAsObject: () => ({}),
+        free: () => {},
+        run: () => {},
+      } as unknown as ReturnType<SqlJsDatabase["prepare"]>;
+    },
+  };
 
-    return db as unknown as SqlJsDatabase;
+  return db as unknown as SqlJsDatabase;
 }
 
 function makeFakeDbManager(): { manager: DbManager; log: DbCallLog } {
-    const log: DbCallLog = { runs: [], execs: [], prepares: [] };
-    const fakeDb = makeFakeDb(log);
-    const manager = {
-        getLogsDb: () => fakeDb,
-        markDirty: () => {},
-    } as unknown as DbManager;
+  const log: DbCallLog = { runs: [], execs: [], prepares: [] };
+  const fakeDb = makeFakeDb(log);
+  const manager = {
+    getLogsDb: () => fakeDb,
+    markDirty: () => {},
+  } as unknown as DbManager;
 
-    return { manager, log };
+  return { manager, log };
 }
 
 function expectDbUntouched(log: DbCallLog, label: string): void {
-    expect(log.runs, `${label}: db.run() must not be called`).toEqual([]);
-    expect(log.execs, `${label}: db.exec() must not be called`).toEqual([]);
-    expect(log.prepares, `${label}: db.prepare() must not be called`).toEqual([]);
+  expect(log.runs, `${label}: db.run() must not be called`).toEqual([]);
+  expect(log.execs, `${label}: db.exec() must not be called`).toEqual([]);
+  expect(log.prepares, `${label}: db.prepare() must not be called`).toEqual([]);
 }
 
 interface ErrorShape { isOk: false; errorMessage: string }
 
 function expectMissingFieldError(
-    result: unknown,
-    op: string,
-    field: string,
+  result: unknown,
+  op: string,
+  field: string,
 ): asserts result is ErrorShape {
-    expect(result, `${op}: handler must return an object`).toBeTypeOf("object");
-    const r = result as Partial<ErrorShape>;
-    expect(r.isOk, `${op}: isOk must be false`).toBe(false);
-    expect(r.errorMessage, `${op}: errorMessage must be a string`).toBeTypeOf("string");
-    expect(r.errorMessage).toContain(`[${op}]`);
-    expect(r.errorMessage).toContain(`'${field}'`);
+  expect(result, `${op}: handler must return an object`).toBeTypeOf("object");
+  const r = result as Partial<ErrorShape>;
+  expect(r.isOk, `${op}: isOk must be false`).toBe(false);
+  expect(r.errorMessage, `${op}: errorMessage must be a string`).toBeTypeOf("string");
+  expect(r.errorMessage).toContain(`[${op}]`);
+  expect(r.errorMessage).toContain(`'${field}'`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -131,67 +131,67 @@ function expectMissingFieldError(
 /* ------------------------------------------------------------------ */
 
 describe("handler-guards, kv-handler missing-field contract", () => {
-    let log: DbCallLog;
+  let log: DbCallLog;
 
-    beforeEach(() => {
-        const fake = makeFakeDbManager();
-        log = fake.log;
-        bindKvDbManager(fake.manager);
-    });
+  beforeEach(() => {
+    const fake = makeFakeDbManager();
+    log = fake.log;
+    bindKvDbManager(fake.manager);
+  });
 
-    it("handleKvGet, missing projectId returns clean error, no DB call", async () => {
-        const result = await handleKvGet({ type: "KV_GET", key: "k" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:get", "projectId");
-        expectDbUntouched(log, "handleKvGet missing projectId");
-    });
+  it("handleKvGet, missing projectId returns clean error, no DB call", async () => {
+    const result = await handleKvGet({ type: "KV_GET", key: "k" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:get", "projectId");
+    expectDbUntouched(log, "handleKvGet missing projectId");
+  });
 
-    it("handleKvGet, missing key returns clean error, no DB call", async () => {
-        const result = await handleKvGet({ type: "KV_GET", projectId: "p1" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:get", "key");
-        expectDbUntouched(log, "handleKvGet missing key");
-    });
+  it("handleKvGet, missing key returns clean error, no DB call", async () => {
+    const result = await handleKvGet({ type: "KV_GET", projectId: "p1" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:get", "key");
+    expectDbUntouched(log, "handleKvGet missing key");
+  });
 
-    it("handleKvGet, empty-string projectId rejected (non-empty contract)", async () => {
-        const result = await handleKvGet({ type: "KV_GET", projectId: "", key: "k" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:get", "projectId");
-        expectDbUntouched(log, "handleKvGet empty projectId");
-    });
+  it("handleKvGet, empty-string projectId rejected (non-empty contract)", async () => {
+    const result = await handleKvGet({ type: "KV_GET", projectId: "", key: "k" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:get", "projectId");
+    expectDbUntouched(log, "handleKvGet empty projectId");
+  });
 
-    it("handleKvSet, missing projectId returns clean error, no DB write", async () => {
-        const result = await handleKvSet({ type: "KV_SET", key: "k", value: "v" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:set", "projectId");
-        expectDbUntouched(log, "handleKvSet missing projectId");
-    });
+  it("handleKvSet, missing projectId returns clean error, no DB write", async () => {
+    const result = await handleKvSet({ type: "KV_SET", key: "k", value: "v" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:set", "projectId");
+    expectDbUntouched(log, "handleKvSet missing projectId");
+  });
 
-    it("handleKvSet, missing key returns clean error, no DB write", async () => {
-        const result = await handleKvSet({ type: "KV_SET", projectId: "p1", value: "v" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:set", "key");
-        expectDbUntouched(log, "handleKvSet missing key");
-    });
+  it("handleKvSet, missing key returns clean error, no DB write", async () => {
+    const result = await handleKvSet({ type: "KV_SET", projectId: "p1", value: "v" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:set", "key");
+    expectDbUntouched(log, "handleKvSet missing key");
+  });
 
-    it("handleKvDelete, missing projectId returns clean error, no DB delete", async () => {
-        const result = await handleKvDelete({ type: "KV_DELETE", key: "k" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:delete", "projectId");
-        expectDbUntouched(log, "handleKvDelete missing projectId");
-    });
+  it("handleKvDelete, missing projectId returns clean error, no DB delete", async () => {
+    const result = await handleKvDelete({ type: "KV_DELETE", key: "k" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:delete", "projectId");
+    expectDbUntouched(log, "handleKvDelete missing projectId");
+  });
 
-    it("handleKvDelete, missing key returns clean error, no DB delete", async () => {
-        const result = await handleKvDelete({ type: "KV_DELETE", projectId: "p1" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:delete", "key");
-        expectDbUntouched(log, "handleKvDelete missing key");
-    });
+  it("handleKvDelete, missing key returns clean error, no DB delete", async () => {
+    const result = await handleKvDelete({ type: "KV_DELETE", projectId: "p1" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:delete", "key");
+    expectDbUntouched(log, "handleKvDelete missing key");
+  });
 
-    it("handleKvList, missing projectId returns clean error, no DB read", async () => {
-        const result = await handleKvList({ type: "KV_LIST" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:list", "projectId");
-        expectDbUntouched(log, "handleKvList missing projectId");
-    });
+  it("handleKvList, missing projectId returns clean error, no DB read", async () => {
+    const result = await handleKvList({ type: "KV_LIST" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:list", "projectId");
+    expectDbUntouched(log, "handleKvList missing projectId");
+  });
 
-    it("handleKvList, non-string projectId (number) is rejected", async () => {
-        const result = await handleKvList({ type: "KV_LIST", projectId: 42 } as unknown as MessageRequest);
-        expectMissingFieldError(result, "kv:list", "projectId");
-        expectDbUntouched(log, "handleKvList numeric projectId");
-    });
+  it("handleKvList, non-string projectId (number) is rejected", async () => {
+    const result = await handleKvList({ type: "KV_LIST", projectId: 42 } as unknown as MessageRequest);
+    expectMissingFieldError(result, "kv:list", "projectId");
+    expectDbUntouched(log, "handleKvList numeric projectId");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -199,55 +199,55 @@ describe("handler-guards, kv-handler missing-field contract", () => {
 /* ------------------------------------------------------------------ */
 
 describe("handler-guards, grouped-kv-handler missing-field contract", () => {
-    let log: DbCallLog;
+  let log: DbCallLog;
 
-    beforeEach(() => {
-        const fake = makeFakeDbManager();
-        log = fake.log;
-        bindGroupedKvDbManager(fake.manager);
-    });
+  beforeEach(() => {
+    const fake = makeFakeDbManager();
+    log = fake.log;
+    bindGroupedKvDbManager(fake.manager);
+  });
 
-    it("handleGkvGet, missing group returns clean error, no DB call", async () => {
-        const result = await handleGkvGet({ type: "GKV_GET", key: "k" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:get", "group");
-        expectDbUntouched(log, "handleGkvGet missing group");
-    });
+  it("handleGkvGet, missing group returns clean error, no DB call", async () => {
+    const result = await handleGkvGet({ type: "GKV_GET", key: "k" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:get", "group");
+    expectDbUntouched(log, "handleGkvGet missing group");
+  });
 
-    it("handleGkvGet, missing key returns clean error, no DB call", async () => {
-        const result = await handleGkvGet({ type: "GKV_GET", group: "g" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:get", "key");
-        expectDbUntouched(log, "handleGkvGet missing key");
-    });
+  it("handleGkvGet, missing key returns clean error, no DB call", async () => {
+    const result = await handleGkvGet({ type: "GKV_GET", group: "g" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:get", "key");
+    expectDbUntouched(log, "handleGkvGet missing key");
+  });
 
-    it("handleGkvSet, missing group returns clean error, no DB write", async () => {
-        const result = await handleGkvSet({ type: "GKV_SET", key: "k", value: "v" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:set", "group");
-        expectDbUntouched(log, "handleGkvSet missing group");
-    });
+  it("handleGkvSet, missing group returns clean error, no DB write", async () => {
+    const result = await handleGkvSet({ type: "GKV_SET", key: "k", value: "v" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:set", "group");
+    expectDbUntouched(log, "handleGkvSet missing group");
+  });
 
-    it("handleGkvSet, missing key returns clean error, no DB write", async () => {
-        const result = await handleGkvSet({ type: "GKV_SET", group: "g", value: "v" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:set", "key");
-        expectDbUntouched(log, "handleGkvSet missing key");
-    });
+  it("handleGkvSet, missing key returns clean error, no DB write", async () => {
+    const result = await handleGkvSet({ type: "GKV_SET", group: "g", value: "v" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:set", "key");
+    expectDbUntouched(log, "handleGkvSet missing key");
+  });
 
-    it("handleGkvSet, group order checked first (group reported when both missing)", async () => {
-        const result = await handleGkvSet({ type: "GKV_SET", value: "v" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:set", "group");
-        expectDbUntouched(log, "handleGkvSet both missing");
-    });
+  it("handleGkvSet, group order checked first (group reported when both missing)", async () => {
+    const result = await handleGkvSet({ type: "GKV_SET", value: "v" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:set", "group");
+    expectDbUntouched(log, "handleGkvSet both missing");
+  });
 
-    it("handleGkvDelete, missing group returns clean error, no DB delete", async () => {
-        const result = await handleGkvDelete({ type: "GKV_DELETE", key: "k" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:delete", "group");
-        expectDbUntouched(log, "handleGkvDelete missing group");
-    });
+  it("handleGkvDelete, missing group returns clean error, no DB delete", async () => {
+    const result = await handleGkvDelete({ type: "GKV_DELETE", key: "k" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:delete", "group");
+    expectDbUntouched(log, "handleGkvDelete missing group");
+  });
 
-    it("handleGkvDelete, missing key returns clean error, no DB delete", async () => {
-        const result = await handleGkvDelete({ type: "GKV_DELETE", group: "g" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "gkv:delete", "key");
-        expectDbUntouched(log, "handleGkvDelete missing key");
-    });
+  it("handleGkvDelete, missing key returns clean error, no DB delete", async () => {
+    const result = await handleGkvDelete({ type: "GKV_DELETE", group: "g" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "gkv:delete", "key");
+    expectDbUntouched(log, "handleGkvDelete missing key");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -255,72 +255,72 @@ describe("handler-guards, grouped-kv-handler missing-field contract", () => {
 /* ------------------------------------------------------------------ */
 
 describe("handler-guards, file-storage-handler missing-field contract", () => {
-    let log: DbCallLog;
+  let log: DbCallLog;
 
-    beforeEach(() => {
-        const fake = makeFakeDbManager();
-        log = fake.log;
-        bindFileStorageDbManager(fake.manager);
-    });
+  beforeEach(() => {
+    const fake = makeFakeDbManager();
+    log = fake.log;
+    bindFileStorageDbManager(fake.manager);
+  });
 
-    it("handleFileSave, missing projectId returns clean error, no DB write", async () => {
-        const result = await handleFileSave({
-            type: "FILE_SAVE",
-            filename: "a.txt",
-            dataBase64: "ZGF0YQ==",
-        } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:save", "projectId");
-        expectDbUntouched(log, "handleFileSave missing projectId");
-    });
+  it("handleFileSave, missing projectId returns clean error, no DB write", async () => {
+    const result = await handleFileSave({
+      type: "FILE_SAVE",
+      filename: "a.txt",
+      dataBase64: "ZGF0YQ==",
+    } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:save", "projectId");
+    expectDbUntouched(log, "handleFileSave missing projectId");
+  });
 
-    it("handleFileSave, missing filename returns clean error, no DB write", async () => {
-        const result = await handleFileSave({
-            type: "FILE_SAVE",
-            projectId: "p1",
-            dataBase64: "ZGF0YQ==",
-        } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:save", "filename");
-        expectDbUntouched(log, "handleFileSave missing filename");
-    });
+  it("handleFileSave, missing filename returns clean error, no DB write", async () => {
+    const result = await handleFileSave({
+      type: "FILE_SAVE",
+      projectId: "p1",
+      dataBase64: "ZGF0YQ==",
+    } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:save", "filename");
+    expectDbUntouched(log, "handleFileSave missing filename");
+  });
 
-    it("handleFileSave, missing dataBase64 returns clean error, no DB write", async () => {
-        const result = await handleFileSave({
-            type: "FILE_SAVE",
-            projectId: "p1",
-            filename: "a.txt",
-        } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:save", "dataBase64");
-        expectDbUntouched(log, "handleFileSave missing dataBase64");
-    });
+  it("handleFileSave, missing dataBase64 returns clean error, no DB write", async () => {
+    const result = await handleFileSave({
+      type: "FILE_SAVE",
+      projectId: "p1",
+      filename: "a.txt",
+    } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:save", "dataBase64");
+    expectDbUntouched(log, "handleFileSave missing dataBase64");
+  });
 
-    it("handleFileSave, non-string dataBase64 (object) rejected", async () => {
-        const result = await handleFileSave({
-            type: "FILE_SAVE",
-            projectId: "p1",
-            filename: "a.txt",
-            dataBase64: { not: "a string" },
-        } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:save", "dataBase64");
-        expectDbUntouched(log, "handleFileSave non-string dataBase64");
-    });
+  it("handleFileSave, non-string dataBase64 (object) rejected", async () => {
+    const result = await handleFileSave({
+      type: "FILE_SAVE",
+      projectId: "p1",
+      filename: "a.txt",
+      dataBase64: { not: "a string" },
+    } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:save", "dataBase64");
+    expectDbUntouched(log, "handleFileSave non-string dataBase64");
+  });
 
-    it("handleFileGet, missing fileId returns clean error, no DB read", async () => {
-        const result = await handleFileGet({ type: "FILE_GET" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:get", "fileId");
-        expectDbUntouched(log, "handleFileGet missing fileId");
-    });
+  it("handleFileGet, missing fileId returns clean error, no DB read", async () => {
+    const result = await handleFileGet({ type: "FILE_GET" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:get", "fileId");
+    expectDbUntouched(log, "handleFileGet missing fileId");
+  });
 
-    it("handleFileList, missing projectId returns clean error, no DB read", async () => {
-        const result = await handleFileList({ type: "FILE_LIST" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:list", "projectId");
-        expectDbUntouched(log, "handleFileList missing projectId");
-    });
+  it("handleFileList, missing projectId returns clean error, no DB read", async () => {
+    const result = await handleFileList({ type: "FILE_LIST" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:list", "projectId");
+    expectDbUntouched(log, "handleFileList missing projectId");
+  });
 
-    it("handleFileDelete, missing fileId returns clean error, no DB delete", async () => {
-        const result = await handleFileDelete({ type: "FILE_DELETE" } as unknown as MessageRequest);
-        expectMissingFieldError(result, "file:delete", "fileId");
-        expectDbUntouched(log, "handleFileDelete missing fileId");
-    });
+  it("handleFileDelete, missing fileId returns clean error, no DB delete", async () => {
+    const result = await handleFileDelete({ type: "FILE_DELETE" } as unknown as MessageRequest);
+    expectMissingFieldError(result, "file:delete", "fileId");
+    expectDbUntouched(log, "handleFileDelete missing fileId");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -328,57 +328,57 @@ describe("handler-guards, file-storage-handler missing-field contract", () => {
 /* ------------------------------------------------------------------ */
 
 describe("handler-guards, project-api-handler missing-field contract", () => {
-    // No DB binding needed: guard fires before initProjectDb / getProjectDb.
-    // If the guard ever regressed, those would throw and surface as a
-    // different test failure (no DbManager bound), still useful signal.
+  // No DB binding needed: guard fires before initProjectDb / getProjectDb.
+  // If the guard ever regressed, those would throw and surface as a
+  // different test failure (no DbManager bound), still useful signal.
 
-    it("handleProjectApi, missing project (slug) returns clean error", async () => {
-        const result = await handleProjectApi({
-            type: "PROJECT_API",
-            method: "GET",
-            endpoint: "Users",
-        } as unknown as Parameters<typeof handleProjectApi>[0]);
-        const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
-        expect(r.errorMessage).toBeTypeOf("string");
-        expect(r.errorMessage).toContain("[projectApi]");
-        expect(r.errorMessage).toContain("'project'");
-    });
+  it("handleProjectApi, missing project (slug) returns clean error", async () => {
+    const result = await handleProjectApi({
+      type: "PROJECT_API",
+      method: "GET",
+      endpoint: "Users",
+    } as unknown as Parameters<typeof handleProjectApi>[0]);
+    const r = result as Partial<ErrorShape>;
+    expect(r.isOk).toBe(false);
+    expect(r.errorMessage).toBeTypeOf("string");
+    expect(r.errorMessage).toContain("[projectApi]");
+    expect(r.errorMessage).toContain("'project'");
+  });
 
-    it("handleProjectApi, missing endpoint returns clean error", async () => {
-        const result = await handleProjectApi({
-            type: "PROJECT_API",
-            project: "my-app",
-            method: "GET",
-        } as unknown as Parameters<typeof handleProjectApi>[0]);
-        const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
-        expect(r.errorMessage).toBeTypeOf("string");
-        expect(r.errorMessage).toContain("[projectApi]");
-        expect(r.errorMessage).toContain("'endpoint'");
-    });
+  it("handleProjectApi, missing endpoint returns clean error", async () => {
+    const result = await handleProjectApi({
+      type: "PROJECT_API",
+      project: "my-app",
+      method: "GET",
+    } as unknown as Parameters<typeof handleProjectApi>[0]);
+    const r = result as Partial<ErrorShape>;
+    expect(r.isOk).toBe(false);
+    expect(r.errorMessage).toBeTypeOf("string");
+    expect(r.errorMessage).toContain("[projectApi]");
+    expect(r.errorMessage).toContain("'endpoint'");
+  });
 
-    it("handleProjectApi, empty-string project rejected", async () => {
-        const result = await handleProjectApi({
-            type: "PROJECT_API",
-            project: "",
-            method: "GET",
-            endpoint: "Users",
-        } as unknown as Parameters<typeof handleProjectApi>[0]);
-        const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
-        expect(r.errorMessage).toContain("'project'");
-    });
+  it("handleProjectApi, empty-string project rejected", async () => {
+    const result = await handleProjectApi({
+      type: "PROJECT_API",
+      project: "",
+      method: "GET",
+      endpoint: "Users",
+    } as unknown as Parameters<typeof handleProjectApi>[0]);
+    const r = result as Partial<ErrorShape>;
+    expect(r.isOk).toBe(false);
+    expect(r.errorMessage).toContain("'project'");
+  });
 
-    it("handleProjectApi, empty-string endpoint rejected", async () => {
-        const result = await handleProjectApi({
-            type: "PROJECT_API",
-            project: "my-app",
-            method: "GET",
-            endpoint: "",
-        } as unknown as Parameters<typeof handleProjectApi>[0]);
-        const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
-        expect(r.errorMessage).toContain("'endpoint'");
-    });
+  it("handleProjectApi, empty-string endpoint rejected", async () => {
+    const result = await handleProjectApi({
+      type: "PROJECT_API",
+      project: "my-app",
+      method: "GET",
+      endpoint: "",
+    } as unknown as Parameters<typeof handleProjectApi>[0]);
+    const r = result as Partial<ErrorShape>;
+    expect(r.isOk).toBe(false);
+    expect(r.errorMessage).toContain("'endpoint'");
+  });
 });

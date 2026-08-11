@@ -56,7 +56,7 @@ export function getLastBridgeOutcome(): {
   isSuccess: boolean;
   source: string;
   error: string;
-} {
+  } {
   return bridgeOutcomeState.get();
 }
 
@@ -91,7 +91,9 @@ function getVisibleCookieNames(): string[] {
     const rawCookie = document.cookie || '';
 
     return rawCookie
-      ? rawCookie.split(';').map(function (c: string) { return c.trim().split('=')[0]; }).filter(Boolean)
+      ? rawCookie.split(';').map(function (c: string) {
+        return c.trim().split('=')[0]; 
+      }).filter(Boolean)
       : [];
   } catch (e) {
     logError('listCookieNames', 'Failed to parse cookie names', e);
@@ -129,7 +131,9 @@ export function getAuthDebugSnapshot(): AuthDebugSnapshot {
 export function extractTokenFromAuthBridgeResponse(
   payload: Record<string, unknown>,
 ): string {
-  if (!payload || typeof payload !== 'object') return '';
+  if (!payload || typeof payload !== 'object') {
+    return '';
+  }
 
   return extractTokenFromUnknownContainer(payload, 0);
 }
@@ -138,7 +142,9 @@ function extractTokenFromUnknownContainer(
   raw: unknown,
   depth: number,
 ): string {
-  if (depth > 4 || !raw || typeof raw !== 'object') return '';
+  if (depth > 4 || !raw || typeof raw !== 'object') {
+    return '';
+  }
 
   const obj = raw as Record<string, unknown>;
 
@@ -219,13 +225,17 @@ export function requestTokenFromExtension(
   const messageType = isForceRefresh ? 'REFRESH_TOKEN' : 'GET_TOKEN';
 
   _requestTokenFromExtensionAttempt(isForceRefresh, function (firstAttempt: ExtensionBridgeAttemptResult) {
-    if (handleAttemptResult(firstAttempt, messageType, onDone)) return;
+    if (handleAttemptResult(firstAttempt, messageType, onDone)) {
+      return;
+    }
 
     // Retry once on timeout (handles MV3 service worker cold-start)
     log(LabelType.ExtensionBridge + messageType + ' timed out — retrying once...', 'warn');
 
     _requestTokenFromExtensionAttempt(isForceRefresh, function (secondAttempt: ExtensionBridgeAttemptResult) {
-      if (handleAttemptResult(secondAttempt, messageType, onDone)) return;
+      if (handleAttemptResult(secondAttempt, messageType, onDone)) {
+        return;
+      }
 
       recordBridgeOutcome(false, 'none', secondAttempt.errorMessage || 'timeout (2 attempts)');
       onDone('', 'none');
@@ -252,17 +262,31 @@ interface BridgeAttemptCtxFull extends BridgeAttemptCtx {
 }
 
 function finishBridgeAttempt(ctx: BridgeAttemptCtxFull, result: ExtensionBridgeAttemptResult): void {
-  if (ctx.isSettled) return;
+  if (ctx.isSettled) {
+    return;
+  }
+
   ctx.isSettled = true;
   window.removeEventListener('message', ctx._onResponse!);
-  if (ctx.timeoutRef) clearTimeout(ctx.timeoutRef);
+  if (ctx.timeoutRef) {
+    clearTimeout(ctx.timeoutRef);
+  }
+
   ctx.onDone(result);
 }
 
 function handleBridgeResponse(ctx: BridgeAttemptCtxFull, event: MessageEvent): void {
-  if (!event.data) return;
-  if (event.data.source !== 'marco-extension') return;
-  if (event.data.requestId !== ctx.requestId) return;
+  if (!event.data) {
+    return;
+  }
+
+  if (event.data.source !== 'marco-extension') {
+    return;
+  }
+
+  if (event.data.requestId !== ctx.requestId) {
+    return;
+  }
 
   const payload = unwrapRelayPayload(event.data.payload);
   const token = extractTokenFromAuthBridgeResponse(payload);
@@ -287,7 +311,10 @@ function _requestTokenFromExtensionAttempt(
     isSettled: false, timeoutRef: null, requestId, startedAt: Date.now(), messageType, onDone,
   };
 
-  ctx._onResponse = function(event: MessageEvent) { handleBridgeResponse(ctx, event); };
+  ctx._onResponse = function(event: MessageEvent) {
+    handleBridgeResponse(ctx, event); 
+  };
+
   window.addEventListener('message', ctx._onResponse);
 
   window.postMessage({
@@ -300,12 +327,16 @@ function _requestTokenFromExtensionAttempt(
 }
 
 function unwrapRelayPayload(rawPayload: unknown): Record<string, unknown> {
-  if (!rawPayload || typeof rawPayload !== 'object') return {};
+  if (!rawPayload || typeof rawPayload !== 'object') {
+    return {};
+  }
 
   const payload = rawPayload as Record<string, unknown>;
   const nested = payload.payload;
 
-  if (!nested || typeof nested !== 'object') return payload;
+  if (!nested || typeof nested !== 'object') {
+    return payload;
+  }
 
   const nestedPayload = nested as Record<string, unknown>;
   const hasTokenLikeKey =
@@ -340,12 +371,19 @@ const RELAY_ERROR_PATTERNS = [
 function isTransportFailure(errorMessage: string): boolean {
   const normalized = errorMessage.toLowerCase();
 
-  return RELAY_ERROR_PATTERNS.some(function (p) { return normalized.includes(p); });
+  return RELAY_ERROR_PATTERNS.some(function (p) {
+    return normalized.includes(p); 
+  });
 }
 
 function handleRelayPong(ctx: RelayPingCtx, event: MessageEvent): void {
-  if (!event.data || event.data.source !== 'marco-extension') return;
-  if (event.data.requestId !== ctx.pingId) return;
+  if (!event.data || event.data.source !== 'marco-extension') {
+    return;
+  }
+
+  if (event.data.requestId !== ctx.pingId) {
+    return;
+  }
 
   const payload = unwrapRelayPayload((event.data as { payload?: unknown }).payload);
   const errorMsg = typeof payload.errorMessage === 'string' ? payload.errorMessage : '';
@@ -375,7 +413,10 @@ export function isRelayActive(): Promise<boolean> {
       resolve,
     };
 
-    ctx._onPong = function(event: MessageEvent) { handleRelayPong(ctx, event); };
+    ctx._onPong = function(event: MessageEvent) {
+      handleRelayPong(ctx, event); 
+    };
+
     window.addEventListener('message', ctx._onPong);
 
     window.postMessage({ source: 'marco-controller', type: 'GET_TOKEN', requestId: pingId }, '*');
@@ -393,16 +434,27 @@ export function wakeBridge(): Promise<boolean> {
     let isSettled = false;
 
     function finish(alive: boolean): void {
-      if (isSettled) return;
+      if (isSettled) {
+        return;
+      }
+
       isSettled = true;
       window.removeEventListener('message', onResponse);
-      if (timer) clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
+
       resolve(alive);
     }
 
     function onResponse(event: MessageEvent): void {
-      if (!event.data || event.data.source !== 'marco-extension') return;
-      if (event.data.requestId !== pingId) return;
+      if (!event.data || event.data.source !== 'marco-extension') {
+        return;
+      }
+
+      if (event.data.requestId !== pingId) {
+        return;
+      }
 
       const payload = unwrapRelayPayload((event.data as { payload?: unknown }).payload);
       const errorMsg = typeof payload.errorMessage === 'string' ? payload.errorMessage : '';
@@ -420,6 +472,8 @@ export function wakeBridge(): Promise<boolean> {
     window.addEventListener('message', onResponse);
     window.postMessage({ source: 'marco-controller', type: 'GET_TOKEN', requestId: pingId }, '*');
 
-    const timer = setTimeout(function () { finish(false); }, 3000);
+    const timer = setTimeout(function () {
+      finish(false); 
+    }, 3000);
   });
 }

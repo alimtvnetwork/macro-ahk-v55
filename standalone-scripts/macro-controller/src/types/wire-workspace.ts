@@ -30,7 +30,10 @@ function hasStringId(source: Record<string, unknown>): boolean {
 
 /** Type guard: is this raw object a shape-valid wire workspace row? */
 export function isWireWorkspace(candidate: unknown): candidate is WireWorkspace {
-  if (candidate === null || typeof candidate !== 'object') return false;
+  if (candidate === null || typeof candidate !== 'object') {
+    return false;
+  }
+
   const source = candidate as Record<string, unknown>;
 
   return hasStringId(source);

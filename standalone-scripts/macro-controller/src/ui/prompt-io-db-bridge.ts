@@ -38,50 +38,58 @@ export interface PartitionResult {
 
 /** Split imported entries by whether they carry a valid `role`. */
 export function partitionByRole(entries: readonly CachedPromptEntry[]): PartitionResult {
-    const dbEntries: CachedPromptEntry[] = [];
-    const cacheEntries: CachedPromptEntry[] = [];
-    for (const e of entries) {
-        if (isPromptRole(e.role)) dbEntries.push(e);
-        else cacheEntries.push(e);
+  const dbEntries: CachedPromptEntry[] = [];
+  const cacheEntries: CachedPromptEntry[] = [];
+  for (const e of entries) {
+    if (isPromptRole(e.role)) {
+      dbEntries.push(e);
+    } else {
+      cacheEntries.push(e);
     }
+  }
 
-    return { dbEntries, cacheEntries };
+  return { dbEntries, cacheEntries };
 }
 
 function dbRowToCached(row: PromptRow): CachedPromptEntry {
-    const out: CachedPromptEntry = {
-        name: row.Name,
-        text: row.Body,
-        slug: row.Slug,
-        role: row.Role,
-        isDefault: row.IsDefault === 1,
-        category: 'macro-db',
-        replaceKey: row.ReplaceKey,
-    };
-    if (Array.isArray(row.ReplaceValues)) out.replaceValues = [...row.ReplaceValues];
+  const out: CachedPromptEntry = {
+    name: row.Name,
+    text: row.Body,
+    slug: row.Slug,
+    role: row.Role,
+    isDefault: row.IsDefault === 1,
+    category: 'macro-db',
+    replaceKey: row.ReplaceKey,
+  };
+  if (Array.isArray(row.ReplaceValues)) {
+    out.replaceValues = [...row.ReplaceValues];
+  }
 
-    return out;
+  return out;
 }
 
 async function readAllDbRows(): Promise<PromptRow[]> {
-    const all: PromptRow[] = [];
-    for (const role of PROMPT_ROLES) {
-        const res = await listPromptsByRole(role);
-        if (res.isFail || !res.value) {
-            logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
-            continue;
-        }
-        for (const r of res.value) all.push(r);
+  const all: PromptRow[] = [];
+  for (const role of PROMPT_ROLES) {
+    const res = await listPromptsByRole(role);
+    if (res.isFail || !res.value) {
+      logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
+      continue;
     }
 
-    return all;
+    for (const r of res.value) {
+      all.push(r);
+    }
+  }
+
+  return all;
 }
 
 /** Read every DB row and map it to a `CachedPromptEntry` for export. */
 export async function collectDbEntriesForExport(): Promise<CachedPromptEntry[]> {
-    const rows = await readAllDbRows();
+  const rows = await readAllDbRows();
 
-    return rows.map(dbRowToCached);
+  return rows.map(dbRowToCached);
 }
 
 /**
@@ -89,20 +97,22 @@ export async function collectDbEntriesForExport(): Promise<CachedPromptEntry[]> 
  * a fresh user edit is never masked by a stale JsonCopy snapshot.
  */
 export function mergeDbIntoExport(
-    cacheEntries: readonly CachedPromptEntry[],
-    dbEntries: readonly CachedPromptEntry[],
+  cacheEntries: readonly CachedPromptEntry[],
+  dbEntries: readonly CachedPromptEntry[],
 ): CachedPromptEntry[] {
-    const dbSlugs = new Set(dbEntries.map((e) => e.slug).filter((s): s is string => !!s));
-    const withoutDb = cacheEntries.filter((e) => !e.slug || !dbSlugs.has(e.slug));
+  const dbSlugs = new Set(dbEntries.map((e) => e.slug).filter((s): s is string => !!s));
+  const withoutDb = cacheEntries.filter((e) => !e.slug || !dbSlugs.has(e.slug));
 
-    return [...dbEntries, ...withoutDb];
+  return [...dbEntries, ...withoutDb];
 }
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
-    const res = await listPromptsByRole(role);
-    if (res.isFail || !res.value) return null;
+  const res = await listPromptsByRole(role);
+  if (res.isFail || !res.value) {
+    return null;
+  }
 
-    return res.value.find((r) => r.Slug === slug) ?? null;
+  return res.value.find((r) => r.Slug === slug) ?? null;
 }
 
 type CommitOutcome =
@@ -111,38 +121,52 @@ type CommitOutcome =
     | { status: 'default-protected' };
 
 async function commitOneEntry(entry: CachedPromptEntry): Promise<CommitOutcome> {
-    const role = entry.role;
-    if (!isPromptRole(role)) return { status: 'error', reason: 'missing role' };
-    const slug = (entry.slug ?? '').trim();
-    if (slug === '') return { status: 'error', reason: 'missing slug for role=' + role };
-    const existing = await findExistingRow(role, slug);
-    // v4.400.0: never let import mutate a default-seeded row.
-    if (existing && existing.IsDefault === 1) return { status: 'default-protected' };
-    const res = await upsertPrompt({
-        id: existing?.Id, slug, name: entry.name, body: entry.text,
-        role, previousBody: existing?.Body,
-        replaceKey: entry.replaceKey,
-        replaceValues: entry.replaceValues,
-        previousReplaceKey: existing?.ReplaceKey,
-    });
+  const role = entry.role;
+  if (!isPromptRole(role)) {
+    return { status: 'error', reason: 'missing role' };
+  }
 
-    return res.isSuccess ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
+  const slug = (entry.slug ?? '').trim();
+  if (slug === '') {
+    return { status: 'error', reason: 'missing slug for role=' + role };
+  }
+
+  const existing = await findExistingRow(role, slug);
+  // v4.400.0: never let import mutate a default-seeded row.
+  if (existing && existing.IsDefault === 1) {
+    return { status: 'default-protected' };
+  }
+
+  const res = await upsertPrompt({
+    id: existing?.Id, slug, name: entry.name, body: entry.text,
+    role, previousBody: existing?.Body,
+    replaceKey: entry.replaceKey,
+    replaceValues: entry.replaceValues,
+    previousReplaceKey: existing?.ReplaceKey,
+  });
+
+  return res.isSuccess ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
 }
 
 /** Route role-tagged entries to `upsertPrompt`; collect per-entry errors. */
 export async function commitDbEntries(entries: readonly CachedPromptEntry[]): Promise<DbCommitResults> {
-    const errors: string[] = [];
-    let upserted = 0;
-    let defaultsProtected = 0;
-    for (const entry of entries) {
-        const outcome = await commitOneEntry(entry);
-        if (outcome.status === 'ok') upserted++;
-        else if (outcome.status === 'default-protected') defaultsProtected++;
-        else errors.push('slug=' + (entry.slug ?? '?') + ': ' + outcome.reason);
+  const errors: string[] = [];
+  let upserted = 0;
+  let defaultsProtected = 0;
+  for (const entry of entries) {
+    const outcome = await commitOneEntry(entry);
+    if (outcome.status === 'ok') {
+      upserted++;
+    } else if (outcome.status === 'default-protected') {
+      defaultsProtected++;
+    } else {
+      errors.push('slug=' + (entry.slug ?? '?') + ': ' + outcome.reason);
     }
-    log('PromptIoDbBridge: commitDbEntries upserted=' + upserted
+  }
+
+  log('PromptIoDbBridge: commitDbEntries upserted=' + upserted
         + ' defaultsProtected=' + defaultsProtected
         + ' errors=' + errors.length, 'info');
 
-    return { upserted, errors, defaultsProtected };
+  return { upserted, errors, defaultsProtected };
 }

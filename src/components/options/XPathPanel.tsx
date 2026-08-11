@@ -74,95 +74,95 @@ export function XPathPanel({ chatBoxXPath, onSaveChatBoxXPath }: XPathPanelProps
 
       {/* XPath Recorder */}
       <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          <Crosshair className="inline h-4 w-4 mr-1.5" />
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <Crosshair className="inline h-4 w-4 mr-1.5" />
           XPath Recorder
-        </CardTitle>
-        <div className="flex gap-2">
-          <Button
-            variant={isRecording ? "destructive" : "default"}
-            size="sm"
-            onClick={toggle}
-            disabled={loading}
-          >
-            {isRecording ? (
-              <>
-                <Square className="h-3.5 w-3.5 mr-1.5" />
+          </CardTitle>
+          <div className="flex gap-2">
+            <Button
+              variant={isRecording ? "destructive" : "default"}
+              size="sm"
+              onClick={toggle}
+              disabled={loading}
+            >
+              {isRecording ? (
+                <>
+                  <Square className="h-3.5 w-3.5 mr-1.5" />
                 Stop
-              </>
-            ) : (
-              <>
-                <Play className="h-3.5 w-3.5 mr-1.5" />
+                </>
+              ) : (
+                <>
+                  <Play className="h-3.5 w-3.5 mr-1.5" />
                 Record
-              </>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={clear}
-            disabled={recorded.length === 0}
-          >
-            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clear}
+              disabled={recorded.length === 0}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
             Clear
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isRecording && (
-          <div className="mb-3 flex items-center gap-2 rounded-md bg-destructive/10 px-3 py-2">
-            <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-            <span className="text-xs text-destructive font-medium">
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isRecording && (
+            <div className="mb-3 flex items-center gap-2 rounded-md bg-destructive/10 px-3 py-2">
+              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+              <span className="text-xs text-destructive font-medium">
               Recording — click elements in the target tab
-            </span>
-          </div>
-        )}
+              </span>
+            </div>
+          )}
 
-        {recorded.length === 0 ? (
-          <div className="text-center text-muted-foreground text-sm py-8">
+          {recorded.length === 0 ? (
+            <div className="text-center text-muted-foreground text-sm py-8">
             No XPaths recorded. Use Ctrl+Shift+R or click Record to start.
-          </div>
-        ) : (
-          <div className="rounded-md border overflow-auto max-h-[320px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">Strategy</TableHead>
-                  <TableHead className="w-20">Tag</TableHead>
-                  <TableHead>XPath</TableHead>
-                  <TableHead className="w-10" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recorded.map((entry, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <StrategyBadge strategy={entry.strategy} />
-                    </TableCell>
-                    <TableCell className="text-xs font-mono">
-                      {entry.tagName}
-                    </TableCell>
-                    <TableCell className="text-xs font-mono max-w-[300px] truncate">
-                      {entry.xpath}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleCopy(entry.xpath)}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </TableCell>
+            </div>
+          ) : (
+            <div className="rounded-md border overflow-auto max-h-[320px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-16">Strategy</TableHead>
+                    <TableHead className="w-20">Tag</TableHead>
+                    <TableHead>XPath</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
+                </TableHeader>
+                <TableBody>
+                  {recorded.map((entry, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <StrategyBadge strategy={entry.strategy} />
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">
+                        {entry.tagName}
+                      </TableCell>
+                      <TableCell className="text-xs font-mono max-w-[300px] truncate">
+                        {entry.xpath}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleCopy(entry.xpath)}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
       </Card>
     </div>
   );

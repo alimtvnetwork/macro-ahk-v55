@@ -23,7 +23,10 @@ function walk(dir: string, acc: string[] = []): string[] {
     const full = join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) {
-      if (entry === '__tests__' || entry === 'node_modules') continue;
+      if (entry === '__tests__' || entry === 'node_modules') {
+        continue;
+      }
+
       walk(full, acc);
     } else if (entry.endsWith('.ts') && !entry.endsWith('.d.ts')) {
       acc.push(full);
@@ -43,7 +46,10 @@ describe('Workspace refetch policy (regression)', () => {
         const line = lines[i];
         const isTimerLine = /\b(set|tracked)Interval\s*\(/.test(line)
           || /\bsetTimeout\s*\(.*fetchLoopCredits/.test(line);
-        if (!isTimerLine) continue;
+        if (!isTimerLine) {
+          continue;
+        }
+
         // Look at this line + next 8 lines for a fetcher name (covers
         // multi-line `setInterval(function () { fetchLoopCredits(...) }, ms)`).
         const slice = lines.slice(i, i + 9).join('\n');
@@ -54,6 +60,7 @@ describe('Workspace refetch policy (regression)', () => {
         }
       }
     }
+
     expect(offenders, 'Polling fetcher detected:\n  ' + offenders.join('\n  ')).toEqual([]);
   });
 

@@ -7,7 +7,7 @@ export function buildImportProgressElement(): {
   label: HTMLSpanElement;
   bar: HTMLDivElement;
   counter: HTMLSpanElement;
-} {
+  } {
   const wrap = document.createElement('div');
   wrap.dataset.testid = 'library-import-progress';
   wrap.hidden = true;
@@ -48,7 +48,10 @@ export function buildImportProgressElement(): {
 
 export function showImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  if (!p) return;
+  if (!p) {
+    return;
+  }
+
   p.wrap.hidden = false;
   p.wrap.style.display = 'block';
   p.label.textContent = 'Preparing import…';
@@ -60,14 +63,20 @@ export function showImportProgress(refs: ModalRefs): void {
 
 export function hideImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  if (!p) return;
+  if (!p) {
+    return;
+  }
+
   p.wrap.hidden = true;
   p.wrap.style.display = 'none';
 }
 
 export function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
   const p = refs.importProgress;
-  if (!p) return;
+  if (!p) {
+    return;
+  }
+
   if (progress.phase === 'entries') {
     p.label.textContent = 'Committed ' + String(progress.entriesCommitted)
       + '/' + String(progress.totalEntries) + ' entries';
@@ -79,6 +88,7 @@ export function updateImportProgress(refs: ModalRefs, progress: ImportProgress):
 
     return;
   }
+
   if (progress.phase === 'revisions') {
     const total = Math.max(1, progress.totalRevisions);
     const pct = Math.min(100, Math.round((progress.insertedRevisions / total) * 100));
@@ -96,6 +106,7 @@ export function updateImportProgress(refs: ModalRefs, progress: ImportProgress):
 
     return;
   }
+
   p.label.textContent = 'Import complete';
   p.counter.textContent = String(progress.insertedRevisions) + '/' + String(progress.totalRevisions);
   p.bar.style.width = '100%';
@@ -109,7 +120,10 @@ export function renderPartialImportErrors(
   parseErrors: readonly string[],
 ): void {
   const panel = refs.partialErrorsPanel;
-  if (!panel) return;
+  if (!panel) {
+    return;
+  }
+
   panel.textContent = '';
   const total = entryErrors.length + parseErrors.length;
   if (total === 0) {
@@ -118,6 +132,7 @@ export function renderPartialImportErrors(
 
     return;
   }
+
   const header = document.createElement('div');
   header.style.cssText = 'font-weight:600;margin-bottom:6px;';
   header.textContent = 'Partial import: ' + String(total) + ' entr' + (total === 1 ? 'y' : 'ies') + ' failed';
@@ -128,7 +143,9 @@ export function renderPartialImportErrors(
   const summary = document.createElement('summary');
   summary.style.cssText = 'cursor:pointer;margin-bottom:6px;color:#f5b7b7;';
   summary.textContent = details.open ? 'Hide details' : 'Show details';
-  details.addEventListener('toggle', () => { summary.textContent = details.open ? 'Hide details' : 'Show details'; });
+  details.addEventListener('toggle', () => {
+    summary.textContent = details.open ? 'Hide details' : 'Show details'; 
+  });
   details.appendChild(summary);
 
   const list = document.createElement('ul');
@@ -144,8 +161,15 @@ export function renderPartialImportErrors(
     li.appendChild(document.createTextNode(message));
     list.appendChild(li);
   };
-  for (const m of parseErrors) appendRow('parse', m);
-  for (const m of entryErrors) appendRow('entry', m);
+
+  for (const m of parseErrors) {
+    appendRow('parse', m);
+  }
+
+  for (const m of entryErrors) {
+    appendRow('entry', m);
+  }
+
   details.appendChild(list);
 
   const dismiss = document.createElement('button');
@@ -153,7 +177,9 @@ export function renderPartialImportErrors(
   dismiss.textContent = 'Dismiss';
   dismiss.dataset.testid = 'library-import-partial-errors-dismiss';
   dismiss.style.cssText = ['margin-top:8px', 'padding:4px 10px', 'background:#3a2530', 'color:#f2c9c9', 'border:1px solid #6b2b3a', CSS_BORDER_RADIUS_6, CSS_CURSOR_POINTER, 'font-size:11.5px'].join(';');
-  dismiss.addEventListener('click', () => { clearPartialImportErrors(refs); });
+  dismiss.addEventListener('click', () => {
+    clearPartialImportErrors(refs); 
+  });
 
   panel.appendChild(details);
   panel.appendChild(dismiss);
@@ -163,7 +189,10 @@ export function renderPartialImportErrors(
 
 export function clearPartialImportErrors(refs: ModalRefs): void {
   const panel = refs.partialErrorsPanel;
-  if (!panel) return;
+  if (!panel) {
+    return;
+  }
+
   panel.textContent = '';
   panel.hidden = true;
   panel.style.display = 'none';

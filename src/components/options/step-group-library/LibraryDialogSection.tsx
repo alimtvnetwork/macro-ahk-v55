@@ -12,5 +12,5 @@
 import { LibraryDialogs, type LibraryDialogsProps } from "./LibraryDialogs";
 
 export function LibraryDialogSection(props: LibraryDialogsProps) {
-    return <LibraryDialogs {...props} />;
+  return <LibraryDialogs {...props} />;
 }

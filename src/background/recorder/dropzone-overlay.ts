@@ -80,164 +80,197 @@ interface DropZoneHandlers {
 }
 
 export function mountDropZoneOverlay(
-    options: DropZoneOptions,
-    container: ParentNode = document.body,
+  options: DropZoneOptions,
+  container: ParentNode = document.body,
 ): DropZoneHandle {
-    if (container === null || container === undefined) {
-        throw new Error("mountDropZoneOverlay: no container available");
-    }
-    const nodes = buildDropZoneNodes(container);
-    const state: DropZoneState = { dragDepth: 0, active: false };
-    const handlers = createDropZoneHandlers(nodes.overlay, state, options);
-    attachDropZoneListeners(handlers);
+  if (container === null || container === undefined) {
+    throw new Error("mountDropZoneOverlay: no container available");
+  }
 
-    return buildDropZoneHandle(nodes, state, handlers);
+  const nodes = buildDropZoneNodes(container);
+  const state: DropZoneState = { dragDepth: 0, active: false };
+  const handlers = createDropZoneHandlers(nodes.overlay, state, options);
+  attachDropZoneListeners(handlers);
+
+  return buildDropZoneHandle(nodes, state, handlers);
 }
 
 function buildDropZoneNodes(container: ParentNode): DropZoneNodes {
-    const host = document.createElement("div");
-    host.id = DROPZONE_HOST_ID;
-    const root = host.attachShadow({ mode: "closed" });
-    root.appendChild(buildDropZoneStyle());
-    const overlay = buildDropZoneOverlayEl();
-    root.appendChild(overlay);
-    container.appendChild(host);
+  const host = document.createElement("div");
+  host.id = DROPZONE_HOST_ID;
+  const root = host.attachShadow({ mode: "closed" });
+  root.appendChild(buildDropZoneStyle());
+  const overlay = buildDropZoneOverlayEl();
+  root.appendChild(overlay);
+  container.appendChild(host);
 
-    return { host, root, overlay };
+  return { host, root, overlay };
 }
 
 function buildDropZoneStyle(): HTMLStyleElement {
-    const style = document.createElement("style");
-    style.textContent = STYLE;
+  const style = document.createElement("style");
+  style.textContent = STYLE;
 
-    return style;
+  return style;
 }
 
 function buildDropZoneOverlayEl(): HTMLDivElement {
-    const overlay = document.createElement("div");
-    overlay.className = "overlay";
-    overlay.dataset.active = "false";
-    overlay.innerHTML =
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.dataset.active = "false";
+  overlay.innerHTML =
         '<div class="panel">Drop CSV or JSON to attach<small>.csv · .json — first row used as header for CSV</small></div>';
 
-    return overlay;
+  return overlay;
 }
 
 function createDropZoneHandlers(
-    overlay: HTMLDivElement,
-    state: DropZoneState,
-    options: DropZoneOptions,
+  overlay: HTMLDivElement,
+  state: DropZoneState,
+  options: DropZoneOptions,
 ): DropZoneHandlers {
-    const setActive = (on: boolean): void => {
-        state.active = on;
-        overlay.dataset.active = on ? "true" : "false";
-    };
+  const setActive = (on: boolean): void => {
+    state.active = on;
+    overlay.dataset.active = on ? "true" : "false";
+  };
 
-    return {
-        onDragEnter: (event) => handleDragEnter(event, state, setActive),
-        onDragOver:  (event) => handleDragOver(event),
-        onDragLeave: () => handleDragLeave(state, setActive),
-        onDrop:      (event) => handleDrop(event, state, setActive, options),
-    };
+  return {
+    onDragEnter: (event) => handleDragEnter(event, state, setActive),
+    onDragOver:  (event) => handleDragOver(event),
+    onDragLeave: () => handleDragLeave(state, setActive),
+    onDrop:      (event) => handleDrop(event, state, setActive, options),
+  };
 }
 
 function handleDragEnter(event: DragEvent, state: DropZoneState, setActive: (on: boolean) => void): void {
-    if (!hasFiles(event.dataTransfer)) { return; }
-    event.preventDefault();
-    state.dragDepth += 1;
-    if (state.dragDepth === 1) { setActive(true); }
+  if (!hasFiles(event.dataTransfer)) {
+    return; 
+  }
+
+  event.preventDefault();
+  state.dragDepth += 1;
+  if (state.dragDepth === 1) {
+    setActive(true); 
+  }
 }
 
 function handleDragOver(event: DragEvent): void {
-    if (!hasFiles(event.dataTransfer)) { return; }
-    event.preventDefault();
-    if (event.dataTransfer !== null) { event.dataTransfer.dropEffect = "copy"; }
+  if (!hasFiles(event.dataTransfer)) {
+    return; 
+  }
+
+  event.preventDefault();
+  if (event.dataTransfer !== null) {
+    event.dataTransfer.dropEffect = "copy"; 
+  }
 }
 
 function handleDragLeave(state: DropZoneState, setActive: (on: boolean) => void): void {
-    state.dragDepth = Math.max(0, state.dragDepth - 1);
-    if (state.dragDepth === 0) { setActive(false); }
+  state.dragDepth = Math.max(0, state.dragDepth - 1);
+  if (state.dragDepth === 0) {
+    setActive(false); 
+  }
 }
 
 function handleDrop(
-    event: DragEvent,
-    state: DropZoneState,
-    setActive: (on: boolean) => void,
-    options: DropZoneOptions,
+  event: DragEvent,
+  state: DropZoneState,
+  setActive: (on: boolean) => void,
+  options: DropZoneOptions,
 ): void {
-    event.preventDefault();
-    state.dragDepth = 0;
-    setActive(false);
-    const files = event.dataTransfer?.files;
-    if (files === undefined || files.length === 0) { return; }
-    for (const file of Array.from(files)) {
-        void handleFile(file, options);
-    }
+  event.preventDefault();
+  state.dragDepth = 0;
+  setActive(false);
+  const files = event.dataTransfer?.files;
+  if (files === undefined || files.length === 0) {
+    return; 
+  }
+
+  for (const file of Array.from(files)) {
+    void handleFile(file, options);
+  }
 }
 
 function attachDropZoneListeners(handlers: DropZoneHandlers): void {
-    window.addEventListener("dragenter", handlers.onDragEnter);
-    window.addEventListener("dragover",  handlers.onDragOver);
-    window.addEventListener("dragleave", handlers.onDragLeave);
-    window.addEventListener("drop",      handlers.onDrop);
+  window.addEventListener("dragenter", handlers.onDragEnter);
+  window.addEventListener("dragover",  handlers.onDragOver);
+  window.addEventListener("dragleave", handlers.onDragLeave);
+  window.addEventListener("drop",      handlers.onDrop);
 }
 
 function buildDropZoneHandle(
-    nodes: DropZoneNodes,
-    state: DropZoneState,
-    handlers: DropZoneHandlers,
+  nodes: DropZoneNodes,
+  state: DropZoneState,
+  handlers: DropZoneHandlers,
 ): DropZoneHandle {
-    let destroyed = false;
+  let destroyed = false;
 
-    return {
-        Host: nodes.host,
-        Root: nodes.root,
-        IsActive: () => state.active,
-        Destroy: () => {
-            if (destroyed) { return; }
-            destroyed = true;
-            detachDropZoneListeners(handlers);
-            nodes.host.remove();
-        },
-    };
+  return {
+    Host: nodes.host,
+    Root: nodes.root,
+    IsActive: () => state.active,
+    Destroy: () => {
+      if (destroyed) {
+        return; 
+      }
+
+      destroyed = true;
+      detachDropZoneListeners(handlers);
+      nodes.host.remove();
+    },
+  };
 }
 
 function detachDropZoneListeners(handlers: DropZoneHandlers): void {
-    window.removeEventListener("dragenter", handlers.onDragEnter);
-    window.removeEventListener("dragover",  handlers.onDragOver);
-    window.removeEventListener("dragleave", handlers.onDragLeave);
-    window.removeEventListener("drop",      handlers.onDrop);
+  window.removeEventListener("dragenter", handlers.onDragEnter);
+  window.removeEventListener("dragover",  handlers.onDragOver);
+  window.removeEventListener("dragleave", handlers.onDragLeave);
+  window.removeEventListener("drop",      handlers.onDrop);
 }
 
 function hasFiles(dt: DataTransfer | null): boolean {
-    if (dt === null) { return false; }
+  if (dt === null) {
+    return false; 
+  }
 
-    return Array.from(dt.types).includes("Files");
+  return Array.from(dt.types).includes("Files");
 }
 
 async function handleFile(file: File, options: DropZoneOptions): Promise<void> {
-    const onError = options.OnError ?? ((err, name) => console.warn(`[DropZone] ${name}: ${err.message}`));
-    try {
-        const mimeKind = detectMimeKind(file);
-        if (mimeKind === null) {
-            throw new Error(`Unsupported file type — accepts .csv / .json (got '${file.name}')`);
-        }
-        const rawText = await file.text();
-        const parsed = mimeKind === "csv" ? parseCsv(rawText) : parseJson(rawText);
-        options.OnFileDropped({ FileName: file.name, MimeKind: mimeKind, RawText: rawText, Parsed: parsed });
-    } catch (err) {
-        onError(err instanceof Error ? err : new Error(String(err)), file.name);
+  const onError = options.OnError ?? ((err, name) => console.warn(`[DropZone] ${name}: ${err.message}`));
+  try {
+    const mimeKind = detectMimeKind(file);
+    if (mimeKind === null) {
+      throw new Error(`Unsupported file type — accepts .csv / .json (got '${file.name}')`);
     }
+
+    const rawText = await file.text();
+    const parsed = mimeKind === "csv" ? parseCsv(rawText) : parseJson(rawText);
+    options.OnFileDropped({ FileName: file.name, MimeKind: mimeKind, RawText: rawText, Parsed: parsed });
+  } catch (err) {
+    onError(err instanceof Error ? err : new Error(String(err)), file.name);
+  }
 }
 
 function detectMimeKind(file: File): "csv" | "json" | null {
-    const lower = file.name.toLowerCase();
-    if (lower.endsWith(".csv"))  { return "csv";  }
-    if (lower.endsWith(".json")) { return "json"; }
-    if (file.type === "text/csv")          { return "csv";  }
-    if (file.type === "application/json")  { return "json"; }
+  const lower = file.name.toLowerCase();
+  if (lower.endsWith(".csv"))  {
+    return "csv";  
+  }
 
-    return null;
+  if (lower.endsWith(".json")) {
+    return "json"; 
+  }
+
+  if (file.type === "text/csv")          {
+    return "csv";  
+  }
+
+  if (file.type === "application/json")  {
+    return "json"; 
+  }
+
+  return null;
 }
 
 export { DataSourceKindId };

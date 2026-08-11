@@ -25,7 +25,7 @@ export interface MembershipRoleSeed {
 }
 
 export const MEMBERSHIP_ROLE_SEEDS: ReadonlyArray<MembershipRoleSeed> = Object.freeze([
-    { Code: UserAddMembershipRoleCodeType.Owner, DisplayLabel: "Owner", SortOrder: 1, RequiresPromotion: 1 },
-    { Code: UserAddMembershipRoleCodeType.Admin, DisplayLabel: "Admin", SortOrder: 2, RequiresPromotion: 0 },
-    { Code: UserAddMembershipRoleCodeType.Member, DisplayLabel: "Member", SortOrder: 3, RequiresPromotion: 0 },
+  { Code: UserAddMembershipRoleCodeType.Owner, DisplayLabel: "Owner", SortOrder: 1, RequiresPromotion: 1 },
+  { Code: UserAddMembershipRoleCodeType.Admin, DisplayLabel: "Admin", SortOrder: 2, RequiresPromotion: 0 },
+  { Code: UserAddMembershipRoleCodeType.Member, DisplayLabel: "Member", SortOrder: 3, RequiresPromotion: 0 },
 ]);

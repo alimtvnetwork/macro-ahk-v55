@@ -27,31 +27,33 @@ export interface RunStats {
 }
 
 export function useRunStats() {
-    const [stats, setStats] = useState<RunStats | null>(null);
-    const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<RunStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const refresh = useCallback(async () => {
-        setLoading(true);
-        const s = await sendMessage<RunStats>({ type: "GET_RUN_STATS" });
-        setStats(s);
-        setLoading(false);
-    }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    const s = await sendMessage<RunStats>({ type: "GET_RUN_STATS" });
+    setStats(s);
+    setLoading(false);
+  }, []);
 
-    const clear = useCallback(async () => {
-        await sendMessage({ type: "CLEAR_RUN_STATS" });
-        setStats({
-            totalCycles: 0,
-            successCount: 0,
-            errorCount: 0,
-            skippedCount: 0,
-            successRate: 0,
-            avgDurationMs: 0,
-            lastErrorMessage: null,
-            recentCycles: [],
-        });
-    }, []);
+  const clear = useCallback(async () => {
+    await sendMessage({ type: "CLEAR_RUN_STATS" });
+    setStats({
+      totalCycles: 0,
+      successCount: 0,
+      errorCount: 0,
+      skippedCount: 0,
+      successRate: 0,
+      avgDurationMs: 0,
+      lastErrorMessage: null,
+      recentCycles: [],
+    });
+  }, []);
 
-    useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    void refresh(); 
+  }, [refresh]);
 
-    return { stats, loading, refresh, clear };
+  return { stats, loading, refresh, clear };
 }

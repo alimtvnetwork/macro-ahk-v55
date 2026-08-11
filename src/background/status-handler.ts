@@ -19,161 +19,167 @@ const _chr = getChromeRef();
 
 /** Builds the full status response aggregated from all subsystems. */
 export async function buildStatusResponse(): Promise<StatusResponse> {
-    const tokenStatus = await resolveTokenStatus();
-    const configStatus = await resolveConfigStatus();
-    const connectionState = resolveConnectionState();
-    const loggingMode = resolveLoggingMode();
+  const tokenStatus = await resolveTokenStatus();
+  const configStatus = await resolveConfigStatus();
+  const connectionState = resolveConnectionState();
+  const loggingMode = resolveLoggingMode();
 
-    return {
-        connection: connectionState,
-        token: tokenStatus,
-        config: configStatus,
-        loggingMode,
-        version: EXTENSION_VERSION,
-        bootStep: getBootStep(),
-        persistenceMode: getBootPersistenceMode(),
-        bootTimings: getBootTimings(),
-        totalBootMs: getTotalBootMs(),
-        bootError: getBootErrorMessage(),
-        bootErrorStack: getBootErrorStack(),
-        bootErrorContext: getBootErrorContext(),
-        wasmProbe: getWasmProbeResult(),
-    };
+  return {
+    connection: connectionState,
+    token: tokenStatus,
+    config: configStatus,
+    loggingMode,
+    version: EXTENSION_VERSION,
+    bootStep: getBootStep(),
+    persistenceMode: getBootPersistenceMode(),
+    bootTimings: getBootTimings(),
+    totalBootMs: getTotalBootMs(),
+    bootError: getBootErrorMessage(),
+    bootErrorStack: getBootErrorStack(),
+    bootErrorContext: getBootErrorContext(),
+    wasmProbe: getWasmProbeResult(),
+  };
 }
 
 /** Resolves the current auth token status from cookies. */
 async function resolveTokenStatus(): Promise<StatusResponse["token"]> {
-    try {
-        const cookie = await readAuthCookie();
+  try {
+    const cookie = await readAuthCookie();
 
-        return evaluateCookieStatus(cookie);
-    } catch (cookieError) {
-        logCookieWarning(cookieError);
+    return evaluateCookieStatus(cookie);
+  } catch (cookieError) {
+    logCookieWarning(cookieError);
 
-        return buildMissingToken();
-    }
+    return buildMissingToken();
+  }
 }
 
 /** Reads the active auth cookie from all candidate URLs. */
 async function readAuthCookie(): Promise<ChromeCookie | null> {
-    // Try active tab URL as primary candidate for better domain matching
-    let primaryUrl: string | null = null;
-    try {
-        const [tab] = await _chr.tabs.query({ active: true, currentWindow: true });
-        primaryUrl = tab?.url ?? null;
-    } catch (err) {
+  // Try active tab URL as primary candidate for better domain matching
+  let primaryUrl: string | null = null;
+  try {
+    const [tab] = await _chr.tabs.query({ active: true, currentWindow: true });
+    primaryUrl = tab?.url ?? null;
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
-    } // allow-swallow: tabs.query rejects on restricted pages; primaryUrl is a heuristic, cookie fallback covers the miss.
+  } // allow-swallow: tabs.query rejects on restricted pages; primaryUrl is a heuristic, cookie fallback covers the miss.
 
-    const sessionCookie = await readCookieFromCandidates("lovable-session-id.id", primaryUrl);
+  const sessionCookie = await readCookieFromCandidates("lovable-session-id.id", primaryUrl);
 
-    if (sessionCookie !== null) {
-        return sessionCookie;
-    }
+  if (sessionCookie !== null) {
+    return sessionCookie;
+  }
 
-    return readCookieFromCandidates("lovable-session-id.refresh", primaryUrl);
+  return readCookieFromCandidates("lovable-session-id.refresh", primaryUrl);
 }
 
 /** Evaluates token status from a cookie value. */
 function evaluateCookieStatus(
-    cookie: ChromeCookie | null,
+  cookie: ChromeCookie | null,
 ): StatusResponse["token"] {
-    const isCookieMissing = cookie === null;
+  const isCookieMissing = cookie === null;
 
-    if (isCookieMissing) {
-        return buildMissingToken();
-    }
+  if (isCookieMissing) {
+    return buildMissingToken();
+  }
 
-    if (cookie.expirationDate === undefined) {
-        return {
-            status: "valid",
-            expiresIn: null,
-        };
-    }
+  if (cookie.expirationDate === undefined) {
+    return {
+      status: "valid",
+      expiresIn: null,
+    };
+  }
 
-    return evaluateExpiration(cookie.expirationDate);
+  return evaluateExpiration(cookie.expirationDate);
 }
 
 /** Evaluates expiration timing for a cookie. */
 function evaluateExpiration(
-    expirationDate: number,
+  expirationDate: number,
 ): StatusResponse["token"] {
-    const nowSeconds = Date.now() / 1000;
-    const secondsRemaining = expirationDate - nowSeconds;
-    const isExpired = secondsRemaining <= 0;
+  const nowSeconds = Date.now() / 1000;
+  const secondsRemaining = expirationDate - nowSeconds;
+  const isExpired = secondsRemaining <= 0;
 
-    if (isExpired) {
-        return {
-            status: "expired",
-            expiresIn: null,
-        };
-    }
-
-    const isExpiringSoon = secondsRemaining < 300;
-
-    if (isExpiringSoon) {
-        return {
-            status: "expiring",
-            expiresIn: `${Math.round(secondsRemaining)}s`,
-        };
-    }
-
+  if (isExpired) {
     return {
-        status: "valid",
-        expiresIn: `${Math.round(secondsRemaining / 60)}m`,
+      status: "expired",
+      expiresIn: null,
     };
+  }
+
+  const isExpiringSoon = secondsRemaining < 300;
+
+  if (isExpiringSoon) {
+    return {
+      status: "expiring",
+      expiresIn: `${Math.round(secondsRemaining)}s`,
+    };
+  }
+
+  return {
+    status: "valid",
+    expiresIn: `${Math.round(secondsRemaining / 60)}m`,
+  };
 }
 
 /** Builds a missing token status object. */
 function buildMissingToken(): StatusResponse["token"] {
-    return {
-        status: "missing",
-        expiresIn: null,
-    };
+  return {
+    status: "missing",
+    expiresIn: null,
+  };
 }
 
 /** Logs a cookie access error. */
 function logCookieWarning(error: unknown): void {
-    logCaughtError(BgLogTag.STATUS_HANDLER, "Token check failed", error);
+  logCaughtError(BgLogTag.STATUS_HANDLER, "Token check failed", error);
 }
 
 /** Resolves the current config loading state. */
 async function resolveConfigStatus(): Promise<StatusResponse["config"]> {
-    try {
-        const fetchStatus = getConfigFetchStatus();
-        const hasFetchError = fetchStatus.lastFetchError !== null;
-        const hasFetched = fetchStatus.lastFetchedAt !== null;
+  try {
+    const fetchStatus = getConfigFetchStatus();
+    const hasFetchError = fetchStatus.lastFetchError !== null;
+    const hasFetched = fetchStatus.lastFetchedAt !== null;
 
-        if (hasFetchError) {
-            return { status: "failed", source: "hardcoded" };
-        }
-        if (hasFetched) {
-            return { status: "loaded", source: "remote" };
-        }
-
-        return { status: "defaults", source: "hardcoded" };
-    } catch (err) { 
-        return { status: "defaults", source: "hardcoded" };
+    if (hasFetchError) {
+      return { status: "failed", source: "hardcoded" };
     }
+
+    if (hasFetched) {
+      return { status: "loaded", source: "remote" };
+    }
+
+    return { status: "defaults", source: "hardcoded" };
+  } catch (err) { 
+    return { status: "defaults", source: "hardcoded" };
+  }
 }
 
 /** Resolves the current network connection state. */
 function resolveConnectionState(): StatusResponse["connection"] {
-    const healthState = getHealthState();
-    const isDegraded = healthState === "DEGRADED";
-    const isError = healthState === "ERROR" || healthState === "FATAL";
+  const healthState = getHealthState();
+  const isDegraded = healthState === "DEGRADED";
+  const isError = healthState === "ERROR" || healthState === "FATAL";
 
-    if (isError) return "offline";
-    if (isDegraded) return "degraded";
+  if (isError) {
+    return "offline";
+  }
 
-    return "online";
+  if (isDegraded) {
+    return "degraded";
+  }
+
+  return "online";
 }
 
 /** Resolves the active logging mode. */
 function resolveLoggingMode(): StatusResponse["loggingMode"] {
-    // Inferred from health: if degraded+, assume fallback
-    const healthState = getHealthState();
-    const isDegraded = healthState !== "HEALTHY";
+  // Inferred from health: if degraded+, assume fallback
+  const healthState = getHealthState();
+  const isDegraded = healthState !== "HEALTHY";
 
-    return isDegraded ? "fallback" : "sqlite";
+  return isDegraded ? "fallback" : "sqlite";
 }

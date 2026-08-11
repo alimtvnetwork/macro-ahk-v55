@@ -30,9 +30,9 @@ import { ServiceResult } from '../../../utils/result-wrapper';
  */
 
 import type {
-    GroupInputBag,
-    JsonObject,
-    JsonValue,
+  GroupInputBag,
+  JsonObject,
+  JsonValue,
 } from "./group-inputs";
 import { InputSourceMethodType, InputSourceFailurePolicyType } from "../../../types/enums";
 import { logBgError } from "@/background/bg-logger";
@@ -69,13 +69,13 @@ export interface InputSourceConfig {
 }
 
 export const DEFAULT_INPUT_SOURCE_CONFIG: InputSourceConfig = Object.freeze({
-    Enabled: false,
-    Url: "",
-    Method: "GET",
-    Headers: [],
-    RequestBody: "",
-    OnFailure: "Abort",
-    TimeoutMs: DEFAULT_TIMEOUT_MS,
+  Enabled: false,
+  Url: "",
+  Method: "GET",
+  Headers: [],
+  RequestBody: "",
+  OnFailure: "Abort",
+  TimeoutMs: DEFAULT_TIMEOUT_MS,
 });
 
 /** Outcome of a single fetch attempt. */
@@ -121,80 +121,97 @@ interface StoredShape {
 }
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
-    return typeof v === "object" && v !== null && !Array.isArray(v);
+  return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
 function sanitiseHeaders(raw: unknown): InputSourceHeader[] {
-    if (!Array.isArray(raw)) return [];
-    const out: InputSourceHeader[] = [];
-    for (const entry of raw) {
-        if (!isPlainObject(entry)) continue;
-        const name = typeof entry.Name === "string" ? entry.Name.trim() : "";
-        const value = typeof entry.Value === "string" ? entry.Value : "";
-        if (name.length === 0) continue;
-        out.push({ Name: name, Value: value });
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  const out: InputSourceHeader[] = [];
+  for (const entry of raw) {
+    if (!isPlainObject(entry)) {
+      continue;
     }
 
-    return out;
+    const name = typeof entry.Name === "string" ? entry.Name.trim() : "";
+    const value = typeof entry.Value === "string" ? entry.Value : "";
+    if (name.length === 0) {
+      continue;
+    }
+
+    out.push({ Name: name, Value: value });
+  }
+
+  return out;
 }
 
 function sanitiseMethod(raw: unknown): InputSourceMethod {
-    return raw === "POST" ? "POST" : "GET";
+  return raw === "POST" ? "POST" : "GET";
 }
 
 function sanitiseFailurePolicy(raw: unknown): InputSourceFailurePolicy {
-    return raw === "ContinueWithLocal" ? "ContinueWithLocal" : "Abort";
+  return raw === "ContinueWithLocal" ? "ContinueWithLocal" : "Abort";
 }
 
 function clampTimeout(raw: unknown): number {
-    const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
+  const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
 
-    return Math.min(60_000, Math.max(1_000, Math.round(n)));
+  return Math.min(60_000, Math.max(1_000, Math.round(n)));
 }
 
 export function loadInputSourceConfig(): InputSourceConfig {
-    if (typeof localStorage === "undefined") return DEFAULT_INPUT_SOURCE_CONFIG;
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw === null) return DEFAULT_INPUT_SOURCE_CONFIG;
-        const parsed = JSON.parse(raw) as StoredShape;
-        if (!isPlainObject(parsed)) return DEFAULT_INPUT_SOURCE_CONFIG;
+  if (typeof localStorage === "undefined") {
+    return DEFAULT_INPUT_SOURCE_CONFIG;
+  }
 
-        return {
-            Enabled: parsed.Enabled === true,
-            Url: typeof parsed.Url === "string" ? parsed.Url : "",
-            Method: sanitiseMethod(parsed.Method),
-            Headers: sanitiseHeaders(parsed.Headers),
-            RequestBody: typeof parsed.RequestBody === "string" ? parsed.RequestBody : "",
-            OnFailure: sanitiseFailurePolicy(parsed.OnFailure),
-            TimeoutMs: clampTimeout(parsed.TimeoutMs),
-        };
-    } catch (err) { 
-        return DEFAULT_INPUT_SOURCE_CONFIG;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === null) {
+      return DEFAULT_INPUT_SOURCE_CONFIG;
     }
+
+    const parsed = JSON.parse(raw) as StoredShape;
+    if (!isPlainObject(parsed)) {
+      return DEFAULT_INPUT_SOURCE_CONFIG;
+    }
+
+    return {
+      Enabled: parsed.Enabled === true,
+      Url: typeof parsed.Url === "string" ? parsed.Url : "",
+      Method: sanitiseMethod(parsed.Method),
+      Headers: sanitiseHeaders(parsed.Headers),
+      RequestBody: typeof parsed.RequestBody === "string" ? parsed.RequestBody : "",
+      OnFailure: sanitiseFailurePolicy(parsed.OnFailure),
+      TimeoutMs: clampTimeout(parsed.TimeoutMs),
+    };
+  } catch (err) { 
+    return DEFAULT_INPUT_SOURCE_CONFIG;
+  }
 }
 
 export function saveInputSourceConfig(config: InputSourceConfig): InputSourceConfig {
-    const normalised: InputSourceConfig = {
-        Enabled: config.Enabled === true,
-        Url: typeof config.Url === "string" ? config.Url.trim() : "",
-        Method: sanitiseMethod(config.Method),
-        Headers: sanitiseHeaders(config.Headers),
-        RequestBody: typeof config.RequestBody === "string" ? config.RequestBody : "",
-        OnFailure: sanitiseFailurePolicy(config.OnFailure),
-        TimeoutMs: clampTimeout(config.TimeoutMs),
-    };
-    if (typeof localStorage !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalised));
-    }
+  const normalised: InputSourceConfig = {
+    Enabled: config.Enabled === true,
+    Url: typeof config.Url === "string" ? config.Url.trim() : "",
+    Method: sanitiseMethod(config.Method),
+    Headers: sanitiseHeaders(config.Headers),
+    RequestBody: typeof config.RequestBody === "string" ? config.RequestBody : "",
+    OnFailure: sanitiseFailurePolicy(config.OnFailure),
+    TimeoutMs: clampTimeout(config.TimeoutMs),
+  };
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalised));
+  }
 
-    return normalised;
+  return normalised;
 }
 
 export function clearInputSourceConfig(): void {
-    if (typeof localStorage !== "undefined") {
-        localStorage.removeItem(STORAGE_KEY);
-    }
+  if (typeof localStorage !== "undefined") {
+    localStorage.removeItem(STORAGE_KEY);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -207,18 +224,23 @@ export function clearInputSourceConfig(): void {
  * `null` on either side is treated as "no bag".
  */
 export function mergeInputBags(
-    local: GroupInputBag | null,
-    incoming: GroupInputBag | null,
+  local: GroupInputBag | null,
+  incoming: GroupInputBag | null,
 ): GroupInputBag {
-    const out: Record<string, JsonValue> = {};
-    if (local !== null) {
-        for (const [k, v] of Object.entries(local)) out[k] = v;
+  const out: Record<string, JsonValue> = {};
+  if (local !== null) {
+    for (const [k, v] of Object.entries(local)) {
+      out[k] = v;
     }
-    if (incoming !== null) {
-        for (const [k, v] of Object.entries(incoming)) out[k] = v;
-    }
+  }
 
-    return out;
+  if (incoming !== null) {
+    for (const [k, v] of Object.entries(incoming)) {
+      out[k] = v;
+    }
+  }
+
+  return out;
 }
 
 /* ------------------------------------------------------------------ */
@@ -232,7 +254,7 @@ export interface FetchInputDeps {
 }
 
 function buildSkipResult(reason: string): FetchInputResult {
-    return { Ok: true, Skipped: true, SkipReason: reason, Bag: null };
+  return { Ok: true, Skipped: true, SkipReason: reason, Bag: null };
 }
 
 function buildErrorResult(args: {
@@ -242,36 +264,37 @@ function buildErrorResult(args: {
     readonly durationMs: number;
     readonly continueOnFail: boolean;
 }): FetchInputResult {
-    return {
-        Ok: false,
-        Skipped: false,
-        Error: args.error,
-        Status: args.status,
-        DurationMs: args.durationMs,
-        Url: args.url,
-        Continue: args.continueOnFail,
-    };
+  return {
+    Ok: false,
+    Skipped: false,
+    Error: args.error,
+    Status: args.status,
+    DurationMs: args.durationMs,
+    Url: args.url,
+    Continue: args.continueOnFail,
+  };
 }
 
 function parseResponseBag(
-    raw: string,
+  raw: string,
 ): { readonly Ok: true; readonly Bag: GroupInputBag } | { readonly Ok: false; readonly Reason: string } {
-    let parsed: JsonValue;
-    try {
-        parsed = JSON.parse(raw) as JsonValue;
-    } catch (e) {
-        const detail = e instanceof Error ? e.message : "Unknown parse error";
+  let parsed: JsonValue;
+  try {
+    parsed = JSON.parse(raw) as JsonValue;
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : "Unknown parse error";
 
-        return { Ok: false, Reason: `Response was not valid JSON: ${detail}` };
-    }
-    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-        return {
-            Ok: false,
-            Reason: `Expected a JSON object at the top level (e.g. { "Email": "you@example.com" }).`,
-        };
-    }
+    return { Ok: false, Reason: `Response was not valid JSON: ${detail}` };
+  }
 
-    return { Ok: true, Bag: parsed as GroupInputBag };
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {
+      Ok: false,
+      Reason: `Expected a JSON object at the top level (e.g. { "Email": "you@example.com" }).`,
+    };
+  }
+
+  return { Ok: true, Bag: parsed as GroupInputBag };
 }
 
 /**
@@ -285,51 +308,61 @@ interface FetchPreflight {
 }
 
 function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPreflight {
-    const continueOnFail = config.OnFailure === "ContinueWithLocal";
-    if (!config.Enabled) return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
-    if (config.Url.trim().length === 0) return { Skip: buildSkipResult("No URL configured"), FetchImpl: null, ContinueOnFail: continueOnFail };
-    const fetchImpl = deps.fetchImpl ?? (typeof fetch === "function" ? fetch : null);
-    if (fetchImpl === null) {
-        return {
-            Skip: buildErrorResult({ url: config.Url, status: null, error: "fetch is not available in this environment", durationMs: 0, continueOnFail }),
-            FetchImpl: null,
-            ContinueOnFail: continueOnFail,
-        };
-    }
+  const continueOnFail = config.OnFailure === "ContinueWithLocal";
+  if (!config.Enabled) {
+    return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
+  }
 
-    return { Skip: null, FetchImpl: fetchImpl, ContinueOnFail: continueOnFail };
+  if (config.Url.trim().length === 0) {
+    return { Skip: buildSkipResult("No URL configured"), FetchImpl: null, ContinueOnFail: continueOnFail };
+  }
+
+  const fetchImpl = deps.fetchImpl ?? (typeof fetch === "function" ? fetch : null);
+  if (fetchImpl === null) {
+    return {
+      Skip: buildErrorResult({ url: config.Url, status: null, error: "fetch is not available in this environment", durationMs: 0, continueOnFail }),
+      FetchImpl: null,
+      ContinueOnFail: continueOnFail,
+    };
+  }
+
+  return { Skip: null, FetchImpl: fetchImpl, ContinueOnFail: continueOnFail };
 }
 
 function buildRequest(config: InputSourceConfig): { headers: Record<string, string>; body: string | undefined } {
-    const headers: Record<string, string> = {};
-    for (const h of config.Headers) headers[h.Name] = h.Value;
-    let body: string | undefined;
-    if (config.Method === "POST" && config.RequestBody.trim().length > 0) {
-        body = config.RequestBody;
-        if (!Object.prototype.hasOwnProperty.call(headers, "Content-Type")) {
-            headers["Content-Type"] = "application/json";
-        }
-    }
+  const headers: Record<string, string> = {};
+  for (const h of config.Headers) {
+    headers[h.Name] = h.Value;
+  }
 
-    return { headers, body };
+  let body: string | undefined;
+  if (config.Method === "POST" && config.RequestBody.trim().length > 0) {
+    body = config.RequestBody;
+    if (!Object.prototype.hasOwnProperty.call(headers, "Content-Type")) {
+      headers["Content-Type"] = "application/json";
+    }
+  }
+
+  return { headers, body };
 }
 
 function handleResponse(
-    res: Response,
-    text: string,
-    config: InputSourceConfig,
-    durationMs: number,
-    continueOnFail: boolean,
+  res: Response,
+  text: string,
+  config: InputSourceConfig,
+  durationMs: number,
+  continueOnFail: boolean,
 ): FetchInputResult {
-    if (!res.ok) {
-        return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
-    }
-    const parsed = parseResponseBag(text);
-    if (!parsed.Ok) {
-        return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
-    }
+  if (!res.ok) {
+    return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
+  }
 
-    return { Ok: true, Skipped: false, Bag: parsed.Bag, Status: res.status, DurationMs: durationMs, Url: config.Url };
+  const parsed = parseResponseBag(text);
+  if (!parsed.Ok) {
+    return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
+  }
+
+  return { Ok: true, Skipped: false, Bag: parsed.Bag, Status: res.status, DurationMs: durationMs, Url: config.Url };
 }
 
 /**
@@ -337,35 +370,41 @@ function handleResponse(
  * The caller decides what to do based on `Ok` + `Continue` + `OnFailure`.
  */
 export async function fetchInputSource(
-    deps: FetchInputDeps = {},
+  deps: FetchInputDeps = {},
 ): Promise<FetchInputResult> {
-    const config = deps.config ?? loadInputSourceConfig();
-    const pre = preflight(deps, config);
-    if (pre.Skip !== null || pre.FetchImpl === null) return pre.Skip as FetchInputResult;
+  const config = deps.config ?? loadInputSourceConfig();
+  const pre = preflight(deps, config);
+  if (pre.Skip !== null || pre.FetchImpl === null) {
+    return pre.Skip as FetchInputResult;
+  }
 
-    const { headers, body } = buildRequest(config);
-    const controller = typeof AbortController === "function" ? new AbortController() : null;
-    const timer = controller === null ? null : setTimeout(() => { controller.abort(); }, config.TimeoutMs);
-    const startedAt = Date.now();
-    try {
-        const res = await pre.FetchImpl(config.Url, { method: config.Method, headers, body, signal: controller?.signal });
-        const text = await res.text();
+  const { headers, body } = buildRequest(config);
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = controller === null ? null : setTimeout(() => {
+    controller.abort(); 
+  }, config.TimeoutMs);
+  const startedAt = Date.now();
+  try {
+    const res = await pre.FetchImpl(config.Url, { method: config.Method, headers, body, signal: controller?.signal });
+    const text = await res.text();
 
-        return handleResponse(res, text, config, Date.now() - startedAt, pre.ContinueOnFail);
-    } catch (e) {
-        const message = e instanceof Error ? e.message : String(e);
-        const isAbort = e instanceof Error && e.name === "AbortError";
+    return handleResponse(res, text, config, Date.now() - startedAt, pre.ContinueOnFail);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    const isAbort = e instanceof Error && e.name === "AbortError";
 
-        return buildErrorResult({
-            url: config.Url,
-            status: null,
-            error: isAbort ? `Request timed out after ${config.TimeoutMs} ms` : message,
-            durationMs: Date.now() - startedAt,
-            continueOnFail: pre.ContinueOnFail,
-        });
-    } finally {
-        if (timer !== null) clearTimeout(timer);
+    return buildErrorResult({
+      url: config.Url,
+      status: null,
+      error: isAbort ? `Request timed out after ${config.TimeoutMs} ms` : message,
+      durationMs: Date.now() - startedAt,
+      continueOnFail: pre.ContinueOnFail,
+    });
+  } finally {
+    if (timer !== null) {
+      clearTimeout(timer);
     }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -388,12 +427,12 @@ export interface InputSourceSnapshot {
  *     caller checks `Result.Continue` to decide abort vs continue.
  */
 export async function resolveBatchInputSnapshot(
-    deps: FetchInputDeps = {},
+  deps: FetchInputDeps = {},
 ): Promise<InputSourceSnapshot> {
-    const result = await fetchInputSource(deps);
-    if (result.Ok && !result.Skipped) {
-        return { Bag: result.Bag, Result: result };
-    }
+  const result = await fetchInputSource(deps);
+  if (result.Ok && !result.Skipped) {
+    return { Bag: result.Bag, Result: result };
+  }
 
-    return { Bag: null, Result: result };
+  return { Bag: null, Result: result };
 }

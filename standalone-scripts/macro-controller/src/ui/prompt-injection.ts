@@ -39,7 +39,9 @@ function getByXPathAsElement(xpath: string): Element | null {
 
 // CQ16: Extracted from openPromptCreationModal closure
 function getSelectedCategory(catSelect: HTMLSelectElement, catCustomInput: HTMLInputElement): string {
-  if (catSelect.value === '__custom__') return catCustomInput.value.trim();
+  if (catSelect.value === '__custom__') {
+    return catCustomInput.value.trim();
+  }
 
   return catSelect.value;
 }
@@ -54,14 +56,23 @@ interface FileHandlerRefs {
 
 // CQ16: Extracted from openPromptCreationModal closure
 function handleFile(file: File, refs: FileHandlerRefs): void {
-  if (!file) return;
+  if (!file) {
+    return;
+  }
+
   const ext = (file.name || '').split('.').pop()?.toLowerCase() || '';
-  if (!['md', 'txt', 'prompt'].includes(ext)) { showPasteToast('❌ Unsupported file type: .' + ext, true);
+  if (!['md', 'txt', 'prompt'].includes(ext)) {
+    showPasteToast('❌ Unsupported file type: .' + ext, true);
 
- return; }
-  if (file.size > 50 * 1024) { showPasteToast('❌ File too large (max 50KB)', true);
+    return; 
+  }
 
- return; }
+  if (file.size > 50 * 1024) {
+    showPasteToast('❌ File too large (max 50KB)', true);
+
+    return; 
+  }
+
   const reader = new FileReader();
   reader.onload = function(e: ProgressEvent<FileReader>) {
     const content = e.target?.result as string;
@@ -70,11 +81,15 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
     if (!refs.titleInput.value.trim()) {
       refs.titleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
     }
+
     refs.dropZone.style.borderColor = '#16a34a';
     refs.dropZone.innerHTML = '✅ Loaded: <b>' + file.name + '</b> (' + content.length + ' chars)';
-    setTimeout(function() { refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; }, Timings.TIMEOUT_NORMAL);
+    setTimeout(function() {
+      refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; 
+    }, Timings.TIMEOUT_NORMAL);
     log('File loaded into prompt editor: ' + file.name, 'success');
   };
+
   reader.readAsText(file);
 }
 
@@ -163,7 +178,7 @@ function formatSaveErrorMessage(
   const buttonLabel = input.isEdit ? '💾 Update' : '💾 Save';
   const roleLabel = input.role === 'plan' ? 'PlanTierType'
     : input.role === 'next' ? 'Next'
-    : input.role === 'generic' ? 'Generic' : 'prompt';
+      : input.role === 'generic' ? 'Generic' : 'prompt';
   const f = input.failure;
   if (f && f.rule === 'rule-zero') {
     const expected = f.expectedN ?? null;
@@ -180,8 +195,11 @@ function formatSaveErrorMessage(
       + 'Detail: ' + detail + '\n'
       + 'Fix: ' + fix;
   }
+
   if (f && f.rule === 'token-drift') {
-    const tokens = (f.missingTokens ?? []).map(function(t) { return '{{' + t + '}}'; }).join(', ');
+    const tokens = (f.missingTokens ?? []).map(function(t) {
+      return '{{' + t + '}}'; 
+    }).join(', ');
     const fix = f.fix ?? ('Paste ' + (tokens || 'the required token(s)') + ' back into the body, then click ' + buttonLabel + '.');
 
     return '❌ Save blocked: required token(s) missing\n'
@@ -208,7 +226,9 @@ export function openPromptCreationModal(
 ): void {
   ensurePromptModalTheme();
   const existing = document.getElementById('marco-prompt-modal');
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const isEdit = !!(editPrompt && editPrompt.id);
   const baseInitial = isEdit ? editPrompt : (prefillData || {});
@@ -223,6 +243,7 @@ export function openPromptCreationModal(
     initialData.category = roleForCategory;
     initialData.__lockedCategory = roleForCategory;
   }
+
   const overlay = document.createElement('div');
   overlay.id = 'marco-prompt-modal';
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000010;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;';
@@ -240,7 +261,10 @@ export function openPromptCreationModal(
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕';
   closeBtn.style.cssText = 'background:none;border:none;color:#9ca3af;font-size:18px;cursor:pointer;padding:0 4px;';
-  closeBtn.onclick = function() { overlay.remove(); };
+  closeBtn.onclick = function() {
+    overlay.remove(); 
+  };
+
   headerEl.appendChild(titleEl);
   headerEl.appendChild(closeBtn);
   modal.appendChild(headerEl);
@@ -260,7 +284,12 @@ export function openPromptCreationModal(
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
-  overlay.onclick = function(e: Event) { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = function(e: Event) {
+    if (e.target === overlay) {
+      overlay.remove();
+    } 
+  };
+
   document.addEventListener('keydown', onEscHandler(overlay));
   bodyResult.titleInput.focus();
 }
@@ -293,18 +322,27 @@ function _buildTemplatePreview(preview: { body: string; slug?: string }, roleLab
   copyBtn.type = 'button';
   copyBtn.textContent = '📋 Copy template';
   copyBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + CSS_BTN_REST_BG + ';color:' + cPanelFg + ';border:1px solid ' + cPrimaryBorderA + ';border-radius:6px;font-size:11px;cursor:pointer;';
-  copyBtn.onmouseenter = function() { copyBtn.style.background = CSS_BTN_HOVER_BG; };
-  copyBtn.onmouseleave = function() { copyBtn.style.background = CSS_BTN_REST_BG; };
+  copyBtn.onmouseenter = function() {
+    copyBtn.style.background = CSS_BTN_HOVER_BG; 
+  };
+
+  copyBtn.onmouseleave = function() {
+    copyBtn.style.background = CSS_BTN_REST_BG; 
+  };
+
   copyBtn.onclick = function() {
     try {
       void navigator.clipboard.writeText(preview.body);
       const prev = copyBtn.textContent;
       copyBtn.textContent = '✓ Copied';
-      setTimeout(function() { copyBtn.textContent = prev; }, 1200);
+      setTimeout(function() {
+        copyBtn.textContent = prev; 
+      }, 1200);
     } catch (err) {
       log('Prompt template copy failed: ' + String(err));
     }
   };
+
   actions.appendChild(copyBtn);
   wrap.appendChild(actions);
 
@@ -375,8 +413,14 @@ function _buildTitleAndContent(body: HTMLElement, initialData: Record<string, un
   titleInput.placeholder = 'e.g. Code Review Prompt';
   titleInput.value = (initialData.name as string) || '';
   titleInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;margin-bottom:12px;outline:none;box-sizing:border-box;';
-  titleInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  titleInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
+  titleInput.onfocus = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  titleInput.onblur = function() {
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
+  };
+
   body.appendChild(titleInput);
 
   const contentLabel = document.createElement('label');
@@ -387,15 +431,27 @@ function _buildTitleAndContent(body: HTMLElement, initialData: Record<string, un
   contentArea.placeholder = 'Enter your prompt text here…\n\nSupports {{date}}, {{time}} variables.';
   contentArea.value = (initialData.text as string) || '';
   contentArea.style.cssText = 'width:100%;height:200px;padding:10px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;';
-  contentArea.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  contentArea.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
+  contentArea.onfocus = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  contentArea.onblur = function() {
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
+  };
+
   body.appendChild(contentArea);
 
   const charCount = document.createElement('div');
   charCount.style.cssText = 'text-align:right;font-size:10px;color:' + cPanelFgDim + ';margin-top:2px;margin-bottom:8px;';
   charCount.textContent = '0 chars';
-  contentArea.oninput = function() { charCount.textContent = contentArea.value.length + ' chars'; };
-  if (initialData.text) charCount.textContent = contentArea.value.length + ' chars';
+  contentArea.oninput = function() {
+    charCount.textContent = contentArea.value.length + ' chars'; 
+  };
+
+  if (initialData.text) {
+    charCount.textContent = contentArea.value.length + ' chars';
+  }
+
   body.appendChild(charCount);
 
   return { titleInput, contentArea, charCount };
@@ -407,15 +463,27 @@ function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement,
   dropZone.innerHTML = '📁 Drop <b>.md</b>, <b>.txt</b>, or <b>.prompt</b> file here<br><span style="font-size:10px;color:#4b5563;">or click to browse</span>';
   const fileInput = document.createElement('input');
   fileInput.type = 'file'; fileInput.accept = '.md,.txt,.prompt'; fileInput.style.display = 'none';
-  dropZone.onclick = function() { fileInput.click(); };
+  dropZone.onclick = function() {
+    fileInput.click(); 
+  };
+
   const fileRefs: FileHandlerRefs = { contentArea, charCount, titleInput, dropZone };
-  fileInput.onchange = function() { handleFile(fileInput.files![0], fileRefs); };
-  dropZone.addEventListener('dragover', function(e: Event) { e.preventDefault(); e.stopPropagation(); (this as HTMLElement).style.borderColor = cPrimary; (this as HTMLElement).style.background = 'rgba(124,58,237,0.1)'; });
-  dropZone.addEventListener('dragleave', function(e: Event) { e.preventDefault(); (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent'; });
+  fileInput.onchange = function() {
+    handleFile(fileInput.files![0], fileRefs); 
+  };
+
+  dropZone.addEventListener('dragover', function(e: Event) {
+    e.preventDefault(); e.stopPropagation(); (this as HTMLElement).style.borderColor = cPrimary; (this as HTMLElement).style.background = 'rgba(124,58,237,0.1)'; 
+  });
+  dropZone.addEventListener('dragleave', function(e: Event) {
+    e.preventDefault(); (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent'; 
+  });
   dropZone.addEventListener('drop', function(e: DragEvent) {
     e.preventDefault(); e.stopPropagation();
     (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent';
-    if (e.dataTransfer && e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0], fileRefs);
+    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0], fileRefs);
+    }
   });
   body.appendChild(dropZone);
   body.appendChild(fileInput);
@@ -433,6 +501,7 @@ function _buildVariableReference(body: HTMLElement): void {
     varList.style.display = isOpen ? 'none' : 'block';
     varToggle.textContent = (isOpen ? '▸' : '▾') + ' Template Variables';
   };
+
   body.appendChild(varToggle);
   body.appendChild(varList);
 }
@@ -452,8 +521,13 @@ function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTML
   tagsInput.placeholder = 'e.g. ui, backend, logic';
   tagsInput.value = Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '';
   tagsInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;';
-  tagsInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  tagsInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
+  tagsInput.onfocus = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  tagsInput.onblur = function() {
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
+  };
   
   tagsWrap.appendChild(tagsInput);
 
@@ -469,7 +543,9 @@ function collectExistingCategories(): string[] {
   const catSeen: Record<string, boolean> = {};
   for (const entry of existingEntries) {
     const ec = (entry.category || '').trim();
-    if (ec && !catSeen[ec.toLowerCase()]) { existingCats.push(ec); catSeen[ec.toLowerCase()] = true; }
+    if (ec && !catSeen[ec.toLowerCase()]) {
+      existingCats.push(ec); catSeen[ec.toLowerCase()] = true; 
+    }
   }
 
   return existingCats;
@@ -488,8 +564,13 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
 
   const catSelect = document.createElement('select');
   catSelect.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;appearance:auto;cursor:pointer;';
-  catSelect.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  catSelect.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
+  catSelect.onfocus = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  catSelect.onblur = function() {
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
+  };
 
   const noneOpt = document.createElement('option');
   noneOpt.value = ''; noneOpt.textContent = '— No category —';
@@ -499,6 +580,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
     opt.value = cat; opt.textContent = cat;
     catSelect.appendChild(opt);
   }
+
   const customOpt = document.createElement('option');
   customOpt.value = '__custom__'; customOpt.textContent = '✏️ Custom category…';
   catSelect.appendChild(customOpt);
@@ -507,21 +589,34 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
   catCustomInput.type = 'text';
   catCustomInput.placeholder = 'Type custom category name…';
   catCustomInput.style.cssText = 'display:none;width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;margin-top:6px;';
-  catCustomInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  catCustomInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
+  catCustomInput.onfocus = function() {
+    (this as HTMLElement).style.borderColor = cPrimary; 
+  };
+
+  catCustomInput.onblur = function() {
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
+  };
 
   catSelect.onchange = function() {
     catCustomInput.style.display = catSelect.value === '__custom__' ? 'block' : 'none';
-    if (catSelect.value !== '__custom__') catCustomInput.value = '';
-    if (catSelect.value === '__custom__') catCustomInput.focus();
+    if (catSelect.value !== '__custom__') {
+      catCustomInput.value = '';
+    }
+
+    if (catSelect.value === '__custom__') {
+      catCustomInput.focus();
+    }
   };
 
   const initialCat = ((initialData.category as string) || '').trim();
   const lockedCategory = ((initialData.__lockedCategory as string) || '').trim();
   if (initialCat) {
-    const matchIdx = existingCats.findIndex(function(c) { return c.toLowerCase() === initialCat.toLowerCase(); });
-    if (matchIdx !== -1) { catSelect.value = existingCats[matchIdx]; }
-    else {
+    const matchIdx = existingCats.findIndex(function(c) {
+      return c.toLowerCase() === initialCat.toLowerCase(); 
+    });
+    if (matchIdx !== -1) {
+      catSelect.value = existingCats[matchIdx]; 
+    } else {
       // Ensure the initial category (e.g. locked 'plan'/'next' for role-scoped
       // prompts) is a real option even when no other prompt has surfaced it
       // yet. Without this the select would silently fall back to '— No
@@ -554,13 +649,17 @@ function buildSlug(role: PromptRole, name: string, editPrompt: EditablePrompt | 
   if (editPrompt && typeof editPrompt.slug === 'string' && editPrompt.slug.trim().length > 0) {
     return editPrompt.slug.trim();
   }
+
   const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   return role + '-' + (base || 'prompt') + '-' + Date.now();
 }
 
 function parseDbPromptId(editPrompt: EditablePrompt | null): number | undefined {
-  if (!editPrompt || typeof editPrompt.id !== 'string') return undefined;
+  if (!editPrompt || typeof editPrompt.id !== 'string') {
+    return undefined;
+  }
+
   const id = Number(editPrompt.id);
 
   return Number.isInteger(id) && id > 0 ? id : undefined;
@@ -568,9 +667,18 @@ function parseDbPromptId(editPrompt: EditablePrompt | null): number | undefined 
 
 function buildLegacyPromptPayload(input: PromptSaveInput): Record<string, unknown> {
   const promptPayload: Record<string, unknown> = { name: input.name, text: input.text, source: 'user' };
-  if (input.category) promptPayload.category = input.category;
-  if (input.tags.length > 0) promptPayload.tags = input.tags;
-  if (input.isEdit && input.editPrompt && input.editPrompt.id) promptPayload.id = input.editPrompt.id;
+  if (input.category) {
+    promptPayload.category = input.category;
+  }
+
+  if (input.tags.length > 0) {
+    promptPayload.tags = input.tags;
+  }
+
+  if (input.isEdit && input.editPrompt && input.editPrompt.id) {
+    promptPayload.id = input.editPrompt.id;
+  }
+
   promptPayload.excludeFromExport = input.excludeFromExport;
 
   return promptPayload;
@@ -578,7 +686,9 @@ function buildLegacyPromptPayload(input: PromptSaveInput): Record<string, unknow
 
 function saveGenericPrompt(input: PromptSaveInput): Promise<PromptSaveResult> {
   return sendToExtension('SAVE_PROMPT', { prompt: buildLegacyPromptPayload(input) }).then(function(resp: Record<string, unknown>) {
-    if (resp && resp.isOk) return { isOk: true };
+    if (resp && resp.isOk) {
+      return { isOk: true };
+    }
 
     return { isOk: false, errorMessage: (resp && resp.errorMessage as string) || 'Save failed, extension may not be connected' };
   });
@@ -633,7 +743,9 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
     replaceKey: input.editPrompt?.replaceKey,
     replaceValues: input.editPrompt?.replaceValues,
   }).then(function(result) {
-    if (result.isSuccess) return { isOk: true };
+    if (result.isSuccess) {
+      return { isOk: true };
+    }
 
     return {
       isOk: false,
@@ -683,7 +795,9 @@ function _buildPromptModalFooter(
   // PlanTierType-23 step 5: required-tokens chip strip + live drift indicator.
   const requiredTokens = (options?.requiredTokens ?? []).filter((t): t is string => typeof t === 'string' && t.length > 0);
   const tokenStrip = _buildRequiredTokenStrip(requiredTokens);
-  if (tokenStrip) footer.appendChild(tokenStrip.root);
+  if (tokenStrip) {
+    footer.appendChild(tokenStrip.root);
+  }
 
   // v4.176.0 — Rule-0 live pre-save indicator. v4.189.0: extended to the Next
   // role. `prompt-injection.ts` already gates BOTH PlanTierType AND Next saves via
@@ -694,7 +808,9 @@ function _buildPromptModalFooter(
   // designed to prevent. Mounting the indicator for both roles closes that gap.
   const showRuleZero = options?.role === 'plan' || options?.role === 'next';
   const ruleZeroIndicator = showRuleZero ? _buildRuleZeroIndicator() : null;
-  if (ruleZeroIndicator) footer.appendChild(ruleZeroIndicator.root);
+  if (ruleZeroIndicator) {
+    footer.appendChild(ruleZeroIndicator.root);
+  }
 
   const buttonRow = document.createElement('div');
   buttonRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;';
@@ -706,8 +822,14 @@ function _buildPromptModalFooter(
   guidelineBtn.textContent = '📥 AI guideline';
   guidelineBtn.title = 'Download a Markdown guideline listing tokens the AI must preserve when editing this prompt.';
   guidelineBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;margin-right:auto;';
-  guidelineBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
-  guidelineBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
+  guidelineBtn.onmouseover = function() {
+    (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
+  };
+
+  guidelineBtn.onmouseout = function() {
+    (this as HTMLElement).style.background = CSS_BTN_REST_BG; 
+  };
+
   guidelineBtn.onclick = function() {
     const guidelineSlug = (isEdit && editPrompt && typeof editPrompt.slug === 'string') ? editPrompt.slug : null;
     const guidelineSeedBody = guidelineSlug ? getSeedBodyForSlug(guidelineSlug) : null;
@@ -715,9 +837,13 @@ function _buildPromptModalFooter(
       roleLabel: options?.roleLabel ?? 'Generic',
       requiredTokens: requiredTokens,
     };
-    if (guidelineSeedBody !== null) guidelineArg.seedBody = guidelineSeedBody;
+    if (guidelineSeedBody !== null) {
+      guidelineArg.seedBody = guidelineSeedBody;
+    }
+
     downloadAiGuideline(guidelineArg);
   };
+
   buttonRow.appendChild(guidelineBtn);
 
   // PlanTierType-23 step 4: Reset to default. Only visible in edit mode for a slug
@@ -733,18 +859,28 @@ function _buildPromptModalFooter(
     resetBtn.title = 'Restore this prompt body to the shipped default. Not saved until you click Save.';
     resetBtn.dataset.testid = 'prompt-editor-reset-default';
     resetBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
-    resetBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
-    resetBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
+    resetBtn.onmouseover = function() {
+      (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
+    };
+
+    resetBtn.onmouseout = function() {
+      (this as HTMLElement).style.background = CSS_BTN_REST_BG; 
+    };
+
     resetBtn.onclick = function() {
       const current = contentArea.value;
       if (current.trim().length > 0 && current !== seedBody) {
         const ok = window.confirm('Reset the prompt body to the shipped default? Unsaved edits in this editor will be discarded (existing DB row is untouched until you click Save).');
-        if (!ok) return;
+        if (!ok) {
+          return;
+        }
       }
+
       contentArea.value = seedBody;
       contentArea.dispatchEvent(new Event('input', { bubbles: true }));
       showPasteToast('↺ Reset to default (unsaved) — click Save to persist', false);
     };
+
     buttonRow.appendChild(resetBtn);
   }
 
@@ -752,19 +888,29 @@ function _buildPromptModalFooter(
   const testBtn = document.createElement('button');
   testBtn.textContent = '📋 Paste Test';
   testBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
-  testBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
-  testBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
+  testBtn.onmouseover = function() {
+    (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
+  };
+
+  testBtn.onmouseout = function() {
+    (this as HTMLElement).style.background = CSS_BTN_REST_BG; 
+  };
+
   testBtn.onclick = function() {
     let text = contentArea.value.trim();
-    if (!text) { showPasteToast('❌ No content to paste', true);
+    if (!text) {
+      showPasteToast('❌ No content to paste', true);
 
- return; }
+      return; 
+    }
+
     const now = new Date();
     text = text.replace(/\{\{date\}\}/gi, now.toLocaleDateString());
     text = text.replace(/\{\{time\}\}/gi, now.toLocaleTimeString());
     const pCfg = getPromptsConfig();
     pasteIntoEditor(text, pCfg, getByXPathAsElement);
   };
+
   buttonRow.appendChild(testBtn);
 
   // v4.177.0 — Inline diff pane. In edit mode only, show a unified +/- diff
@@ -783,19 +929,31 @@ function _buildPromptModalFooter(
   const diffPersistRole: string = (options?.role === 'plan' || options?.role === 'next') ? options.role : 'generic';
   const diffPersistKey = 'marco.diffOpen.' + diffPersistRole;
   const readDiffPref = function (): boolean {
-    try { return window.localStorage.getItem(diffPersistKey) === '1'; } catch { return false; }
+    try {
+      return window.localStorage.getItem(diffPersistKey) === '1'; 
+    } catch {
+      return false; 
+    }
   };
+
   const writeDiffPref = function (open: boolean): void {
-    try { window.localStorage.setItem(diffPersistKey, open ? '1' : '0'); } catch (err) {
+    try {
+      window.localStorage.setItem(diffPersistKey, open ? '1' : '0'); 
+    } catch (err) {
       console.error();
     }
   };
+
   let isDiffOpen = false;
   const rerenderDiff = function (): void {
-    if (!isDiffOpen || diffBaseline === null) return;
+    if (!isDiffOpen || diffBaseline === null) {
+      return;
+    }
+
     diffHost.textContent = '';
     diffHost.appendChild(renderDiffPane(diffBaseline, contentArea.value));
   };
+
   if (diffBaseline !== null) {
     const diffBtn = document.createElement('button');
     diffBtn.textContent = '🔍 Diff vs saved';
@@ -807,11 +965,13 @@ function _buildPromptModalFooter(
       diffBtn.textContent = isDiffOpen ? '🔍 Hide diff' : '🔍 Diff vs saved';
       rerenderDiff();
     };
+
     diffBtn.onclick = function () {
       isDiffOpen = !isDiffOpen;
       writeDiffPref(isDiffOpen);
       applyDiffOpenState();
     };
+
     buttonRow.appendChild(diffBtn);
 
     // Restore the persisted state for this role on mount.
@@ -832,13 +992,18 @@ function _buildPromptModalFooter(
 
         return;
       }
+
       const isDiffShortcut = (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey
         && (e.key === 'd' || e.key === 'D');
-      if (!isDiffShortcut) return;
+      if (!isDiffShortcut) {
+        return;
+      }
+
       e.preventDefault();
       e.stopPropagation();
       diffBtn.click();
     };
+
     document.addEventListener('keydown', diffKeyHandler);
   }
 
@@ -847,10 +1012,15 @@ function _buildPromptModalFooter(
   saveBtn.textContent = isEdit ? '💾 Update' : '💾 Save';
   saveBtn.style.cssText = 'padding:8px 18px;background:' + cPrimary + ';border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;';
   saveBtn.onmouseover = function() {
-    if (!(saveBtn as HTMLButtonElement).disabled) (this as HTMLElement).style.background = '#6d28d9';
+    if (!(saveBtn as HTMLButtonElement).disabled) {
+      (this as HTMLElement).style.background = '#6d28d9';
+    }
   };
+
   saveBtn.onmouseout = function() {
-    if (!(saveBtn as HTMLButtonElement).disabled) (this as HTMLElement).style.background = '#7c3aed';
+    if (!(saveBtn as HTMLButtonElement).disabled) {
+      (this as HTMLElement).style.background = '#7c3aed';
+    }
   };
 
   // Wire live drift check: recompute missing tokens on every keystroke.
@@ -870,12 +1040,17 @@ function _buildPromptModalFooter(
       saveBtn.title = '';
     }
   };
+
   const prevInput = contentArea.oninput;
   contentArea.oninput = function (ev: Event) {
-    if (typeof prevInput === 'function') prevInput.call(contentArea, ev);
+    if (typeof prevInput === 'function') {
+      prevInput.call(contentArea, ev);
+    }
+
     refreshDriftState();
     rerenderDiff();
   };
+
   refreshDriftState();
 
   // eslint-disable-next-line max-lines-per-function -- linear save-response ceremony; split would obscure flow
@@ -904,6 +1079,7 @@ function _buildPromptModalFooter(
 
       return;
     }
+
     const role = options?.role;
     const canUndo = isEdit
       && (role === 'plan' || role === 'next')
@@ -923,7 +1099,9 @@ function _buildPromptModalFooter(
           slug: previousSlug, name: previousName, body: previousBody,
           role: role, previousBody: text,
         };
-        if (previousId !== undefined) undoPayload.id = previousId;
+        if (previousId !== undefined) {
+          undoPayload.id = previousId;
+        }
 
         return upsertPrompt(undoPayload).then(function(r) {
           if (!r.ok) {
@@ -936,6 +1114,7 @@ function _buildPromptModalFooter(
 
             return;
           }
+
           showPasteToast('↺ Reverted to previous version', false);
           refreshAfterPromptSave();
         });
@@ -943,6 +1122,7 @@ function _buildPromptModalFooter(
     } else {
       showPasteToast('✓ Prompt saved: ' + name, false);
     }
+
     log('Prompt saved: ' + name, 'success');
     overlay.remove();
     refreshAfterPromptSave();
@@ -952,15 +1132,23 @@ function _buildPromptModalFooter(
     const { titleInput, contentArea, catSelect, catCustomInput, tagsInput, excludeFromExportInput } = bodyResult;
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
-    if (!name) { showPasteToast('❌ Title is required', true); titleInput.focus();
+    if (!name) {
+      showPasteToast('❌ Title is required', true); titleInput.focus();
 
- return; }
-    if (!text) { showPasteToast('❌ Content is required', true); contentArea.focus();
+      return; 
+    }
 
- return; }
-    if (text.length > 50 * 1024) { showPasteToast('❌ Content exceeds 50KB limit', true);
+    if (!text) {
+      showPasteToast('❌ Content is required', true); contentArea.focus();
 
- return; }
+      return; 
+    }
+
+    if (text.length > 50 * 1024) {
+      showPasteToast('❌ Content exceeds 50KB limit', true);
+
+      return; 
+    }
 
     if (tokenStrip) {
       const missing = tokenStrip.recomputeMissing(text);
@@ -999,7 +1187,10 @@ function _buildPromptModalFooter(
       excludeFromExport: !!excludeFromExportInput.checked,
       isEdit: isEdit, editPrompt: editPrompt,
     };
-    if (options?.role) saveInput.role = options.role;
+    if (options?.role) {
+      saveInput.role = options.role;
+    }
+
     savePromptFromEditor(saveInput).then(function(resp: PromptSaveResult) {
       handleSaveResponse(resp, name, text);
     });
@@ -1021,7 +1212,9 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
   root: HTMLElement;
   recomputeMissing: (body: string) => string[];
 } | null {
-  if (requiredTokens.length === 0) return null;
+  if (requiredTokens.length === 0) {
+    return null;
+  }
 
   const root = document.createElement('div');
   root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:rgba(124,58,237,0.08);border-radius:6px;font-size:11px;color:' + cPrimaryLight + ';';
@@ -1039,6 +1232,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
     root.appendChild(chip);
     chips.set(token, chip);
   }
+
   const note = document.createElement('span');
   note.style.cssText = 'margin-left:auto;font-size:10px;color:' + cPanelFgDim + ';';
   note.textContent = 'These tokens are substituted at paste time — do not delete or rename them.';
@@ -1052,7 +1246,9 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
       chip.style.background = ok ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
       chip.style.borderColor = ok ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.7)';
       chip.style.color = ok ? '#86efac' : '#fca5a5';
-      if (!ok) missing.push(token);
+      if (!ok) {
+        missing.push(token);
+      }
     }
 
     return missing;
@@ -1110,7 +1306,7 @@ function _ruleZeroApplyStyle(badge: HTMLElement, paintText: RuleZeroPaintText): 
 function _buildRuleZeroIndicator(): {
   root: HTMLElement;
   recompute: (body: string) => import('../db/rule-zero-validator').RuleZeroCheck;
-} {
+  } {
   const root = document.createElement('div');
   root.dataset.testid = 'prompt-editor-rule-zero-indicator';
   root.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;background:rgba(124,58,237,0.06);border-radius:6px;font-size:11px;color:' + cPrimaryLight + ';';

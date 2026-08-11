@@ -57,7 +57,11 @@ vi.mock('../db/project-chat-submit-db', () => ({
   }),
   renameProjectChatSubmits: vi.fn(async (pid: string, newName: string) => {
     let touched = 0;
-    for (const r of rows) if (r.ProjectId === pid) { r.ProjectName = newName; touched += 1; }
+    for (const r of rows) {
+      if (r.ProjectId === pid) {
+        r.ProjectName = newName; touched += 1; 
+      }
+    }
 
     return touched > 0;
   }),
@@ -69,7 +73,10 @@ let opfsFileIdCounter = 1;
 
 vi.mock('../storage/chat-submit-opfs-store', () => ({
   saveEntry: vi.fn(async (pid: string, text: string) => {
-    if (!opfsFiles.has(pid)) opfsFiles.set(pid, new Map());
+    if (!opfsFiles.has(pid)) {
+      opfsFiles.set(pid, new Map());
+    }
+
     const fileId = `f${opfsFileIdCounter++}`;
     opfsFiles.get(pid)!.set(fileId, text);
 
@@ -78,7 +85,10 @@ vi.mock('../storage/chat-submit-opfs-store', () => ({
   readEntry: vi.fn(async (pid: string, fid: string) => opfsFiles.get(pid)?.get(fid) ?? null),
   deleteEntry: vi.fn(async (pid: string, fid: string) => {
     const dir = opfsFiles.get(pid);
-    if (!dir || !dir.has(fid)) return false;
+    if (!dir || !dir.has(fid)) {
+      return false;
+    }
+
     dir.delete(fid);
 
     return true;
@@ -127,7 +137,9 @@ beforeEach(() => {
 });
 
 async function settle(): Promise<void> {
-  for (let i = 0; i < 6; i += 1) await Promise.resolve();
+  for (let i = 0; i < 6; i += 1) {
+    await Promise.resolve();
+  }
 }
 
 describe('plan 13 end-to-end', () => {
@@ -165,6 +177,7 @@ describe('plan 13 end-to-end', () => {
       await captureChatSubmit({ source: 'paste', text: `msg-${i}`, isVerbose: true });
       await new Promise((r) => setTimeout(r, 2));
     }
+
     await settle();
     await enforceChatSubmitWindow(PROJECT_ID, 10);
 
@@ -172,8 +185,14 @@ describe('plan 13 end-to-end', () => {
     expect(remaining).toHaveLength(10);
     // The 10 newest messages must survive; msg-0..msg-4 must be gone.
     const bodies = remaining.map((e) => e.body);
-    for (let i = 5; i < 15; i += 1) expect(bodies).toContain(`msg-${i}`);
-    for (let i = 0; i < 5; i += 1) expect(bodies).not.toContain(`msg-${i}`);
+    for (let i = 5; i < 15; i += 1) {
+      expect(bodies).toContain(`msg-${i}`);
+    }
+
+    for (let i = 0; i < 5; i += 1) {
+      expect(bodies).not.toContain(`msg-${i}`);
+    }
+
     expect(opfsFiles.get(PROJECT_ID)!.size).toBe(10);
   });
 

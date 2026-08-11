@@ -35,14 +35,14 @@ export interface QueueStorage {
 export const DEFAULT_MAX_QUEUE_SIZE = 50;
 
 const newId = (): string =>
-    `tq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  `tq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
 const emptyRecord = (): TaskQueueRecord => ({ items: [], updatedAt: Date.now() });
 
 const readOrEmpty = async (storage: QueueStorage, projectId: string): Promise<TaskQueueRecord> => {
-    const record = await storage.read(projectId);
+  const record = await storage.read(projectId);
 
-    return record ?? emptyRecord();
+  return record ?? emptyRecord();
 };
 
 export interface EnqueueOptions {
@@ -50,66 +50,68 @@ export interface EnqueueOptions {
 }
 
 export const createTaskQueue = (storage: QueueStorage) => {
-    const enqueueMany = async (
-        projectId: string,
-        texts: readonly string[],
-        options: EnqueueOptions = {},
-    ): Promise<TaskQueueItem[]> => {
-        const max = options.maxQueueSize ?? DEFAULT_MAX_QUEUE_SIZE;
-        const record = await readOrEmpty(storage, projectId);
-        const room = max - record.items.length;
-        if (room <= 0) {
-            throwDiagnostic('QUEUE_INVARIANT_E001', {
-                where: 'enqueueMany',
-                reason: `TaskQueueFull: projectId=${projectId} size=${record.items.length} max=${max}`,
-                projectId,
-                size: record.items.length,
-                max,
-            });
-        }
-        const accepted = texts.slice(0, room).map((text): TaskQueueItem => ({
-            id: newId(),
-            text,
-            status: "pending",
-            createdAt: Date.now(),
-        }));
-        record.items.push(...accepted);
-        record.updatedAt = Date.now();
-        await storage.write(projectId, record);
+  const enqueueMany = async (
+    projectId: string,
+    texts: readonly string[],
+    options: EnqueueOptions = {},
+  ): Promise<TaskQueueItem[]> => {
+    const max = options.maxQueueSize ?? DEFAULT_MAX_QUEUE_SIZE;
+    const record = await readOrEmpty(storage, projectId);
+    const room = max - record.items.length;
+    if (room <= 0) {
+      throwDiagnostic('QUEUE_INVARIANT_E001', {
+        where: 'enqueueMany',
+        reason: `TaskQueueFull: projectId=${projectId} size=${record.items.length} max=${max}`,
+        projectId,
+        size: record.items.length,
+        max,
+      });
+    }
 
-        return accepted;
-    };
+    const accepted = texts.slice(0, room).map((text): TaskQueueItem => ({
+      id: newId(),
+      text,
+      status: "pending",
+      createdAt: Date.now(),
+    }));
+    record.items.push(...accepted);
+    record.updatedAt = Date.now();
+    await storage.write(projectId, record);
 
-    const peek = async (projectId: string): Promise<TaskQueueItem | null> => {
-        const record = await readOrEmpty(storage, projectId);
+    return accepted;
+  };
 
-        return record.items.find((item) => item.status === "pending") ?? null;
-    };
+  const peek = async (projectId: string): Promise<TaskQueueItem | null> => {
+    const record = await readOrEmpty(storage, projectId);
 
-    const dequeue = async (projectId: string): Promise<TaskQueueItem | null> => {
-        const record = await readOrEmpty(storage, projectId);
-        const idx = record.items.findIndex((item) => item.status === "pending");
-        if (idx === -1) {
-            return null;
-        }
-        const [item] = record.items.splice(idx, 1);
-        record.updatedAt = Date.now();
-        await storage.write(projectId, record);
+    return record.items.find((item) => item.status === "pending") ?? null;
+  };
 
-        return item;
-    };
+  const dequeue = async (projectId: string): Promise<TaskQueueItem | null> => {
+    const record = await readOrEmpty(storage, projectId);
+    const idx = record.items.findIndex((item) => item.status === "pending");
+    if (idx === -1) {
+      return null;
+    }
 
-    const clear = async (projectId: string): Promise<void> => {
-        await storage.write(projectId, emptyRecord());
-    };
+    const [item] = record.items.splice(idx, 1);
+    record.updatedAt = Date.now();
+    await storage.write(projectId, record);
 
-    const count = async (projectId: string): Promise<number> => {
-        const record = await readOrEmpty(storage, projectId);
+    return item;
+  };
 
-        return record.items.filter((item) => item.status === "pending").length;
-    };
+  const clear = async (projectId: string): Promise<void> => {
+    await storage.write(projectId, emptyRecord());
+  };
 
-    return { enqueueMany, peek, dequeue, clear, count };
+  const count = async (projectId: string): Promise<number> => {
+    const record = await readOrEmpty(storage, projectId);
+
+    return record.items.filter((item) => item.status === "pending").length;
+  };
+
+  return { enqueueMany, peek, dequeue, clear, count };
 };
 
 export type TaskQueue = ReturnType<typeof createTaskQueue>;

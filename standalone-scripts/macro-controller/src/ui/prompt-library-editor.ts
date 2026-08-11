@@ -86,6 +86,7 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
 
       return;
     }
+
     log('PromptLibraryModal: edited id=' + row.Id + ' slug=' + row.Slug + ' key=' + payload.replaceKey + ' values=' + payload.replaceValues.length, 'info');
     await renderAllRoles(refs);
   } catch (err) {
@@ -97,7 +98,10 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
 export function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: PromptRow, renderAllRoles: (r: ModalRefs) => Promise<void>): void {
   const ed = buildEditorEl(row);
   rowEl.replaceWith(ed.wrap);
-  const cancel = (): void => { refs.activeEditor = null; void renderAllRoles(refs); };
+  const cancel = (): void => {
+    refs.activeEditor = null; void renderAllRoles(refs); 
+  };
+
   const save = (): void => {
     if (ed.tokenError.textContent) {
       refs.status.textContent = 'Invalid Token: ' + ed.tokenError.textContent;
@@ -105,12 +109,14 @@ export function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: Promp
 
       return;
     }
+
     if (ed.valuesError.textContent) {
       refs.status.textContent = 'Invalid N options: ' + ed.valuesError.textContent;
       ed.valuesInput.focus();
 
       return;
     }
+
     const parsedValues = ed.valuesInput.value.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
     void handleEditSave(refs, row, {
       name: ed.nameInput.value,
@@ -119,6 +125,7 @@ export function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: Promp
       replaceValues: parsedValues,
     }, renderAllRoles);
   };
+
   ed.cancelBtn.addEventListener('click', cancel);
   ed.saveBtn.addEventListener('click', save);
   refs.activeEditor = { row, save, cancel };

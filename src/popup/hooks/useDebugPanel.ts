@@ -24,33 +24,33 @@ export interface DebugEntry {
 /* ------------------------------------------------------------------ */
 
 export function useDebugPanel() {
-    const [entries, setEntries] = useState<Map<string, DebugEntry>>(new Map());
-    const [isVisible, setIsVisible] = useState(false);
+  const [entries, setEntries] = useState<Map<string, DebugEntry>>(new Map());
+  const [isVisible, setIsVisible] = useState(false);
 
-    const debugOk = useCallback((action: string) => {
-        setEntries((prev) => {
-            const next = new Map(prev);
-            next.set(action, { action, error: null, timestamp: new Date() });
+  const debugOk = useCallback((action: string) => {
+    setEntries((prev) => {
+      const next = new Map(prev);
+      next.set(action, { action, error: null, timestamp: new Date() });
 
-            return next;
-        });
-        setIsVisible(true);
-    }, []);
+      return next;
+    });
+    setIsVisible(true);
+  }, []);
 
-    const debugError = useCallback((action: string, errorMessage: string) => {
-        setEntries((prev) => {
-            const next = new Map(prev);
-            next.set(action, { action, error: errorMessage, timestamp: new Date() });
+  const debugError = useCallback((action: string, errorMessage: string) => {
+    setEntries((prev) => {
+      const next = new Map(prev);
+      next.set(action, { action, error: errorMessage, timestamp: new Date() });
 
-            return next;
-        });
-        setIsVisible(true);
-    }, []);
+      return next;
+    });
+    setIsVisible(true);
+  }, []);
 
-    const clear = useCallback(() => {
-        setEntries(new Map());
-        setIsVisible(false);
-    }, []);
+  const clear = useCallback(() => {
+    setEntries(new Map());
+    setIsVisible(false);
+  }, []);
 
-    return { entries, isVisible, debugOk, debugError, clear };
+  return { entries, isVisible, debugOk, debugError, clear };
 }

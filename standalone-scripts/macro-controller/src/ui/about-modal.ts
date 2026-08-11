@@ -62,7 +62,9 @@ function getAboutData() {
 // ── Inline styles (applied via CSS classes → style injection) ──
 
 function injectAboutStyles(): void {
-  if (document.getElementById('marco-about-styles')) return;
+  if (document.getElementById('marco-about-styles')) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = 'marco-about-styles';
@@ -225,9 +227,11 @@ function _aboutFooterStyles(): string {
 export function showAboutModal(): void {
   // Remove existing if open
   const existing = document.getElementById('macroloop-about-modal');
-  if (existing) { existing.remove();
+  if (existing) {
+    existing.remove();
 
- return; }
+    return; 
+  }
 
   // Inject scoped styles
   injectAboutStyles();
@@ -246,7 +250,11 @@ export function showAboutModal(): void {
   const container = document.createElement('div');
   container.id = 'macroloop-about-modal';
   container.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  container.onclick = function(e: Event) { if (e.target === container) container.remove(); };
+  container.onclick = function(e: Event) {
+    if (e.target === container) {
+      container.remove();
+    } 
+  };
 
   // Inject rendered HTML
   const innerContainer = document.createElement('div');
@@ -258,7 +266,9 @@ export function showAboutModal(): void {
     // Bind close button
     const closeBtn = modal.querySelector('[data-action="close"]');
     if (closeBtn) {
-      (closeBtn as HTMLElement).onclick = function() { container.remove(); };
+      (closeBtn as HTMLElement).onclick = function() {
+        container.remove(); 
+      };
     }
 
     container.appendChild(modal);

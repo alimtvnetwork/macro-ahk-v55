@@ -23,20 +23,29 @@ export function buildHeaderControls(
   copyButton.style.cssText = 'margin-left:auto;padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;font-size:10px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;';
   copyButton.textContent = '📋';
   copyButton.title = 'Copy auth diagnostics';
-  copyButton.onmouseenter = function () { copyButton.style.opacity = '1'; };
-  copyButton.onmouseleave = function () { copyButton.style.opacity = '0.7'; };
+  copyButton.onmouseenter = function () {
+    copyButton.style.opacity = '1'; 
+  };
+
+  copyButton.onmouseleave = function () {
+    copyButton.style.opacity = '0.7'; 
+  };
 
   copyButton.onclick = function (e: MouseEvent) {
     e.stopPropagation();
     const text = buildDiagnosticClipboardText(cookieVal, bridgeVal, srcVal, jwtVal, jwtDetailVal, refreshVal);
     navigator.clipboard.writeText(text).then(function () {
       copyButton.textContent = '✅';
-      setTimeout(function () { copyButton.textContent = '📋'; }, 1500);
+      setTimeout(function () {
+        copyButton.textContent = '📋'; 
+      }, 1500);
     }).catch(function (e: unknown) {
       logError('copyAuthDiag', 'Clipboard write failed', e);
       showToast('❌ Clipboard write failed', 'error');
       copyButton.textContent = '❌';
-      setTimeout(function () { copyButton.textContent = '📋'; }, 1500);
+      setTimeout(function () {
+        copyButton.textContent = '📋'; 
+      }, 1500);
     });
   };
 
@@ -70,8 +79,8 @@ function buildDiagnosticClipboardText(
     if (authDiag) {
       const bridgeTag = authDiag.bridgeOutcome === 'hit' ? '✅ bridge hit'
         : authDiag.bridgeOutcome === 'timeout' ? '⏱ bridge timeout'
-        : authDiag.bridgeOutcome === 'error' ? '❌ bridge error'
-        : 'bridge skipped';
+          : authDiag.bridgeOutcome === 'error' ? '❌ bridge error'
+            : 'bridge skipped';
       lines.push('SDK Auth: ' + authDiag.source + ' · ' + bridgeTag + ' · ' + Math.round(authDiag.durationMs) + 'ms');
     }
   } catch (e: unknown) {

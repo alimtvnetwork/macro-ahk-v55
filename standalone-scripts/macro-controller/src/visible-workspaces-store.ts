@@ -21,36 +21,38 @@ let lastRows: ReadonlyArray<WorkspaceCredit> = [];
 const listeners = new Set<Listener>();
 
 export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): void {
-    lastRows = rows;
-    for (const cb of listeners) {
-        try {
-            cb(rows);
-        } catch (_e: unknown) {
-            logError('MacroController', 'Unknown error');
-        }
+  lastRows = rows;
+  for (const cb of listeners) {
+    try {
+      cb(rows);
+    } catch (_e: unknown) {
+      logError('MacroController', 'Unknown error');
     }
+  }
 }
 
 export function subscribeVisibleWorkspaces(cb: Listener): () => void {
-    listeners.add(cb);
-    // Push the current snapshot immediately so late subscribers stay in sync.
-    if (lastRows.length > 0) {
-        try { cb(lastRows); } catch (_e: unknown) {
-            logError('MacroController', 'Unknown error');
-        }
+  listeners.add(cb);
+  // Push the current snapshot immediately so late subscribers stay in sync.
+  if (lastRows.length > 0) {
+    try {
+      cb(lastRows); 
+    } catch (_e: unknown) {
+      logError('MacroController', 'Unknown error');
     }
+  }
 
-    return function unsubscribe(): void {
-        listeners.delete(cb);
-    };
+  return function unsubscribe(): void {
+    listeners.delete(cb);
+  };
 }
 
 export function getLastVisibleWorkspaces(): ReadonlyArray<WorkspaceCredit> {
-    return lastRows;
+  return lastRows;
 }
 
 /** Test-only: reset module singleton state between tests. */
 export function __resetVisibleWorkspacesStore(): void {
-    lastRows = [];
-    listeners.clear();
+  lastRows = [];
+  listeners.clear();
 }

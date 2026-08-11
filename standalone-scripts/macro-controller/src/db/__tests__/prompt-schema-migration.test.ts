@@ -16,84 +16,84 @@ const captured: CapturedCall[] = [];
 let responsesQueue: QueuedResponse[] = [];
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
+  }),
 }));
 vi.mock('../../ui/extension-relay', () => ({
-    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
-        captured.push({ method: payload.method, sql: payload.params.sql });
+  sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+    captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
-    }),
+    return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
+  }),
 }));
 vi.mock('../../error-utils', async () => {
-    const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+  const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
 
-    return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
+  return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 vi.mock('../../seed/seed-plan-next', () => ({
-    seedPlanNextPrompts: vi.fn(async () => (new DbResult(true, undefined))),
+  seedPlanNextPrompts: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 import { initMacroDb, migratePromptReplaceColumns } from '../macro-db';
 
 beforeEach(() => {
-    captured.length = 0;
-    responsesQueue = [];
+  captured.length = 0;
+  responsesQueue = [];
 });
 
 describe('Prompt column migration', () => {
-    it('CREATE TABLE embeds ReplaceKey and ReplaceValues defaults', async () => {
-        await initMacroDb();
-        const schemaSql = captured[0].sql;
-        expect(schemaSql).toMatch(/ReplaceKey TEXT NOT NULL DEFAULT 'n'/);
-        expect(schemaSql).toMatch(/ReplaceValues TEXT NOT NULL DEFAULT '\["1","2","3","5","8"\]'/);
-    });
+  it('CREATE TABLE embeds ReplaceKey and ReplaceValues defaults', async () => {
+    await initMacroDb();
+    const schemaSql = captured[0].sql;
+    expect(schemaSql).toMatch(/ReplaceKey TEXT NOT NULL DEFAULT 'n'/);
+    expect(schemaSql).toMatch(/ReplaceValues TEXT NOT NULL DEFAULT '\["1","2","3","5","8"\]'/);
+  });
 
-    it('backfills role/default/replace columns on a legacy DB that lacks them', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true }, // schema
-            { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Slug' }] }, // PRAGMA
-            { ok: true, isFail: false, isSuccess: true }, // ALTER Role
-            { ok: true, isFail: false, isSuccess: true }, // ALTER IsDefault
-            { ok: true, isFail: false, isSuccess: true }, // ALTER ReplaceKey
-            { ok: true, isFail: false, isSuccess: true }, // ALTER ReplaceValues
-            { ok: true, isFail: false, isSuccess: true }, // CREATE index
-        ];
-        await initMacroDb();
-        const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
-        expect(alters).toHaveLength(4);
-        expect(alters[0].sql).toContain('Role');
-        expect(alters[1].sql).toContain('IsDefault');
-        expect(alters[2].sql).toContain('ReplaceKey');
-        expect(alters[3].sql).toContain('ReplaceValues');
-        expect(captured.some((entry) => entry.sql.startsWith('CREATE INDEX IF NOT EXISTS idx_prompt_role_isdefault'))).toBe(true);
-    });
+  it('backfills role/default/replace columns on a legacy DB that lacks them', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true }, // schema
+      { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Slug' }] }, // PRAGMA
+      { ok: true, isFail: false, isSuccess: true }, // ALTER Role
+      { ok: true, isFail: false, isSuccess: true }, // ALTER IsDefault
+      { ok: true, isFail: false, isSuccess: true }, // ALTER ReplaceKey
+      { ok: true, isFail: false, isSuccess: true }, // ALTER ReplaceValues
+      { ok: true, isFail: false, isSuccess: true }, // CREATE index
+    ];
+    await initMacroDb();
+    const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
+    expect(alters).toHaveLength(4);
+    expect(alters[0].sql).toContain('Role');
+    expect(alters[1].sql).toContain('IsDefault');
+    expect(alters[2].sql).toContain('ReplaceKey');
+    expect(alters[3].sql).toContain('ReplaceValues');
+    expect(captured.some((entry) => entry.sql.startsWith('CREATE INDEX IF NOT EXISTS idx_prompt_role_isdefault'))).toBe(true);
+  });
 
-    it('skips ALTER when both columns already exist (idempotent second boot)', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Role' }, { name: 'IsDefault' }, { name: 'ReplaceKey' }, { name: 'ReplaceValues' }] },
-            { ok: true, isFail: false, isSuccess: true },
-        ];
-        await migratePromptReplaceColumns();
-        const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
-        expect(alters).toHaveLength(0);
-        expect(captured.some((entry) => entry.sql.startsWith('CREATE INDEX IF NOT EXISTS idx_prompt_role_isdefault'))).toBe(true);
-    });
+  it('skips ALTER when both columns already exist (idempotent second boot)', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Role' }, { name: 'IsDefault' }, { name: 'ReplaceKey' }, { name: 'ReplaceValues' }] },
+      { ok: true, isFail: false, isSuccess: true },
+    ];
+    await migratePromptReplaceColumns();
+    const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
+    expect(alters).toHaveLength(0);
+    expect(captured.some((entry) => entry.sql.startsWith('CREATE INDEX IF NOT EXISTS idx_prompt_role_isdefault'))).toBe(true);
+  });
 
-    it('adds only the missing column when one is already present', async () => {
-        responsesQueue = [
-            { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Role' }, { name: 'IsDefault' }, { name: 'ReplaceKey' }] },
-            { ok: true, isFail: false, isSuccess: true },
-            { ok: true, isFail: false, isSuccess: true },
-        ];
-        await migratePromptReplaceColumns();
-        const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
-        expect(alters).toHaveLength(1);
-        expect(alters[0].sql).toContain('ReplaceValues');
-    });
+  it('adds only the missing column when one is already present', async () => {
+    responsesQueue = [
+      { ok: true, isFail: false, isSuccess: true, rows: [{ name: 'Id' }, { name: 'Role' }, { name: 'IsDefault' }, { name: 'ReplaceKey' }] },
+      { ok: true, isFail: false, isSuccess: true },
+      { ok: true, isFail: false, isSuccess: true },
+    ];
+    await migratePromptReplaceColumns();
+    const alters = captured.filter((entry) => entry.sql.startsWith('ALTER TABLE Prompt ADD COLUMN'));
+    expect(alters).toHaveLength(1);
+    expect(alters[0].sql).toContain('ReplaceValues');
+  });
 });

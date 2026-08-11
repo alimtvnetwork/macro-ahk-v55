@@ -38,22 +38,29 @@ export const RECORDER_SELECTION_STORAGE_KEY = "marco_recorder_selection_v1";
 let current: RecorderSelection = { StepGroupId: null, StepId: null, Source: "external" };
 
 export function getSelection(): RecorderSelection {
-    return current;
+  return current;
 }
 
 export function setSelection(next: RecorderSelection): void {
-    current = next;
-    if (typeof window === "undefined") { return; }
-    window.dispatchEvent(new CustomEvent<RecorderSelection>(EVENT_NAME, { detail: next }));
+  current = next;
+  if (typeof window === "undefined") {
+    return; 
+  }
+
+  window.dispatchEvent(new CustomEvent<RecorderSelection>(EVENT_NAME, { detail: next }));
 }
 
 export function subscribeSelection(listener: (sel: RecorderSelection) => void): () => void {
-    if (typeof window === "undefined") { return () => { /* noop */ }; }
-    const handler = (e: Event) => {
-        const detail = (e as CustomEvent<RecorderSelection>).detail;
-        listener(detail);
-    };
-    window.addEventListener(EVENT_NAME, handler);
+  if (typeof window === "undefined") {
+    return () => { /* noop */ }; 
+  }
 
-    return () => window.removeEventListener(EVENT_NAME, handler);
+  const handler = (e: Event) => {
+    const detail = (e as CustomEvent<RecorderSelection>).detail;
+    listener(detail);
+  };
+
+  window.addEventListener(EVENT_NAME, handler);
+
+  return () => window.removeEventListener(EVENT_NAME, handler);
 }

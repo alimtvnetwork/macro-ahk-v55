@@ -60,21 +60,37 @@ interface EmitInput {
 }
 
 function levelFor(outcome: PromptSeedOutcome): StepNotifyLevelType {
-  if (outcome === 'failed') return 'error';
-  if (outcome === 'skipped') return 'warning';
+  if (outcome === 'failed') {
+    return 'error';
+  }
+
+  if (outcome === 'skipped') {
+    return 'warning';
+  }
 
   return 'success';
 }
 
 function formatLine(evt: PromptSeedEvent): string {
   const parts: string[] = [];
-  if (evt.role) parts.push('role=' + evt.role);
-  if (evt.slug) parts.push('slug=' + evt.slug);
+  if (evt.role) {
+    parts.push('role=' + evt.role);
+  }
+
+  if (evt.slug) {
+    parts.push('slug=' + evt.slug);
+  }
+
   parts.push('outcome=' + evt.outcome);
   if (evt.metrics) {
-    for (const [k, v] of Object.entries(evt.metrics)) parts.push(k + '=' + String(v));
+    for (const [k, v] of Object.entries(evt.metrics)) {
+      parts.push(k + '=' + String(v));
+    }
   }
-  if (evt.detail) parts.push('detail=' + evt.detail);
+
+  if (evt.detail) {
+    parts.push('detail=' + evt.detail);
+  }
 
   return '[PromptSeed:' + evt.event + '] ' + parts.join(' ');
 }
@@ -85,7 +101,10 @@ function appendToTraceBuffer(evt: PromptSeedEvent): void {
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     const buf: PromptSeedEvent[] = Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];
     buf.push(evt);
-    while (buf.length > PROMPT_SEED_TRACE_MAX) buf.shift();
+    while (buf.length > PROMPT_SEED_TRACE_MAX) {
+      buf.shift();
+    }
+
     localStorage.setItem(StorageKeyType.PromptSeedTrace, JSON.stringify(buf));
   } catch (err) {
     logError('PromptSeedTelemetry', 'appendToTraceBuffer failed', err);
@@ -94,7 +113,10 @@ function appendToTraceBuffer(evt: PromptSeedEvent): void {
 
 function dispatchWindowEvent(evt: PromptSeedEvent): void {
   try {
-    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
+    if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') {
+      return;
+    }
+
     window.dispatchEvent(new CustomEvent('marco:prompt-seed-trace', { detail: evt }));
   } catch (err) {
     logError('PromptSeedTelemetry', 'dispatchWindowEvent failed', err);
@@ -110,15 +132,28 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
     event: input.event,
     outcome: input.outcome ?? 'ok',
   };
-  if (input.role !== undefined) evt.role = input.role;
-  if (input.slug !== undefined) evt.slug = input.slug;
-  if (input.metrics !== undefined) evt.metrics = input.metrics;
-  if (input.detail !== undefined) evt.detail = input.detail;
+  if (input.role !== undefined) {
+    evt.role = input.role;
+  }
+
+  if (input.slug !== undefined) {
+    evt.slug = input.slug;
+  }
+
+  if (input.metrics !== undefined) {
+    evt.metrics = input.metrics;
+  }
+
+  if (input.detail !== undefined) {
+    evt.detail = input.detail;
+  }
+
   try {
     log(formatLine(evt), levelFor(evt.outcome));
   } catch (err) {
     logError('PromptSeedTelemetry', 'log() emit failed', err);
   }
+
   appendToTraceBuffer(evt);
   dispatchWindowEvent(evt);
 
@@ -129,7 +164,10 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
 export function readPromptSeedTrace(): PromptSeedEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
-    if (!raw) return [];
+    if (!raw) {
+      return [];
+    }
+
     const parsed = JSON.parse(raw) as unknown;
 
     return Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];

@@ -58,22 +58,35 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
  */
 export function daysBetween(isoOrMs: string | number, nowMs?: number): number {
   const t = typeof isoOrMs === 'number' ? isoOrMs : Date.parse(isoOrMs);
-  if (!Number.isFinite(t)) return 0;
+  if (!Number.isFinite(t)) {
+    return 0;
+  }
+
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = now - t;
-  if (diffMs <= 0) return 0;
+  if (diffMs <= 0) {
+    return 0;
+  }
 
   return Math.floor(diffMs / MS_PER_DAY);
 }
 
 /** Days until a future ISO timestamp. Returns -1 when invalid or in the past. */
 export function daysUntil(iso: string, nowMs?: number): number {
-  if (!iso) return -1;
+  if (!iso) {
+    return -1;
+  }
+
   const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return -1;
+  if (!Number.isFinite(t)) {
+    return -1;
+  }
+
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = t - now;
-  if (diffMs < 0) return -1;
+  if (diffMs < 0) {
+    return -1;
+  }
 
   return Math.ceil(diffMs / MS_PER_DAY);
 }
@@ -83,9 +96,15 @@ export function daysUntil(iso: string, nowMs?: number): number {
  * Returns empty string for missing or unparseable input.
  */
 export function formatDateDDMMMYY(iso: string): string {
-  if (!iso) return '';
+  if (!iso) {
+    return '';
+  }
+
   const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return '';
+  if (!Number.isFinite(t)) {
+    return '';
+  }
+
   const d = new Date(t);
   const day = String(d.getDate()).padStart(2, '0');
   const mon = MONTH_NAMES[d.getMonth()];
@@ -96,14 +115,21 @@ export function formatDateDDMMMYY(iso: string): string {
 
 /** "3d", "2mo 1d", "1y 2mo" — shared by past/future durations. */
 export function formatDayCount(days: number): string {
-  if (days < 1) return '<1d';
-  if (days < 30) return days + 'd';
+  if (days < 1) {
+    return '<1d';
+  }
+
+  if (days < 30) {
+    return days + 'd';
+  }
+
   if (days < 365) {
     const months = Math.floor(days / 30);
     const remDays = days % 30;
 
     return remDays > 0 ? months + 'mo ' + remDays + 'd' : months + 'mo';
   }
+
   const years = Math.floor(days / 365);
   const remMonths = Math.floor((days % 365) / 30);
 
@@ -127,8 +153,13 @@ function normalizeStatus(s: string): string {
 }
 
 function pickRefillIso(ws: WorkspaceCredit): string {
-  if (ws.nextRefillAt) return ws.nextRefillAt;
-  if (ws.billingPeriodEndAt) return ws.billingPeriodEndAt;
+  if (ws.nextRefillAt) {
+    return ws.nextRefillAt;
+  }
+
+  if (ws.billingPeriodEndAt) {
+    return ws.billingPeriodEndAt;
+  }
 
   return '';
 }
@@ -191,7 +222,10 @@ function resolveRefillStatus(
   ws: WorkspaceCredit, config: WorkspaceLifecycleConfig, nowMs?: number,
 ): WorkspaceStatus | null {
   const refillIso = pickRefillIso(ws);
-  if (!refillIso) return null;
+  if (!refillIso) {
+    return null;
+  }
+
   const dToRefill = daysUntil(refillIso, nowMs);
   if (dToRefill >= 0 && dToRefill <= config.refillWarningThresholdDays) {
     return buildStatus('about-to-refill', { refillIso, daysToRefill: dToRefill });
@@ -222,13 +256,23 @@ export function getEffectiveStatus(
   // tier must never surface as Expired/Canceled — skip straight to the
   // refill/normal branches. (Issue: free-plan expiry suppression.)
   if (isMissingIsFree) {
-    if (isCanceled) return resolveCanceledStatus(changedIso, daysSinceChange, grace);
-    if (tierExpired && !isPastDue) return resolveTierExpiredStatus(changedIso, daysSinceChange, grace);
-    if (isPastDue) return resolvePastDueStatus(changedIso, daysSinceChange);
+    if (isCanceled) {
+      return resolveCanceledStatus(changedIso, daysSinceChange, grace);
+    }
+
+    if (tierExpired && !isPastDue) {
+      return resolveTierExpiredStatus(changedIso, daysSinceChange, grace);
+    }
+
+    if (isPastDue) {
+      return resolvePastDueStatus(changedIso, daysSinceChange);
+    }
   }
 
   const refillStatus = resolveRefillStatus(ws, config, nowMs);
-  if (refillStatus) return refillStatus;
+  if (refillStatus) {
+    return refillStatus;
+  }
 
   return buildStatus('normal', {});
 }
@@ -277,7 +321,9 @@ export function hasLiveGrants(ws: WorkspaceCredit): boolean {
  * Idempotent — safe to call repeatedly (already-zero values stay zero).
  */
 export function applyCanceledCreditOverride(ws: WorkspaceCredit, status: WorkspaceStatus): void {
-  if (!shouldApplyCanceledOverride(status)) return;
+  if (!shouldApplyCanceledOverride(status)) {
+    return;
+  }
 
   ws.rollover = 0;
   ws.billingAvailable = 0;

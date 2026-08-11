@@ -80,7 +80,8 @@ export function useOnboarding() {
         });
         setIsComplete(isDone);
       }
-    } catch (err) { void 0;
+    } catch (err) {
+      void 0;
       // In preview/sandbox, chrome storage can exist as a shim but never resolve.
       // Fall back to localStorage and always unblock UI.
       const isDone = localStorage.getItem(ONBOARDING_KEY) !== "false";
@@ -104,6 +105,7 @@ export function useOnboarding() {
     } else {
       localStorage.setItem(ONBOARDING_KEY, "true");
     }
+
     setIsComplete(true);
   }, []);
 
@@ -115,6 +117,7 @@ export function useOnboarding() {
     } else {
       localStorage.removeItem(ONBOARDING_KEY);
     }
+
     setIsComplete(false);
   }, []);
 
@@ -154,10 +157,12 @@ export function usePermissions() {
         if (isGranted) {
           setGranted((prev) => [...prev, origin]);
         }
+
         setLoading(false);
 
         return isGranted;
-      } catch (err) { void 0;
+      } catch (err) {
+        void 0;
         setLoading(false);
 
         return false;

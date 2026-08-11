@@ -47,16 +47,35 @@ function keyOf(issue: PromptHealthIssue): string {
 
 export function buildRepairReport(result: AutoRepairResult): RepairReportSummary {
   const before = new Map<string, PromptHealthIssue>();
-  for (const issue of result.initialReport.issues) before.set(keyOf(issue), issue);
+  for (const issue of result.initialReport.issues) {
+    before.set(keyOf(issue), issue);
+  }
+
   const after = new Map<string, PromptHealthIssue>();
-  for (const issue of result.finalReport.issues) after.set(keyOf(issue), issue);
+  for (const issue of result.finalReport.issues) {
+    after.set(keyOf(issue), issue);
+  }
 
   const fixed: PromptHealthIssue[] = [];
-  for (const [key, issue] of before) if (!after.has(key)) fixed.push(issue);
+  for (const [key, issue] of before) {
+    if (!after.has(key)) {
+      fixed.push(issue);
+    }
+  }
+
   const stillBroken: PromptHealthIssue[] = [];
-  for (const [key, issue] of after) if (before.has(key)) stillBroken.push(issue);
+  for (const [key, issue] of after) {
+    if (before.has(key)) {
+      stillBroken.push(issue);
+    }
+  }
+
   const newlyFlagged: PromptHealthIssue[] = [];
-  for (const [key, issue] of after) if (!before.has(key)) newlyFlagged.push(issue);
+  for (const [key, issue] of after) {
+    if (!before.has(key)) {
+      newlyFlagged.push(issue);
+    }
+  }
 
   const summary: RepairReportSummary = {
     fixed, stillBroken, newlyFlagged,
@@ -67,7 +86,9 @@ export function buildRepairReport(result: AutoRepairResult): RepairReportSummary
     finalCount: result.finalReport.issues.length,
     checkedAt: result.finalReport.checkedAt,
   };
-  if (result.reseedError) summary.reseedError = result.reseedError;
+  if (result.reseedError) {
+    summary.reseedError = result.reseedError;
+  }
 
   return summary;
 }
@@ -89,18 +110,33 @@ export function formatRepairReportText(report: RepairReportSummary): string {
   } else {
     lines.push('Reseed attempted: no (already healthy)');
   }
+
   lines.push('');
   lines.push('✅ Fixed / restored (' + report.fixed.length + '):');
-  if (report.fixed.length === 0) lines.push('  (none)');
-  else for (const issue of report.fixed) lines.push(formatIssueLine(issue));
+  if (report.fixed.length === 0) {
+    lines.push('  (none)');
+  } else {
+    for (const issue of report.fixed) {
+      lines.push(formatIssueLine(issue));
+    }
+  }
+
   lines.push('');
   lines.push('⚠️ Still broken (' + report.stillBroken.length + '):');
-  if (report.stillBroken.length === 0) lines.push('  (none)');
-  else for (const issue of report.stillBroken) lines.push(formatIssueLine(issue));
+  if (report.stillBroken.length === 0) {
+    lines.push('  (none)');
+  } else {
+    for (const issue of report.stillBroken) {
+      lines.push(formatIssueLine(issue));
+    }
+  }
+
   if (report.newlyFlagged.length > 0) {
     lines.push('');
     lines.push('➕ Newly flagged after repair (' + report.newlyFlagged.length + '):');
-    for (const issue of report.newlyFlagged) lines.push(formatIssueLine(issue));
+    for (const issue of report.newlyFlagged) {
+      lines.push(formatIssueLine(issue));
+    }
   }
 
   return lines.join('\n');
@@ -108,10 +144,13 @@ export function formatRepairReportText(report: RepairReportSummary): string {
 
 export function stashRepairReport(report: RepairReportSummary): void {
   try {
-    if (typeof window !== 'undefined') window.__marcoLastRepairReport = report;
+    if (typeof window !== 'undefined') {
+      window.__marcoLastRepairReport = report;
+    }
   } catch (err) {
     logError('MacroController', 'Unknown error');
   }
+
   const text = formatRepairReportText(report);
   if (report.reseedAttempted && !report.reseedOk) {
     logDiagnosticFromCode('REPAIR_RESEED_E001', {
@@ -119,6 +158,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
       reason: report.reseedError ?? 'unknown',
     });
   }
+
   if (!report.isHealthy) {
     logDiagnosticFromCode('REPAIR_RESIDUAL_E001', {
       finalCount: report.finalCount,
@@ -127,6 +167,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
       newlyFlaggedCount: report.newlyFlagged.length,
     });
   }
+
   log('[RepairReport]\n' + text, report.isHealthy ? 'success' : 'info');
 }
 
@@ -137,7 +178,9 @@ export function stashRepairReport(report: RepairReportSummary): void {
  */
 // eslint-disable-next-line max-lines-per-function -- self-contained modal builder; splitting fragments DOM lifecycle
 export function showRepairReportModal(report: RepairReportSummary): HTMLElement | null {
-  if (typeof document === 'undefined' || !document.body) return null;
+  if (typeof document === 'undefined' || !document.body) {
+    return null;
+  }
 
   const backdrop = document.createElement('div');
   backdrop.dataset.role = 'repair-report-backdrop';
@@ -206,11 +249,27 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
   backdrop.appendChild(modal);
   document.body.appendChild(backdrop);
 
-  const dismiss = (): void => { if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop); document.removeEventListener('keydown', onKey); };
-  const onKey = (event: KeyboardEvent): void => { if (event.key === 'Escape') dismiss(); };
+  const dismiss = (): void => {
+    if (backdrop.parentNode) {
+      backdrop.parentNode.removeChild(backdrop);
+    }
+
+    document.removeEventListener('keydown', onKey); 
+  };
+
+  const onKey = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') {
+      dismiss();
+    } 
+  };
+
   closeBtn.addEventListener('click', dismiss);
   doneBtn.addEventListener('click', dismiss);
-  backdrop.addEventListener('click', (event) => { if (event.target === backdrop) dismiss(); });
+  backdrop.addEventListener('click', (event) => {
+    if (event.target === backdrop) {
+      dismiss();
+    } 
+  });
   document.addEventListener('keydown', onKey);
 
   return backdrop;
@@ -231,6 +290,7 @@ function renderIssueList(heading: string, issues: PromptHealthIssue[], accent: s
 
     return wrap;
   }
+
   const list = document.createElement('ul');
   list.style.cssText = 'margin:0;padding-left:20px;font-size:12px;line-height:1.55;';
   for (const issue of issues) {
@@ -242,6 +302,7 @@ function renderIssueList(heading: string, issues: PromptHealthIssue[], accent: s
     li.append('[' + issue.role + '] ' + issue.slug + ' ', badge, document.createTextNode(issue.detail));
     list.appendChild(li);
   }
+
   wrap.appendChild(list);
 
   return wrap;

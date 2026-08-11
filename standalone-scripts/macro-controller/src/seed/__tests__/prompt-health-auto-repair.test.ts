@@ -16,30 +16,32 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 const toastCalls: Array<{ message: string; level?: string }> = [];
 vi.mock('../../toast', () => ({
-    showToast: vi.fn((message: string, level?: string) => { toastCalls.push({ message, level }); }),
+  showToast: vi.fn((message: string, level?: string) => {
+    toastCalls.push({ message, level }); 
+  }),
 }));
 vi.mock('../../error-utils', async () => {
-    const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+  const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
 
-    return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
+  return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 
 let responsesQueue: unknown[] = [];
 vi.mock('../../db/extension-bridge', () => ({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
+  sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
+  sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 
 const reseedCalls: Array<{ force?: boolean }> = [];
 let reseedResult: { ok: boolean; error?: string; mode: ReseedModeType } = { ok: true, isFail: false, isSuccess: true, mode: 'idempotent' };
 vi.mock('../reseed-command', () => ({
-    reseedPromptsOnDemand: vi.fn(async (opts?: { force?: boolean }) => {
-        reseedCalls.push({ force: opts?.force });
+  reseedPromptsOnDemand: vi.fn(async (opts?: { force?: boolean }) => {
+    reseedCalls.push({ force: opts?.force });
 
-        return reseedResult;
-    }),
+    return reseedResult;
+  }),
 }));
 
 import { runPromptHealthCheckWithAutoRepair } from '../prompt-health-auto-repair';
@@ -52,78 +54,81 @@ interface Row {
     CreatedAt: number; UpdatedAt: number;
 }
 function healthyRow(role: PromptRowRoleType, overrides: Partial<Row> = {}): Row {
-    const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
-    if (!seed) throw new Error('seed row missing');
+  const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
+  if (!seed) {
+    throw new Error('seed row missing');
+  }
 
-    return {
-        Id: role === 'plan' ? 1 : 2, Slug: seed.slug, Name: seed.name, Body: seed.body,
-        Role: role, IsDefault: 1, ReplaceKey: '{{n}}',
-        ReplaceValues: JSON.stringify(['5', '10']), CreatedAt: 1, UpdatedAt: 1,
-        ...overrides,
-    };
+  return {
+    Id: role === 'plan' ? 1 : 2, Slug: seed.slug, Name: seed.name, Body: seed.body,
+    Role: role, IsDefault: 1, ReplaceKey: '{{n}}',
+    ReplaceValues: JSON.stringify(['5', '10']), CreatedAt: 1, UpdatedAt: 1,
+    ...overrides,
+  };
 }
+
 const ok = (row: Row): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [row] });
 const empty = (): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [] });
 
 beforeEach(() => {
-    toastCalls.length = 0;
-    responsesQueue = [];
-    reseedCalls.length = 0;
-    reseedResult = { ok: true, isFail: false, isSuccess: true, mode: 'idempotent' };
+  toastCalls.length = 0;
+  responsesQueue = [];
+  reseedCalls.length = 0;
+  reseedResult = { ok: true, isFail: false, isSuccess: true, mode: 'idempotent' };
 });
 
 describe('runPromptHealthCheckWithAutoRepair', () => {
-    it('AR1: healthy on first probe skips reseed and stays quiet', async () => {
-        responsesQueue = [ok(healthyRow('plan')), ok(healthyRow('next'))];
-        const result = await runPromptHealthCheckWithAutoRepair();
-        expect(result.isHealthy).toBe(true);
-        expect(result.repairAttempted).toBe(false);
-        expect(reseedCalls.length).toBe(0);
-        expect(toastCalls).toEqual([]);
-    });
+  it('AR1: healthy on first probe skips reseed and stays quiet', async () => {
+    responsesQueue = [ok(healthyRow('plan')), ok(healthyRow('next'))];
+    const result = await runPromptHealthCheckWithAutoRepair();
+    expect(result.isHealthy).toBe(true);
+    expect(result.repairAttempted).toBe(false);
+    expect(reseedCalls.length).toBe(0);
+    expect(toastCalls).toEqual([]);
+  });
 
-    it('AR2: unhealthy -> reseed -> healthy: green success toast, no red toast', async () => {
-        responsesQueue = [
-            // First (silent) probe: plan missing
-            empty(), ok(healthyRow('next')),
-            // Second (loud) probe: both healthy
-            ok(healthyRow('plan')), ok(healthyRow('next')),
-        ];
-        const result = await runPromptHealthCheckWithAutoRepair();
-        expect(result.repairAttempted).toBe(true);
-        expect(result.reseedOk).toBe(true);
-        expect(result.isHealthy).toBe(true);
-        expect(reseedCalls.length).toBe(1);
-        // Force mode must NEVER be auto-invoked.
-        expect(reseedCalls[0]?.force).toBeUndefined();
-        expect(toastCalls.some(t => t.level === 'success')).toBe(true);
-        expect(toastCalls.some(t => t.level === 'error')).toBe(false);
-    });
+  it('AR2: unhealthy -> reseed -> healthy: green success toast, no red toast', async () => {
+    responsesQueue = [
+      // First (silent) probe: plan missing
+      empty(), ok(healthyRow('next')),
+      // Second (loud) probe: both healthy
+      ok(healthyRow('plan')), ok(healthyRow('next')),
+    ];
+    const result = await runPromptHealthCheckWithAutoRepair();
+    expect(result.repairAttempted).toBe(true);
+    expect(result.reseedOk).toBe(true);
+    expect(result.isHealthy).toBe(true);
+    expect(reseedCalls.length).toBe(1);
+    // Force mode must NEVER be auto-invoked.
+    expect(reseedCalls[0]?.force).toBeUndefined();
+    expect(toastCalls.some(t => t.level === 'success')).toBe(true);
+    expect(toastCalls.some(t => t.level === 'error')).toBe(false);
+  });
 
-    it('AR3: unhealthy -> reseed fails: loud second probe raises red toast', async () => {
-        reseedResult = new DbResult(false, undefined, 'db offline', { mode: 'idempotent' });
-        responsesQueue = [
-            empty(), ok(healthyRow('next')),
-            empty(), ok(healthyRow('next')),
-        ];
-        const result = await runPromptHealthCheckWithAutoRepair();
-        expect(result.repairAttempted).toBe(true);
-        expect(result.reseedOk).toBe(false);
-        expect(result.reseedError).toBe('db offline');
-        expect(result.isHealthy).toBe(false);
-        expect(toastCalls.some(t => t.level === 'error')).toBe(true);
-    });
+  it('AR3: unhealthy -> reseed fails: loud second probe raises red toast', async () => {
+    reseedResult = new DbResult(false, undefined, 'db offline', { mode: 'idempotent' });
+    responsesQueue = [
+      empty(), ok(healthyRow('next')),
+      empty(), ok(healthyRow('next')),
+    ];
+    const result = await runPromptHealthCheckWithAutoRepair();
+    expect(result.repairAttempted).toBe(true);
+    expect(result.reseedOk).toBe(false);
+    expect(result.reseedError).toBe('db offline');
+    expect(result.isHealthy).toBe(false);
+    expect(toastCalls.some(t => t.level === 'error')).toBe(true);
+  });
 
-    it('AR4: unhealthy -> reseed ok but issues remain: red toast + no force', async () => {
-        responsesQueue = [
-            ok(healthyRow('plan', { IsDefault: 0 })), ok(healthyRow('next')),
-            ok(healthyRow('plan', { IsDefault: 0 })), ok(healthyRow('next')),
-        ];
-        const result = await runPromptHealthCheckWithAutoRepair();
-        expect(result.reseedOk).toBe(true);
-        expect(result.isHealthy).toBe(false);
-        expect(reseedCalls.length).toBe(1);
-        expect(reseedCalls[0]?.force).toBeUndefined();
-        expect(toastCalls.some(t => t.level === 'error')).toBe(true);
-    });
+  it('AR4: unhealthy -> reseed ok but issues remain: red toast + no force', async () => {
+    responsesQueue = [
+      ok(healthyRow('plan', { IsDefault: 0 })), ok(healthyRow('next')),
+      ok(healthyRow('plan', { IsDefault: 0 })), ok(healthyRow('next')),
+    ];
+    const result = await runPromptHealthCheckWithAutoRepair();
+    expect(result.reseedOk).toBe(true);
+    expect(result.isHealthy).toBe(false);
+    expect(reseedCalls.length).toBe(1);
+    expect(reseedCalls[0]?.force).toBeUndefined();
+    expect(toastCalls.some(t => t.level === 'error')).toBe(true);
+  });
 });

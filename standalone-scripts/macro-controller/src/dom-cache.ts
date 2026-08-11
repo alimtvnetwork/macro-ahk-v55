@@ -36,7 +36,9 @@ class DomCache {
 
   /** Get a single node by XPath, using cache if fresh */
   getByXPath(xpath: string): Node | null {
-    if (!xpath) return null;
+    if (!xpath) {
+      return null;
+    }
 
     const cached = this._cache.get(xpath);
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
@@ -46,6 +48,7 @@ class DomCache {
 
         return cached.element;
       }
+
       // Element was removed from DOM — invalidate this entry
       this._cache.delete(xpath);
     }
@@ -65,7 +68,9 @@ class DomCache {
 
   /** Get all nodes by XPath, using cache if fresh */
   getAllByXPath(xpath: string): Node[] {
-    if (!xpath) return [];
+    if (!xpath) {
+      return [];
+    }
 
     const cached = this._cacheMulti.get(xpath);
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
@@ -86,6 +91,7 @@ class DomCache {
           nodes.push(node);
         }
       }
+
       this._cacheMulti.set(xpath, { elements: nodes, timestamp: Date.now() });
 
       return nodes;
@@ -106,6 +112,7 @@ class DomCache {
 
         return cached.element as Element | null;
       }
+
       this._cache.delete(key);
     }
 
@@ -126,6 +133,7 @@ class DomCache {
 
         return cached.element as HTMLElement | null;
       }
+
       this._cache.delete(key);
     }
 

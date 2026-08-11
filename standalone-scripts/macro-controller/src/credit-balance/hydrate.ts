@@ -32,36 +32,38 @@ let hydratePromise: Promise<ReadonlyArray<CreditBalanceCacheRow>> | null = null;
  * Memoised — concurrent callers share one underlying load.
  */
 export function hydrateCreditBalanceFromCache(): Promise<ReadonlyArray<CreditBalanceCacheRow>> {
-    if (hydratePromise) {
-        return hydratePromise;
-    }
-    hydratePromise = (async function (): Promise<ReadonlyArray<CreditBalanceCacheRow>> {
-        try {
-            const rows = await listCreditBalanceCache();
-            for (const row of rows) {
-                seedLastFetched(row.WorkspaceId, row.FetchedAtMs);
-            }
-            log(
-                'CreditBalance.hydrate: seeded ' + rows.length + ' workspace(s) from SQLite',
-                'info',
-            );
-
-            return rows;
-        } catch (caught: unknown) {
-            logError(
-                'CreditBalance.hydrate',
-                'failed to hydrate credit-balance cache from marco.kv',
-                caught,
-            );
-
-            return [];
-        }
-    })();
-
+  if (hydratePromise) {
     return hydratePromise;
+  }
+
+  hydratePromise = (async function (): Promise<ReadonlyArray<CreditBalanceCacheRow>> {
+    try {
+      const rows = await listCreditBalanceCache();
+      for (const row of rows) {
+        seedLastFetched(row.WorkspaceId, row.FetchedAtMs);
+      }
+
+      log(
+        'CreditBalance.hydrate: seeded ' + rows.length + ' workspace(s) from SQLite',
+        'info',
+      );
+
+      return rows;
+    } catch (caught: unknown) {
+      logError(
+        'CreditBalance.hydrate',
+        'failed to hydrate credit-balance cache from marco.kv',
+        caught,
+      );
+
+      return [];
+    }
+  })();
+
+  return hydratePromise;
 }
 
 /** Test-only reset of the memoised promise. */
 export function __resetHydrateForTests(): void {
-    hydratePromise = null;
+  hydratePromise = null;
 }

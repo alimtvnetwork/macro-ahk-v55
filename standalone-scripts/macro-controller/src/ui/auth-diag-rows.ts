@@ -139,11 +139,13 @@ function _getBridgeErrorHelp(error: string): string {
       'The token is still available from localStorage. ' +
       'The bridge will reconnect automatically on the next action, or refresh the page (F5).';
   }
+
   if (lower.includes('receiving end does not exist')) {
     return 'Normal MV3 behavior — the background service worker is currently suspended. ' +
       'This happens automatically after ~30s of inactivity. ' +
       'The bridge will reconnect on the next action, or open the extension popup to wake it.';
   }
+
   if (lower.includes('could not establish connection')) {
     return 'Chrome could not reach the extension. It may be disabled, uninstalled, or crashed. ' +
       'Fix: Check chrome://extensions to verify the extension is enabled and reload it.';
@@ -169,8 +171,13 @@ function _appendHelpIcon(diagRow: DiagRowElements, helpText: string): void {
   tooltip.textContent = helpText;
 
   helpIcon.appendChild(tooltip);
-  helpIcon.onmouseover = function() { tooltip.style.display = 'block'; helpIcon.style.opacity = '1'; };
-  helpIcon.onmouseout = function() { tooltip.style.display = 'none'; helpIcon.style.opacity = '0.7'; };
+  helpIcon.onmouseover = function() {
+    tooltip.style.display = 'block'; helpIcon.style.opacity = '1'; 
+  };
+
+  helpIcon.onmouseout = function() {
+    tooltip.style.display = 'none'; helpIcon.style.opacity = '0.7'; 
+  };
 
   diagRow.row.appendChild(helpIcon);
 }
@@ -178,7 +185,9 @@ function _appendHelpIcon(diagRow: DiagRowElements, helpText: string): void {
 /** Remove existing help icon from a row. */
 function _removeHelpIcon(diagRow: DiagRowElements): void {
   const existing = diagRow.row.querySelector('[data-help-icon]');
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 }
 
 export function updateSourceRow(deps: AuthDiagDeps, srcRow: DiagRowElements, headerBadge: HTMLElement): void {
@@ -306,8 +315,13 @@ function buildRefreshButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLButto
   const button = document.createElement('button');
   button.style.cssText = 'padding:2px 8px;background:#1e3a5f;color:' + cPrimaryLighter + ';border:1px solid #2563eb;border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
   button.textContent = '🔄 Force Refresh Token';
-  button.onmouseenter = function () { button.style.background = '#2563eb'; };
-  button.onmouseleave = function () { button.style.background = '#1e3a5f'; };
+  button.onmouseenter = function () {
+    button.style.background = '#2563eb'; 
+  };
+
+  button.onmouseleave = function () {
+    button.style.background = '#1e3a5f'; 
+  };
 
   button.onclick = function () {
     button.disabled = true;
@@ -330,8 +344,13 @@ function buildReadCookieButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLBu
   button.style.cssText = 'padding:2px 8px;background:#1e3a5f;color:' + cPrimaryLighter + ';border:1px solid #2563eb;border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
   button.textContent = '🍪 Read Cookie';
   button.title = 'Read session token from extension bridge and save to localStorage';
-  button.onmouseenter = function () { button.style.background = '#2563eb'; };
-  button.onmouseleave = function () { button.style.background = '#1e3a5f'; };
+  button.onmouseenter = function () {
+    button.style.background = '#2563eb'; 
+  };
+
+  button.onmouseleave = function () {
+    button.style.background = '#1e3a5f'; 
+  };
 
   button.onclick = function () {
     button.disabled = true;
@@ -342,7 +361,9 @@ function buildReadCookieButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLBu
       onUpdate();
       button.disabled = false;
       button.textContent = hasToken ? '✅ Read Cookie' : '❌ Read Cookie';
-      setTimeout(function () { button.textContent = '🍪 Read Cookie'; }, Timings.TIMEOUT_NORMAL);
+      setTimeout(function () {
+        button.textContent = '🍪 Read Cookie'; 
+      }, Timings.TIMEOUT_NORMAL);
     });
   };
 

@@ -17,58 +17,61 @@ import { buildPromptsBundle } from './prompt-bundle-types';
 import type { PromptEntry } from '../types/ui-types';
 
 const SAMPLE_ENTRIES: readonly PromptEntry[] = [
-    {
-        name: 'Sample PlanTierType prompt',
-        text: 'Rewrite the plan into {{n}} concise bullet points that preserve intent.',
-        category: 'plan',
-        slug: 'sample-plan',
-        role: 'plan',
-        isFavorite: false,
-        isDefault: false,
-    },
-    {
-        name: 'Sample Next prompt',
-        text: 'Return the next {{n}} actionable steps as a numbered list.',
-        category: 'next',
-        slug: 'sample-next',
-        role: 'next',
-        isFavorite: false,
-        isDefault: false,
-    },
-    {
-        name: 'Sample Generic prompt',
-        text: 'Freeform prompt body. Generic role has no required tokens.',
-        category: 'generic',
-        slug: 'sample-generic',
-        role: 'generic',
-        isFavorite: false,
-        isDefault: false,
-    },
+  {
+    name: 'Sample PlanTierType prompt',
+    text: 'Rewrite the plan into {{n}} concise bullet points that preserve intent.',
+    category: 'plan',
+    slug: 'sample-plan',
+    role: 'plan',
+    isFavorite: false,
+    isDefault: false,
+  },
+  {
+    name: 'Sample Next prompt',
+    text: 'Return the next {{n}} actionable steps as a numbered list.',
+    category: 'next',
+    slug: 'sample-next',
+    role: 'next',
+    isFavorite: false,
+    isDefault: false,
+  },
+  {
+    name: 'Sample Generic prompt',
+    text: 'Freeform prompt body. Generic role has no required tokens.',
+    category: 'generic',
+    slug: 'sample-generic',
+    role: 'generic',
+    isFavorite: false,
+    isDefault: false,
+  },
 ];
 
 export function buildSamplePromptsJson(_nowIso?: string): string {
-    const bundle = buildPromptsBundle([...SAMPLE_ENTRIES], VERSION, { format: 'json' });
+  const bundle = buildPromptsBundle([...SAMPLE_ENTRIES], VERSION, { format: 'json' });
 
-    return JSON.stringify(bundle, null, 2);
+  return JSON.stringify(bundle, null, 2);
 }
 
 export function downloadSamplePromptsJson(): void {
-    try {
-        const data = buildSamplePromptsJson();
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'prompts-sample.json';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            if (a.parentNode) a.parentNode.removeChild(a);
-            URL.revokeObjectURL(url);
-        }, Timings.POLL_INTERVAL_FAST);
-        showToast('Downloaded prompts-sample.json', 'success');
-    } catch (err) {
-        log('[PromptLibrary] Sample JSON download failed: ' + String(err), 'error');
-        showToast('Sample download failed', 'error');
-    }
+  try {
+    const data = buildSamplePromptsJson();
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'prompts-sample.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
+
+      URL.revokeObjectURL(url);
+    }, Timings.POLL_INTERVAL_FAST);
+    showToast('Downloaded prompts-sample.json', 'success');
+  } catch (err) {
+    log('[PromptLibrary] Sample JSON download failed: ' + String(err), 'error');
+    showToast('Sample download failed', 'error');
+  }
 }

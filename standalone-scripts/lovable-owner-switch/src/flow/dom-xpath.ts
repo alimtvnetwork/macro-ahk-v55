@@ -9,24 +9,24 @@
 const XPATH_RESULT_FIRST_ORDERED = 9;
 
 export const queryByXPath = (xpath: string, root: Document = document): Element | null => {
-    const result = root.evaluate(xpath, root, null, XPATH_RESULT_FIRST_ORDERED, null);
-    const node = result.singleNodeValue;
+  const result = root.evaluate(xpath, root, null, XPATH_RESULT_FIRST_ORDERED, null);
+  const node = result.singleNodeValue;
 
-    if (node === null) {
-        return null;
-    }
+  if (node === null) {
+    return null;
+  }
 
-    return node instanceof Element ? node : null;
+  return node instanceof Element ? node : null;
 };
 
 export const queryInputByXPath = (xpath: string, root: Document = document): HTMLInputElement | null => {
-    const el = queryByXPath(xpath, root);
+  const el = queryByXPath(xpath, root);
 
-    return el instanceof HTMLInputElement ? el : null;
+  return el instanceof HTMLInputElement ? el : null;
 };
 
 export const queryButtonByXPath = (xpath: string, root: Document = document): HTMLButtonElement | null => {
-    const el = queryByXPath(xpath, root);
+  const el = queryByXPath(xpath, root);
 
-    return el instanceof HTMLButtonElement ? el : null;
+  return el instanceof HTMLButtonElement ? el : null;
 };

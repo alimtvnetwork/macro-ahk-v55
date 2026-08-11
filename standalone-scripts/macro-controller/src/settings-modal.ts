@@ -109,39 +109,39 @@ function buildHtml(state: ModalState): string {
     +     'Overrides persist in chrome.storage.local across reloads.'
     +   '</div>'
     +   buildField({
-          label: 'Expiry Grace Period (days)',
-          help: 'Days after subscription_status_changed_at before Expired escalates to Fully Expired.',
-          valueEl: inputHtml('grace', state.graceInput, submittingDisabled),
-          effective: config.expiryGracePeriodDays,
-          jsonValue: readJsonConfigValue('expiryGracePeriodDays'),
-          defaultValue: DEFAULT_EXPIRY_GRACE_PERIOD_DAYS,
-        })
+      label: 'Expiry Grace Period (days)',
+      help: 'Days after subscription_status_changed_at before Expired escalates to Fully Expired.',
+      valueEl: inputHtml('grace', state.graceInput, submittingDisabled),
+      effective: config.expiryGracePeriodDays,
+      jsonValue: readJsonConfigValue('expiryGracePeriodDays'),
+      defaultValue: DEFAULT_EXPIRY_GRACE_PERIOD_DAYS,
+    })
     +   buildField({
-          label: 'Refill Warning Threshold (days)',
-          help: 'Days before refill date to start showing the About To Refill pill.',
-          valueEl: inputHtml('refill', state.refillInput, submittingDisabled),
-          effective: config.refillWarningThresholdDays,
-          jsonValue: readJsonConfigValue('refillWarningThresholdDays'),
-          defaultValue: DEFAULT_REFILL_WARNING_THRESHOLD_DAYS,
-        })
+      label: 'Refill Warning Threshold (days)',
+      help: 'Days before refill date to start showing the About To Refill pill.',
+      valueEl: inputHtml('refill', state.refillInput, submittingDisabled),
+      effective: config.refillWarningThresholdDays,
+      jsonValue: readJsonConfigValue('refillWarningThresholdDays'),
+      defaultValue: DEFAULT_REFILL_WARNING_THRESHOLD_DAYS,
+    })
     +   buildField({
-          label: 'Pro_0 Credit-Balance Cache TTL (minutes)',
-          help: 'How long to cache /credit-balance results in IndexedDB before refetching for pro_0 plan workspaces.',
-          valueEl: inputHtml('proZeroTtl', state.proZeroTtlInput, submittingDisabled),
-          effective: getProZeroCacheTtlMinutes(),
-          jsonValue: undefined,
-          defaultValue: PRO_ZERO_CACHE_TTL_DEFAULT_MIN,
-        })
+      label: 'Pro_0 Credit-Balance Cache TTL (minutes)',
+      help: 'How long to cache /credit-balance results in IndexedDB before refetching for pro_0 plan workspaces.',
+      valueEl: inputHtml('proZeroTtl', state.proZeroTtlInput, submittingDisabled),
+      effective: getProZeroCacheTtlMinutes(),
+      jsonValue: undefined,
+      defaultValue: PRO_ZERO_CACHE_TTL_DEFAULT_MIN,
+    })
     +   buildField({
-          label: 'Projects Cache TTL (hours)',
-          help: 'How long the Projects modal keeps each workspace’s project list in SQLite before refetching. Refresh button always bypasses this.',
-          valueEl: inputHtml('projectsCacheTtl', state.projectsCacheTtlInput, submittingDisabled),
-          effective: typeof getSettingsOverrides().projectsCacheTtlHours === 'number'
-            ? (getSettingsOverrides().projectsCacheTtlHours as number)
-            : DEFAULT_PROJECTS_CACHE_TTL_HOURS,
-          jsonValue: undefined,
-          defaultValue: DEFAULT_PROJECTS_CACHE_TTL_HOURS,
-        })
+      label: 'Projects Cache TTL (hours)',
+      help: 'How long the Projects modal keeps each workspace’s project list in SQLite before refetching. Refresh button always bypasses this.',
+      valueEl: inputHtml('projectsCacheTtl', state.projectsCacheTtlInput, submittingDisabled),
+      effective: typeof getSettingsOverrides().projectsCacheTtlHours === 'number'
+        ? (getSettingsOverrides().projectsCacheTtlHours as number)
+        : DEFAULT_PROJECTS_CACHE_TTL_HOURS,
+      jsonValue: undefined,
+      defaultValue: DEFAULT_PROJECTS_CACHE_TTL_HOURS,
+    })
     +   errorHtml
     + '</div>'
     + '<div style="padding:10px 14px;border-top:1px solid ' + cPanelBorder + ';display:flex;justify-content:space-between;gap:8px;background:rgba(0,0,0,0.20);">'
@@ -162,7 +162,10 @@ function buildHtml(state: ModalState): string {
 
 function ensureBackdrop(): HTMLDivElement {
   let bd = document.getElementById(BACKDROP_ID) as HTMLDivElement | null;
-  if (bd) return bd;
+  if (bd) {
+    return bd;
+  }
+
   bd = document.createElement('div');
   bd.id = BACKDROP_ID;
   bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:' + (Z_INDEX - 1) + ';display:none;';
@@ -173,7 +176,10 @@ function ensureBackdrop(): HTMLDivElement {
 
 function ensureModalEl(): HTMLDivElement {
   let el = document.getElementById(MODAL_ID) as HTMLDivElement | null;
-  if (el) return el;
+  if (el) {
+    return el;
+  }
+
   el = document.createElement('div');
   el.id = MODAL_ID;
   el.style.cssText = [
@@ -194,7 +200,10 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
-  if (!el) return;
+  if (!el) {
+    return;
+  }
+
   const store = el as HTMLElement & ModalHandlerStore;
   if (store._marcoSettingsKey) {
     document.removeEventListener('keydown', store._marcoSettingsKey, true);
@@ -207,8 +216,13 @@ export function hideSettingsModal(): void {
   detachKeyHandler();
   const el = document.getElementById(MODAL_ID);
   const bd = document.getElementById(BACKDROP_ID);
-  if (el) el.style.display = 'none';
-  if (bd) bd.style.display = 'none';
+  if (el) {
+    el.style.display = 'none';
+  }
+
+  if (bd) {
+    bd.style.display = 'none';
+  }
 }
 
 /**
@@ -217,7 +231,10 @@ export function hideSettingsModal(): void {
  */
 function parseInput(raw: string, label: string): number | undefined {
   const trimmed = raw.trim();
-  if (trimmed === '') return undefined;
+  if (trimmed === '') {
+    return undefined;
+  }
+
   const n = Number(trimmed);
   if (!Number.isFinite(n) || n < 0) {
     throwDiagnostic('SETTINGS_VALIDATE_E001', { fieldLabel: label, rawValue: raw });
@@ -248,10 +265,21 @@ export function showSettingsModal(): void {
     const r = el.querySelector<HTMLInputElement>('[data-marco-el="refill"]');
     const p = el.querySelector<HTMLInputElement>('[data-marco-el="proZeroTtl"]');
     const pc = el.querySelector<HTMLInputElement>('[data-marco-el="projectsCacheTtl"]');
-    if (g) state.graceInput = g.value;
-    if (r) state.refillInput = r.value;
-    if (p) state.proZeroTtlInput = p.value;
-    if (pc) state.projectsCacheTtlInput = pc.value;
+    if (g) {
+      state.graceInput = g.value;
+    }
+
+    if (r) {
+      state.refillInput = r.value;
+    }
+
+    if (p) {
+      state.proZeroTtlInput = p.value;
+    }
+
+    if (pc) {
+      state.projectsCacheTtlInput = pc.value;
+    }
   }
 
   function rerender(): void {
@@ -262,17 +290,33 @@ export function showSettingsModal(): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
-      if (!t) return;
+      if (!t) {
+        return;
+      }
+
       const action = t.getAttribute('data-marco-action');
-      if (!action) return;
+      if (!action) {
+        return;
+      }
+
       e.stopPropagation();
-      if (state.submitting) return;
-      if (action === 'close' || action === 'cancel') hideSettingsModal();
-      else if (action === 'submit') { snapshotInputs(); void doSubmit(); }
-      else if (action === 'reset') void doReset();
+      if (state.submitting) {
+        return;
+      }
+
+      if (action === 'close' || action === 'cancel') {
+        hideSettingsModal();
+      } else if (action === 'submit') {
+        snapshotInputs(); void doSubmit(); 
+      } else if (action === 'reset') {
+        void doReset();
+      }
     };
+
     bd.onclick = function (): void {
-      if (!state.submitting) hideSettingsModal();
+      if (!state.submitting) {
+        hideSettingsModal();
+      }
     };
   }
 
@@ -291,6 +335,7 @@ export function showSettingsModal(): void {
 
       return;
     }
+
     state = { ...state, submitting: true, error: '' };
     rerender();
     try {
@@ -327,13 +372,20 @@ export function showSettingsModal(): void {
 
   detachKeyHandler();
   const onKey = function (e: KeyboardEvent): void {
-    if (e.key === 'Escape' && !state.submitting) hideSettingsModal();
+    if (e.key === 'Escape' && !state.submitting) {
+      hideSettingsModal();
+    }
   };
+
   (el as HTMLElement & ModalHandlerStore)._marcoSettingsKey = onKey;
-  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, EVENT_LISTENER_DELAY_MS);
+  setTimeout(function () {
+    document.addEventListener('keydown', onKey, true); 
+  }, EVENT_LISTENER_DELAY_MS);
 
   setTimeout(function () {
     const gi = el.querySelector<HTMLInputElement>('[data-marco-el="grace"]');
-    if (gi) gi.focus();
+    if (gi) {
+      gi.focus();
+    }
   }, 30);
 }

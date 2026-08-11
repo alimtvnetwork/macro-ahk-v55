@@ -20,9 +20,9 @@ export interface TaskStatusSeed {
 }
 
 export const TASK_STATUS_SEEDS: ReadonlyArray<TaskStatusSeed> = Object.freeze([
-    { Code: OwnerSwitchTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
-    { Code: OwnerSwitchTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
-    { Code: OwnerSwitchTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
-    { Code: OwnerSwitchTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
-    { Code: OwnerSwitchTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
+  { Code: OwnerSwitchTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
+  { Code: OwnerSwitchTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
+  { Code: OwnerSwitchTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
+  { Code: OwnerSwitchTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
+  { Code: OwnerSwitchTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
 ]);

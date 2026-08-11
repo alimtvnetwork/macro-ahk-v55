@@ -45,54 +45,54 @@ interface ReasonTemplate {
 }
 
 const TEMPLATES: Record<Reason, ReasonTemplate> = {
-    EmptySelection: {
-        Title: "No groups selected",
-        Summary:
+  EmptySelection: {
+    Title: "No groups selected",
+    Summary:
             "An export needs at least one ticked StepGroup, but the selection was empty when the bundle was requested.",
-        Suggestion:
+    Suggestion:
             "Tick one or more groups in the tree on the left, then try Export again.",
-        Severity: "Selection",
-    },
-    ProjectNotFound: {
-        Title: "Source project no longer exists",
-        Summary:
+    Severity: "Selection",
+  },
+  ProjectNotFound: {
+    Title: "Source project no longer exists",
+    Summary:
             "The project the selected groups belong to disappeared from the library mid-export — most often because it was deleted in another window or tab.",
-        Suggestion:
+    Suggestion:
             "Reload the page, switch to a project that still exists, then re-tick the groups you want to export.",
-        Severity: "Selection",
-    },
-    GroupNotFound: {
-        Title: "Selected groups no longer exist",
-        Summary:
+    Severity: "Selection",
+  },
+  GroupNotFound: {
+    Title: "Selected groups no longer exist",
+    Summary:
             "One or more StepGroups in the selection are not present in the source project anymore. They may have been deleted or moved between tick and export.",
-        Suggestion:
+    Suggestion:
             "Reload the library, re-tick the groups you want, then export again. The IDs that disappeared are listed under Technical detail.",
-        Severity: "Selection",
-    },
-    GroupOutsideProject: {
-        Title: "Selected group belongs to a different project",
-        Summary:
+    Severity: "Selection",
+  },
+  GroupOutsideProject: {
+    Title: "Selected group belongs to a different project",
+    Summary:
             "At least one ticked StepGroup lives under a project other than the one being exported. A bundle can only carry groups from a single project.",
-        Suggestion:
+    Suggestion:
             "Untick the cross-project IDs (shown under Technical detail), or switch to the project that actually owns them and start the export from there.",
-        Severity: "Selection",
-    },
-    RunGroupTargetMissing: {
-        Title: "RunGroup steps point outside the selection",
-        Summary:
+    Severity: "Selection",
+  },
+  RunGroupTargetMissing: {
+    Title: "RunGroup steps point outside the selection",
+    Summary:
             "The selection contains RunGroup invocations whose target StepGroup is not part of the bundle. Exporting as-is would produce broken references on import.",
-        Suggestion:
+    Suggestion:
             "Tick the missing target groups too, or enable “Include descendants” so referenced sub-trees travel with the export. The offending Step IDs are under Technical detail.",
-        Severity: "Bundle",
-    },
-    InternalError: {
-        Title: "Unexpected export error",
-        Summary:
+    Severity: "Bundle",
+  },
+  InternalError: {
+    Title: "Unexpected export error",
+    Summary:
             "The exporter threw before the .zip could be assembled. No file was downloaded and your library is unchanged.",
-        Suggestion:
+    Suggestion:
             "Try the export again. If it keeps failing, file a bug and attach the technical detail below — especially the Reason and any IDs.",
-        Severity: "Internal",
-    },
+    Severity: "Internal",
+  },
 };
 
 /**
@@ -101,13 +101,13 @@ const TEMPLATES: Record<Reason, ReasonTemplate> = {
  * `InternalError` so the dialog can never render with empty copy.
  */
 export function explainExportFailure(failure: ExportFailure): ExportErrorExplanation {
-    const tpl: ReasonTemplate = TEMPLATES[failure.Reason] ?? TEMPLATES.InternalError;
+  const tpl: ReasonTemplate = TEMPLATES[failure.Reason] ?? TEMPLATES.InternalError;
 
-    return {
-        Title: tpl.Title,
-        Summary: tpl.Summary,
-        Suggestion: tpl.Suggestion,
-        Severity: tpl.Severity,
-        Failure: failure,
-    };
+  return {
+    Title: tpl.Title,
+    Summary: tpl.Summary,
+    Suggestion: tpl.Suggestion,
+    Severity: tpl.Severity,
+    Failure: failure,
+  };
 }

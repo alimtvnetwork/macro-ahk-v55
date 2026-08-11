@@ -40,7 +40,10 @@ function createBroadcastHandler(setCountValue: CountSetter): BroadcastMessageHan
 }
 
 function attachBroadcastListener(runtime: RuntimeLike | undefined, handler: BroadcastMessageHandler): boolean {
-  if (!runtime?.onMessage) { return false; }
+  if (!runtime?.onMessage) {
+    return false; 
+  }
+
   try {
     runtime.onMessage.addListener(handler);
 
@@ -63,11 +66,18 @@ function detachBroadcastListener(runtime: RuntimeLike | undefined, handler: Broa
 function createPollingControls(refresh: RefreshErrorCount, pollIntervalMs: number, disabled: boolean) {
   let pollId: ReturnType<typeof setInterval> | null = null;
   const start = () => {
-    if (disabled || pollId !== null) { return; }
+    if (disabled || pollId !== null) {
+      return; 
+    }
+
     pollId = setInterval(() => void refresh(), pollIntervalMs);
   };
+
   const stop = () => {
-    if (pollId === null) { return; }
+    if (pollId === null) {
+      return; 
+    }
+
     clearInterval(pollId);
     pollId = null;
   };
@@ -81,18 +91,31 @@ function bindVisibilityPolling(
   disabled: boolean,
 ): () => void {
   const handleVisibility = () => {
-    if (disabled || typeof document === "undefined") { return; }
-    if (document.hidden) { pollingControls.stop(); } else {
+    if (disabled || typeof document === "undefined") {
+      return; 
+    }
+
+    if (document.hidden) {
+      pollingControls.stop(); 
+    } else {
       void refresh();
       pollingControls.start();
     }
   };
-  if (typeof document !== "undefined") { document.addEventListener("visibilitychange", handleVisibility); }
-  if (typeof document === "undefined" || !document.hidden) { pollingControls.start(); }
+
+  if (typeof document !== "undefined") {
+    document.addEventListener("visibilitychange", handleVisibility); 
+  }
+
+  if (typeof document === "undefined" || !document.hidden) {
+    pollingControls.start(); 
+  }
 
   return () => {
     pollingControls.stop();
-    if (typeof document !== "undefined") { document.removeEventListener("visibilitychange", handleVisibility); }
+    if (typeof document !== "undefined") {
+      document.removeEventListener("visibilitychange", handleVisibility); 
+    }
   };
 }
 
@@ -105,7 +128,9 @@ function setupErrorCountSubscriptions(refresh: RefreshErrorCount, setCountValue:
 
   return () => {
     cleanupPolling();
-    if (listenerAttached) { detachBroadcastListener(runtime, broadcastHandler); }
+    if (listenerAttached) {
+      detachBroadcastListener(runtime, broadcastHandler); 
+    }
   };
 }
 

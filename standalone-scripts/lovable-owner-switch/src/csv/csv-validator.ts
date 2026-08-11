@@ -24,78 +24,81 @@ const MAX_NOTES_LENGTH = 500;
 const MAX_PASSWORD_LENGTH = 200;
 
 const pushEmailError = (
-    errors: CsvParseError[],
-    rowIndex: number,
-    column: OwnerSwitchCsvColumnType,
-    value: string,
+  errors: CsvParseError[],
+  rowIndex: number,
+  column: OwnerSwitchCsvColumnType,
+  value: string,
 ): void => {
-    errors.push({
-        RowIndex: rowIndex,
-        Column: column,
-        Message: `Invalid email in ${column}: ${value}`,
-    });
+  errors.push({
+    RowIndex: rowIndex,
+    Column: column,
+    Message: `Invalid email in ${column}: ${value}`,
+  });
 };
 
 const validateOptionalEmail = (
-    errors: CsvParseError[],
-    rowIndex: number,
-    column: OwnerSwitchCsvColumnType,
-    value: string | null,
+  errors: CsvParseError[],
+  rowIndex: number,
+  column: OwnerSwitchCsvColumnType,
+  value: string | null,
 ): void => {
-    if (value !== null && !isValidEmail(value)) {
-        pushEmailError(errors, rowIndex, column, value);
-    }
+  if (value !== null && !isValidEmail(value)) {
+    pushEmailError(errors, rowIndex, column, value);
+  }
 };
 
 const validateLength = (
-    errors: CsvParseError[],
-    rowIndex: number,
-    column: OwnerSwitchCsvColumnType,
-    value: string | null,
-    max: number,
+  errors: CsvParseError[],
+  rowIndex: number,
+  column: OwnerSwitchCsvColumnType,
+  value: string | null,
+  max: number,
 ): void => {
-    if (value !== null && value.length > max) {
-        errors.push({
-            RowIndex: rowIndex,
-            Column: column,
-            Message: `${column} exceeds max length ${max} (got ${value.length})`,
-        });
-    }
+  if (value !== null && value.length > max) {
+    errors.push({
+      RowIndex: rowIndex,
+      Column: column,
+      Message: `${column} exceeds max length ${max} (got ${value.length})`,
+    });
+  }
 };
 
 const validateOwnerPairDistinct = (
-    errors: CsvParseError[],
-    row: OwnerSwitchCsvRow,
+  errors: CsvParseError[],
+  row: OwnerSwitchCsvRow,
 ): void => {
-    if (row.OwnerEmail2 === null) return;
-    if (row.OwnerEmail1.trim().toLowerCase() === row.OwnerEmail2.trim().toLowerCase()) {
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: OwnerSwitchCsvColumnType.OwnerEmail2,
-            Message: `OwnerEmail2 duplicates OwnerEmail1 (${row.OwnerEmail1})`,
-        });
-    }
+  if (row.OwnerEmail2 === null) {
+    return;
+  }
+
+  if (row.OwnerEmail1.trim().toLowerCase() === row.OwnerEmail2.trim().toLowerCase()) {
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: OwnerSwitchCsvColumnType.OwnerEmail2,
+      Message: `OwnerEmail2 duplicates OwnerEmail1 (${row.OwnerEmail1})`,
+    });
+  }
 };
 
 export const validateRow = (row: OwnerSwitchCsvRow): ReadonlyArray<CsvParseError> => {
-    const errors: CsvParseError[] = [];
+  const errors: CsvParseError[] = [];
 
-    if (!isValidEmail(row.LoginEmail)) {
-        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.LoginEmail, row.LoginEmail);
-    }
+  if (!isValidEmail(row.LoginEmail)) {
+    pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.LoginEmail, row.LoginEmail);
+  }
 
-    if (!isValidEmail(row.OwnerEmail1)) {
-        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail1, row.OwnerEmail1);
-    }
+  if (!isValidEmail(row.OwnerEmail1)) {
+    pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail1, row.OwnerEmail1);
+  }
 
-    validateOptionalEmail(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail2, row.OwnerEmail2);
+  validateOptionalEmail(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail2, row.OwnerEmail2);
 
-    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Password, row.Password, MAX_PASSWORD_LENGTH);
-    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Notes, row.Notes, MAX_NOTES_LENGTH);
+  validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Password, row.Password, MAX_PASSWORD_LENGTH);
+  validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Notes, row.Notes, MAX_NOTES_LENGTH);
 
-    validateOwnerPairDistinct(errors, row);
+  validateOwnerPairDistinct(errors, row);
 
-    return errors;
+  return errors;
 };
 
 /**
@@ -103,26 +106,26 @@ export const validateRow = (row: OwnerSwitchCsvRow): ReadonlyArray<CsvParseError
  * Each duplicate row gets its own error so all offenders surface in the UI.
  */
 export const validateFile = (
-    rows: ReadonlyArray<OwnerSwitchCsvRow>,
+  rows: ReadonlyArray<OwnerSwitchCsvRow>,
 ): ReadonlyArray<CsvParseError> => {
-    const errors: CsvParseError[] = [];
-    const seenAt = new Map<string, number>();
+  const errors: CsvParseError[] = [];
+  const seenAt = new Map<string, number>();
 
-    for (const row of rows) {
-        const key = row.LoginEmail.trim().toLowerCase();
-        const firstSeen = seenAt.get(key);
+  for (const row of rows) {
+    const key = row.LoginEmail.trim().toLowerCase();
+    const firstSeen = seenAt.get(key);
 
-        if (firstSeen === undefined) {
-            seenAt.set(key, row.RowIndex);
-            continue;
-        }
-
-        errors.push({
-            RowIndex: row.RowIndex,
-            Column: OwnerSwitchCsvColumnType.LoginEmail,
-            Message: `Duplicate LoginEmail (${row.LoginEmail}) — first seen on row ${firstSeen}`,
-        });
+    if (firstSeen === undefined) {
+      seenAt.set(key, row.RowIndex);
+      continue;
     }
 
-    return errors;
+    errors.push({
+      RowIndex: row.RowIndex,
+      Column: OwnerSwitchCsvColumnType.LoginEmail,
+      Message: `Duplicate LoginEmail (${row.LoginEmail}) — first seen on row ${firstSeen}`,
+    });
+  }
+
+  return errors;
 };

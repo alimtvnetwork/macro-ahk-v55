@@ -21,7 +21,9 @@ import { CONFIG, IDS, loopCreditState, state } from './shared-state';
 import { closeProjectDialogSafe, detectWorkspaceViaProjectDialog } from './workspace-detection';
 
 /** Shorthand for MacroController singleton */
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // CQ4: Extracted helpers for workspace matching
@@ -33,11 +35,15 @@ function normalizeWorkspaceName(name: string): string {
 
 function findExactWorkspaceMatch(name: string, wsList: WorkspaceCredit[]): WorkspaceCredit | null {
   const normalized = normalizeWorkspaceName(name);
-  if (!normalized || !wsList || wsList.length === 0) return null;
+  if (!normalized || !wsList || wsList.length === 0) {
+    return null;
+  }
 
   for (const ws of wsList) {
     const wsName = (ws.fullName || ws.name || '') as string;
-    if (normalizeWorkspaceName(wsName) === normalized) { return ws; }
+    if (normalizeWorkspaceName(wsName) === normalized) {
+      return ws; 
+    }
   }
 
   return null;
@@ -72,10 +78,18 @@ function restoreOnFailure(
 function syncCurrentWsFromName(wsList: WorkspaceCredit[]): void {
   const isMissingWorkspaceName = !state.workspaceName;
   const isMissingWorkspaceList = !wsList || wsList.length === 0;
-  if (isMissingWorkspaceName) return;
-  if (isMissingWorkspaceList) return;
+  if (isMissingWorkspaceName) {
+    return;
+  }
+
+  if (isMissingWorkspaceList) {
+    return;
+  }
+
   const matched = findExactWorkspaceMatch(state.workspaceName, wsList);
-  if (matched) { loopCreditState.currentWs = matched; }
+  if (matched) {
+    loopCreditState.currentWs = matched; 
+  }
 }
 
 function doXPathDetect(

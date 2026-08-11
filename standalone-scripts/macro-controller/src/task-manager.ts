@@ -26,19 +26,39 @@ export class TaskQueueManager {
     const time = new Date().toLocaleTimeString();
     const logMsg = `[${time}] ${msg}`;
     this._executionLogs.push(logMsg);
-    if (this._executionLogs.length > 100) this._executionLogs.shift();
-    if (this._onLogUpdate) this._onLogUpdate([...this._executionLogs]);
+    if (this._executionLogs.length > 100) {
+      this._executionLogs.shift();
+    }
+
+    if (this._onLogUpdate) {
+      this._onLogUpdate([...this._executionLogs]);
+    }
+
     log(`[TaskExecution] ${msg}`, level);
   }
 
-  getExecutionLogs(): string[] { return this._executionLogs; }
-  onLogUpdate(cb: (logs: string[]) => void): void { this._onLogUpdate = cb; }
+  getExecutionLogs(): string[] {
+    return this._executionLogs; 
+  }
+  onLogUpdate(cb: (logs: string[]) => void): void {
+    this._onLogUpdate = cb; 
+  }
 
-  isProcessing(): boolean { return this._isProcessing; }
-  isPaused(): boolean { return this._isPaused; }
-  isStopped(): boolean { return this._isStopped; }
-  setPaused(paused: boolean): void { this._isPaused = paused; }
-  setStopped(stopped: boolean): void { this._isStopped = stopped; }
+  isProcessing(): boolean {
+    return this._isProcessing; 
+  }
+  isPaused(): boolean {
+    return this._isPaused; 
+  }
+  isStopped(): boolean {
+    return this._isStopped; 
+  }
+  setPaused(paused: boolean): void {
+    this._isPaused = paused; 
+  }
+  setStopped(stopped: boolean): void {
+    this._isStopped = stopped; 
+  }
 
   static getInstance(): TaskQueueManager {
     if (!TaskQueueManager._instance) {
@@ -52,11 +72,15 @@ export class TaskQueueManager {
    * Start processing the queue.
    */
   async startProcessing(): Promise<void> {
-    if (this._isProcessing) return;
+    if (this._isProcessing) {
+      return;
+    }
     
     this._isStopped = false;
     const queueState = await loadTaskQueue();
-    if (queueState.isPaused || this._isPaused || queueState.tasks.length === 0) return;
+    if (queueState.isPaused || this._isPaused || queueState.tasks.length === 0) {
+      return;
+    }
 
     this._isProcessing = true;
     this._abortController = new AbortController();
@@ -189,8 +213,13 @@ export class TaskQueueManager {
 
     for (const selector of sendSelectors) {
       const el = document.querySelector(selector);
-      if (el instanceof HTMLButtonElement && !el.disabled) return el;
-      if (el instanceof HTMLInputElement && !el.disabled) return el;
+      if (el instanceof HTMLButtonElement && !el.disabled) {
+        return el;
+      }
+
+      if (el instanceof HTMLInputElement && !el.disabled) {
+        return el;
+      }
     }
 
     return null;
@@ -202,6 +231,7 @@ export class TaskQueueManager {
     if (this._abortController) {
       this._abortController.abort();
     }
+
     log('[TaskQueue] Queue processing stopped manually', 'warn');
   }
 }

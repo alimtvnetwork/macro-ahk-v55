@@ -10,6 +10,7 @@ export function getByXPath(xpath: string): Node | null {
 
     return null;
   }
+
   try {
     return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   } catch (e: unknown) {
@@ -27,12 +28,15 @@ export function getAllByXPath(xpath: string): Node[] {
 
     return [];
   }
+
   try {
     const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     const nodes: Node[] = [];
     for (let i = 0; i < result.snapshotLength; i++) {
       const item = result.snapshotItem(i);
-      if (item) nodes.push(item);
+      if (item) {
+        nodes.push(item);
+      }
     }
 
     return nodes;

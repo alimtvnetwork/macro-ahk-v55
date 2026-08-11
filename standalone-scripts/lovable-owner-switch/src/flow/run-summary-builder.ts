@@ -15,10 +15,10 @@
  */
 
 import {
-    RunSummaryRowStatus, RunSummaryScriptCodeType,
+  RunSummaryRowStatus, RunSummaryScriptCodeType,
 } from "../../../lovable-common/src/report/run-summary-types";
 import type {
-    RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
+  RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
 } from "../../../lovable-common/src/report/run-summary-types";
 import { RowOutcomeCodeType } from "./row-types";
 import { LogSeverityType } from "./log-sink";
@@ -26,67 +26,67 @@ import type { PromotedOwnerRecord, RowExecutionResult } from "./row-types";
 import type { LogEntry } from "./log-sink";
 
 const statusFor = (outcome: RowOutcomeCodeType): RunSummaryRowStatus => {
-    if (outcome === RowOutcomeCodeType.Succeeded) {
-        return RunSummaryRowStatus.Succeeded;
-    }
+  if (outcome === RowOutcomeCodeType.Succeeded) {
+    return RunSummaryRowStatus.Succeeded;
+  }
 
-    if (outcome === RowOutcomeCodeType.PromoteFailedPartial) {
-        return RunSummaryRowStatus.PartiallySucceeded;
-    }
+  if (outcome === RowOutcomeCodeType.PromoteFailedPartial) {
+    return RunSummaryRowStatus.PartiallySucceeded;
+  }
 
-    return RunSummaryRowStatus.Failed;
+  return RunSummaryRowStatus.Failed;
 };
 
 const actionFor = (record: PromotedOwnerRecord): RunSummaryAction => {
-    if (record.Promoted) {
-        return { Code: "PromoteToOwner", Outcome: "ok", Detail: record.OwnerEmail };
-    }
+  if (record.Promoted) {
+    return { Code: "PromoteToOwner", Outcome: "ok", Detail: record.OwnerEmail };
+  }
 
-    const failedStep = record.FailedStep ?? "PromoteToOwner";
-    const error = record.Error ?? "unknown error";
+  const failedStep = record.FailedStep ?? "PromoteToOwner";
+  const error = record.Error ?? "unknown error";
 
-    return {
-        Code: failedStep, Outcome: "failed",
-        Detail: `${record.OwnerEmail}: ${error}`,
-    };
+  return {
+    Code: failedStep, Outcome: "failed",
+    Detail: `${record.OwnerEmail}: ${error}`,
+  };
 };
 
 const replayHintFor = (result: RowExecutionResult): RunSummaryRow["ReplayHint"] => {
-    const promoted = result.PromotedOwners
-        .filter((r) => r.Promoted).map((r) => r.OwnerEmail);
-    const failed = result.PromotedOwners
-        .filter((r) => !r.Promoted).map((r) => r.OwnerEmail);
+  const promoted = result.PromotedOwners
+    .filter((r) => r.Promoted).map((r) => r.OwnerEmail);
+  const failed = result.PromotedOwners
+    .filter((r) => !r.Promoted).map((r) => r.OwnerEmail);
 
-    return Object.freeze({
-        AlreadyPromotedOwners: promoted.join(",") || "",
-        FailedOwners: failed.join(",") || "",
-        ReplayInstruction: failed.length === 0
-            ? "Row complete — no replay needed"
-            : `Re-run row with OwnerEmails restricted to: ${failed.join(", ")}`,
-    });
+  return Object.freeze({
+    AlreadyPromotedOwners: promoted.join(",") || "",
+    FailedOwners: failed.join(",") || "",
+    ReplayInstruction: failed.length === 0
+      ? "Row complete — no replay needed"
+      : `Re-run row with OwnerEmails restricted to: ${failed.join(", ")}`,
+  });
 };
 
 const buildRow = (result: RowExecutionResult): RunSummaryRow => ({
-    RowIndex: result.RowIndex,
-    Status: statusFor(result.Outcome),
-    OutcomeCode: result.Outcome,
-    DurationMs: result.DurationMs,
-    LastError: result.LastError,
-    Actions: result.PromotedOwners.map(actionFor),
-    ReplayHint: replayHintFor(result),
+  RowIndex: result.RowIndex,
+  Status: statusFor(result.Outcome),
+  OutcomeCode: result.Outcome,
+  DurationMs: result.DurationMs,
+  LastError: result.LastError,
+  Actions: result.PromotedOwners.map(actionFor),
+  ReplayHint: replayHintFor(result),
 });
 
 const countRows = (rows: ReadonlyArray<RunSummaryRow>): RunSummaryCounts => ({
-    Total: rows.length,
-    Succeeded: rows.filter((r) => r.Status === RunSummaryRowStatus.Succeeded).length,
-    Failed: rows.filter((r) => r.Status === RunSummaryRowStatus.Failed).length,
-    PartiallySucceeded: rows.filter((r) => r.Status === RunSummaryRowStatus.PartiallySucceeded).length,
+  Total: rows.length,
+  Succeeded: rows.filter((r) => r.Status === RunSummaryRowStatus.Succeeded).length,
+  Failed: rows.filter((r) => r.Status === RunSummaryRowStatus.Failed).length,
+  PartiallySucceeded: rows.filter((r) => r.Status === RunSummaryRowStatus.PartiallySucceeded).length,
 });
 
 const noticesFrom = (entries: ReadonlyArray<LogEntry>): ReadonlyArray<string> => {
-    return entries
-        .filter((e) => e.Severity === LogSeverityType.Warn || e.Severity === LogSeverityType.Error)
-        .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
+  return entries
+    .filter((e) => e.Severity === LogSeverityType.Warn || e.Severity === LogSeverityType.Error)
+    .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
 };
 
 export interface OwnerSwitchSummaryInput {
@@ -96,14 +96,14 @@ export interface OwnerSwitchSummaryInput {
 }
 
 export const buildOwnerSwitchRunSummary = (input: OwnerSwitchSummaryInput): RunSummary => {
-    const rows = input.Results.map(buildRow);
+  const rows = input.Results.map(buildRow);
 
-    return {
-        Script: RunSummaryScriptCodeType.OwnerSwitch,
-        TaskId: input.TaskId,
-        GeneratedAtUtc: new Date().toISOString(),
-        Counts: countRows(rows),
-        Rows: rows,
-        Notices: noticesFrom(input.LogEntries),
-    };
+  return {
+    Script: RunSummaryScriptCodeType.OwnerSwitch,
+    TaskId: input.TaskId,
+    GeneratedAtUtc: new Date().toISOString(),
+    Counts: countRows(rows),
+    Rows: rows,
+    Notices: noticesFrom(input.LogEntries),
+  };
 };

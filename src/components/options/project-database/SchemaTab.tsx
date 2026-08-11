@@ -145,7 +145,13 @@ function SchemaToolbar({
           type="file"
           accept=".json"
           className="hidden"
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) onImport(f); e.target.value = ""; }}
+          onChange={(e) => {
+            const f = e.target.files?.[0]; if (f) {
+              onImport(f);
+            }
+
+            e.target.value = ""; 
+          }}
         />
       </div>
     </div>
@@ -153,7 +159,9 @@ function SchemaToolbar({
 }
 
 function ResultBanner({ result }: { result: { isOk: boolean; created?: number; migrated?: number; errorMessage?: string; errors?: string[] } | null }) {
-  if (!result) return null;
+  if (!result) {
+    return null;
+  }
 
   return (
     <div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs ${

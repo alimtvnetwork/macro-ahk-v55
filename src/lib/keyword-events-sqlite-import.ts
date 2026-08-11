@@ -23,12 +23,12 @@ import initSqlJs, { type Database } from "sql.js";
 import type JSZipType from "jszip";
 
 import type {
-    KeywordEvent,
-    KeywordEventStep,
-    KeywordEventTarget,
+  KeywordEvent,
+  KeywordEventStep,
+  KeywordEventTarget,
 } from "@/hooks/use-keyword-events";
 import {
-    KEYWORD_EVENTS_BUNDLE_KIND,
+  KEYWORD_EVENTS_BUNDLE_KIND,
 } from "@/lib/keyword-events-sqlite-export";
 import { MatchedByType } from "../types/enums";
 
@@ -44,7 +44,7 @@ const REQUIRED_TABLES = ["Meta", "KeywordEvents"] as const;
  *  return a usable row. Forward-compat: extras are allowed, only these are
  *  required. */
 const REQUIRED_KEYWORD_EVENTS_COLUMNS = [
-    "Uid", "Keyword", "Steps", "SortOrder",
+  "Uid", "Keyword", "Steps", "SortOrder",
 ] as const;
 
 /* ------------------------------------------------------------------ */
@@ -78,15 +78,15 @@ export interface KeywordEventsImportResult {
 /* ------------------------------------------------------------------ */
 
 async function initDb(data: Uint8Array): Promise<Database> {
-    const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+  const SQL = await initSqlJs({ locateFile: () => WASM_URL });
 
-    return new SQL.Database(data);
+  return new SQL.Database(data);
 }
 
 async function loadJSZip(): Promise<typeof JSZipType> {
-    const mod = await import("jszip");
+  const mod = await import("jszip");
 
-    return mod.default;
+  return mod.default;
 }
 
 /* ------------------------------------------------------------------ */
@@ -94,96 +94,109 @@ async function loadJSZip(): Promise<typeof JSZipType> {
 /* ------------------------------------------------------------------ */
 
 function parseJsonField<T>(raw: unknown): T | undefined {
-    if (typeof raw !== "string" || raw.length === 0) return undefined;
-    try {
-        return JSON.parse(raw) as T;
-    } catch (err) { void 0;
+  if (typeof raw !== "string" || raw.length === 0) {
+    return undefined;
+  }
 
-        return undefined;
-    }
+  try {
+    return JSON.parse(raw) as T;
+  } catch (err) {
+    void 0;
+
+    return undefined;
+  }
 }
 
 function rowToEvent(row: Record<string, unknown>): ImportedKeywordEvent | null {
-    const uid = typeof row.Uid === "string" ? row.Uid : null;
-    const keyword = typeof row.Keyword === "string" ? row.Keyword : null;
-    if (!uid || !keyword) return null;
+  const uid = typeof row.Uid === "string" ? row.Uid : null;
+  const keyword = typeof row.Keyword === "string" ? row.Keyword : null;
+  if (!uid || !keyword) {
+    return null;
+  }
 
-    const description = typeof row.Description === "string" ? row.Description : undefined;
-    const enabled = row.Enabled === undefined || row.Enabled === null
-        ? undefined
-        : Number(row.Enabled) !== 0;
-    const steps = parseJsonField<readonly KeywordEventStep[]>(row.Steps);
-    const target = parseJsonField<KeywordEventTarget>(row.Target);
-    const tags = parseJsonField<readonly string[]>(row.Tags);
-    const category = typeof row.Category === "string" && row.Category.length > 0
-        ? row.Category
-        : undefined;
-    const pauseAfterMs = typeof row.PauseAfterMs === "number"
-        ? row.PauseAfterMs
-        : undefined;
+  const description = typeof row.Description === "string" ? row.Description : undefined;
+  const enabled = row.Enabled === undefined || row.Enabled === null
+    ? undefined
+    : Number(row.Enabled) !== 0;
+  const steps = parseJsonField<readonly KeywordEventStep[]>(row.Steps);
+  const target = parseJsonField<KeywordEventTarget>(row.Target);
+  const tags = parseJsonField<readonly string[]>(row.Tags);
+  const category = typeof row.Category === "string" && row.Category.length > 0
+    ? row.Category
+    : undefined;
+  const pauseAfterMs = typeof row.PauseAfterMs === "number"
+    ? row.PauseAfterMs
+    : undefined;
 
-    return {
-        Uid: uid,
-        Keyword: keyword,
-        ...(description !== undefined && { Description: description }),
-        ...(enabled !== undefined && { Enabled: enabled }),
-        ...(steps !== undefined && { Steps: steps }),
-        ...(target !== undefined && { Target: target }),
-        ...(tags !== undefined && { Tags: tags }),
-        ...(category !== undefined && { Category: category }),
-        ...(pauseAfterMs !== undefined && { PauseAfterMs: pauseAfterMs }),
-    };
+  return {
+    Uid: uid,
+    Keyword: keyword,
+    ...(description !== undefined && { Description: description }),
+    ...(enabled !== undefined && { Enabled: enabled }),
+    ...(steps !== undefined && { Steps: steps }),
+    ...(target !== undefined && { Target: target }),
+    ...(tags !== undefined && { Tags: tags }),
+    ...(category !== undefined && { Category: category }),
+    ...(pauseAfterMs !== undefined && { PauseAfterMs: pauseAfterMs }),
+  };
 }
 
 function readMeta(db: Database, key: string): string | null {
-    const stmt = db.prepare(`SELECT Value FROM Meta WHERE Key = ?`);
-    try {
-        stmt.bind([key]);
-        if (!stmt.step()) return null;
-        const value = stmt.get()[0];
-
-        return typeof value === "string" ? value : null;
-    } finally {
-        stmt.free();
+  const stmt = db.prepare(`SELECT Value FROM Meta WHERE Key = ?`);
+  try {
+    stmt.bind([key]);
+    if (!stmt.step()) {
+      return null;
     }
+
+    const value = stmt.get()[0];
+
+    return typeof value === "string" ? value : null;
+  } finally {
+    stmt.free();
+  }
 }
 
 /** Returns the set of user-table names defined in the SQLite database. */
 function listTables(db: Database): Set<string> {
-    const tables = new Set<string>();
-    const stmt = db.prepare(
-        `SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'`,
-    );
-    try {
-        while (stmt.step()) {
-            const name = stmt.get()[0];
-            if (typeof name === "string") tables.add(name);
-        }
-    } finally {
-        stmt.free();
+  const tables = new Set<string>();
+  const stmt = db.prepare(
+    `SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'`,
+  );
+  try {
+    while (stmt.step()) {
+      const name = stmt.get()[0];
+      if (typeof name === "string") {
+        tables.add(name);
+      }
     }
+  } finally {
+    stmt.free();
+  }
 
-    return tables;
+  return tables;
 }
 
 /** Returns the set of column names declared on `tableName`. Empty set when
  *  the table does not exist (caller should already have rejected that). */
 function listColumns(db: Database, tableName: string): Set<string> {
-    const cols = new Set<string>();
-    // PRAGMA table_info doesn't accept bound parameters in sql.js; tableName
-    // comes from a server-controlled allow-list so direct interpolation is
-    // safe here.
-    const stmt = db.prepare(`PRAGMA table_info(${tableName})`);
-    try {
-        while (stmt.step()) {
-            const row = stmt.getAsObject() as Record<string, unknown>;
-            if (typeof row.name === "string") cols.add(row.name);
-        }
-    } finally {
-        stmt.free();
+  const cols = new Set<string>();
+  // PRAGMA table_info doesn't accept bound parameters in sql.js; tableName
+  // comes from a server-controlled allow-list so direct interpolation is
+  // safe here.
+  const stmt = db.prepare(`PRAGMA table_info(${tableName})`);
+  try {
+    while (stmt.step()) {
+      const row = stmt.getAsObject() as Record<string, unknown>;
+      if (typeof row.name === "string") {
+        cols.add(row.name);
+      }
     }
+  } finally {
+    stmt.free();
+  }
 
-    return cols;
+  return cols;
 }
 
 /**
@@ -192,44 +205,46 @@ function listColumns(db: Database, tableName: string): Set<string> {
  * Throws a clear, user-facing Error on the first mismatch.
  */
 function assertKeywordEventsSchema(db: Database): void {
-    const tables = listTables(db);
-    const missingTables = REQUIRED_TABLES.filter((t) => !tables.has(t));
-    if (missingTables.length > 0) {
-        throw new Error(
-            `Invalid keyword-events bundle: missing required table(s) `
+  const tables = listTables(db);
+  const missingTables = REQUIRED_TABLES.filter((t) => !tables.has(t));
+  if (missingTables.length > 0) {
+    throw new Error(
+      `Invalid keyword-events bundle: missing required table(s) `
             + `[${missingTables.join(", ")}]. Found tables: `
             + `[${[...tables].join(", ") || "none"}]. `
             + `Expected a ZIP produced by Export selected as ZIP `
             + `(file: ${DB_FILENAME}).`,
-        );
-    }
+    );
+  }
 
-    const cols = listColumns(db, "KeywordEvents");
-    const missingCols = REQUIRED_KEYWORD_EVENTS_COLUMNS.filter((c) => !cols.has(c));
-    if (missingCols.length > 0) {
-        throw new Error(
-            `Invalid keyword-events bundle: KeywordEvents table is missing `
+  const cols = listColumns(db, "KeywordEvents");
+  const missingCols = REQUIRED_KEYWORD_EVENTS_COLUMNS.filter((c) => !cols.has(c));
+  if (missingCols.length > 0) {
+    throw new Error(
+      `Invalid keyword-events bundle: KeywordEvents table is missing `
             + `column(s) [${missingCols.join(", ")}]. Found columns: `
             + `[${[...cols].join(", ") || "none"}]. The export format may `
             + `be from an incompatible version.`,
-        );
-    }
+    );
+  }
 }
 
 function readKeywordEvents(db: Database): ImportedKeywordEvent[] {
-    const stmt = db.prepare(`SELECT * FROM KeywordEvents ORDER BY SortOrder ASC, Id ASC`);
-    const rows: ImportedKeywordEvent[] = [];
-    try {
-        while (stmt.step()) {
-            const row = stmt.getAsObject() as Record<string, unknown>;
-            const ev = rowToEvent(row);
-            if (ev) rows.push(ev);
-        }
-    } finally {
-        stmt.free();
+  const stmt = db.prepare(`SELECT * FROM KeywordEvents ORDER BY SortOrder ASC, Id ASC`);
+  const rows: ImportedKeywordEvent[] = [];
+  try {
+    while (stmt.step()) {
+      const row = stmt.getAsObject() as Record<string, unknown>;
+      const ev = rowToEvent(row);
+      if (ev) {
+        rows.push(ev);
+      }
     }
+  } finally {
+    stmt.free();
+  }
 
-    return rows;
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -242,34 +257,34 @@ function readKeywordEvents(db: Database): ImportedKeywordEvent[] {
  * unit tests can build a DB inline and round-trip without the ZIP layer.
  */
 export async function readKeywordEventsSqliteDb(
-    data: Uint8Array,
+  data: Uint8Array,
 ): Promise<KeywordEventsImportResult> {
-    const db = await initDb(data);
-    try {
-        // Structural check first — gives a more actionable error than the
-        // bundle_kind probe below when the .db is from a different exporter
-        // (or when Meta itself is missing).
-        assertKeywordEventsSchema(db);
+  const db = await initDb(data);
+  try {
+    // Structural check first — gives a more actionable error than the
+    // bundle_kind probe below when the .db is from a different exporter
+    // (or when Meta itself is missing).
+    assertKeywordEventsSchema(db);
 
-        const bundleKind = readMeta(db, "bundle_kind");
-        if (bundleKind !== KEYWORD_EVENTS_BUNDLE_KIND) {
-            throw new Error(
-                `Not a keyword-events bundle: Meta.bundle_kind = `
+    const bundleKind = readMeta(db, "bundle_kind");
+    if (bundleKind !== KEYWORD_EVENTS_BUNDLE_KIND) {
+      throw new Error(
+        `Not a keyword-events bundle: Meta.bundle_kind = `
                 + `${bundleKind ?? "null"} (expected `
                 + `'${KEYWORD_EVENTS_BUNDLE_KIND}'). The schema matches but `
                 + `this file was tagged as a different export type.`,
-            );
-        }
-
-        return {
-            bundleKind,
-            formatVersion: readMeta(db, "format_version"),
-            exportedAt: readMeta(db, "exported_at"),
-            events: readKeywordEvents(db),
-        };
-    } finally {
-        db.close();
+      );
     }
+
+    return {
+      bundleKind,
+      formatVersion: readMeta(db, "format_version"),
+      exportedAt: readMeta(db, "exported_at"),
+      events: readKeywordEvents(db),
+    };
+  } finally {
+    db.close();
+  }
 }
 
 /**
@@ -278,22 +293,23 @@ export async function readKeywordEventsSqliteDb(
  * does not match the keyword-events contract.
  */
 export async function readKeywordEventsZip(
-    file: Blob,
+  file: Blob,
 ): Promise<KeywordEventsImportResult> {
-    const JSZipCtor = await loadJSZip();
-    const zip = await JSZipCtor.loadAsync(file);
-    const entry = zip.file(DB_FILENAME);
-    if (!entry) {
-        const present = Object.keys(zip.files);
-        throw new Error(
-            `Missing ${DB_FILENAME} in ZIP — expected a keyword-events `
+  const JSZipCtor = await loadJSZip();
+  const zip = await JSZipCtor.loadAsync(file);
+  const entry = zip.file(DB_FILENAME);
+  if (!entry) {
+    const present = Object.keys(zip.files);
+    throw new Error(
+      `Missing ${DB_FILENAME} in ZIP — expected a keyword-events `
             + `bundle produced by Export selected as ZIP. ZIP contents: `
             + `[${present.join(", ") || "empty"}].`,
-        );
-    }
-    const bytes = await entry.async("uint8array");
+    );
+  }
 
-    return readKeywordEventsSqliteDb(bytes);
+  const bytes = await entry.async("uint8array");
+
+  return readKeywordEventsSqliteDb(bytes);
 }
 
 /* ------------------------------------------------------------------ */
@@ -329,63 +345,65 @@ export interface PlanImportMatchesOptions {
 
 /* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */
 export function planImportMatches(
-    selected: ReadonlyArray<KeywordEvent>,
-    imported: ReadonlyArray<ImportedKeywordEvent>,
-    options: PlanImportMatchesOptions = {},
+  selected: ReadonlyArray<KeywordEvent>,
+  imported: ReadonlyArray<ImportedKeywordEvent>,
+  options: PlanImportMatchesOptions = {},
 ): ImportMatchPlan {
-    const strictUidOnly = options.strictUidOnly === true;
-    const consumedSelectedIds = new Set<string>();
-    const matches: ImportMatchPlan["matches"] = [];
-    const unmatchedImports: ImportedKeywordEvent[] = [];
+  const strictUidOnly = options.strictUidOnly === true;
+  const consumedSelectedIds = new Set<string>();
+  const matches: ImportMatchPlan["matches"] = [];
+  const unmatchedImports: ImportedKeywordEvent[] = [];
 
-    const byUid = new Map<string, KeywordEvent>();
-    const byKeyword = new Map<string, KeywordEvent>();
-    for (const ev of selected) {
-        byUid.set(ev.Id, ev);
-        const key = ev.Keyword.trim().toLowerCase();
-        if (key && !byKeyword.has(key)) byKeyword.set(key, ev);
+  const byUid = new Map<string, KeywordEvent>();
+  const byKeyword = new Map<string, KeywordEvent>();
+  for (const ev of selected) {
+    byUid.set(ev.Id, ev);
+    const key = ev.Keyword.trim().toLowerCase();
+    if (key && !byKeyword.has(key)) {
+      byKeyword.set(key, ev);
     }
+  }
 
-    const matchesMutable: Array<{
+  const matchesMutable: Array<{
         readonly target: KeywordEvent;
         readonly source: ImportedKeywordEvent;
         readonly matchedBy: MatchedByType;
     }> = [];
 
-    for (const src of imported) {
-        let target = byUid.get(src.Uid);
-        let matchedBy: MatchedByType = "uid";
-        if (!target || consumedSelectedIds.has(target.Id)) {
-            if (strictUidOnly) {
-                target = undefined;
-            } else {
-                const key = src.Keyword.trim().toLowerCase();
-                const candidate = key ? byKeyword.get(key) : undefined;
-                if (candidate && !consumedSelectedIds.has(candidate.Id)) {
-                    target = candidate;
-                    matchedBy = "keyword";
-                } else {
-                    target = undefined;
-                }
-            }
-        }
-
-        if (target) {
-            consumedSelectedIds.add(target.Id);
-            matchesMutable.push({ target, source: src, matchedBy });
+  for (const src of imported) {
+    let target = byUid.get(src.Uid);
+    let matchedBy: MatchedByType = "uid";
+    if (!target || consumedSelectedIds.has(target.Id)) {
+      if (strictUidOnly) {
+        target = undefined;
+      } else {
+        const key = src.Keyword.trim().toLowerCase();
+        const candidate = key ? byKeyword.get(key) : undefined;
+        if (candidate && !consumedSelectedIds.has(candidate.Id)) {
+          target = candidate;
+          matchedBy = "keyword";
         } else {
-            unmatchedImports.push(src);
+          target = undefined;
         }
+      }
     }
 
-    void matches;
-    const unmatchedSelected = selected.filter(ev => !consumedSelectedIds.has(ev.Id));
+    if (target) {
+      consumedSelectedIds.add(target.Id);
+      matchesMutable.push({ target, source: src, matchedBy });
+    } else {
+      unmatchedImports.push(src);
+    }
+  }
 
-    return {
-        matches: matchesMutable,
-        unmatchedImports,
-        unmatchedSelected,
-    };
+  void matches;
+  const unmatchedSelected = selected.filter(ev => !consumedSelectedIds.has(ev.Id));
+
+  return {
+    matches: matchesMutable,
+    unmatchedImports,
+    unmatchedSelected,
+  };
 }
 
 /**
@@ -394,19 +412,39 @@ export function planImportMatches(
  * absent fields don't accidentally clear existing values.
  */
 export function buildPatchFromImport(
-    src: ImportedKeywordEvent,
+  src: ImportedKeywordEvent,
 ): Partial<Omit<KeywordEvent, "Id">> {
-    const patch: { -readonly [K in keyof Omit<KeywordEvent, "Id">]?: KeywordEvent[K] } = {};
-    patch.Keyword = src.Keyword;
-    if (src.Description !== undefined) patch.Description = src.Description;
-    if (src.Enabled !== undefined) patch.Enabled = src.Enabled;
-    if (src.Steps !== undefined) patch.Steps = src.Steps;
-    if (src.Target !== undefined) patch.Target = src.Target;
-    if (src.Tags !== undefined) patch.Tags = src.Tags;
-    if (src.Category !== undefined) patch.Category = src.Category;
-    if (src.PauseAfterMs !== undefined) patch.PauseAfterMs = src.PauseAfterMs;
+  const patch: { -readonly [K in keyof Omit<KeywordEvent, "Id">]?: KeywordEvent[K] } = {};
+  patch.Keyword = src.Keyword;
+  if (src.Description !== undefined) {
+    patch.Description = src.Description;
+  }
 
-    return patch;
+  if (src.Enabled !== undefined) {
+    patch.Enabled = src.Enabled;
+  }
+
+  if (src.Steps !== undefined) {
+    patch.Steps = src.Steps;
+  }
+
+  if (src.Target !== undefined) {
+    patch.Target = src.Target;
+  }
+
+  if (src.Tags !== undefined) {
+    patch.Tags = src.Tags;
+  }
+
+  if (src.Category !== undefined) {
+    patch.Category = src.Category;
+  }
+
+  if (src.PauseAfterMs !== undefined) {
+    patch.PauseAfterMs = src.PauseAfterMs;
+  }
+
+  return patch;
 }
 
 /* ------------------------------------------------------------------ */
@@ -428,35 +466,53 @@ type DiffableValue = string | number | boolean | readonly string[] | KeywordEven
  * overwrite existing data. Values are stringified for display only.
  */
 export function diffMatchedFields(
-    target: KeywordEvent,
-    source: ImportedKeywordEvent,
+  target: KeywordEvent,
+  source: ImportedKeywordEvent,
 ): readonly FieldDiff[] {
-    const diffs: FieldDiff[] = [];
-    const compare = (field: string, before: DiffableValue, after: DiffableValue): void => {
-        if (after === undefined) return;
-        const a = stringifyForDiff(before);
-        const b = stringifyForDiff(after);
-        if (a !== b) diffs.push({ field, before: a, after: b });
-    };
+  const diffs: FieldDiff[] = [];
+  const compare = (field: string, before: DiffableValue, after: DiffableValue): void => {
+    if (after === undefined) {
+      return;
+    }
 
-    compare("Keyword", target.Keyword, source.Keyword);
-    compare("Description", target.Description, source.Description);
-    compare("Enabled", target.Enabled, source.Enabled);
-    compare("Steps", target.Steps, source.Steps);
-    compare("Target", target.Target, source.Target);
-    compare("Tags", target.Tags, source.Tags);
-    compare("Category", target.Category, source.Category);
-    compare("PauseAfterMs", target.PauseAfterMs, source.PauseAfterMs);
+    const a = stringifyForDiff(before);
+    const b = stringifyForDiff(after);
+    if (a !== b) {
+      diffs.push({ field, before: a, after: b });
+    }
+  };
 
-    return diffs;
+  compare("Keyword", target.Keyword, source.Keyword);
+  compare("Description", target.Description, source.Description);
+  compare("Enabled", target.Enabled, source.Enabled);
+  compare("Steps", target.Steps, source.Steps);
+  compare("Target", target.Target, source.Target);
+  compare("Tags", target.Tags, source.Tags);
+  compare("Category", target.Category, source.Category);
+  compare("PauseAfterMs", target.PauseAfterMs, source.PauseAfterMs);
+
+  return diffs;
 }
 
 function stringifyForDiff(value: DiffableValue): string {
-    if (value === null || value === undefined) return "—";
-    if (typeof value === "string") return value;
-    if (typeof value === "number" || typeof value === "boolean") return String(value);
-    try { return JSON.stringify(value); } catch (err) { void 0;
+  if (value === null || value === undefined) {
+    return "—";
+  }
 
- return String(value); }
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  try {
+    return JSON.stringify(value); 
+  } catch (err) {
+    void 0;
+
+    return String(value); 
+  }
 }
 

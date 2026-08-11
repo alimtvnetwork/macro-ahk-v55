@@ -124,7 +124,9 @@ describe('subscribeProjectNameChange + notifyIfProjectRenamed', () => {
   });
 
   it('isolates listener exceptions — one bad listener does not break others', () => {
-    const bad = vi.fn(() => { throw new Error('boom'); });
+    const bad = vi.fn(() => {
+      throw new Error('boom'); 
+    });
     const good = vi.fn();
     subscribeProjectNameChange(bad);
     subscribeProjectNameChange(good);

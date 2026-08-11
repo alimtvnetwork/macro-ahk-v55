@@ -19,34 +19,34 @@ import type { EmptySettings } from "../../types/instruction/seed/empty-settings"
 import { VERSION } from "../../shared-version";
 
 const instruction: ProjectInstruction<EmptySettings> = {
-    SchemaVersion: "1.0",
-    Name: "lovable-common",
-    DisplayName: "Lovable Common (XPath + API)",
-    Version: VERSION,
-    Description: "Shared XPaths, default delays, and (future) LovableApiClient consumed by Lovable Owner Switch and Lovable User Add.",
-    World: InjectionWorldType.Main,
-    IsGlobal: false,
-    Dependencies: [],
-    LoadOrder: 5,
-    Seed: {
-        Id: "default-lovable-common",
-        SeedOnInstall: true,
-        IsRemovable: false,
-        AutoInject: false,
-        RunAt: InjectionRunAtType.DocumentIdle,
-        TargetUrls: [],
-        Cookies: [],
-        Settings: {},
-    },
-    Assets: {
-        Css: [],
-        Configs: [],
-        Scripts: [
-            { File: "lovable-common.js", Order: 1, IsIife: true },
-        ],
-        Templates: [],
-        Prompts: [],
-    },
+  SchemaVersion: "1.0",
+  Name: "lovable-common",
+  DisplayName: "Lovable Common (XPath + API)",
+  Version: VERSION,
+  Description: "Shared XPaths, default delays, and (future) LovableApiClient consumed by Lovable Owner Switch and Lovable User Add.",
+  World: InjectionWorldType.Main,
+  IsGlobal: false,
+  Dependencies: [],
+  LoadOrder: 5,
+  Seed: {
+    Id: "default-lovable-common",
+    SeedOnInstall: true,
+    IsRemovable: false,
+    AutoInject: false,
+    RunAt: InjectionRunAtType.DocumentIdle,
+    TargetUrls: [],
+    Cookies: [],
+    Settings: {},
+  },
+  Assets: {
+    Css: [],
+    Configs: [],
+    Scripts: [
+      { File: "lovable-common.js", Order: 1, IsIife: true },
+    ],
+    Templates: [],
+    Prompts: [],
+  },
 };
 
 export default instruction;

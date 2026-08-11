@@ -93,7 +93,9 @@ function renderShell(x: number, y: number): void {
 
 function renderBody(): void {
   const body = document.getElementById('bulk-members-body');
-  if (!body || !activeState) return;
+  if (!body || !activeState) {
+    return;
+  }
 
   if (activeState.loading) {
     body.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8;">⏳ Aggregating...</div>';
@@ -115,6 +117,7 @@ function renderBody(): void {
     body.innerHTML = union.map(m => renderMemberRow(m, totalWs)).join('');
     attachRowListeners(body, union);
   }
+
   renderFooter();
 }
 
@@ -122,32 +125,36 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
   body.querySelectorAll('.bulk-member-row').forEach(row => {
     const userId = row.getAttribute('data-user-id')!;
     const member = union.find(m => m.userId === userId);
-    if (!member) return;
+    if (!member) {
+      return;
+    }
 
     row.addEventListener('contextmenu', (e: Event) => {
-        const mouseEvent = e as MouseEvent;
-        e.preventDefault();
-        showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
+      const mouseEvent = e as MouseEvent;
+      e.preventDefault();
+      showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
     });
 
     const moreBtn = row.querySelector('.bulk-member-more');
     if (moreBtn) {
-        moreBtn.addEventListener('click', (e: Event) => {
-            const mouseEvent = e as MouseEvent;
-            e.stopPropagation();
-            showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
-        });
+      moreBtn.addEventListener('click', (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        e.stopPropagation();
+        showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
+      });
     }
   });
 }
 
 function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number): void {
-    const existing = document.getElementById('bulk-member-row-ctx');
-    if (existing) existing.remove();
+  const existing = document.getElementById('bulk-member-row-ctx');
+  if (existing) {
+    existing.remove();
+  }
 
-    const menu = document.createElement('div');
-    menu.id = 'bulk-member-row-ctx';
-    menu.style.cssText = `
+  const menu = document.createElement('div');
+  menu.id = 'bulk-member-row-ctx';
+  menu.style.cssText = `
         position: fixed;
         left: ${x}px;
         top: ${y}px;
@@ -160,40 +167,40 @@ function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number
         min-width: 160px;
     `;
 
-    const buildItem = (label: string, onClick: () => void) => {
-        const item = document.createElement('div');
-        item.textContent = label;
-        item.style.cssText = `padding: 6px 12px; font-size: ${tFontTiny}; color: ${cPanelFg}; cursor: pointer;`;
-        item.onmouseover = () => item.style.background = 'rgba(139,92,246,0.3)';
-        item.onmouseout = () => item.style.background = 'transparent';
-        item.onclick = () => {
-            menu.remove();
-            onClick();
-        };
-
-        return item;
+  const buildItem = (label: string, onClick: () => void) => {
+    const item = document.createElement('div');
+    item.textContent = label;
+    item.style.cssText = `padding: 6px 12px; font-size: ${tFontTiny}; color: ${cPanelFg}; cursor: pointer;`;
+    item.onmouseover = () => item.style.background = 'rgba(139,92,246,0.3)';
+    item.onmouseout = () => item.style.background = 'transparent';
+    item.onclick = () => {
+      menu.remove();
+      onClick();
     };
 
-    menu.appendChild(buildItem('👑 Promote to Owner', () => {
-        if (activeState) {
-            promoteMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
-        }
-    }));
-    menu.appendChild(buildItem('👤 Demote to Member', () => {
-        if (activeState) {
-            demoteMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
-        }
-    }));
-    menu.appendChild(buildItem('❌ Remove from All', () => {
-        if (confirm(`Remove ${member.fullName} from ALL selected workspaces?`) && activeState) {
-            removeMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
-        }
-    }));
+    return item;
+  };
 
-    document.body.appendChild(menu);
-    setTimeout(() => {
-        document.addEventListener('click', () => menu.remove(), { once: true });
-    }, 10);
+  menu.appendChild(buildItem('👑 Promote to Owner', () => {
+    if (activeState) {
+      promoteMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
+    }
+  }));
+  menu.appendChild(buildItem('👤 Demote to Member', () => {
+    if (activeState) {
+      demoteMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
+    }
+  }));
+  menu.appendChild(buildItem('❌ Remove from All', () => {
+    if (confirm(`Remove ${member.fullName} from ALL selected workspaces?`) && activeState) {
+      removeMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
+    }
+  }));
+
+  document.body.appendChild(menu);
+  setTimeout(() => {
+    document.addEventListener('click', () => menu.remove(), { once: true });
+  }, 10);
 }
 
 function renderMemberRow(m: AggregatedMember, totalWs: number): string {
@@ -217,7 +224,9 @@ function renderMemberRow(m: AggregatedMember, totalWs: number): string {
 
 function renderFooter(): void {
   const footer = document.getElementById('bulk-members-footer');
-  if (!footer) return;
+  if (!footer) {
+    return;
+  }
 
   footer.innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -239,7 +248,9 @@ function renderFooter(): void {
     onValidEmailsChange: (emails) => {
       validEmails = emails;
       const btn = document.getElementById('bulk-invite-btn') as HTMLButtonElement;
-      if (btn) btn.disabled = emails.length === 0;
+      if (btn) {
+        btn.disabled = emails.length === 0;
+      }
     }
   });
 
@@ -250,7 +261,7 @@ function renderFooter(): void {
   inviteBtn.onclick = () => {
     const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as MemberRole;
     if (activeState) {
-        inviteMemberMany(activeState.wsIds, validEmails, role, loopCreditState.perWorkspace || []);
+      inviteMemberMany(activeState.wsIds, validEmails, role, loopCreditState.perWorkspace || []);
     }
   };
 }

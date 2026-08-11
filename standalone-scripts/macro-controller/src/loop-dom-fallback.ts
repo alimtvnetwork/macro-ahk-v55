@@ -14,7 +14,9 @@ import { TIMING, state } from './shared-state';
 import { logError, logError } from './error-utils';
 
 /** Shorthand for MacroController singleton */
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // DEPRECATED: Signal AHK via Clipboard
@@ -27,7 +29,9 @@ export function dispatchDelegateSignal(direction: string): void {
   document.title = titleMarker + cleanTitle;
   log('DEPRECATED: Title signal set: ' + titleMarker, 'delegate');
   try {
-    navigator.clipboard.writeText(signal).catch(function(err) { logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); });
+    navigator.clipboard.writeText(signal).catch(function(err) {
+      logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); 
+    });
   } catch (e) {
     logError('MacroController', 'Unknown error');
     logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1);
@@ -112,6 +116,7 @@ export function forceSwitch(direction: LoopDirectionType | string): void {
 
     return;
   }
+
   log('=== FORCE ' + direction.toUpperCase() + ' ===', 'delegate');
   logSub('v7.9.6: Direct API move — no AHK delegation', 1);
   performDirectMove(direction as LoopDirectionType);

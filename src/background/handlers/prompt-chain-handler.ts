@@ -53,17 +53,17 @@ interface ExecuteChainStepMessage extends MessageRequest {
 /* ------------------------------------------------------------------ */
 
 async function loadChains(): Promise<PromptChain[]> {
-    try {
-        const result = await chrome.storage.sync.get(STORAGE_KEY);
+  try {
+    const result = await chrome.storage.sync.get(STORAGE_KEY);
 
-        return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
-    } catch (err) { 
-        return [];
-    }
+    return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
+  } catch (err) { 
+    return [];
+  }
 }
 
 async function saveChains(chains: PromptChain[]): Promise<void> {
-    await chrome.storage.sync.set({ [STORAGE_KEY]: chains });
+  await chrome.storage.sync.set({ [STORAGE_KEY]: chains });
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,29 +71,30 @@ async function saveChains(chains: PromptChain[]): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 export async function handleGetPromptChains(): Promise<{ chains: PromptChain[] }> {
-    return { chains: await loadChains() };
+  return { chains: await loadChains() };
 }
 
 export async function handleSavePromptChain(payload: MessageRequest): Promise<{ isOk: true; chain: PromptChain }> {
-    const { chain } = payload as SaveChainMessage;
-    const chains = await loadChains();
-    const idx = chains.findIndex((c) => c.id === chain.id);
-    if (idx >= 0) {
-        chains[idx] = chain;
-    } else {
-        chains.push(chain);
-    }
-    await saveChains(chains);
+  const { chain } = payload as SaveChainMessage;
+  const chains = await loadChains();
+  const idx = chains.findIndex((c) => c.id === chain.id);
+  if (idx >= 0) {
+    chains[idx] = chain;
+  } else {
+    chains.push(chain);
+  }
 
-    return { isOk: true, chain };
+  await saveChains(chains);
+
+  return { isOk: true, chain };
 }
 
 export async function handleDeletePromptChain(payload: MessageRequest): Promise<{ isOk: true }> {
-    const { chainId } = payload as DeleteChainMessage;
-    const chains = await loadChains();
-    await saveChains(chains.filter((c) => c.id !== chainId));
+  const { chainId } = payload as DeleteChainMessage;
+  const chains = await loadChains();
+  await saveChains(chains.filter((c) => c.id !== chainId));
 
-    return { isOk: true };
+  return { isOk: true };
 }
 
 /**
@@ -131,42 +132,48 @@ interface PendingPromptArgs {
 }
 
 function generateCorrelationId(): string {
-    // crypto.randomUUID is available in MV3 service workers.
-    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-        return crypto.randomUUID();
-    }
+  // crypto.randomUUID is available in MV3 service workers.
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
 
-    return `marco-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `marco-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 async function writePendingArgs(correlationId: string, args: PendingPromptArgs): Promise<void> {
-    const stored = await chrome.storage.session.get(PROMPT_ARGS_KEY);
-    const map = (stored[PROMPT_ARGS_KEY] as Record<string, PendingPromptArgs> | undefined) ?? {};
-    map[correlationId] = args;
-    await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
+  const stored = await chrome.storage.session.get(PROMPT_ARGS_KEY);
+  const map = (stored[PROMPT_ARGS_KEY] as Record<string, PendingPromptArgs> | undefined) ?? {};
+  map[correlationId] = args;
+  await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
 }
 
 async function clearPendingArg(correlationId: string): Promise<void> {
-    try {
-        const stored = await chrome.storage.session.get(PROMPT_ARGS_KEY);
-        const map = (stored[PROMPT_ARGS_KEY] as Record<string, PendingPromptArgs> | undefined) ?? {};
-        if (!(correlationId in map)) return;
-        delete map[correlationId];
-        if (Object.keys(map).length === 0) {
-            await chrome.storage.session.remove(PROMPT_ARGS_KEY);
-        } else {
-            await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
-        }
-    } catch (err) {
+  try {
+    const stored = await chrome.storage.session.get(PROMPT_ARGS_KEY);
+    const map = (stored[PROMPT_ARGS_KEY] as Record<string, PendingPromptArgs> | undefined) ?? {};
+    if (!(correlationId in map)) {
+      return;
+    }
+
+    delete map[correlationId];
+    if (Object.keys(map).length === 0) {
+      await chrome.storage.session.remove(PROMPT_ARGS_KEY);
+    } else {
+      await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
+    }
+  } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+  }
 }
 
 function isPromptResultMessage(value: unknown, correlationId: string): value is PromptInjectResultMessage {
-    if (!value || typeof value !== "object") return false;
-    const messageRecord = value as Record<string, unknown>;
+  if (!value || typeof value !== "object") {
+    return false;
+  }
 
-    return messageRecord.type === PROMPT_INJECT_RESULT && messageRecord.correlationId === correlationId;
+  const messageRecord = value as Record<string, unknown>;
+
+  return messageRecord.type === PROMPT_INJECT_RESULT && messageRecord.correlationId === correlationId;
 }
 
 /**
@@ -174,73 +181,76 @@ function isPromptResultMessage(value: unknown, correlationId: string): value is 
  * Resolves with the message or rejects on timeout.
  */
 function awaitInjectResult(correlationId: string): Promise<PromptInjectResultMessage> {
-    return new Promise<PromptInjectResultMessage>((resolve, reject) => {
-        const timeoutHandle = setTimeout(() => {
-            chrome.runtime.onMessage.removeListener(listener);
-            reject(new Error(`Timed out after ${PROMPT_INJECT_TIMEOUT_MS}ms waiting for prompt-injector result`));
-        }, PROMPT_INJECT_TIMEOUT_MS);
+  return new Promise<PromptInjectResultMessage>((resolve, reject) => {
+    const timeoutHandle = setTimeout(() => {
+      chrome.runtime.onMessage.removeListener(listener);
+      reject(new Error(`Timed out after ${PROMPT_INJECT_TIMEOUT_MS}ms waiting for prompt-injector result`));
+    }, PROMPT_INJECT_TIMEOUT_MS);
 
-        const listener = (message: unknown): void => {
-            if (!isPromptResultMessage(message, correlationId)) return;
-            clearTimeout(timeoutHandle);
-            chrome.runtime.onMessage.removeListener(listener);
-            resolve(message);
-        };
+    const listener = (message: unknown): void => {
+      if (!isPromptResultMessage(message, correlationId)) {
+        return;
+      }
 
-        chrome.runtime.onMessage.addListener(listener);
-    });
+      clearTimeout(timeoutHandle);
+      chrome.runtime.onMessage.removeListener(listener);
+      resolve(message);
+    };
+
+    chrome.runtime.onMessage.addListener(listener);
+  });
 }
 
 export async function handleExecuteChainStep(payload: MessageRequest): Promise<{ isOk: true }> {
-    const step = payload as ExecuteChainStepMessage;
+  const step = payload as ExecuteChainStepMessage;
 
-    // Apply template variable substitution (e.g. {{date}}, {{workspace}})
-    const resolvedText = await applyTemplateVariables(step.promptText);
+  // Apply template variable substitution (e.g. {{date}}, {{workspace}})
+  const resolvedText = await applyTemplateVariables(step.promptText);
 
-    console.log(`[Marco] Executing chain step ${step.stepIndex + 1}/${step.totalSteps}: ${resolvedText.length} chars`);
+  console.log(`[Marco] Executing chain step ${step.stepIndex + 1}/${step.totalSteps}: ${resolvedText.length} chars`);
 
-    // Find the active tab
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    const tab = tabs[0];
-    if (!tab?.id) {
-        throw new Error("No active tab found — open a target page first");
+  // Find the active tab
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const tab = tabs[0];
+  if (!tab?.id) {
+    throw new Error("No active tab found — open a target page first");
+  }
+
+  // Fetch the configured chatbox XPath
+  const chatBoxXPath = await getChatBoxXPath();
+
+  const correlationId = generateCorrelationId();
+  const resultPromise = awaitInjectResult(correlationId);
+
+  try {
+    await writePendingArgs(correlationId, {
+      text: resolvedText,
+      chatBoxXPath,
+    });
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: [PROMPT_INJECTOR_FILE],
+    });
+
+    const result = await resultPromise;
+
+    if (!result.success) {
+      throw new Error("Could not find or inject into the editor — is the chat input visible?");
     }
 
-    // Fetch the configured chatbox XPath
-    const chatBoxXPath = await getChatBoxXPath();
-
-    const correlationId = generateCorrelationId();
-    const resultPromise = awaitInjectResult(correlationId);
-
-    try {
-        await writePendingArgs(correlationId, {
-            text: resolvedText,
-            chatBoxXPath,
-        });
-
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: [PROMPT_INJECTOR_FILE],
-        });
-
-        const result = await resultPromise;
-
-        if (!result.success) {
-            throw new Error("Could not find or inject into the editor — is the chat input visible?");
-        }
-
-        if (!result.verified) {
-            logBgWarnError(BgLogTag.MARCO, `Step ${step.stepIndex + 1}: prompt may be truncated`);
-        }
-
-        console.log(`[Marco] Step ${step.stepIndex + 1}/${step.totalSteps} complete (method=${result.method})`);
-    } catch (err) {
-        const reason = err instanceof Error ? err.message : String(err);
-        logCaughtError(BgLogTag.MARCO, `Chain step ${step.stepIndex + 1} failed`, err);
-        throw new Error(`Step ${step.stepIndex + 1} failed: ${reason}`);
-    } finally {
-        await clearPendingArg(correlationId);
+    if (!result.verified) {
+      logBgWarnError(BgLogTag.MARCO, `Step ${step.stepIndex + 1}: prompt may be truncated`);
     }
 
-    return { isOk: true };
+    console.log(`[Marco] Step ${step.stepIndex + 1}/${step.totalSteps} complete (method=${result.method})`);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    logCaughtError(BgLogTag.MARCO, `Chain step ${step.stepIndex + 1} failed`, err);
+    throw new Error(`Step ${step.stepIndex + 1} failed: ${reason}`);
+  } finally {
+    await clearPendingArg(correlationId);
+  }
+
+  return { isOk: true };
 }

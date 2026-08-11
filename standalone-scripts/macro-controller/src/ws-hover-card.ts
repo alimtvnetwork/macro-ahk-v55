@@ -85,7 +85,10 @@ function sectionHeaderHtml(text: string): string {
 
 function pillHtml(status: WorkspaceStatus, ws?: WorkspaceCredit): string {
   const display = classifyFromStatus(status, ws || ({} as WorkspaceCredit));
-  if (display.kind === 'normal' || !display.label) return '';
+  if (display.kind === 'normal' || !display.label) {
+    return '';
+  }
+
   const s = resolveBadgeStyle(display.tone);
 
   return '<span style="font-size:9px;color:' + s.fg
@@ -107,11 +110,17 @@ function pillHtml(status: WorkspaceStatus, ws?: WorkspaceCredit): string {
 export function buildSubHeader(ws: WorkspaceCredit): string {
   const parts: string[] = [];
   parts.push(escHtml(formatPlanDisplayLabel(ws.plan) || String(ws.tier || 'FREE')));
-  if (ws.membershipRole || ws.role) parts.push(escHtml(String(ws.membershipRole || ws.role)));
+  if (ws.membershipRole || ws.role) {
+    parts.push(escHtml(String(ws.membershipRole || ws.role)));
+  }
+
   if (typeof ws.numProjects === 'number' && ws.numProjects > 0) {
     parts.push(ws.numProjects + ' project' + (ws.numProjects === 1 ? '' : 's'));
   }
-  if (ws.gitSyncEnabled) parts.push('Git Sync ✓');
+
+  if (ws.gitSyncEnabled) {
+    parts.push('Git Sync ✓');
+  }
 
   return '<div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">' + parts.join(' · ') + '</div>';
 }
@@ -128,12 +137,14 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
     out.push(rowHtml('Free Trial',
       Math.round(ws.freeRemaining || 0) + ' / ' + Math.round(ws.freeGranted || 0)));
   }
+
   out.push(rowHtml('Daily',
     summary.daily + ' / ' + summary.dailyLimit));
   if (summary.rolloverLimit > 0) {
     out.push(rowHtml('Rollover',
       summary.rollover + ' / ' + summary.rolloverLimit));
   }
+
   out.push(rowHtml('Billing',
     summary.billingAvailable + ' / ' + summary.billingLimit));
   // Wire fields added 2026-06: shown when /credit-balance supplied them.
@@ -142,6 +153,7 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
     out.push(rowHtml('Cloud remaining', String(summary.cloudRemaining), '#7dd3fc'));
     out.push(rowHtml('AI remaining', String(summary.aiRemaining), '#c4b5fd'));
   }
+
   if (summary.source !== 'Inline') {
     out.push(rowHtml('Source', summary.source));
   }
@@ -158,16 +170,25 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
 function buildSubscriptionSection(ws: WorkspaceCredit): string {
   const subStatus = (ws.subscriptionStatus || '').trim();
   const changedIso = (ws.subscriptionStatusChangedAt || '').trim();
-  if (!subStatus && !changedIso) return '';
+  if (!subStatus && !changedIso) {
+    return '';
+  }
+
   const out: string[] = [sectionHeaderHtml('Subscription')];
   if (subStatus) {
     const norm = subStatus.toLowerCase();
     let color = '#e2e8f0';
-    if (isHealthyStatus(norm)) color = '#34d399';
-    else if (isPastDueStatus(norm)) color = '#fde68a';
-    else if (isCanceledStatus(norm) || norm === SubscriptionStatusType.EXPIRED) color = '#fca5a5';
+    if (isHealthyStatus(norm)) {
+      color = '#34d399';
+    } else if (isPastDueStatus(norm)) {
+      color = '#fde68a';
+    } else if (isCanceledStatus(norm) || norm === SubscriptionStatusType.EXPIRED) {
+      color = '#fca5a5';
+    }
+
     out.push(rowHtml(LABEL_STATUS, escHtml(subStatus), color));
   }
+
   if (changedIso) {
     const date = formatDateDDMMMYY(changedIso);
     const days = daysBetween(changedIso);
@@ -189,7 +210,9 @@ function pickRefillEstimateIso(ws: WorkspaceCredit): string {
 
 /** Build the highlighted "Next refill (in Nd)" row when in the warning window. */
 function activeRefillRow(status: WorkspaceStatus): string {
-  if (status.kind !== KIND_ABOUT_TO_REFILL || !status.refillIso) return '';
+  if (status.kind !== KIND_ABOUT_TO_REFILL || !status.refillIso) {
+    return '';
+  }
 
   return rowHtml('Next refill',
     formatDateDDMMMYY(status.refillIso) + ' (in ' + formatDayCount(status.daysToRefill) + ')',
@@ -200,7 +223,10 @@ function activeRefillRow(status: WorkspaceStatus): string {
  *  estimate falls back from billingPeriodEndAt. Skipped when the highlighted
  *  active row above already covers the same date. */
 function estimatedRefillRow(ws: WorkspaceCredit, status: WorkspaceStatus, estimateIso: string): string {
-  if (!estimateIso || status.kind === KIND_ABOUT_TO_REFILL) return '';
+  if (!estimateIso || status.kind === KIND_ABOUT_TO_REFILL) {
+    return '';
+  }
+
   const days = daysUntil(estimateIso);
   const inSuffix = days > 0 ? ' (in ' + formatDayCount(days) + ')' : '';
   const sourceTag = ws.nextRefillAt ? '' : ' [from billing_period_end]';
@@ -213,9 +239,15 @@ function estimatedRefillRow(ws: WorkspaceCredit, status: WorkspaceStatus, estima
  *    warningStart = estimateIso − config.refillWarningThresholdDays
  *  Lets the user see exactly which day the "About To Refill" pill will trigger. */
 function warningStartRow(estimateIso: string, refillWarningDays: number): string {
-  if (!estimateIso || refillWarningDays <= 0) return '';
+  if (!estimateIso || refillWarningDays <= 0) {
+    return '';
+  }
+
   const refillMs = Date.parse(estimateIso);
-  if (!Number.isFinite(refillMs)) return '';
+  if (!Number.isFinite(refillMs)) {
+    return '';
+  }
+
   const warnMs = refillMs - refillWarningDays * 86_400_000;
   const warnDate = formatDateDDMMMYY(new Date(warnMs).toISOString());
   const now = Date.now();
@@ -236,39 +268,65 @@ function buildRefillSection(
   config: WorkspaceLifecycleConfig,
 ): string {
   const estimateIso = pickRefillEstimateIso(ws);
-  if (!estimateIso && status.kind !== KIND_ABOUT_TO_REFILL) return '';
+  if (!estimateIso && status.kind !== KIND_ABOUT_TO_REFILL) {
+    return '';
+  }
+
   const rows = [
     activeRefillRow(status),
     estimatedRefillRow(ws, status, estimateIso),
     warningStartRow(estimateIso, config.refillWarningThresholdDays),
   ].filter((s) => s.length > 0);
-  if (rows.length === 0) return '';
+  if (rows.length === 0) {
+    return '';
+  }
 
   return sectionHeaderHtml('Refill') + rows.join('');
 }
 
 function expiryLabelFor(kind: WorkspaceStatus['kind']): string {
-  if (kind === 'expired-canceled') return 'Canceled on';
-  if (kind === 'fully-expired') return 'Fully expired since';
-  if (kind === 'about-to-expire') return LABEL_PAST_DUE_SINCE;
-  if (kind === KIND_PAST_DUE_EXPIRING) return LABEL_PAST_DUE_SINCE;
-  if (kind === 'expired') return 'Expired since';
+  if (kind === 'expired-canceled') {
+    return 'Canceled on';
+  }
+
+  if (kind === 'fully-expired') {
+    return 'Fully expired since';
+  }
+
+  if (kind === 'about-to-expire') {
+    return LABEL_PAST_DUE_SINCE;
+  }
+
+  if (kind === KIND_PAST_DUE_EXPIRING) {
+    return LABEL_PAST_DUE_SINCE;
+  }
+
+  if (kind === 'expired') {
+    return 'Expired since';
+  }
 
   return 'Since';
 }
 
 function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): string {
-  if (status.kind === 'normal' || status.kind === KIND_ABOUT_TO_REFILL) return '';
+  if (status.kind === 'normal' || status.kind === KIND_ABOUT_TO_REFILL) {
+    return '';
+  }
+
   const out: string[] = [sectionHeaderHtml('Expiry')];
   if (status.sinceIso) {
     const date = formatDateDDMMMYY(status.sinceIso);
     const dur = formatDayCount(status.daysSince);
     let color = '#fca5a5';
-    if (status.kind === 'about-to-expire' || status.kind === KIND_PAST_DUE_EXPIRING) color = '#fde68a';
+    if (status.kind === 'about-to-expire' || status.kind === KIND_PAST_DUE_EXPIRING) {
+      color = '#fde68a';
+    }
+
     out.push(rowHtml(expiryLabelFor(status.kind), date + ' (' + dur + ')', color));
   } else {
     out.push(rowHtml(LABEL_STATUS, escHtml(status.label), '#fca5a5'));
   }
+
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Billing period ends', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
@@ -282,22 +340,34 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
  * subscription remains unpaid. Only renders for `past-due-expiring` rows.
  */
 function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): string {
-  if (status.kind !== KIND_PAST_DUE_EXPIRING) return '';
+  if (status.kind !== KIND_PAST_DUE_EXPIRING) {
+    return '';
+  }
+
   const out: string[] = [sectionHeaderHtml('Past Due')];
   out.push(rowHtml(LABEL_STATUS, 'Grants remain active', '#34d399'));
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
+
   out.push(rowHtml('Warning', 'Credits will be lost if unpaid', '#fca5a5'));
 
   return out.join('');
 }
 
 function buildMetaSection(ws: WorkspaceCredit): string {
-  if (!ws.createdAt && !ws.id) return '';
+  if (!ws.createdAt && !ws.id) {
+    return '';
+  }
+
   const out: string[] = [sectionHeaderHtml('Meta')];
-  if (ws.createdAt) out.push(rowHtml('Created', formatDateDDMMMYY(ws.createdAt)));
-  if (ws.id) out.push(rowHtml('ID', escHtml(String(ws.id))));
+  if (ws.createdAt) {
+    out.push(rowHtml('Created', formatDateDDMMMYY(ws.createdAt)));
+  }
+
+  if (ws.id) {
+    out.push(rowHtml('ID', escHtml(String(ws.id))));
+  }
 
   return out.join('');
 }
@@ -355,6 +425,7 @@ function buildStatusTraceSection(explanation: StatusExplanation): string {
   } else {
     out.push(rowHtml('status_changed_at', '—'));
   }
+
   if (inp.refillIsoUsed) {
     const inDays = inp.daysToRefill >= 0 ? ' (in ' + formatDayCount(inp.daysToRefill) + ')' : ' (past)';
     out.push(rowHtml('refill date',
@@ -363,6 +434,7 @@ function buildStatusTraceSection(explanation: StatusExplanation): string {
   } else {
     out.push(rowHtml('refill date', '—'));
   }
+
   out.push(rowHtml('grace / refill window',
     formatDayCount(inp.expiryGracePeriodDays) + ' / ' + formatDayCount(inp.refillWarningThresholdDays)));
 
@@ -373,6 +445,7 @@ function buildStatusTraceSection(explanation: StatusExplanation): string {
     const text = step.matched ? step.description : (step.skippedReason || 'skipped');
     out.push(traceLineHtml(step.matched, step.rule, text));
   }
+
   out.push('</div>');
 
   out.push('<div style="margin-top:6px;font-size:10px;color:#94a3b8;">'
@@ -400,18 +473,31 @@ const C_ACCENT = '#67e8f9';
 const C_MUTED = '#94a3b8';
 
 function availableColor(available: number, daily: number): string {
-  if (available <= 0) return C_DESTRUCTIVE;
+  if (available <= 0) {
+    return C_DESTRUCTIVE;
+  }
+
   const denom = daily > 0 ? daily : Math.max(1, available);
   const ratio = available / denom;
-  if (ratio < 0.1) return C_DESTRUCTIVE;
-  if (ratio < 0.5) return C_WARNING;
+  if (ratio < 0.1) {
+    return C_DESTRUCTIVE;
+  }
+
+  if (ratio < 0.5) {
+    return C_WARNING;
+  }
 
   return C_SUCCESS;
 }
 
 function dateColor(daysUntilEvent: number, expired = false): string {
-  if (expired || daysUntilEvent < 0) return C_DESTRUCTIVE;
-  if (daysUntilEvent <= 1) return C_WARNING;
+  if (expired || daysUntilEvent < 0) {
+    return C_DESTRUCTIVE;
+  }
+
+  if (daysUntilEvent <= 1) {
+    return C_WARNING;
+  }
 
   return C_ACCENT;
 }
@@ -445,6 +531,7 @@ function creditsCompactRow(ws: WorkspaceCredit): string {
 
     return compactRow('Credits', dashHtml);
   }
+
   const avail = summary.available;
   const daily = Math.round(summary.dailyLimit || summary.daily || 0);
   const used = summary.totalUsed;
@@ -463,7 +550,10 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
   const iso = status.kind === KIND_ABOUT_TO_REFILL && status.refillIso
     ? status.refillIso
     : pickRefillEstimateIso(ws);
-  if (!iso) return '';
+  if (!iso) {
+    return '';
+  }
+
   const days = daysUntil(iso);
   const date = formatDateDDMMMYY(iso);
   const rel = days < 0 ? 'overdue' : (days === 0 ? 'today' : 'in ' + formatDayCount(days));
@@ -477,7 +567,10 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
 function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string {
   const iso = (ws.billingPeriodEndAt || '').trim();
   const expired = status.kind === 'expired' || status.kind === 'fully-expired' || status.kind === 'expired-canceled';
-  if (!iso && !expired) return '';
+  if (!iso && !expired) {
+    return '';
+  }
+
   if (!iso && status.sinceIso) {
     const days = daysBetween(status.sinceIso);
     const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">expired ' + formatDayCount(days) + ' ago</span>'
@@ -485,7 +578,11 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
 
     return compactRow('Expires', html);
   }
-  if (!iso) return '';
+
+  if (!iso) {
+    return '';
+  }
+
   const days = daysUntil(iso);
   const date = formatDateDDMMMYY(iso);
   const rel = days < 0 ? 'expired ' + formatDayCount(-days) + ' ago' : (days === 0 ? 'today' : 'in ' + formatDayCount(days));
@@ -498,7 +595,10 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
 
 /** Issue 118: compact past-due warning row for the hover card header. */
 function pastDueCompactRow(status: WorkspaceStatus): string {
-  if (status.kind !== KIND_PAST_DUE_EXPIRING) return '';
+  if (status.kind !== KIND_PAST_DUE_EXPIRING) {
+    return '';
+  }
+
   const days = status.daysSince || 0;
   const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">past due ' + formatDayCount(days) + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> — pay to keep credits</span>';
@@ -571,7 +671,10 @@ function scheduleHide(): void {
 
 function ensureCardElement(): HTMLDivElement {
   let el = document.getElementById(HOVERCARD_ID) as HTMLDivElement | null;
-  if (el) return el;
+  if (el) {
+    return el;
+  }
+
   el = document.createElement('div');
   el.id = HOVERCARD_ID;
   el.style.cssText = [
@@ -608,9 +711,16 @@ function positionCard(card: HTMLElement, anchor: HTMLElement): void {
     const leftSide = r.left - cardRect.width - GAP;
     left = leftSide >= 8 ? leftSide : Math.max(8, vw - cardRect.width - 8);
   }
+
   let top = r.top;
-  if (top + cardRect.height > vh - 8) top = Math.max(8, vh - cardRect.height - 8);
-  if (top < 8) top = 8;
+  if (top + cardRect.height > vh - 8) {
+    top = Math.max(8, vh - cardRect.height - 8);
+  }
+
+  if (top < 8) {
+    top = 8;
+  }
+
   card.style.left = left + 'px';
   card.style.top = top + 'px';
   card.style.visibility = 'visible';
@@ -619,7 +729,9 @@ function positionCard(card: HTMLElement, anchor: HTMLElement): void {
 function hideCard(): void {
   cancelHideTimer();
   const el = document.getElementById(HOVERCARD_ID);
-  if (el) el.style.display = 'none';
+  if (el) {
+    el.style.display = 'none';
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -642,23 +754,42 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
   if (store._wsHoverCardOver) {
     listEl.removeEventListener('mouseover', store._wsHoverCardOver);
   }
+
   if (store._wsHoverCardOut) {
     listEl.removeEventListener('mouseout', store._wsHoverCardOut);
   }
 
   const overHandler = function (e: MouseEvent): void {
     const config = getWorkspaceLifecycleConfig();
-    if (!config.enableWorkspaceHoverDetails) return;
+    if (!config.enableWorkspaceHoverDetails) {
+      return;
+    }
+
     const target = e.target as HTMLElement | null;
-    if (!target) return;
+    if (!target) {
+      return;
+    }
+
     const nameEl = target.closest(SEL_WS_NAME) as HTMLElement | null;
-    if (!nameEl) return;
+    if (!nameEl) {
+      return;
+    }
+
     const item = nameEl.closest(SEL_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    if (!item) {
+      return;
+    }
+
     const wsId = item.getAttribute('data-ws-id') || '';
-    if (!wsId) return;
+    if (!wsId) {
+      return;
+    }
+
     const ws = lookup(wsId);
-    if (!ws) return;
+    if (!ws) {
+      return;
+    }
+
     cancelHideTimer();
     const status = getEffectiveStatus(ws, config);
     const card = ensureCardElement();
@@ -668,10 +799,19 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
 
   const outHandler = function (e: MouseEvent): void {
     const target = e.target as HTMLElement | null;
-    if (!target) return;
-    if (!target.closest(SEL_WS_NAME)) return;
+    if (!target) {
+      return;
+    }
+
+    if (!target.closest(SEL_WS_NAME)) {
+      return;
+    }
+
     const related = e.relatedTarget as HTMLElement | null;
-    if (related && related.closest(SEL_WS_NAME)) return;
+    if (related && related.closest(SEL_WS_NAME)) {
+      return;
+    }
+
     // Don't hide immediately — give the user time to move onto the card and
     // click <details> or copy IDs. The card's own mouseenter cancels the timer.
     if (related && related.closest('#' + HOVERCARD_ID)) {
@@ -679,6 +819,7 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
 
       return;
     }
+
     scheduleHide();
   };
 
@@ -703,13 +844,19 @@ export function hideWorkspaceHoverCard(): void {
 export function showWorkspaceHoverCardPinned(wsId: string): void {
   const anchor = document.querySelector('[data-ws-id="' + wsId + '"]') as HTMLElement | null;
   const row = anchor ? anchor.closest(SEL_WS_ITEM) as HTMLElement | null : null;
-  if (!row) return;
+  if (!row) {
+    return;
+  }
+
   const sdkWindow = window as unknown as {
     RiseupAsiaMacroExt?: { loopCreditState?: { perWorkspace?: WorkspaceCredit[] } };
   };
   const all = sdkWindow.RiseupAsiaMacroExt?.loopCreditState?.perWorkspace || [];
   const ws = all.find((w) => String(w.id) === wsId);
-  if (!ws) return;
+  if (!ws) {
+    return;
+  }
+
   const config = getWorkspaceLifecycleConfig();
   const status = getEffectiveStatus(ws, config);
   cancelHideTimer();
@@ -717,15 +864,22 @@ export function showWorkspaceHoverCardPinned(wsId: string): void {
   card.innerHTML = buildWorkspaceHoverHtml(ws, status, config);
   positionCard(card, row);
   const dismiss = (e: Event): void => {
-    if (e.type === 'keydown' && (e as KeyboardEvent).key !== 'Escape') return;
+    if (e.type === 'keydown' && (e as KeyboardEvent).key !== 'Escape') {
+      return;
+    }
+
     if (e.type === 'click') {
       const target = e.target as HTMLElement | null;
-      if (target && (target.closest('#' + HOVERCARD_ID) || row.contains(target))) return;
+      if (target && (target.closest('#' + HOVERCARD_ID) || row.contains(target))) {
+        return;
+      }
     }
+
     hideCard();
     document.removeEventListener('click', dismiss, true);
     document.removeEventListener('keydown', dismiss, true);
   };
+
   setTimeout(() => {
     document.addEventListener('click', dismiss, true);
     document.addEventListener('keydown', dismiss, true);

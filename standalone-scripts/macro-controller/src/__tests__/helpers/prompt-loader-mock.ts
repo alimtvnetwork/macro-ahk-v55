@@ -30,10 +30,10 @@ export interface PromptLoaderMockShape {
 }
 
 export function buildPromptLoaderMock(overrides: Partial<PromptLoaderMockShape> = {}): PromptLoaderMockShape {
-    const defaults: PromptLoaderMockShape = {
-        sendToExtension: async () => ({ ok: true, rows: [] }),
-        getPromptsConfig: () => ({ editorXPath: '//div' }),
-    };
+  const defaults: PromptLoaderMockShape = {
+    sendToExtension: async () => ({ ok: true, rows: [] }),
+    getPromptsConfig: () => ({ editorXPath: '//div' }),
+  };
 
-    return { ...defaults, ...overrides };
+  return { ...defaults, ...overrides };
 }

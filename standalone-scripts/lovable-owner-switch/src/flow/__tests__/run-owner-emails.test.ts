@@ -20,93 +20,93 @@ import type { OwnerSwitchCsvRow } from "../../csv/csv-types";
 import * as runPromoteModule from "../run-promote";
 
 const buildRow = (overrides: Partial<OwnerSwitchCsvRow> = {}): OwnerSwitchCsvRow => ({
-    RowIndex: 1,
-    LoginEmail: "[email protected]",
-    Password: "pw",
-    OwnerEmail1: "[email protected]",
-    OwnerEmail2: "[email protected]",
-    Notes: null,
-    ...overrides,
+  RowIndex: 1,
+  LoginEmail: "[email protected]",
+  Password: "pw",
+  OwnerEmail1: "[email protected]",
+  OwnerEmail2: "[email protected]",
+  Notes: null,
+  ...overrides,
 });
 
 const buildCtx = (row: OwnerSwitchCsvRow): RowExecutionContext => ({
-    Task: {
-        TaskId: "task-1", LoginUrl: "https://lovable.dev/login",
-        CommonPassword: null, UseIncognito: false,
-    },
-    Row: row,
-    Api: {} as RowExecutionContext["Api"],
-    Caches: {} as RowExecutionContext["Caches"],
-    XPathOverrides: [],
+  Task: {
+    TaskId: "task-1", LoginUrl: "https://lovable.dev/login",
+    CommonPassword: null, UseIncognito: false,
+  },
+  Row: row,
+  Api: {} as RowExecutionContext["Api"],
+  Caches: {} as RowExecutionContext["Caches"],
+  XPathOverrides: [],
 });
 
 const collectingSink = (): { sink: LogSink; entries: LogEntry[] } => {
-    const entries: LogEntry[] = [];
+  const entries: LogEntry[] = [];
 
-    return { sink: { write: (e) => entries.push(e) }, entries };
+  return { sink: { write: (e) => entries.push(e) }, entries };
 };
 
 describe("runOwnerEmails — failure marking, no rollback", () => {
-    it("multi-owner: owner1 succeeds, owner2 fails → partial state + warn log", async () => {
-        const { sink, entries } = collectingSink();
-        const spy = vi.spyOn(runPromoteModule, "runPromote")
-            .mockResolvedValueOnce({ Outcomes: [], FailedStep: null, Error: null })
-            .mockResolvedValueOnce({
-                Outcomes: [], FailedStep: null, Error: "PUT 500 server error",
-            });
+  it("multi-owner: owner1 succeeds, owner2 fails → partial state + warn log", async () => {
+    const { sink, entries } = collectingSink();
+    const spy = vi.spyOn(runPromoteModule, "runPromote")
+      .mockResolvedValueOnce({ Outcomes: [], FailedStep: null, Error: null })
+      .mockResolvedValueOnce({
+        Outcomes: [], FailedStep: null, Error: "PUT 500 server error",
+      });
 
-        const result = await runOwnerEmails(buildCtx(buildRow()), sink);
+    const result = await runOwnerEmails(buildCtx(buildRow()), sink);
 
-        expect(spy).toHaveBeenCalledTimes(2);
-        expect(result.Failure).not.toBeNull();
-        expect(result.Failure?.Email).toBe("[email protected]");
-        expect(result.Records).toHaveLength(2);
-        expect(result.Records[0]).toEqual({
-            OwnerEmail: "[email protected]", Promoted: true, FailedStep: null, Error: null,
-        });
-        expect(result.Records[1]).toMatchObject({
-            OwnerEmail: "[email protected]", Promoted: false, Error: "PUT 500 server error",
-        });
-
-        const warnEntry = entries.find(
-            (e) => e.Phase === LogPhaseType.Promote && e.Severity === LogSeverityType.Warn,
-        );
-        expect(warnEntry).toBeDefined();
-        expect(warnEntry?.Message).toMatch(/No rollback performed/);
-        expect(warnEntry?.Message).toMatch(/[email protected]/);
-
-        spy.mockRestore();
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(result.Failure).not.toBeNull();
+    expect(result.Failure?.Email).toBe("[email protected]");
+    expect(result.Records).toHaveLength(2);
+    expect(result.Records[0]).toEqual({
+      OwnerEmail: "[email protected]", Promoted: true, FailedStep: null, Error: null,
+    });
+    expect(result.Records[1]).toMatchObject({
+      OwnerEmail: "[email protected]", Promoted: false, Error: "PUT 500 server error",
     });
 
-    it("single-owner failure: no warn log (nothing was promoted before)", async () => {
-        const { sink, entries } = collectingSink();
-        const spy = vi.spyOn(runPromoteModule, "runPromote")
-            .mockResolvedValueOnce({
-                Outcomes: [], FailedStep: null, Error: "membership not found",
-            });
+    const warnEntry = entries.find(
+      (e) => e.Phase === LogPhaseType.Promote && e.Severity === LogSeverityType.Warn,
+    );
+    expect(warnEntry).toBeDefined();
+    expect(warnEntry?.Message).toMatch(/No rollback performed/);
+    expect(warnEntry?.Message).toMatch(/[email protected]/);
 
-        const result = await runOwnerEmails(buildCtx(buildRow({ OwnerEmail2: null })), sink);
+    spy.mockRestore();
+  });
 
-        expect(result.Records).toHaveLength(1);
-        expect(result.Records[0].Promoted).toBe(false);
-        expect(result.Failure?.Email).toBe("[email protected]");
+  it("single-owner failure: no warn log (nothing was promoted before)", async () => {
+    const { sink, entries } = collectingSink();
+    const spy = vi.spyOn(runPromoteModule, "runPromote")
+      .mockResolvedValueOnce({
+        Outcomes: [], FailedStep: null, Error: "membership not found",
+      });
 
-        const warnEntries = entries.filter((e) => e.Severity === LogSeverityType.Warn);
-        expect(warnEntries).toHaveLength(0);
+    const result = await runOwnerEmails(buildCtx(buildRow({ OwnerEmail2: null })), sink);
 
-        spy.mockRestore();
-    });
+    expect(result.Records).toHaveLength(1);
+    expect(result.Records[0].Promoted).toBe(false);
+    expect(result.Failure?.Email).toBe("[email protected]");
 
-    it("all owners succeed → no failure, every record marked Promoted=true", async () => {
-        const { sink } = collectingSink();
-        const spy = vi.spyOn(runPromoteModule, "runPromote")
-            .mockResolvedValue({ Outcomes: [], FailedStep: null, Error: null });
+    const warnEntries = entries.filter((e) => e.Severity === LogSeverityType.Warn);
+    expect(warnEntries).toHaveLength(0);
 
-        const result = await runOwnerEmails(buildCtx(buildRow()), sink);
+    spy.mockRestore();
+  });
 
-        expect(result.Failure).toBeNull();
-        expect(result.Records.every((r) => r.Promoted)).toBe(true);
+  it("all owners succeed → no failure, every record marked Promoted=true", async () => {
+    const { sink } = collectingSink();
+    const spy = vi.spyOn(runPromoteModule, "runPromote")
+      .mockResolvedValue({ Outcomes: [], FailedStep: null, Error: null });
 
-        spy.mockRestore();
-    });
+    const result = await runOwnerEmails(buildCtx(buildRow()), sink);
+
+    expect(result.Failure).toBeNull();
+    expect(result.Records.every((r) => r.Promoted)).toBe(true);
+
+    spy.mockRestore();
+  });
 });

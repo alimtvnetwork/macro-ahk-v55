@@ -41,8 +41,13 @@ export interface WireBatchRefreshOptions extends BatchRefreshOptions {
 }
 
 function isDispatchablePlan(plan: string, allowPlan0: boolean): boolean {
-  if (plan === PRO_ONE_PLAN_LITERAL) return true;
-  if (allowPlan0 && plan === PRO_ZERO_PLAN_LITERAL) return true;
+  if (plan === PRO_ONE_PLAN_LITERAL) {
+    return true;
+  }
+
+  if (allowPlan0 && plan === PRO_ZERO_PLAN_LITERAL) {
+    return true;
+  }
 
   return false;
 }
@@ -72,7 +77,9 @@ export async function batchRefreshFromWire(
     };
   });
 
-  const dispatchableCount = batchInput.filter(function (c) { return c.dispatchable; }).length;
+  const dispatchableCount = batchInput.filter(function (c) {
+    return c.dispatchable; 
+  }).length;
 
   log('CreditBalance.batchFromWire: raw=' + String(rawRows.length)
     + ', typed=' + String(candidates.length)

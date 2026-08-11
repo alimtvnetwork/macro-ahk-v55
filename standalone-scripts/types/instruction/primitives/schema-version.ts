@@ -45,7 +45,7 @@ export const CURRENT_SCHEMA_VERSION = "1.0" as const;
 export type SupportedSchemaVersion = typeof SUPPORTED_SCHEMA_VERSIONS[number];
 
 export function isSupportedSchemaVersion(v: unknown): v is SupportedSchemaVersion {
-    return typeof v === "string"
+  return typeof v === "string"
         && SCHEMA_VERSION_PATTERN.test(v)
         && (SUPPORTED_SCHEMA_VERSIONS as readonly string[]).includes(v);
 }

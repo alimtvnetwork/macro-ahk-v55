@@ -31,7 +31,9 @@ function makeResult(): CreditFetchResult {
 }
 
 describe('hasFreshCreditBalanceCache', () => {
-  beforeEach(() => { clearCreditBalanceUpdateMemoryCache(); });
+  beforeEach(() => {
+    clearCreditBalanceUpdateMemoryCache(); 
+  });
 
   it('returns false for empty workspace id', () => {
     expect(hasFreshCreditBalanceCache('')).toBe(false);

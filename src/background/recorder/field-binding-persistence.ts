@@ -34,36 +34,36 @@ export interface PersistedFieldBinding {
  * to pass the columns array.
  */
 export async function validateFieldBinding(
-    projectSlug: string,
-    dataSourceId: number,
-    columnName: string,
+  projectSlug: string,
+  dataSourceId: number,
+  columnName: string,
 ): Promise<void> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
-    const columns = readDataSourceColumns(db, dataSourceId);
-    const exists = columns.includes(columnName);
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
+  const columns = readDataSourceColumns(db, dataSourceId);
+  const exists = columns.includes(columnName);
 
-    if (exists === false) {
-        throw new Error(
-            `FieldBinding rejected — column "${columnName}" not in DataSource ${dataSourceId}`,
-        );
-    }
+  if (exists === false) {
+    throw new Error(
+      `FieldBinding rejected — column "${columnName}" not in DataSource ${dataSourceId}`,
+    );
+  }
 }
 
 function readDataSourceColumns(
-    db: SqlJsDatabase,
-    dataSourceId: number,
+  db: SqlJsDatabase,
+  dataSourceId: number,
 ): ReadonlyArray<string> {
-    const result = db.exec(
-        "SELECT Columns FROM DataSource WHERE DataSourceId = ?",
-        [dataSourceId],
-    );
-    const raw = result[0]?.values[0]?.[0];
-    if (raw === undefined) {
-        throw new Error(`DataSource ${dataSourceId} not found`);
-    }
+  const result = db.exec(
+    "SELECT Columns FROM DataSource WHERE DataSourceId = ?",
+    [dataSourceId],
+  );
+  const raw = result[0]?.values[0]?.[0];
+  if (raw === undefined) {
+    throw new Error(`DataSource ${dataSourceId} not found`);
+  }
 
-    return JSON.parse(raw as string) as ReadonlyArray<string>;
+  return JSON.parse(raw as string) as ReadonlyArray<string>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,46 +71,46 @@ function readDataSourceColumns(
 /* ------------------------------------------------------------------ */
 
 export async function upsertFieldBinding(
-    projectSlug: string,
-    stepId: number,
-    dataSourceId: number,
-    columnName: string,
+  projectSlug: string,
+  stepId: number,
+  dataSourceId: number,
+  columnName: string,
 ): Promise<PersistedFieldBinding> {
-    await validateFieldBinding(projectSlug, dataSourceId, columnName);
+  await validateFieldBinding(projectSlug, dataSourceId, columnName);
 
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
 
-    db.run(
-        `INSERT INTO FieldBinding (StepId, DataSourceId, ColumnName)
+  db.run(
+    `INSERT INTO FieldBinding (StepId, DataSourceId, ColumnName)
          VALUES (?, ?, ?)
          ON CONFLICT(StepId) DO UPDATE SET
              DataSourceId = excluded.DataSourceId,
              ColumnName   = excluded.ColumnName`,
-        [stepId, dataSourceId, columnName],
-    );
+    [stepId, dataSourceId, columnName],
+  );
 
-    mgr.markDirty();
+  mgr.markDirty();
 
-    return readBindingByStep(db, stepId);
+  return readBindingByStep(db, stepId);
 }
 
 function readBindingByStep(
-    db: SqlJsDatabase,
-    stepId: number,
+  db: SqlJsDatabase,
+  stepId: number,
 ): PersistedFieldBinding {
-    const result = db.exec(
-        `SELECT FieldBindingId, StepId, DataSourceId, ColumnName, CreatedAt
+  const result = db.exec(
+    `SELECT FieldBindingId, StepId, DataSourceId, ColumnName, CreatedAt
          FROM FieldBinding
          WHERE StepId = ?`,
-        [stepId],
-    );
-    const row = result[0]?.values[0];
-    if (row === undefined) {
-        throw new Error(`FieldBinding row missing for StepId ${stepId} after upsert`);
-    }
+    [stepId],
+  );
+  const row = result[0]?.values[0];
+  if (row === undefined) {
+    throw new Error(`FieldBinding row missing for StepId ${stepId} after upsert`);
+  }
 
-    return rowToRecord(row);
+  return rowToRecord(row);
 }
 
 /* ------------------------------------------------------------------ */
@@ -118,18 +118,18 @@ function readBindingByStep(
 /* ------------------------------------------------------------------ */
 
 export async function listFieldBindings(
-    projectSlug: string,
+  projectSlug: string,
 ): Promise<ReadonlyArray<PersistedFieldBinding>> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
-    const result = db.exec(
-        `SELECT FieldBindingId, StepId, DataSourceId, ColumnName, CreatedAt
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
+  const result = db.exec(
+    `SELECT FieldBindingId, StepId, DataSourceId, ColumnName, CreatedAt
          FROM FieldBinding
          ORDER BY FieldBindingId DESC`,
-    );
-    const values = result[0]?.values ?? [];
+  );
+  const values = result[0]?.values ?? [];
 
-    return values.map(rowToRecord);
+  return values.map(rowToRecord);
 }
 
 /* ------------------------------------------------------------------ */
@@ -137,13 +137,13 @@ export async function listFieldBindings(
 /* ------------------------------------------------------------------ */
 
 export async function deleteFieldBinding(
-    projectSlug: string,
-    stepId: number,
+  projectSlug: string,
+  stepId: number,
 ): Promise<void> {
-    const mgr = await initProjectDb(projectSlug);
-    const db = mgr.getDb();
-    db.run("DELETE FROM FieldBinding WHERE StepId = ?", [stepId]);
-    mgr.markDirty();
+  const mgr = await initProjectDb(projectSlug);
+  const db = mgr.getDb();
+  db.run("DELETE FROM FieldBinding WHERE StepId = ?", [stepId]);
+  mgr.markDirty();
 }
 
 /* ------------------------------------------------------------------ */
@@ -151,11 +151,11 @@ export async function deleteFieldBinding(
 /* ------------------------------------------------------------------ */
 
 function rowToRecord(row: ReadonlyArray<unknown>): PersistedFieldBinding {
-    return {
-        FieldBindingId: row[0] as number,
-        StepId: row[1] as number,
-        DataSourceId: row[2] as number,
-        ColumnName: row[3] as string,
-        CreatedAt: row[4] as string,
-    };
+  return {
+    FieldBindingId: row[0] as number,
+    StepId: row[1] as number,
+    DataSourceId: row[2] as number,
+    ColumnName: row[3] as string,
+    CreatedAt: row[4] as string,
+  };
 }

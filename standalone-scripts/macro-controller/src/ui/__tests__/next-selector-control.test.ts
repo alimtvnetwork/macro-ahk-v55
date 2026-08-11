@@ -14,9 +14,9 @@ const setDefaultPromptForRoleMock = vi.fn();
 const openPromptEditorMock = vi.fn();
 
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
+  DbResult,
+  DbResult,
+  DbResult,
   listPromptsByRole: (...args: unknown[]) => listPromptsByRoleMock(...args),
   setDefaultPromptForRole: (...args: unknown[]) => setDefaultPromptForRoleMock(...args),
 }));

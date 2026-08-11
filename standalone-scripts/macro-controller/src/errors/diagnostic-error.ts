@@ -58,8 +58,14 @@ export function toDiagnosticId(
   value: string | number | boolean | null | undefined,
   fallback: string = '(unset)',
 ): DiagnosticContextValue {
-  if (value === undefined) return fallback;
-  if (value === null) return null;
+  if (value === undefined) {
+    return fallback;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
     return value;
   }
@@ -113,6 +119,7 @@ export class DiagnosticError extends Error {
         `Unknown error code "${code}". Add it to ERROR_CODES before throwing.`,
       );
     }
+
     assertRequiredKeys(entry, context);
     const message = formatTemplate(entry.humanTemplate, context);
     super(`[${code}] ${message}`);
@@ -135,27 +142,28 @@ export class DiagnosticError extends Error {
     for (const [k, v] of Object.entries(this.context)) {
       maskedContext[k] = SENSITIVE_KEY_PATTERN.test(k) ? MASK : v;
     }
+
     const causeInfo = extractCauseInfo(this.cause);
     const report: DiagnosticReport = causeInfo
       ? {
-          code: this.code,
-          area: this.area,
-          action: this.action,
-          severity: this.severity,
-          message: this.message,
-          context: maskedContext,
-          cause: causeInfo,
-          timestamp: this.timestamp,
-        }
+        code: this.code,
+        area: this.area,
+        action: this.action,
+        severity: this.severity,
+        message: this.message,
+        context: maskedContext,
+        cause: causeInfo,
+        timestamp: this.timestamp,
+      }
       : {
-          code: this.code,
-          area: this.area,
-          action: this.action,
-          severity: this.severity,
-          message: this.message,
-          context: maskedContext,
-          timestamp: this.timestamp,
-        };
+        code: this.code,
+        area: this.area,
+        action: this.action,
+        severity: this.severity,
+        message: this.message,
+        context: maskedContext,
+        timestamp: this.timestamp,
+      };
 
     return report;
   }
@@ -172,11 +180,13 @@ function assertRequiredKeys(entry: ErrorCodeEntry, context: DiagnosticContext): 
       missingRequired.push(key);
     }
   }
+
   if (missingRequired.length > 0) {
     throw new DiagnosticMetaError(
       `Error code "${entry.code}" is missing required context keys: ${missingRequired.join(', ')}.`,
     );
   }
+
   const placeholders = extractTemplatePlaceholders(entry.humanTemplate);
   const missingPlaceholders: string[] = [];
   for (const name of placeholders) {
@@ -184,6 +194,7 @@ function assertRequiredKeys(entry: ErrorCodeEntry, context: DiagnosticContext): 
       missingPlaceholders.push(name);
     }
   }
+
   if (missingPlaceholders.length > 0) {
     throw new DiagnosticMetaError(
       `Error code "${entry.code}" template references placeholders not supplied in context: ${missingPlaceholders.join(', ')}.`,
@@ -201,8 +212,14 @@ function formatTemplate(template: string, context: DiagnosticContext): string {
 }
 
 function stringifyValue(v: DiagnosticContextValue | undefined): string {
-  if (v === undefined || v === null) return String(v);
-  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') return String(v);
+  if (v === undefined || v === null) {
+    return String(v);
+  }
+
+  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+    return String(v);
+  }
+
   try {
     return JSON.stringify(v);
   } catch {
@@ -216,7 +233,10 @@ function extractCauseInfo(cause: unknown): DiagnosticReport['cause'] | undefined
       ? { name: cause.name, message: cause.message, stack: cause.stack }
       : { name: cause.name, message: cause.message };
   }
-  if (typeof cause === 'string') return { name: 'string', message: cause };
+
+  if (typeof cause === 'string') {
+    return { name: 'string', message: cause };
+  }
 
   return undefined;
 }
@@ -232,5 +252,6 @@ export function throwDiagnostic(code: string, context: DiagnosticContext, cause?
   if (!(code in ERROR_CODES)) {
     throw new DiagnosticMetaError(`Unknown error code "${code}".`);
   }
+
   throw new DiagnosticError(code, context, cause);
 }

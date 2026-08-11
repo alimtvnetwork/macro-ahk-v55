@@ -80,7 +80,7 @@ export const PROBE_POLL_INTERVAL_MS = 1_000;
 
 /** Well-known job id the server uses for sync-project jobs. */
 export function wellKnownJobId(projectId: string): string {
-    return 'gitsync-sync-project-' + projectId;
+  return 'gitsync-sync-project-' + projectId;
 }
 
 /* ------------------------------------------------------------------ */
@@ -88,10 +88,12 @@ export function wellKnownJobId(projectId: string): string {
 /* ------------------------------------------------------------------ */
 
 function getSdk(): SdkBridge | null {
-    const sdk = (window as unknown as { marco?: SdkBridge }).marco;
-    if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+  const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+  if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
+    return null;
+  }
 
-    return sdk;
+  return sdk;
 }
 
 /* ------------------------------------------------------------------ */
@@ -107,55 +109,67 @@ function getSdk(): SdkBridge | null {
  * Never retries internally — sequential fail-fast.
  */
 export async function probeProgress(
-    wsId: string,
-    projectId: string,
-    jobId: string,
+  wsId: string,
+  projectId: string,
+  jobId: string,
 ): Promise<GitsyncProgressBody | null> {
-    if (!wsId || !projectId || !jobId) {
-        const missing: string[] = [];
-        if (!wsId) missing.push('wsId');
-        if (!projectId) missing.push('projectId');
-        if (!jobId) missing.push('jobId');
-        throwDiagnostic('GITSYNC_PROBE_E001', { missingArgs: missing.join(',') });
+  if (!wsId || !projectId || !jobId) {
+    const missing: string[] = [];
+    if (!wsId) {
+      missing.push('wsId');
     }
-    const sdk = getSdk();
-    if (!sdk) {
-        const reason = 'marco.api.call unavailable (SDK not injected)';
-        logError('GitsyncProbe', 'probeProgress: ' + reason
+
+    if (!projectId) {
+      missing.push('projectId');
+    }
+
+    if (!jobId) {
+      missing.push('jobId');
+    }
+
+    throwDiagnostic('GITSYNC_PROBE_E001', { missingArgs: missing.join(',') });
+  }
+
+  const sdk = getSdk();
+  if (!sdk) {
+    const reason = 'marco.api.call unavailable (SDK not injected)';
+    logError('GitsyncProbe', 'probeProgress: ' + reason
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']');
-        throwDiagnostic('GITSYNC_PROBE_E002', { reason });
-    }
+    throwDiagnostic('GITSYNC_PROBE_E002', { reason });
+  }
 
-    const resp = await sdk.api.call('gitsync.progress', {
-        params: { wsId, projectId, jobId },
-        baseUrl: CREDIT_API_BASE,
-    });
+  const resp = await sdk.api.call('gitsync.progress', {
+    params: { wsId, projectId, jobId },
+    baseUrl: CREDIT_API_BASE,
+  });
 
-    if (resp.status === HttpCodes.NOT_FOUND) {
-        log('[GitsyncProbe] 404 — no job yet for ws=' + wsId + ' pid=' + projectId
+  if (resp.status === HttpCodes.NOT_FOUND) {
+    log('[GitsyncProbe] 404 — no job yet for ws=' + wsId + ' pid=' + projectId
             + ' job=' + jobId, 'info');
 
-        return null;
-    }
-    if (resp.status === HttpCodes.UNAUTHORIZED || resp.status === HttpCodes.FORBIDDEN) {
-        // Caller lacks access → treat as no visible job.
-        log('[GitsyncProbe] HTTP ' + resp.status + ' for ws=' + wsId
+    return null;
+  }
+
+  if (resp.status === HttpCodes.UNAUTHORIZED || resp.status === HttpCodes.FORBIDDEN) {
+    // Caller lacks access → treat as no visible job.
+    log('[GitsyncProbe] HTTP ' + resp.status + ' for ws=' + wsId
             + ' pid=' + projectId + ' → null', 'info');
 
-        return null;
-    }
-    if (!resp.ok) {
-        const preview = JSON.stringify(resp.data).substring(0, 200);
-        logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
+    return null;
+  }
+
+  if (!resp.ok) {
+    const preview = JSON.stringify(resp.data).substring(0, 200);
+    logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']'
             + ' bodyPreview=' + preview);
-        throwDiagnostic('GITSYNC_PROBE_E003', {
-            status: resp.status,
-            url: 'gitsync.progress?wsId=' + wsId + '&projectId=' + projectId + '&jobId=' + jobId,
-        });
-    }
+    throwDiagnostic('GITSYNC_PROBE_E003', {
+      status: resp.status,
+      url: 'gitsync.progress?wsId=' + wsId + '&projectId=' + projectId + '&jobId=' + jobId,
+    });
+  }
 
-    return (resp.data ?? {}) as GitsyncProgressBody;
+  return (resp.data ?? {}) as GitsyncProgressBody;
 }
 
 /* ------------------------------------------------------------------ */
@@ -163,28 +177,31 @@ export async function probeProgress(
 /* ------------------------------------------------------------------ */
 
 function isTerminal(body: GitsyncProgressBody | null): boolean {
-    if (!body) return false;
-    const s = body.status;
+  if (!body) {
+    return false;
+  }
 
-    return s === 'completed' || s === 'failed';
+  const s = body.status;
+
+  return s === 'completed' || s === 'failed';
 }
 
 function toConnected(body: GitsyncProgressBody): GitsyncConnectionState | null {
-    const url = body.result?.repo_url;
-    if (typeof url === 'string' && url.length > 0) {
-        return {
-            connected: true,
-            repoUrl: url,
-            repoName: body.result?.repo_name ?? null,
-            owner: body.result?.owner ?? null,
-        };
-    }
+  const url = body.result?.repo_url;
+  if (typeof url === 'string' && url.length > 0) {
+    return {
+      connected: true,
+      repoUrl: url,
+      repoName: body.result?.repo_name ?? null,
+      owner: body.result?.owner ?? null,
+    };
+  }
 
-    return null;
+  return null;
 }
 
 function sleep(ms: number): Promise<void> {
-    return new Promise((r) => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 /**
@@ -201,57 +218,70 @@ function sleep(ms: number): Promise<void> {
  * @param deadlineMs  total polling budget (default {@link DEFAULT_PROBE_DEADLINE_MS})
  */
 export async function resolveConnection(
-    wsId: string,
-    _connId: string,
-    projectId: string,
-    deadlineMs: number = DEFAULT_PROBE_DEADLINE_MS,
+  wsId: string,
+  _connId: string,
+  projectId: string,
+  deadlineMs: number = DEFAULT_PROBE_DEADLINE_MS,
 ): Promise<GitsyncConnectionState> {
-    if (!wsId || !projectId) {
-        return { connected: false, reason: 'error' };
-    }
-    const jobId = wellKnownJobId(projectId);
-    const start = Date.now();
+  if (!wsId || !projectId) {
+    return { connected: false, reason: 'error' };
+  }
 
-    // First probe — fast path for "already connected".
-    let body: GitsyncProgressBody | null;
-    try {
-        body = await probeProgress(wsId, projectId, jobId);
-    } catch (err: unknown) {
-        logError('GitsyncProbe', 'resolveConnection initial probe failed'
+  const jobId = wellKnownJobId(projectId);
+  const start = Date.now();
+
+  // First probe — fast path for "already connected".
+  let body: GitsyncProgressBody | null;
+  try {
+    body = await probeProgress(wsId, projectId, jobId);
+  } catch (err: unknown) {
+    logError('GitsyncProbe', 'resolveConnection initial probe failed'
             + ' [ws=' + wsId + ' pid=' + projectId + ']', err);
 
-        return { connected: false, reason: 'error' };
+    return { connected: false, reason: 'error' };
+  }
+
+  if (body === null) {
+    return { connected: false, reason: 'no_job' };
+  }
+
+  const initial = toConnected(body);
+  if (initial) {
+    return initial;
+  }
+
+  if (isTerminal(body)) {
+    return { connected: false, reason: 'no_repo_url' };
+  }
+
+  // In-flight — poll sequentially within deadline.
+  while (Date.now() - start < deadlineMs) {
+    await sleep(PROBE_POLL_INTERVAL_MS);
+    try {
+      body = await probeProgress(wsId, projectId, jobId);
+    } catch (err: unknown) {
+      logError('GitsyncProbe', 'resolveConnection poll probe failed'
+                + ' [ws=' + wsId + ' pid=' + projectId + ']', err);
+
+      return { connected: false, reason: 'error' };
     }
 
     if (body === null) {
-        return { connected: false, reason: 'no_job' };
+      return { connected: false, reason: 'no_job' };
     }
 
-    const initial = toConnected(body);
-    if (initial) return initial;
-    if (isTerminal(body)) return { connected: false, reason: 'no_repo_url' };
-
-    // In-flight — poll sequentially within deadline.
-    while (Date.now() - start < deadlineMs) {
-        await sleep(PROBE_POLL_INTERVAL_MS);
-        try {
-            body = await probeProgress(wsId, projectId, jobId);
-        } catch (err: unknown) {
-            logError('GitsyncProbe', 'resolveConnection poll probe failed'
-                + ' [ws=' + wsId + ' pid=' + projectId + ']', err);
-
-            return { connected: false, reason: 'error' };
-        }
-        if (body === null) {
-            return { connected: false, reason: 'no_job' };
-        }
-        const next = toConnected(body);
-        if (next) return next;
-        if (isTerminal(body)) return { connected: false, reason: 'no_repo_url' };
+    const next = toConnected(body);
+    if (next) {
+      return next;
     }
 
-    log('[GitsyncProbe] resolveConnection deadline ws=' + wsId
+    if (isTerminal(body)) {
+      return { connected: false, reason: 'no_repo_url' };
+    }
+  }
+
+  log('[GitsyncProbe] resolveConnection deadline ws=' + wsId
         + ' pid=' + projectId + ' after ' + deadlineMs + 'ms', 'info');
 
-    return { connected: false, reason: 'deadline' };
+  return { connected: false, reason: 'deadline' };
 }

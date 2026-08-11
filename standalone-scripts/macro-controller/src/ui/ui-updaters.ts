@@ -17,7 +17,10 @@ import { cacheWorkspaceName } from '../workspace-cache';
 import { isValidWorkspaceCandidateName } from '../ws-name-matching';
 import { getTitleBarDisplayState } from './title-bar-display';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
+
 import { IDS, TIMING, state, loopCreditState } from '../shared-state';
 import { log } from '../logger';
 import { runCycle } from '../loop-engine';
@@ -52,6 +55,7 @@ export function updateUI(): void {
       loopCreditState.currentWs ? loopCreditState.currentWs.id : undefined,
     );
   }
+
   // Clear the "from cache" flag once real data arrives
   if (state.workspaceFromApi) {
     state.workspaceFromCache = false;
@@ -84,12 +88,16 @@ export function updateProjectNameDisplay(): void {
  */
 export function updateTitleBarWorkspaceName(): void {
   const el = document.getElementById('loop-title-ws-name');
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   clearSkeletons(el);
 
   const syncIcon = document.getElementById('loop-ws-sync-icon');
-  if (syncIcon) syncIcon.remove();
+  if (syncIcon) {
+    syncIcon.remove();
+  }
 
   const titleBarState = getTitleBarDisplayState();
   el.textContent = titleBarState.text;
@@ -118,7 +126,10 @@ export function updateButtons(): void {
  * Button click animation — color flash only, no scale (v1.56).
  */
 export function animateBtn(btn: HTMLElement): void {
-  if (!btn) return;
+  if (!btn) {
+    return;
+  }
+
   const origBg = btn.style.background || '';
   btn.style.transition = 'filter 100ms ease, background 150ms ease, opacity 100ms ease';
   btn.style.filter = 'brightness(0.75)';
@@ -137,13 +148,20 @@ export function animateBtn(btn: HTMLElement): void {
  * Consistent hover feedback — color transition only, no scale/translate (v1.56).
  */
 export function attachButtonHoverFx(btn: HTMLElement): void {
-  if (!btn) return;
+  if (!btn) {
+    return;
+  }
+
   btn.style.transition = 'filter 150ms ease, background-color 150ms ease, box-shadow 150ms ease';
   btn.onmouseenter = function() {
-    if ((btn as HTMLButtonElement).disabled) return;
+    if ((btn as HTMLButtonElement).disabled) {
+      return;
+    }
+
     btn.style.filter = 'brightness(1.12)';
     btn.style.boxShadow = '0 2px 8px rgba(0,0,0,.3)';
   };
+
   btn.onmouseleave = function() {
     btn.style.filter = '';
     btn.style.boxShadow = '';
@@ -197,16 +215,27 @@ export function destroyPanel(): void {
   log('MacroLoop panel DESTROYED by user — remove marker + globals for clean re-inject', 'warn');
   nsWrite('_internal.destroyed', true);
 
-  try { nsCallTyped('api.loop.stop'); } catch (e) { log('destroyPanel: loop stop failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  try {
+    nsCallTyped('api.loop.stop'); 
+  } catch (e) {
+    log('destroyPanel: loop stop failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 
   const marker = document.getElementById(IDS.SCRIPT_MARKER);
-  if (marker) marker.remove();
+  if (marker) {
+    marker.remove();
+  }
+
   const container = document.getElementById(IDS.CONTAINER);
-  if (container) container.remove();
+  if (container) {
+    container.remove();
+  }
 
   // v3.60.0: also remove satellite elements with their own idempotency guards
   const recordIndicator = document.getElementById(IDS.RECORD_INDICATOR);
-  if (recordIndicator) recordIndicator.remove();
+  if (recordIndicator) {
+    recordIndicator.remove();
+  }
   // v4.16+: inline strips (PlanTierType / Next / Repeat) are NOT torn down here.
   // They live in the shared `#marco-inline-strips-frame` above the chat box
   // and persist until the user explicitly clicks the frame × button. Closing
@@ -216,11 +245,15 @@ export function destroyPanel(): void {
   // v3.60.0: clear SPA route-guard sentinel so the next bootstrap re-installs it
   try {
     (window as unknown as { __marcoRouteGuardInstalled?: boolean }).__marcoRouteGuardInstalled = false;
-  } catch (e) { log('destroyPanel: route-guard reset failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  } catch (e) {
+    log('destroyPanel: route-guard reset failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
+  }
 
   // v3.60.0: invalidate DOM cache — stale detached nodes must not be reused
   try {
-    if (typeof domCache.invalidate === 'function') domCache.invalidate();
+    if (typeof domCache.invalidate === 'function') {
+      domCache.invalidate();
+    }
   } catch (_e) {
     logError('MacroController', 'Unknown error');
   }
@@ -238,7 +271,9 @@ export function destroyPanel(): void {
   // Tear down the singleton so the next injection bootstraps a fresh one
   try {
     const mc = MacroController.getInstance() as unknown as { destroy?: () => void };
-    if (typeof mc.destroy === 'function') mc.destroy();
+    if (typeof mc.destroy === 'function') {
+      mc.destroy();
+    }
   } catch (e) {
     log('destroyPanel: MacroController.destroy failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');
   }

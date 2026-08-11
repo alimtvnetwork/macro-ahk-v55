@@ -9,15 +9,25 @@ import { buildTierBadgeHtml } from './ws-status-badges';
 const CSS_BG = ';background:';
 
 export function wsStatusEmoji(isCurrent: boolean, available: number, limitInt: number): string {
-  if (isCurrent) return '📍';
-  if (available <= 0) return '🔴';
-  if (available <= limitInt * 0.2) return '🟡';
+  if (isCurrent) {
+    return '📍';
+  }
+
+  if (available <= 0) {
+    return '🔴';
+  }
+
+  if (available <= limitInt * 0.2) {
+    return '🟡';
+  }
 
   return '🟢';
 }
 
 export function wsRowBgStyle(isCurrent: boolean, isSel: boolean): string {
-  if (isCurrent) return 'background:' + cPrimaryHL + ';border-left:3px solid #a78bfa;';
+  if (isCurrent) {
+    return 'background:' + cPrimaryHL + ';border-left:3px solid #a78bfa;';
+  }
 
   return isSel ? 'border-left:3px solid #facc15;' : 'border-left:3px solid transparent;';
 }

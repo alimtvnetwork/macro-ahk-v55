@@ -22,12 +22,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { formatFailureReport, type FailureReport } from "../failure-logger";
 import {
-    FIXTURE_NOW,
-    allFixtures,
-    fixtureRecordNoTarget,
-    fixtureReplayPrimaryDrift,
-    fixtureReplayVariableMissing,
-    fixtureReplayZeroMatches,
+  FIXTURE_NOW,
+  allFixtures,
+  fixtureRecordNoTarget,
+  fixtureReplayPrimaryDrift,
+  fixtureReplayVariableMissing,
+  fixtureReplayZeroMatches,
 } from "./__fixtures__/failure-report-fixtures";
 
 /**
@@ -35,24 +35,24 @@ import {
  * `scripts/check-failure-log-schema.mjs` — keep these in lockstep.
  */
 const REQUIRED_REPORT_FIELDS: ReadonlyArray<keyof FailureReport> = [
-    "Phase",
-    "Reason",
-    "ReasonDetail",
-    "StackTrace",
-    "StepId",
-    "Index",
-    "StepKind",
-    "Selectors",
-    "Variables",
-    "DomContext",
-    "ResolvedXPath",
-    "Timestamp",
-    "SourceFile",
-    "Verbose",
+  "Phase",
+  "Reason",
+  "ReasonDetail",
+  "StackTrace",
+  "StepId",
+  "Index",
+  "StepKind",
+  "Selectors",
+  "Variables",
+  "DomContext",
+  "ResolvedXPath",
+  "Timestamp",
+  "SourceFile",
+  "Verbose",
 ];
 
 beforeEach(() => {
-    document.body.innerHTML = "";
+  document.body.innerHTML = "";
 });
 
 /* ================================================================== */
@@ -60,39 +60,39 @@ beforeEach(() => {
 /* ================================================================== */
 
 describe("FailureReport schema (required fields)", () => {
-    for (const { Name, Bundle } of allFixtures()) {
-        for (const mode of ["NonVerbose", "Verbose"] as const) {
-            it(`${Name} / ${mode} declares every REQUIRED_REPORT_FIELD`, () => {
-                const report = Bundle[mode];
-                for (const field of REQUIRED_REPORT_FIELDS) {
-                    expect(
-                        Object.prototype.hasOwnProperty.call(report, field),
-                        `Missing required field '${String(field)}' in ${Name}/${mode}`,
-                    ).toBe(true);
-                }
-            });
-
-            it(`${Name} / ${mode} pins Verbose flag, ISO timestamp, SourceFile`, () => {
-                const report = Bundle[mode];
-                expect(report.Verbose).toBe(mode === "Verbose");
-                expect(report.Timestamp).toBe("2026-04-26T10:00:00.000Z");
-                expect(report.SourceFile.length).toBeGreaterThan(0);
-                expect(report.SourceFile.endsWith(".ts")).toBe(true);
-            });
-
-            it(`${Name} / ${mode} stamps non-empty Reason + ReasonDetail`, () => {
-                const report = Bundle[mode];
-                expect(report.Reason.length).toBeGreaterThan(0);
-                expect(report.ReasonDetail.length).toBeGreaterThan(0);
-            });
-
-            it(`${Name} / ${mode} keeps Selectors + Variables as arrays (never undefined)`, () => {
-                const report = Bundle[mode];
-                expect(Array.isArray(report.Selectors)).toBe(true);
-                expect(Array.isArray(report.Variables)).toBe(true);
-            });
+  for (const { Name, Bundle } of allFixtures()) {
+    for (const mode of ["NonVerbose", "Verbose"] as const) {
+      it(`${Name} / ${mode} declares every REQUIRED_REPORT_FIELD`, () => {
+        const report = Bundle[mode];
+        for (const field of REQUIRED_REPORT_FIELDS) {
+          expect(
+            Object.prototype.hasOwnProperty.call(report, field),
+            `Missing required field '${String(field)}' in ${Name}/${mode}`,
+          ).toBe(true);
         }
+      });
+
+      it(`${Name} / ${mode} pins Verbose flag, ISO timestamp, SourceFile`, () => {
+        const report = Bundle[mode];
+        expect(report.Verbose).toBe(mode === "Verbose");
+        expect(report.Timestamp).toBe("2026-04-26T10:00:00.000Z");
+        expect(report.SourceFile.length).toBeGreaterThan(0);
+        expect(report.SourceFile.endsWith(".ts")).toBe(true);
+      });
+
+      it(`${Name} / ${mode} stamps non-empty Reason + ReasonDetail`, () => {
+        const report = Bundle[mode];
+        expect(report.Reason.length).toBeGreaterThan(0);
+        expect(report.ReasonDetail.length).toBeGreaterThan(0);
+      });
+
+      it(`${Name} / ${mode} keeps Selectors + Variables as arrays (never undefined)`, () => {
+        const report = Bundle[mode];
+        expect(Array.isArray(report.Selectors)).toBe(true);
+        expect(Array.isArray(report.Variables)).toBe(true);
+      });
     }
+  }
 });
 
 /* ================================================================== */
@@ -100,52 +100,52 @@ describe("FailureReport schema (required fields)", () => {
 /* ================================================================== */
 
 describe("Verbose toggle payload contract", () => {
-    it("non-verbose reports omit OuterHtml/Text + null CapturedHtml", () => {
-        const { NonVerbose } = fixtureReplayZeroMatches();
-        // CapturedHtml at top level is null on non-verbose runs.
-        expect(NonVerbose.CapturedHtml).toBeNull();
-        // DomContext keeps the truncated snippets but NOT the full versions.
-        expect(NonVerbose.DomContext).not.toBeNull();
-        const contextFixture = NonVerbose.DomContext!;
-        expect(contextFixture.OuterHtmlSnippet.length).toBeGreaterThan(0);
-        expect(contextFixture.OuterHtmlSnippet.length).toBeLessThanOrEqual(240);
-        expect(contextFixture.TextSnippet.length).toBeLessThanOrEqual(120);
-        expect(contextFixture.OuterHtml).toBeUndefined();
-        expect(contextFixture.Text).toBeUndefined();
-    });
+  it("non-verbose reports omit OuterHtml/Text + null CapturedHtml", () => {
+    const { NonVerbose } = fixtureReplayZeroMatches();
+    // CapturedHtml at top level is null on non-verbose runs.
+    expect(NonVerbose.CapturedHtml).toBeNull();
+    // DomContext keeps the truncated snippets but NOT the full versions.
+    expect(NonVerbose.DomContext).not.toBeNull();
+    const contextFixture = NonVerbose.DomContext!;
+    expect(contextFixture.OuterHtmlSnippet.length).toBeGreaterThan(0);
+    expect(contextFixture.OuterHtmlSnippet.length).toBeLessThanOrEqual(240);
+    expect(contextFixture.TextSnippet.length).toBeLessThanOrEqual(120);
+    expect(contextFixture.OuterHtml).toBeUndefined();
+    expect(contextFixture.Text).toBeUndefined();
+  });
 
-    it("verbose reports populate OuterHtml/Text + CapturedHtml mirrors DomContext.OuterHtml", () => {
-        const { Verbose } = fixtureReplayZeroMatches();
-        expect(Verbose.DomContext).not.toBeNull();
-        const contextFixture = Verbose.DomContext!;
-        expect(contextFixture.OuterHtml).toBeDefined();
-        expect(contextFixture.Text).toBeDefined();
-        expect(contextFixture.OuterHtml).toContain('id="go"');
-        expect(contextFixture.Text).toBe("Go");
-        // CapturedHtml is surfaced at top level for export tooling — and must
-        // be byte-identical to DomContext.OuterHtml when both exist.
-        expect(Verbose.CapturedHtml).toBe(contextFixture.OuterHtml);
-    });
+  it("verbose reports populate OuterHtml/Text + CapturedHtml mirrors DomContext.OuterHtml", () => {
+    const { Verbose } = fixtureReplayZeroMatches();
+    expect(Verbose.DomContext).not.toBeNull();
+    const contextFixture = Verbose.DomContext!;
+    expect(contextFixture.OuterHtml).toBeDefined();
+    expect(contextFixture.Text).toBeDefined();
+    expect(contextFixture.OuterHtml).toContain('id="go"');
+    expect(contextFixture.Text).toBe("Go");
+    // CapturedHtml is surfaced at top level for export tooling — and must
+    // be byte-identical to DomContext.OuterHtml when both exist.
+    expect(Verbose.CapturedHtml).toBe(contextFixture.OuterHtml);
+  });
 
-    it("verbose flag does NOT alter Reason / ReasonDetail / Selectors / Variables", () => {
-        // The toggle gates payload size, never classification or attempt
-        // outcomes — guard against accidental coupling.
-        const bundle = fixtureReplayPrimaryDrift();
-        expect(bundle.Verbose.Reason).toBe(bundle.NonVerbose.Reason);
-        expect(bundle.Verbose.ReasonDetail).toBe(bundle.NonVerbose.ReasonDetail);
-        expect(bundle.Verbose.Selectors).toEqual(bundle.NonVerbose.Selectors);
-        expect(bundle.Verbose.Variables).toEqual(bundle.NonVerbose.Variables);
-    });
+  it("verbose flag does NOT alter Reason / ReasonDetail / Selectors / Variables", () => {
+    // The toggle gates payload size, never classification or attempt
+    // outcomes — guard against accidental coupling.
+    const bundle = fixtureReplayPrimaryDrift();
+    expect(bundle.Verbose.Reason).toBe(bundle.NonVerbose.Reason);
+    expect(bundle.Verbose.ReasonDetail).toBe(bundle.NonVerbose.ReasonDetail);
+    expect(bundle.Verbose.Selectors).toEqual(bundle.NonVerbose.Selectors);
+    expect(bundle.Verbose.Variables).toEqual(bundle.NonVerbose.Variables);
+  });
 
-    it("Record-phase fixture without a Target yields null DomContext + null CapturedHtml in both modes", () => {
-        const { NonVerbose, Verbose } = fixtureRecordNoTarget();
-        expect(NonVerbose.DomContext).toBeNull();
-        expect(NonVerbose.CapturedHtml).toBeNull();
-        expect(Verbose.DomContext).toBeNull();
-        expect(Verbose.CapturedHtml).toBeNull();
-        // Selectors come from PersistedSelector → "NotEvaluated" tail.
-        expect(NonVerbose.Selectors.every((s) => s.FailureReason === "NotEvaluated")).toBe(true);
-    });
+  it("Record-phase fixture without a Target yields null DomContext + null CapturedHtml in both modes", () => {
+    const { NonVerbose, Verbose } = fixtureRecordNoTarget();
+    expect(NonVerbose.DomContext).toBeNull();
+    expect(NonVerbose.CapturedHtml).toBeNull();
+    expect(Verbose.DomContext).toBeNull();
+    expect(Verbose.CapturedHtml).toBeNull();
+    // Selectors come from PersistedSelector → "NotEvaluated" tail.
+    expect(NonVerbose.Selectors.every((s) => s.FailureReason === "NotEvaluated")).toBe(true);
+  });
 });
 
 /* ================================================================== */
@@ -153,30 +153,30 @@ describe("Verbose toggle payload contract", () => {
 /* ================================================================== */
 
 describe("Auto-classified Reason codes", () => {
-    it("ReplayZeroMatches → ZeroMatches", () => {
-        const { NonVerbose } = fixtureReplayZeroMatches();
-        expect(NonVerbose.Reason).toBe("ZeroMatches");
-        expect(NonVerbose.ReasonDetail).toContain("0 nodes");
-    });
+  it("ReplayZeroMatches → ZeroMatches", () => {
+    const { NonVerbose } = fixtureReplayZeroMatches();
+    expect(NonVerbose.Reason).toBe("ZeroMatches");
+    expect(NonVerbose.ReasonDetail).toContain("0 nodes");
+  });
 
-    it("ReplayPrimaryDrift → PrimaryMissedFallbackOk", () => {
-        const { NonVerbose } = fixtureReplayPrimaryDrift();
-        expect(NonVerbose.Reason).toBe("PrimaryMissedFallbackOk");
-        expect(NonVerbose.ReasonDetail).toContain("Primary selector");
-        expect(NonVerbose.ReasonDetail).toContain("fallback(s) matched");
-    });
+  it("ReplayPrimaryDrift → PrimaryMissedFallbackOk", () => {
+    const { NonVerbose } = fixtureReplayPrimaryDrift();
+    expect(NonVerbose.Reason).toBe("PrimaryMissedFallbackOk");
+    expect(NonVerbose.ReasonDetail).toContain("Primary selector");
+    expect(NonVerbose.ReasonDetail).toContain("fallback(s) matched");
+  });
 
-    it("ReplayVariableMissing → VariableMissing (outranks selector outcomes)", () => {
-        const { NonVerbose } = fixtureReplayVariableMissing();
-        expect(NonVerbose.Reason).toBe("VariableMissing");
-        expect(NonVerbose.ReasonDetail).toContain("Email");
-    });
+  it("ReplayVariableMissing → VariableMissing (outranks selector outcomes)", () => {
+    const { NonVerbose } = fixtureReplayVariableMissing();
+    expect(NonVerbose.Reason).toBe("VariableMissing");
+    expect(NonVerbose.ReasonDetail).toContain("Email");
+  });
 
-    it("RecordNoTarget → NotEvaluated attempts surface as Unknown (no live evaluation happened)", () => {
-        const { NonVerbose } = fixtureRecordNoTarget();
-        // No live evaluation → classifier MUST NOT claim ZeroMatches.
-        expect(NonVerbose.Reason).not.toBe("ZeroMatches");
-    });
+  it("RecordNoTarget → NotEvaluated attempts surface as Unknown (no live evaluation happened)", () => {
+    const { NonVerbose } = fixtureRecordNoTarget();
+    // No live evaluation → classifier MUST NOT claim ZeroMatches.
+    expect(NonVerbose.Reason).not.toBe("ZeroMatches");
+  });
 });
 
 /* ================================================================== */
@@ -184,83 +184,83 @@ describe("Auto-classified Reason codes", () => {
 /* ================================================================== */
 
 describe("formatFailureReport text format", () => {
-    it("emits the [MarcoReplay] tag, Reason line, and at-source line for replay reports", () => {
-        const { NonVerbose } = fixtureReplayZeroMatches();
-        const text = formatFailureReport(NonVerbose);
-        const head = text.split("\n").slice(0, 3);
-        expect(head[0]).toContain("[MarcoReplay]");
-        expect(head[0]).toContain("Element not found for selector '#go'");
-        expect(head[1]).toMatch(/^ {2}Reason: ZeroMatches,/);
-        expect(head[2]).toContain("at src/background/recorder/live-dom-replay.ts");
-        expect(head[2]).toContain("StepId=7");
-        expect(head[2]).toContain("Index=3");
-        expect(head[2]).toContain("Kind=Click");
-    });
+  it("emits the [MarcoReplay] tag, Reason line, and at-source line for replay reports", () => {
+    const { NonVerbose } = fixtureReplayZeroMatches();
+    const text = formatFailureReport(NonVerbose);
+    const head = text.split("\n").slice(0, 3);
+    expect(head[0]).toContain("[MarcoReplay]");
+    expect(head[0]).toContain("Element not found for selector '#go'");
+    expect(head[1]).toMatch(/^ {2}Reason: ZeroMatches,/);
+    expect(head[2]).toContain("at src/background/recorder/live-dom-replay.ts");
+    expect(head[2]).toContain("StepId=7");
+    expect(head[2]).toContain("Index=3");
+    expect(head[2]).toContain("Kind=Click");
+  });
 
-    it("emits the [MarcoRecord] tag for record-phase reports", () => {
-        const { NonVerbose } = fixtureRecordNoTarget();
-        const text = formatFailureReport(NonVerbose);
-        expect(text.startsWith("[MarcoRecord]")).toBe(true);
-    });
+  it("emits the [MarcoRecord] tag for record-phase reports", () => {
+    const { NonVerbose } = fixtureRecordNoTarget();
+    const text = formatFailureReport(NonVerbose);
+    expect(text.startsWith("[MarcoRecord]")).toBe(true);
+  });
 
-    it("renders a Selectors table with ✗/✓ + primary marker + tail counts", () => {
-        const { NonVerbose } = fixtureReplayPrimaryDrift();
-        const text = formatFailureReport(NonVerbose);
-        // Primary missed:  ✗ ✓ XPathFull …
-        expect(text).toMatch(/✗ ✓ XPathFull\s+\/\/button\[@id='go'].*0 matches \(ZeroMatches/);
-        // Fallback hit:    ✓ · Css …
-        expect(text).toMatch(/✓ · Css\s+#go .*1 match\b/);
-    });
+  it("renders a Selectors table with ✗/✓ + primary marker + tail counts", () => {
+    const { NonVerbose } = fixtureReplayPrimaryDrift();
+    const text = formatFailureReport(NonVerbose);
+    // Primary missed:  ✗ ✓ XPathFull …
+    expect(text).toMatch(/✗ ✓ XPathFull\s+\/\/button\[@id='go'].*0 matches \(ZeroMatches/);
+    // Fallback hit:    ✓ · Css …
+    expect(text).toMatch(/✓ · Css\s+#go .*1 match\b/);
+  });
 
-    it("renders a Variables table when Variables is non-empty", () => {
-        const { NonVerbose } = fixtureReplayVariableMissing();
-        const text = formatFailureReport(NonVerbose);
-        expect(text).toContain("Variables:");
-        expect(text).toMatch(/✗ \{\{Email}} = .* MissingColumn/);
-    });
+  it("renders a Variables table when Variables is non-empty", () => {
+    const { NonVerbose } = fixtureReplayVariableMissing();
+    const text = formatFailureReport(NonVerbose);
+    expect(text).toContain("Variables:");
+    expect(text).toMatch(/✗ \{\{Email}} = .* MissingColumn/);
+  });
 
-    it("includes the verbose CapturedHtml block ONLY when Verbose=true", () => {
-        const { NonVerbose, Verbose } = fixtureReplayZeroMatches();
-        const offText = formatFailureReport(NonVerbose);
-        const onText = formatFailureReport(Verbose);
-        expect(offText).not.toContain("CapturedHtml (verbose):");
-        expect(onText).toContain("CapturedHtml (verbose):");
-        expect(onText).toContain('id="go"');
-    });
+  it("includes the verbose CapturedHtml block ONLY when Verbose=true", () => {
+    const { NonVerbose, Verbose } = fixtureReplayZeroMatches();
+    const offText = formatFailureReport(NonVerbose);
+    const onText = formatFailureReport(Verbose);
+    expect(offText).not.toContain("CapturedHtml (verbose):");
+    expect(onText).toContain("CapturedHtml (verbose):");
+    expect(onText).toContain('id="go"');
+  });
 
-    it("includes ResolvedXPath line when present, omits when null", () => {
-        const withXPath = formatFailureReport(fixtureReplayZeroMatches().NonVerbose);
-        const withoutXPath = formatFailureReport(fixtureReplayVariableMissing().NonVerbose);
-        expect(withXPath).toContain("ResolvedXPath: //button[@id='go']");
-        expect(withoutXPath).not.toContain("ResolvedXPath:");
-    });
+  it("includes ResolvedXPath line when present, omits when null", () => {
+    const withXPath = formatFailureReport(fixtureReplayZeroMatches().NonVerbose);
+    const withoutXPath = formatFailureReport(fixtureReplayVariableMissing().NonVerbose);
+    expect(withXPath).toContain("ResolvedXPath: //button[@id='go']");
+    expect(withoutXPath).not.toContain("ResolvedXPath:");
+  });
 
-    it("renders the DataRow as JSON and the Stack block when StackTrace is present", () => {
-        const { NonVerbose } = fixtureReplayZeroMatches();
-        const text = formatFailureReport(NonVerbose);
-        expect(text).toContain('DataRow: {"Email":"alice@example.com"}');
-        expect(text).toContain("Stack:");
-        expect(text).toContain("Error: Element not found");
-    });
+  it("renders the DataRow as JSON and the Stack block when StackTrace is present", () => {
+    const { NonVerbose } = fixtureReplayZeroMatches();
+    const text = formatFailureReport(NonVerbose);
+    expect(text).toContain('DataRow: {"Email":"alice@example.com"}');
+    expect(text).toContain("Stack:");
+    expect(text).toContain("Error: Element not found");
+  });
 
-    it("uses the deterministic FIXTURE_NOW timestamp (no wall-clock leakage)", () => {
-        // Sanity check — the fixture clock itself is deterministic.
-        expect(FIXTURE_NOW().toISOString()).toBe("2026-04-26T10:00:00.000Z");
-        const { NonVerbose } = fixtureReplayZeroMatches();
-        expect(NonVerbose.Timestamp).toBe("2026-04-26T10:00:00.000Z");
-    });
+  it("uses the deterministic FIXTURE_NOW timestamp (no wall-clock leakage)", () => {
+    // Sanity check — the fixture clock itself is deterministic.
+    expect(FIXTURE_NOW().toISOString()).toBe("2026-04-26T10:00:00.000Z");
+    const { NonVerbose } = fixtureReplayZeroMatches();
+    expect(NonVerbose.Timestamp).toBe("2026-04-26T10:00:00.000Z");
+  });
 
-    it("never emits em-dash (U+2014) or en-dash (U+2013) in the formatted body (LOG-format-3)", () => {
-        // Fixed drift class: earlier revisions used ' — ' separators inside
-        // Reason and Variables lines. Downstream regex parsers (support
-        // report scraper, AI paste target) expect ASCII ',' separators only.
-        // If this fires, the format has regressed: replace em/en dashes with
-        // ',' (or ':') in `failure-logger.ts` before touching this test.
-        for (const { Name, Bundle } of allFixtures()) {
-            for (const mode of ["NonVerbose", "Verbose"] as const) {
-                const text = formatFailureReport(Bundle[mode]);
-                expect(text, `fixture=${Name}/${mode}`).not.toMatch(/\u2014|\u2013/);
-            }
-        }
-    });
+  it("never emits em-dash (U+2014) or en-dash (U+2013) in the formatted body (LOG-format-3)", () => {
+    // Fixed drift class: earlier revisions used ' — ' separators inside
+    // Reason and Variables lines. Downstream regex parsers (support
+    // report scraper, AI paste target) expect ASCII ',' separators only.
+    // If this fires, the format has regressed: replace em/en dashes with
+    // ',' (or ':') in `failure-logger.ts` before touching this test.
+    for (const { Name, Bundle } of allFixtures()) {
+      for (const mode of ["NonVerbose", "Verbose"] as const) {
+        const text = formatFailureReport(Bundle[mode]);
+        expect(text, `fixture=${Name}/${mode}`).not.toMatch(/\u2014|\u2013/);
+      }
+    }
+  });
 });

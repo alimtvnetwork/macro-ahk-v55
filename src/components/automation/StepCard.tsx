@@ -22,11 +22,25 @@ import { StepNotifyLevelType } from "../../types/enums";
 /* ------------------------------------------------------------------ */
 
 function StepStatusIndicator({ status }: { status?: StepStatus }) {
-  if (!status || status === "pending") return <Clock className="h-3 w-3 text-muted-foreground" />;
-  if (status === "running") return <Loader2 className="h-3 w-3 animate-spin text-primary" />;
-  if (status === "done") return <Check className="h-3 w-3 text-green-500" />;
-  if (status === "error") return <AlertCircle className="h-3 w-3 text-destructive" />;
-  if (status === "skipped") return <SkipForward className="h-3 w-3 text-muted-foreground" />;
+  if (!status || status === "pending") {
+    return <Clock className="h-3 w-3 text-muted-foreground" />;
+  }
+
+  if (status === "running") {
+    return <Loader2 className="h-3 w-3 animate-spin text-primary" />;
+  }
+
+  if (status === "done") {
+    return <Check className="h-3 w-3 text-green-500" />;
+  }
+
+  if (status === "error") {
+    return <AlertCircle className="h-3 w-3 text-destructive" />;
+  }
+
+  if (status === "skipped") {
+    return <SkipForward className="h-3 w-3 text-muted-foreground" />;
+  }
 
   return null;
 }

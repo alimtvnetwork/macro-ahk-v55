@@ -78,13 +78,13 @@ interface ErrorResult {
 
 /** Maps logical script names to their folder under projects/scripts/ */
 const SCRIPT_FOLDER_MAP: Record<string, string> = {
-    macroController: "macro-controller",
-    "marco-sdk": "marco-sdk",
-    xpath: "xpath",
+  macroController: "macro-controller",
+  "marco-sdk": "marco-sdk",
+  xpath: "xpath",
 };
 
 function resolveScriptFolder(scriptName: string): string | null {
-    return SCRIPT_FOLDER_MAP[scriptName] ?? null;
+  return SCRIPT_FOLDER_MAP[scriptName] ?? null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -93,25 +93,28 @@ function resolveScriptFolder(scriptName: string): string | null {
 
 /** Fetches and parses a project's instruction.json from extension dist. */
 async function fetchInstruction(folder: string): Promise<InstructionManifest> {
-    const url = chrome.runtime.getURL(
-        `projects/scripts/${folder}/instruction.json`,
-    );
-    const res = ServiceResult.wrapFetch(await fetch(url));
-    if (res.isFail) {
-        throw new Error(`Failed to fetch instruction.json: ${res.status}`);
-    }
+  const url = chrome.runtime.getURL(
+    `projects/scripts/${folder}/instruction.json`,
+  );
+  const res = ServiceResult.wrapFetch(await fetch(url));
+  if (res.isFail) {
+    throw new Error(`Failed to fetch instruction.json: ${res.status}`);
+  }
 
-    return res.json() as Promise<InstructionManifest>;
+  return res.json() as Promise<InstructionManifest>;
 }
 
 /** Gets the primary output file from an instruction manifest. */
 function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
-    const scripts = instruction.Assets?.Scripts;
-    if (!scripts?.length) return null;
-    // Sort by Order and return the first script's File
-    const sorted = [...scripts].sort((a, b) => a.Order - b.Order);
+  const scripts = instruction.Assets?.Scripts;
+  if (!scripts?.length) {
+    return null;
+  }
 
-    return sorted[0].File;
+  // Sort by Order and return the first script's File
+  const sorted = [...scripts].sort((a, b) => a.Order - b.Order);
+
+  return sorted[0].File;
 }
 
 /* ------------------------------------------------------------------ */
@@ -120,50 +123,52 @@ function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
 
 /* Handler function is inherently sequential — suppress false positive */
 export async function handleGetScriptInfo(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<ScriptInfoResponse | ErrorResult> {
-    const request = message as MessageRequest & { scriptName: string };
-    const scriptName = request.scriptName;
+  const request = message as MessageRequest & { scriptName: string };
+  const scriptName = request.scriptName;
 
-    const folder = resolveScriptFolder(scriptName);
-    if (!folder) {
-        return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
+  const folder = resolveScriptFolder(scriptName);
+  if (!folder) {
+    return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
+  }
+
+  try {
+    const instruction = await fetchInstruction(folder);
+    const outputFile = getPrimaryOutputFile(instruction);
+
+    if (!outputFile) {
+      return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
     }
 
+    // Optionally get file size
+    let sizeBytes: number | null = null;
     try {
-        const instruction = await fetchInstruction(folder);
-        const outputFile = getPrimaryOutputFile(instruction);
-
-        if (!outputFile) {
-            return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
-        }
-
-        // Optionally get file size
-        let sizeBytes: number | null = null;
-        try {
-            const scriptUrl = chrome.runtime.getURL(
-                `projects/scripts/${folder}/${outputFile}`,
-            );
-            const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
-            const cl = headRes.headers.get("content-length");
-            if (cl) sizeBytes = parseInt(cl, 10);
-        } catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
-
-        return {
-            isOk: true,
-            scriptName: instruction.Name,
-            bundledVersion: instruction.Version,
-            outputFile,
-            sizeBytes,
-        };
+      const scriptUrl = chrome.runtime.getURL(
+        `projects/scripts/${folder}/${outputFile}`,
+      );
+      const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
+      const cl = headRes.headers.get("content-length");
+      if (cl) {
+        sizeBytes = parseInt(cl, 10);
+      }
     } catch (err) {
-        return {
-            isOk: false,
-            errorMessage: `Script info error: ${err instanceof Error ? err.message : String(err)}`,
-        };
+      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
     }
+
+    return {
+      isOk: true,
+      scriptName: instruction.Name,
+      bundledVersion: instruction.Version,
+      outputFile,
+      sizeBytes,
+    };
+  } catch (err) {
+    return {
+      isOk: false,
+      errorMessage: `Script info error: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -172,62 +177,64 @@ export async function handleGetScriptInfo(
 
 // eslint-disable-next-line max-lines-per-function
 export async function handleHotReloadScript(
-    message: MessageRequest,
+  message: MessageRequest,
 ): Promise<HotReloadResponse | ErrorResult> {
-    const request = message as MessageRequest & { scriptName: string };
-    const scriptName = request.scriptName;
+  const request = message as MessageRequest & { scriptName: string };
+  const scriptName = request.scriptName;
 
-    const folder = resolveScriptFolder(scriptName);
-    if (!folder) {
-        return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
+  const folder = resolveScriptFolder(scriptName);
+  if (!folder) {
+    return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
+  }
+
+  try {
+    const instruction = await fetchInstruction(folder);
+    const outputFile = getPrimaryOutputFile(instruction);
+
+    if (!outputFile) {
+      return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
     }
 
-    try {
-        const instruction = await fetchInstruction(folder);
-        const outputFile = getPrimaryOutputFile(instruction);
-
-        if (!outputFile) {
-            return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
-        }
-
-        const scriptUrl = chrome.runtime.getURL(
-            `projects/scripts/${folder}/${outputFile}`,
-        );
-        const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
-        if (scriptRes.isFail) {
-            return {
-                isOk: false,
-                errorMessage: `Script fetch failed: ${scriptRes.status}`,
-            };
-        }
-        const scriptSource = await scriptRes.text();
-
-        let sizeBytes: number | null = null;
-        const contentLength = scriptRes.headers.get("content-length");
-        if (contentLength) {
-            sizeBytes = parseInt(contentLength, 10);
-        }
-        if (sizeBytes === null) {
-            sizeBytes = scriptSource.length;
-        }
-
-        console.log(
-            `[Marco] HOT_RELOAD_SCRIPT: ${scriptName} v${instruction.Version} (${scriptSource.length} bytes)`,
-        );
-
-        return {
-            isOk: true,
-            scriptName: instruction.Name,
-            version: instruction.Version,
-            bundledVersion: instruction.Version,
-            outputFile,
-            sizeBytes,
-            scriptSource,
-        };
-    } catch (err) {
-        return {
-            isOk: false,
-            errorMessage: `Hot-reload error: ${err instanceof Error ? err.message : String(err)}`,
-        };
+    const scriptUrl = chrome.runtime.getURL(
+      `projects/scripts/${folder}/${outputFile}`,
+    );
+    const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
+    if (scriptRes.isFail) {
+      return {
+        isOk: false,
+        errorMessage: `Script fetch failed: ${scriptRes.status}`,
+      };
     }
+
+    const scriptSource = await scriptRes.text();
+
+    let sizeBytes: number | null = null;
+    const contentLength = scriptRes.headers.get("content-length");
+    if (contentLength) {
+      sizeBytes = parseInt(contentLength, 10);
+    }
+
+    if (sizeBytes === null) {
+      sizeBytes = scriptSource.length;
+    }
+
+    console.log(
+      `[Marco] HOT_RELOAD_SCRIPT: ${scriptName} v${instruction.Version} (${scriptSource.length} bytes)`,
+    );
+
+    return {
+      isOk: true,
+      scriptName: instruction.Name,
+      version: instruction.Version,
+      bundledVersion: instruction.Version,
+      outputFile,
+      sizeBytes,
+      scriptSource,
+    };
+  } catch (err) {
+    return {
+      isOk: false,
+      errorMessage: `Hot-reload error: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
 }

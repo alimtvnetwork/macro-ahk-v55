@@ -34,24 +34,32 @@ const ALLOWED_PROTOCOLS = ['http:', 'https:'];
  * malformed URLs, or non-http(s) schemes.
  */
 export function normalizeRedirectUrl(
-    redirectUrl: string,
-    origin: string,
+  redirectUrl: string,
+  origin: string,
 ): string | null {
-    if (!redirectUrl) return null;
-    const trimmed = redirectUrl.trim();
-    if (!trimmed) return null;
-    try {
-        const url = new URL(trimmed, origin);
-        if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) return null;
+  if (!redirectUrl) {
+    return null;
+  }
 
-        return url.toString();
-    } catch (err: unknown) {
-        logError('RemixNav',
-            'normalizeRedirectUrl: invalid URL "' + trimmed + '" (origin=' + origin + ')',
-            err);
+  const trimmed = redirectUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
 
-        return null;
+  try {
+    const url = new URL(trimmed, origin);
+    if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) {
+      return null;
     }
+
+    return url.toString();
+  } catch (err: unknown) {
+    logError('RemixNav',
+      'normalizeRedirectUrl: invalid URL "' + trimmed + '" (origin=' + origin + ')',
+      err);
+
+    return null;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -67,32 +75,34 @@ export function normalizeRedirectUrl(
  * requires the active-tab nav for the remix-and-continue flow.
  */
 export function navigateActiveTabToRemixedProject(
-    redirectUrl: string,
+  redirectUrl: string,
 ): boolean {
-    const w = (typeof window !== 'undefined' ? window : null);
-    if (!w || !w.location) {
-        logError('RemixNav', 'navigate refused: window.location unavailable');
+  const w = (typeof window !== 'undefined' ? window : null);
+  if (!w || !w.location) {
+    logError('RemixNav', 'navigate refused: window.location unavailable');
 
-        return false;
-    }
-    const origin = w.location.origin || DomainConstants.PRIMARY_URL;
-    const absolute = normalizeRedirectUrl(redirectUrl, origin);
-    if (!absolute) {
-        logError('RemixNav',
-            'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');
+    return false;
+  }
 
-        return false;
-    }
-    log('[RemixNav] navigating active tab → ' + absolute, 'info');
-    try {
-        w.location.assign(absolute);
+  const origin = w.location.origin || DomainConstants.PRIMARY_URL;
+  const absolute = normalizeRedirectUrl(redirectUrl, origin);
+  if (!absolute) {
+    logError('RemixNav',
+      'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');
 
-        return true;
-    } catch (err: unknown) {
-        logError('RemixNav', 'location.assign threw for ' + absolute, err);
+    return false;
+  }
 
-        return false;
-    }
+  log('[RemixNav] navigating active tab → ' + absolute, 'info');
+  try {
+    w.location.assign(absolute);
+
+    return true;
+  } catch (err: unknown) {
+    logError('RemixNav', 'location.assign threw for ' + absolute, err);
+
+    return false;
+  }
 }
 
 /**
@@ -100,11 +110,11 @@ export function navigateActiveTabToRemixedProject(
  * captured by Step 6. Returns the same boolean as the underlying call.
  */
 export function navigateFromCachedRemix(row: RemixNewProjectRow | null): boolean {
-    if (!row || !row.RedirectUrl) {
-        logError('RemixNav', 'navigateFromCachedRemix: missing row or RedirectUrl');
+  if (!row || !row.RedirectUrl) {
+    logError('RemixNav', 'navigateFromCachedRemix: missing row or RedirectUrl');
 
-        return false;
-    }
+    return false;
+  }
 
-    return navigateActiveTabToRemixedProject(row.RedirectUrl);
+  return navigateActiveTabToRemixedProject(row.RedirectUrl);
 }

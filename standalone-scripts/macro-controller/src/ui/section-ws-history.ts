@@ -48,19 +48,28 @@ export function createWsHistorySection(deps: WsHistoryDeps): WsHistoryResult {
   wsHistoryPanel.id = 'loop-ws-history-panel';
   wsHistoryPanel.style.cssText = 'padding:4px;background:rgba(0,0,0,.5);border:1px solid #b45309;border-radius:3px;max-height:120px;overflow-y:auto;';
 
-  const renderWsHistory = function(): void { renderWsHistoryPanel(wsHistoryPanel, deps); };
+  const renderWsHistory = function(): void {
+    renderWsHistoryPanel(wsHistoryPanel, deps); 
+  };
 
   wsHistoryCol.body.appendChild(wsHistoryPanel);
   const origClick = wsHistoryCol.header.onclick as (() => void) | null;
 
   wsHistoryCol.header.onclick = function () {
-    if (origClick) origClick();
+    if (origClick) {
+      origClick();
+    }
+
     const isVisible = wsHistoryCol.body.style.display !== 'none';
-    if (isVisible) renderWsHistory();
+    if (isVisible) {
+      renderWsHistory();
+    }
   };
 
   const isInitiallyVisible = wsHistoryCol.body.style.display !== 'none';
-  if (isInitiallyVisible) renderWsHistory();
+  if (isInitiallyVisible) {
+    renderWsHistory();
+  }
 
   return { section: wsHistoryCol.section, renderWsHistory };
 }

@@ -49,6 +49,8 @@ export function showMsg(area: HTMLElement, type: ShowMsgLevelType, text: string)
   area.appendChild(message);
 
   if (isSuccess) {
-    setTimeout(() => { message.remove(); }, 4000);
+    setTimeout(() => {
+      message.remove(); 
+    }, 4000);
   }
 }

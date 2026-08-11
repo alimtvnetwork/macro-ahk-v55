@@ -17,11 +17,11 @@ const listPromptsByRoleMock = vi.fn();
 const upsertPromptMock = vi.fn();
 
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
-    listPromptsByRole: (...args: unknown[]) => listPromptsByRoleMock(...args),
-    upsertPrompt: (...args: unknown[]) => upsertPromptMock(...args),
+  DbResult,
+  DbResult,
+  DbResult,
+  listPromptsByRole: (...args: unknown[]) => listPromptsByRoleMock(...args),
+  upsertPrompt: (...args: unknown[]) => upsertPromptMock(...args),
 }));
 vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 vi.mock('../../logging', () => ({ log: vi.fn() }));
@@ -30,86 +30,86 @@ import { commitDbEntries } from '../prompt-io-db-bridge';
 import type { CachedPromptEntry } from '../prompt-cache';
 
 beforeEach(() => {
-    listPromptsByRoleMock.mockReset();
-    upsertPromptMock.mockReset();
+  listPromptsByRoleMock.mockReset();
+  upsertPromptMock.mockReset();
 });
 
 describe('commitDbEntries (PlanTierType 22 gap #10 DB-side integration)', () => {
-    it('C1: routes a valid plan entry to upsertPrompt with previousBody/replaceKey carried over', async () => {
-        listPromptsByRoleMock.mockResolvedValue({
-            ok: true, isFail: false, isSuccess: true, value: [{ Id: 5, Slug: 's1', Body: 'old {{n}}', ReplaceKey: 'n' }],
-        });
-        upsertPromptMock.mockResolvedValue(new DbResult(true, 5));
-        const entries: CachedPromptEntry[] = [
-            { name: 'S1', text: 'new {{n}}', slug: 's1', role: 'plan', replaceKey: 'n' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
-        expect(upsertPromptMock).toHaveBeenCalledTimes(1);
-        const call = upsertPromptMock.mock.calls[0][0];
-        expect(call.id).toBe(5);
-        expect(call.previousBody).toBe('old {{n}}');
-        expect(call.previousReplaceKey).toBe('n');
+  it('C1: routes a valid plan entry to upsertPrompt with previousBody/replaceKey carried over', async () => {
+    listPromptsByRoleMock.mockResolvedValue({
+      ok: true, isFail: false, isSuccess: true, value: [{ Id: 5, Slug: 's1', Body: 'old {{n}}', ReplaceKey: 'n' }],
     });
+    upsertPromptMock.mockResolvedValue(new DbResult(true, 5));
+    const entries: CachedPromptEntry[] = [
+      { name: 'S1', text: 'new {{n}}', slug: 's1', role: 'plan', replaceKey: 'n' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
+    expect(upsertPromptMock).toHaveBeenCalledTimes(1);
+    const call = upsertPromptMock.mock.calls[0][0];
+    expect(call.id).toBe(5);
+    expect(call.previousBody).toBe('old {{n}}');
+    expect(call.previousReplaceKey).toBe('n');
+  });
 
-    it('C2: entry with missing slug is rejected before DB read, no upsert issued', async () => {
-        const entries: CachedPromptEntry[] = [
-            { name: 'noslug', text: 'x', role: 'plan' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res.upserted).toBe(0);
-        expect(res.errors[0]).toMatch(/missing slug/);
-        expect(upsertPromptMock).not.toHaveBeenCalled();
-        expect(listPromptsByRoleMock).not.toHaveBeenCalled();
-    });
+  it('C2: entry with missing slug is rejected before DB read, no upsert issued', async () => {
+    const entries: CachedPromptEntry[] = [
+      { name: 'noslug', text: 'x', role: 'plan' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res.upserted).toBe(0);
+    expect(res.errors[0]).toMatch(/missing slug/);
+    expect(upsertPromptMock).not.toHaveBeenCalled();
+    expect(listPromptsByRoleMock).not.toHaveBeenCalled();
+  });
 
-    it('C3: invalid role short-circuits with "missing role" without touching DB', async () => {
-        const entries: CachedPromptEntry[] = [
-            // @ts-expect-error - intentional invalid role
-            { name: 'x', text: 'y', slug: 's', role: 'bogus' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res.upserted).toBe(0);
-        expect(res.errors[0]).toMatch(/missing role/);
-        expect(upsertPromptMock).not.toHaveBeenCalled();
-    });
+  it('C3: invalid role short-circuits with "missing role" without touching DB', async () => {
+    const entries: CachedPromptEntry[] = [
+      // @ts-expect-error - intentional invalid role
+      { name: 'x', text: 'y', slug: 's', role: 'bogus' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res.upserted).toBe(0);
+    expect(res.errors[0]).toMatch(/missing role/);
+    expect(upsertPromptMock).not.toHaveBeenCalled();
+  });
 
-    it('C4: upsertPrompt failure surfaces per-entry with slug prefix', async () => {
-        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
-        upsertPromptMock.mockResolvedValue(new DbResult(false, undefined, 'token drift'));
-        const entries: CachedPromptEntry[] = [
-            { name: 'A', text: 'no tokens', slug: 'plan-a', role: 'plan' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res.upserted).toBe(0);
-        expect(res.errors).toEqual(['slug=plan-a: token drift']);
-    });
+  it('C4: upsertPrompt failure surfaces per-entry with slug prefix', async () => {
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
+    upsertPromptMock.mockResolvedValue(new DbResult(false, undefined, 'token drift'));
+    const entries: CachedPromptEntry[] = [
+      { name: 'A', text: 'no tokens', slug: 'plan-a', role: 'plan' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res.upserted).toBe(0);
+    expect(res.errors).toEqual(['slug=plan-a: token drift']);
+  });
 
-    it('C5: mixed batch tallies successes and failures independently (no all-or-nothing)', async () => {
-        // Two entries: first succeeds, second fails -> upserted=1, one error.
-        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
-        upsertPromptMock
-            .mockResolvedValueOnce(new DbResult(true, 10))
-            .mockResolvedValueOnce(new DbResult(false, undefined, 'body empty'));
-        const entries: CachedPromptEntry[] = [
-            { name: 'good', text: 'ok', slug: 'g', role: 'generic' },
-            { name: 'bad', text: '', slug: 'b', role: 'generic' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res.upserted).toBe(1);
-        expect(res.errors).toEqual(['slug=b: body empty']);
-    });
+  it('C5: mixed batch tallies successes and failures independently (no all-or-nothing)', async () => {
+    // Two entries: first succeeds, second fails -> upserted=1, one error.
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
+    upsertPromptMock
+      .mockResolvedValueOnce(new DbResult(true, 10))
+      .mockResolvedValueOnce(new DbResult(false, undefined, 'body empty'));
+    const entries: CachedPromptEntry[] = [
+      { name: 'good', text: 'ok', slug: 'g', role: 'generic' },
+      { name: 'bad', text: '', slug: 'b', role: 'generic' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res.upserted).toBe(1);
+    expect(res.errors).toEqual(['slug=b: body empty']);
+  });
 
-    it('C6: creates new row when findExistingRow returns null (no id, no previousBody)', async () => {
-        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
-        upsertPromptMock.mockResolvedValue(new DbResult(true, 99));
-        const entries: CachedPromptEntry[] = [
-            { name: 'New', text: 'body', slug: 'new-slug', role: 'generic' },
-        ];
-        const res = await commitDbEntries(entries);
-        expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
-        const call = upsertPromptMock.mock.calls[0][0];
-        expect(call.id).toBeUndefined();
-        expect(call.previousBody).toBeUndefined();
-    });
+  it('C6: creates new row when findExistingRow returns null (no id, no previousBody)', async () => {
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
+    upsertPromptMock.mockResolvedValue(new DbResult(true, 99));
+    const entries: CachedPromptEntry[] = [
+      { name: 'New', text: 'body', slug: 'new-slug', role: 'generic' },
+    ];
+    const res = await commitDbEntries(entries);
+    expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
+    const call = upsertPromptMock.mock.calls[0][0];
+    expect(call.id).toBeUndefined();
+    expect(call.previousBody).toBeUndefined();
+  });
 });

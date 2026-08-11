@@ -33,7 +33,10 @@ export type OpfsRootResult = OpfsUnavailableReason | OpfsAvailableRoot;
 
 async function resolveRoot(): Promise<OpfsRootResult> {
   const hasStorage = typeof navigator !== 'undefined' && !!navigator.storage?.getDirectory;
-  if (!hasStorage) return { isAvailable: false, reason: 'navigator.storage.getDirectory unavailable' };
+  if (!hasStorage) {
+    return { isAvailable: false, reason: 'navigator.storage.getDirectory unavailable' };
+  }
+
   try {
     const root = await navigator.storage.getDirectory();
 
@@ -50,6 +53,7 @@ async function getProjectDir(projectId: string, isCreate: boolean): Promise<File
 
     return null;
   }
+
   const base = await rootResult.root.getDirectoryHandle(ROOT_DIR, { create: isCreate });
 
   return base.getDirectoryHandle(projectId, { create: isCreate });
@@ -57,7 +61,9 @@ async function getProjectDir(projectId: string, isCreate: boolean): Promise<File
 
 function generateFileId(): ChatSubmitFileId {
   const hasRandomUuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function';
-  if (hasRandomUuid) return crypto.randomUUID();
+  if (hasRandomUuid) {
+    return crypto.randomUUID();
+  }
 
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
@@ -65,7 +71,10 @@ function generateFileId(): ChatSubmitFileId {
 export async function saveEntry(projectId: string, text: string): Promise<ChatSubmitFileId | null> {
   try {
     const dir = await getProjectDir(projectId, true);
-    if (!dir) return null;
+    if (!dir) {
+      return null;
+    }
+
     const fileId = generateFileId();
     const handle = await dir.getFileHandle(`${fileId}${FILE_EXT}`, { create: true });
     const writable = await handle.createWritable();
@@ -83,7 +92,10 @@ export async function saveEntry(projectId: string, text: string): Promise<ChatSu
 export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Promise<string | null> {
   try {
     const dir = await getProjectDir(projectId, false);
-    if (!dir) return null;
+    if (!dir) {
+      return null;
+    }
+
     const handle = await dir.getFileHandle(`${fileId}${FILE_EXT}`, { create: false });
     const file = await handle.getFile();
 
@@ -98,7 +110,10 @@ export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Pr
 export async function deleteEntry(projectId: string, fileId: ChatSubmitFileId): Promise<boolean> {
   try {
     const dir = await getProjectDir(projectId, false);
-    if (!dir) return false;
+    if (!dir) {
+      return false;
+    }
+
     await dir.removeEntry(`${fileId}${FILE_EXT}`);
 
     return true;
@@ -114,7 +129,9 @@ async function collectFileIds(dir: FileSystemDirectoryHandle): Promise<ChatSubmi
   const iterable = dir as unknown as AsyncIterable<[string, FileSystemHandle]>;
   for await (const [name, handle] of iterable) {
     const isTxtFile = handle.kind === 'file' && name.endsWith(FILE_EXT);
-    if (isTxtFile) ids.push(name.slice(0, -FILE_EXT.length));
+    if (isTxtFile) {
+      ids.push(name.slice(0, -FILE_EXT.length));
+    }
   }
 
   return ids;
@@ -123,7 +140,9 @@ async function collectFileIds(dir: FileSystemDirectoryHandle): Promise<ChatSubmi
 export async function listProject(projectId: string): Promise<ChatSubmitFileId[]> {
   try {
     const dir = await getProjectDir(projectId, false);
-    if (!dir) return [];
+    if (!dir) {
+      return [];
+    }
 
     return await collectFileIds(dir);
   } catch (e) {
@@ -140,6 +159,7 @@ export async function deleteProject(projectId: string): Promise<boolean> {
 
     return false;
   }
+
   try {
     const base = await rootResult.root.getDirectoryHandle(ROOT_DIR, { create: false });
     await base.removeEntry(projectId, { recursive: true });

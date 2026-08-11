@@ -21,9 +21,9 @@ import { PaymentBannerHider } from "./index";
 import { BannerLogFnType } from "../../types/runtime/enums/banner";
 import { logPaymentBannerHiderError } from "./logger";
 import {
-    BannerStateType,
-    REMOVE_DELAY_MS,
-    STATE_ATTR,
+  BannerStateType,
+  REMOVE_DELAY_MS,
+  STATE_ATTR,
 } from "./types";
 
 const TAG = "[PaymentBannerHider.smokeTest]";
@@ -31,18 +31,18 @@ const FADING_WAIT_MS = 50;
 const DONE_WAIT_MS = REMOVE_DELAY_MS + 100;
 
 class StubBannerLocator extends BannerLocator {
-    public constructor(private readonly target: HTMLElement) {
-        super();
-    }
+  public constructor(private readonly target: HTMLElement) {
+    super();
+  }
 
-    public override locate(): LocateResult | null {
-        return {
-            element: this.target,
-            source: "xpath",
-            xpath: "stub",
-            matchedText: "Payment issue detected.",
-        };
-    }
+  public override locate(): LocateResult | null {
+    return {
+      element: this.target,
+      source: "xpath",
+      xpath: "stub",
+      matchedText: "Payment issue detected.",
+    };
+  }
 }
 
 interface AssertionFailure {
@@ -52,71 +52,79 @@ interface AssertionFailure {
 }
 
 function assertState(
-    element: HTMLElement,
-    step: string,
-    expected: BannerStateType | null,
+  element: HTMLElement,
+  step: string,
+  expected: BannerStateType | null,
 ): AssertionFailure | null {
-    const actual = element.getAttribute(STATE_ATTR);
-    const expectedStr = expected === null ? "(none)" : expected;
+  const actual = element.getAttribute(STATE_ATTR);
+  const expectedStr = expected === null ? "(none)" : expected;
 
-    if (expected === null && actual === null) {
-        return null;
-    }
+  if (expected === null && actual === null) {
+    return null;
+  }
 
-    if (actual === expected) {
-        return null;
-    }
+  if (actual === expected) {
+    return null;
+  }
 
-    return { step, expected: expectedStr, actual };
+  return { step, expected: expectedStr, actual };
 }
 
 function wait(ms: number): Promise<void> {
-    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function buildFakeBanner(): HTMLElement {
-    const element = document.createElement("div");
-    element.id = "pbh-smoke-test-banner";
-    element.textContent = "Payment issue detected.";
-    document.body.appendChild(element);
+  const element = document.createElement("div");
+  element.id = "pbh-smoke-test-banner";
+  element.textContent = "Payment issue detected.";
+  document.body.appendChild(element);
 
-    return element;
+  return element;
 }
 
 export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
-    const banner = buildFakeBanner();
-    const failures: AssertionFailure[] = [];
+  const banner = buildFakeBanner();
+  const failures: AssertionFailure[] = [];
 
-    try {
-        const before = assertState(banner, "before-check", null);
-        if (before !== null) failures.push(before);
-
-        const hider = new PaymentBannerHider(new StubBannerLocator(banner));
-        hider.check();
-
-        const fading = assertState(banner, "after-check", BannerStateType.Fading);
-        if (fading !== null) failures.push(fading);
-
-        await wait(FADING_WAIT_MS);
-        const hiding = assertState(banner, "post-microtask", BannerStateType.Hiding);
-        if (hiding !== null) failures.push(hiding);
-
-        await wait(DONE_WAIT_MS);
-        const done = assertState(banner, "post-delay", BannerStateType.Done);
-        if (done !== null) failures.push(done);
-
-        if (failures.length === 0) {
-            console.log(`${TAG} PASS — fading → hiding → done verified`);
-
-            return true;
-        }
-
-        logPaymentBannerHiderError(BannerLogFnType.SmokeTest, `${TAG} FAIL`, failures);
-
-        return false;
-    } finally {
-        banner.remove();
+  try {
+    const before = assertState(banner, "before-check", null);
+    if (before !== null) {
+      failures.push(before);
     }
+
+    const hider = new PaymentBannerHider(new StubBannerLocator(banner));
+    hider.check();
+
+    const fading = assertState(banner, "after-check", BannerStateType.Fading);
+    if (fading !== null) {
+      failures.push(fading);
+    }
+
+    await wait(FADING_WAIT_MS);
+    const hiding = assertState(banner, "post-microtask", BannerStateType.Hiding);
+    if (hiding !== null) {
+      failures.push(hiding);
+    }
+
+    await wait(DONE_WAIT_MS);
+    const done = assertState(banner, "post-delay", BannerStateType.Done);
+    if (done !== null) {
+      failures.push(done);
+    }
+
+    if (failures.length === 0) {
+      console.log(`${TAG} PASS — fading → hiding → done verified`);
+
+      return true;
+    }
+
+    logPaymentBannerHiderError(BannerLogFnType.SmokeTest, `${TAG} FAIL`, failures);
+
+    return false;
+  } finally {
+    banner.remove();
+  }
 }
 
 declare global {

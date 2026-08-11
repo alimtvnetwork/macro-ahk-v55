@@ -15,17 +15,17 @@ import type { SqlRow } from "./handler-types";
 
 /** Collects all rows from a prepared statement into an array. */
 export function collectRows(
-    stmt: { step(): boolean; getAsObject(): SqlRow; free(): void },
+  stmt: { step(): boolean; getAsObject(): SqlRow; free(): void },
 ): SqlRow[] {
-    const rows: SqlRow[] = [];
+  const rows: SqlRow[] = [];
 
-    while (stmt.step()) {
-        rows.push(stmt.getAsObject());
-    }
+  while (stmt.step()) {
+    rows.push(stmt.getAsObject());
+  }
 
-    stmt.free();
+  stmt.free();
 
-    return rows;
+  return rows;
 }
 
 /* ------------------------------------------------------------------ */
@@ -43,16 +43,17 @@ const ALLOWED_TABLES = new Set(["Logs", "Errors", "Sessions", "Prompts", "Projec
 
 /** Counts all rows in a table. Table name is validated against an allowlist. */
 export function countTable(
-    db: { exec(sql: string): ExecResult[] },
-    table: string,
+  db: { exec(sql: string): ExecResult[] },
+  table: string,
 ): number {
-    if (!ALLOWED_TABLES.has(table)) {
-        throw new Error(`[SQL safety] Table name "${table}" not in allowlist`);
-    }
-    const result = db.exec(`SELECT COUNT(*) as cnt FROM ${table}`);
-    const hasResult = result.length > 0 && result[0].values.length > 0;
+  if (!ALLOWED_TABLES.has(table)) {
+    throw new Error(`[SQL safety] Table name "${table}" not in allowlist`);
+  }
 
-    return hasResult ? (result[0].values[0][0] as number) : 0;
+  const result = db.exec(`SELECT COUNT(*) as cnt FROM ${table}`);
+  const hasResult = result.length > 0 && result[0].values.length > 0;
+
+  return hasResult ? (result[0].values[0][0] as number) : 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,18 +72,18 @@ interface PreparedDb {
 
 /** Queries logs filtered by source. */
 export function queryWithSource(db: PreparedDb, source: string, limit: number): SqlRow[] {
-    const stmt = db.prepare(
-        "SELECT * FROM Logs WHERE Source = ? ORDER BY Timestamp DESC LIMIT ?",
-    );
-    stmt.bind([source, limit]);
+  const stmt = db.prepare(
+    "SELECT * FROM Logs WHERE Source = ? ORDER BY Timestamp DESC LIMIT ?",
+  );
+  stmt.bind([source, limit]);
 
-    return collectRows(stmt);
+  return collectRows(stmt);
 }
 
 /** Queries all logs without filter. */
 export function queryAll(db: PreparedDb, limit: number): SqlRow[] {
-    const stmt = db.prepare("SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?");
-    stmt.bind([limit]);
+  const stmt = db.prepare("SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?");
+  stmt.bind([limit]);
 
-    return collectRows(stmt);
+  return collectRows(stmt);
 }

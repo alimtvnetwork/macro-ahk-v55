@@ -91,22 +91,28 @@ export interface UtilsApi {
 /* ------------------------------------------------------------------ */
 
 function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
-    return new Promise<T>(function (resolve) {
-        let isSettled = false;
+  return new Promise<T>(function (resolve) {
+    let isSettled = false;
 
-        const timer = setTimeout(function () {
-            if (isSettled) { return; }
-            isSettled = true;
-            resolve(fallback);
-        }, ms);
+    const timer = setTimeout(function () {
+      if (isSettled) {
+        return; 
+      }
 
-        promise.then(function (value) {
-            if (isSettled) { return; }
-            isSettled = true;
-            clearTimeout(timer);
-            resolve(value);
-        });
+      isSettled = true;
+      resolve(fallback);
+    }, ms);
+
+    promise.then(function (value) {
+      if (isSettled) {
+        return; 
+      }
+
+      isSettled = true;
+      clearTimeout(timer);
+      resolve(value);
     });
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -114,23 +120,29 @@ function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 /* ------------------------------------------------------------------ */
 
 async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions): Promise<T> {
-    let currentDelay = options.delayMs;
+  let currentDelay = options.delayMs;
 
-    for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
-        try {
-            return await fn();
-        } catch (error: unknown) {
-            NamespaceLogger.error('parseJson', 'JSON parse failed', error);
-            if (attempt === options.maxAttempts) { throw error; }
-            if (options.onRetry) { options.onRetry(attempt, error); }
-            await delay(currentDelay);
-            if (options.backoffMultiplier !== undefined) {
-                currentDelay = currentDelay * options.backoffMultiplier;
-            }
-        }
+  for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error: unknown) {
+      NamespaceLogger.error('parseJson', 'JSON parse failed', error);
+      if (attempt === options.maxAttempts) {
+        throw error; 
+      }
+
+      if (options.onRetry) {
+        options.onRetry(attempt, error); 
+      }
+
+      await delay(currentDelay);
+      if (options.backoffMultiplier !== undefined) {
+        currentDelay = currentDelay * options.backoffMultiplier;
+      }
     }
+  }
 
-    throw new Error("withRetry: exhausted all attempts");
+  throw new Error("withRetry: exhausted all attempts");
 }
 
 /* ------------------------------------------------------------------ */
@@ -138,48 +150,57 @@ async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions): Promis
 /* ------------------------------------------------------------------ */
 
 function createConcurrencyLock<T>(): ConcurrencyLock<T> {
-    let inFlight: Promise<T> | null = null;
-    const waiters: Array<{
+  let inFlight: Promise<T> | null = null;
+  const waiters: Array<{
         resolve: (result: ConcurrencyLockResult<T>) => void;
         timer: ReturnType<typeof setTimeout> | null;
     }> = [];
 
-    function resolveAllWaiters(value: T): void {
-        const pending = waiters.splice(0);
-        for (const waiter of pending) {
-            if (waiter.timer !== null) { clearTimeout(waiter.timer); }
-            waiter.resolve({ value, wasQueued: true });
-        }
+  function resolveAllWaiters(value: T): void {
+    const pending = waiters.splice(0);
+    for (const waiter of pending) {
+      if (waiter.timer !== null) {
+        clearTimeout(waiter.timer); 
+      }
+
+      waiter.resolve({ value, wasQueued: true });
     }
+  }
 
-    return {
-        get isInFlight(): boolean { return inFlight !== null; },
+  return {
+    get isInFlight(): boolean {
+      return inFlight !== null; 
+    },
 
-        run(fn: () => Promise<T>, timeoutMs?: number, fallback?: T): Promise<ConcurrencyLockResult<T>> {
-            if (inFlight !== null) {
-                return new Promise<ConcurrencyLockResult<T>>(function (resolve) {
-                    const entry: typeof waiters[0] = { resolve, timer: null };
-                    if (timeoutMs !== undefined && fallback !== undefined) {
-                        entry.timer = setTimeout(function () {
-                            const idx = waiters.indexOf(entry);
-                            if (idx !== -1) { waiters.splice(idx, 1); }
-                            resolve({ value: fallback!, wasQueued: true });
-                        }, timeoutMs);
-                    }
-                    waiters.push(entry);
-                });
-            }
+    run(fn: () => Promise<T>, timeoutMs?: number, fallback?: T): Promise<ConcurrencyLockResult<T>> {
+      if (inFlight !== null) {
+        return new Promise<ConcurrencyLockResult<T>>(function (resolve) {
+          const entry: typeof waiters[0] = { resolve, timer: null };
+          if (timeoutMs !== undefined && fallback !== undefined) {
+            entry.timer = setTimeout(function () {
+              const idx = waiters.indexOf(entry);
+              if (idx !== -1) {
+                waiters.splice(idx, 1); 
+              }
 
-            inFlight = fn();
+              resolve({ value: fallback!, wasQueued: true });
+            }, timeoutMs);
+          }
 
-            return inFlight.then(function (value) {
-                inFlight = null;
-                resolveAllWaiters(value);
+          waiters.push(entry);
+        });
+      }
 
-                return { value, wasQueued: false };
-            });
-        },
-    };
+      inFlight = fn();
+
+      return inFlight.then(function (value) {
+        inFlight = null;
+        resolveAllWaiters(value);
+
+        return { value, wasQueued: false };
+      });
+    },
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -187,7 +208,9 @@ function createConcurrencyLock<T>(): ConcurrencyLock<T> {
 /* ------------------------------------------------------------------ */
 
 function delay(ms: number): Promise<void> {
-    return new Promise<void>(function (resolve) { setTimeout(resolve, ms); });
+  return new Promise<void>(function (resolve) {
+    setTimeout(resolve, ms); 
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -205,64 +228,73 @@ interface ActivePollEntry {
 const _activePolls = new Set<ActivePollEntry>();
 
 export function _diagActivePolls(): Array<{ label: string; ageMs: number }> {
-    const now = Date.now();
-    const out: Array<{ label: string; ageMs: number }> = [];
-    _activePolls.forEach(function (entry) {
-        out.push({ label: entry.label, ageMs: now - entry.startedAt });
-    });
+  const now = Date.now();
+  const out: Array<{ label: string; ageMs: number }> = [];
+  _activePolls.forEach(function (entry) {
+    out.push({ label: entry.label, ageMs: now - entry.startedAt });
+  });
 
-    return out;
+  return out;
 }
 
 function pollUntil<T>(
-    condition: () => T | null | undefined | false,
-    options: PollUntilOptions = {},
+  condition: () => T | null | undefined | false,
+  options: PollUntilOptions = {},
 ): Promise<T | null> {
-    const intervalMs = options.intervalMs ?? 200;
-    const timeoutMs = options.timeoutMs ?? 5000;
+  const intervalMs = options.intervalMs ?? 200;
+  const timeoutMs = options.timeoutMs ?? 5000;
 
-    return new Promise<T | null>(function (resolve) {
-        const startedAt = Date.now();
-        const immediate = condition();
+  return new Promise<T | null>(function (resolve) {
+    const startedAt = Date.now();
+    const immediate = condition();
 
-        if (immediate) {
-            if (options.onFound) { options.onFound(0); }
-            resolve(immediate);
+    if (immediate) {
+      if (options.onFound) {
+        options.onFound(0); 
+      }
 
-            return;
+      resolve(immediate);
+
+      return;
+    }
+
+    const entry: ActivePollEntry = {
+      handle: 0 as unknown as ReturnType<typeof setInterval>,
+      label: 'pollUntil(timeoutMs=' + timeoutMs + ',intervalMs=' + intervalMs + ')',
+      startedAt,
+    };
+
+    function stop(): void {
+      clearInterval(entry.handle);
+      _activePolls.delete(entry);
+    }
+
+    entry.handle = setInterval(function () {
+      const elapsed = Date.now() - startedAt;
+      const result = condition();
+
+      if (result) {
+        stop();
+        if (options.onFound) {
+          options.onFound(elapsed); 
         }
 
-        const entry: ActivePollEntry = {
-            handle: 0 as unknown as ReturnType<typeof setInterval>,
-            label: 'pollUntil(timeoutMs=' + timeoutMs + ',intervalMs=' + intervalMs + ')',
-            startedAt,
-        };
+        resolve(result);
 
-        function stop(): void {
-            clearInterval(entry.handle);
-            _activePolls.delete(entry);
+        return;
+      }
+
+      if (elapsed >= timeoutMs) {
+        stop();
+        if (options.onTimeout) {
+          options.onTimeout(); 
         }
 
-        entry.handle = setInterval(function () {
-            const elapsed = Date.now() - startedAt;
-            const result = condition();
-
-            if (result) {
-                stop();
-                if (options.onFound) { options.onFound(elapsed); }
-                resolve(result);
-
-                return;
-            }
-
-            if (elapsed >= timeoutMs) {
-                stop();
-                if (options.onTimeout) { options.onTimeout(); }
-                resolve(null);
-            }
-        }, intervalMs);
-        _activePolls.add(entry);
-    });
+        resolve(null);
+      }
+    }, intervalMs);
+    _activePolls.add(entry);
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -270,21 +302,21 @@ function pollUntil<T>(
 /* ------------------------------------------------------------------ */
 
 function waitForElement(options: WaitForElementOptions): Promise<Element | null> {
-    const { selector, useXPath = false, timeoutMs = 10000, intervalMs = 200, parent } = options;
-    const root = parent || document;
+  const { selector, useXPath = false, timeoutMs = 10000, intervalMs = 200, parent } = options;
+  const root = parent || document;
 
-    return pollUntil(function () {
-        if (useXPath) {
-            const result = document.evaluate(
-                selector, root, null,
-                XPathResult.FIRST_ORDERED_NODE_TYPE, null,
-            );
+  return pollUntil(function () {
+    if (useXPath) {
+      const result = document.evaluate(
+        selector, root, null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE, null,
+      );
 
-            return result.singleNodeValue as Element | null;
-        }
+      return result.singleNodeValue as Element | null;
+    }
 
-        return root.querySelector(selector);
-    }, { intervalMs, timeoutMs });
+    return root.querySelector(selector);
+  }, { intervalMs, timeoutMs });
 }
 
 /* ------------------------------------------------------------------ */
@@ -292,12 +324,17 @@ function waitForElement(options: WaitForElementOptions): Promise<Element | null>
 /* ------------------------------------------------------------------ */
 
 function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
-    let timer: ReturnType<typeof setTimeout> | null = null;
+  let timer: ReturnType<typeof setTimeout> | null = null;
 
-    return function (...args: A) {
-        if (timer !== null) { clearTimeout(timer); }
-        timer = setTimeout(function () { timer = null; fn(...args); }, ms);
-    };
+  return function (...args: A) {
+    if (timer !== null) {
+      clearTimeout(timer); 
+    }
+
+    timer = setTimeout(function () {
+      timer = null; fn(...args); 
+    }, ms);
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -305,24 +342,27 @@ function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
 /* ------------------------------------------------------------------ */
 
 function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
-    let last = 0;
-    let timer: ReturnType<typeof setTimeout> | null = null;
+  let last = 0;
+  let timer: ReturnType<typeof setTimeout> | null = null;
 
-    return function (...args: A) {
-        const now = Date.now();
-        const remaining = ms - (now - last);
-        if (remaining <= 0) {
-            if (timer !== null) { clearTimeout(timer); timer = null; }
-            last = now;
-            fn(...args);
-        } else if (timer === null) {
-            timer = setTimeout(function () {
-                last = Date.now();
-                timer = null;
-                fn(...args);
-            }, remaining);
-        }
-    };
+  return function (...args: A) {
+    const now = Date.now();
+    const remaining = ms - (now - last);
+    if (remaining <= 0) {
+      if (timer !== null) {
+        clearTimeout(timer); timer = null; 
+      }
+
+      last = now;
+      fn(...args);
+    } else if (timer === null) {
+      timer = setTimeout(function () {
+        last = Date.now();
+        timer = null;
+        fn(...args);
+      }, remaining);
+    }
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -330,37 +370,43 @@ function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
 /* ------------------------------------------------------------------ */
 
 function safeJsonParse<T>(json: string, fallback: T): T {
-    try {
-        return JSON.parse(json) as T;
-    } catch {
-        return fallback;
-    }
+  try {
+    return JSON.parse(json) as T;
+  } catch {
+    return fallback;
+  }
 }
 
 function formatDuration(ms: number): string {
-    if (ms < 1000) { return ms + "ms"; }
-    if (ms < 60000) { return (ms / 1000).toFixed(1) + "s"; }
-    const mins = Math.floor(ms / 60000);
-    const secs = Math.round((ms % 60000) / 1000);
+  if (ms < 1000) {
+    return ms + "ms"; 
+  }
 
-    return mins + "m " + secs + "s";
+  if (ms < 60000) {
+    return (ms / 1000).toFixed(1) + "s"; 
+  }
+
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.round((ms % 60000) / 1000);
+
+  return mins + "m " + secs + "s";
 }
 
 let _uidCounter = 0;
 function uid(prefix = "m"): string {
-    return prefix + "-" + Date.now().toString(36) + "-" + (++_uidCounter).toString(36);
+  return prefix + "-" + Date.now().toString(36) + "-" + (++_uidCounter).toString(36);
 }
 
 function deepClone<T>(value: T): T {
-    if (typeof structuredClone === "function") {
-        return structuredClone(value);
-    }
+  if (typeof structuredClone === "function") {
+    return structuredClone(value);
+  }
 
-    return JSON.parse(JSON.stringify(value)) as T;
+  return JSON.parse(JSON.stringify(value)) as T;
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /* ------------------------------------------------------------------ */
@@ -368,19 +414,19 @@ function isObject(value: unknown): value is Record<string, unknown> {
 /* ------------------------------------------------------------------ */
 
 export function createUtilsApi(): UtilsApi {
-    return {
-        withTimeout,
-        withRetry,
-        createConcurrencyLock,
-        delay,
-        pollUntil,
-        waitForElement,
-        debounce,
-        throttle,
-        safeJsonParse,
-        formatDuration,
-        uid,
-        deepClone,
-        isObject,
-    };
+  return {
+    withTimeout,
+    withRetry,
+    createConcurrencyLock,
+    delay,
+    pollUntil,
+    waitForElement,
+    debounce,
+    throttle,
+    safeJsonParse,
+    formatDuration,
+    uid,
+    deepClone,
+    isObject,
+  };
 }

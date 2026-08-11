@@ -54,9 +54,12 @@ const ROW_IDS = [
 describe('Credit-sort hamburger rows (v3.30.0)', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    try { localStorage.removeItem('ml_credit_sort_mode'); } catch (err) {
+    try {
+      localStorage.removeItem('ml_credit_sort_mode'); 
+    } catch (err) {
       logError('MacroController', 'Unknown error');
     }
+
     setLoopWsCreditSortMode('none');
   });
 
@@ -67,6 +70,7 @@ describe('Credit-sort hamburger rows (v3.30.0)', () => {
       expect(el, `missing row ${id}`).toBeTruthy();
       expect(el!.getAttribute('data-active')).toBe('false');
     }
+
     expect(document.getElementById('loop-ws-credit-sort-high')!.textContent).toContain('High credit');
     expect(document.getElementById('loop-ws-credit-sort-pro-low')!.textContent).toContain('Pro low');
   });

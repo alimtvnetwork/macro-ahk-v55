@@ -11,18 +11,28 @@ const CSS_BG = ';background:';
 
 export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): string {
   const display: WorkspaceDisplayStatus = classifyFromStatus(status, ws);
-  if (display.kind === 'normal' || !display.label) return '';
+  if (display.kind === 'normal' || !display.label) {
+    return '';
+  }
+
   const style = resolveBadgeStyle(display.tone);
 
   const tipParts: string[] = [display.label];
-  if (display.sublabel) tipParts.push(display.sublabel);
-  if (display.tooltip) tipParts.push(display.tooltip);
+  if (display.sublabel) {
+    tipParts.push(display.sublabel);
+  }
+
+  if (display.tooltip) {
+    tipParts.push(display.tooltip);
+  }
+
   if (status.kind === 'about-to-refill' && status.refillIso) {
     tipParts.push('Refills ' + formatDateDDMMMYY(status.refillIso) + ' (in ' + formatDayCount(status.daysToRefill) + ')');
   } else if (status.sinceIso) {
     const date = formatDateDDMMMYY(status.sinceIso);
     tipParts.push('Since ' + date + ' (' + formatDayCount(status.daysSince) + ')');
   }
+
   const tip = tipParts.join(' — ').replace(/"/g, '&quot;');
 
   let html = '<span class="marco-ws-status-pill marco-ws-status-' + display.kind
@@ -45,8 +55,14 @@ export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit
 
 export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
   const days = daysToRefillForWs(ws);
-  if (days === null) return '';
-  if (days > REFILL_PRIORITY_WINDOW_DAYS) return '';
+  if (days === null) {
+    return '';
+  }
+
+  if (days > REFILL_PRIORITY_WINDOW_DAYS) {
+    return '';
+  }
+
   let fg = '#cbd5e1';
   let bg = 'rgba(71,85,105,0.35)';
   let border = 'rgba(148,163,184,0.5)';
@@ -65,14 +81,19 @@ export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
 export function resolveStatusPill(
   ws: WorkspaceCredit, config: ReturnType<typeof getWorkspaceLifecycleConfig>,
 ): { pillHtml: string; suppressTier: boolean } {
-  if (!config.enableWorkspaceStatusLabels) return { pillHtml: '', suppressTier: false };
+  if (!config.enableWorkspaceStatusLabels) {
+    return { pillHtml: '', suppressTier: false };
+  }
+
   const wsTier = ws.tier || WsTierValueType.FREE;
   const status = getEffectiveStatus(ws, config);
   const pillHtml = buildStatusPillHtml(status, ws);
   let suppressTier = false;
   if (isExpiredTier(wsTier)) {
     const display = classifyFromStatus(status, ws);
-    if (display.kind !== 'normal') suppressTier = true;
+    if (display.kind !== 'normal') {
+      suppressTier = true;
+    }
   }
 
   return { pillHtml, suppressTier };
@@ -80,12 +101,21 @@ export function resolveStatusPill(
 
 export function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
   const days = expiredDays(ws);
-  if (days === null) return '';
+  if (days === null) {
+    return '';
+  }
+
   const startDate = formatExpiryStartDate(ws);
   const duration = formatExpiredDuration(ws);
   const tipParts = ['Expired'];
-  if (startDate) tipParts.push('since ' + startDate);
-  if (duration) tipParts.push('(' + duration + ')');
+  if (startDate) {
+    tipParts.push('since ' + startDate);
+  }
+
+  if (duration) {
+    tipParts.push('(' + duration + ')');
+  }
+
   const tip = tipParts.join(' ').replace(/"/g, '&quot;');
 
   return '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
@@ -113,6 +143,7 @@ export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
   } else if (isExpiredTier(wsTier)) {
     tierBadge += buildLegacyExpiredBadge(ws);
   }
+
   if (!config.enableWorkspaceStatusLabels) {
     tierBadge += buildRefillBadgeHtml(ws);
   }

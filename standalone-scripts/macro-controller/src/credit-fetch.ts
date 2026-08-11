@@ -52,7 +52,9 @@ const LOG_SCOPE_CREDIT_FETCH = 'credit-fetch';
 const CREDIT_FETCH_ASYNC_SCOPE = 'credit-fetch-async';
 const LOG_PREFIX = 'Credit API (async): ';
 
-function mc() { return MacroController.getInstance(); }
+function mc() {
+  return MacroController.getInstance(); 
+}
 
 // ============================================
 // Helper — call marco.api.credits.fetchWorkspaces
@@ -78,6 +80,7 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
       op: 'apiFetchWorkspaces',
     });
   }
+
   if (!sdk.api) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco.api',
@@ -85,6 +88,7 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
       op: 'apiFetchWorkspaces',
     });
   }
+
   if (!sdk.api.credits || typeof sdk.api.credits.fetchWorkspaces !== 'function') {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco.api.credits.fetchWorkspaces',
@@ -152,7 +156,9 @@ async function handleAuthRecovery(
   statusText: string,
 ): Promise<string | null> {
   markBearerTokenExpired(LOG_SCOPE_CREDIT_FETCH);
-  if (token) { invalidateSessionBridgeKey(token); }
+  if (token) {
+    invalidateSessionBridgeKey(token); 
+  }
 
   log('Credit API: Auth ' + status + ' — forcing token refresh before retry...', 'warn');
   const userWorkspacesPath = ApiPathType.UserWorkspaces;
@@ -225,7 +231,10 @@ export function schedulePostParseEnrichment(): void {
   // Fire-and-forget — pro_0 + pro_1 rows refresh asynchronously and trigger a UI update.
   applyProZeroEnrichment()
     .then(function (mutated: number): void {
-      if (mutated === 0) return;
+      if (mutated === 0) {
+        return;
+      }
+
       syncCreditStateFromApi();
       mc().updateUI();
       repaintWorkspaceRowsAfterEnrichment('pro_0');
@@ -237,7 +246,10 @@ export function schedulePostParseEnrichment(): void {
   // pro_1 overlay from SQLite /credit-balance cache (122a).
   applyProOneEnrichment()
     .then(function (mutated: number): void {
-      if (mutated === 0) return;
+      if (mutated === 0) {
+        return;
+      }
+
       syncCreditStateFromApi();
       mc().updateUI();
       repaintWorkspaceRowsAfterEnrichment('pro_1');
@@ -248,7 +260,10 @@ export function schedulePostParseEnrichment(): void {
 
   enrichCreditBalanceUpdateWorkspaces(loopCreditState.perWorkspace)
     .then(function (mutated: number): void {
-      if (mutated === 0) return;
+      if (mutated === 0) {
+        return;
+      }
+
       syncCreditStateFromApi();
       mc().updateUI();
       repaintWorkspaceRowsAfterEnrichment('ktlo/free/cancelled');
@@ -263,7 +278,9 @@ async function processSuccessData(
   autoDetectFn?: (token: string) => Promise<void>,
 ): Promise<void> {
   const isParseOk = parseLoopApiResponse(data);
-  if (!isParseOk) return;
+  if (!isParseOk) {
+    return;
+  }
 
   const freshToken = resolveToken();
   nsWrite('_internal.resolvedToken', freshToken);
@@ -303,45 +320,51 @@ export function fetchLoopCredits(
   const tokenPromise = isRetry
     ? Promise.resolve(resolveToken())
     : getBearerToken({ force: true }).catch(function (err: unknown) {
-        logError(LOG_SCOPE_CREDIT_FETCH, 'pre-flight getBearerToken({force}) failed', err);
+      logError(LOG_SCOPE_CREDIT_FETCH, 'pre-flight getBearerToken({force}) failed', err);
 
-        return resolveToken();
-      });
+      return resolveToken();
+    });
 
   tokenPromise.then(function (token: string) {
     logCreditPreflight(token, isRetry);
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-      if (resp.isFail) {
-        if (isAuthFailure(resp.status) && !isRetry) {
-          const recovered = await handleAuthRecovery(token, resp.status, '');
-          if (!recovered) { mc().updateUI();
+        if (resp.isFail) {
+          if (isAuthFailure(resp.status) && !isRetry) {
+            const recovered = await handleAuthRecovery(token, resp.status, '');
+            if (!recovered) {
+              mc().updateUI();
 
- return undefined; }
-          fetchLoopCredits(true, autoDetectFn);
+              return undefined; 
+            }
 
-          return undefined;
+            fetchLoopCredits(true, autoDetectFn);
+
+            return undefined;
+          }
+
+          handleNonAuthError(resp);
+          throwDiagnostic('CREDIT_FETCH_E002', {
+            status: resp.status,
+            url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
+            op: 'fetchLoopCredits',
+            isRetry: isRetry === true,
+          });
         }
 
-        handleNonAuthError(resp);
-        throwDiagnostic('CREDIT_FETCH_E002', {
-          status: resp.status,
-          url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
-          op: 'fetchLoopCredits',
-          isRetry: isRetry === true,
-        });
-      }
+        const data = resp.data as Record<string, unknown>;
+        logSub('Credit API: response received, data keys=' + Object.keys(data).join(','), 1);
 
-      const data = resp.data as Record<string, unknown>;
-      logSub('Credit API: response received, data keys=' + Object.keys(data).join(','), 1);
-
-      return data;
-    })
+        return data;
+      })
       .then(async function (data: Record<string, unknown> | undefined) {
-      if (!data) return;
-      await processSuccessData(data, autoDetectFn);
-    })
+        if (!data) {
+          return;
+        }
+
+        await processSuccessData(data, autoDetectFn);
+      })
       .catch(function (err: Error) {
         logError('Credit API failed', '' + err.message);
         logSub('Token source: ' + getLastTokenSource(), 1);
@@ -361,9 +384,13 @@ export function fetchLoopCredits(
 class CreditAsyncState {
   private _inFlight: Promise<void> | null = null;
 
-  get inFlight(): Promise<void> | null { return this._inFlight; }
+  get inFlight(): Promise<void> | null {
+    return this._inFlight; 
+  }
 
-  set inFlight(value: Promise<void> | null) { this._inFlight = value; }
+  set inFlight(value: Promise<void> | null) {
+    this._inFlight = value; 
+  }
 }
 
 const creditAsyncState = new CreditAsyncState();
@@ -380,7 +407,9 @@ export function fetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
   const promise = doFetchLoopCreditsAsync(isRetry);
 
   if (!isRetry) {
-    creditAsyncState.inFlight = promise.finally(function () { creditAsyncState.inFlight = null; });
+    creditAsyncState.inFlight = promise.finally(function () {
+      creditAsyncState.inFlight = null; 
+    });
 
     return creditAsyncState.inFlight;
   }
@@ -403,7 +432,9 @@ async function resolveTokenWithRecovery(isRetry?: boolean): Promise<string> {
 // CQ4: Extracted — handle auth failure in async path
 async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Promise<void> {
   markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE);
-  if (token) { invalidateSessionBridgeKey(token); }
+  if (token) {
+    invalidateSessionBridgeKey(token); 
+  }
 
   log(LOG_PREFIX + 'Auth ' + resp.status + ' — forcing token refresh before retry...', 'warn');
   showToast('Auth ' + resp.status + ' — recovering session...', 'warn', { noStop: true });
@@ -442,7 +473,10 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
       return handleAsyncAuthFailure(resp, token);
     }
 
-    if (isAuthFailure(resp.status)) { markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE); }
+    if (isAuthFailure(resp.status)) {
+      markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE); 
+    }
+
     throwDiagnostic('CREDIT_FETCH_E002', {
       status: resp.status,
       url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
@@ -470,7 +504,9 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
     return 0;
   });
-  if (proZeroMutated + proOneMutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
+  if (proZeroMutated + proOneMutated > 0) {
+    syncCreditStateFromApi(); mc().updateUI(); 
+  }
 }
 
 // ============================================

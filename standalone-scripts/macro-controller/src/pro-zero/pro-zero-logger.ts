@@ -16,20 +16,20 @@ import { logError, logConsole } from '../error-utils';
 const FN = 'ProZeroCreditBalance';
 
 export function logRequested(workspaceId: string): void {
-    logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_REQUESTED + ' WorkspaceId=' + workspaceId);
+  logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_REQUESTED + ' WorkspaceId=' + workspaceId);
 }
 
 export function logReceived(totalGranted: number, totalRemaining: number, billingUsed: number): void {
-    logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_RECEIVED
+  logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_RECEIVED
         + ' total_granted=' + totalGranted
         + ' total_remaining=' + totalRemaining
         + ' total_billing_period_used=' + billingUsed);
 }
 
 export function logFailed(status: CreditBalanceFetchStatusType, detail: string): void {
-    logError(FN, CreditBalanceLogEventType.CREDIT_BALANCE_FAILED + ' status=' + status + ' detail=' + detail);
+  logError(FN, CreditBalanceLogEventType.CREDIT_BALANCE_FAILED + ' status=' + status + ' detail=' + detail);
 }
 
 export function logSkippedNonProZero(plan: WorkspacePlanType): void {
-    logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_SKIPPED_NON_PRO_ZERO + ' plan=' + plan);
+  logConsole(FN, CreditBalanceLogEventType.CREDIT_BALANCE_SKIPPED_NON_PRO_ZERO + ' plan=' + plan);
 }

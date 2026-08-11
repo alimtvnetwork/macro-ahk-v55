@@ -44,156 +44,165 @@ interface ProjectEditorProps {
 
 // eslint-disable-next-line max-lines-per-function
 export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
-    const platform = getPlatform();
-    const isEditing = project !== null;
-    const title = isEditing ? project.name : "New Project";
+  const platform = getPlatform();
+  const isEditing = project !== null;
+  const title = isEditing ? project.name : "New Project";
 
-    const [name, setName] = useState(project?.name ?? "");
-    const [description, setDescription] = useState(project?.description ?? "");
-    const [rules, setRules] = useState(project?.targetUrls ?? []);
-    const [cookies, setCookies] = useState<Array<{ cookieName: string; url: string; role: CookieBindingRoleType; description?: string }>>(project?.cookies ?? []);
-    const [variablesJson, setVariablesJson] = useState(() => {
-        if (!project?.settings) return "{}";
-        const vars = (project.settings as Record<string, unknown>).variables;
-        if (vars === undefined) return "{}";
-        try { return JSON.stringify(vars, null, 2); } catch (err) { /* swallowed */
- return "{}"; }
-    });
-    const [isSaving, setIsSaving] = useState(false);
-    const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);
+  const [name, setName] = useState(project?.name ?? "");
+  const [description, setDescription] = useState(project?.description ?? "");
+  const [rules, setRules] = useState(project?.targetUrls ?? []);
+  const [cookies, setCookies] = useState<Array<{ cookieName: string; url: string; role: CookieBindingRoleType; description?: string }>>(project?.cookies ?? []);
+  const [variablesJson, setVariablesJson] = useState(() => {
+    if (!project?.settings) {
+      return "{}";
+    }
 
-    // Script rows are managed by ScriptsConfigEditor via ref
-    const [scriptRows, setScriptRows] = useState<Array<{ scriptName: string; runAt: string; configId?: string }>>([]);
+    const vars = (project.settings as Record<string, unknown>).variables;
+    if (vars === undefined) {
+      return "{}";
+    }
 
-    const handleSave = useCallback(async () => {
-        if (name.trim() === "") {
-            setToast({ message: "Project name is required.", variant: "error" });
+    try {
+      return JSON.stringify(vars, null, 2); 
+    } catch (err) { /* swallowed */
+      return "{}"; 
+    }
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);
 
-            return;
-        }
+  // Script rows are managed by ScriptsConfigEditor via ref
+  const [scriptRows, setScriptRows] = useState<Array<{ scriptName: string; runAt: string; configId?: string }>>([]);
 
-        setIsSaving(true);
-        try {
-            // Build scripts from rows
-            const scripts = scriptRows.map((row, i: number) => ({
-                path: row.scriptName,
-                order: i,
-                runAt: row.runAt,
-                configBinding: row.configId || undefined,
-            }));
+  const handleSave = useCallback(async () => {
+    if (name.trim() === "") {
+      setToast({ message: "Project name is required.", variant: "error" });
 
-            // Parse variables
-            const settings: Record<string, unknown> = { ...(project?.settings ?? { logLevel: "info" }) };
-            try {
-                settings.variables = JSON.parse(variablesJson);
-            } catch (err) {
-                console.warn("[ProjectEditor] variables JSON invalid; keeping existing settings.variables", err);
-            }
+      return;
+    }
 
-            const payload: StoredProject = {
-                id: project?.id ?? crypto.randomUUID(),
-                schemaVersion: 1,
-                name: name.trim(),
-                version: project?.version ?? "1.0.1",
-                description: description.trim() || undefined,
-                targetUrls: rules,
-                scripts,
-                configs: [],
-                cookies: cookies.length > 0 ? cookies : undefined,
-                settings,
-                createdAt: project?.createdAt ?? new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            };
+    setIsSaving(true);
+    try {
+      // Build scripts from rows
+      const scripts = scriptRows.map((row, i: number) => ({
+        path: row.scriptName,
+        order: i,
+        runAt: row.runAt,
+        configBinding: row.configId || undefined,
+      }));
 
-            await platform.sendMessage({ type: "SAVE_PROJECT", project: payload });
-            setToast({ message: "Project saved and persisted.", variant: "success" });
-            setTimeout(onBack, 800);
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            setToast({ message: `Save failed: ${msg}`, variant: "error" });
-        } finally {
-            setIsSaving(false);
-        }
-    }, [name, description, rules, scriptRows, cookies, variablesJson, project, platform, onBack]);
+      // Parse variables
+      const settings: Record<string, unknown> = { ...(project?.settings ?? { logLevel: "info" }) };
+      try {
+        settings.variables = JSON.parse(variablesJson);
+      } catch (err) {
+        console.warn("[ProjectEditor] variables JSON invalid; keeping existing settings.variables", err);
+      }
 
-    return (
-        <>
-            {toast && <Toast message={toast.message} variant={toast.variant} onDismiss={() => setToast(null)} />}
+      const payload: StoredProject = {
+        id: project?.id ?? crypto.randomUUID(),
+        schemaVersion: 1,
+        name: name.trim(),
+        version: project?.version ?? "1.0.1",
+        description: description.trim() || undefined,
+        targetUrls: rules,
+        scripts,
+        configs: [],
+        cookies: cookies.length > 0 ? cookies : undefined,
+        settings,
+        createdAt: project?.createdAt ?? new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-            <div className="anim-fade-in-right">
-                <div className="content-header">
-                    <h1 className="content-title">
-                        <button className="btn btn-secondary btn-sm" onClick={onBack}>← Projects</button>
-                        {" / "}{title}
-                    </h1>
-                </div>
+      await platform.sendMessage({ type: "SAVE_PROJECT", project: payload });
+      setToast({ message: "Project saved and persisted.", variant: "success" });
+      setTimeout(onBack, 800);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setToast({ message: `Save failed: ${msg}`, variant: "error" });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [name, description, rules, scriptRows, cookies, variablesJson, project, platform, onBack]);
 
-                {/* Name & Description */}
-                <div className="form-group">
-                    <label className="form-label">Name</label>
-                    <input
-                        className="form-input"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="My Project"
-                    />
-                </div>
+  return (
+    <>
+      {toast && <Toast message={toast.message} variant={toast.variant} onDismiss={() => setToast(null)} />}
 
-                <div className="form-group">
-                    <label className="form-label">Description</label>
-                    <input
-                        className="form-input"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Optional description"
-                    />
-                </div>
-            </div>
+      <div className="anim-fade-in-right">
+        <div className="content-header">
+          <h1 className="content-title">
+            <button className="btn btn-secondary btn-sm" onClick={onBack}>← Projects</button>
+            {" / "}{title}
+          </h1>
+        </div>
 
-            {/* Staggered editor sections */}
-            {[
-                { key: "urls", delay: 0.05, content: (
-                    <>
-                        <h2 style={{ fontSize: 16, margin: "24px 0 12px" }}>URL Rules</h2>
-                        <UrlRulesEditor rules={rules} onChange={setRules} />
-                    </>
-                )},
-                { key: "scripts", delay: 0.1, content: (
-                    <ScriptsConfigEditor
-                        projectScripts={project?.scripts ?? []}
-                        onChange={setScriptRows}
-                    />
-                )},
-                { key: "cookies", delay: 0.15, content: (
-                    <CookieBindingsEditor bindings={cookies} onChange={setCookies} />
-                )},
-                { key: "vars", delay: 0.2, content: (
-                    <VariablesEditor json={variablesJson} onChange={setVariablesJson} />
-                )},
-            ].map(({ key, delay, content }) => (
-                <div
-                    key={key}
-                    className="anim-fade-in-up"
-                    style={{ animationDelay: `${delay}s` }}
-                >
-                    {content}
-                </div>
-            ))}
+        {/* Name & Description */}
+        <div className="form-group">
+          <label className="form-label">Name</label>
+          <input
+            className="form-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="My Project"
+          />
+        </div>
 
-            {/* Save Actions */}
-            <div
-                className="anim-fade-in-up anim-delay-5"
-                style={{ marginTop: 12, display: "flex", gap: 12 }}
-            >
-                <button
-                    className="btn btn-primary"
-                    onClick={() => void handleSave()}
-                    disabled={isSaving}
-                >
-                    {isSaving ? "Saving…" : "Save Project"}
-                </button>
-                <button className="btn btn-secondary" onClick={onBack}>Cancel</button>
-            </div>
-        </>
-    );
+        <div className="form-group">
+          <label className="form-label">Description</label>
+          <input
+            className="form-input"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Optional description"
+          />
+        </div>
+      </div>
+
+      {/* Staggered editor sections */}
+      {[
+        { key: "urls", delay: 0.05, content: (
+          <>
+            <h2 style={{ fontSize: 16, margin: "24px 0 12px" }}>URL Rules</h2>
+            <UrlRulesEditor rules={rules} onChange={setRules} />
+          </>
+        )},
+        { key: "scripts", delay: 0.1, content: (
+          <ScriptsConfigEditor
+            projectScripts={project?.scripts ?? []}
+            onChange={setScriptRows}
+          />
+        )},
+        { key: "cookies", delay: 0.15, content: (
+          <CookieBindingsEditor bindings={cookies} onChange={setCookies} />
+        )},
+        { key: "vars", delay: 0.2, content: (
+          <VariablesEditor json={variablesJson} onChange={setVariablesJson} />
+        )},
+      ].map(({ key, delay, content }) => (
+        <div
+          key={key}
+          className="anim-fade-in-up"
+          style={{ animationDelay: `${delay}s` }}
+        >
+          {content}
+        </div>
+      ))}
+
+      {/* Save Actions */}
+      <div
+        className="anim-fade-in-up anim-delay-5"
+        style={{ marginTop: 12, display: "flex", gap: 12 }}
+      >
+        <button
+          className="btn btn-primary"
+          onClick={() => void handleSave()}
+          disabled={isSaving}
+        >
+          {isSaving ? "Saving…" : "Save Project"}
+        </button>
+        <button className="btn btn-secondary" onClick={onBack}>Cancel</button>
+      </div>
+    </>
+  );
 }
