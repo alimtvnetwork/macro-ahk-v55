@@ -50,6 +50,4 @@ describe('Task Next token substitution', () => {
     expect(pasted).toBe('# Next 5 steps or tasks');
     expect(pasted).not.toContain('{{n}}');
   });
-
-
 });

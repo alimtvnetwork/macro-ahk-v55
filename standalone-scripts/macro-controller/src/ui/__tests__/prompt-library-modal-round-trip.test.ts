@@ -73,7 +73,7 @@ const flush = async (): Promise<void> => {
 };
 
 describe('prompt-library-modal - Export -> Import round-trip', () => {
-  let capturedBlob: Blob | null = null;
+  const capturedBlob: Blob | null = null;
   let performSpy: ReturnType<typeof vi.spyOn> | null = null;
 
   beforeEach(() => {

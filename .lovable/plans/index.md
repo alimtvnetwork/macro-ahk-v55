@@ -20,6 +20,7 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 12 | [prompts-import-export-menu](./completed/12-prompts-import-export-menu.md) | - | completed | 2026-07-15 |
 | 13 | [per-project-chat-submit-tracker](./completed/13-per-project-chat-submit-tracker.md) | - | completed | 2026-07-15 |
 | 14 | [editable-plan-next-prompt-library](./completed/14-editable-plan-next-prompt-library.md) | [subtasks](./subtasks/14-editable-plan-next-prompt-library/) | completed | 2026-07-25 |
+| 22 | [prompt-library-test-coverage-50](./completed/22-prompt-library-test-coverage-50.md) | - | completed | 2026-08-11 |
 | 102 | [ci-cd-bug-and-guidelines](./completed/102-ci-cd-bug-and-guidelines.md) | - | completed | 2026-08-08 |
 
 ## Live Lovable plans (`live-lovable/`)

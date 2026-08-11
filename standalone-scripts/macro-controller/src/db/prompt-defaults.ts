@@ -89,3 +89,19 @@ export function decodeReplaceValues(raw: unknown): string[] {
     return [...REPLACE_VALUES_DEFAULT];
   }
 }
+
+import { getSeedBodyForSlug } from '../seed/plan-next-prompts';
+import { DiagnosticError } from '../errors/diagnostic-error';
+
+/**
+ * Returns the default body for a given slug.
+ * Throws a DiagnosticError if the slug is unknown (negative path test gap 6).
+ */
+export function getDefaultBody(role: string, slug: string): string {
+  const body = getSeedBodyForSlug(slug);
+  if (!body) {
+    throw new DiagnosticError('PROMPT_DEFAULTS_E001', { role, slug, reason: 'unknown role/slug' });
+  }
+
+  return body;
+}

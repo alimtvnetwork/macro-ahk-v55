@@ -39,6 +39,8 @@ function buildTokenRegex(key: string): RegExp {
  * shape-invalid (logged, never thrown) so a corrupt DB row cannot
  * kill the chip.
  */
+import { DiagnosticError } from '../errors/diagnostic-error';
+
 export function substituteToken(body: string, key: string, value: string | number): string {
   if (typeof body !== 'string' || body.length === 0) {
     return body ?? '';
@@ -50,7 +52,21 @@ export function substituteToken(body: string, key: string, value: string | numbe
     return body;
   }
 
+  // Validate value: must be provided, non-zero, and an integer
+  if (value === undefined || value === null || value === '') {
+    throw new DiagnosticError('PROMPT_TOKEN_E001', { key, value, reason: 'value is missing' }, new Error('value is missing'));
+  }
+
+  const numValue = Number(value);
+  if (!Number.isInteger(numValue)) {
+    throw new DiagnosticError('PROMPT_TOKEN_E001', { key, value, reason: 'value must be an integer' }, new Error('value must be an integer'));
+  }
+  
+  if (numValue === 0) {
+    throw new DiagnosticError('PROMPT_TOKEN_E001', { key, value, reason: 'value cannot be zero' }, new Error('value cannot be zero'));
+  }
+
   const valueText = String(value);
-  const primary = body.replace(buildTokenRegex(key), valueText);
-  return primary;
+
+  return body.replace(buildTokenRegex(key), valueText);
 }

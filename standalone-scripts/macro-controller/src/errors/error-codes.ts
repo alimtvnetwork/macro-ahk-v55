@@ -43,6 +43,22 @@ export interface ErrorCodeEntry {
  * and unit-tested end-to-end without waiting for every migration to land.
  */
 export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.freeze({
+  PROMPT_TOKEN_E001: {
+    code: 'PROMPT_TOKEN_E001',
+    area: 'PROMPT',
+    action: 'FORMAT',
+    severity: 'error',
+    humanTemplate: 'Invalid token value: {reason}',
+    requiredContextKeys: ['reason'],
+  },
+  PROMPT_DEFAULTS_E001: {
+    code: 'PROMPT_DEFAULTS_E001',
+    area: 'PROMPT',
+    action: 'READ',
+    severity: 'error',
+    humanTemplate: 'Cannot get default body for {role} prompt "{slug}": {reason}.',
+    requiredContextKeys: ['role', 'slug', 'reason'],
+  },
   PROMPT_VALIDATE_E001: {
     code: 'PROMPT_VALIDATE_E001',
     area: 'PROMPT',

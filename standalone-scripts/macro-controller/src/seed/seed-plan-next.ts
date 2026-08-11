@@ -442,7 +442,8 @@ async function writeSeedAuditRow(params: {
     reason: string;
 }): Promise<void> {
   const promoted = params.telemetry.reduce((s, t) => s + t.promotedDefault, 0);
-  if (params.inserted === 0 && promoted === 0 && params.upgraded === 0) {
+  const isFailure = params.reason.startsWith('failed:') || params.reason.startsWith('caught:');
+  if (!isFailure && params.inserted === 0 && promoted === 0 && params.upgraded === 0) {
     emitPromptSeedEvent({
       event: 'seed.audit-skip', outcome: 'skipped',
       detail: 'no-observable-change',
@@ -492,9 +493,10 @@ import { RunSqlMethodType } from "../types/enums";
 
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
   const startedAt = Date.now();
+  let tel: Map<PromptRole, RoleTelemetry> | undefined;
   try {
     emitPromptSeedEvent({ event: 'seed.start', outcome: 'ok' });
-    const tel = initTelemetry();
+    tel = initTelemetry();
     const existing = await selectExistingSlugs();
     tallyInsertCounts(existing, tel);
     const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
@@ -507,6 +509,15 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
       emitPromptSeedEvent({
         event: 'seed.failed', outcome: 'failed', detail: message,
         metrics: { elapsedMs: Date.now() - startedAt },
+      });
+
+      const telemetry = Array.from(tel.values());
+      await writeSeedAuditRow({
+        telemetry,
+        inserted: 0,
+        skipped: 0,
+        upgraded: 0,
+        reason: 'failed: ' + message,
       });
 
       return ServiceResult.wrap({ ok: false, error: message });
@@ -549,6 +560,16 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
       event: 'seed.failed', outcome: 'failed', detail: message,
       metrics: { elapsedMs: Date.now() - startedAt },
     });
+
+    if (tel) {
+      await writeSeedAuditRow({
+        telemetry: Array.from(tel.values()),
+        inserted: 0,
+        skipped: 0,
+        upgraded: 0,
+        reason: 'caught: ' + message,
+      }).catch(() => {});
+    }
 
     return ServiceResult.wrap({ ok: false, error: message });
   }

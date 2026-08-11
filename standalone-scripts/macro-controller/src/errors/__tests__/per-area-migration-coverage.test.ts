@@ -95,7 +95,8 @@ const MIGRATED_MODULES: readonly {
   { path: 'ui/prompt-import-audit.ts',     allowedAreas: ['PROMPT_IO'] },
   { path: 'async-utils.ts',                allowedAreas: ['ASYNC'] },
   { path: 'types/prompt-role.ts',          allowedAreas: ['TYPE'] },
-
+  { path: 'db/prompt-defaults.ts',         allowedAreas: ['PROMPT'] },
+  { path: 'utils/token-substitute.ts',     allowedAreas: ['PROMPT'] },
 ];
 
 /**

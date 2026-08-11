@@ -75,3 +75,16 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
     return new ServiceResult(false, undefined, reason);
   }
 }
+
+/**
+ * Upsert a prompt and enforce that it becomes the single default for its role.
+ */
+export async function upsertForRole(input: import('./prompt-db').UpsertInput): Promise<EnforceResult> {
+  const { upsertPrompt } = await import('./prompt-db');
+  const result = await upsertPrompt(input);
+  if (result.isFail) {
+    return new ServiceResult(false, undefined, result.error || 'upsertPrompt failed');
+  }
+
+  return enforceSingleDefaultPerRole(input.role, result.value as number);
+}

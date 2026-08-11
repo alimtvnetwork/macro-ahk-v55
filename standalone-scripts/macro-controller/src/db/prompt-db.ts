@@ -366,3 +366,24 @@ export async function deletePromptById(id: number): Promise<DbResult<void>> {
 
   return new DbResult(true, undefined);
 }
+
+/**
+ * Delete a Prompt by its unique slug.
+ */
+export async function deleteBySlug(slug: string): Promise<DbResult<void>> {
+  if (slug.trim() === '') {
+    return fail('deleteBySlug', 'slug must not be empty');
+  }
+
+  const rowResult = await getPromptBySlug(slug);
+  if (rowResult.isFail) {
+    return fail('deleteBySlug', rowResult.error || 'query failed');
+  }
+
+  const row = rowResult.value;
+  if (!row) {
+    return fail('deleteBySlug', 'unknown slug');
+  }
+
+  return deletePromptById(row.Id);
+}
