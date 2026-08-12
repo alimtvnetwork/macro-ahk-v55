@@ -25,6 +25,8 @@ import { makeDraggable } from './drag-window';
 import { CreditToneType, WorkspaceSortKeyType, SortDirectionType } from "../types/enums";
 import { LeftRightType } from "../../../../src/types/enums";
 
+const HSL_FOREGROUND = 'hsl(var(--foreground))';
+
 const DIALOG_ID = 'marco-credit-totals-modal';
 const ATTR_ARIA_LABEL = 'aria-label';
 
@@ -104,7 +106,7 @@ function toneColor(tone: CreditTone | undefined): string {
     return TONE_COLOR[tone];
   }
 
-  return 'hsl(var(--foreground))';
+  return HSL_FOREGROUND;
 }
 
 /** Build a single summary card (heading + 3 stat rows). */
@@ -334,7 +336,7 @@ function buildChip(
   btn.textContent = label;
   btn.setAttribute('data-active', active ? 'true' : 'false');
   const bg = active ? 'rgba(124,58,237,0.35)' : 'transparent';
-  const fg = active ? 'hsl(var(--foreground))' : cPanelFgDim;
+  const fg = active ? HSL_FOREGROUND : cPanelFgDim;
   btn.style.cssText =
     'background:' + bg +
     ';border:1px solid ' + (active ? cPrimaryLighter : 'rgba(124,58,237,0.35)') +
@@ -411,7 +413,7 @@ function buildSearchBar(initialQuery: string, onChange: (q: string) => void): HT
     + 'font-family:monospace;outline:none;';
   input.addEventListener('focus', function (): void {
     input.style.borderColor = cPrimaryLighter;
-    input.style.color = 'hsl(var(--foreground))';
+    input.style.color = HSL_FOREGROUND;
   });
   input.addEventListener('blur', function (): void {
     input.style.borderColor = 'rgba(124,58,237,0.35)';
@@ -452,7 +454,7 @@ function renderHeaderCells(ctx: TableCtx): void {
     const arrow = isActive ? (ctx.sortState.dir === 'asc' ? ' ▲' : ' ▼') : '';
     cell.textContent = col.label + arrow;
     if (isActive) {
-      cell.style.color = 'hsl(var(--foreground))';
+      cell.style.color = HSL_FOREGROUND;
     }
 
     cell.onclick = function (): void {

@@ -491,6 +491,74 @@ async function writeSeedAuditRow(params: {
 import { ServiceResult } from '../utils/result-wrapper';
 import { RunSqlMethodType } from "../types/enums";
 
+async function handleSeedError(
+  message: string,
+  startedAt: number,
+  tel: Map<PromptRole, RoleTelemetry> | undefined,
+  reasonPrefix: 'failed: ' | 'caught: ',
+  errObject?: unknown,
+  includeInsertOrIgnoreFailEvent?: boolean
+): Promise<ServiceResult<SeedResult>> {
+  logDiagnosticFromCode('SEED_INSERT_E001', {
+    role: 'all', reason: message, boot: 'true', dbVersion: DB_NAME,
+  }, errObject);
+
+  if (includeInsertOrIgnoreFailEvent) {
+    emitPromptSeedEvent({ event: 'seed.insert-or-ignore', outcome: 'failed', detail: message });
+  }
+
+  emitPromptSeedEvent({
+    event: 'seed.failed', outcome: 'failed', detail: message,
+    metrics: { elapsedMs: Date.now() - startedAt },
+  });
+
+  if (tel) {
+    await writeSeedAuditRow({
+      telemetry: Array.from(tel.values()),
+      inserted: 0,
+      skipped: 0,
+      upgraded: 0,
+      reason: reasonPrefix + message,
+    }).catch(() => {});
+  }
+
+  return ServiceResult.wrap({ ok: false, error: message });
+}
+
+async function finalizeSeedSuccess(
+  tel: Map<PromptRole, RoleTelemetry>,
+  startedAt: number,
+  insertedTotal: number,
+  skippedTotal: number
+): Promise<ServiceResult<SeedResult>> {
+  emitPromptSeedEvent({
+    event: 'seed.insert-or-ignore', outcome: 'ok',
+    metrics: { inserted: insertedTotal, skipped: skippedTotal },
+  });
+  const upgradedTotal = await upgradeLegacyDefaultBodies();
+  await promoteDefaultsAndTally(tel);
+  const telemetry = Array.from(tel.values());
+  emitTelemetry(telemetry);
+  await writeSeedAuditRow({
+    telemetry,
+    inserted: insertedTotal,
+    skipped: skippedTotal,
+    upgraded: upgradedTotal,
+    reason: 'boot',
+  });
+  emitPromptSeedEvent({
+    event: 'seed.complete', outcome: 'ok',
+    metrics: {
+      elapsedMs: Date.now() - startedAt,
+      inserted: insertedTotal,
+      skipped: skippedTotal,
+      promoted: telemetry.reduce((s, t) => s + t.promotedDefault, 0),
+    },
+  });
+
+  return ServiceResult.wrap({ ok: true, telemetry });
+}
+
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
   const startedAt = Date.now();
   let tel: Map<PromptRole, RoleTelemetry> | undefined;
@@ -502,75 +570,17 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
     const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
     if (insertResp.isFail) {
       const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
-      logDiagnosticFromCode('SEED_INSERT_E001', {
-        role: 'all', reason: message, boot: 'true', dbVersion: DB_NAME,
-      });
-      emitPromptSeedEvent({ event: 'seed.insert-or-ignore', outcome: 'failed', detail: message });
-      emitPromptSeedEvent({
-        event: 'seed.failed', outcome: 'failed', detail: message,
-        metrics: { elapsedMs: Date.now() - startedAt },
-      });
 
-      const telemetry = Array.from(tel.values());
-      await writeSeedAuditRow({
-        telemetry,
-        inserted: 0,
-        skipped: 0,
-        upgraded: 0,
-        reason: 'failed: ' + message,
-      });
-
-      return ServiceResult.wrap({ ok: false, error: message });
+      return await handleSeedError(message, startedAt, tel, 'failed: ', undefined, true);
     }
 
     const insertedTotal = Array.from(tel.values()).reduce((s, t) => s + t.inserted, 0);
     const skippedTotal = Array.from(tel.values()).reduce((s, t) => s + t.skipped, 0);
-    emitPromptSeedEvent({
-      event: 'seed.insert-or-ignore', outcome: 'ok',
-      metrics: { inserted: insertedTotal, skipped: skippedTotal },
-    });
-    const upgradedTotal = await upgradeLegacyDefaultBodies();
-    await promoteDefaultsAndTally(tel);
-    const telemetry = Array.from(tel.values());
-    emitTelemetry(telemetry);
-    await writeSeedAuditRow({
-      telemetry,
-      inserted: insertedTotal,
-      skipped: skippedTotal,
-      upgraded: upgradedTotal,
-      reason: 'boot',
-    });
-    emitPromptSeedEvent({
-      event: 'seed.complete', outcome: 'ok',
-      metrics: {
-        elapsedMs: Date.now() - startedAt,
-        inserted: insertedTotal,
-        skipped: skippedTotal,
-        promoted: telemetry.reduce((s, t) => s + t.promotedDefault, 0),
-      },
-    });
 
-    return ServiceResult.wrap({ ok: true, telemetry });
+    return await finalizeSeedSuccess(tel, startedAt, insertedTotal, skippedTotal);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    logDiagnosticFromCode('SEED_INSERT_E001', {
-      role: 'all', reason: message, boot: 'true', dbVersion: DB_NAME,
-    }, err);
-    emitPromptSeedEvent({
-      event: 'seed.failed', outcome: 'failed', detail: message,
-      metrics: { elapsedMs: Date.now() - startedAt },
-    });
 
-    if (tel) {
-      await writeSeedAuditRow({
-        telemetry: Array.from(tel.values()),
-        inserted: 0,
-        skipped: 0,
-        upgraded: 0,
-        reason: 'caught: ' + message,
-      }).catch(() => {});
-    }
-
-    return ServiceResult.wrap({ ok: false, error: message });
+    return await handleSeedError(message, startedAt, tel, 'caught: ', err, false);
   }
 }

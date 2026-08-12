@@ -21,6 +21,9 @@ import {
   renderPromptItems,
 } from './save-prompt-prompt-list';
 
+const COLOR_PRIMARY = 'hsl(var(--primary))';
+const BG_TRANSPARENT_BLACK = 'rgba(0,0,0,0.2)';
+
 // CQ11: Singleton for dropdown element cache
 class PromptsDropdownState {
   private _element: HTMLElement | null = null;
@@ -125,8 +128,8 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
 
     const editToggle = buildDropdownHeader(dropdown, () => {
       isEditMode = !isEditMode;
-      editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
-      editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : 'hsl(var(--primary))';
+      editToggle.style.background = isEditMode ? COLOR_PRIMARY : BG_TRANSPARENT_BLACK;
+      editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : COLOR_PRIMARY;
       doRender();
     });
 
@@ -159,8 +162,8 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
         event.preventDefault();
         event.stopPropagation();
         isEditMode = !isEditMode;
-        editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
-        editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : 'hsl(var(--primary))';
+        editToggle.style.background = isEditMode ? COLOR_PRIMARY : BG_TRANSPARENT_BLACK;
+        editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : COLOR_PRIMARY;
         doRender();
       }
     });

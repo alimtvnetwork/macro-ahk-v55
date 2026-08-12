@@ -30,6 +30,8 @@ import { DbResult } from './db-result';
 export { DbResult };
 import { RunSqlMethodType } from "../types/enums";
 
+const QUERY_FAILED = 'query failed';
+
 export interface PromptRow {
     Id: number;
     Slug: string;
@@ -124,7 +126,7 @@ export async function listPromptsByRole(role: PromptRole): Promise<DbResult<Prom
         + ' ORDER BY IsDefault DESC, UpdatedAt DESC';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
   if (resp.isFail) {
-    return fail('listPromptsByRole', resp.errorMessage || 'query failed');
+    return fail('listPromptsByRole', resp.errorMessage || QUERY_FAILED);
   }
 
   const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToPrompt) : [];
@@ -142,7 +144,7 @@ export async function getDefaultPromptForRole(role: PromptRole): Promise<DbResul
         + ' AND IsDefault = 1 LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
   if (resp.isFail) {
-    return fail('getDefaultPromptForRole', resp.errorMessage || 'query failed');
+    return fail('getDefaultPromptForRole', resp.errorMessage || QUERY_FAILED);
   }
 
   const rows = Array.isArray(resp.rows) ? resp.rows : [];
@@ -162,7 +164,7 @@ export async function getPromptBySlug(slug: string): Promise<DbResult<PromptRow 
   const sql = 'SELECT * FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
   if (resp.isFail) {
-    return fail('getPromptBySlug', resp.errorMessage || 'query failed');
+    return fail('getPromptBySlug', resp.errorMessage || QUERY_FAILED);
   }
 
   const rows = Array.isArray(resp.rows) ? resp.rows : [];
@@ -377,7 +379,7 @@ export async function deleteBySlug(slug: string): Promise<DbResult<void>> {
 
   const rowResult = await getPromptBySlug(slug);
   if (rowResult.isFail) {
-    return fail('deleteBySlug', rowResult.error || 'query failed');
+    return fail('deleteBySlug', rowResult.error || QUERY_FAILED);
   }
 
   const row = rowResult.value;

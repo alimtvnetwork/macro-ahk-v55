@@ -21,6 +21,11 @@ import {
 import type { AuthDiagDeps } from './section-auth-diag';
 import { logError } from '../error-utils';
 import { CssFragmentType } from '../types';
+
+const COLOR_SUCCESS = 'hsl(var(--success))';
+const COLOR_WARNING = 'hsl(var(--warning))';
+const COLOR_DESTRUCTIVE = 'hsl(var(--destructive))';
+
 // ── Diagnostic Row Elements ──
 
 export interface DiagRowElements {
@@ -94,32 +99,32 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
   if (bridge.isSuccess) {
     bridgeRow.iconEl.textContent = '✅';
     bridgeRow.valEl.textContent = 'OK via ' + bridge.source;
-    bridgeRow.valEl.style.color = 'hsl(var(--success))';
+    bridgeRow.valEl.style.color = COLOR_SUCCESS;
     _removeHelpIcon(bridgeRow);
   } else if (_isServiceWorkerSuspended(bridge.error || '')) {
     // Auto-wake: show reconnecting state, then ping to wake service worker
     bridgeRow.iconEl.textContent = '🔄';
     bridgeRow.valEl.textContent = 'Reconnecting…';
-    bridgeRow.valEl.style.color = 'hsl(var(--warning))';
+    bridgeRow.valEl.style.color = COLOR_WARNING;
     _removeHelpIcon(bridgeRow);
 
     deps.wakeBridge().then(function (alive: boolean) {
       if (alive) {
         bridgeRow.iconEl.textContent = '✅';
         bridgeRow.valEl.textContent = 'OK — reconnected after idle';
-        bridgeRow.valEl.style.color = 'hsl(var(--success))';
+        bridgeRow.valEl.style.color = COLOR_SUCCESS;
         _removeHelpIcon(bridgeRow);
       } else {
         bridgeRow.iconEl.textContent = '💤';
         bridgeRow.valEl.textContent = 'Idle — service worker suspended';
-        bridgeRow.valEl.style.color = 'hsl(var(--warning))';
+        bridgeRow.valEl.style.color = COLOR_WARNING;
         _appendHelpIcon(bridgeRow, _getBridgeErrorHelp(bridge.error || ''));
       }
     });
   } else {
     bridgeRow.iconEl.textContent = '❌';
     bridgeRow.valEl.textContent = 'FAILED' + (bridge.error ? ' — ' + bridge.error : '');
-    bridgeRow.valEl.style.color = 'hsl(var(--destructive))';
+    bridgeRow.valEl.style.color = COLOR_DESTRUCTIVE;
     _appendHelpIcon(bridgeRow, _getBridgeErrorHelp(bridge.error || ''));
   }
 }
@@ -218,11 +223,11 @@ export function updateJwtRow(deps: AuthDiagDeps, jwtRow: DiagRowElements, jwtDet
   if (info.valid) {
     jwtRow.iconEl.textContent = '✅';
     jwtRow.valEl.textContent = 'Valid · expires in ' + formatRemaining(info.remainingMs);
-    jwtRow.valEl.style.color = 'hsl(var(--success))';
+    jwtRow.valEl.style.color = COLOR_SUCCESS;
   } else {
     jwtRow.iconEl.textContent = '❌';
     jwtRow.valEl.textContent = info.error || 'Invalid / expired';
-    jwtRow.valEl.style.color = 'hsl(var(--destructive))';
+    jwtRow.valEl.style.color = COLOR_DESTRUCTIVE;
   }
 
   jwtDetailVal.textContent = 'sub: ' + info.sub + ' · iat: ' + info.issuedAt + ' · exp: ' + info.expiresAt;
@@ -242,11 +247,11 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
   if (outcome.isSuccess) {
     refreshRow.iconEl.textContent = '✅';
     refreshRow.valEl.textContent = 'OK @ ' + outcome.time + ' via ' + outcome.source;
-    refreshRow.valEl.style.color = 'hsl(var(--success))';
+    refreshRow.valEl.style.color = COLOR_SUCCESS;
   } else {
     refreshRow.iconEl.textContent = '❌';
     refreshRow.valEl.textContent = 'FAILED @ ' + outcome.time + (outcome.error ? ' — ' + outcome.error : '');
-    refreshRow.valEl.style.color = 'hsl(var(--destructive))';
+    refreshRow.valEl.style.color = COLOR_DESTRUCTIVE;
   }
 }
 
@@ -256,11 +261,11 @@ export function updateWsCacheRow(wsCacheRow: DiagRowElements): void {
   if (state.workspaceFromCache) {
     wsCacheRow.iconEl.textContent = '📦';
     wsCacheRow.valEl.textContent = 'Cached: "' + (cachedName || state.workspaceName) + '"';
-    wsCacheRow.valEl.style.color = 'hsl(var(--warning))';
+    wsCacheRow.valEl.style.color = COLOR_WARNING;
   } else if (state.workspaceFromApi) {
     wsCacheRow.iconEl.textContent = '🌐';
     wsCacheRow.valEl.textContent = 'Fresh (API): "' + state.workspaceName + '"';
-    wsCacheRow.valEl.style.color = 'hsl(var(--success))';
+    wsCacheRow.valEl.style.color = COLOR_SUCCESS;
   } else if (state.workspaceName) {
     wsCacheRow.iconEl.textContent = '🔍';
     wsCacheRow.valEl.textContent = 'Detected: "' + state.workspaceName + '"';

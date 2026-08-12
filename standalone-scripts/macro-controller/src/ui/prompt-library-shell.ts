@@ -1,6 +1,9 @@
 import { ModalRefs, ROLE_FILTERS, SORT_MODES, SortMode, CSS_CURSOR_POINTER, CSS_BORDER_RADIUS_6, CSS_PADDING_10_12, CSS_FONT_SIZE_12, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10 } from './prompt-library-types';
 import { renderAllRoles } from './prompt-library-list';
 
+const CSS_BG_BACKGROUND = 'background:hsl(var(--background))';
+const CSS_COLOR_FOREGROUND = 'color:hsl(var(--foreground))';
+
 export function chipCss(isActive: boolean): string {
   const bg = isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted))';
   const fg = isActive ? 'hsl(var(--warning))' : 'hsl(var(--foreground))';
@@ -249,23 +252,23 @@ function _buildStatusPanels() {
   errorBanner.setAttribute('aria-live', 'assertive');
   errorBanner.setAttribute('aria-atomic', 'true');
   errorBanner.hidden = true;
-  errorBanner.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:hsl(var(--background))', 'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:hsl(var(--foreground))', 'outline:none'].join(';');
+  errorBanner.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_BACKGROUND, 'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, CSS_COLOR_FOREGROUND, 'outline:none'].join(';');
 
   const fileInfo = document.createElement('div');
   fileInfo.dataset.testid = 'library-file-info';
   fileInfo.hidden = true;
   fileInfo.setAttribute('aria-live', 'polite');
-  fileInfo.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:hsl(var(--foreground))', 'font-family:ui-monospace,monospace'].join(';');
+  fileInfo.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, CSS_COLOR_FOREGROUND, 'font-family:ui-monospace,monospace'].join(';');
 
   const previewPanel = document.createElement('div');
   previewPanel.dataset.testid = 'library-import-preview-panel';
   previewPanel.hidden = true;
-  previewPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:hsl(var(--background))', CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:hsl(var(--foreground))'].join(';');
+  previewPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_BACKGROUND, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, CSS_COLOR_FOREGROUND].join(';');
 
   const partialErrorsPanel = document.createElement('div');
   partialErrorsPanel.dataset.testid = 'library-import-partial-errors';
   partialErrorsPanel.hidden = true;
-  partialErrorsPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:hsl(var(--background))', 'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:hsl(var(--foreground))'].join(';');
+  partialErrorsPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_BACKGROUND, 'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, CSS_COLOR_FOREGROUND].join(';');
 
   return { errorBanner, fileInfo, previewPanel, partialErrorsPanel };
 }
@@ -317,7 +320,7 @@ export function buildShell(): ShellEls {
   const panel = document.createElement('div');
   panel.style.cssText = [
     'width:min(720px,92vw)', 'max-height:85vh', 'overflow:auto',
-    'background:hsl(var(--background))', 'color:hsl(var(--foreground))',
+    CSS_BG_BACKGROUND, CSS_COLOR_FOREGROUND,
     CSS_BORDER_DEFAULT, 'border-radius:10px',
     'box-shadow:0 20px 60px rgba(0,0,0,0.6)',
     'padding:16px 18px',

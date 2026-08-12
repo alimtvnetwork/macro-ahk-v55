@@ -5,6 +5,9 @@ import { ModalRefs, PREVIEW_MAX_CHARS, CSS_BORDER_RADIUS_6, CSS_CURSOR_POINTER }
 import { handleSetDefault, handleDuplicate, handleDelete, handleResetToDefault } from './prompt-library-actions';
 import { openInlineEditor } from './prompt-library-editor';
 
+const HSL_FOREGROUND = 'hsl(var(--foreground))';
+const HSL_MUTED = 'hsl(var(--muted))';
+
 function btnCss(bg: string, fg: string): string {
   return [
     'background:' + bg, 'color:' + fg,
@@ -25,7 +28,7 @@ export function buildRowLeft(refs: ModalRefs, row: PromptRow, container: HTMLEle
   const caret = isExpanded ? '▾ ' : '▸ ';
   const name = document.createElement('div');
   name.textContent = caret + (row.IsDefault ? '★ ' : '') + row.Name;
-  name.style.cssText = 'font-weight:' + (row.IsDefault ? '600' : '400') + ';color:' + (row.IsDefault ? 'hsl(var(--warning))' : 'hsl(var(--foreground))') + ';';
+  name.style.cssText = 'font-weight:' + (row.IsDefault ? '600' : '400') + ';color:' + (row.IsDefault ? 'hsl(var(--warning))' : HSL_FOREGROUND) + ';';
   const slug = document.createElement('div');
   slug.textContent = row.Slug + '  ·  ' + row.Body.length + ' chars';
   slug.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));margin-top:2px;';
@@ -42,14 +45,14 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
   const setDefaultBtn = document.createElement('button');
   setDefaultBtn.textContent = row.IsDefault ? 'Default' : 'Set default';
   setDefaultBtn.disabled = row.IsDefault === 1;
-  setDefaultBtn.style.cssText = btnCss(row.IsDefault ? 'hsl(var(--primary))' : 'hsl(var(--muted))', 'hsl(var(--foreground))') + ';opacity:' + (row.IsDefault ? '0.6' : '1') + ';cursor:' + (row.IsDefault ? 'default' : 'pointer');
+  setDefaultBtn.style.cssText = btnCss(row.IsDefault ? 'hsl(var(--primary))' : HSL_MUTED, HSL_FOREGROUND) + ';opacity:' + (row.IsDefault ? '0.6' : '1') + ';cursor:' + (row.IsDefault ? 'default' : 'pointer');
   setDefaultBtn.addEventListener('click', () => {
     void handleSetDefault(refs, row, renderAllRoles); 
   });
 
   const dupBtn = document.createElement('button');
   dupBtn.textContent = 'Duplicate';
-  dupBtn.style.cssText = btnCss('hsl(var(--muted))', 'hsl(var(--foreground))');
+  dupBtn.style.cssText = btnCss(HSL_MUTED, HSL_FOREGROUND);
   dupBtn.addEventListener('click', () => {
     void handleDuplicate(refs, row, renderAllRoles); 
   });
@@ -57,7 +60,7 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
   const editBtn = document.createElement('button');
   editBtn.textContent = 'Edit';
   editBtn.title = 'Inline edit: rename or tweak body without leaving the library';
-  editBtn.style.cssText = btnCss('hsl(var(--muted))', 'hsl(var(--foreground))');
+  editBtn.style.cssText = btnCss(HSL_MUTED, HSL_FOREGROUND);
   editBtn.addEventListener('click', () => {
     openInlineEditor(refs, rowEl, row, renderAllRoles); 
   });
@@ -65,7 +68,7 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
   const quickEditBtn = document.createElement('button');
   quickEditBtn.textContent = 'Full editor';
   quickEditBtn.title = 'Open the full drift-guarded editor (shared with chip gears)';
-  quickEditBtn.style.cssText = btnCss('hsl(var(--muted))', 'hsl(var(--foreground))');
+  quickEditBtn.style.cssText = btnCss(HSL_MUTED, HSL_FOREGROUND);
   quickEditBtn.addEventListener('click', () => {
     void openPromptEditor({ role: row.Role, promptId: row.Id }); 
   });
@@ -88,7 +91,7 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
     const resetBtn = document.createElement('button');
     resetBtn.textContent = '↺ Reset';
     resetBtn.title = 'Restore this seeded prompt to its shipped default body';
-    resetBtn.style.cssText = btnCss('hsl(var(--muted))', 'hsl(var(--warning))');
+    resetBtn.style.cssText = btnCss(HSL_MUTED, 'hsl(var(--warning))');
     resetBtn.addEventListener('click', () => {
       void handleResetToDefault(refs, row, renderAllRoles); 
     });

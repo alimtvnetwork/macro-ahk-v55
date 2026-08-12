@@ -13,6 +13,9 @@ import { renderCreditBar } from '../credit-api';
 import { TaskQueueManager } from '../task-manager';
 import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
 
+const COLOR_WARNING = 'hsl(var(--warning))';
+const COLOR_PRIMARY = 'hsl(var(--primary))';
+
 // ============================================
 // StatusRenderState — encapsulated render state (CQ11, CQ17)
 // ============================================
@@ -70,10 +73,10 @@ function _updateQueueStatusEl(): void {
         let statusText = 'Synced';
         
         if (isPaused) {
-          statusDotColor = 'hsl(var(--warning))'; // orange
+          statusDotColor = COLOR_WARNING; // orange
           statusText = 'Paused';
         } else if (isProcessing) {
-          statusDotColor = 'hsl(var(--primary))'; // blue
+          statusDotColor = COLOR_PRIMARY; // blue
           statusText = 'Active';
         }
 
@@ -189,7 +192,7 @@ export function updateQueueBadge(): void {
         if (pending > 0) {
           badge.textContent = String(pending);
           badge.style.display = 'block';
-          badge.style.background = isProcessing ? 'hsl(var(--primary))' : 'hsl(var(--destructive))';
+          badge.style.background = isProcessing ? COLOR_PRIMARY : 'hsl(var(--destructive))';
           if (isProcessing) {
             badge.style.animation = 'marco-pulse 2s infinite';
           } else {
@@ -295,9 +298,9 @@ function buildDelegateText(): string {
 function buildRunningStatusParts(creditIcon: string, creditLabel: string, delegateText: string): Array<{ text: string; color?: string; bold?: boolean; id?: string }> {
   const parts: Array<{ text: string; color?: string; bold?: boolean; id?: string }> = [];
   if (state.workspaceName) {
-    parts.push({ text: state.workspaceName, color: 'hsl(var(--warning))', bold: true });
+    parts.push({ text: state.workspaceName, color: COLOR_WARNING, bold: true });
     if (state.workspaceJustChanged) {
-      parts.push({ text: ' ⚡ WS Changed', color: 'hsl(var(--warning))', bold: true });
+      parts.push({ text: ' ⚡ WS Changed', color: COLOR_WARNING, bold: true });
     }
 
     parts.push({ text: ' | ' });
@@ -305,11 +308,11 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
 
   parts.push({ text: '● ', color: 'hsl(var(--success))' });
   parts.push({ text: state.direction.toUpperCase() + ' | #' + state.cycleCount + ' | ' });
-  parts.push({ text: creditIcon + ' ' + creditLabel, color: 'hsl(var(--warning))' });
+  parts.push({ text: creditIcon + ' ' + creditLabel, color: COLOR_WARNING });
   parts.push({ text: ' | ' });
-  parts.push({ text: state.countdown + 's', color: 'hsl(var(--warning))', bold: true, id: 'marco-countdown-text' });
+  parts.push({ text: state.countdown + 's', color: COLOR_WARNING, bold: true, id: 'marco-countdown-text' });
   if (delegateText) {
-    const dColor = state.forceDirection ? 'hsl(var(--warning))' : 'hsl(var(--primary))';
+    const dColor = state.forceDirection ? COLOR_WARNING : COLOR_PRIMARY;
     parts.push({ text: delegateText, color: dColor, bold: !!state.forceDirection });
   }
 
@@ -320,7 +323,7 @@ function renderProgressBar(progressContainer: HTMLElement): void {
   // Progress bar
   const totalSec = Math.floor(TIMING.LOOP_INTERVAL / 1000);
   const pct = totalSec > 0 ? Math.max(0, Math.min(100, ((totalSec - state.countdown) / totalSec) * 100)) : 0;
-  const barColor = pct > 80 ? 'hsl(var(--destructive))' : pct > 50 ? 'hsl(var(--warning))' : 'hsl(var(--success))';
+  const barColor = pct > 80 ? 'hsl(var(--destructive))' : pct > 50 ? COLOR_WARNING : 'hsl(var(--success))';
   let barEl = document.getElementById('marco-progress-bar');
   if (!barEl) {
     progressContainer.innerHTML = '<div style="width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">'
@@ -359,7 +362,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
     const creditLabelStop = state.hasFreeCredit ? 'Free Credit' : 'No Credit';
     const creditSpan = document.createElement('span');
     creditSpan.textContent = ' | ' + creditIconStop + ' ' + creditLabelStop;
-    creditSpan.style.color = 'hsl(var(--warning))';
+    creditSpan.style.color = COLOR_WARNING;
     statusLine.appendChild(creditSpan);
   }
 
@@ -411,13 +414,13 @@ export function updateRecordIndicator(): void {
     const { dot, label } = ensureRecordChildren(el);
     if (state.isDelegating) {
       if (state.forceDirection) {
-        dot.style.background = 'hsl(var(--warning))';
+        dot.style.background = COLOR_WARNING;
         label.textContent = ' FORCE ' + state.forceDirection.toUpperCase();
-        el.style.background = 'hsl(var(--warning))';
+        el.style.background = COLOR_WARNING;
       } else {
-        dot.style.background = 'hsl(var(--primary))';
+        dot.style.background = COLOR_PRIMARY;
         label.textContent = ' SWITCHING';
-        el.style.background = 'hsl(var(--primary))';
+        el.style.background = COLOR_PRIMARY;
       }
     } else {
       dot.style.background = 'hsl(var(--foreground))';
