@@ -28,3 +28,12 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | # | Plan | Status | Updated |
 |---|------|--------|---------|
 | 01 | [prompts-authoring-and-release-memory](./live-lovable/01-prompts-authoring-and-release-memory.md) | completed | 2026-07-23 |
+| 23 | [prompt-library-relocate-and-light-mode](./completed/23-prompt-library-relocate-and-light-mode.md) | - | completed | 2026-08-12 |
+| 24 | [eslint-warnings-cleanup-30](./completed/24-eslint-warnings-cleanup-30.md) | - | completed | 2026-08-12 |
+| 25 | [eslint-cleanup-continuation-30](./completed/25-eslint-cleanup-continuation-30.md) | - | completed | 2026-08-12 |
+| 27 | [fix-coding-guideline-violations](./completed/27-fix-coding-guideline-violations.md) | - | completed | 2026-08-12 |
+| 29 | [version-json-single-source-of-truth](./completed/29-version-json-single-source-of-truth.md) | - | completed | 2026-08-12 |
+| 30 | [refactor-oversized-functions-15-line-cap](./completed/30-refactor-oversized-functions-15-line-cap.md) | - | completed | 2026-08-12 |
+| 31 | [lint-cleanup-ctx-denylist-and-15-line-cap](./completed/31-lint-cleanup-ctx-denylist-and-15-line-cap.md) | - | completed | 2026-08-12 |
+| 33 | [plan-10](./completed/33-plan-10.md) | - | completed | 2026-08-12 |
+| 35 | [fix-remaining-lint-issues](./completed/35-fix-remaining-lint-issues.md) | - | completed | 2026-08-12 |

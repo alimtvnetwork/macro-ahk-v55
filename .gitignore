@@ -121,3 +121,4 @@ test-reports/
 test_results/
 vitest-results.json
 test-result.md
+.lovable/temp/
