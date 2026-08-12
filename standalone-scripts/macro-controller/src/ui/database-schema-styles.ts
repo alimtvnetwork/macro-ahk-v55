@@ -129,7 +129,7 @@ function _schemaTableListStyles(): string {
     .marco-schema-table-entry {
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
-      font-size: 12px; color: #cbd5e1;
+      font-size: 12px; color: hsl(var(--foreground));
     }
     .marco-schema-table-entry:hover { background: rgba(255,255,255,0.03); }
     .marco-schema-table-cols {

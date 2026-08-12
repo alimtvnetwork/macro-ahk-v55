@@ -25,6 +25,16 @@ import { extractEditorPlainText, replaceEditorText } from './editor-text';
 import { captureChatSubmit } from '../capture/chat-submit-capture';
 import { buildNextSelectorControl } from './next-selector-control';
 import { RepeatPhaseType, CssDisplayType } from "../types/enums";
+import { buildMorePopover } from './plan-more-popover';
+import {
+  enhancePopoverA11y,
+  isPopoverOpen,
+  positionPopoverFixed,
+  setPopoverVisibility,
+  wirePopoverButton,
+  createOutsidePopoverCloser,
+  registerPointerPopoverCloser
+} from './next-inline-ui';
 
 export const PRESETS = [1, 2, 3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 50, 60, 70, 75, 80, 100, 200] as const;
 /**
@@ -599,7 +609,9 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'true');
     document.addEventListener('click', onDocClick, true);
     document.addEventListener('keydown', onKey, true);
-    if (typeof window !== 'undefined') window.addEventListener('pagehide', close);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', close);
+    }
   }
 
   function close(): void {
@@ -608,7 +620,9 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'false');
     document.removeEventListener('click', onDocClick, true);
     document.removeEventListener('keydown', onKey, true);
-    if (typeof window !== 'undefined') window.removeEventListener('pagehide', close);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pagehide', close);
+    }
   }
 
   function onDocClick(e: Event): void {

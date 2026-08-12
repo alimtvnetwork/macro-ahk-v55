@@ -28,7 +28,7 @@ export function buildSearchInput(
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = '🔍 Search prompts…';
-  input.style.cssText = 'width:100%;box-sizing:border-box;padding:5px 10px;border-radius:6px;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.3);color:#e0e0e0;font-size:11px;outline:none;font-family:system-ui,sans-serif;';
+  input.style.cssText = 'width:100%;box-sizing:border-box;padding:5px 10px;border-radius:6px;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.3);color:hsl(var(--foreground));font-size:11px;outline:none;font-family:system-ui,sans-serif;';
   input.onfocus = function () {
     input.style.borderColor = 'hsl(var(--primary))'; 
   };
@@ -99,7 +99,7 @@ export function buildCategoryChips(
   for (const categoryName of categories) {
     const chip = document.createElement('span');
     chip.textContent = categoryName;
-    chip.style.cssText = 'padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:rgba(124,58,237,0.2);color:#a78bfa;';
+    chip.style.cssText = 'padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:rgba(124,58,237,0.2);color:hsl(var(--primary));';
     chip.onclick = function (event) {
       event.stopPropagation();
       setActiveFilter(categoryName);
@@ -118,7 +118,7 @@ export function buildCategoryChips(
         ? currentFilter === null
         : currentFilter === chip.textContent;
       chip.style.background = isActive ? 'hsl(var(--primary))' : 'rgba(124,58,237,0.2)';
-      chip.style.color = isActive ? 'hsl(var(--foreground))' : '#a78bfa';
+      chip.style.color = isActive ? 'hsl(var(--foreground))' : 'hsl(var(--primary))';
     }
   };
 
@@ -195,7 +195,7 @@ function buildPromptItem(
   dropdown: HTMLElement,
 ): HTMLElement {
   const item = document.createElement('div');
-  item.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;font-size:12px;color:#e0e0e0;transition:background 0.12s;border-bottom:1px solid rgba(255,255,255,0.04);';
+  item.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;font-size:12px;color:hsl(var(--foreground));transition:background 0.12s;border-bottom:1px solid rgba(255,255,255,0.04);';
   item.onmouseover = function () {
     item.style.background = 'rgba(124,58,237,0.15)'; 
   };
@@ -215,7 +215,7 @@ function buildPromptItem(
   if (hasCategory) {
     const badge = document.createElement('span');
     badge.textContent = prompt.category!;
-    badge.style.cssText = 'font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(124,58,237,0.2);color:#a78bfa;white-space:nowrap;';
+    badge.style.cssText = 'font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(124,58,237,0.2);color:hsl(var(--primary));white-space:nowrap;';
     item.appendChild(badge);
   }
 

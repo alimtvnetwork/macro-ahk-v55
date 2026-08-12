@@ -231,7 +231,7 @@ function _buildJsLogsSection(): HTMLElement {
 
   const copyLogBtn = document.createElement('button');
   copyLogBtn.textContent = 'Copy';
-  copyLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
+  copyLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:hsl(var(--foreground));border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
   copyLogBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -251,7 +251,7 @@ function _buildJsLogsSection(): HTMLElement {
   const downloadLogBtn = document.createElement('button');
   downloadLogBtn.textContent = 'DL';
   downloadLogBtn.title = 'Download logs';
-  downloadLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
+  downloadLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:hsl(var(--foreground));border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
   downloadLogBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -261,7 +261,7 @@ function _buildJsLogsSection(): HTMLElement {
   const clearLogBtn = document.createElement('button');
   clearLogBtn.textContent = 'Clr';
   clearLogBtn.title = 'Clear all logs';
-  clearLogBtn.style.cssText = 'padding:2px 6px;background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;border-radius:2px;font-size:9px;cursor:pointer;';
+  clearLogBtn.style.cssText = 'padding:2px 6px;background:hsl(var(--destructive));color:hsl(var(--foreground));border:1px solid hsl(var(--destructive));border-radius:2px;font-size:9px;cursor:pointer;';
   clearLogBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -289,7 +289,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   const errHeaderBtns = document.createElement('span');
   errHeaderBtns.style.cssText = 'margin-left:auto;display:flex;gap:3px;align-items:center;';
 
-  const _errBtnStyle = 'padding:1px 5px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid rgba(255,255,255,0.08);border-radius:2px;font-size:9px;cursor:pointer;transition:background-color 150ms ease,filter 150ms ease;';
+  const _errBtnStyle = 'padding:1px 5px;background:' + cPanelBgAlt + ';color:hsl(var(--foreground));border:1px solid rgba(255,255,255,0.08);border-radius:2px;font-size:9px;cursor:pointer;transition:background-color 150ms ease,filter 150ms ease;';
 
   const copyAllErrBtn = document.createElement('button');
   copyAllErrBtn.textContent = '📋';
@@ -348,7 +348,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   const clearErrBtn = document.createElement('button');
   clearErrBtn.textContent = '🗑';
   clearErrBtn.title = 'Clear Errors';
-  clearErrBtn.style.cssText = _errBtnStyle + 'color:#fca5a5;';
+  clearErrBtn.style.cssText = _errBtnStyle + 'color:hsl(var(--foreground));';
   clearErrBtn.onmouseenter = function() {
     clearErrBtn.style.filter = CssFragmentType.Brightness13; 
   };
@@ -421,7 +421,7 @@ function _renderRecentErrorsList(container: HTMLElement): void {
 
   let html = '';
   for (const err of recentErrors) {
-    const color = err.level === 'error' ? '#fca5a5' : '#fde68a';
+    const color = err.level === 'error' ? 'hsl(var(--destructive))' : 'hsl(var(--warning))';
     const icon = err.level === 'error' ? '❌' : '⚠️';
     html += '<div style="font-size:10px;font-family:monospace;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:' + color + ';">';
     html += '<span style="color:hsl(var(--muted-foreground));">[' + err.timestamp + ']</span> ' + icon + ' ' + _escHtml(err.message);

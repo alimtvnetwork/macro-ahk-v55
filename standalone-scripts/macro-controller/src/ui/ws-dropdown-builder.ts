@@ -147,7 +147,7 @@ function _buildWsDropdownHeader(deps: WsDropdownDeps): HTMLElement {
   const wsDropHeader = document.createElement('div');
   wsDropHeader.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:4px;flex-wrap:wrap;';
   wsDropHeader.innerHTML = '<span style="font-size:11px;">🏢</span><span id="loop-ws-count-label" style="font-size:10px;color:' + cPrimaryLighter + ';font-weight:bold;">Workspaces</span>'
-    + '<span id="loop-ws-sel-count" style="font-size:8px;color:#facc15;display:none;"></span>';
+    + '<span id="loop-ws-sel-count" style="font-size:8px;color:hsl(var(--warning));display:none;"></span>';
 
   _appendActionButtons(wsDropHeader, deps);
 
@@ -209,7 +209,7 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   wsRenameBtn.id = 'loop-ws-rename-btn';
   wsRenameBtn.textContent = '✏️ Rename';
   wsRenameBtn.title = 'Bulk rename selected workspaces';
-  wsRenameBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(234,179,8,0.2);color:#facc15;border:1px solid rgba(234,179,8,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
+  wsRenameBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(234,179,8,0.2);color:hsl(var(--warning));border:1px solid rgba(234,179,8,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsRenameBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -292,7 +292,7 @@ function _buildWsSearchInput(
   wsSearchInput.placeholder = '🔍 Search...';
   wsSearchInput.style.cssText = 'width:100%;padding:3px 5px;border:1px solid ' + cInputBorder + ';border-radius:3px;background:' + cInputBg + ';color:' + cInputFg + ';font-size:9px;outline:none;box-sizing:border-box;margin-bottom:4px;';
   wsSearchInput.onfocus = function() {
-    (this as HTMLElement).style.borderColor = '#a78bfa'; 
+    (this as HTMLElement).style.borderColor = 'hsl(var(--primary))'; 
   };
 
   wsSearchInput.onblur = function() {
@@ -337,13 +337,13 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
   const moveBtn = document.createElement('button');
   moveBtn.textContent = '🚀 Move';
   moveBtn.title = 'Move project to selected workspace';
-  moveBtn.style.cssText = 'flex:1;padding:4px 8px;background:#059669;color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;';
+  moveBtn.style.cssText = 'flex:1;padding:4px 8px;background:hsl(var(--success));color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;';
   moveBtn.onmouseover = function() {
-    (this as HTMLElement).style.background = '#047857'; 
+    (this as HTMLElement).style.background = 'hsl(var(--success))'; 
   };
 
   moveBtn.onmouseout = function() {
-    (this as HTMLElement).style.background = '#059669'; 
+    (this as HTMLElement).style.background = 'hsl(var(--success))'; 
   };
 
   moveBtn.onclick = function(e: Event) {

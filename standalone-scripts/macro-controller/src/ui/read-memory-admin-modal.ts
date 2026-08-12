@@ -106,7 +106,7 @@ function buildStatusBadge(row: ReadMemoryRow): HTMLElement {
   const isCanonical = row.Slug === CANONICAL_SLUG;
   const active = row.IsDefault === 1;
   const label = isCanonical ? 'Canonical' : (active ? 'Active' : 'Disabled');
-  const bg = isCanonical ? 'hsl(var(--primary))' : (active ? 'hsl(var(--destructive))' : '#4b5563');
+  const bg = isCanonical ? 'hsl(var(--primary))' : (active ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))');
   badge.textContent = label;
   badge.style.cssText =
     'display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;'
@@ -124,7 +124,7 @@ function buildDeactivateButton(row: ReadMemoryRow, onDone: () => void): HTMLElem
   btn.disabled = disabled;
   btn.style.cssText =
     'padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;'
-    + 'border:1px solid rgba(255,255,255,0.15);cursor:' + (disabled ? 'not-allowed' : 'pointer') + ';'
+    + 'border:1px solid hsl(var(--border));cursor:' + (disabled ? 'not-allowed' : 'pointer') + ';'
     + 'color:hsl(var(--foreground));background:' + (disabled ? 'rgba(75,85,99,0.4)' : 'hsl(var(--destructive))') + ';';
   if (isCanonical) {
     btn.title = 'Cannot deactivate the canonical Read Memory prompt';
@@ -155,7 +155,7 @@ async function handleDeactivateClick(row: ReadMemoryRow, btn: HTMLButtonElement,
 function buildTableHeader(): HTMLElement {
   const thead = document.createElement('thead');
   const tr = document.createElement('tr');
-  tr.style.cssText = 'background:rgba(124,58,237,0.25);text-align:left;';
+  tr.style.cssText = 'background:hsl(var(--primary) / 0.25);text-align:left;';
   for (const label of ['Slug', 'Name', 'Status', 'Action']) {
     const th = document.createElement('th');
     th.textContent = label;
@@ -225,7 +225,7 @@ function buildHeader(onClose: () => void): HTMLElement {
   header.style.cssText =
     'display:flex;align-items:center;justify-content:space-between;'
     + 'padding:10px 14px;border-bottom:1px solid rgba(124,58,237,0.4);'
-    + 'background:linear-gradient(135deg,#1a0b2e,#2d1b4e);';
+    + 'background:linear-gradient(135deg,hsl(var(--background)),hsl(var(--primary)));';
   const title = document.createElement('div');
   title.textContent = '🛡 Read Memory Admin';
   title.style.cssText = 'font-size:13px;font-weight:700;color:hsl(var(--foreground));';
@@ -244,7 +244,7 @@ function buildSubtitle(count: number): HTMLElement {
   const canonicalNote = 'The canonical `' + CANONICAL_SLUG + '` slug cannot be deactivated. ';
   sub.textContent = canonicalNote
     + count + ' row(s) matched. Deactivating flips IsDefault=0 and prefixes Name with `' + DUPLICATE_PREFIX + '`.';
-  sub.style.cssText = 'padding:8px 14px;font-size:11px;color:#c4b5fd;background:rgba(124,58,237,0.08);';
+  sub.style.cssText = 'padding:8px 14px;font-size:11px;color:hsl(var(--primary));background:hsl(var(--primary) / 0.08);';
 
   return sub;
 }
@@ -271,7 +271,7 @@ function buildPanel(): HTMLElement {
   const panel = document.createElement('div');
   panel.style.cssText =
     'width:min(760px,92vw);max-height:80vh;overflow:auto;'
-    + 'background:#0f0620;border:1px solid rgba(124,58,237,0.6);'
+    + 'background:hsl(var(--background));border:1px solid hsl(var(--primary) / 0.6);'
     + 'border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:hsl(var(--foreground));';
 
   return panel;

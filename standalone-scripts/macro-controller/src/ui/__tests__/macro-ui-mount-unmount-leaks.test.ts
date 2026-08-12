@@ -51,7 +51,7 @@ vi.mock('../next-selector-control', () => ({
 }));
 vi.mock('../../shared-state', () => ({
   cPanelFg: 'hsl(var(--foreground))',
-  cPrimaryLight: '#a78bfa',
+  cPrimaryLight: 'hsl(var(--primary))',
   cSectionBg: 'hsl(var(--background))',
 }));
 

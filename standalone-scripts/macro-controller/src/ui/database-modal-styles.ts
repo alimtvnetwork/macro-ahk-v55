@@ -207,7 +207,7 @@ function buildTableStyles(): string {
     .marco-db-data-table td {
       padding: 5px 10px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: #cbd5e1;
+      color: hsl(var(--foreground));
       max-width: 260px;
       overflow: hidden;
       text-overflow: ellipsis;

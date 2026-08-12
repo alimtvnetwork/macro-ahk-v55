@@ -15,7 +15,7 @@ const STATUS_COLORS: Record<string, string> = {
   ok: 'hsl(var(--success))',
   warn: 'hsl(var(--warning))',
   error: 'hsl(var(--destructive))',
-  pending: '#60a5fa',
+  pending: 'hsl(var(--accent))',
 };
 
 /** Build the waterfall container with header and refresh button. */
@@ -31,7 +31,7 @@ export function buildWaterfallSection(): { waterfallContainer: HTMLElement; rend
   waterfallTitle.textContent = '⏱ Startup Waterfall';
 
   const refreshWfBtn = document.createElement('button');
-  refreshWfBtn.style.cssText = 'padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;font-size:9px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;color:' + cPanelFgDim + ';';
+  refreshWfBtn.style.cssText = 'padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid hsl(var(--border));border-radius:3px;font-size:9px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;color:' + cPanelFgDim + ';';
   refreshWfBtn.textContent = '🔄';
   refreshWfBtn.title = 'Refresh waterfall';
   refreshWfBtn.onmouseenter = function () {
@@ -166,7 +166,7 @@ function buildWaterfallRow(
   const barFill = document.createElement('div');
   const leftPct = (entry.startMs / maxEnd * 100).toFixed(1);
   const widthPct = Math.max(((entry.endMs - entry.startMs) / maxEnd * 100), 1).toFixed(1);
-  const color = STATUS_COLORS[entry.status] || '#60a5fa';
+  const color = STATUS_COLORS[entry.status] || 'hsl(var(--accent))';
   barFill.style.cssText = 'position:absolute;top:0;bottom:0;left:' + leftPct + '%;width:' + widthPct + '%;background:' + color + ';border-radius:2px;opacity:0.8;';
 
   const isPending = entry.status === 'pending';

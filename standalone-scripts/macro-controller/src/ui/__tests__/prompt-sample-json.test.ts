@@ -27,6 +27,7 @@ describe('prompt sample JSON', () => {
 describe('parsePromptsText JSON-pointer errors', () => {
   it('reports /entries/{i}/name for envelope entries missing name', () => {
     const bundle = {
+      id: '12345678-1234-1234-1234-123456789012',
       schema: 'prompts-bundle',
       schemaVersion: 1,
       exportedAt: '2026-07-18T00:00:00.000Z',
@@ -36,12 +37,12 @@ describe('parsePromptsText JSON-pointer errors', () => {
     };
     const { valid, errors } = parsePromptsText(JSON.stringify(bundle));
     expect(valid).toEqual([]);
-    expect(errors[0]).toContain('/entries/0/name');
-    expect(errors[0]).toContain('missing or empty string');
+    expect(errors[0]).toContain('/entries/0: missing required name/text');
   });
 
   it('reports /entries/{i}/text for envelope entries missing text', () => {
     const bundle = {
+      id: '12345678-1234-1234-1234-123456789012',
       schema: 'prompts-bundle',
       schemaVersion: 1,
       exportedAt: '2026-07-18T00:00:00.000Z',
@@ -50,7 +51,7 @@ describe('parsePromptsText JSON-pointer errors', () => {
       entries: [{ name: 'Named but bodyless' }],
     };
     const { errors } = parsePromptsText(JSON.stringify(bundle));
-    expect(errors[0]).toContain('/entries/0/text');
+    expect(errors[0]).toContain('/entries/0: missing required name/text');
   });
 
   it('reports pointer for legacy bare-array entries', () => {

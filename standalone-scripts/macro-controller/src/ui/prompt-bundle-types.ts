@@ -157,20 +157,20 @@ function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
 function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   const errors: string[] = [];
   if (!UUID_RE.test(String(value['id']))) {
-    errors.push('Missing or malformed id (expected UUIDv4)');
+    errors.push('/id: Missing or malformed id (expected UUIDv4)');
   }
 
   if (value['schemaVersion'] !== PROMPTS_BUNDLE_SCHEMA_VERSION) {
-    errors.push(`schemaVersion must equal ${PROMPTS_BUNDLE_SCHEMA_VERSION}`);
+    errors.push(`/schemaVersion: schemaVersion must equal ${PROMPTS_BUNDLE_SCHEMA_VERSION}`);
   }
 
   if (typeof value['exportedAt'] !== 'string') {
-    errors.push('exportedAt must be an ISO-8601 string');
+    errors.push('/exportedAt: exportedAt must be an ISO-8601 string');
   }
 
   const exporterVersion = value['exporterVersion'];
   if (typeof exporterVersion !== 'string' || !SEMVER_RE.test(exporterVersion)) {
-    errors.push('exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
+    errors.push('/exporterVersion: exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
   }
 
   return errors;
@@ -182,14 +182,14 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
   const errors: string[] = [];
   rawEntries.forEach((raw, index) => {
     if (!isPlainObject(raw)) {
-      errors.push(`entries[${index}] is not an object`);
+      errors.push(`/entries/${index}: is not an object`);
 
       return;
     }
 
     const entry = coercePromptEntry(raw);
     if (!entry) {
-      errors.push(`entries[${index}] missing required name/text`);
+      errors.push(`/entries/${index}: missing required name/text`);
 
       return;
     }
@@ -203,13 +203,13 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
 /** Validate a parsed JSON value against the envelope contract. */
 export function validatePromptsBundle(value: unknown): BundleValidationResult {
   if (!isPlainObject(value)) {
-    return { isValid: false, bundle: null, errors: ['Bundle root is not an object'] };
+    return { isValid: false, bundle: null, errors: ['/: Bundle root is not an object'] };
   }
 
   const errors = validateEnvelopeFields(value);
   const rawEntries = value['entries'];
   if (!Array.isArray(rawEntries)) {
-    errors.push('entries must be an array');
+    errors.push('/entries: entries must be an array');
 
     return { isValid: false, bundle: null, errors };
   }
@@ -218,7 +218,7 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
   errors.push(...entryErrors);
   const rawEntryCount = value['entryCount'];
   if (rawEntryCount !== entries.length) {
-    errors.push(`entryCount (${String(rawEntryCount)}) != entries.length (${entries.length})`);
+    errors.push(`/entryCount: entryCount (${String(rawEntryCount)}) != entries.length (${entries.length})`);
   }
 
   if (errors.length > 0) {

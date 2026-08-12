@@ -67,7 +67,6 @@ describe('substituteToken', () => {
     expect(substituteToken('{{count}}', 'n', 3)).toBe('{{count}}');
   });
 
-
   it('is regex-safe for keys with allowed dots/colons/hyphens', () => {
     expect(substituteToken('{{plan.count}} ${plan.count}', 'plan.count', 4))
       .toBe('4 4');

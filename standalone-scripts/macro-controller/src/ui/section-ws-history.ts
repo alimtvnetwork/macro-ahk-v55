@@ -46,7 +46,7 @@ export function createWsHistorySection(deps: WsHistoryDeps): WsHistoryResult {
 
   const wsHistoryPanel = document.createElement('div');
   wsHistoryPanel.id = 'loop-ws-history-panel';
-  wsHistoryPanel.style.cssText = 'padding:4px;background:rgba(0,0,0,.5);border:1px solid #b45309;border-radius:3px;max-height:120px;overflow-y:auto;';
+  wsHistoryPanel.style.cssText = 'padding:4px;background:rgba(0,0,0,.5);border:1px solid hsl(var(--warning));border-radius:3px;max-height:120px;overflow-y:auto;';
 
   const renderWsHistory = function(): void {
     renderWsHistoryPanel(wsHistoryPanel, deps); 
@@ -94,5 +94,5 @@ function buildHistoryEntries(history: Array<Record<string, string>>): string {
 }
 
 function buildClearButton(historyKey: string): string {
-  return '<div style="margin-top:4px;text-align:right;"><button onclick="(function(){try{localStorage.removeItem(\'' + historyKey + '\');document.getElementById(\'loop-ws-history-panel\').innerHTML=\'<div style=\\\'color:' + cPanelFgDim + ';font-size:10px;padding:4px;\\\'>History cleared</div>\';}catch(e){console.warn(\'[MacroLoop] Clear history failed:\',e.message||e);}})();" style="padding:2px 6px;background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;border-radius:2px;font-size:9px;cursor:pointer;">Clear History</button></div>';
+  return '<div style="margin-top:4px;text-align:right;"><button onclick="(function(){try{localStorage.removeItem(\'' + historyKey + '\');document.getElementById(\'loop-ws-history-panel\').innerHTML=\'<div style=\\\'color:' + cPanelFgDim + ';font-size:10px;padding:4px;\\\'>History cleared</div>\';}catch(e){console.warn(\'[MacroLoop] Clear history failed:\',e.message||e);}})();" style="padding:2px 6px;background:hsl(var(--destructive));color:hsl(var(--foreground));border:1px solid hsl(var(--destructive));border-radius:2px;font-size:9px;cursor:pointer;">Clear History</button></div>';
 }

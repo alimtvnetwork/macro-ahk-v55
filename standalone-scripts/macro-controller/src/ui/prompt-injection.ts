@@ -26,8 +26,8 @@ import { getSeedBodyForSlug } from '../seed/plan-next-prompts';
 import { renderDiffPane } from './prompt-diff';
 import { ValidatedRuleType } from "../types/enums";
 
-const CSS_BTN_HOVER_BG = '#2d3348';
-const CSS_BTN_REST_BG = '#252a36';
+const CSS_BTN_HOVER_BG = 'hsl(var(--muted))';
+const CSS_BTN_REST_BG = 'hsl(var(--background))';
 const CSS_MODAL_SECONDARY_BTN_BASE = 'padding:8px 14px;background:';
 
 /** Adapter: getByXPath returns Node|null, pasteIntoEditor needs Element|null */
@@ -82,7 +82,7 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
       refs.titleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
     }
 
-    refs.dropZone.style.borderColor = '#16a34a';
+    refs.dropZone.style.borderColor = 'hsl(var(--success))';
     refs.dropZone.innerHTML = '✅ Loaded: <b>' + file.name + '</b> (' + content.length + ' chars)';
     setTimeout(function() {
       refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; 
@@ -460,7 +460,7 @@ function _buildTitleAndContent(body: HTMLElement, initialData: Record<string, un
 function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement, charCount: HTMLElement, titleInput: HTMLInputElement): void {
   const dropZone = document.createElement('div');
   dropZone.style.cssText = 'border:2px dashed ' + cPrimaryBorderA + ';border-radius:8px;padding:16px;text-align:center;color:' + cPanelFgDim + ';font-size:11px;margin-bottom:12px;transition:all .2s;cursor:pointer;';
-  dropZone.innerHTML = '📁 Drop <b>.md</b>, <b>.txt</b>, or <b>.prompt</b> file here<br><span style="font-size:10px;color:#4b5563;">or click to browse</span>';
+  dropZone.innerHTML = '📁 Drop <b>.md</b>, <b>.txt</b>, or <b>.prompt</b> file here<br><span style="font-size:10px;color:hsl(var(--foreground));">or click to browse</span>';
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = '.md,.txt,.prompt';
@@ -503,8 +503,8 @@ function _buildVariableReference(body: HTMLElement): void {
   varToggle.style.cssText = 'cursor:pointer;font-size:11px;color:' + cPrimaryLight + ';margin-bottom:4px;user-select:none;';
   varToggle.textContent = '▸ Template Variables';
   const varList = document.createElement('div');
-  varList.style.cssText = 'display:none;padding:6px 10px;background:rgba(124,58,237,0.08);border-radius:6px;font-size:10px;color:hsl(var(--muted-foreground));margin-bottom:12px;line-height:1.8;';
-  varList.innerHTML = '<code style="color:#c4b5fd;">{{date}}</code> — current date<br><code style="color:#c4b5fd;">{{time}}</code> — current time<br><code style="color:#c4b5fd;">{{date:FORMAT}}</code> — e.g. dd-MMM-YYYY<br><code style="color:#c4b5fd;">{{time:FORMAT}}</code> — e.g. 12 hr clock';
+  varList.style.cssText = 'display:none;padding:6px 10px;background:hsl(var(--primary) / 0.08);border-radius:6px;font-size:10px;color:hsl(var(--muted-foreground));margin-bottom:12px;line-height:1.8;';
+  varList.innerHTML = '<code style="color:hsl(var(--primary));">{{date}}</code> — current date<br><code style="color:hsl(var(--primary));">{{time}}</code> — current time<br><code style="color:hsl(var(--primary));">{{date:FORMAT}}</code> — e.g. dd-MMM-YYYY<br><code style="color:hsl(var(--primary));">{{time:FORMAT}}</code> — e.g. 12 hr clock';
   varToggle.onclick = function() {
     const isOpen = varList.style.display !== 'none';
     varList.style.display = isOpen ? 'none' : 'block';
@@ -839,7 +839,7 @@ function _buildPromptModalFooter(
   const guidelineBtn = document.createElement('button');
   guidelineBtn.textContent = '📥 AI guideline';
   guidelineBtn.title = 'Download a Markdown guideline listing tokens the AI must preserve when editing this prompt.';
-  guidelineBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;margin-right:auto;';
+  guidelineBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:hsl(var(--primary));font-size:12px;cursor:pointer;margin-right:auto;';
   guidelineBtn.onmouseover = function() {
     (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
   };
@@ -876,7 +876,7 @@ function _buildPromptModalFooter(
     resetBtn.textContent = '↺ Reset to default';
     resetBtn.title = 'Restore this prompt body to the shipped default. Not saved until you click Save.';
     resetBtn.dataset.testid = 'prompt-editor-reset-default';
-    resetBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+    resetBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:hsl(var(--primary));font-size:12px;cursor:pointer;';
     resetBtn.onmouseover = function() {
       (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
     };
@@ -905,7 +905,7 @@ function _buildPromptModalFooter(
   // Paste Test button
   const testBtn = document.createElement('button');
   testBtn.textContent = '📋 Paste Test';
-  testBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+  testBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:hsl(var(--primary));font-size:12px;cursor:pointer;';
   testBtn.onmouseover = function() {
     (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; 
   };
@@ -977,7 +977,7 @@ function _buildPromptModalFooter(
     diffBtn.textContent = '🔍 Diff vs saved';
     diffBtn.title = 'Toggle a live unified diff comparing this editor with the currently-saved prompt body. Shortcut: Ctrl+D (Cmd+D on macOS).';
     diffBtn.dataset.testid = 'prompt-editor-diff-toggle';
-    diffBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+    diffBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:hsl(var(--primary));font-size:12px;cursor:pointer;';
     const applyDiffOpenState = function (): void {
       diffHost.style.display = isDiffOpen ? 'block' : 'none';
       diffBtn.textContent = isDiffOpen ? '🔍 Hide diff' : '🔍 Diff vs saved';
@@ -1237,7 +1237,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
   }
 
   const root = document.createElement('div');
-  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:rgba(124,58,237,0.08);border-radius:6px;font-size:11px;color:' + cPrimaryLight + ';';
+  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:hsl(var(--primary) / 0.08);border-radius:6px;font-size:11px;color:' + cPrimaryLight + ';';
   const label = document.createElement('span');
   label.textContent = '🔒 Required tokens:';
   label.style.cssText = 'font-weight:600;';
@@ -1265,7 +1265,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
       const ok = present.has(token);
       chip.style.background = ok ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
       chip.style.borderColor = ok ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.7)';
-      chip.style.color = ok ? '#86efac' : '#fca5a5';
+      chip.style.color = ok ? 'hsl(var(--success))' : 'hsl(var(--destructive))';
       if (!ok) {
         missing.push(token);
       }
@@ -1311,15 +1311,15 @@ function _ruleZeroApplyStyle(badge: HTMLElement, paintText: RuleZeroPaintText): 
   if (paintText.neutral) {
     badge.style.background = 'rgba(148,163,184,0.15)';
     badge.style.borderColor = 'rgba(148,163,184,0.5)';
-    badge.style.color = '#cbd5e1';
+    badge.style.color = 'hsl(var(--foreground))';
   } else if (paintText.good) {
     badge.style.background = 'rgba(34,197,94,0.15)';
     badge.style.borderColor = 'rgba(34,197,94,0.6)';
-    badge.style.color = '#86efac';
+    badge.style.color = 'hsl(var(--success))';
   } else {
     badge.style.background = 'rgba(239,68,68,0.15)';
     badge.style.borderColor = 'rgba(239,68,68,0.7)';
-    badge.style.color = '#fca5a5';
+    badge.style.color = 'hsl(var(--destructive))';
   }
 }
 

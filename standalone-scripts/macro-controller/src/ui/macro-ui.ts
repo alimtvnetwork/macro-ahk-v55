@@ -40,7 +40,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   
   const bulkCount = document.createElement('div');
   bulkCount.id = 'task-bulk-count';
-  bulkCount.style.cssText = 'font-size:9px;color:#60a5fa;font-weight:700;';
+  bulkCount.style.cssText = 'font-size:9px;color:hsl(var(--foreground));font-weight:700;';
   bulkRow.appendChild(bulkCount);
 
   const bulkBtns = document.createElement('div');

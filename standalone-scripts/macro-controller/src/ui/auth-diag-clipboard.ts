@@ -20,7 +20,7 @@ export function buildHeaderControls(
   refreshVal: HTMLElement,
 ): { copyButton: HTMLElement; headerBadge: HTMLElement } {
   const copyButton = document.createElement('button');
-  copyButton.style.cssText = 'margin-left:auto;padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;font-size:10px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;';
+  copyButton.style.cssText = 'margin-left:auto;padding:1px 5px;background:rgba(255,255,255,0.08);border:1px solid hsl(var(--border));border-radius:3px;font-size:10px;cursor:pointer;opacity:0.7;transition:opacity 0.15s;line-height:1;';
   copyButton.textContent = '📋';
   copyButton.title = 'Copy auth diagnostics';
   copyButton.onmouseenter = function () {

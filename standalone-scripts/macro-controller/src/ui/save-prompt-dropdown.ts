@@ -126,7 +126,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
     const editToggle = buildDropdownHeader(dropdown, () => {
       isEditMode = !isEditMode;
       editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
-      editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : '#a78bfa';
+      editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : 'hsl(var(--primary))';
       doRender();
     });
 
@@ -160,7 +160,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
         event.stopPropagation();
         isEditMode = !isEditMode;
         editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
-        editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : '#a78bfa';
+        editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : 'hsl(var(--primary))';
         doRender();
       }
     });
@@ -175,7 +175,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
 
 function buildDropdownHeader(dropdown: HTMLElement, onToggleEdit: () => void): HTMLElement {
   const header = document.createElement('div');
-  header.style.cssText = 'padding:6px 10px;font-size:10px;color:#a78bfa;border-bottom:1px solid rgba(124,58,237,0.3);font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;';
+  header.style.cssText = 'padding:6px 10px;font-size:10px;color:hsl(var(--primary));border-bottom:1px solid rgba(124,58,237,0.3);font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;';
 
   const headerLeft = document.createElement('span');
   headerLeft.style.cssText = 'overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;';
@@ -186,7 +186,7 @@ function buildDropdownHeader(dropdown: HTMLElement, onToggleEdit: () => void): H
   const editToggle = document.createElement('button');
   editToggle.textContent = '✏️';
   editToggle.title = 'Toggle edit mode (Ctrl+E)';
-  editToggle.style.cssText = 'flex:0 0 auto;padding:2px 6px;border-radius:6px;font-size:10px;line-height:1;cursor:pointer;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.2);color:#a78bfa;';
+  editToggle.style.cssText = 'flex:0 0 auto;padding:2px 6px;border-radius:6px;font-size:10px;line-height:1;cursor:pointer;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.2);color:hsl(var(--primary));';
   editToggle.onclick = function (event) {
     event.stopPropagation();
     onToggleEdit();

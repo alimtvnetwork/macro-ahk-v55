@@ -60,13 +60,13 @@ describe('prompt-library-modal drop-zone focus ring', () => {
     expect(zone.style.outlineColor === '' || zone.style.outlineColor === 'transparent').toBe(true);
 
     zone.dispatchEvent(new FocusEvent('focus'));
-    expect(zone.style.outlineColor).toBe('rgb(124, 196, 255)');
+    expect(zone.style.outlineColor).toBe('hsl(var(--accent))');
     expect(zone.style.boxShadow).toContain('rgba(124, 196, 255');
-    expect(zone.style.borderColor).toBe('rgb(124, 196, 255)');
+    expect(zone.style.borderColor).toBe('hsl(var(--accent))');
 
     zone.dispatchEvent(new FocusEvent('blur'));
     expect(zone.style.outlineColor).toBe('transparent');
     expect(zone.style.boxShadow).toBe('none');
-    expect(zone.style.borderColor).toBe('rgb(58, 72, 99)');
+    expect(zone.style.borderColor).toBe('hsl(var(--muted))');
   });
 });

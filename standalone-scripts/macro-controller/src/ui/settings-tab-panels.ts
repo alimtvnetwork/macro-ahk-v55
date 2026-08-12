@@ -627,7 +627,7 @@ function buildModalOverlay(): HTMLElement {
 function buildHistoryModalContainer(): HTMLElement {
   const modal = document.createElement('div');
   const s = state as unknown as Record<string, string>;
-  modal.style.cssText = 'background:' + (s.cPanelBg || '#1a1625') + ';border:1px solid ' + (s.cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
+  modal.style.cssText = 'background:' + (s.cPanelBg || 'hsl(var(--background))') + ';border:1px solid ' + (s.cPanelBorder || 'hsl(var(--background))') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
 
   return modal;
 }

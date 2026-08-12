@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.2.0] 2026-08-12 Prompt Library Relocate & Light Mode
+
+### Added
+- Implemented Light Mode design system (themes and color overrides).
+- Restructured `prompt-library-modal.ts` and UX for better accessibility and focus.
+- Introduced `repeat-row popover` and `PromptEditor` for robust prompt management.
+
+### Fixed
+- Fixed ESLint violations and Vitest failures across the repo.
+- Enforced strict JSON pointer validation (RFC 6901) for PromptsBundleV1.
 ## [v5.27.0] 2026-08-09 DomainConstants Circular Dependency Fix
 
 ### Fixed

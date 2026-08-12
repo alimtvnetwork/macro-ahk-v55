@@ -145,7 +145,7 @@ function applyBadgeStyle(badge: HTMLElement, hasViolations: boolean, isSaved: bo
   const bg = hasViolations
     ? 'rgba(239,68,68,0.28)'
     : (isSaved ? 'rgba(59,130,246,0.25)' : 'rgba(107,114,128,0.25)');
-  const fg = hasViolations ? '#fecaca' : (isSaved ? '#93c5fd' : '#d1d5db');
+  const fg = hasViolations ? 'hsl(var(--destructive))' : (isSaved ? 'hsl(var(--accent))' : 'hsl(var(--foreground))');
   const border = hasViolations ? '1px solid rgba(239,68,68,0.55)' : '1px solid transparent';
   badge.style.cssText = 'font-size:9px;font-weight:600;color:' + fg + ';background:' + bg +
     ';padding:1px 6px;border-radius:3px;margin-left:4px;cursor:pointer;letter-spacing:0.3px;border:' + border + ';';
@@ -168,7 +168,7 @@ function openOrderPopover(anchor: HTMLElement): void {
     'width:360px',
     'max-height:60vh',
     'overflow:auto',
-    'background:#0f0720',
+    'background:hsl(var(--background))',
     'border:1px solid hsl(var(--primary))',
     'border-radius:6px',
     'box-shadow:0 8px 24px rgba(0,0,0,0.5)',
@@ -191,11 +191,11 @@ function buildPopoverHeader(
   const head = document.createElement('div');
   head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
   const title = document.createElement('div');
-  title.style.cssText = 'font-weight:700;color:#c4b5fd;';
+  title.style.cssText = 'font-weight:700;color:hsl(var(--primary));';
   title.textContent = 'Prompt Order · ' + (info.source === 'localStorage' ? 'localStorage' : 'DEFAULT');
   const count = document.createElement('div');
   const ok = report.violationCount === 0;
-  count.style.cssText = 'font-size:10px;color:' + (ok ? '#86efac' : '#fca5a5') + ';';
+  count.style.cssText = 'font-size:10px;color:' + (ok ? 'hsl(var(--success))' : 'hsl(var(--destructive))') + ';';
   count.textContent = ok ? '✓ compliant' : '⚠ ' + report.violationCount + ' issue(s)';
   head.appendChild(title);
   head.appendChild(count);
@@ -207,7 +207,7 @@ function buildTerminalSummary(report: OrderComplianceReport): HTMLElement {
   const box = document.createElement('div');
   const ok = report.terminalOk;
   box.style.cssText = 'font-size:10px;margin-bottom:6px;padding:4px 6px;border-radius:4px;background:' +
-    (ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.14)') + ';color:' + (ok ? '#bbf7d0' : '#fecaca') + ';';
+    (ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.14)') + ';color:' + (ok ? 'hsl(var(--success))' : 'hsl(var(--destructive))') + ';';
   box.textContent = (ok ? '✓' : '⚠') + ' Terminal-7 tail ' + (ok ? 'matches' : 'MISMATCH') +
     ' — expected: ' + report.expectedTerminal.join(' → ');
 
@@ -243,18 +243,18 @@ function buildRow(row: OrderRow): HTMLElement {
 
 function statusPalette(status: ViolationKind): { bg: string; fg: string; icon: string } {
   if (status === 'ok') {
-    return { bg: 'transparent', fg: '#d1d5db', icon: '·' };
+    return { bg: 'transparent', fg: 'hsl(var(--foreground))', icon: '·' };
   }
 
   if (status === 'out-of-order') {
-    return { bg: 'rgba(234,179,8,0.15)', fg: '#fde68a', icon: '↕' };
+    return { bg: 'rgba(234,179,8,0.15)', fg: 'hsl(var(--warning))', icon: '↕' };
   }
 
   if (status === 'unknown') {
     return { bg: 'rgba(107,114,128,0.18)', fg: 'hsl(var(--foreground))', icon: '?' };
   }
 
-  return { bg: 'rgba(239,68,68,0.16)', fg: '#fecaca', icon: '×' };
+  return { bg: 'rgba(239,68,68,0.16)', fg: 'hsl(var(--destructive))', icon: '×' };
 }
 
 function outsideClickHandler(): void {

@@ -80,7 +80,7 @@ export function buildPresetRow(
   const newOpt = document.createElement('option');
   newOpt.value = '__new__';
   newOpt.textContent = '+ New...';
-  newOpt.style.color = '#22d3ee';
+  newOpt.style.color = 'hsl(var(--accent))';
   select.appendChild(newOpt);
 
   select.onchange = function () {
@@ -113,7 +113,7 @@ export function buildPresetRow(
   const cloneBtn = document.createElement('button');
   cloneBtn.textContent = '📋';
   cloneBtn.title = 'Clone selected preset';
-  cloneBtn.style.cssText = 'padding:2px 6px;background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);border-radius:3px;font-size:10px;cursor:pointer;';
+  cloneBtn.style.cssText = 'padding:2px 6px;background:hsl(var(--accent) / 0.15);color:hsl(var(--accent));border:1px solid hsl(var(--accent) / 0.3);border-radius:3px;font-size:10px;cursor:pointer;';
   cloneBtn.onclick = function () {
     onClone(select.value); 
   };

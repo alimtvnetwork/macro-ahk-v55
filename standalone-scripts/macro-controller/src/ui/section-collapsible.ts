@@ -60,7 +60,7 @@ function buildSectionHeader(): HTMLElement {
   const header = document.createElement('div');
   header.style.cssText = 'display:flex;align-items:center;cursor:pointer;user-select:none;padding:2px 4px;border-radius:3px;transition:background-color 150ms ease;';
   header.onmouseenter = function () {
-    header.style.backgroundColor = 'rgba(255,255,255,0.06)'; 
+    header.style.backgroundColor = 'hsl(var(--muted))'; 
   };
 
   header.onmouseleave = function () {

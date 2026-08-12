@@ -28,7 +28,7 @@ export function buildDropdownHeader(
   rerender: Rerender,
 ): HTMLElement {
   const header = document.createElement('div');
-  header.style.cssText = 'position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-bottom:1px solid hsl(var(--primary));background:#1a0b2e;';
+  header.style.cssText = 'position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-bottom:1px solid hsl(var(--primary));background:hsl(var(--background));';
   const left = document.createElement('div');
   left.style.cssText = 'display:flex;align-items:center;gap:2px;';
   left.appendChild(buildPlanTabMarker());

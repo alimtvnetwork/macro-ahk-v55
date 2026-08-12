@@ -470,7 +470,7 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
     for (const [j, ws] of selected.entries()) {
       const origName = ws.fullName || ws.name || '';
       const newName = applyRenameTemplate(template, prefix, suffix, starts, j, origName);
-      html += '<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);"><span style="color:hsl(var(--muted-foreground));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + origName.replace(/"/g, '&quot;') + '">' + origName + '</span><span style="color:hsl(var(--muted-foreground));">→</span><span style="color:#67e8f9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;" title="' + newName.replace(/"/g, '&quot;') + '">' + newName + '</span></div>';
+      html += '<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid hsl(var(--border));"><span style="color:hsl(var(--muted-foreground));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + origName.replace(/"/g, '&quot;') + '">' + origName + '</span><span style="color:hsl(var(--muted-foreground));">→</span><span style="color:hsl(var(--accent));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;" title="' + newName.replace(/"/g, '&quot;') + '">' + newName + '</span></div>';
     }
 
     previewList.innerHTML = html || '<div style="color:hsl(var(--muted-foreground));">No changes</div>';
@@ -491,7 +491,7 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
 function _appendVarHintAndStartNums(body: HTMLElement): HTMLElement {
   const varHint = document.createElement('div');
   varHint.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:6px;padding:2px 4px;background:rgba(0,0,0,.2);border-radius:2px;';
-  varHint.innerHTML = 'Variables: <span style="color:#facc15">$$$</span> <span style="color:' + cPrimaryLight + '">###</span> <span style="color:#34d399">***</span> — zero-padded by count ($$$ → 001). Works in prefix, template, suffix.';
+  varHint.innerHTML = 'Variables: <span style="color:hsl(var(--warning))">$$$</span> <span style="color:' + cPrimaryLight + '">###</span> <span style="color:hsl(var(--success))">***</span> — zero-padded by count ($$$ → 001). Works in prefix, template, suffix.';
   body.appendChild(varHint);
 
   const startNumsContainer = document.createElement('div');
@@ -543,7 +543,7 @@ function _detectVarsAndRenderStarts(
   if (hasDollar || hasHash || hasStar) {
     html += '<div style="font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:3px;">Start Numbers:</div><div style="display:flex;gap:8px;flex-wrap:wrap;">';
     if (hasDollar) {
-      html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, '#facc15');
+      html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, 'hsl(var(--warning))');
     }
 
     if (hasHash) {
@@ -551,7 +551,7 @@ function _detectVarsAndRenderStarts(
     }
 
     if (hasStar) {
-      html += buildStartNumInput('**', 'rename-start-star', startNums.star, '#34d399');
+      html += buildStartNumInput('**', 'rename-start-star', startNums.star, 'hsl(var(--success))');
     }
 
     html += '</div>';
@@ -630,7 +630,7 @@ function _appendDelayAndEta(body: HTMLElement, count: number): { delaySlider: HT
   delaySlider.value = String(getRenameDelayMs());
   delaySlider.style.cssText = 'flex:1;accent-color:' + cPrimaryLight + ';height:4px;';
   const delayVal = document.createElement('span');
-  delayVal.style.cssText = 'font-size:9px;color:#22d3ee;min-width:42px;text-align:right;';
+  delayVal.style.cssText = 'font-size:9px;color:hsl(var(--accent));min-width:42px;text-align:right;';
   delayVal.textContent = getRenameDelayMs() + 'ms';
   const delayRow = document.createElement('div');
   delayRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
@@ -699,7 +699,7 @@ function _buildRenameButtons(
   const applyBtn = document.createElement('button');
   applyBtn.id = 'ahk-loop-rename-apply';
   applyBtn.textContent = '✅ Apply';
-  applyBtn.style.cssText = 'padding:4px 12px;background:#059669;color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
+  applyBtn.style.cssText = 'padding:4px 12px;background:hsl(var(--success));color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
   applyBtn.onclick = function () {
     _autoSave(inputs);
     _executeRenameApply(selected, tmplRow, prefixRow, suffixRow, getStartNums, applyBtn, stopBtn, cancelBtn, etaRow);
@@ -763,7 +763,7 @@ function _executeRenameApply(
     const etaMs = remaining * perOpMs;
     const avgLabel = getRenameAvgOpMs() > 0 ? ' (avg ' + getRenameAvgOpMs() + 'ms/op)' : ' (est. ' + getRenameDelayMs() + 'ms/op)';
     etaRow.style.display = 'block';
-    etaRow.innerHTML = '⏱ ETA: <span style="color:#22d3ee;">' + formatEta(etaMs) + '</span> remaining — ' + remaining + ' items' + avgLabel;
+    etaRow.innerHTML = '⏱ ETA: <span style="color:hsl(var(--accent));">' + formatEta(etaMs) + '</span> remaining — ' + remaining + ' items' + avgLabel;
   };
 
   bulkRenameWorkspaces(entries, function (results: BulkRenameResults, done: boolean) {
@@ -786,13 +786,13 @@ function handleRenameDone(
     ? '⏹ Stopped: ' + results.success + '/' + results.total
     : '✅ ' + results.success + '/' + results.total + (results.failed > 0 ? ' (' + results.failed + ' failed)' : ' done');
   applyBtn.textContent = statusText;
-  applyBtn.style.background = results.cancelled || results.failed > 0 ? 'hsl(var(--warning))' : '#059669';
+  applyBtn.style.background = results.cancelled || results.failed > 0 ? 'hsl(var(--warning))' : 'hsl(var(--success))';
   stopBtn.style.display = 'none';
   etaRow.style.display = 'none';
   setTimeout(function () {
     (applyBtn as HTMLButtonElement).disabled = false;
     applyBtn.textContent = '✅ Apply';
-    applyBtn.style.background = '#059669';
+    applyBtn.style.background = 'hsl(var(--success))';
     cancelBtn.style.display = 'inline-block';
     populateLoopWorkspaceDropdown();
   }, Timings.TIMEOUT_NORMAL);

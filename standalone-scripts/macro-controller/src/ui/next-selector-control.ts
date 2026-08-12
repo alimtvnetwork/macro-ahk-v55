@@ -27,7 +27,7 @@ const CSS_SELECT =
   + 'border-radius:4px;color:' + cPanelFg + ';font:11px system-ui,-apple-system,sans-serif;'
   + 'cursor:pointer;max-width:180px;';
 const CSS_EDIT_BTN =
-  'padding:2px 6px;background:rgba(124,58,237,0.25);border:1px solid rgba(124,58,237,0.5);'
+  'padding:2px 6px;background:hsl(var(--primary) / 0.25);border:1px solid rgba(124,58,237,0.5);'
   + 'border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:11px;line-height:1.4;';
 const CSS_LABEL = 'font-weight:600;color:' + cPrimaryLight + ';flex:0 0 auto;';
 const CSS_HINT = 'font-size:10px;opacity:0.7;color:' + cPanelFg + ';';

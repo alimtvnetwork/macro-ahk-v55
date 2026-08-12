@@ -100,11 +100,11 @@ function renderProCard(d: SummaryDetails): string {
 
 function renderProCreditsCard(d: SummaryDetails): string {
   const parts: string[] = [];
-  parts.push(row('Pro available',  fmt(d.pro.creditsAvailable),  '#86efac'));
-  parts.push(row('Pro total',      fmt(d.pro.creditsTotal),      '#a78bfa'));
+  parts.push(row('Pro available',  fmt(d.pro.creditsAvailable),  'hsl(var(--success))'));
+  parts.push(row('Pro total',      fmt(d.pro.creditsTotal),      'hsl(var(--primary))'));
   parts.push(row('Pro used',
     fmt(Math.max(0, d.pro.creditsTotal - d.pro.creditsAvailable)),
-    '#fb923c'));
+    'hsl(var(--warning))'));
   parts.push(sectionTitle('At risk'));
   parts.push(row('Expiring credits',
     fmt(d.pro.creditsExpiringAvailable),
@@ -118,10 +118,10 @@ function renderProCreditsCard(d: SummaryDetails): string {
 
 function renderFreeCard(d: SummaryDetails): string {
   const parts: string[] = [];
-  parts.push(row('Free credits available', fmt(d.free.dailyAvailable), '#86efac'));
+  parts.push(row('Free credits available', fmt(d.free.dailyAvailable), 'hsl(var(--success))'));
   parts.push(row('Workspaces with free',   fmt(d.free.workspacesWithFree)));
   parts.push(sectionTitle('Combined'));
-  parts.push(row('Pro + Free spendable',   fmt(d.grand.availableSpendable), '#86efac'));
+  parts.push(row('Pro + Free spendable',   fmt(d.grand.availableSpendable), 'hsl(var(--success))'));
 
   return parts.join('');
 }

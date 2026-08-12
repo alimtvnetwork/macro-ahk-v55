@@ -403,7 +403,7 @@ function _appendFilteredItems(
     const suggestions = getSuggestedPrompts(entries);
     if (suggestions.length > 0) {
       const sugHeader = document.createElement('div');
-      sugHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:#3daee9;background:rgba(61,174,233,0.05);text-transform:uppercase;letter-spacing:0.5px;';
+      sugHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:hsl(var(--foreground));background:rgba(61,174,233,0.05);text-transform:uppercase;letter-spacing:0.5px;';
       sugHeader.textContent = '✨ Suggested';
       container.appendChild(sugHeader);
       suggestions.forEach((p: LoaderPromptEntry, idx: number) => {
@@ -420,7 +420,7 @@ function _appendFilteredItems(
   const favorites = entries.filter(p => p.isFavorite);
   if (favorites.length > 0 && !getPromptCategoryFilter() && !_currentSearchQuery) {
     const favHeader = document.createElement('div');
-    favHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:#facc15;background:rgba(250,204,21,0.05);text-transform:uppercase;letter-spacing:0.5px;';
+    favHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:hsl(var(--warning));background:rgba(250,204,21,0.05);text-transform:uppercase;letter-spacing:0.5px;';
     favHeader.textContent = '⭐ Favorites';
     container.appendChild(favHeader);
     for (const [idx, p] of favorites.entries()) {
@@ -854,13 +854,13 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement, taskNextDeps: Tas
   const taskNextItem = document.createElement('div');
   taskNextItem.style.cssText = 'border-bottom:1px solid rgba(124,58,237,0.3);';
   const taskNextRow = document.createElement('div');
-  taskNextRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 8px;cursor:pointer;font-size:13px;color:#e9d5ff;font-weight:700;background:rgba(124,58,237,0.18);';
+  taskNextRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 8px;cursor:pointer;font-size:13px;color:hsl(var(--primary));font-weight:700;background:rgba(124,58,237,0.18);';
   const taskNextLabel = document.createElement('span');
   taskNextLabel.textContent = '⏭ Task Next';
   taskNextRow.appendChild(taskNextLabel);
   const taskNextArrow = document.createElement('span');
   taskNextArrow.textContent = '▸';
-  taskNextArrow.style.cssText = 'font-size:13px;margin-left:4px;color:#e9d5ff;';
+  taskNextArrow.style.cssText = 'font-size:13px;margin-left:4px;color:hsl(var(--primary));';
   taskNextRow.appendChild(taskNextArrow);
 
   const taskNextSub = document.createElement('div');
@@ -1208,7 +1208,7 @@ function renderPromptItem(
   }
 
   const hasText = Boolean(p.text);
-  item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 10px;cursor:pointer;font-size:12px;line-height:1.4;color:' + (hasText ? '#c9a8ef' : '#6b5a8a') + ';border-bottom:1px solid rgba(124,58,237,0.12);' + (hasText ? '' : 'opacity:0.6;');
+  item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 10px;cursor:pointer;font-size:12px;line-height:1.4;color:' + (hasText ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))') + ';border-bottom:1px solid rgba(124,58,237,0.12);' + (hasText ? '' : 'opacity:0.6;');
   item.onmouseover = function() {
     (this as HTMLElement).style.background = cBtnMenuHover; 
   };

@@ -566,7 +566,7 @@ function makeBtn(label: string, primary: boolean): HTMLButtonElement {
   b.type = 'button';
   b.textContent = label;
   const bg = primary
-    ? 'linear-gradient(135deg,hsl(var(--primary)) 0%,#4f46e5 50%,hsl(var(--primary)) 100%)'
+    ? 'linear-gradient(135deg,hsl(var(--primary)) 0%,hsl(var(--primary)) 50%,hsl(var(--primary)) 100%)'
     : 'rgba(124,58,237,0.18)';
   const shadow = primary
     ? '0 2px 6px rgba(79,70,229,0.4), inset 0 1px 0 rgba(255,255,255,0.18)'
@@ -609,7 +609,7 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
 // eslint-disable-next-line max-lines-per-function
 function buildControl(): HTMLElement {
   const root = document.createElement('div');
-  root.style.cssText = 'padding:6px 8px;background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.25);border-radius:6px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;display:flex;flex-direction:column;gap:6px;';
+  root.style.cssText = 'padding:6px 8px;background:' + cSectionBg + ';border:1px solid hsl(var(--primary) / 0.25);border-radius:6px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;display:flex;flex-direction:column;gap:6px;';
 
   // Header (toggle collapse)
   const header = document.createElement('div');

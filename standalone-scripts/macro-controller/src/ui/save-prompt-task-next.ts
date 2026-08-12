@@ -19,7 +19,7 @@ export function buildTaskNextSubmenu(
   taskNextDeps: NonNullable<SavePromptDeps['taskNextDeps']>,
 ): void {
   const taskNextItem = document.createElement('div');
-  taskNextItem.style.cssText = 'position:relative;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;cursor:pointer;font-size:11px;color:#a78bfa;border-bottom:1px solid rgba(124,58,237,0.3);font-weight:600;';
+  taskNextItem.style.cssText = 'position:relative;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;cursor:pointer;font-size:11px;color:hsl(var(--primary));border-bottom:1px solid rgba(124,58,237,0.3);font-weight:600;';
   taskNextItem.textContent = '⏭ Task Next';
 
   const arrow = document.createElement('span');
@@ -96,7 +96,7 @@ function buildPresetCountItems(
 
   for (const count of presetCounts) {
     const item = document.createElement('div');
-    item.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#e0e0e0;';
+    item.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:hsl(var(--foreground));';
     item.textContent = 'Next ' + count + ' task' + (count > 1 ? 's' : '');
     item.onmouseover = function () {
       (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; 
@@ -129,7 +129,7 @@ function buildCustomCountRow(
 
   const label = document.createElement('span');
   label.textContent = 'Custom:';
-  label.style.cssText = 'font-size:10px;color:#a78bfa;';
+  label.style.cssText = 'font-size:10px;color:hsl(var(--primary));';
   customRow.appendChild(label);
 
   const input = document.createElement('input');
@@ -137,7 +137,7 @@ function buildCustomCountRow(
   input.min = '1';
   input.max = '999';
   input.placeholder = '#';
-  input.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:#e0e0e0;font-size:10px;';
+  input.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:hsl(var(--foreground));font-size:10px;';
   input.onclick = function (event) {
     event.stopPropagation(); 
   };
@@ -183,7 +183,7 @@ function buildSettingsItem(
   taskNextDeps: NonNullable<SavePromptDeps['taskNextDeps']>,
 ): void {
   const settingsItem = document.createElement('div');
-  settingsItem.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#a78bfa;border-top:1px solid rgba(124,58,237,0.2);';
+  settingsItem.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:hsl(var(--primary));border-top:1px solid rgba(124,58,237,0.2);';
   settingsItem.textContent = '⚙ Settings';
   settingsItem.onmouseover = function () {
     (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; 

@@ -69,8 +69,8 @@ function buildBackdrop(): HTMLDivElement {
 function buildModal(): HTMLDivElement {
   const modal = document.createElement('div');
   modal.style.cssText =
-    'width:min(720px,92vw);max-height:82vh;overflow:auto;background:#0f172a;color:hsl(var(--foreground));'
-    + 'border:1px solid #334155;border-radius:8px;padding:16px;font-family:system-ui,sans-serif;font-size:12px;';
+    'width:min(720px,92vw);max-height:82vh;overflow:auto;background:hsl(var(--background));color:hsl(var(--foreground));'
+    + 'border:1px solid hsl(var(--border));border-radius:8px;padding:16px;font-family:system-ui,sans-serif;font-size:12px;';
   modal.appendChild(buildHeader());
   modal.appendChild(buildE005Section());
   modal.appendChild(buildSnapshotSection());
@@ -117,7 +117,7 @@ function buildE005Section(): HTMLDivElement {
 
 function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
   const row = document.createElement('div');
-  row.style.cssText = 'padding:6px 8px;border-left:2px solid hsl(var(--warning));background:#111827;border-radius:3px;margin:4px 0;';
+  row.style.cssText = 'padding:6px 8px;border-left:2px solid hsl(var(--warning));background:hsl(var(--background))827;border-radius:3px;margin:4px 0;';
   const top = document.createElement('div');
   top.style.cssText = 'display:flex;justify-content:space-between;font-family:ui-monospace,monospace;';
   const codeSpan = document.createElement('span');
@@ -129,7 +129,7 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
   top.appendChild(codeSpan);
   top.appendChild(timeSpan);
   const detail = document.createElement('div');
-  detail.style.cssText = 'color:#cbd5e1;margin-top:3px;font-family:ui-monospace,monospace;';
+  detail.style.cssText = 'color:hsl(var(--foreground));margin-top:3px;font-family:ui-monospace,monospace;';
   detail.textContent =
     'owner=' + summary.slugOwnerRole
     + '  mismatch=' + summary.orphanRoleMismatch
@@ -262,7 +262,7 @@ function buildBridgeSection(): HTMLDivElement {
   wrap.appendChild(sectionTitle('sql-bridge state (rawSql method-name adapter)'));
   const state = getSqlBridgeState();
   const grid = document.createElement('pre');
-  grid.style.cssText = 'background:#111827;color:#cbd5e1;padding:8px;border-radius:4px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;margin:4px 0;';
+  grid.style.cssText = 'background:hsl(var(--background))827;color:hsl(var(--foreground));padding:8px;border-radius:4px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;margin:4px 0;';
   const lines = [
     'SELECT winning: ' + (state.winning.SELECT ?? NOT_ACCEPTED),
     'WRITE  winning: ' + (state.winning.WRITE ?? NOT_ACCEPTED),
@@ -284,7 +284,7 @@ function buildHeader(): HTMLDivElement {
   title.style.cssText = 'font-size:14px;font-weight:600;';
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
-  closeBtn.style.cssText = 'background:#334155;color:hsl(var(--foreground));border:0;padding:4px 10px;border-radius:4px;cursor:pointer;';
+  closeBtn.style.cssText = 'background:hsl(var(--background));color:hsl(var(--foreground));border:0;padding:4px 10px;border-radius:4px;cursor:pointer;';
   closeBtn.onclick = () => {
     document.getElementById('marco-seed-diag-panel')?.remove(); 
   };
@@ -331,7 +331,7 @@ function buildSnapshotSection(): HTMLDivElement {
 
 function renderStageRow(stage: SeedStageReport): HTMLDivElement {
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid #1e293b;';
+  row.style.cssText = 'display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid hsl(var(--background));';
   const dot = document.createElement('span');
   dot.textContent = '\u25CF';
   dot.style.cssText = 'color:' + STATUS_COLOR[stage.status] + ';font-size:14px;line-height:1;';
@@ -339,7 +339,7 @@ function renderStageRow(stage: SeedStageReport): HTMLDivElement {
   name.textContent = stage.stage;
   name.style.cssText = 'min-width:220px;font-family:ui-monospace,monospace;';
   const detail = document.createElement('span');
-  detail.style.cssText = 'flex:1;color:#cbd5e1;';
+  detail.style.cssText = 'flex:1;color:hsl(var(--foreground));';
   detail.textContent = buildStageDetail(stage);
   row.appendChild(dot);
   row.appendChild(name);
@@ -384,7 +384,7 @@ function buildTraceSection(): HTMLDivElement {
 
 function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   const row = document.createElement('div');
-  row.style.cssText = 'padding:5px 6px;border-left:2px solid hsl(var(--muted-foreground));margin:3px 0;background:#111827;border-radius:3px;';
+  row.style.cssText = 'padding:5px 6px;border-left:2px solid hsl(var(--muted-foreground));margin:3px 0;background:hsl(var(--background))827;border-radius:3px;';
   const top = document.createElement('div');
   top.style.cssText = 'display:flex;justify-content:space-between;gap:8px;';
   const codeSpan = document.createElement('span');
@@ -396,7 +396,7 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   top.appendChild(codeSpan);
   top.appendChild(timeSpan);
   const body = document.createElement('div');
-  body.style.cssText = 'color:#cbd5e1;margin-top:2px;white-space:pre-wrap;';
+  body.style.cssText = 'color:hsl(var(--foreground));margin-top:2px;white-space:pre-wrap;';
   body.textContent = evt.title + (evt.detail ? '\n' + evt.detail : '');
   row.appendChild(top);
   row.appendChild(body);
@@ -417,13 +417,13 @@ function toastColor(level: string): string {
     return 'hsl(var(--success))';
   }
 
-  return '#93c5fd';
+  return 'hsl(var(--accent))';
 }
 
 function sectionTitle(text: string): HTMLDivElement {
   const node = document.createElement('div');
   node.textContent = text;
-  node.style.cssText = 'font-size:12px;font-weight:600;color:#c4b5fd;margin:10px 0 4px;';
+  node.style.cssText = 'font-size:12px;font-weight:600;color:hsl(var(--primary));margin:10px 0 4px;';
 
   return node;
 }

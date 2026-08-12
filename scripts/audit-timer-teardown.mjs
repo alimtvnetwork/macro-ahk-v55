@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
 import { readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { toRelativePosixPath } from './lib/path-utils.mjs';
 
 const ROOT = process.cwd();
 const SRC = join(ROOT, 'src');
@@ -49,7 +50,7 @@ for (const file of walk(SRC)) {
     const teardowns = (src.match(pair) || []).length;
     if (teardowns === 0) {
       findings.push({
-        file: relative(ROOT, file),
+        file: toRelativePosixPath(ROOT, file),
         installer: rx.source,
         installs,
         teardowns,

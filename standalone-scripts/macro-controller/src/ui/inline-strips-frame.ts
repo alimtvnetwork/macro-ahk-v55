@@ -38,9 +38,9 @@ const FRAME_CSS = [
   'gap:0',
   'margin:6px 0 4px',
   'padding:4px 6px 6px',
-  'border:1px solid rgba(255,255,255,0.10)',
+  'border:1px solid hsl(var(--border))',
   'border-radius:8px',
-  'background:rgba(255,255,255,0.02)',
+  'background:hsl(var(--strip-frame-bg))',
 ].join(';');
 
 const HEADER_CSS = [
@@ -63,7 +63,7 @@ const BODY_CSS = [
 const BTN_CSS = [
   'background:transparent',
   'color:inherit',
-  'border:1px solid rgba(255,255,255,0.15)',
+  'border:1px solid hsl(var(--border))',
   'border-radius:4px',
   'padding:1px 6px',
   'font-size:11px',
@@ -72,9 +72,9 @@ const BTN_CSS = [
 ].join(';');
 
 const RESTORE_BTN_CSS = [
-  'background:rgba(124,58,237,0.25)',
-  'color:#e9d5ff',
-  'border:1px solid rgba(124,58,237,0.6)',
+  'background:hsl(var(--primary) / 0.25)',
+  'color:hsl(var(--primary))',
+  'border:1px solid hsl(var(--primary) / 0.6)',
   'border-radius:4px',
   'padding:2px 8px',
   'font-size:11px',

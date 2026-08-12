@@ -92,11 +92,11 @@ export function downloadCsv(filename: string, csvText: string): void {
 /** Tone palette for credit numbers — colourful, dark-theme safe (Step 7). */
 export type CreditTone = CreditToneType;
 const TONE_COLOR: Record<CreditTone, string> = {
-  ok: '#86efac',      // green — remaining / healthy
+  ok: 'hsl(var(--success))',      // green — remaining / healthy
   warn: 'hsl(var(--warning))',    // amber — alerts
-  used: '#fb923c',    // orange — consumption
-  total: '#a78bfa',   // purple — totals / grants
-  accent: '#67e8f9',  // cyan — plan / meta
+  used: 'hsl(var(--warning))',    // orange — consumption
+  total: 'hsl(var(--primary))',   // purple — totals / grants
+  accent: 'hsl(var(--accent))',  // cyan — plan / meta
   muted: cPanelFgDim,
 };
 function toneColor(tone: CreditTone | undefined): string {
@@ -104,7 +104,7 @@ function toneColor(tone: CreditTone | undefined): string {
     return TONE_COLOR[tone];
   }
 
-  return '#e0e0e0';
+  return 'hsl(var(--foreground))';
 }
 
 /** Build a single summary card (heading + 3 stat rows). */
@@ -604,7 +604,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
     row.setAttribute('data-zebra', '1');
   }
 
-  row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.5fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
+  row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.5fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:hsl(var(--foreground));border-bottom:1px solid hsl(var(--primary) / 0.08);font-variant-numeric:tabular-nums;';
   row.title = 'Double-click to open workspace projects';
   row.ondblclick = function (): void {
     try {
@@ -621,7 +621,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   name.textContent = ws.fullName || ws.name || ws.id;
 
   const plan = document.createElement('span');
-  plan.style.cssText = 'color:#67e8f9;font-weight:600;font-size:10px;';
+  plan.style.cssText = 'color:hsl(var(--accent));font-weight:600;font-size:10px;';
   plan.textContent = formatPlanDisplayLabel(ws.plan) || '—';
 
   const projectsN = Number(ws.numProjects) || 0;
@@ -632,17 +632,17 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   const summary = resolveCreditSummary(ws);
   const usedN = summary.totalUsed;
   const used = document.createElement('span');
-  used.style.cssText = 'text-align:right;color:#fb923c;font-weight:700;font-size:11px;';
+  used.style.cssText = 'text-align:right;color:hsl(var(--warning));font-weight:700;font-size:11px;';
   used.textContent = formatCount(usedN);
 
   const remN = summary.available;
   const rem = document.createElement('span');
-  const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? 'hsl(var(--warning))' : '#86efac';
+  const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? 'hsl(var(--warning))' : 'hsl(var(--success))';
   rem.style.cssText = 'text-align:right;color:' + remColor + ';font-weight:700;font-size:11px;';
   rem.textContent = formatCount(remN);
 
   const total = document.createElement('span');
-  total.style.cssText = 'text-align:right;color:#a78bfa;font-weight:700;font-size:11px;';
+  total.style.cssText = 'text-align:right;color:hsl(var(--primary));font-weight:700;font-size:11px;';
   total.textContent = formatCount(summary.total);
 
   row.appendChild(name);

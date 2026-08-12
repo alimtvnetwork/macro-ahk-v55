@@ -232,7 +232,7 @@ export function showPasteToast(message: string, isError: boolean): void {
   const isMultiline = message.indexOf('\n') !== -1;
   const toast = document.createElement('div');
   toast.style.cssText = 'display:flex;align-items:stretch;border-radius:6px;overflow:hidden;' +
-    'background:hsl(var(--background));border:1px solid rgba(255,255,255,0.06);' +
+    'background:hsl(var(--background));border:1px solid hsl(var(--muted));' +
     'box-shadow:0 4px 16px rgba(0,0,0,0.4);' +
     'font-family:system-ui,-apple-system,sans-serif;pointer-events:auto;' +
     'transform:translateY(8px);opacity:0;transition:all .25s ease-out;' +
@@ -299,7 +299,7 @@ function _buildUndoToastShell(): { toast: HTMLDivElement; content: HTMLDivElemen
   const toast = document.createElement('div');
   toast.dataset.testid = 'undo-toast';
   toast.style.cssText = 'display:flex;align-items:stretch;border-radius:6px;overflow:hidden;' +
-    'background:hsl(var(--background));border:1px solid rgba(255,255,255,0.06);' +
+    'background:hsl(var(--background));border:1px solid hsl(var(--muted));' +
     'box-shadow:0 4px 16px rgba(0,0,0,0.4);' +
     'font-family:system-ui,-apple-system,sans-serif;pointer-events:auto;' +
     'transform:translateY(8px);opacity:0;transition:all .25s ease-out;max-width:420px;' +
@@ -333,7 +333,7 @@ function _buildIdChip(restoredId: number | string): HTMLSpanElement {
   chip.title = 'Restored row id';
   chip.style.cssText = 'flex-shrink:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;' +
     'font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(196,181,253,0.12);' +
-    'color:#c4b5fd;border:1px solid rgba(196,181,253,0.25);';
+    'color:hsl(var(--primary));border:1px solid rgba(196,181,253,0.25);';
 
   return chip;
 }
@@ -354,7 +354,7 @@ function _buildCountdown(durationMs: number): {
 
   const bar = document.createElement('div');
   bar.dataset.testid = 'undo-toast-countdown-bar';
-  bar.style.cssText = 'height:100%;width:100%;background:#c4b5fd;border-radius:2px;' +
+  bar.style.cssText = 'height:100%;width:100%;background:hsl(var(--primary));border-radius:2px;' +
     'transition:width ' + String(durationMs) + 'ms linear;';
   track.appendChild(bar);
 
@@ -399,7 +399,7 @@ function _buildUndoButton(label: string): HTMLButtonElement {
   undoBtn.dataset.testid = 'undo-toast-action';
   undoBtn.textContent = label;
   undoBtn.style.cssText = 'padding:4px 10px;background:transparent;border:1px solid rgba(196,181,253,0.5);' +
-    'border-radius:4px;color:#c4b5fd;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;';
+    'border-radius:4px;color:hsl(var(--primary));font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;';
 
   return undoBtn;
 }
@@ -629,7 +629,7 @@ export async function resolveDynamicVariables(text: string): Promise<string | nu
 
 function _createVariableModalHeader(): HTMLDivElement {
   const header = document.createElement('div');
-  header.style.cssText = 'font-size:14px;font-weight:700;color:#3daee9;margin-bottom:8px;';
+  header.style.cssText = 'font-size:14px;font-weight:700;color:hsl(var(--foreground));margin-bottom:8px;';
   header.textContent = 'Variables Required';
 
   return header;
@@ -647,9 +647,9 @@ function _createVariableInputRow(v: string, inputs: Record<string, HTMLInputElem
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = `Enter value for ${v}...`;
-  input.style.cssText = 'background:#252536;border:1px solid #313147;border-radius:6px;padding:8px 10px;color:hsl(var(--foreground));font-size:12px;outline:none;';
-  input.onfocus = () => input.style.borderColor = '#007acc';
-  input.onblur = () => input.style.borderColor = '#313147';
+  input.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:6px;padding:8px 10px;color:hsl(var(--foreground));font-size:12px;outline:none;';
+  input.onfocus = () => input.style.borderColor = 'hsl(var(--accent))';
+  input.onblur = () => input.style.borderColor = 'hsl(var(--border))';
   
   row.appendChild(input);
   modal.appendChild(row);
@@ -665,7 +665,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);font-family:system-ui,-apple-system,sans-serif;';
     
     const modal = document.createElement('div');
-    modal.style.cssText = 'background:hsl(var(--background));border:1px solid #313147;border-radius:12px;width:400px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;';
+    modal.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:12px;width:400px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;';
     
     modal.appendChild(_createVariableModalHeader());
 
@@ -677,7 +677,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid #313147;color:hsl(var(--muted-foreground));border-radius:6px;cursor:pointer;';
+    cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));border-radius:6px;cursor:pointer;';
     cancelBtn.onclick = () => {
       overlay.remove();
       resolve(null);
@@ -685,7 +685,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Inject Prompt';
-    submitBtn.style.cssText = 'padding:6px 16px;font-size:12px;background:#007acc;color:hsl(var(--foreground));border:none;border-radius:6px;cursor:pointer;font-weight:600;';
+    submitBtn.style.cssText = 'padding:6px 16px;font-size:12px;background:hsl(var(--background));color:hsl(var(--foreground));border:none;border-radius:6px;cursor:pointer;font-weight:600;';
     submitBtn.onclick = () => {
       const results: Record<string, string> = {};
       vars.forEach(v => results[v] = inputs[v].value.trim());
@@ -839,7 +839,7 @@ export async function visualSyncConfirm(): Promise<void> {
   const dot = document.querySelector('#marco-queue-status span[style*="color"]');
   if (dot) {
     const origColor = (dot as HTMLElement).style.color;
-    (dot as HTMLElement).style.color = '#3daee9'; // light blue sync color
+    (dot as HTMLElement).style.color = 'hsl(var(--accent))'; // light blue sync color
     (dot as HTMLElement).style.transform = 'scale(1.4)';
     (dot as HTMLElement).style.transition = 'all 0.3s ease';
     

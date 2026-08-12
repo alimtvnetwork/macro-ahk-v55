@@ -1,7 +1,19 @@
 {
-  "generatedAt": "2026-08-06T17:55:34.761Z",
-  "totalFindings": 33,
+  "generatedAt": "2026-08-12T09:46:57.344Z",
+  "totalFindings": 36,
   "findings": [
+    {
+      "file": "src/background/handlers/recorder-capture-handler.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/background/recorder/chrome-tabs-adapter.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
     {
       "file": "src/background/spa-reinject.ts",
       "installer": "\\bsetTimeout\\s*\\(",
@@ -30,6 +42,12 @@
       "file": "src/components/options/project-database/ErrorModal.tsx",
       "installer": "\\bsetTimeout\\s*\\(",
       "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/project-storage.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 2,
       "teardowns": 0
     },
     {

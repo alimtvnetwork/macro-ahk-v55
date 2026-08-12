@@ -121,7 +121,7 @@ function buildPromptActionRow(item: GearMenuItem, role: PromptRole): HTMLButtonE
   label.style.cssText = 'min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
   row.append(icon, label);
   row.onmouseover = () => {
-    row.style.background = 'rgba(124,58,237,0.25)'; 
+    row.style.background = 'hsl(var(--primary) / 0.25)'; 
   };
 
   row.onmouseout = () => {

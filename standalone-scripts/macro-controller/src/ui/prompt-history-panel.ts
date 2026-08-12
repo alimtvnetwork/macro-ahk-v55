@@ -208,7 +208,7 @@ function renderLastImportError(): void {
   message.setAttribute('data-role', 'last-import-error-message');
   message.textContent = err.key + ': ' + err.detail;
   message.title = err.key + ': ' + err.detail;
-  message.style.cssText = 'color:#fca5a5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+  message.style.cssText = 'color:hsl(var(--foreground));flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
   const when = doc.createElement('span');
   when.setAttribute('data-role', 'last-import-error-when');
   when.textContent = formatWhen(err.at);
@@ -218,7 +218,7 @@ function renderLastImportError(): void {
   clear.setAttribute(ATTR_DATA_ACTION, 'clear-last-import-error');
   clear.setAttribute(ATTR_ARIA_LABEL, 'Dismiss last import error');
   clear.setAttribute('type', 'button');
-  clear.style.cssText = 'background:transparent;border:1px solid #7f1d1d;color:#fca5a5;font-size:10px;padding:0 6px;border-radius:3px;cursor:pointer;flex-shrink:0;';
+  clear.style.cssText = 'background:transparent;border:1px solid hsl(var(--destructive));color:hsl(var(--foreground));font-size:10px;padding:0 6px;border-radius:3px;cursor:pointer;flex-shrink:0;';
   clear.onclick = () => {
     _lastImportError = null;
     renderLastImportError(); 
@@ -357,7 +357,7 @@ function buildHeaderActions(
   exportBtn.textContent = '↓ Export JSON';
   exportBtn.setAttribute(ATTR_DATA_ACTION, 'export-history');
   exportBtn.setAttribute(ATTR_ARIA_LABEL, 'Export revision history as JSON');
-  exportBtn.style.cssText = 'background:#1f2937;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
+  exportBtn.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
   exportBtn.onclick = () => downloadRevisionExport(doc, slug, role, revisions);
   actionsGroup.appendChild(exportBtn);
 
@@ -370,7 +370,7 @@ function buildHeaderActions(
   importBtn.textContent = '↑ Import JSON';
   importBtn.setAttribute(ATTR_DATA_ACTION, 'import-history');
   importBtn.setAttribute(ATTR_ARIA_LABEL, 'Import revision history from JSON');
-  importBtn.style.cssText = 'background:#1f2937;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
+  importBtn.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
   importBtn.onclick = () => importInput.click();
   importInput.onchange = () => handleImportFile(importInput, slug, role, deps);
   actionsGroup.appendChild(importBtn);
@@ -397,7 +397,7 @@ function buildPanelHeader(
   header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;';
   const title = doc.createElement('div');
   title.textContent = '↺ History  ' + slug;
-  title.style.cssText = 'font-size:14px;font-weight:700;color:#a78bfa;';
+  title.style.cssText = 'font-size:14px;font-weight:700;color:hsl(var(--primary));';
   header.appendChild(title);
   header.appendChild(buildHeaderActions(doc, slug, role, revisions, deps));
 
@@ -408,7 +408,7 @@ function buildLastErrorArea(doc: Document): HTMLElement {
   const lastErr = doc.createElement('div');
   lastErr.setAttribute('data-role', 'last-import-error');
   lastErr.setAttribute('aria-live', 'polite');
-  lastErr.style.cssText = 'display:none;align-items:center;gap:8px;font-size:11px;background:#1a0e0e;border:1px solid #7f1d1d;border-radius:4px;padding:4px 8px;';
+  lastErr.style.cssText = 'display:none;align-items:center;gap:8px;font-size:11px;background:hsl(var(--background));border:1px solid hsl(var(--destructive));border-radius:4px;padding:4px 8px;';
 
   return lastErr;
 }
@@ -421,7 +421,7 @@ function _buildPanelContainer(doc: Document, slug: string): { overlay: HTMLEleme
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2147483000;display:flex;align-items:center;justify-content:center;color-scheme:dark;';
 
   const card = doc.createElement('div');
-  card.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;width:min(720px,92vw);max-height:82vh;display:flex;flex-direction:column;gap:10px;font-family:system-ui,sans-serif;color:hsl(var(--foreground));';
+  card.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:8px;padding:16px;width:min(720px,92vw);max-height:82vh;display:flex;flex-direction:column;gap:10px;font-family:system-ui,sans-serif;color:hsl(var(--foreground));';
   overlay.appendChild(card);
 
   return { overlay, card };
@@ -459,7 +459,7 @@ function buildPanel(
   toolbar.setAttribute('data-role', 'history-toolbar');
   toolbar.setAttribute('role', 'toolbar');
   toolbar.setAttribute(ATTR_ARIA_LABEL, 'History sort and filter controls');
-  toolbar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11px;color:#cbd5e1;';
+  toolbar.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11px;color:hsl(var(--foreground));';
   card.appendChild(toolbar);
 
   const list = doc.createElement('div');
@@ -695,7 +695,7 @@ function renderToolbar(
   const sep = doc.createElement('span');
   sep.textContent = '│';
   sep.setAttribute('aria-hidden', 'true');
-  sep.style.cssText = 'color:#334155;margin:0 4px;';
+  sep.style.cssText = 'color:hsl(var(--foreground));margin:0 4px;';
   toolbar.appendChild(sep);
 
   const filterLabel = doc.createElement('span');
@@ -801,8 +801,8 @@ function buildSortButton(
 
   const base = 'font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;font-weight:600;';
   btn.style.cssText = active
-    ? base + 'background:#312e81;border:1px solid #6366f1;color:#e0e7ff;'
-    : base + 'background:#1f2937;border:1px solid #334155;color:#cbd5e1;';
+    ? base + 'background:hsl(var(--background));border:1px solid hsl(var(--border));color:hsl(var(--foreground));'
+    : base + 'background:hsl(var(--background));border:1px solid hsl(var(--border));color:hsl(var(--foreground));';
   btn.onclick = () => {
     if (state.sortKey === key) {
       state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
@@ -824,8 +824,8 @@ function buildChip(doc: Document, label: string, active: boolean, dataRole: stri
   chip.setAttribute('data-role', dataRole);
   const base = 'font-size:10px;padding:2px 8px;border-radius:10px;cursor:pointer;font-weight:600;letter-spacing:0.02em;';
   chip.style.cssText = active
-    ? base + 'background:#1e293b;border:1px solid #facc15;color:#facc15;'
-    : base + 'background:#111827;border:1px solid #334155;color:hsl(var(--muted-foreground));';
+    ? base + 'background:hsl(var(--background));border:1px solid hsl(var(--warning));color:hsl(var(--warning));'
+    : base + 'background:hsl(var(--background))827;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));';
 
   return chip;
 }
@@ -839,7 +839,7 @@ function buildRevisionRow(
   const row = doc.createElement('div');
   row.setAttribute('data-role', 'revision-row');
   row.setAttribute('data-revision-id', String(rev.Id));
-  row.style.cssText = 'border:1px solid #334155;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;background:#111827;';
+  row.style.cssText = 'border:1px solid hsl(var(--border));border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;background:hsl(var(--background))827;';
 
   const meta = doc.createElement('div');
   meta.style.cssText = 'display:flex;align-items:center;gap:10px;font-size:11px;color:hsl(var(--muted-foreground));';
@@ -847,7 +847,7 @@ function buildRevisionRow(
   when.textContent = formatWhen(rev.CreatedAt);
   const reason = doc.createElement('span');
   reason.textContent = 'reason: ' + rev.Reason;
-  reason.style.cssText = 'color:#a78bfa;';
+  reason.style.cssText = 'color:hsl(var(--primary));';
   const name = doc.createElement('span');
   name.textContent = rev.Name;
   name.style.cssText = 'color:hsl(var(--foreground));font-weight:600;';
@@ -859,7 +859,7 @@ function buildRevisionRow(
     imported.textContent = 'imported';
     imported.setAttribute('data-role', 'imported-badge');
     imported.setAttribute('title', 'Restored from an off-device history archive (PromptId=0 sentinel).');
-    imported.style.cssText = 'background:#1e293b;border:1px solid hsl(var(--muted-foreground));color:#facc15;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;letter-spacing:0.02em;';
+    imported.style.cssText = 'background:hsl(var(--background));border:1px solid hsl(var(--muted-foreground));color:hsl(var(--warning));font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;letter-spacing:0.02em;';
     meta.appendChild(imported);
   }
 
@@ -867,7 +867,7 @@ function buildRevisionRow(
 
   const preview = doc.createElement('pre');
   preview.textContent = truncateBody(rev.Body);
-  preview.style.cssText = 'margin:0;font-size:11px;color:#cbd5e1;background:#0b1220;border:1px solid #1f2937;border-radius:4px;padding:6px;max-height:120px;overflow:auto;white-space:pre-wrap;font-family:ui-monospace,monospace;';
+  preview.style.cssText = 'margin:0;font-size:11px;color:hsl(var(--foreground));background:hsl(var(--background));border:1px solid hsl(var(--background));border-radius:4px;padding:6px;max-height:120px;overflow:auto;white-space:pre-wrap;font-family:ui-monospace,monospace;';
   row.appendChild(preview);
 
   const actions = doc.createElement('div');

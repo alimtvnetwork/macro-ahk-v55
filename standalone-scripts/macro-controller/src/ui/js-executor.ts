@@ -59,7 +59,7 @@ export function renderLoopJsHistory(): void {
   for (const [histIndex, e] of loopJsHistory.entries()) {
     const statusColor = e.success ? 'hsl(var(--success))' : 'hsl(var(--destructive))';
     const statusIcon = e.success ? '✓' : '✗';
-    html += '<div class="loop-js-hist-item" data-hist-idx="' + histIndex + '" style="display:flex;gap:4px;align-items:flex-start;padding:3px 4px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;font-family:monospace;"'
+    html += '<div class="loop-js-hist-item" data-hist-idx="' + histIndex + '" style="display:flex;gap:4px;align-items:flex-start;padding:3px 4px;cursor:pointer;border-bottom:1px solid hsl(var(--border));font-size:10px;font-family:monospace;"'
       + ' onmouseover="(this as HTMLElement).style.background=\'rgba(139,92,246,0.15)\'"'
       + ' onmouseout="(this as HTMLElement).style.background=\'transparent\'">'
       + CssFragmentType.SpanStyleColor + statusColor + ';font-size:10px;">' + statusIcon + '</span>'

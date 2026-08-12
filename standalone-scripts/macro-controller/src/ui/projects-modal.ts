@@ -202,7 +202,7 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
     body.innerHTML = ''
             + '<div style="text-align:center;padding:20px 12px;color:' + cPanelFgDim + ';font-size:11px;">'
             +   '<div style="font-size:24px;margin-bottom:6px;opacity:0.6;">📭</div>'
-            +   '<div style="color:#cbd5e1;margin-bottom:4px;">No workspaces loaded yet.</div>'
+            +   '<div style="color:hsl(var(--foreground));margin-bottom:4px;">No workspaces loaded yet.</div>'
             +   '<div style="font-size:10px;">Open the workspace list first, then reopen this modal.</div>'
             + '</div>';
 
@@ -510,10 +510,10 @@ function buildZeroResultsPanel(
   return '<div style="text-align:center;padding:24px 12px;color:' + cPanelFgDim + ';font-size:11px;'
         + 'border:1px dashed rgba(124,58,237,0.35);border-radius:6px;margin-top:4px;">'
         + '<div style="font-size:22px;margin-bottom:6px;opacity:0.6;">🔍</div>'
-        + '<div style="color:#cbd5e1;margin-bottom:6px;">No projects match your filters.</div>'
+        + '<div style="color:hsl(var(--foreground));margin-bottom:6px;">No projects match your filters.</div>'
         + '<div style="font-size:10px;margin-bottom:10px;">Active: ' + activeChips.join(' · ') + '</div>'
         + '<button data-clear-filters="1" type="button" '
-        +   'style="background:rgba(124,58,237,0.25);border:1px solid ' + cPrimary + ';color:#e9d5ff;'
+        +   'style="background:hsl(var(--primary) / 0.25);border:1px solid ' + cPrimary + ';color:hsl(var(--primary));'
         +   'padding:4px 12px;border-radius:4px;cursor:pointer;font-size:10px;font-family:monospace;">'
         +   'Clear all filters</button>'
         + '</div>';
@@ -645,7 +645,7 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
   const headerSuffix = b.loading
     ? '<span style="color:hsl(var(--muted-foreground));font-weight:400;"> (loading…)</span>'
     : b.error
-      ? '<span style="color:#fca5a5;font-weight:400;" title="' + escapeHtml(b.error) + '"> (error)</span>'
+      ? '<span style="color:hsl(var(--foreground));font-weight:400;" title="' + escapeHtml(b.error) + '"> (error)</span>'
       : '<span style="color:hsl(var(--muted-foreground));font-weight:400;"> (' + (b.projects?.length ?? 0) + ')</span>'
               + (openCount > 0 ? ' <span style="color:hsl(var(--warning));font-weight:400;">· ' + openCount + ' open</span>' : '');
 
@@ -653,10 +653,10 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
   if (b.loading) {
     body = '<div style="color:hsl(var(--muted-foreground));font-size:10px;padding:3px 4px;font-style:italic;">Fetching projects…</div>';
   } else if (b.error) {
-    body = '<div style="color:#fca5a5;font-size:10px;padding:4px 6px;background:rgba(239,68,68,0.08);'
+    body = '<div style="color:hsl(var(--foreground));font-size:10px;padding:4px 6px;background:rgba(239,68,68,0.08);'
             + 'border-left:2px solid hsl(var(--destructive));border-radius:2px;">'
             + '<div style="margin-bottom:2px;">⚠ Failed to load projects.</div>'
-            + '<div style="color:#cbd5e1;opacity:0.8;font-family:monospace;word-break:break-word;">'
+            + '<div style="color:hsl(var(--foreground));opacity:0.8;font-family:monospace;word-break:break-word;">'
             + escapeHtml(b.error) + '</div>'
             + '<div style="color:hsl(var(--muted-foreground));margin-top:3px;font-style:italic;">Click ↻ Refresh to retry.</div>'
             + '</div>';
@@ -703,15 +703,15 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
   const url = tab?.url ?? ('https://lovable.dev/projects/' + p.id);
   const dot = isOpenFlag
     ? '<span style="color:hsl(var(--success));margin-right:4px;" title="Open in Chrome">●</span>'
-    : '<span style="margin-right:4px;color:#334155;">○</span>';
-  const nameColor = isOpenFlag ? '#67e8f9' : '#cbd5e1';
+    : '<span style="margin-right:4px;color:hsl(var(--foreground));">○</span>';
+  const nameColor = isOpenFlag ? 'hsl(var(--accent))' : 'hsl(var(--foreground))';
   const fontWeight = isOpenFlag ? '700' : '400';
   const bg = isOpenFlag ? 'background:rgba(16,185,129,0.08);' : '';
   const idLabel = '<span style="color:hsl(var(--muted-foreground));font-size:9px;">' + escapeHtml(p.id) + '</span>';
   const repoBadge = p.githubRepo
     ? ('<span title="' + escapeHtml(p.githubRepo + (p.githubBranch ? '@' + p.githubBranch : ''))
             + '" style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:8px;'
-            + 'background:rgba(124,58,237,0.18);color:#c4b5fd;font-size:9px;max-width:140px;overflow:hidden;'
+            + 'background:rgba(124,58,237,0.18);color:hsl(var(--primary));font-size:9px;max-width:140px;overflow:hidden;'
             + 'text-overflow:ellipsis;white-space:nowrap;">⎇ ' + escapeHtml(shortRepo(p.githubRepo))
             + (p.githubBranch ? ':' + escapeHtml(p.githubBranch) : '') + '</span>')
     : '';
@@ -719,7 +719,7 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
         + 'title="Open in new tab" '
         + 'style="color:' + (isOpenFlag ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))') + ';font-size:12px;padding:0 4px;cursor:pointer;'
         + 'border-radius:3px;" '
-        + 'onmouseover="this.style.background=\'rgba(124,58,237,0.25)\';this.style.color=\'#a78bfa\'" '
+        + 'onmouseover="this.style.background=\'hsl(var(--primary) / 0.25)\';this.style.color=\'hsl(var(--primary))\'" '
         + 'onmouseout="this.style.background=\'transparent\';this.style.color=\''
         + (isOpenFlag ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))') + '\'">↗</span>';
 
@@ -1035,7 +1035,7 @@ function paintWorkspaceFilterChip(button: HTMLButtonElement, ws: WorkspaceCredit
   button.textContent = (isVisible ? '● ' : '○ ') + (ws.fullName || ws.name || ws.id);
   button.style.cssText = 'border-radius:10px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
         + (isVisible
-          ? 'background:rgba(16,185,129,0.14);color:#86efac;border:1px solid rgba(16,185,129,0.45);'
+          ? 'background:rgba(16,185,129,0.14);color:hsl(var(--success));border:1px solid rgba(16,185,129,0.45);'
           : 'background:rgba(15,23,42,0.45);color:hsl(var(--muted-foreground));border:1px solid rgba(100,116,139,0.35);');
 }
 
@@ -1048,7 +1048,7 @@ function createFooter(
 
   const legend = document.createElement('span');
   legend.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));flex:1;min-width:120px;';
-  legend.innerHTML = '<span style="color:hsl(var(--success));">●</span> open in Chrome &nbsp; <span style="color:#334155;">○</span> closed';
+  legend.innerHTML = '<span style="color:hsl(var(--success));">●</span> open in Chrome &nbsp; <span style="color:hsl(var(--foreground));">○</span> closed';
 
   const status = document.createElement('span');
   status.id = 'marco-projects-export-status';
@@ -1063,7 +1063,7 @@ function createFooter(
   exportBtn.id = 'marco-projects-export-btn';
   exportBtn.textContent = '⬇ Export CSV';
   exportBtn.title = 'Export all loaded projects to CSV with workspace, credits, GitHub repo + branch, version, and last activity';
-  exportBtn.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
+  exportBtn.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:3px;font-size:10px;cursor:pointer;';
   exportBtn.onclick = function (): void {
     onExport(status); 
   };
@@ -1071,7 +1071,7 @@ function createFooter(
   const refresh = document.createElement('button');
   refresh.type = 'button';
   refresh.textContent = '⟳ Refresh';
-  refresh.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
+  refresh.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:3px;font-size:10px;cursor:pointer;';
   refresh.onclick = function (): void {
     onRefresh(); 
   };
@@ -1230,7 +1230,7 @@ function exportCsv(statusEl: HTMLElement): void {
   const blocks = state.blocks;
   const tabIndex = state.tabIndex;
   if (blocks.length === 0 || !tabIndex) {
-    statusEl.style.color = '#fca5a5';
+    statusEl.style.color = 'hsl(var(--destructive))';
     statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
 
     return;
@@ -1240,7 +1240,7 @@ function exportCsv(statusEl: HTMLElement): void {
   const { rows, fallbackCount, normalizedLastCommunicationCount, filename } =
         _buildExportRows(blocks, tabIndex, exportedAt);
   if (rows.length === 0) {
-    statusEl.style.color = '#fca5a5';
+    statusEl.style.color = 'hsl(var(--destructive))';
     statusEl.textContent = '⚠ No projects to export.';
 
     return;

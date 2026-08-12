@@ -106,7 +106,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
       body,
       moreWrap,
       (n) => makeChip(n),
-      'rgba(124,58,237,0.6)',
+      'hsl(var(--primary) / 0.6)',
     );
     recompute();
     const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]')!;
@@ -126,7 +126,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
       body,
       moreWrap,
       (n, hi) => makeChip(n, hi),
-      'rgba(124,58,237,0.6)',
+      'hsl(var(--primary) / 0.6)',
     );
     recompute();
 
@@ -157,7 +157,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
       body,
       moreWrap,
       (n) => makeChip(n),
-      'rgba(124,58,237,0.6)',
+      'hsl(var(--primary) / 0.6)',
     );
     recompute();
     const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]')!;
@@ -180,7 +180,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
       body,
       moreWrap,
       (n) => makeChip(n),
-      'rgba(124,58,237,0.6)',
+      'hsl(var(--primary) / 0.6)',
     );
     recompute();
 
@@ -212,7 +212,7 @@ describe('installChipOverflow (ResizeObserver-based chip hiding)', () => {
       body,
       moreWrap,
       (n) => makeChip(n),
-      'rgba(124,58,237,0.6)',
+      'hsl(var(--primary) / 0.6)',
     );
     recompute();
 

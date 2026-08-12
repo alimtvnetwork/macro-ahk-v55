@@ -400,7 +400,7 @@ export function createResizeHandle(ctx: PanelLayoutCtx, type: string): HTMLEleme
     handle.style.cssText = 'position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;z-index:99999;display:flex;align-items:center;justify-content:center;';
     const grip = document.createElement('div');
     grip.style.cssText = 'width:10px;height:10px;opacity:0.4;transition:opacity .2s;';
-    grip.innerHTML = '<svg viewBox="0 0 10 10" width="10" height="10"><circle cx="7" cy="3" r="1" fill="#ae7ce8"/><circle cx="3" cy="7" r="1" fill="#ae7ce8"/><circle cx="7" cy="7" r="1" fill="#ae7ce8"/></svg>';
+    grip.innerHTML = '<svg viewBox="0 0 10 10" width="10" height="10"><circle cx="7" cy="3" r="1" fill="hsl(var(--primary))"/><circle cx="3" cy="7" r="1" fill="hsl(var(--primary))"/><circle cx="7" cy="7" r="1" fill="hsl(var(--primary))"/></svg>';
     handle.appendChild(grip);
     handle.onmouseenter = function() {
       grip.style.opacity = '0.9'; 

@@ -32,6 +32,7 @@ import { substituteToken } from '../utils/token-substitute';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { buildChipGearActionSection } from './chip-gear-menu';
 import { subscribePromptsChanged } from './prompts-changed-event';
+import { buildMorePopover } from './plan-more-popover';
 
 /** Hard guard: PlanTierType/Next strips MUST NOT auto-trigger Repeat or each other. */
 export const INLINE_AUTOCHAIN_DISABLED = true;
@@ -560,7 +561,7 @@ function createMenuKeydownHandler(panel: HTMLElement, trigger: HTMLElement, onCl
  * mode. Kept lightweight so the same helper works for the chip menu
  * (grid of numbers) and the trailing-action menu (column of buttons).
  */
-function enhancePopoverA11y(
+export function enhancePopoverA11y(
   panel: HTMLElement,
   trigger: HTMLElement,
   onClose: () => void,
@@ -587,7 +588,7 @@ function enhancePopoverA11y(
   };
 }
 
-interface PopoverA11y {
+export interface PopoverA11y {
   syncItems: () => void;
   focusFirst: () => void;
   announceOpen: () => void;
@@ -611,7 +612,7 @@ interface OriginalActionPosition {
   next: Node | null;
 }
 
-function isPopoverOpen(panel: HTMLElement): boolean {
+export function isPopoverOpen(panel: HTMLElement): boolean {
   return panel.style.display === STYLE_DISPLAY_FLEX;
 }
 
@@ -624,7 +625,7 @@ function createOverflowButton(panelId: string, title: string, label: string, acc
   button.setAttribute(ATTR_ARIA_HASPOPUP, MENU_ROLE);
   button.setAttribute(ATTR_ARIA_EXPANDED, 'false');
   button.setAttribute(ATTR_ARIA_CONTROLS, panelId);
-  button.style.cssText = 'padding:3px 10px;background:rgba(255,255,255,0.06);border:1px solid ' + accent + ';border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:13px;font-weight:700;line-height:1.2;' + CSS_CHIP_TRANSITION;
+  button.style.cssText = 'padding:3px 10px;background:hsl(var(--muted));border:1px solid ' + accent + ';border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:13px;font-weight:700;line-height:1.2;' + CSS_CHIP_TRANSITION;
 
   return button;
 }
@@ -659,7 +660,7 @@ function buildOverflowShell(config: {
   return { wrap, button, panel };
 }
 
-function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): void {
+export function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): void {
   const rect = button.getBoundingClientRect();
   // Escape the strip body's `overflow:hidden` by promoting the panel to
   // fixed positioning anchored to the button rect. Left-align the panel to
@@ -705,7 +706,7 @@ function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): void {
   panel.style.overflowY = 'auto';
 }
 
-function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a11y: PopoverA11y, open: boolean): void {
+export function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a11y: PopoverA11y, open: boolean): void {
   const wasOpen = isPopoverOpen(panel);
   if (open) {
     positionPopoverFixed(panel, button);
@@ -722,7 +723,7 @@ function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a11y: Pop
   }
 }
 
-function wirePopoverButton(button: HTMLButtonElement, panel: HTMLElement, setOpen: (open: boolean) => void): void {
+export function wirePopoverButton(button: HTMLButtonElement, panel: HTMLElement, setOpen: (open: boolean) => void): void {
   button.onclick = (event) => {
     event.stopPropagation();
     setOpen(!isPopoverOpen(panel));
@@ -745,7 +746,7 @@ function handlePopoverButtonKeydown(event: KeyboardEvent, panel: HTMLElement, se
   }
 }
 
-function createOutsidePopoverCloser(container: HTMLElement, panel: HTMLElement, button: HTMLElement, setOpen: (open: boolean) => void): (event: Event) => void {
+export function createOutsidePopoverCloser(container: HTMLElement, panel: HTMLElement, button: HTMLElement, setOpen: (open: boolean) => void): (event: Event) => void {
   return (event: Event): void => {
     if (!isPopoverOpen(panel)) {
       return;
@@ -967,51 +968,7 @@ export function installActionOverflow(
   return recompute;
 }
 
-function populatePlanDropup(panel: HTMLElement, values: readonly number[]): void {
-  while (panel.firstChild) {
-    panel.removeChild(panel.firstChild);
-  }
-
-  // v4.399: numbers on TOP so they're always visible when the popover flips
-  // upward against the viewport bottom. Prompt-management actions render
-  // below the grid.
-  const chipGrid = document.createElement('div');
-  chipGrid.style.cssText = 'display:grid;grid-template-columns:repeat(6,auto);gap:4px;margin-bottom:6px;';
-  for (const n of values) {
-    const b = makePlanPresetButton(n, PLAN_PRESETS_HIGHLIGHT.has(n));
-    b.addEventListener('click', function () {
-      panel.style.display = 'none'; 
-    });
-    chipGrid.appendChild(b);
-  }
-
-  panel.appendChild(chipGrid);
-  panel.appendChild(buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: 'rgba(245,158,11,0.85)' }));
-}
-
-interface PlanDropupHandle {
-  panel: HTMLElement;
-  setOpen: (open: boolean) => void;
-  a11y: PopoverA11y;
-}
-
-function createPlanDropupPanel(): HTMLElement {
-  const panel = document.createElement('div');
-  panel.id = 'marco-plan-dropup-' + Math.random().toString(36).slice(2, 9);
-  panel.setAttribute(ATTR_ROLE, MENU_ROLE);
-  panel.setAttribute(ATTR_ARIA_LABEL, 'PlanTierType menu');
-  panel.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:4px;padding:7px;background:hsl(var(--background));border:1px solid rgba(245,158,11,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
-  panel.dataset['role'] = 'plan-dropup';
-
-  return panel;
-}
-
-function wirePlanTriggerAria(trigger: HTMLButtonElement, panelId: string): void {
-  trigger.setAttribute(ATTR_ARIA_HASPOPUP, MENU_ROLE);
-  trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false');
-  trigger.setAttribute(ATTR_ARIA_CONTROLS, panelId);
-}
-
+// Using plan-more-popover.ts
 function schedulePlanDropupDbRefresh(rePopulate: (values: readonly number[]) => void): void {
   void (async () => {
     try {
@@ -1022,28 +979,6 @@ function schedulePlanDropupDbRefresh(rePopulate: (values: readonly number[]) => 
       logError('NextInline', 'plan dropup DB refresh failed', err);
     }
   })();
-}
-
-function buildPlanDropup(anchor: HTMLElement, trigger: HTMLButtonElement): PlanDropupHandle {
-  const panel = createPlanDropupPanel();
-  const a11y = enhancePopoverA11y(panel, trigger, () => setOpen(false), 'PlanTierType menu');
-  const rePopulate = (values: readonly number[]): void => {
-    populatePlanDropup(panel, values);
-    if (isPopoverOpen(panel)) {
-      positionPopoverFixed(panel, trigger);
-    }
-
-    a11y.syncItems();
-  };
-
-  rePopulate(PLAN_PRESETS);
-  const setOpen = (open: boolean): void => setPopoverVisibility(panel, trigger, a11y, open);
-  wirePlanTriggerAria(trigger, panel.id);
-  schedulePlanDropupDbRefresh(rePopulate);
-  anchor.appendChild(panel);
-  registerPointerPopoverCloser(createOutsidePopoverCloser(anchor, panel, trigger, setOpen));
-
-  return { panel, setOpen, a11y };
 }
 
 function buildSplitStrip(): HTMLElement {
@@ -1084,8 +1019,26 @@ function buildSplitStrip(): HTMLElement {
   moreBtn.dataset['role'] = 'plan-more-btn';
   moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--background));background:linear-gradient(135deg,hsl(var(--warning)) 0%,hsl(var(--warning)) 60%,hsl(var(--warning)) 100%);box-shadow:0 1px 4px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
   moreWrap.appendChild(moreBtn);
-  const { panel, setOpen } = buildPlanDropup(moreWrap, moreBtn);
-  wirePopoverButton(moreBtn, panel, setOpen);
+  const { panel, setOpen } = buildMorePopover({
+    role: 'plan',
+    roleLabel: 'PlanTierType',
+    accent: 'rgba(245,158,11,0.6)',
+    anchor: moreWrap,
+    trigger: moreBtn,
+    initialValues: PLAN_PRESETS,
+    buildChip: (n) => makePlanPresetButton(n, PLAN_PRESETS_HIGHLIGHT.has(n)),
+    appendExtra: (p) => p.appendChild(buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: 'rgba(245,158,11,0.85)' })),
+    scheduleDbRefresh: schedulePlanDropupDbRefresh,
+  }, {
+    enhancePopoverA11y,
+    isPopoverOpen,
+    positionPopoverFixed,
+    setPopoverVisibility,
+    wirePopoverButton,
+    createOutsidePopoverCloser,
+    registerPointerPopoverCloser
+  });
+  // wirePopoverButton is already done inside buildMorePopover for the main trigger
   body.appendChild(moreWrap);
 
   root.appendChild(body);
@@ -1141,7 +1094,7 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
  */
 function buildNextMorePopover(anchor: HTMLElement): HTMLElement {
   const panel = document.createElement('div');
-  panel.style.cssText = 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:7px;background:hsl(var(--background));border:1px solid rgba(124,58,237,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
+  panel.style.cssText = 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:7px;background:hsl(var(--background));border:1px solid hsl(var(--primary) / 0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
   panel.dataset['role'] = 'next-dropup';
   panel.appendChild(buildChipGearActionSection({ role: 'next', roleLabel: 'Next', accent: 'rgba(124,58,237,0.85)' }));
   anchor.appendChild(panel);
@@ -1232,8 +1185,8 @@ function buildNextStrip(deps: TaskNextDeps): HTMLElement {
   const moreWrap = buildNextMoreWrap();
   body.appendChild(moreWrap);
   root.appendChild(body);
-  const recomputeOverflow = installChipOverflow(body, moreWrap, (n, hi) => makeNextPresetButton(deps, n, hi), 'rgba(124,58,237,0.6)');
-  installActionOverflow(body, 'rgba(124,58,237,0.6)');
+  const recomputeOverflow = installChipOverflow(body, moreWrap, (n, hi) => makeNextPresetButton(deps, n, hi), 'hsl(var(--primary) / 0.6)');
+  installActionOverflow(body, 'hsl(var(--primary) / 0.6)');
   void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
   subscribeInlineStripGroupCollapse(function () {
     applyInlineStripGroupCollapse(); 
@@ -1321,10 +1274,12 @@ const _dropupClosers: Array<(ev: MouseEvent) => void> = [];
 const _pointerPopoverClosers: Array<(ev: Event) => void> = [];
 
 /** Register outside-pointer closers for a ⋯ popover on both mousedown and touchstart. */
-function registerPointerPopoverCloser(handler: (ev: Event) => void): void {
-  document.addEventListener('mousedown', handler, true);
-  document.addEventListener('touchstart', handler, true);
-  _pointerPopoverClosers.push(handler);
+export function registerPointerPopoverCloser(handler: (ev: Event) => void): void {
+  if (typeof document !== 'undefined') {
+    document.addEventListener('mousedown', handler, true);
+    document.addEventListener('touchstart', handler, true);
+    _pointerPopoverClosers.push(handler);
+  }
 }
 
 function _teardownPointerPopoverClosers(): void {

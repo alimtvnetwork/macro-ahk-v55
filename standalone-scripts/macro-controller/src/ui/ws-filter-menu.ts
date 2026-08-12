@@ -92,7 +92,7 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
 
   const checkChip = document.createElement('span');
   checkChip.textContent = config.initialActive ? '☑' : '☐';
-  checkChip.style.cssText = 'font-size:11px;color:#a78bfa;width:12px;flex-shrink:0;';
+  checkChip.style.cssText = 'font-size:11px;color:hsl(var(--primary));width:12px;flex-shrink:0;';
 
   const iconSpan = document.createElement('span');
   iconSpan.textContent = config.icon;
@@ -152,7 +152,7 @@ function buildMinCreditsRow(populate: () => void): HTMLElement {
   input.style.cssText =
     'width:48px;padding:2px 4px;border:1px solid ' + cPrimary +
     ';border-radius:3px;background:' + cPanelBg +
-    ';color:#22d3ee;font-size:10px;outline:none;font-family:monospace;text-align:right;';
+    ';color:hsl(var(--accent));font-size:10px;outline:none;font-family:monospace;text-align:right;';
   input.oninput = function () {
     populate(); 
   };
@@ -171,9 +171,9 @@ function buildLegendBlock(): HTMLElement {
     'margin-top:2px;background:rgba(0,0,0,0.25);';
   legend.innerHTML =
     '<span style="font-size:8px;color:hsl(var(--success));" title="Billing credits from subscription">💰Billing</span>'
-    + '<span style="font-size:8px;color:#c4b5fd;" title="Rollover from previous period">🔄Rollover</span>'
-    + '<span style="font-size:8px;color:#facc15;" title="Daily free credits">📅Daily</span>'
-    + '<span style="font-size:8px;color:#22d3ee;" title="Total available credits">⚡Total</span>'
+    + '<span style="font-size:8px;color:hsl(var(--primary));" title="Rollover from previous period">🔄Rollover</span>'
+    + '<span style="font-size:8px;color:hsl(var(--warning));" title="Daily free credits">📅Daily</span>'
+    + '<span style="font-size:8px;color:hsl(var(--accent));" title="Total available credits">⚡Total</span>'
     + '<span style="font-size:8px;color:hsl(var(--success));" title="Trial credits">🎁Trial</span>'
     + '<span style="font-size:8px;color:hsl(var(--muted-foreground));" title="📍=Current 🟢=OK 🟡=Low 🔴=Empty">📍🟢🟡🔴</span>';
 
@@ -317,7 +317,7 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
     const chip = document.createElement('span');
     chip.className = 'marco-credit-sort-chip';
     chip.textContent = isActive ? '◉' : '○';
-    chip.style.cssText = 'font-size:11px;color:#a78bfa;width:12px;flex-shrink:0;';
+    chip.style.cssText = 'font-size:11px;color:hsl(var(--primary));width:12px;flex-shrink:0;';
 
     const iconSpan = document.createElement('span');
     iconSpan.textContent = m.icon;

@@ -403,19 +403,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
   const rawEntries = (raw as { entries?: unknown }).entries;
   const result = validatePromptsBundle(raw);
   if (!result.isValid || !result.bundle) {
-    if (Array.isArray(rawEntries)) {
-      rawEntries.forEach((entry, index) => {
-        const detail = validatePromptEntryDetailed(entry);
-        if (!detail.entry) {
-          const ptr = detail.field ? `/entries/${index}/${detail.field}` : `/entries/${index}`;
-          errors.push(`${ptr}: ${detail.reason ?? 'invalid'} (requires name and text)`);
-        }
-      });
-    }
-
-    if (errors.length === 0) {
-      errors.push(...result.errors);
-    }
+    errors.push(...result.errors);
 
     return { valid, errors };
   }

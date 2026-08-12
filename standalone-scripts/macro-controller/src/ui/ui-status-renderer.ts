@@ -70,7 +70,7 @@ function _updateQueueStatusEl(): void {
         let statusText = 'Synced';
         
         if (isPaused) {
-          statusDotColor = '#f97316'; // orange
+          statusDotColor = 'hsl(var(--warning))'; // orange
           statusText = 'Paused';
         } else if (isProcessing) {
           statusDotColor = 'hsl(var(--primary))'; // blue
@@ -297,7 +297,7 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
   if (state.workspaceName) {
     parts.push({ text: state.workspaceName, color: 'hsl(var(--warning))', bold: true });
     if (state.workspaceJustChanged) {
-      parts.push({ text: ' ⚡ WS Changed', color: '#f97316', bold: true });
+      parts.push({ text: ' ⚡ WS Changed', color: 'hsl(var(--warning))', bold: true });
     }
 
     parts.push({ text: ' | ' });
@@ -309,7 +309,7 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
   parts.push({ text: ' | ' });
   parts.push({ text: state.countdown + 's', color: 'hsl(var(--warning))', bold: true, id: 'marco-countdown-text' });
   if (delegateText) {
-    const dColor = state.forceDirection ? '#f97316' : 'hsl(var(--primary))';
+    const dColor = state.forceDirection ? 'hsl(var(--warning))' : 'hsl(var(--primary))';
     parts.push({ text: delegateText, color: dColor, bold: !!state.forceDirection });
   }
 
@@ -411,9 +411,9 @@ export function updateRecordIndicator(): void {
     const { dot, label } = ensureRecordChildren(el);
     if (state.isDelegating) {
       if (state.forceDirection) {
-        dot.style.background = '#f97316';
+        dot.style.background = 'hsl(var(--warning))';
         label.textContent = ' FORCE ' + state.forceDirection.toUpperCase();
-        el.style.background = '#c2410c';
+        el.style.background = 'hsl(var(--warning))';
       } else {
         dot.style.background = 'hsl(var(--primary))';
         label.textContent = ' SWITCHING';

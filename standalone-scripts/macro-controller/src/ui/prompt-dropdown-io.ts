@@ -162,7 +162,7 @@ function makeExportOption(pop: HTMLElement, label: string, run: () => Promise<vo
 function buildExportPopover(anchor: HTMLElement): HTMLElement {
   const pop = document.createElement('div');
   pop.setAttribute('data-marco-export-popover', '1');
-  pop.style.cssText = 'position:absolute;z-index:2147483647;display:flex;flex-direction:column;gap:4px;padding:6px;background:#1e1b2e;border:1px solid rgba(255,255,255,0.15);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.6);';
+  pop.style.cssText = 'position:absolute;z-index:2147483647;display:flex;flex-direction:column;gap:4px;padding:6px;background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.6);';
   const rect = anchor.getBoundingClientRect();
   pop.style.top = (rect.bottom + window.scrollY + 4) + 'px';
   pop.style.left = (rect.left + window.scrollX) + 'px';
@@ -241,7 +241,7 @@ export function buildImportButton(_ctx: PromptContext, _taskNextDeps: TaskNextDe
 function makeIoSectionHeader(text: string): HTMLElement {
   const h = document.createElement('div');
   h.textContent = text;
-  h.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#c4b5fd;padding:2px 6px;margin-top:2px;';
+  h.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:hsl(var(--primary));padding:2px 6px;margin-top:2px;';
 
   return h;
 }
@@ -304,7 +304,7 @@ function openLegacyIoDialog(): void {
 function buildImportExportPopover(anchor: HTMLElement, rerender: Rerender): HTMLElement {
   const pop = document.createElement('div');
   pop.setAttribute('data-marco-io-popover', '1');
-  pop.style.cssText = 'position:absolute;z-index:2147483647;display:flex;flex-direction:column;gap:3px;padding:6px;background:#1e1b2e;border:1px solid rgba(255,255,255,0.15);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.6);min-width:180px;';
+  pop.style.cssText = 'position:absolute;z-index:2147483647;display:flex;flex-direction:column;gap:3px;padding:6px;background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.6);min-width:180px;';
   const rect = anchor.getBoundingClientRect();
   pop.style.top = (rect.bottom + window.scrollY + 4) + 'px';
   pop.style.left = (rect.left + window.scrollX) + 'px';

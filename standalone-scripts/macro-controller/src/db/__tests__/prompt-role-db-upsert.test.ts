@@ -33,6 +33,7 @@ vi.mock('../../error-utils', async () => {
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 
 import { upsertForRole } from '../prompt-role-db';
+import { upsertPrompt } from '../prompt-db';
 import { PromptRole } from '../../types/prompt-role';
 
 beforeEach(() => {

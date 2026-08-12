@@ -98,17 +98,18 @@ export interface SeedPromptRow {
     body: string;
     role: PromptRole;
     isDefault: boolean;
+    requiredTokens?: string[];
 }
 
 export const PLAN_NEXT_SEED_ROWS: SeedPromptRow[] = [
-  { slug: 'plan-default', name: 'PlanTierType (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true },
-  { slug: 'plan-concise', name: 'PlanTierType (concise)', body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false },
-  { slug: 'plan-with-evidence', name: 'PlanTierType (evidence-first)', body: '# PlanTierType in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false },
-  { slug: 'plan-risk-annotated', name: 'PlanTierType (risk-annotated)', body: '# PlanTierType in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false },
-  { slug: 'next-default', name: 'Next (default)', body: NEXT_DEFAULT_BODY, role: 'next', isDefault: true },
-  { slug: 'next-concise', name: 'Next (concise)', body: 'Give me the next {{n}} steps from the current pending plan. One line each, no rationale. TODO(user): replace with final concise variant.', role: 'next', isDefault: false },
-  { slug: 'next-with-time', name: 'Next (time-estimate)', body: 'Give me the next {{n}} steps from the current pending plan, each with a realistic time estimate and what it unblocks. TODO(user): replace with final time-estimate variant.', role: 'next', isDefault: false },
-  { slug: 'next-with-risk', name: 'Next (risk-first)', body: 'Give me the next {{n}} steps from the current pending plan, sorted by risk descending, with a rollback note per step. TODO(user): replace with final risk-first variant.', role: 'next', isDefault: false },
+  { slug: 'plan-default', name: 'PlanTierType (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true, requiredTokens: ['n'] },
+  { slug: 'plan-concise', name: 'PlanTierType (concise)', body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false, requiredTokens: ['n'] },
+  { slug: 'plan-with-evidence', name: 'PlanTierType (evidence-first)', body: '# PlanTierType in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false, requiredTokens: ['n'] },
+  { slug: 'plan-risk-annotated', name: 'PlanTierType (risk-annotated)', body: '# PlanTierType in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false, requiredTokens: ['n'] },
+  { slug: 'next-default', name: 'Next (default)', body: NEXT_DEFAULT_BODY, role: 'next', isDefault: true, requiredTokens: ['n'] },
+  { slug: 'next-concise', name: 'Next (concise)', body: 'Give me the next {{n}} steps from the current pending plan. One line each, no rationale. TODO(user): replace with final concise variant.', role: 'next', isDefault: false, requiredTokens: ['n'] },
+  { slug: 'next-with-time', name: 'Next (time-estimate)', body: 'Give me the next {{n}} steps from the current pending plan, each with a realistic time estimate and what it unblocks. TODO(user): replace with final time-estimate variant.', role: 'next', isDefault: false, requiredTokens: ['n'] },
+  { slug: 'next-with-risk', name: 'Next (risk-first)', body: 'Give me the next {{n}} steps from the current pending plan, sorted by risk descending, with a rollback note per step. TODO(user): replace with final risk-first variant.', role: 'next', isDefault: false, requiredTokens: ['n'] },
 ];
 
 export function getSeedBodyForSlug(slug: string): string | null {
@@ -131,5 +132,5 @@ export function getRequiredTokensForRole(role: PromptRole): string[] {
     return [];
   }
 
-  return Array.from(new Set(extractParamTokens(defaultRow.body)));
+  return defaultRow.requiredTokens ? [...defaultRow.requiredTokens] : [];
 }

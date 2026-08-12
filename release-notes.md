@@ -1,3 +1,14 @@
+## [v0.2.0] - Prompt Library Relocate & Light Mode
+
+### Added
+- Implemented Light Mode design system (themes and color overrides).
+- Restructured `prompt-library-modal.ts` and UX for better accessibility and focus.
+- Introduced `repeat-row popover` and `PromptEditor` for robust prompt management.
+
+### Fixed
+- Fixed ESLint violations and Vitest failures across the repo.
+- Enforced strict JSON pointer validation (RFC 6901) for PromptsBundleV1.
+
 ## [v4.366.0] - 2026-07-20 seed-plan-next regression + SDK compile-instruction VERSION fix
 
 ### Fixed

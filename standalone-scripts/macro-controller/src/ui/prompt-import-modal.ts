@@ -84,7 +84,7 @@ function makeBtn(label: string, variant: ButtonVariantType): HTMLButtonElement {
   btn.textContent = label;
   const base = 'padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.12);';
   const primary = 'background:rgba(124,58,237,0.85);color:hsl(var(--foreground));';
-  const ghost = 'background:rgba(255,255,255,0.06);color:#ddd;';
+  const ghost = 'background:hsl(var(--muted));color:hsl(var(--foreground));';
   applyStyle(btn, base + (variant === 'primary' ? primary : ghost));
 
   return btn;
@@ -98,10 +98,10 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
   const wrap = document.createElement('div');
   applyStyle(wrap, 'max-height:280px;overflow:auto;border:1px solid rgba(255,255,255,0.08);border-radius:5px;');
   const table = document.createElement('table');
-  applyStyle(table, 'width:100%;border-collapse:collapse;font-size:11px;color:#ddd;');
+  applyStyle(table, 'width:100%;border-collapse:collapse;font-size:11px;color:hsl(var(--foreground));');
   const thead = document.createElement('thead');
   thead.innerHTML =
-    '<tr style="background:rgba(124,58,237,0.25);position:sticky;top:0;">'
+    '<tr style="background:hsl(var(--primary) / 0.25);position:sticky;top:0;">'
     + '<th style="text-align:left;padding:6px 8px;">Slug</th>'
     + '<th style="text-align:left;padding:6px 8px;">Name</th>'
     + '<th style="text-align:left;padding:6px 8px;">Conflict</th>'
@@ -111,7 +111,7 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
   const tbody = document.createElement('tbody');
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="4" style="padding:10px;text-align:center;color:#888;">No entries to import</td>';
+    tr.innerHTML = '<td colspan="4" style="padding:10px;text-align:center;color:hsl(var(--muted-foreground));">No entries to import</td>';
     tbody.appendChild(tr);
   }
 
@@ -132,7 +132,7 @@ function conflictBadge(state: PreviewRow['conflict']): string {
   const color = colors[state];
 
   return '<span style="display:inline-block;padding:2px 6px;border-radius:3px;background:' + color
-    + ';color:#000;font-weight:700;font-size:10px;">' + state + '</span>';
+    + ';color:hsl(var(--background));font-weight:700;font-size:10px;">' + state + '</span>';
 }
 
 export function defaultActionFor(conflict: PreviewRow['conflict']): RowAction {
@@ -179,10 +179,10 @@ function actionLabel(action: RowAction): string {
 
 function buildPreviewRow(row: PreviewRow, index: number, onChange: () => void): HTMLElement {
   const tr = document.createElement('tr');
-  const bg = index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+  const bg = index % 2 === 0 ? 'hsl(var(--strip-frame-bg))' : 'transparent';
   tr.style.cssText = 'background:' + bg + ';border-top:1px solid rgba(255,255,255,0.05);';
   const slugCell = document.createElement('td');
-  slugCell.style.cssText = 'padding:5px 8px;font-family:monospace;color:#8ab4f8;';
+  slugCell.style.cssText = 'padding:5px 8px;font-family:monospace;color:hsl(var(--foreground));';
   slugCell.textContent = row.slug;
   const nameCell = document.createElement('td');
   nameCell.style.cssText = 'padding:5px 8px;';
@@ -194,7 +194,7 @@ function buildPreviewRow(row: PreviewRow, index: number, onChange: () => void): 
   actionCell.style.cssText = 'padding:5px 8px;';
 
   const select = document.createElement('select');
-  select.style.cssText = 'background:#2a2540;color:#eee;border:1px solid rgba(255,255,255,0.15);border-radius:3px;font-size:10px;padding:2px 4px;cursor:pointer;';
+  select.style.cssText = 'background:hsl(var(--background));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:3px;font-size:10px;padding:2px 4px;cursor:pointer;';
   allowedActionsFor(row.conflict).forEach((act) => {
     const opt = document.createElement('option');
     opt.value = act;
@@ -268,10 +268,10 @@ export function classifyRow(incoming: PromptEntry, existing: CachedPromptEntry |
 function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
   body.innerHTML = '';
   const drop = document.createElement('div');
-  applyStyle(drop, 'border:2px dashed rgba(255,255,255,0.18);border-radius:8px;padding:32px;text-align:center;color:#aaa;cursor:pointer;transition:background 0.15s;');
+  applyStyle(drop, 'border:2px dashed rgba(255,255,255,0.18);border-radius:8px;padding:32px;text-align:center;color:hsl(var(--foreground));cursor:pointer;transition:background 0.15s;');
   drop.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">📥</div>'
-    + '<div style="font-size:13px;color:#ddd;margin-bottom:4px;">Drop a .json, .zip, or .sqlite file here</div>'
-    + '<div style="font-size:11px;color:#888;">or click to choose a file</div>';
+    + '<div style="font-size:13px;color:hsl(var(--foreground));margin-bottom:4px;">Drop a .json, .zip, or .sqlite file here</div>'
+    + '<div style="font-size:11px;color:hsl(var(--muted-foreground));">or click to choose a file</div>';
   drop.ondragover = (ev) => {
     ev.preventDefault();
     drop.style.background = 'rgba(124,58,237,0.12)'; 
@@ -310,7 +310,7 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
 function renderParsing(body: HTMLElement, filename: string): void {
   body.innerHTML = '';
   const box = document.createElement('div');
-  applyStyle(box, 'padding:32px;text-align:center;color:#ddd;');
+  applyStyle(box, 'padding:32px;text-align:center;color:hsl(var(--foreground));');
   box.innerHTML = '<div style="font-size:24px;margin-bottom:8px;">⏳</div>'
     + '<div style="font-size:12px;">Parsing <b>' + escapeHtml(filename) + '</b>…</div>';
   body.appendChild(box);
@@ -319,7 +319,7 @@ function renderParsing(body: HTMLElement, filename: string): void {
 function renderPreview(body: HTMLElement, state: ModalState, rerender: () => void): void {
   body.innerHTML = '';
   const header = document.createElement('div');
-  applyStyle(header, 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;color:#bbb;');
+  applyStyle(header, 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;color:hsl(var(--foreground));');
   const format = state.format ?? 'json';
   const counts = countByAction(state.rows);
   header.innerHTML = '<span>Format: <b style="color:hsl(var(--foreground));">' + format.toUpperCase() + '</b> &middot; Source: <b style="color:hsl(var(--foreground));">'
@@ -327,7 +327,7 @@ function renderPreview(body: HTMLElement, state: ModalState, rerender: () => voi
     + '<span>' + state.rows.length + ' entries &middot; '
     + '<span style="color:hsl(var(--success));">+' + counts.add + '</span> / '
     + '<span style="color:hsl(var(--warning));">~' + counts.overwrite + '</span> / '
-    + '<span style="color:#a78bfa;">R' + counts.rename + '</span> / '
+    + '<span style="color:hsl(var(--primary));">R' + counts.rename + '</span> / '
     + '<span style="color:hsl(var(--muted-foreground));">S' + counts.skip + '</span></span>';
   body.appendChild(header);
 
@@ -349,7 +349,7 @@ function countByAction(rows: PreviewRow[]): { add: number; overwrite: number; sk
 
 function buildBulkActionsBar(rows: PreviewRow[], onChange: () => void): HTMLElement {
   const bar = document.createElement('div');
-  applyStyle(bar, 'display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:10px;color:#888;');
+  applyStyle(bar, 'display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:10px;color:hsl(var(--muted-foreground));');
   const label = document.createElement('span');
   label.textContent = 'Bulk for conflicts:';
   bar.appendChild(label);
@@ -359,7 +359,7 @@ function buildBulkActionsBar(rows: PreviewRow[], onChange: () => void): HTMLElem
     b.type = 'button';
     b.textContent = text;
     applyStyle(b, 'padding:3px 8px;border-radius:3px;font-size:10px;font-weight:600;cursor:pointer;'
-      + 'border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#ddd;');
+      + 'border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--foreground));');
     b.onclick = () => {
       rows.forEach((r) => {
         if (r.conflict === 'new') {
@@ -386,7 +386,7 @@ function buildBulkActionsBar(rows: PreviewRow[], onChange: () => void): HTMLElem
 function renderCommitting(body: HTMLElement, count: number): void {
   body.innerHTML = '';
   const box = document.createElement('div');
-  applyStyle(box, 'padding:32px;text-align:center;color:#ddd;');
+  applyStyle(box, 'padding:32px;text-align:center;color:hsl(var(--foreground));');
   box.innerHTML = '<div style="font-size:24px;margin-bottom:8px;">📝</div>'
     + '<div style="font-size:12px;">Importing ' + count + ' prompts…</div>';
   body.appendChild(box);
@@ -397,7 +397,7 @@ function renderDone(body: HTMLElement, added: number, updated: number): void {
   const box = document.createElement('div');
   applyStyle(box, 'padding:32px;text-align:center;color:hsl(var(--success));');
   box.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">✅</div>'
-    + '<div style="font-size:13px;color:#ddd;">Imported <b>' + added + '</b> new, <b>' + updated + '</b> updated</div>';
+    + '<div style="font-size:13px;color:hsl(var(--foreground));">Imported <b>' + added + '</b> new, <b>' + updated + '</b> updated</div>';
   body.appendChild(box);
 }
 
@@ -414,14 +414,14 @@ interface RenderErrorInput {
 function renderError(body: HTMLElement, input: RenderErrorInput): void {
   body.innerHTML = '';
   const panel = document.createElement('div');
-  applyStyle(panel, 'border:1px solid hsl(var(--destructive));background:rgba(239,68,68,0.08);border-radius:6px;padding:12px;color:#fecaca;');
+  applyStyle(panel, 'border:1px solid hsl(var(--destructive));background:rgba(239,68,68,0.08);border-radius:6px;padding:12px;color:hsl(var(--foreground));');
 
   // Code badge + heading row.
   const headRow = document.createElement('div');
   applyStyle(headRow, 'display:flex;align-items:center;gap:8px;margin-bottom:6px;');
   if (input.code) {
     const badge = document.createElement('span');
-    applyStyle(badge, 'font-family:monospace;font-size:10px;font-weight:700;background:#7f1d1d;color:#fecaca;padding:2px 6px;border-radius:3px;letter-spacing:0.5px;');
+    applyStyle(badge, 'font-family:monospace;font-size:10px;font-weight:700;background:hsl(var(--destructive));color:hsl(var(--foreground));padding:2px 6px;border-radius:3px;letter-spacing:0.5px;');
     badge.textContent = input.code;
     headRow.appendChild(badge);
   }
@@ -435,7 +435,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   // Actionable hint (short, plain-language).
   if (input.hint) {
     const hintEl = document.createElement('div');
-    applyStyle(hintEl, 'font-size:11px;color:#fde68a;margin-bottom:8px;');
+    applyStyle(hintEl, 'font-size:11px;color:hsl(var(--foreground));margin-bottom:8px;');
     hintEl.textContent = input.hint;
     panel.appendChild(hintEl);
   }
@@ -443,7 +443,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   // Details block (raw error).
   if (input.details) {
     const detailsEl = document.createElement('pre');
-    applyStyle(detailsEl, 'font-family:monospace;font-size:10px;color:#fca5a5;margin:0;white-space:pre-wrap;max-height:150px;overflow:auto;');
+    applyStyle(detailsEl, 'font-family:monospace;font-size:10px;color:hsl(var(--foreground));margin:0;white-space:pre-wrap;max-height:150px;overflow:auto;');
     detailsEl.textContent = input.details;
     panel.appendChild(detailsEl);
   }
@@ -452,7 +452,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   const actions = document.createElement('div');
   applyStyle(actions, 'display:flex;gap:12px;align-items:center;margin-top:8px;');
   const retry = document.createElement('a');
-  applyStyle(retry, 'color:#93c5fd;cursor:pointer;font-size:11px;');
+  applyStyle(retry, 'color:hsl(var(--foreground));cursor:pointer;font-size:11px;');
   retry.textContent = 'Try another file';
   retry.onclick = (ev) => {
     ev.preventDefault();
@@ -463,7 +463,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
 
   if (input.auditId) {
     const audit = document.createElement('a');
-    applyStyle(audit, 'color:#93c5fd;cursor:pointer;font-size:11px;font-family:monospace;');
+    applyStyle(audit, 'color:hsl(var(--foreground));cursor:pointer;font-size:11px;font-family:monospace;');
     audit.textContent = 'View audit entry (' + input.auditId.slice(0, 24) + '...)';
     audit.title = 'Audit id: ' + input.auditId;
     audit.onclick = (ev) => {
@@ -494,7 +494,7 @@ function buildShell(onClose: () => void): { root: HTMLElement; body: HTMLElement
   };
 
   const panel = document.createElement('div');
-  applyStyle(panel, 'width:640px;max-width:92vw;background:#1e1b2e;border:1px solid rgba(255,255,255,0.12);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.7);color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;');
+  applyStyle(panel, 'width:640px;max-width:92vw;background:hsl(var(--background));border:1px solid rgba(255,255,255,0.12);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.7);color:hsl(var(--foreground));font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;');
 
   const header = document.createElement('div');
   applyStyle(header, 'display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.08);');
@@ -503,7 +503,7 @@ function buildShell(onClose: () => void): { root: HTMLElement; body: HTMLElement
   applyStyle(title, 'font-weight:700;font-size:14px;');
   const close = document.createElement('span');
   close.textContent = '×';
-  applyStyle(close, 'cursor:pointer;font-size:20px;color:#aaa;');
+  applyStyle(close, 'cursor:pointer;font-size:20px;color:hsl(var(--foreground));');
   close.onclick = onClose;
   header.appendChild(title);
   header.appendChild(close);

@@ -46,19 +46,19 @@ export async function renderAllRoles(refs: ModalRefs): Promise<void> {
 
 export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refreshAllRoles: (r: ModalRefs) => Promise<void>): Promise<HTMLElement> {
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'margin:10px 0 14px;border:1px solid #2b3648;border-radius:8px;padding:8px 10px;background:#0f1522;';
+  wrap.style.cssText = 'margin:10px 0 14px;border:1px solid hsl(var(--muted));border-radius:8px;padding:8px 10px;background:hsl(var(--background));';
   const h = document.createElement('div');
   h.textContent = 'Role: ' + role;
   h.title = ROLE_TOOLTIPS[role];
   h.setAttribute('aria-label', 'Role: ' + role + '. ' + ROLE_TOOLTIPS[role]);
-  h.style.cssText = 'font-size:12px;font-weight:600;color:#c9b7ff;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;cursor:help;';
+  h.style.cssText = 'font-size:12px;font-weight:600;color:hsl(var(--foreground));margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;cursor:help;';
   wrap.appendChild(h);
 
   const result = await listPromptsByRole(role);
   if (result.isFail || !result.value) {
     const err = document.createElement('div');
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
-    err.style.cssText = 'color:#f5a3a3;font-size:11px;';
+    err.style.cssText = 'color:hsl(var(--foreground));font-size:11px;';
     wrap.appendChild(err);
 
     return wrap;
@@ -68,7 +68,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
   if (rows.length === 0) {
     const empty = document.createElement('div');
     empty.textContent = '(no rows)';
-    empty.style.cssText = 'color:#7a8699;font-size:11px;font-style:italic;';
+    empty.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;font-style:italic;';
     wrap.appendChild(empty);
 
     return wrap;

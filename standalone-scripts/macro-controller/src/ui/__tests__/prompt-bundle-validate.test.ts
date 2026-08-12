@@ -69,7 +69,7 @@ describe('validatePromptsBundle — invalid fixtures', () => {
   it('rejects entries missing required name', () => {
     const result = validatePromptsBundle(loadFixture('invalid-entry-missing-name.json'));
     expect(result.isValid).toBe(false);
-    expect(result.errors.join('|')).toMatch(/entries\[1\] missing required name\/text/);
+    expect(result.errors.join('|')).toMatch(/\/entries\/1: missing required name\/text/);
   });
 
   it('rejects non-array entries', () => {
@@ -81,13 +81,13 @@ describe('validatePromptsBundle — invalid fixtures', () => {
   it('rejects a null root', () => {
     const result = validatePromptsBundle(null);
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain('Bundle root is not an object');
+    expect(result.errors).toContain('/: Bundle root is not an object');
   });
 
   it('rejects an array root', () => {
     const result = validatePromptsBundle([]);
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain('Bundle root is not an object');
+    expect(result.errors).toContain('/: Bundle root is not an object');
   });
 });
 

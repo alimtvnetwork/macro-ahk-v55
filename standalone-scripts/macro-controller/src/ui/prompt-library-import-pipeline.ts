@@ -28,7 +28,7 @@ export function showImportSpinner(importBtn: HTMLButtonElement): void {
   spinner.dataset.testid = 'library-import-spinner';
   spinner.setAttribute('aria-hidden', 'true');
   spinner.style.cssText = [
-    'display:inline-block', 'width:10px', 'height:10px', 'border:2px solid #9aa7bd',
+    'display:inline-block', 'width:10px', 'height:10px', 'border:2px solid hsl(var(--muted-foreground))',
     'border-top-color:transparent', 'border-radius:50%', 'margin-right:6px',
     'vertical-align:-1px', 'animation:mc-spin 0.7s linear infinite',
   ].join(';');

@@ -14,7 +14,7 @@ export function buildImportProgressElement(): {
   wrap.style.cssText = [
     CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, 'padding:8px 10px',
     CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6,
-    'font-size:11px', 'color:#c9d3e6',
+    'font-size:11px', 'color:hsl(var(--foreground))',
   ].join(';');
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
@@ -25,7 +25,7 @@ export function buildImportProgressElement(): {
   const counter = document.createElement('span');
   counter.dataset.testid = 'library-import-progress-counter';
   counter.textContent = '0/0';
-  counter.style.cssText = 'font-variant-numeric:tabular-nums;color:#9aa7bd;flex-shrink:0;';
+  counter.style.cssText = 'font-variant-numeric:tabular-nums;color:hsl(var(--muted-foreground));flex-shrink:0;';
   row.appendChild(label);
   row.appendChild(counter);
 
@@ -37,7 +37,7 @@ export function buildImportProgressElement(): {
   bar.setAttribute('aria-valuemin', '0');
   bar.setAttribute('aria-valuemax', '100');
   bar.setAttribute(ATTR_ARIA_VALUENOW, '0');
-  bar.style.cssText = 'height:100%;width:0%;background:#7cc4ff;transition:width 120ms ease-out;';
+  bar.style.cssText = 'height:100%;width:0%;background:hsl(var(--background));transition:width 120ms ease-out;';
   track.appendChild(bar);
 
   wrap.appendChild(row);
@@ -119,7 +119,7 @@ function buildPartialErrorsDetails(entryErrors: readonly string[], parseErrors: 
   const details = document.createElement('details');
   details.open = total <= 5;
   const summary = document.createElement('summary');
-  summary.style.cssText = 'cursor:pointer;margin-bottom:6px;color:#f5b7b7;';
+  summary.style.cssText = 'cursor:pointer;margin-bottom:6px;color:hsl(var(--foreground));';
   summary.textContent = details.open ? 'Hide details' : 'Show details';
   details.addEventListener('toggle', () => {
     summary.textContent = details.open ? 'Hide details' : 'Show details'; 
@@ -134,7 +134,7 @@ function buildPartialErrorsDetails(entryErrors: readonly string[], parseErrors: 
     li.style.cssText = 'margin:2px 0;white-space:pre-wrap;word-break:break-word;';
     const tag = document.createElement('span');
     tag.textContent = source === 'parse' ? '[parse] ' : '[entry] ';
-    tag.style.cssText = 'color:#f5b7b7;font-weight:600;';
+    tag.style.cssText = 'color:hsl(var(--foreground));font-weight:600;';
     li.appendChild(tag);
     li.appendChild(document.createTextNode(message));
     list.appendChild(li);
@@ -183,7 +183,7 @@ export function renderPartialImportErrors(
   dismiss.type = 'button';
   dismiss.textContent = 'Dismiss';
   dismiss.dataset.testid = 'library-import-partial-errors-dismiss';
-  dismiss.style.cssText = ['margin-top:8px', 'padding:4px 10px', 'background:#3a2530', 'color:#f2c9c9', 'border:1px solid #6b2b3a', CSS_BORDER_RADIUS_6, CSS_CURSOR_POINTER, 'font-size:11.5px'].join(';');
+  dismiss.style.cssText = ['margin-top:8px', 'padding:4px 10px', 'background:hsl(var(--background))', 'color:hsl(var(--foreground))', 'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6, CSS_CURSOR_POINTER, 'font-size:11.5px'].join(';');
   dismiss.addEventListener('click', () => {
     clearPartialImportErrors(refs); 
   });

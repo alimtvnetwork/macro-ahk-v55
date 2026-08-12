@@ -217,7 +217,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
   body.appendChild(summaryLine);
 
   body.appendChild(renderIssueList('✅ Fixed / restored', report.fixed, cSuccess));
-  body.appendChild(renderIssueList('⚠️ Still broken', report.stillBroken, '#f97316'));
+  body.appendChild(renderIssueList('⚠️ Still broken', report.stillBroken, 'hsl(var(--warning))'));
   if (report.newlyFlagged.length > 0) {
     body.appendChild(renderIssueList('➕ Newly flagged after repair', report.newlyFlagged, 'hsl(var(--destructive))'));
   }

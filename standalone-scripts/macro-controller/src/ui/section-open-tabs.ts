@@ -56,7 +56,7 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
   const refreshBtn = document.createElement('button');
   refreshBtn.type = 'button';
   refreshBtn.textContent = '⟳ Refresh';
-  refreshBtn.style.cssText = 'margin-top:4px;padding:2px 8px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;';
+  refreshBtn.style.cssText = 'margin-top:4px;padding:2px 8px;background:hsl(var(--secondary));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:3px;font-size:9px;cursor:pointer;';
   refreshBtn.onclick = function (e: Event): void {
     e.stopPropagation();
     onRefresh();
@@ -149,7 +149,7 @@ function renderEmpty(text: string): string {
 }
 
 function renderError(reason: string): string {
-  return '<div style="color:#fca5a5;font-size:10px;padding:4px;">⚠ ' + escapeHtml(reason) + '</div>';
+  return '<div style="color:hsl(var(--foreground));font-size:10px;padding:4px;">⚠ ' + escapeHtml(reason) + '</div>';
 }
 
 function renderList(tabs: ReadonlyArray<OpenLovableTabInfoView>, capturedAt: string | undefined): string {
@@ -204,19 +204,19 @@ function renderRow(t: OpenLovableTabInfoView): string {
     ? '<span style="color:hsl(var(--warning));margin-right:4px;" title="Active in window">●</span>'
     : '';
   const focusBadge = t.windowFocused
-    ? '<span style="color:#60a5fa;margin-right:4px;" title="Focused window">◆</span>'
+    ? '<span style="color:hsl(var(--foreground));margin-right:4px;" title="Focused window">◆</span>'
     : '';
   const whyLine = renderWhyLine(t);
 
   const copyBtn = ''
         + '<button type="button" data-copy-url="' + escapeHtml(t.url) + '" '
         +   'title="Copy tab URL to clipboard" '
-        +   'style="margin-left:4px;padding:1px 6px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;flex-shrink:0;">'
+        +   'style="margin-left:4px;padding:1px 6px;background:hsl(var(--secondary));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:3px;font-size:9px;cursor:pointer;flex-shrink:0;">'
         +   '⎘ Copy'
         + '</button>';
 
   return ''
-        + '<div style="font-size:10px;font-family:monospace;padding:3px 4px;border-top:1px solid rgba(255,255,255,0.06);">'
+        + '<div style="font-size:10px;font-family:monospace;padding:3px 4px;border-top:1px solid hsl(var(--muted));">'
         +   '<div style="display:flex;align-items:center;gap:4px;">'
         +     focusBadge + activeBadge
         +     '<span style="color:hsl(var(--foreground));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(t.title) + '">' + titleSafe + '</span>'
@@ -247,7 +247,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
     }
 
     btn.textContent = '✓ Copied';
-    btn.style.background = '#065f46';
+    btn.style.background = 'hsl(var(--success))';
     window.setTimeout(function (): void {
       btn.textContent = originalText;
       btn.style.background = 'hsl(var(--secondary))';
@@ -256,7 +256,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
     const msg = e instanceof Error ? e.message : String(e);
     log('Copy URL failed: ' + msg, 'warn');
     btn.textContent = '✗ Failed';
-    btn.style.background = '#7f1d1d';
+    btn.style.background = 'hsl(var(--destructive))';
     window.setTimeout(function (): void {
       btn.textContent = originalText;
       btn.style.background = 'hsl(var(--secondary))';
@@ -288,7 +288,7 @@ function renderWhyLine(t: OpenLovableTabInfoView): string {
       : patternSafe;
     ruleLabel = ''
             + '<span style="color:hsl(var(--muted-foreground));">' + escapeHtml(t.matchedRule.matchType) + '</span> '
-            + '<span style="color:#cbd5e1;" title="' + patternSafe + '">"' + patternShort + '"</span>'
+            + '<span style="color:hsl(var(--foreground));" title="' + patternSafe + '">"' + patternShort + '"</span>'
             + originTag;
   } else {
     ruleLabel = '<span style="color:hsl(var(--muted-foreground));font-style:italic;">no project rule matched</span>';

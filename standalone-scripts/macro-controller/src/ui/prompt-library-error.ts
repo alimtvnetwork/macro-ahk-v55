@@ -52,7 +52,7 @@ export function extractImportErrorReason(err: unknown): string {
 function btnCss(bg: string, fg: string): string {
   return [
     'background:' + bg, 'color:' + fg,
-    'border:1px solid #3a465c', CSS_BORDER_RADIUS_6,
+    'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6,
     'padding:4px 10px', 'font-size:11px', CSS_CURSOR_POINTER,
     'margin-left:6px',
   ].join(';');
@@ -83,7 +83,7 @@ export function renderImportErrorBanner(
     retryBtn.textContent = 'Retry import';
     retryBtn.dataset.testid = 'library-import-retry';
     retryBtn.setAttribute(ATTR_ARIA_LABEL, 'Retry import with the same file');
-    retryBtn.style.cssText = btnCss('#6b2c34', '#ffd7dc') + ';margin-top:8px;';
+    retryBtn.style.cssText = btnCss('hsl(var(--destructive))', 'hsl(var(--destructive))') + ';margin-top:8px;';
     retryBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       onRetry();

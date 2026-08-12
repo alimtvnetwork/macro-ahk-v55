@@ -69,7 +69,7 @@ export function buildTitleRow(
 
 function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   const title = document.createElement('div');
-  title.style.cssText = 'font-weight:bold;color:#E0E0E0;font-size:14px;flex-shrink:0;white-space:nowrap;transform:translateY(-2px);';
+  title.style.cssText = 'font-weight:bold;color:hsl(var(--foreground));font-size:14px;flex-shrink:0;white-space:nowrap;transform:translateY(-2px);';
   title.textContent = 'TS Macro';
 
   const wsNameEl = buildWorkspaceNameBadge(deps);
@@ -182,7 +182,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   }
 
   wsNameEl.onmouseenter = function() {
-    wsNameEl.style.color = '#fde68a'; 
+    wsNameEl.style.color = 'hsl(var(--warning))'; 
   };
 
   wsNameEl.onmouseleave = function() {

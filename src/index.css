@@ -36,6 +36,11 @@
 
     --radius: 0.5rem;
 
+    --strip-frame-bg: 224 28% 8%;
+    --chip-bg: 224 18% 16%;
+    --chip-border: 224 18% 18%;
+    --editor-callout-bg: 224 24% 12%;
+
     --sidebar-background: 224 28% 8%;
     --sidebar-foreground: 220 14% 92%;
     --sidebar-primary: 268 70% 60%;

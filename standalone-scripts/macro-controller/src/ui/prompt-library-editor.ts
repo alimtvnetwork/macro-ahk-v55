@@ -22,7 +22,7 @@ export interface EditorEls {
 function btnCss(bg: string, fg: string): string {
   return [
     'background:' + bg, 'color:' + fg,
-    'border:1px solid #3a465c', CSS_BORDER_RADIUS_6,
+    'border:1px solid hsl(var(--border))', CSS_BORDER_RADIUS_6,
     'padding:4px 10px', 'font-size:11px', CSS_CURSOR_POINTER,
     'margin-left:6px',
   ].join(';');
@@ -30,26 +30,26 @@ function btnCss(bg: string, fg: string): string {
 
 export function buildEditorEl(row: PromptRow): EditorEls {
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'padding:8px 4px;border-top:1px solid #1c2536;background:#0b1220;';
+  wrap.style.cssText = 'padding:8px 4px;border-top:1px solid hsl(var(--background));background:hsl(var(--background));';
   const nameInput = document.createElement('input');
   nameInput.type = 'text';
   nameInput.value = row.Name;
-  nameInput.style.cssText = 'width:100%;box-sizing:border-box;background:#0f1522;color:#e6edf7;border:1px solid #2b3648;border-radius:6px;padding:4px 6px;font-size:12px;margin-bottom:6px;';
+  nameInput.style.cssText = 'width:100%;box-sizing:border-box;background:hsl(var(--background));color:hsl(var(--foreground));border:1px solid hsl(var(--muted));border-radius:6px;padding:4px 6px;font-size:12px;margin-bottom:6px;';
   const tokenEls = buildTokenRow((row as PromptRow & { ReplaceKey?: string }).ReplaceKey ?? REPLACE_KEY_DEFAULT);
   const initialValues = (row as PromptRow & { ReplaceValues?: string[] }).ReplaceValues ?? [...REPLACE_VALUES_DEFAULT];
   const valuesEls = buildValuesRow(initialValues);
   const bodyInput = document.createElement('textarea');
   bodyInput.value = row.Body;
   bodyInput.rows = 10;
-  bodyInput.style.cssText = 'width:100%;box-sizing:border-box;background:#0f1522;color:#e6edf7;border:1px solid #2b3648;border-radius:6px;padding:6px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre;';
+  bodyInput.style.cssText = 'width:100%;box-sizing:border-box;background:hsl(var(--background));color:hsl(var(--foreground));border:1px solid hsl(var(--muted));border-radius:6px;padding:6px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre;';
   const bar = document.createElement('div');
   bar.style.cssText = 'display:flex;justify-content:flex-end;margin-top:6px;';
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
-  cancelBtn.style.cssText = btnCss('#2b3648', '#e6edf7');
+  cancelBtn.style.cssText = btnCss('hsl(var(--muted))', 'hsl(var(--foreground))');
   const saveBtn = document.createElement('button');
   saveBtn.textContent = 'Save';
-  saveBtn.style.cssText = btnCss('#2f4a2f', '#d6f5d6');
+  saveBtn.style.cssText = btnCss('hsl(var(--success))', 'hsl(var(--success))');
   bar.appendChild(cancelBtn);
   bar.appendChild(saveBtn);
   wrap.appendChild(nameInput);
