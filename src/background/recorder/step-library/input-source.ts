@@ -353,7 +353,7 @@ function handleResponse(
   durationMs: number,
   continueOnFail: boolean,
 ): FetchInputResult {
-  if (res.Ok === false) {
+  if (res.ok === false) {
     return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
   }
 

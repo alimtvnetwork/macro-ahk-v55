@@ -6,7 +6,7 @@ import { AlertTriangle, ChevronDown, ChevronRight, Copy, Check, Download, MouseP
 import { readClickTrail, type ClickTrailEntry } from "@/lib/click-trail";
 import { useBenignWarningStats } from "@/hooks/use-benign-warning-stats";
 import type { BenignWarningTally } from "@/lib/benign-warnings";
-import { BootFailureBannerMode, CauseKindEnum } from "../../types/enums";
+import { BootFailureBannerModeType, CauseKindType } from "../../types/enums";
 
 /** Structured per-failure context — see BootErrorContext in shared/messages.ts. */
 export interface BootErrorContext {
@@ -80,7 +80,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
   // steps, and SQL body (keeping only the correlation header, op summary,
   // WASM probe, and benign tally totals). "full" includes everything.
   // Persisted across mounts so users keep their preferred default.
-  const [reportMode, setReportMode] = useState<BootFailureBannerMode>(() => {
+  const [reportMode, setReportMode] = useState<BootFailureBannerModeType>(() => {
     try {
       const saved = localStorage.getItem("marco_support_report_mode");
 
@@ -91,7 +91,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       return "full";
     }
   });
-  const setReportModePersisted = (mode: BootFailureBannerMode): void => {
+  const setReportModePersisted = (mode: BootFailureBannerModeType): void => {
     setReportMode(mode);
     try {
       localStorage.setItem("marco_support_report_mode", mode);
@@ -135,7 +135,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
       // allow-swallow: clipboard denied; textarea fallback stays visible
-      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
+      logError("AutoCatch", "Automatically caught swallowed error", err);
     }
   };
 
@@ -150,7 +150,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
       // allow-swallow: clipboard denied; snippet stays visible for manual copy
-      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
+      logError("AutoCatch", "Automatically caught swallowed error", err);
     }
   };
 
@@ -180,7 +180,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
       // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
-      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
+      logError("AutoCatch", "Automatically caught swallowed error", err);
     }
   };
 
@@ -308,7 +308,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
         <CollapsibleSection
           icon={<FileWarning className="h-3 w-3" />}
           // eslint-disable-next-line sonarjs/no-nested-template-literals -- inline label formatting; helper would obscure the one-line summary
-          label={`WASM probe — ${probe.isSuccess ? "ok" : "failed"} (${probe.status !== null ? `HTTP ${probe.status}` : "no response"})`}
+          label={`WASM probe — ${probe.ok ? "ok" : "failed"} (${probe.status !== null ? `HTTP ${probe.status}` : "no response"})`}
           isOpen={showProbe}
           onToggle={() => setShowProbe((v) => !v)}
         >
@@ -316,7 +316,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
             <div className="flex flex-wrap gap-x-3 gap-y-1">
               <span><span className="text-destructive/60">status:</span> {probe.status !== null ? probe.status : "—"}</span>
               <span><span className="text-destructive/60">content-length:</span> {probe.contentLength ?? "—"}</span>
-              <span><span className="text-destructive/60">ok:</span> {probe.isSuccess ? "true" : "false"}</span>
+              <span><span className="text-destructive/60">ok:</span> {probe.ok ? "true" : "false"}</span>
               <span><span className="text-destructive/60">at:</span> {formatTime(probe.at)}</span>
             </div>
             <div className="break-all">
@@ -439,7 +439,7 @@ function CollapsibleSection({ icon, label, isOpen, onToggle, children }: Collaps
 /*  Cause Classification                                          */
 /* ────────────────────────────────────────────────────────────── */
 
-type CauseKind = CauseKindEnum;
+type CauseKind = CauseKindType;
 
 interface Cause {
   kind: CauseKind;
@@ -563,7 +563,7 @@ interface ReportInput {
   /** Tally of warnings filtered out of the Errors drawer. */
   benignTally: BenignWarningTally;
   /** "short" — correlation header + summary only; "full" — everything. */
-  mode: BootFailureBannerMode;
+  mode: BootFailureBannerModeType;
 }
 
 /** Produces a plain-text bundle suitable for clipboard/issue reports. */
@@ -626,7 +626,7 @@ function buildReport(input: ReportInput): string {
     lines.push(`  URL:            ${p.url}`);
     lines.push(`  Status:         ${p.status !== null ? p.status : "(no response)"}`);
     lines.push(`  Content-Length: ${p.contentLength ?? "(absent)"}`);
-    lines.push(`  OK:             ${p.isSuccess ? "true" : "false"}`);
+    lines.push(`  OK:             ${p.ok ? "true" : "false"}`);
     lines.push(`  Probed at:      ${p.at}`);
     if (p.headError !== null) {
       lines.push(`  HEAD error:     ${p.headError}`);

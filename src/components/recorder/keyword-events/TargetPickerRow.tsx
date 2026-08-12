@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/select";
 import type { KeywordEventTarget } from "@/hooks/use-keyword-events";
 import { cn } from "@/lib/utils";
-import { classifySelector, type SelectorStatus } from "./target-picker-status";
-import { SemanticSemanticKindEnum1 } from "../../../types/enums";
+import { classifySelector } from "./target-picker-status";
+import { SelectorStatusType, SemanticKindExtendedType } from "../../../types/enums";
 
 const CSS_INPUT_INVALID = "border-destructive focus-visible:ring-destructive";
 
@@ -75,7 +75,7 @@ function KindSelector(props: {
   );
 }
 
-function SelectorHint(props: { status: SelectorStatus }): JSX.Element {
+function SelectorHint(props: { status: SelectorStatusType }): JSX.Element {
   const { status } = props;
   if (status === "invalid") {
     return <p className="text-[10px] text-destructive">Invalid CSS selector, playback will fall back to document.body.</p>;
@@ -95,7 +95,7 @@ function SelectorHint(props: { status: SelectorStatus }): JSX.Element {
 function SelectorInputRow(props: {
     eventId: string;
     selectorText: string;
-    status: SelectorStatus;
+    status: SelectorStatusType;
     onChange: (next: KeywordEventTarget) => void;
 }): JSX.Element {
   const { eventId, selectorText, status, onChange } = props;
@@ -122,7 +122,7 @@ function SelectorInputRow(props: {
   );
 }
 
-function NonSelectorHint(props: { kind: SemanticSemanticKindEnum1 }): JSX.Element {
+function NonSelectorHint(props: { kind: SemanticKindExtendedType }): JSX.Element {
   return (
     <p className="text-[10px] text-muted-foreground">
       {props.kind === "ActiveElement"
@@ -159,7 +159,7 @@ export function TargetPickerRow(props: TargetPickerRowProps): JSX.Element {
       <KindSelector eventId={eventId} kind={value.Kind} onKindChange={handleKindChange} />
       {isSelector
         ? <SelectorInputRow eventId={eventId} selectorText={selectorText} status={status} onChange={onChange} />
-        : <NonSelectorHint kind={value.Kind as SemanticSemanticKindEnum1} />}
+        : <NonSelectorHint kind={value.Kind as SemanticKindExtendedType} />}
     </div>
   );
 }

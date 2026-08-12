@@ -31,19 +31,19 @@ export const apiRegistry: ApiRegistry = Object.freeze({
   credits: Object.freeze({
     fetchWorkspaces: Object.freeze({
       url: "/user/workspaces",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Fetch all user workspaces with credit info",
     }),
     fetchBalance: Object.freeze({
       url: "/workspaces/{wsId}/credit-balance",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Fetch credit balance for a specific workspace",
     }),
     resolve: Object.freeze({
       url: "/workspaces/{wsId}/credit-balance",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Resolve workspace credit balance with fallback",
     }),
@@ -56,7 +56,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
     // MUST use `workspace.moveV2` below.
     move: Object.freeze({
       url: "/projects/{projectId}/move-to-workspace",
-      method: "PUT" as const,
+      method: HttpMethodType.PUT,
       auth: true,
       description: "DEPRECATED (v1): Move project to a different workspace",
     }),
@@ -65,39 +65,39 @@ export const apiRegistry: ApiRegistry = Object.freeze({
     // live call confirms — patch here if server returns 4xx.
     moveV2: Object.freeze({
       url: "/workspaces/{wsId}/memberships/{userId}",
-      method: "PUT" as const,
+      method: HttpMethodType.PUT,
       auth: true,
       description: "Move project to workspace (v2, membership-scoped) — PENDING-VERIFY",
       timeoutMs: 15_000,
     }),
     rename: Object.freeze({
       url: "/user/workspaces/{wsId}",
-      method: "PUT" as const,
+      method: HttpMethodType.PUT,
       auth: true,
       description: "Rename a workspace",
     }),
     markViewed: Object.freeze({
       url: "/projects/{projectId}/mark-viewed",
-      method: "POST" as const,
+      method: HttpMethodType.POST,
       auth: true,
       description: "Mark project as recently viewed (returns workspace_id)",
     }),
     probe: Object.freeze({
       url: "/user/workspaces",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Probe workspace list for connectivity check",
       timeoutMs: 8_000,
     }),
     resolveByProject: Object.freeze({
       url: "/projects/{projectId}/workspace",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Resolve workspace for a given project",
     }),
     switchContext: Object.freeze({
       url: "/workspaces/{wsId}/workspace-access-requests",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Switch active workspace context without moving a project (fallback when no project ID available)",
     }),
@@ -117,7 +117,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
          */
     search: Object.freeze({
       url: "/workspaces/{wsId}/memberships/search?status=active&limit=20",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Search active members of a workspace (top 20)",
       timeoutMs: 10_000,
@@ -127,21 +127,21 @@ export const apiRegistry: ApiRegistry = Object.freeze({
     // live call and patch this entry if the server returns 404/405.
     invite: Object.freeze({
       url: "/workspaces/{wsId}/memberships",
-      method: "POST" as const,
+      method: HttpMethodType.POST,
       auth: true,
       description: "Invite a user to a workspace (body: { email, role })",
       timeoutMs: 10_000,
     }),
     remove: Object.freeze({
       url: "/workspaces/{wsId}/memberships/{userId}",
-      method: "DELETE" as const,
+      method: HttpMethodType.DELETE,
       auth: true,
       description: "Remove a member from a workspace",
       timeoutMs: 10_000,
     }),
     updateRole: Object.freeze({
       url: "/workspaces/{wsId}/memberships/{userId}",
-      method: "PATCH" as const,
+      method: HttpMethodType.PATCH,
       auth: true,
       description: "Change a member's role (body: { role: 'owner' | 'member' })",
       timeoutMs: 10_000,
@@ -158,7 +158,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
          */
     list: Object.freeze({
       url: "/workspaces/{wsId}/projects?limit=200",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "List up to 200 projects in a workspace (used for remix-name collision check)",
       timeoutMs: 10_000,
@@ -170,7 +170,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
     // See `.lovable/question-and-ambiguity/52-projects-get-405.md`.
     gitsync: Object.freeze({
       url: "/workspaces/{wsId}/projects/{projectId}/gitsync",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Fetch gitsync (GitHub repo link) config for a project",
       timeoutMs: 10_000,
@@ -184,7 +184,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
          */
     init: Object.freeze({
       url: "/projects/{projectId}/remix/init",
-      method: "POST" as const,
+      method: HttpMethodType.POST,
       auth: true,
       description: "Initialize a project remix into the target workspace",
       timeoutMs: 30_000,
@@ -202,7 +202,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
          */
     progress: Object.freeze({
       url: "/workspaces/{wsId}/connections/gitsync/projects/{projectId}/jobs/{jobId}/progress",
-      method: "GET" as const,
+      method: HttpMethodType.GET,
       auth: true,
       description: "Read GitSync job progress (status/step/result.repo_url)",
       timeoutMs: 10_000,
@@ -216,7 +216,7 @@ export const apiRegistry: ApiRegistry = Object.freeze({
          */
     syncProject: Object.freeze({
       url: "/workspaces/{wsId}/connections/gitsync/{connId}/projects/{projectId}/sync",
-      method: "POST" as const,
+      method: HttpMethodType.POST,
       auth: true,
       description: "Trigger GitSync sync for a project (returns job_id)",
       timeoutMs: 15_000,

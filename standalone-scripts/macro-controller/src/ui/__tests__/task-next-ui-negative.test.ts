@@ -15,8 +15,10 @@ vi.mock('../prompt-utils', () => ({
   showPasteToast: showPasteToastMock,
 }));
 
-vi.mock('../prompt-loader', () => ({
-  getPromptsConfig: () => ({ entries: [] }),
+import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
+
+vi.mock('../prompt-loader', () => buildPromptLoaderMock({
+  getPromptsConfig: () => ({ entries: [] } as any),
 }));
 
 vi.mock('../../queue-control/task-queue-project-store', () => ({

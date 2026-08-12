@@ -185,9 +185,13 @@ function evaluateInstructionSource(source, tsPath) {
 
     const enumBindings = [
         `const InjectionWorld = { Main: "MAIN", Isolated: "ISOLATED" };`,
+        `const InjectionWorldType = { Main: "MAIN", Isolated: "ISOLATED" };`,
         `const InjectionRunAt = { DocumentStart: "document_start", DocumentEnd: "document_end", DocumentIdle: "document_idle" };`,
+        `const InjectionRunAtType = { DocumentStart: "document_start", DocumentEnd: "document_end", DocumentIdle: "document_idle" };`,
         `const MatchType = { Glob: "glob", Regex: "regex", Exact: "exact" };`,
+        `const MatchRuleType = { Glob: "glob", Regex: "regex", Exact: "exact" };`,
         `const AssetInjectTarget = { Head: "head" };`,
+        `const AssetInjectTargetType = { Head: "head" };`,
         `const VERSION = ${JSON.stringify(SHARED_VERSION)};`,
     ];
     const evalCode = enumBindings.concat(preambleLines).join("\n") + "\nreturn (" + match[1] + ")";

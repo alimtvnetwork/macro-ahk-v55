@@ -7,7 +7,25 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
-import { ServiceResult } from "@/utils/result-wrapper";
+import initSqlJs from "./sqljs-loader";
+import { BootPersistenceModeType } from "../types/enums";
+import { logCaughtError, BgLogTag, AUTO_CAUGHT_MSG } from "./bg-logger";
+import {
+  loadOrCreateFromOpfs,
+  loadFromStorage,
+  saveToOpfs,
+} from "./db-persistence";
+import { wrapDatabaseWithBindSafety } from "./sqlite-bind-safety";
+import {
+  RECORDER_DB_SCHEMA,
+  applyParamsJsonMigration,
+  applyChainColumnsMigration,
+} from "./recorder-db-schema";
+import {
+  DEFAULT_PROJECT_DATABASES,
+  type DefaultDatabaseDef,
+} from "../types/default-databases";
+
 type SqlJs = import("sql.js").SqlJsStatic;
 type PersistenceMode = BootPersistenceModeType;
 

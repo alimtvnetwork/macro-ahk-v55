@@ -21,7 +21,7 @@ import { DEFAULT_PROMPTS, getPromptsConfig } from './prompt-manager';
 import { getByXPath } from '../xpath-utils';
 import { taskNextState, findNextTasksPrompt, type TaskNextDeps } from './task-next-ui';
 import { triggerPlanPasteFromInline, isSplitterRunning } from './task-splitter-ui';
-import { setRepeatCount } from './repeat-loop-ui';
+
 import { cPanelFg, cPrimaryLight } from '../shared-state';
 import {
   applyInlineStripGroupCollapse,
@@ -254,7 +254,11 @@ function planClickHandler(n: number): void {
   // Repeat count textbox so the user can immediately hit 🔁 Repeat
   // without retyping it. Repeat still requires an explicit Run click.
   try {
-    setRepeatCount(clamped); 
+    import('./repeat-loop-ui').then(mod => {
+      mod.setRepeatCount(clamped);
+    }).catch(e => {
+      log('PlanInline: setRepeatCount load failed - ' + (e instanceof Error ? e.message : String(e)), 'warn');
+    });
   } catch (e) {
     log('PlanInline: setRepeatCount failed - ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
   }

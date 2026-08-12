@@ -156,7 +156,7 @@ function DecisionList({ decisions }: { decisions: Decision[] }): JSX.Element {
 }
 
 function DecisionRow({ decision }: { decision: Decision }): JSX.Element {
-  const badge = reasonBadge(decision.reason, decision.isSuccess);
+  const badge = reasonBadge(decision.reason, decision.ok);
 
   return <li className="flex items-start gap-2 text-xs"><span className={`shrink-0 px-1.5 py-0.5 rounded border ${badge.cls}`}>{badge.label}</span><span className="font-mono">{decision.scriptName}</span><span className="text-muted-foreground truncate" title={decision.detail}>: {decision.detail}</span></li>;
 }

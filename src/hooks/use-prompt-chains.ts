@@ -6,7 +6,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
 import type { PromptEntry } from "./use-prompts";
-import { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
+import type { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
+export type { ChainStepStatusType };
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */

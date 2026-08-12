@@ -10,5 +10,5 @@ import type { MatchRuleType } from "../enums/match-type";
  */
 export type TargetUrl = {
     readonly Pattern: UrlPattern;
-    readonly MatchRuleType: MatchRuleType;
+    readonly MatchType: MatchRuleType;
 };

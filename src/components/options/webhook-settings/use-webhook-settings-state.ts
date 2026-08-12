@@ -24,7 +24,7 @@ import {
 } from "@/background/recorder/step-library/result-webhook";
 
 import { isCorruptPlaceholder } from "./delivery-log-utils";
-import type { StatusFilter } from "./DeliveryLogSection";
+import type { StatusFilterType } from "@/types/enums";
 
 export interface LogCounts { readonly all: number; readonly success: number; readonly skipped: number; readonly failure: number; }
 
@@ -43,7 +43,7 @@ function computeLogCounts(log: ReadonlyArray<WebhookDeliveryResult>): LogCounts 
   return { all: log.length, success, skipped, failure };
 }
 
-function entryMatchesStatus(entry: WebhookDeliveryResult, filter: StatusFilter): boolean {
+function entryMatchesStatus(entry: WebhookDeliveryResult, filter: StatusFilterType): boolean {
   if (filter === "skipped") {
     return isWebhookSkipped(entry);
   }
@@ -72,7 +72,7 @@ function entryMatchesQuery(entry: WebhookDeliveryResult, query: string): boolean
   return event.includes(query) || emitted.includes(query) || status.includes(query);
 }
 
-function filterLog(log: ReadonlyArray<WebhookDeliveryResult>, statusFilter: StatusFilter, searchQuery: string): ReadonlyArray<WebhookDeliveryResult> {
+function filterLog(log: ReadonlyArray<WebhookDeliveryResult>, statusFilter: StatusFilterType, searchQuery: string): ReadonlyArray<WebhookDeliveryResult> {
   const query = searchQuery.trim().toLowerCase();
 
   return log.filter((entry) => entryMatchesStatus(entry, statusFilter) && entryMatchesQuery(entry, query));
@@ -135,7 +135,7 @@ function useWebhookDraft(open: boolean) {
 
 function useWebhookLog(open: boolean) {
   const [log, setLog] = useState<ReadonlyArray<WebhookDeliveryResult>>([]);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [payloadOpenIdx, setPayloadOpenIdx] = useState<number | null>(null);

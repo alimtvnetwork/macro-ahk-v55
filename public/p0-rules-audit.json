@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-27T04:12:48.794Z",
+  "generated": "2026-08-12T16:15:08.068Z",
   "baselinesSource": "spec/33-missing-coding-guideline/99-baselines.json",
   "strict": true,
   "regressedCount": 0,
@@ -9,18 +9,18 @@
       "id": "P0-01",
       "title": "innerHTML sinks",
       "baseline": 187,
-      "observed": 141,
+      "observed": -1,
       "eslintRule": "no-restricted-syntax (AssignmentExpression[left.property.name='innerHTML'])",
-      "delta": -46,
+      "delta": -188,
       "status": "at-or-below-baseline"
     },
     {
       "id": "P0-02",
       "title": "new Function() dynamic eval",
       "baseline": 1,
-      "observed": 1,
+      "observed": -1,
       "eslintRule": "no-restricted-syntax (NewExpression[callee.name='Function'])",
-      "delta": 0,
+      "delta": -2,
       "status": "at-or-below-baseline"
     },
     {
@@ -45,9 +45,9 @@
       "id": "P0-04b",
       "title": "Unannotated silent catches",
       "baseline": 5,
-      "observed": 0,
+      "observed": -1,
       "eslintRule": "no-empty ({ allowEmptyCatch: false })",
-      "delta": -5,
+      "delta": -6,
       "status": "at-or-below-baseline"
     },
     {
@@ -55,7 +55,7 @@
       "title": "setInterval sites bypassing trackedSetInterval registry",
       "baseline": 10,
       "observed": 0,
-      "note": "total setInterval: 13; trackedSetInterval refs: 28",
+      "note": "total setInterval: -1; trackedSetInterval refs: -1",
       "eslintRule": "custom AST rule (not implemented); enforced by check-timer-teardown.mjs",
       "delta": -10,
       "status": "at-or-below-baseline"
@@ -64,9 +64,9 @@
       "id": "P0-06",
       "title": "Raw localStorage literal keys",
       "baseline": 15,
-      "observed": 15,
+      "observed": -1,
       "eslintRule": "no-restricted-syntax (CallExpression[callee.object.name='localStorage'])",
-      "delta": 0,
+      "delta": -16,
       "status": "at-or-below-baseline"
     },
     {
@@ -106,9 +106,9 @@
       "id": "P0-10",
       "title": "`as unknown as` double-casts",
       "baseline": 71,
-      "observed": 71,
+      "observed": 67,
       "eslintRule": "no-restricted-syntax (TSAsExpression > TSAsExpression[TSUnknownKeyword])",
-      "delta": 0,
+      "delta": -4,
       "status": "at-or-below-baseline"
     }
   ]

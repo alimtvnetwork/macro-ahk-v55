@@ -75,6 +75,8 @@ export const enum BgLogTag {
  *  Logger helpers narrow internally via `instanceof Error` checks. */
 export type CaughtError = unknown;
 
+export const AUTO_CAUGHT_MSG = "Automatically caught swallowed error";
+
 export interface BgErrorContext {
     scriptId?: string;
     projectId?: string;

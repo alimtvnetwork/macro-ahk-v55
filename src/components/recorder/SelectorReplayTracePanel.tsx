@@ -32,10 +32,9 @@ import type { FailureReport } from "@/background/recorder/failure-logger";
 import {
   buildReplayTrace,
   type TraceStep,
-  type TraceStepStatus,
 } from "./selector-replay-trace";
 import { FormSnapshotBadge } from "./FormSnapshotTable";
-import { ReplayTraceSummaryOutcome } from "../../types/enums";
+import { TraceStepStatusType, ReplayTraceSummaryOutcomeType } from "../../types/enums";
 
 interface SelectorReplayTracePanelProps {
     readonly report: FailureReport;
@@ -43,28 +42,28 @@ interface SelectorReplayTracePanelProps {
     readonly embedded?: boolean;
 }
 
-const STATUS_TONE: Readonly<Record<TraceStepStatus, string>> = {
+const STATUS_TONE: Readonly<Record<TraceStepStatusType, string>> = {
   matched: "border-emerald-500/40 bg-emerald-500/5",
   missed:  "border-destructive/40 bg-destructive/5",
   errored: "border-rose-500/40 bg-rose-500/5",
   pending: "border-border bg-muted/20 opacity-70",
 };
 
-const STATUS_ICON_TONE: Readonly<Record<TraceStepStatus, string>> = {
+const STATUS_ICON_TONE: Readonly<Record<TraceStepStatusType, string>> = {
   matched: "text-emerald-500",
   missed:  "text-destructive",
   errored: "text-rose-500",
   pending: "text-muted-foreground",
 };
 
-const STATUS_LABEL: Readonly<Record<TraceStepStatus, string>> = {
+const STATUS_LABEL: Readonly<Record<TraceStepStatusType, string>> = {
   matched: "MATCHED",
   missed:  "MISSED",
   errored: "ERROR",
   pending: "SKIPPED",
 };
 
-function StatusIcon({ status }: { readonly status: TraceStepStatus }) {
+function StatusIcon({ status }: { readonly status: TraceStepStatusType }) {
   const cls = `h-3.5 w-3.5 shrink-0 ${STATUS_ICON_TONE[status]}`;
   switch (status) {
     case "matched": return <CheckCircle2 className={cls} aria-hidden />;
@@ -155,7 +154,7 @@ function SummaryBar({
     readonly evaluated: number;
     readonly skipped: number;
     readonly stoppedAt: number | null;
-    readonly outcome: ReplayTraceSummaryOutcome;
+    readonly outcome: ReplayTraceSummaryOutcomeType;
     readonly snapshot: FailureReport["FormSnapshot"];
 }) {
   const tone =

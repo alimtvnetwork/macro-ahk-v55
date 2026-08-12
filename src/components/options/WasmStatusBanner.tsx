@@ -31,7 +31,7 @@ import type { WasmProbeSnapshot } from "@/hooks/use-extension-data";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, RefreshCw, ShieldAlert, FileWarning, Copy, Check, Wrench, ExternalLink, RotateCw, Terminal, FileCode } from "lucide-react";
 import { logError } from "./options-logger";
-import { InitOutcomeEnum, FixScenarioEnum } from "../../types/enums";
+import { InitOutcomeType, FixScenarioType } from "../../types/enums";
 
 /* ----------------------------------------------------------------------- */
 /*  Runtime CSP probe                                                       */
@@ -105,7 +105,7 @@ function readDeclaredCsp(): string | null {
 /*  Boot-side WASM init evaluation                                          */
 /* ----------------------------------------------------------------------- */
 
-type InitOutcome = InitOutcomeEnum;
+type InitOutcome = InitOutcomeType;
 
 interface InitEvaluation {
     outcome: InitOutcome;
@@ -126,7 +126,7 @@ function evaluateBootInit(
 
   if (isFailure && mentionsWasm) {
     const headDetail = wasmProbe !== null && wasmProbe !== undefined
-      ? `HEAD probe → ${wasmProbe.url}\n  status=${wasmProbe.status ?? "n/a"} length=${wasmProbe.contentLength ?? "n/a"} ok=${wasmProbe.isSuccess}`
+      ? `HEAD probe → ${wasmProbe.url}\n  status=${wasmProbe.status ?? "n/a"} length=${wasmProbe.contentLength ?? "n/a"} ok=${wasmProbe.ok}`
       : null;
     const errorDetail = bootError ?? "(no error message captured)";
     const detail = headDetail !== null ? `${errorDetail}\n\n${headDetail}` : errorDetail;
@@ -199,7 +199,7 @@ function buildReport(args: {
     lines.push(`URL:            ${wasmProbe.url}`);
     lines.push(`HTTP status:    ${wasmProbe.status ?? "n/a"}`);
     lines.push(`Content-Length: ${wasmProbe.contentLength ?? "n/a"}`);
-    lines.push(`OK:             ${wasmProbe.isSuccess}`);
+    lines.push(`OK:             ${wasmProbe.ok}`);
     lines.push(`HEAD error:     ${wasmProbe.headError ?? "(none)"}`);
     lines.push(`Captured at:    ${wasmProbe.at}`);
   } else {
@@ -426,7 +426,7 @@ export function WasmStatusBanner() {
 /* ----------------------------------------------------------------------- */
 
 type FixScenario =
-    FixScenarioEnum;
+    FixScenarioType;
 
 interface FixStep {
     title: string;

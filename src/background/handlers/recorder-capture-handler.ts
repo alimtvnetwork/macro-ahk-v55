@@ -126,7 +126,7 @@ async function persistOneCapture(
   let finalPayload = payload;
     
   // Type casting because CapturedAt is injected by content script but isn't typed in XPathCapturePayload
-  const capturedAtStr = (payload as Record<string, unknown>).CapturedAt as string | undefined;
+  const capturedAtStr = (payload as unknown as Record<string, unknown>).CapturedAt as string | undefined;
   if (capturedAtStr) {
     const capturedAtMs = new Date(capturedAtStr).getTime();
     const openedUrl = getRecentlyOpenedTabUrl(capturedAtMs);

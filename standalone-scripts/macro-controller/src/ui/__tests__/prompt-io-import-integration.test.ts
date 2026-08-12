@@ -24,9 +24,11 @@ vi.mock('../prompt-cache', () => ({
   clearPromptCache: clearPromptCacheMock,
 }));
 
+import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
+
 // Mock Loader
 const invalidatePromptCacheMock = vi.hoisted(() => vi.fn());
-vi.mock('../prompt-loader', () => ({
+vi.mock('../prompt-loader', () => buildPromptLoaderMock({
   invalidatePromptCache: invalidatePromptCacheMock,
 }));
 

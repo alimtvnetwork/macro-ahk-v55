@@ -209,8 +209,17 @@ function dismissAll(): void {
 /*  Show toast                                                         */
 /* ------------------------------------------------------------------ */
 
+function resolveColors(): Record<ToastLevelType, { text: string; bg: string; border: string; icon: string }> {
+  return {
+    [ToastLevelType.Info]: { text: "#00529B", bg: "#BDE5F8", border: "#00529B", icon: "ℹ️" },
+    [ToastLevelType.Success]: { text: "#4F8A10", bg: "#DFF2BF", border: "#4F8A10", icon: "✅" },
+    [ToastLevelType.Warn]: { text: "#9F6000", bg: "#FEEFB3", border: "#9F6000", icon: "⚠️" },
+    [ToastLevelType.Error]: { text: "#D8000C", bg: "#FFD2D2", border: "#D8000C", icon: "❌" },
+  } as Record<ToastLevelType, { text: string; bg: string; border: string; icon: string }>;
+}
+
 // eslint-disable-next-line max-lines-per-function
-function showToast(message: string, level: ToastLevelType = "error", opts: ToastOpts = {}): void {
+function showToast(message: string, level: ToastLevelType = ToastLevelType.Error, opts: ToastOpts = {}): void {
   // Guard: defer if DOM not ready yet
   if (!document.body && !document.documentElement) {
     setTimeout(() => showToast(message, level, opts), 50);
@@ -230,7 +239,7 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
 
   const timeStr = nowTimeStr();
   const colors = resolveColors();
-  const c = colors[level] || colors.error;
+  const c = colors[level] || colors[ToastLevelType.Error];
 
   const container = getOrCreateContainer();
 
@@ -355,11 +364,11 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
   }
 
   // Auto-dismiss
-  const ms = opts.duration ?? (level === "error" ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
+  const ms = opts.duration ?? (level === ToastLevelType.Error ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
   toast._dismissTimer = setTimeout(() => dismissToast(toast), ms);
 
   // Error-level: trigger stop-loop callback
-  if (level === "error" && !_errorStopTriggered && !opts.noStop && _stopLoopFn) {
+  if (level === ToastLevelType.Error && !_errorStopTriggered && !opts.noStop && _stopLoopFn) {
     _errorStopTriggered = true;
     try {
       _stopLoopFn(); 
@@ -371,7 +380,7 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
   }
 
   // Push to recent errors store
-  if (level === "error" || level === "warn") {
+  if (level === ToastLevelType.Error || level === ToastLevelType.Warn) {
     pushRecentError({ timestamp: timeStr, level, message, stack: opts.stack, requestDetail: opts.requestDetail });
   }
 }
@@ -384,16 +393,16 @@ export function createNotifyApi(): NotifyApi {
   return {
     toast: showToast,
     info(message: string, opts?: ToastOpts) {
-      showToast(message, "info", opts); 
+      showToast(message, ToastLevelType.Info, opts); 
     },
     success(message: string, opts?: ToastOpts) {
-      showToast(message, "success", opts); 
+      showToast(message, ToastLevelType.Success, opts); 
     },
     warning(message: string, opts?: ToastOpts) {
-      showToast(message, "warn", opts); 
+      showToast(message, ToastLevelType.Warn, opts); 
     },
     error(message: string, opts?: ToastOpts) {
-      showToast(message, "error", opts); 
+      showToast(message, ToastLevelType.Error, opts); 
     },
     dismissAll,
     onError(callback: ErrorCallback) {

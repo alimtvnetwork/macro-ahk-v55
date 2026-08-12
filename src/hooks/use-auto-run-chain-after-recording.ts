@@ -139,12 +139,6 @@ export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): voi
       .catch((caught: unknown) => {
         // The chain runner traps its own errors and resolves with a
         // result; this catch is purely defensive against custom
-
-        endCbRef.current?.(result);
-      })
-      .catch((caught: unknown) => {
-        // The chain runner traps its own errors and resolves with a
-        // result; this catch is purely defensive against custom
         // runners passed in by tests.
         logError("useAutoRunChainAfterRecording", "Custom runner rejected — default runner always resolves; investigate test/runner injection", caught);
       });

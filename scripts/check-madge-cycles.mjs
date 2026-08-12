@@ -50,7 +50,7 @@ function runMadge() {
   const result = spawnSync(
     'npx',
     ['--yes', 'madge', '--circular', '--extensions', 'ts', '--json', TARGET],
-    { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
+    { cwd: REPO_ROOT, encoding: 'utf8', shell: process.platform === 'win32', maxBuffer: 32 * 1024 * 1024 },
   );
   if (result.error) {
     throw new Error('check-madge-cycles: madge failed to spawn: ' + result.error.message);

@@ -1,4 +1,4 @@
-/**
+/**
  * ScriptBundleDetailView — Detail/editor view for a single script bundle.
  * Mirrors ProjectDetailView pattern with the bundle editor from ScriptsList.
  */
@@ -36,6 +36,7 @@ import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { RunAtSelect, FileDropZone, RUN_AT_OPTIONS } from "./ScriptsList";
 import { toast } from "sonner";
 import { logError } from "@/components/options/options-logger";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -460,15 +461,16 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
                 setIsCheckingUpdate(true);
                 try {
-                  const res = ServiceResult.wrapFetch(await fetch(updateUrl.trim()));
+                  const fetchRes = await fetch(updateUrl.trim());
+                  const res = ServiceResult.wrapFetch(fetchRes);
                   if (res.isFail) {
                     // HEFF: single attempt; report status and stop.
                     throw new Error(
-                      `HEFF: HTTP ${res.status} on GET ${updateUrl.trim()} — update fetch halted. Awaiting user instruction.`,
+                      `HEFF: HTTP ${fetchRes.status} on GET ${updateUrl.trim()} — update fetch halted. Awaiting user instruction.`,
                     );
                   }
 
-                  const text = await res.text();
+                  const text = await fetchRes.text();
                   if (!text.trim()) {
                     throw new Error("Empty response");
                   }

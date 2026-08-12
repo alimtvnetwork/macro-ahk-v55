@@ -156,7 +156,7 @@ export async function handleKvList(
     return entries;
   });
 
-  if (wrap.Ok === false) {
+  if (wrap.ok === false) {
     return { entries: [] };
   }
 

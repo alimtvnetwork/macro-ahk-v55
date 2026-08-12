@@ -18,6 +18,7 @@
  */
 
 import { NamespaceLogger } from "./logger";
+import { ToastLevelType } from "./notify";
 /* `ProjectNamespace` is a global ambient interface declared in
    `standalone-scripts/types/project-namespace-shape.d.ts` — no import needed. */
 
@@ -43,7 +44,7 @@ type MarcoOpaque = {
     readonly kv?: { get(k: string): Promise<unknown>; set(k: string, v: unknown): Promise<void>; delete(k: string): Promise<void>; list(): Promise<unknown> };
     readonly files?: { save(n: string, d: string): Promise<unknown>; read(n: string): Promise<unknown>; list(): Promise<unknown> };
     readonly notify?: {
-        toast(msg: string, level?: string, opts?: unknown): unknown;
+        toast(msg: string, level?: ToastLevelType, opts?: unknown): unknown;
         dismiss?(id: string): unknown;
         dismissAll?(): unknown;
         onError?(cb: (e: unknown) => void): unknown;
@@ -201,7 +202,7 @@ export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): v
     }),
     notify: Object.freeze({
       toast: (msg: string, level?: string, opts?: unknown) =>
-        marco.notify ? marco.notify.toast(msg, level, opts) : console.log(LOG_PREFIX, msg),
+        marco.notify ? marco.notify.toast(msg, level as ToastLevelType, opts) : console.log(LOG_PREFIX, msg),
       dismiss: (id: string) => (marco.notify?.dismiss ? marco.notify.dismiss(id) : undefined),
       dismissAll: () => (marco.notify?.dismissAll ? marco.notify.dismissAll() : undefined),
       onError: (cb: (e: unknown) => void) =>

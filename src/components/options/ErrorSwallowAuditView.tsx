@@ -40,7 +40,7 @@ import { AlertOctagon, AlertTriangle, FileWarning, RefreshCw, Info, ExternalLink
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AuditSeverityEnum, BadgeEnum, ToneEnum } from "../../types/enums";
+import { AuditSeverityType, BadgeType, ToneType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 import { ServiceResult } from "@/utils/result-wrapper";
 
@@ -50,7 +50,7 @@ const AUDIT_CLI_COMMAND = "node scripts/audit-error-swallow.mjs";
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type AuditSeverity = AuditSeverityEnum;
+export type AuditSeverity = AuditSeverityType;
 
 export interface AuditItem {
     readonly Id: string;
@@ -137,7 +137,7 @@ function validateReport(raw: any): AuditReport | string {
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function severityMeta(severity: AuditSeverity): { label: string; badge: BadgeEnum; Icon: typeof AlertOctagon; ring: string } {
+function severityMeta(severity: AuditSeverity): { label: string; badge: BadgeType; Icon: typeof AlertOctagon; ring: string } {
   if (severity === "P0") {
     return { label: "P0 · Critical", badge: "destructive", Icon: AlertOctagon, ring: "border-destructive/60 bg-destructive/10" };
   }
@@ -175,8 +175,9 @@ export default function ErrorSwallowAuditView() {
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const res = ServiceResult.wrapFetch(await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" }));
-      if (res.status === HttpCodes.NOT_FOUND) {
+      const fetchRes = await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" });
+      const res = ServiceResult.wrapFetch(fetchRes);
+      if (fetchRes.status === HttpCodes.NOT_FOUND) {
         setState({ kind: "missing" });
 
         return;
@@ -186,13 +187,13 @@ export default function ErrorSwallowAuditView() {
         // HEFF: single attempt; surface status, do NOT retry.
         setState({
           kind: "error",
-          message: `HEFF: HTTP ${res.status} on GET ${DEFAULT_AUDIT_URL} — ${res.statusText}. Loop halted.`,
+          message: `HEFF: HTTP ${fetchRes.status} on GET ${DEFAULT_AUDIT_URL} — ${fetchRes.statusText}. Loop halted.`,
         });
 
         return;
       }
 
-      const raw = await res.json();
+      const raw = await fetchRes.json();
       const validated = validateReport(raw);
       if (typeof validated === "string") {
         setState({ kind: "error", message: `Malformed audit report — ${validated}` });
@@ -559,7 +560,7 @@ function AuditSummaryPanel({ state, onReload }: { state: LoadState; onReload: ()
   );
 }
 
-function StatTile({ label, value, tone }: { label: string; value: number; tone: ToneEnum }) {
+function StatTile({ label, value, tone }: { label: string; value: number; tone: ToneType }) {
   const toneClass =
         tone === "destructive" ? "border-destructive/60 bg-destructive/10 text-destructive"
           : tone === "warn"      ? "border-amber-500/40 bg-amber-500/10 text-amber-300"

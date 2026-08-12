@@ -33,9 +33,9 @@ const instruction: ProjectInstruction<{ OnlyRunAsDependency: boolean }> = {
     AutoInject: true,
     RunAt: InjectionRunAtType.DocumentStart,
     TargetUrls: [
-      { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
-      { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
-      { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
+      { Pattern: "https://lovable.dev/projects/*", MatchType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovable.app/*", MatchType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovableproject.com/*", MatchType: MatchRuleType.Glob },
     ],
     Cookies: [
       { CookieName: "lovable-session-id.id", Url: LOVABLE_BASE_URL, Role: "session", Description: "Primary session cookie — JWT bearer token" },

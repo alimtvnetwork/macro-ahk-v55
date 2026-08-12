@@ -1,0 +1,81 @@
+name: Build prompt-manager desktop app
+
+on:
+  push:
+    tags:
+      - 'prompt-manager-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to attach binaries to (e.g. prompt-manager-v1.0.0)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: prompt-manager-linux-x64
+            ext: ''
+          - os: macos-latest
+            asset: prompt-manager-macos-x64
+            ext: ''
+          - os: windows-latest
+            asset: prompt-manager-windows-x64.exe
+            ext: '.exe'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --no-cache-dir pyinstaller
+          python -m pip install -r prompt-manager/requirements.txt
+      - name: Build binary
+        run: |
+          pyinstaller --onefile --windowed --name prompt-manager${{ matrix.ext }} prompt-manager/app.py
+        shell: bash
+      - name: Rename artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          cp dist/prompt-manager${{ matrix.ext }} out/${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: out/${{ matrix.asset }}
+
+  release:
+    name: Attach binaries to release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || inputs.tag != ''
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f -exec cp {} release-assets/ \;
+          (cd release-assets && sha256sum * > checksums-prompt-manager.txt)
+          ls -la release-assets
+      - name: Resolve tag
+        id: tag
+        run: |
+          TAG="${{ inputs.tag }}"
+          [ -z "$TAG" ] && TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: release-assets/*
+          fail_on_unmatched_files: true

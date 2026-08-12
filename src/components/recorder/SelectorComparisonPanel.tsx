@@ -169,7 +169,7 @@ function AttemptRowHeader({
   onPromote,
   isPromoting,
 }: {
-  readonly attempt: SelectorEvaluationAttempt;
+  readonly attempt: SelectorAttemptComparison;
   readonly onPromote: ((selectorId: number) => void) | null;
   readonly isPromoting: boolean;
 }) {
@@ -214,7 +214,7 @@ function AttemptRowDetails({
   history,
   showHistory,
 }: {
-  readonly attempt: SelectorEvaluationAttempt;
+  readonly attempt: SelectorAttemptComparison;
   readonly history: SelectorHistoryBucket | null;
   readonly showHistory: boolean;
 }) {

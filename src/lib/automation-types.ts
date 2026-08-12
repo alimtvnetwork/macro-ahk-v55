@@ -1,6 +1,8 @@
 import { StepNotifyLevelType, ConditionCheckType, TaskTriggerType, ChainRunnerStatusType, BranchLabelType } from "../types/enums";
 import { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
+export type TriggerType = TaskTriggerType;
+
 /**
  * Automation Chain Types — Spec 21
  *
