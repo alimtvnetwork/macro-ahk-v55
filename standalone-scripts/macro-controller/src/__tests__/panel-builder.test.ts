@@ -212,6 +212,7 @@ function makeMockDeps(): PanelBuilderDeps {
  
 describe('panel-builder', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     document.body.innerHTML = '';
     (window as any).__loopUpdateStartStopBtn = undefined;
     (window as any).__loopUpdateAuthDiag = undefined;
@@ -220,6 +221,11 @@ describe('panel-builder', () => {
     // during panel-builder unit tests (these tests don't exercise the
     // namespace itself — they just need it to be present).
     (window as any).RiseupAsiaMacroExt = { Projects: {} };
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it('creates the main UI container in document.body', () => {
