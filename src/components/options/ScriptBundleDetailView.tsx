@@ -1,4 +1,4 @@
-/**
+/**
  * ScriptBundleDetailView — Detail/editor view for a single script bundle.
  * Mirrors ProjectDetailView pattern with the bundle editor from ScriptsList.
  */

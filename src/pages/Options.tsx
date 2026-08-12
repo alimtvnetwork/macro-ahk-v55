@@ -154,19 +154,17 @@ const OptionsPage = () => {
         console.log("[Options] ── INTERACTIVE ── mount-to-interactive=%.1fms (budget=%dms)", ms, budget);
       }
 
-      if (ms > budget) {
-        if (import.meta.env.MODE !== "test") {
-          console.warn(
-            "[Options] ⚠ PERF BUDGET EXCEEDED ── mount-to-interactive %.1fms > %dms budget. " +
-            "Breakdown: projects=%s scripts=%s configs=%s onboarding=%s",
-            ms,
-            budget,
-            pLoading ? "pending" : "ready",
-            sLoading ? "pending" : "ready",
-            cLoading ? "pending" : "ready",
-            onboardingLoading ? "pending" : "ready",
-          );
-        }
+      if (ms > budget && import.meta.env.MODE !== "test") {
+        console.warn(
+          "[Options] ⚠ PERF BUDGET EXCEEDED ── mount-to-interactive %.1fms > %dms budget. " +
+          "Breakdown: projects=%s scripts=%s configs=%s onboarding=%s",
+          ms,
+          budget,
+          pLoading ? "pending" : "ready",
+          sLoading ? "pending" : "ready",
+          cLoading ? "pending" : "ready",
+          onboardingLoading ? "pending" : "ready",
+        );
       }
     }
   }, [pLoading, sLoading, cLoading, onboardingLoading]);
