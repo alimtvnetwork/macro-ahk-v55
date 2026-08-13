@@ -1,5 +1,5 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { logError } from '../error-utils';
+const COMPONENT_ID = "prompt-editor";
 // import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Shared Prompt Editor entry point (PlanTierType-23, step 4).
@@ -94,7 +94,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
 
     snapshot.roleListError = listed.ok ? '(empty)' : (listed?.error ?? 'unknown');
   } catch (err) {
-    logError("prompt-editor", "err", err instanceof Error ? err : new Error(String(err)));
+    logError(COMPONENT_ID, "err", err instanceof Error ? err : new Error(String(err)));
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -129,7 +129,7 @@ async function collectSlugOwner(
     const bySlug = await getPromptBySlug(slug);
     recordSlugOwner(bySlug as Parameters<typeof recordSlugOwner>[0], role, snapshot);
   } catch (err) {
-    logError("prompt-editor", "err", err instanceof Error ? err : new Error(String(err)));
+    logError(COMPONENT_ID, "err", err instanceof Error ? err : new Error(String(err)));
     snapshot.slugLookupThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -229,7 +229,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
 
     openPromptCreationModal(rc.ctx, rc.taskNextDeps, editPrompt, prefill, modalOptions);
   } catch (err) {
-    logError("prompt-editor", "err", err instanceof Error ? err : new Error(String(err)));
+    logError(COMPONENT_ID, "err", err instanceof Error ? err : new Error(String(err)));
     const reason = err instanceof Error ? err.message : String(err);
     reportEditorFailure(
       'PROMPT_EDIT_E003',
@@ -294,7 +294,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
       }
     }
   } catch (err) {
-    logError("prompt-editor", "err", err instanceof Error ? err : new Error(String(err)));
+    logError(COMPONENT_ID, "err", err instanceof Error ? err : new Error(String(err)));
     const snap = await buildRoleDiagnosticSnapshot(role);
     const context: DiagnosticContext = {
       ...snap,
@@ -312,8 +312,8 @@ async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
   if (seed.ok === false) {
-    logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: seed?.error ?? 'seed failed' });
-    emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: seed?.error ?? 'seed failed' });
+    logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: String(seed?.error ?? 'seed failed') });
+    emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: String(seed?.error ?? 'seed failed') });
   }
 }
 
@@ -494,7 +494,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
       '❌ No default prompt found for ' + role,
     );
   } catch (err) {
-    logError("prompt-editor", "err", err instanceof Error ? err : new Error(String(err)));
+    logError(COMPONENT_ID, "err", err instanceof Error ? err : new Error(String(err)));
     await handleOpenDefaultError(role, seedRow, err);
   }
 }

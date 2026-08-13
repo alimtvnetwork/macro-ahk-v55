@@ -168,7 +168,7 @@ function buildWorkspaceNodes(
   survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }>,
   currentName: string,
   maxTotalCredits: number,
-  selIdValue: string | boolean
+  selIdValue: string | false
 ): { frag: DocumentFragment, count: number, currentIdx: number } {
   let count = 0;
   let currentIdx = -1;
@@ -377,7 +377,7 @@ class WsDropdownState {
       WsDropdownState.instance = new WsDropdownState();
     }
 
-    return WsDropdownState.instance;
+    return WsDropdownState.instance!;
   }
 
   getHash(): string {
@@ -481,7 +481,7 @@ class CreditResolvedRepaintScheduler {
       CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
     }
 
-    return CreditResolvedRepaintScheduler.instance;
+    return CreditResolvedRepaintScheduler.instance!;
   }
 
   schedule(): void {

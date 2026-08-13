@@ -7,7 +7,7 @@
  * @see .lovable/memory/features/macro-controller/bulk-rename-system.md
  */
 
-import { EVENT_LISTENER_DELAY_MS, MODAL_ANIMATION_DELAY_MS } from './constants';
+import { MODAL_ANIMATION_DELAY_MS } from './constants';
 import { log } from './logger';
 import { showToast } from './toast';
 import { loopCreditState, setLoopWsCheckedIds, setLoopWsLastCheckedIdx } from './shared-state';

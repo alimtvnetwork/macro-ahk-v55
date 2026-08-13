@@ -40,6 +40,10 @@ const PROJECTS = {
         ["vite", ["build", "--config", "vite.config.payment-banner-hider.ts"]],
         ["node", ["scripts/copy-payment-banner-hider-css.mjs"]],
     ],
+    "prompt-manager": [
+        ["tsc", ["--noEmit", "-p", "tsconfig.prompt-manager.json"]],
+        ["vite", ["build", "--config", "vite.config.prompt-manager.ts"]],
+    ],
     "xpath": [
         ["tsc", ["--noEmit", "-p", "tsconfig.xpath.json"]],
         ["vite", ["build", "--config", "vite.config.xpath.ts"]],

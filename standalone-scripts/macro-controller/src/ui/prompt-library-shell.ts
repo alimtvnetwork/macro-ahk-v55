@@ -327,7 +327,7 @@ export function buildShell(): ShellEls {
   ].join(';');
 
   const { actionWrap, refs } = _buildActionWrap();
-  const { previewBtn, previewFileInput, importRoleSelect, importBtn, fileInput, includeRevisionsCb, exportBtn, closeBtn, sampleBtn } = refs;
+  const { previewBtn, previewFileInput, importRoleSelect, importBtn, fileInput, includeRevisionsCb, exportBtn } = refs;
 
   const header = _buildHeader(actionWrap);
   const scrollWrap = document.createElement('div');

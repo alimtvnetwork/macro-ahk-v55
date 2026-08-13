@@ -9,7 +9,7 @@
  * no queue clicks — preserves pre-v3.37.0 behaviour.
  */
 
-import { isFeatureFlagEnabled } from './feature-flags';
+import { isFeatureFlagEnabled, FeatureFlagNameType } from './feature-flags';
 import { log } from './logger';
 import { logError } from './error-utils';
 import { showToast } from './toast';
@@ -60,7 +60,7 @@ export async function gatedMoveToWorkspace(
   targetWorkspaceName: string,
   options: GatedMoveOptions = {},
 ): Promise<void> {
-  if (!isFeatureFlagEnabled('Loop.RunStateGate.Enabled')) {
+  if (!isFeatureFlagEnabled(FeatureFlagNameType.LoopRunStateGateEnabled)) {
     await moveToWorkspace(targetWorkspaceId, targetWorkspaceName);
 
     return;

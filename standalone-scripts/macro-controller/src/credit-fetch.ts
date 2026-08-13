@@ -1,5 +1,5 @@
 import { HttpCodes } from "./constants/http";
-import { ServiceResult } from './utils/result-wrapper';
+
 /**
  * MacroLoop Controller — Credit Fetch
  *

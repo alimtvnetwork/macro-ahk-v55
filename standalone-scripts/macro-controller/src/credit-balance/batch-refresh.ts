@@ -142,7 +142,7 @@ export async function batchRefreshProOneCreditBalances(
   for (const c of candidates) {
     if (c.dispatchable !== true) {
       counters.skipped += 1;
-      results.push({ workspaceId: c.workspaceId, outcome: 'skipped', reason: 'plan-not-eligible' });
+      results.push({ workspaceId: c.workspaceId, outcome: 'skipped', reason: BatchSkipReasonType.PlanNotEligible });
     }
   }
 

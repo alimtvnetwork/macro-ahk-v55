@@ -192,6 +192,7 @@ function evaluateInstructionSource(source, tsPath) {
         `const MatchRuleType = { Glob: "glob", Regex: "regex", Exact: "exact" };`,
         `const AssetInjectTarget = { Head: "head" };`,
         `const AssetInjectTargetType = { Head: "head" };`,
+        `const DomainConstants = { PRIMARY_URL: "https://lovable.dev", DASHBOARD_URL: "https://lovable.dev/dashboard", PROJECTS_URL: "https://lovable.dev/projects", PRIMARY_DOMAIN: "lovable.dev", PRIMARY_DOMAIN_DOT: ".lovable.dev", API_URL: "https://api.lovable.dev" };`,
         `const VERSION = ${JSON.stringify(SHARED_VERSION)};`,
     ];
     const evalCode = enumBindings.concat(preambleLines).join("\n") + "\nreturn (" + match[1] + ")";

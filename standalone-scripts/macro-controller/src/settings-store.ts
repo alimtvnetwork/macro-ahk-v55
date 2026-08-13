@@ -1,5 +1,3 @@
-import { DbResult } from './db/db-result';
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Settings Store — v2.218.0
  *
@@ -252,7 +250,7 @@ function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: fal
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(value));
 
-    return new DbResult(true, undefined);
+    return { ok: true };
   } catch (e: unknown) {
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };
   }

@@ -36,7 +36,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     IsRemovable: false,
     AutoInject: true,
     RunAt: InjectionRunAtType.DocumentIdle,
-    TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
+    TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchType: MatchRuleType.Glob }],
     Cookies: [],
     Settings: {},
   },

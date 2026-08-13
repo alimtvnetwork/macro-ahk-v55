@@ -86,8 +86,8 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
     if (seedRes.ok === false) {
-      seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
-      logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
+      seedReason = String(seedRes.error ?? 'seedPlanNextPrompts returned !ok');
+      logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason || 'auto-seed failed'));
     }
 
     stage = 'post-seed-list';

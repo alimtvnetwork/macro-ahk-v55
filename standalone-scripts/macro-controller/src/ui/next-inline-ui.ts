@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 // import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline strips above the Lovable chat textarea — order top→bottom:

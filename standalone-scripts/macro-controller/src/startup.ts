@@ -300,9 +300,9 @@ function _preWarmPrompts(attempt: number): void {
 
   const hasSdk = sdk !== null && sdk !== undefined;
   const hasPrompts = hasSdk && sdk!.prompts !== null && sdk!.prompts !== undefined;
-  const hasPreWarm = hasPrompts && typeof sdk!.prompts.preWarm === 'function';
+  const hasPreWarm = hasPrompts && typeof sdk?.prompts?.preWarm === 'function';
   if (hasPreWarm) {
-    sdk?.prompts.preWarm().then(function(prompts: unknown[]) {
+    sdk?.prompts?.preWarm().then(function(prompts: unknown[]) {
       if (prompts && prompts.length > 0) {
         log('Startup: 📋 Pre-warmed ' + prompts.length + ' prompts via SDK (attempt ' + (attempt + 1) + ')', 'success');
         timingEnd(LabelType.PromptPrewarm, 'ok', prompts.length + ' prompts via SDK');

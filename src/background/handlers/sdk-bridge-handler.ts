@@ -60,6 +60,32 @@ export async function handleSdkAuthRefresh(): Promise<string | null> {
 }
 
 /** AUTH_IS_EXPIRED — checks if the current token appears expired. */
+export async function handleSdkAuthIsExpired(): Promise<{ isExpired: boolean }> {
+  const result = await handleGetToken();
+  if (!result.token) return { isExpired: true };
+  try {
+    const payload = JSON.parse(atob(result.token.split('.')[1]));
+    if (payload && payload.exp) {
+      return { isExpired: payload.exp * 1000 < Date.now() };
+    }
+  } catch (e) {
+    // Ignore parse errors
+  }
+  return { isExpired: false };
+}
+
+/** AUTH_GET_JWT — returns the parsed JWT payload. */
+export async function handleSdkAuthGetJwt(): Promise<{ jwtPayload: Record<string, unknown> | null }> {
+  const result = await handleGetToken();
+  if (!result.token) return { jwtPayload: null };
+  try {
+    const payload = JSON.parse(atob(result.token.split('.')[1]));
+    return { jwtPayload: payload };
+  } catch (e) {
+    return { jwtPayload: null };
+  }
+}
+
 /** COOKIES_GET — get a single cookie value by name. */
 export async function handleSdkCookiesGet(
   payload: MessageRequest,

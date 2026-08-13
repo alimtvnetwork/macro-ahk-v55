@@ -34,7 +34,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     AutoInject: true,
     RunAt: InjectionRunAtType.DocumentIdle,
     TargetUrls: [
-      { Pattern: "https://lovable.dev/dashboard", MatchRuleType: MatchRuleType.Exact },
+      { Pattern: "https://lovable.dev/dashboard", MatchType: MatchRuleType.Exact },
     ],
     Cookies: [],
     Settings: {},

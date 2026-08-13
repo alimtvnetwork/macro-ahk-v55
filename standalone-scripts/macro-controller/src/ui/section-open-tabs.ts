@@ -99,7 +99,7 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
     panel.innerHTML = renderEmpty('Loading…');
     try {
       const resp = await sendToExtension('GET_OPEN_LOVABLE_TABS', {}) as unknown as OpenLovableTabsResponseView;
-      if (!resp || resp.ok === false) {
+      if (!resp || (resp as Record<string, unknown>).ok === false) {
         const reason = resp?.errorMessage ?? 'no response';
         panel.innerHTML = renderError(reason);
 

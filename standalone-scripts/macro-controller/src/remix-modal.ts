@@ -11,7 +11,7 @@
  * listeners. Esc / outside click / ✕ all dismiss when not submitting.
  */
 
-import { EVENT_LISTENER_DELAY_MS, MODAL_ANIMATION_DELAY_MS } from './constants';
+import { EVENT_LISTENER_DELAY_MS } from './constants';
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimary, cPrimaryLight, lDropdownRadius } from './shared-state';
 import { getRemixConfig, openRemixRedirect } from './remix-config';
 import { submitRemix } from './remix-fetch';

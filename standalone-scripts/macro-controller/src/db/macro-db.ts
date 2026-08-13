@@ -1,5 +1,5 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception", UNKNOWN_ERROR = 'Unknown error';
-import { ServiceResult } from '../utils/result-wrapper';
+const UNKNOWN_ERROR = 'Unknown error';
+
 /**
  * MacroLoop Controller — SQLite DB Management (prompts.macro)
  */
@@ -163,7 +163,7 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 }
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
-  const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN}, 'context')`);
+  const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN})`, 'context');
   if (resp?.ok) {
     return;
   }
@@ -224,7 +224,7 @@ async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
   if (seedResult.ok === false) {
-    const reason = seedResult.error ?? UNKNOWN_ERROR;
+    const reason = String(seedResult.error ?? UNKNOWN_ERROR);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });
 

@@ -16,6 +16,7 @@ import type { WorkspaceCredit } from './types';
 import { isCanceledStatus, isPastDueStatus, isExpiredTier, isFreeTier } from './types/subscription-status';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
 import { WorkspaceStatusKindType } from "./types/enums";
+export { WorkspaceStatusKindType };
 
 /* ------------------------------------------------------------------ */
 /*  Status kinds                                                       */

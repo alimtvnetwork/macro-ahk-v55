@@ -1,4 +1,3 @@
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Remix Fetch — v2.217.0
  *
@@ -84,10 +83,10 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const names = new Set<string>();
   for (const p of list) {
     const hasProject = p !== null && p !== undefined;
-    const hasName = hasProject && typeof (p as any)?.name === 'string';
-    const hasNonEmptyName = hasName && (p as any)?.name.trim().length > 0;
+    const hasName = hasProject && typeof (p as Record<string, unknown>)?.name === 'string';
+    const hasNonEmptyName = hasName && ((p as Record<string, unknown>)?.name as string).trim().length > 0;
     if (hasNonEmptyName) {
-      names.add((p as any)?.name.trim().toLowerCase());
+      names.add(((p as Record<string, unknown>)?.name as string).trim().toLowerCase());
     }
   }
 
