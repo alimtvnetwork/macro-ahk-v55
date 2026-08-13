@@ -301,7 +301,7 @@ function Invoke-PackageScriptDirect([string]$PackageDir, [string]$ScriptName) {
         try {
             if ($IsWindows -or $env:OS -eq "Windows_NT") {
                 $quotedLog = '"' + $logPath + '"'
-                & cmd.exe /d /s /c "$scriptCommand >> $quotedLog 2>&1"
+                & cmd.exe /d /s /c "( $scriptCommand ) >> $quotedLog 2>&1"
             } else {
                 & /bin/sh -c "$scriptCommand >> '$logPath' 2>&1"
             }

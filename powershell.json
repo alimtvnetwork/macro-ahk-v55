@@ -14,7 +14,7 @@
     ".vite",
     ".pnp.cjs"
   ],
-  "defaultProfile": "Main Account",
+  "defaultProfile": "Person 1",
   "browserExePath": "",
   "chromeUserDataDir": "",
   "edgeUserDataDir": "",

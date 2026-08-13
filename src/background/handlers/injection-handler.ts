@@ -58,7 +58,7 @@ import {
   executeInTab,
 } from "./injection-pipeline";
 import { PipelineLineLevelType, MirrorDiagnosticToTabLevelType } from "../../types/enums";
-import { logCaughtError, BgLogTag } from "../bg-logger";
+import { logCaughtError } from "../bg-logger";
 
 // Pipeline cache types/helpers + Stage 3/4 machinery moved to ./injection-pipeline (PERF-R2b step 5).
 // Syntax preflight helpers moved to ./injection-syntax-preflight (PERF-R2b step 1).
