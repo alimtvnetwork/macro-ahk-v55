@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Prompts Import modal (plan 12 steps 13-14).
  *

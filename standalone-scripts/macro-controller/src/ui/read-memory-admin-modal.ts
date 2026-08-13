@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Read Memory Admin Modal
  *
@@ -51,7 +50,7 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + "OR Name LIKE '" + DUPLICATE_PREFIX + "%' "
     + 'ORDER BY IsDefault DESC, Slug ASC';
   const resp = await runSqlBridge('QUERY', sql);
-  if (resp.isFail || !Array.isArray(resp.rows)) {
+  if (resp.ok === false || !Array.isArray(resp.rows)) {
     return [];
   }
 
@@ -81,7 +80,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
     "UPDATE Prompt SET IsDefault = 0, Name = '" + escaped + "', "
     + 'UpdatedAt = ' + now + ' WHERE Id = ' + row.Id;
   const resp = await runSqlBridge('SCHEMA', sql);
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-deactivate',
       reason: resp?.errorMessage ?? 'unknown error',

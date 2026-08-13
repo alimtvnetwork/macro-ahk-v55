@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Panel Sections — Tools master section and panel assembly extracted from panel-builder.ts (Phase 5F)
  *

@@ -1,6 +1,4 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
-import { DbResult } from '../db/db-result';
-import { ServiceResult } from '../utils/result-wrapper';
+// import { DbResult } from '../db/db-result';
 /**
  * pending-restore-undo.ts — Persist a restore's undo intent across page
  * reloads so the Undo affordance survives a quick refresh within the
@@ -155,13 +153,13 @@ async function reverseUpdate(p: UpdatePayload): Promise<{ ok: boolean; error?: s
     replaceValues: p.preReplaceValues,
   });
 
-  return revert.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
+  return revert.ok ? { ok: true } : { ok: false, error: revert.error ?? "unknown" };
 }
 
 async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: string }> {
   const del = await deletePromptById(p.newId);
 
-  return del.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
+  return del.ok ? { ok: true } : { ok: false, error: del.error ?? "unknown" };
 }
 
 /**
@@ -191,7 +189,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
     const result = record.payload.kind === 'update'
       ? await reverseUpdate(record.payload)
       : await reverseInsert(record.payload);
-    if (result.isFail) {
+    if (result.ok === false) {
       logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
       showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
 

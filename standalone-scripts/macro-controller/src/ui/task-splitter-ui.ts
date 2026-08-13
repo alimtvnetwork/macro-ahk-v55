@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * Task Splitter UI — paste one long instruction, break it into N steps,
@@ -855,7 +854,7 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.isFail || !result.value || result.value.Body.length === 0) {
+    if (result.ok === false || !result.value || result.value.Body.length === 0) {
       return null;
     }
 

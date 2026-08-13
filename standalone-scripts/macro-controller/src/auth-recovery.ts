@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Auth Recovery & Refresh Waterfall
  * Phase 5B: Extracted from auth.ts
@@ -32,7 +31,6 @@ import {
 } from './auth-bridge';
 import { createConcurrencyLock } from './async-utils';
 import type { ConcurrencyLock } from './async-utils';
-import { logError } from './error-utils';
 
 // ============================================
 // Types

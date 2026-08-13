@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { toErrorMessage, logError } from '../error-utils';
 /**
  * MacroLoop Controller — Prompt Utility Functions

@@ -1,5 +1,4 @@
-import { DbResult } from '../db/db-result';
-import { ServiceResult } from '../utils/result-wrapper';
+
 /**
  * prompt-history-panel.ts - Restore-from-revision UI for PlanTierType/Next prompts.
  *
@@ -276,7 +275,7 @@ export async function openPromptHistoryPanel(
   }
 
   const revResult = await listRev(slug);
-  if (revResult.isFail || !revResult.value) {
+  if (revResult.ok === false || !revResult.value) {
     const reason = revResult.error ?? 'unknown';
     reportHistoryFailure(
       'HISTORY_LIST_E001',
@@ -951,7 +950,7 @@ async function handleRestoreUpdate(
       replaceKey: preImage.replaceKey,
       replaceValues: preImage.replaceValues,
     });
-    if (revert.isFail) {
+    if (revert.ok === false) {
       const reason = revert.error ?? 'unknown';
       reportHistoryFailure(
         'HISTORY_UNDO_E001',
@@ -989,7 +988,7 @@ function handleRestoreInsert(
   undoToast(successMsg, async () => {
     clearPendingRestoreUndo();
     const del = await deleteFn(newId);
-    if (del.isFail) {
+    if (del.ok === false) {
       const reason = del.error ?? 'unknown';
       reportHistoryFailure(
         'HISTORY_UNDO_E001',
@@ -1029,7 +1028,7 @@ async function handleRestore(
   }
 
   const listResult = await listByRole(role);
-  if (listResult.isFail || !listResult.value) {
+  if (listResult.ok === false || !listResult.value) {
     const reason = listResult.error ?? 'unknown';
     reportHistoryFailure(
       'HISTORY_RESTORE_E001',
@@ -1054,7 +1053,7 @@ async function handleRestore(
     replaceKey: rev.ReplaceKey,
     replaceValues,
   });
-  if (upsertResult.isFail) {
+  if (upsertResult.ok === false) {
     const reason = upsertResult.error ?? 'unknown';
     reportHistoryFailure(
       'HISTORY_RESTORE_E001',
@@ -1223,31 +1222,31 @@ function validateImportEnvelope(
   expectedRole: PromptRole,
 ): { ok: true; envelope: Record<string, unknown>; revisions: unknown[] } | { ok: false; error: string } {
   if (!parsed || typeof parsed !== 'object') {
-    return new DbResult(false, undefined, 'Payload is not an object');
+    return { ok: false, error: 'Payload is not an object' };
   }
 
   const p = parsed as Record<string, unknown>;
   if (p['schemaVersion'] !== 1) {
-    return new DbResult(false, undefined, 'Unsupported schemaVersion (expected 1, got ' + String(p['schemaVersion']) + ')');
+    return { ok: false, error: 'Unsupported schemaVersion (expected 1, got ' + String(p['schemaVersion']) + ')' };
   }
 
   const pSlug = p['slug'];
   if (typeof pSlug !== 'string' || pSlug.trim() === '') {
-    return new DbResult(false, undefined, 'Missing or invalid slug');
+    return { ok: false, error: 'Missing or invalid slug' };
   }
 
   if (pSlug !== expectedSlug) {
-    return new DbResult(false, undefined, 'Slug mismatch: file is for "' + pSlug + '", panel is open on "' + expectedSlug + '"');
+    return { ok: false, error: 'Slug mismatch: file is for "' + pSlug + '", panel is open on "' + expectedSlug + '"' };
   }
 
   const pRole = p['role'];
   if (pRole !== expectedRole) {
-    return new DbResult(false, undefined, 'Role mismatch: file is "' + String(pRole) + '", panel is "' + expectedRole + '"');
+    return { ok: false, error: 'Role mismatch: file is "' + String(pRole) + '", panel is "' + expectedRole + '"' };
   }
 
   const pRevisions = p['revisions'];
   if (!Array.isArray(pRevisions)) {
-    return new DbResult(false, undefined, 'revisions is not an array');
+    return { ok: false, error: 'revisions is not an array' };
   }
 
   return { ok: true, envelope: p, revisions: pRevisions };
@@ -1260,7 +1259,7 @@ function coerceImportRow(
   expectedRole: PromptRole,
 ): { ok: true; row: ImportedRevisionInput } | { ok: false; error: string } {
   if (!rawItem || typeof rawItem !== 'object') {
-    return new DbResult(false, undefined, 'revisions[' + String(index) + '] is not an object');
+    return { ok: false, error: 'revisions[' + String(index) + '] is not an object' };
   }
 
   const raw = rawItem as Record<string, unknown>;
@@ -1268,11 +1267,11 @@ function coerceImportRow(
   const rawName = raw['Name'];
   const rawSlug = raw['Slug'];
   if (typeof rawBody !== 'string' || typeof rawName !== 'string' || typeof rawSlug !== 'string') {
-    return new DbResult(false, undefined, 'revisions[' + String(index) + '] missing required fields');
+    return { ok: false, error: 'revisions[' + String(index) + '] missing required fields' };
   }
 
   if (rawSlug !== expectedSlug) {
-    return new DbResult(false, undefined, 'revisions[' + String(index) + '] slug mismatch');
+    return { ok: false, error: 'revisions[' + String(index) + '] slug mismatch' };
   }
 
   const rawRole = raw['Role'];
@@ -1305,19 +1304,19 @@ export function parseRevisionImportPayload(
   try {
     parsed = JSON.parse(jsonText);
   } catch (err) {
-    return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
+    return { ok: false, error: 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)) };
   }
 
   const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-  if (envelope.isFail) {
-    return new DbResult(false, undefined, envelope.error);
+  if (envelope.ok === false) {
+    return { ok: false, error: envelope.error };
   }
 
   const rows: ImportedRevisionInput[] = [];
   for (let i = 0; i < envelope.revisions.length; i += 1) {
     const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-    if (coerced.isFail) {
-      return new DbResult(false, undefined, coerced.error);
+    if (coerced.ok === false) {
+      return { ok: false, error: coerced.error };
     }
 
     rows.push(coerced.row);
@@ -1375,7 +1374,7 @@ async function writeImportedRevisions(
 ): Promise<void> {
   const snapshotResult = await getMaxRevisionId();
   const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-  if (snapshotResult.isFail) {
+  if (snapshotResult.ok === false) {
     logHistoryDiagnostic(
       'HISTORY_INTERNAL_E001',
       { stage: 'max-rev-id', reason: 'getMaxRevisionId failed before import: ' + (snapshotResult.error ?? '?') },
@@ -1383,7 +1382,7 @@ async function writeImportedRevisions(
   }
 
   const write = await insertImportedRevisions(slug, rows);
-  if (write.isFail) {
+  if (write.ok === false) {
     const reason = write.error ?? '?';
     reportHistoryFailure(
       'HISTORY_IMPORT_E002',
@@ -1401,7 +1400,7 @@ async function writeImportedRevisions(
   if (snapshotResult.isSuccess && count > 0) {
     undoToast(successMsg, async () => {
       const del = await deleteImportedRevisionsAfter(slug, sinceId);
-      if (del.isFail) {
+      if (del.ok === false) {
         const reason = del.error ?? 'unknown';
         reportHistoryFailure(
           'HISTORY_UNDO_E001',
@@ -1441,7 +1440,7 @@ async function handleImportFile(
   try {
     const text = await file.text();
     const parsed = parseRevisionImportPayload(text, slug, role);
-    if (parsed.isFail || !parsed.rows) {
+    if (parsed.ok === false || !parsed.rows) {
       const reason = parsed.error ?? 'unknown';
       captureLastImportFailure('parse', 'parse rejected: ' + reason);
       reportHistoryFailure(

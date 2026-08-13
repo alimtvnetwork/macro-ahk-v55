@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Migration: remove duplicate/legacy Read Memory seed entries from SQLite.
  *
@@ -42,7 +41,7 @@ function buildInList(): string {
 async function countLegacyRows(): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Slug IN (' + buildInList() + ')';
   const resp = await runLoggedQuery('QUERY', sql, 'context');
-  if (resp.isFail || !Array.isArray(resp.rows) || resp.rows.length === 0) {
+  if (resp.ok === false || !Array.isArray(resp.rows) || resp.rows.length === 0) {
     return 0;
   }
 
@@ -58,7 +57,7 @@ async function deleteLegacyPromptRows(): Promise<void> {
     'DELETE FROM PromptRevision WHERE Slug IN (' + inList + '); ' +
     'DELETE FROM Prompt WHERE Slug IN (' + inList + ');';
   const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
       reason: resp?.errorMessage ?? 'unknown error',

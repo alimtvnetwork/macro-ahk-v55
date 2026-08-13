@@ -55,7 +55,7 @@ export function setRunCycleRef(runCycle: () => void): void {
 }
 
 function isAuthFailure(status: number): boolean {
-  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
+  return status === 401 || status === 403;
 }
 
 function isLoopStale(): boolean {
@@ -91,7 +91,7 @@ async function doubleConfirmAndMove(threshold: number): Promise<void> {
 
   const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logError('Double-confirm API fetch failed', 'HTTP ' + resp.status);
 
     return;
@@ -318,7 +318,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
       markBearerTokenExpired(LOG_SCOPE_LOOP_CYCLE);
     }
 
-    if (resp.isFail) {
+    if (resp.ok === false) {
       throwDiagnostic('LOOP_FALLBACK_HTTP_E001', {
         status: resp.status,
         url: `${CREDIT_API_BASE}/user/workspaces`,

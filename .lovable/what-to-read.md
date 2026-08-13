@@ -2,10 +2,11 @@
 
 > Canonical map of what the AI must read before working on this project.
 
-> Last updated: 2026-08-07T16:45:00Z
+> Last updated: 2026-08-13T03:02:00Z
 
 ## Changelog
 
+- 2026-08-13T03:02:00Z, Fixed TS and ESLint warnings; restored syntax correctness; achieved fully green vitest run.
 - 2026-08-07T16:45:00Z, Captured RCA 06 (zero-asset releases) and the release trigger policy; cut v5.25.0.
 - 2026-08-06T09:43:00Z, Performed v5.17.0 release ceremony and synchronized memory.
 - 2026-08-06T09:42:00Z, Performed global .lovable memory restructure into topic folders per v3.0 enforcement.

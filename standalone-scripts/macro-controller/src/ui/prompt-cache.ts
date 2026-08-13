@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — IndexedDB Prompt Cache (Dual-Record)
  *
@@ -8,7 +7,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from '../logger';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import { DB_PROMPTS_CACHE_VERSION as DB_VERSION } from '../constants';
 import { PromptCacheKeyType } from '../types';

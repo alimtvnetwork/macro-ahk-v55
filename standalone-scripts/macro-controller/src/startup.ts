@@ -1,5 +1,5 @@
 import { Timings } from "./constants/timing";
-import { ServiceResult } from './utils/result-wrapper';
+// import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller, Startup & Initialization
  * Step 2h: Extracted from macro-looping.ts
@@ -147,7 +147,7 @@ function initializeMacroDbAndCapture(): void {
     installReseedCommandGlobal();
     try {
       const result = await seedPlanNextPrompts();
-      if (result.isFail) {
+      if (result.ok === false) {
         logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
     } catch (err: unknown) {
@@ -302,7 +302,7 @@ function _preWarmPrompts(attempt: number): void {
   const hasPrompts = hasSdk && sdk!.prompts !== null && sdk!.prompts !== undefined;
   const hasPreWarm = hasPrompts && typeof sdk!.prompts.preWarm === 'function';
   if (hasPreWarm) {
-    sdk.prompts.preWarm().then(function(prompts: unknown[]) {
+    sdk?.prompts.preWarm().then(function(prompts: unknown[]) {
       if (prompts && prompts.length > 0) {
         log('Startup: 📋 Pre-warmed ' + prompts.length + ' prompts via SDK (attempt ' + (attempt + 1) + ')', 'success');
         timingEnd(LabelType.PromptPrewarm, 'ok', prompts.length + ' prompts via SDK');
@@ -737,7 +737,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
 }
 
 function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknown }): MarkViewedResponse | null {
-  const isFailed = resp.isFail;
+  const isFailed = resp.ok === false;
   if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
     timingEnd(LabelType.WsPrefetch, 'warn', 'HTTP ' + resp.status);

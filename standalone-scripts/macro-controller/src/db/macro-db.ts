@@ -1,4 +1,4 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception", LOG_UNKNOWN_ERROR = 'Unknown error';
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception", UNKNOWN_ERROR = 'Unknown error';
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — SQLite DB Management (prompts.macro)
@@ -153,7 +153,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', migration.ddl, 'context');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
     return;
@@ -189,13 +189,13 @@ export async function migratePromptReplaceColumns(): Promise<void> {
 
     await ensurePromptRoleDefaultIndex();
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: 'batch', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
 
 const CODE_DB_MACRO_INIT = 'DB_MACRO_INIT_E001';
-const UNKNOWN_ERROR = 'unknown error';
+
 const STAGE_ORPHAN_REPAIR = 'orphan-repair';
 const STAGE_AUTO_REPAIR = 'auto-repair';
 const STAGE_SCHEMA_INIT = 'schema-init';
@@ -223,7 +223,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  if (seedResult.isFail) {
+  if (seedResult.ok === false) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });
@@ -303,7 +303,7 @@ export async function initMacroDb(): Promise<void> {
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
     }
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     const reason = err instanceof Error ? err.message : String(err);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'send-schema-init', reason }, err);
     stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
@@ -331,7 +331,7 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
   try {
     await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -356,7 +356,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
     await runLoggedQuery('SCHEMA', sql, 'context');
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveCommunication', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -383,7 +383,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
   try {
     await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -419,7 +419,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
     await runLoggedQuery('SCHEMA', sql, 'context');
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'purgeOldCommunications', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -467,7 +467,7 @@ export async function exportDatabaseDump(): Promise<void> {
       logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: resp?.errorMessage || 'no dump data' });
     }
   } catch (err) {
-    logError('MacroController', LOG_UNKNOWN_ERROR);
+    logError('MacroController', UNKNOWN_ERROR);
     logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }

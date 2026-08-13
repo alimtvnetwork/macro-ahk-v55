@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { showToast } from '../toast';
 import { parsePromptsText, previewPromptImport, type PromptImportPreview } from './prompt-io';
 import { buildFriendlyImportError } from './prompt-import-error-message';

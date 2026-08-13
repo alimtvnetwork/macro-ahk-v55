@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * queue-control — pauseQueue() / resumeQueue() click the Lovable
  * "Pause queue" / "Resume queue" buttons. These are the ONLY clicks the

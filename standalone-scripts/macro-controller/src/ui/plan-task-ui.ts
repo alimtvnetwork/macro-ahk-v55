@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * PlanTierType Task UI — Inline accordion mirror of Task Next, but injects a
  * "plan this task in N steps" prompt instead of running a multi-task loop.

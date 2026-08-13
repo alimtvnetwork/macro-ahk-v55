@@ -1,5 +1,5 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
-import { ServiceResult } from '../utils/result-wrapper';
+// import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline strips above the Lovable chat textarea — order top→bottom:
  *   1) 📋 PlanTierType  → click number → APPEND PlanTierType-${N} prompt to chat (no submit)
@@ -1023,7 +1023,7 @@ function buildSplitStrip(): HTMLElement {
   moreBtn.dataset['role'] = 'plan-more-btn';
   moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--background));background:linear-gradient(135deg,hsl(var(--warning)) 0%,hsl(var(--warning)) 60%,hsl(var(--warning)) 100%);box-shadow:0 1px 4px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
   moreWrap.appendChild(moreBtn);
-  const { panel, setOpen } = buildMorePopover({
+  buildMorePopover({
     role: 'plan',
     roleLabel: 'PlanTierType',
     accent: 'rgba(245,158,11,0.6)',

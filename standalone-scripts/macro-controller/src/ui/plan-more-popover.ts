@@ -1,17 +1,4 @@
-import {
-  cPanelFg,
-  cPanelFgDim,
-  STYLE_DISPLAY_FLEX,
-  STYLE_DISPLAY_NONE,
-  ATTR_ARIA_EXPANDED,
-  MENU_ROLE,
-  ATTR_ARIA_HASPOPUP,
-  ATTR_ARIA_LABEL,
-  ATTR_ARIA_CONTROLS,
-  ATTR_ROLE,
-  CSS_CHIP_TRANSITION,
-  cLogDefault
-} from '../shared-state';
+
 
 import type { PopoverA11y } from './next-inline-ui';
 
@@ -120,7 +107,7 @@ export function buildMorePopover(config: MorePopoverConfig, deps: PopoverDepende
   }
   
   config.anchor.appendChild(panel);
-  registerPointerPopoverCloser(createOutsidePopoverCloser(config.anchor, panel, config.trigger, setOpen));
+  deps.registerPointerPopoverCloser(deps.createOutsidePopoverCloser(config.anchor, panel, config.trigger, setOpen));
 
   return { panel, setOpen, a11y };
 }

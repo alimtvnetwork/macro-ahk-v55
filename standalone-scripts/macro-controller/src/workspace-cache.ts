@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { logError, logWarn, logDebug } from './error-utils';
 /**
  * Workspace Cache — localStorage persistence for instant UI on reload.

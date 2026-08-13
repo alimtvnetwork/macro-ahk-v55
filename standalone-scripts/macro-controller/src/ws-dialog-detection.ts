@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Workspace Dialog Detection — Tier 2 XPath-based workspace detection via project dialog.
  *

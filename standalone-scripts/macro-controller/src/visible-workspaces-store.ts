@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Visible-workspaces store — tiny pub/sub for the dashboard SummaryBar
  * (Issue 125 Task 9, filter-reactive recomputation).

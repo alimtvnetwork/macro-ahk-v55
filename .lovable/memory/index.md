@@ -51,6 +51,7 @@
 - **Em dashes banned**: Never use em dashes (-) in any output. Use commas, colons, or parentheses.
 
 ## Recent Workflow
+- [27-session-2026-08-13-vitest-eslint-fixes](.lovable/memory/workflow/27-session-2026-08-13-vitest-eslint-fixes.md) - Vitest syntax fixes and ESLint cleanup.
 - [24-session-2026-08-06-release-v5-19-0](.lovable/memory/workflow/24-session-2026-08-06-release-v5-19-0.md) - Release ceremony v5.19.0 performed with remote-tag hardening.
 - [21-session-2026-08-06-write-memory-enforcement](.lovable/memory/workflow/21-session-2026-08-06-write-memory-enforcement.md) - Maximum enforcement v3.0 implemented.
 - [22-session-2026-08-06-memory-restructure](.lovable/memory/workflow/22-session-2026-08-06-memory-restructure.md) - Global .lovable folder restructure and audit.

@@ -28,7 +28,6 @@ import { sendToExtension } from './extension-bridge';
 import { DB_NAME } from './db-name';
 import { RunSqlMethodType, SqlBucketType } from "../types/enums";
 import { logError } from '../error-utils';
-import { ServiceResult } from '../utils/result-wrapper';
 
 export class SqlBridgeResp {
   constructor(
@@ -228,7 +227,7 @@ export async function runLoggedQuery(
   project: string = DB_NAME
 ): Promise<SqlBridgeResp> {
   const resp = await runSql(legacy, sql, project);
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
 
     return resp;

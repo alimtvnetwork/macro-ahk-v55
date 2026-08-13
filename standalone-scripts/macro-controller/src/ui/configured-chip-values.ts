@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * PlanTierType-15 Task 9: Resolve the chip-value list for a given prompt role from
  * the database (`Prompt.ReplaceValues`), falling back to the caller-supplied
@@ -46,7 +45,7 @@ export async function resolveConfiguredChipValues(
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole(role);
-    if (result.isFail || !result.value) {
+    if (result.ok === false || !result.value) {
       return [...fallback];
     }
 

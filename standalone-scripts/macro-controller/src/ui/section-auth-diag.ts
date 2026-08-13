@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Auth Diagnostics Section
  *
@@ -28,7 +27,7 @@ import {
 
 import { buildWaterfallSection } from './auth-diag-waterfall';
 import { buildHeaderControls } from './auth-diag-clipboard';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { showToast } from '../toast';
 
 // Re-export for backward compatibility

@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — ensureGithubRepo helper (Issue 129 Step 5)
  *
@@ -240,7 +239,7 @@ export async function ensureGithubRepo(
 
   // ── 2) POST /sync once (no retry).
   const posted = await postSync(wsId, connId, projectId);
-  if (posted.isFail || !posted.jobId) {
+  if (posted.ok === false || !posted.jobId) {
     setGitsyncCache(wsId, projectId, 'error');
 
     return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };

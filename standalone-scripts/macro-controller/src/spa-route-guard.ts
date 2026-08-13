@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — SPA Route Guard (U-5, v2.245.0)
  *
@@ -28,7 +27,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from './logger';
-import { logError, logError } from './error-utils';
+import { logError } from './error-utils';
 import {
   extractProjectIdFromUrl,
   invalidateProjectIdCache,

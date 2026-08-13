@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Startup validation: detect multiple Read Memory prompt records and
  * auto-disable the duplicates so only the canonical entry
@@ -50,7 +49,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
   const resp = await runLoggedQuery('QUERY', sql, 'context');
-  if (resp.isFail || !Array.isArray(resp.rows)) {
+  if (resp.ok === false || !Array.isArray(resp.rows)) {
     return [];
   }
 
@@ -66,7 +65,7 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
     + 'UpdatedAt = ' + now + ' '
     + 'WHERE Id IN (' + idList + ')';
   const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',
       reason: resp?.errorMessage ?? 'unknown error',

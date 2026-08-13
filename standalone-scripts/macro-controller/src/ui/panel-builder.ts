@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Panel Builder — orchestrator for MacroLoop Controller panel (Phase 5F barrel)
  *

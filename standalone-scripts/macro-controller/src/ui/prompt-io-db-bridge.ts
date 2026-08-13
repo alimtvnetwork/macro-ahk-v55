@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * prompt-io-db-bridge.ts - plan-14 steps 12 & 13.
  *
@@ -72,7 +71,7 @@ async function readAllDbRows(): Promise<PromptRow[]> {
   const all: PromptRow[] = [];
   for (const role of PROMPT_ROLES) {
     const res = await listPromptsByRole(role);
-    if (res.isFail || !res.value) {
+    if (res.ok === false || !res.value) {
       logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
       continue;
     }
@@ -108,7 +107,7 @@ export function mergeDbIntoExport(
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
   const res = await listPromptsByRole(role);
-  if (res.isFail || !res.value) {
+  if (res.ok === false || !res.value) {
     return null;
   }
 

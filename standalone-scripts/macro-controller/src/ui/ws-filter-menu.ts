@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Workspace Filter Hamburger Menu
  *
@@ -18,7 +17,7 @@ import {
   cPrimaryLighter,
 } from '../shared-state';
 import { logSub } from '../logger';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { DataAttrType } from '../types';
 import {
   getLoopWsCreditSortMode,

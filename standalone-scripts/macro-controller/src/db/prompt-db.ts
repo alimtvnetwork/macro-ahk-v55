@@ -125,7 +125,7 @@ export async function listPromptsByRole(role: PromptRole): Promise<DbResult<Prom
   const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' ORDER BY IsDefault DESC, UpdatedAt DESC';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return fail('listPromptsByRole', resp.errorMessage || QUERY_FAILED);
   }
 
@@ -143,7 +143,7 @@ export async function getDefaultPromptForRole(role: PromptRole): Promise<DbResul
   const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return fail('getDefaultPromptForRole', resp.errorMessage || QUERY_FAILED);
   }
 
@@ -163,7 +163,7 @@ export async function getPromptBySlug(slug: string): Promise<DbResult<PromptRow 
 
   const sql = 'SELECT * FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return fail('getPromptBySlug', resp.errorMessage || QUERY_FAILED);
   }
 
@@ -209,7 +209,7 @@ async function resolveInsertedPromptId(input: UpsertInput): Promise<number | nul
         + ' AND Role = ' + sqlLit(input.role)
         + ' LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return null;
   }
 
@@ -294,7 +294,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
     ? buildUpdateSql({ ...input, id: input.id as number }, resolved, now)
     : buildInsertSql(input, resolved, now);
   const resp = await runLoggedQuery('SCHEMA', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return fail('upsertPrompt', resp.errorMessage || 'write failed');
   }
 
@@ -310,7 +310,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
     // recordPromptRevision; we never fail the upsert on history failure.
     const { recordPromptRevision } = await import('./prompt-revision-db');
     const revResult = await recordPromptRevision({ previous: preImage, reason: 'upsert' });
-    if (revResult.isFail) {
+    if (revResult.ok === false) {
       logDiagnosticFromCode('DB_PROMPT_REVISION_SNAPSHOT_E001', { slug: preImage.Slug, reason: revResult.error ?? 'unknown error' });
     }
   }
@@ -321,7 +321,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
 async function countRowsForRole(role: PromptRole): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Role = ' + sqlLit(role);
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return -1;
   }
 
@@ -333,7 +333,7 @@ async function countRowsForRole(role: PromptRole): Promise<number> {
 
 async function readPromptRow(id: number): Promise<PromptRow | null> {
   const resp = await runSql('QUERY', 'SELECT * FROM Prompt WHERE Id = ' + String(id) + ' LIMIT 1');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return null;
   }
 
@@ -362,7 +362,7 @@ export async function deletePromptById(id: number): Promise<DbResult<void>> {
   }
 
   const resp = await runLoggedQuery('SCHEMA', 'DELETE FROM Prompt WHERE Id = ' + String(id), 'prompt-db');
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return fail('deletePromptById', resp.errorMessage || 'delete failed');
   }
 
@@ -378,7 +378,7 @@ export async function deleteBySlug(slug: string): Promise<DbResult<void>> {
   }
 
   const rowResult = await getPromptBySlug(slug);
-  if (rowResult.isFail) {
+  if (rowResult.ok === false) {
     return fail('deleteBySlug', rowResult.error || QUERY_FAILED);
   }
 

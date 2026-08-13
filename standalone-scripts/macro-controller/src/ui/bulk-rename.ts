@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Bulk Rename Dialog
@@ -30,7 +29,7 @@ import {
   cPrimaryBorderA,
 } from '../shared-state';
 import { log } from '../logger';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import {
   applyRenameTemplate,

@@ -1,5 +1,4 @@
 import { HttpCodes } from "./constants/http";
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Gitsync API client (v3.19.0)
  *
@@ -123,7 +122,7 @@ export async function fetchGitsyncConfig(
     return { status: 'not_linked' };
   }
 
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logError('GitsyncApi', 'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
 

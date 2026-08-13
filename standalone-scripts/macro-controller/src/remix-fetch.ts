@@ -73,7 +73,7 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const url = '/workspaces/' + wsId + '/projects';
   log('[Remix] GET ' + url, 'delegate');
   const resp = await api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  if (resp.isFail) {
+  if (resp.ok === false) {
     const preview = JSON.stringify(resp.data).substring(0, 200);
     logError('Remix', 'projects.list HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });
@@ -84,10 +84,10 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const names = new Set<string>();
   for (const p of list) {
     const hasProject = p !== null && p !== undefined;
-    const hasName = hasProject && typeof p.name === 'string';
-    const hasNonEmptyName = hasName && p.name.trim().length > 0;
+    const hasName = hasProject && typeof (p as any)?.name === 'string';
+    const hasNonEmptyName = hasName && (p as any)?.name.trim().length > 0;
     if (hasNonEmptyName) {
-      names.add(p.name.trim().toLowerCase());
+      names.add((p as any)?.name.trim().toLowerCase());
     }
   }
 
@@ -133,7 +133,7 @@ export async function submitRemix(opts: {
     includeCustomKnowledge: opts.includeCustomKnowledge,
   }, { baseUrl: CREDIT_API_BASE });
 
-  if (resp.isFail) {
+  if (resp.ok === false) {
     const preview = JSON.stringify(resp.data).substring(0, 250);
     logError('Remix', 'remix.init HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });

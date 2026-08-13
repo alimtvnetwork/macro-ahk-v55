@@ -1,5 +1,3 @@
-import { cPanelFg } from '../shared-state';
-import { cPanelFgDim } from '../shared-state';
 
 export const STYLE_DISPLAY_FLEX = 'flex';
 export const STYLE_DISPLAY_NONE = 'none';

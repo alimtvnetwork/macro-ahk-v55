@@ -41,9 +41,9 @@ const instruction: ProjectInstruction<MacroControllerSettings> = {
     RunAt: InjectionRunAtType.DocumentIdle,
     CookieBinding: "lovable-session-id.id",
     TargetUrls: [
-      { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
-      { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
-      { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
+      { Pattern: "https://lovable.dev/projects/*", MatchType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovable.app/*", MatchType: MatchRuleType.Glob },
+      { Pattern: "https://*.lovableproject.com/*", MatchType: MatchRuleType.Glob },
     ],
     Cookies: [
       { CookieName: "lovable-session-id.id", Url: DomainConstants.PRIMARY_URL, Role: "session", Description: "Session ID — primary bearer token" },

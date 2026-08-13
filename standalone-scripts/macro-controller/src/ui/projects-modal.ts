@@ -1,5 +1,4 @@
 import { Timings } from "../constants/timing";
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — Projects Modal
  *
@@ -334,7 +333,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   }
 
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  if (resp.isFail) {
+  if (resp.ok === false) {
     const preview = JSON.stringify(resp.data).substring(0, 160);
     logError('Projects', 'projects.list HTTP ' + resp.status + ' for ws=' + wsId + ': ' + preview);
     throwDiagnostic('UI_PROJECTS_LIST_E001', {

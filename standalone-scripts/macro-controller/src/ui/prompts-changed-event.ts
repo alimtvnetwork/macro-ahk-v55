@@ -1,6 +1,5 @@
 import { logError } from "../error-utils";
 
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Cross-module notification that the Prompt table changed on disk.
  *

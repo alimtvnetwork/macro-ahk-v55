@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { TimingEntryStatusType } from "./types/enums";
 import { logError } from "./error-utils";
 

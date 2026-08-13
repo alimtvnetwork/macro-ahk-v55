@@ -8,7 +8,6 @@
  */
 
 import type { PromptRole } from '../types/prompt-role';
-import { extractParamTokens } from '../db/prompt-token-guard';
 import { DiagnosticError } from '../errors/diagnostic-error';
 import bundledPromptBundle from '../../03-macro-prompts.json';
 

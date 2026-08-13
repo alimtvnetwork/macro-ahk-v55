@@ -1,6 +1,4 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt Injection — Prompt creation/edit modal, paste-into-editor logic
  *

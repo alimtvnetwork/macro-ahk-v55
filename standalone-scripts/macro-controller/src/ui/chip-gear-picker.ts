@@ -1,4 +1,4 @@
-import { ServiceResult } from '../utils/result-wrapper';
+// import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Shared "pick one of role's prompts" modal used by the chip gear menu
  * items (Edit specific / Set active / Delete). Small dark dialog rendered
@@ -60,7 +60,7 @@ interface LoadState {
 async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; initialReason: string | null }> {
   let res = await listPromptsByRole(role);
   let initialReason = res.isSuccess ? null : (res.error ?? 'listPromptsByRole returned !ok');
-  if (res.isFail && isSqlBridgeContractError(initialReason ?? undefined)) {
+  if (res.ok === false && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
     if (retry.isSuccess) {
@@ -74,7 +74,7 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
 
 async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ res: ListRes; stage: LoadStage; seedReason: string | null; seedAttempted: boolean }> {
   const isManaged = role === 'plan' || role === 'next';
-  const emptyOrFailed = current.isFail || ((current.value ?? []).length === 0);
+  const emptyOrFailed = current.ok === false || ((current.value ?? []).length === 0);
   if (!isManaged || !emptyOrFailed) {
     return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
@@ -85,7 +85,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   try {
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
-    if (seedRes.isFail) {
+    if (seedRes.ok === false) {
       seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
     }
@@ -152,7 +152,7 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
-  if (state.res.isFail) {
+  if (state.res.ok === false) {
     return emitLoadFailure(opts, state);
   }
 

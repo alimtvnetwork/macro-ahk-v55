@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { log } from '../logger';
 import { showToast } from '../toast';
 import { exportPromptsToJson, parsePromptsText, performPromptImport } from './prompt-io';

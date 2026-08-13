@@ -1,5 +1,5 @@
 import { HttpCodes } from "../constants/http";
-import { ServiceResult } from '../utils/result-wrapper';
+
 import { getBearerToken, markBearerTokenExpired } from '../auth';
 import { CREDIT_API_BASE } from '../shared-state';
 import { CreditFetchOutcomeType } from './credit-fetch-outcome';
@@ -103,17 +103,7 @@ function buildResult(
   return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
 }
 
-function classifyHttpReason(status: number): CreditFetchOutcomeType {
-  if (status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN) {
-    return CreditFetchOutcomeType.AuthError;
-  }
 
-  if (status >= HttpCodes.INTERNAL_SERVER_ERROR) {
-    return CreditFetchOutcomeType.HttpError;
-  }
-
-  return CreditFetchOutcomeType.HttpError;
-}
 
 async function handleNonOkResponse(
   response: Response,

@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline chip gear menu (PlanTierType-23, step 3).
  *
@@ -319,7 +318,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
 
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  if (result.isFail) {
+  if (result.ok === false) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
       'SEED_RESEED_E001',
@@ -394,7 +393,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   }
 
   const res = await setDefaultPromptForRole(picked.Id, role);
-  if (res.isFail) {
+  if (res.ok === false) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E003',
@@ -434,7 +433,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
   }
 
   const res = await deletePromptById(picked.Id);
-  if (res.isFail) {
+  if (res.ok === false) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E004',

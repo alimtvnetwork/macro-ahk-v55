@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { DomainConstants } from "../constants/domain";
 /**
  * MacroLoop Controller — Credit Totals Modal (Issue 116, Task 2)

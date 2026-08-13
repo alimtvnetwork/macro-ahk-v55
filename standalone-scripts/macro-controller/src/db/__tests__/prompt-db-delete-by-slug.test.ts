@@ -47,7 +47,7 @@ describe('deleteBySlug negative and integration (Plan 22 gap #2)', () => {
     ];
 
     const r = await deleteBySlug('unknown-slug');
-    expect(r.isFail).toBe(true);
+    expect(r.ok === false).toBe(true);
     expect(r.error).toMatch(/unknown slug/);
   });
 

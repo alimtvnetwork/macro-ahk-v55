@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Loop DOM Fallback — DOM-based fallback strategies, direct moves, deprecated delegation
  *
@@ -11,7 +10,7 @@ import { LoopDirectionType } from './types';
 import { MacroController } from './core/MacroController';
 import { checkSystemBusy, closeProjectDialog, ensureProjectDialogOpen, isUserTypingInPrompt, pollForDialogReady } from './dom-helpers';
 import { TIMING, state } from './shared-state';
-import { logError, logError } from './error-utils';
+import { logError } from './error-utils';
 
 /** Shorthand for MacroController singleton */
 function mc() {

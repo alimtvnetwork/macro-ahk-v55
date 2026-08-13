@@ -1,5 +1,4 @@
 import { HttpCodes } from "./constants/http";
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Credit Balance API — Free Credit Detection via /workspaces/{id}/credit-balance
  *

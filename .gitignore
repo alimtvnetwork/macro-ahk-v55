@@ -122,3 +122,5 @@ test_results/
 vitest-results.json
 test-result.md
 .lovable/temp/
+.lovable/temp-scripts/
+undefined/

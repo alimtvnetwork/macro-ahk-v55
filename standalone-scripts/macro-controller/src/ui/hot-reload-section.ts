@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 const ERROR_CONTEXT_MACRO = 'MacroController';
 const ERROR_MSG_UNKNOWN = 'Unknown error';
 import { Timings } from "../constants/timing";
@@ -31,7 +30,7 @@ import { showToast } from '../toast';
 import { sendToExtension } from './prompt-manager';
 import { destroyPanel } from './ui-updaters';
 import { createCollapsibleSection } from './sections';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { REINJECT_COOLDOWN_MS } from '../constants';
 import { CssFragmentType, StorageKeyType } from '../types';
 /* ------------------------------------------------------------------ */

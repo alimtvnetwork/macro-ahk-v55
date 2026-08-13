@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 import { logError } from '../error-utils';
 import { type PromptRow, listPromptsByRole } from '../db/prompt-db';
 import type { PromptRole } from '../types/prompt-role';
@@ -55,7 +54,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
   wrap.appendChild(h);
 
   const result = await listPromptsByRole(role);
-  if (result.isFail || !result.value) {
+  if (result.ok === false || !result.value) {
     const err = document.createElement('div');
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
     err.style.cssText = 'color:hsl(var(--foreground));font-size:11px;';

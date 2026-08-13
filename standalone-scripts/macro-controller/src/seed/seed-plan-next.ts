@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * seed-plan-next.ts - idempotent seeder for the PlanTierType/Next prompt library
  * (plan-14, step 9). Emits structured boot telemetry (v4.72.0):
@@ -86,7 +85,7 @@ async function selectExistingSlugs(): Promise<Set<string>> {
   const sql = 'SELECT Slug FROM Prompt WHERE Slug IN (' + list + ')';
   const resp = await rawSql('QUERY', sql);
   const out = new Set<string>();
-  if (resp.isFail || !Array.isArray(resp.rows)) {
+  if (resp.ok === false || !Array.isArray(resp.rows)) {
     return out;
   }
 
@@ -104,7 +103,7 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
   const sql = 'SELECT 1 FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
   const resp = await rawSql('QUERY', sql);
-  if (resp.isFail) {
+  if (resp.ok === false) {
     return false;
   }
 
@@ -115,7 +114,7 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
   const sql = 'UPDATE Prompt SET IsDefault = 1 WHERE Slug = '
         + sqlLit(slug) + ' AND Role = ' + sqlLit(role);
   const resp = await rawSql('SCHEMA', sql);
-  if (resp.isFail) {
+  if (resp.ok === false) {
     const message = resp.errorMessage ?? '?';
     logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
     emitPromptSeedEvent({ event: 'seed.promote-default', role, slug, outcome: 'failed', detail: message });
@@ -321,7 +320,7 @@ function resolveUpgradeMatch(row: typeof PLAN_NEXT_SEED_ROWS[number], currentBod
 async function readCurrentBody(slug: string): Promise<string | null> {
   const readSql = 'SELECT Body FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
   const readResp = await rawSql('QUERY', readSql);
-  if (readResp.isFail || !Array.isArray(readResp.rows) || readResp.rows.length === 0) {
+  if (readResp.ok === false || !Array.isArray(readResp.rows) || readResp.rows.length === 0) {
     return null;
   }
 
@@ -373,7 +372,7 @@ async function applyLegacyBodyUpgrade(
   match: UpgradeMatch,
 ): Promise<boolean> {
   const updateResp = await rawSql('SCHEMA', buildBodyUpdateSql(row));
-  if (updateResp.isFail) {
+  if (updateResp.ok === false) {
     emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
 
     return false;
@@ -474,7 +473,7 @@ async function writeSeedAuditRow(params: {
           sqlLit(JSON.stringify(params.telemetry)),
         ].join(', ') + ')';
   const resp = await rawSql('SCHEMA', sql);
-  if (resp.isFail) {
+  if (resp.ok === false) {
     const message = resp.errorMessage ?? '?';
     logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
     emitPromptSeedEvent({ event: 'seed.audit-write', outcome: 'failed', detail: message });
@@ -568,7 +567,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
     const existing = await selectExistingSlugs();
     tallyInsertCounts(existing, tel);
     const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
-    if (insertResp.isFail) {
+    if (insertResp.ok === false) {
       const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
 
       return await handleSeedError(message, startedAt, tel, 'failed: ', undefined, true);

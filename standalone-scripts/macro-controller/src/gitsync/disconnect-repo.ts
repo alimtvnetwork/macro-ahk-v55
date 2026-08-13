@@ -1,5 +1,4 @@
 import { HttpCodes } from "../constants/http";
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — Gitsync Disconnect (Issue 129 / Step 9)
  *
@@ -97,7 +96,7 @@ export async function disconnectGithubRepo(
     return { status: 'not_linked' };
   }
 
-  if (resp.isFail) {
+  if (resp.ok === false) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));

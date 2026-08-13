@@ -1,5 +1,4 @@
 import { HttpCodes } from "../constants/http";
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — GitSync progress probe (v3.40.2)
  *

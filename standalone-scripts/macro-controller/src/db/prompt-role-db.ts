@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * prompt-role-db.ts - role-scoped Prompt table helpers (plan-14, step 4).
  *
@@ -82,7 +81,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
 export async function upsertForRole(input: import('./prompt-db').UpsertInput): Promise<EnforceResult> {
   const { upsertPrompt } = await import('./prompt-db');
   const result = await upsertPrompt(input);
-  if (result.isFail) {
+  if (result.ok === false) {
     return new ServiceResult(false, undefined, result.error || 'upsertPrompt failed');
   }
 

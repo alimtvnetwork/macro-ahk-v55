@@ -53,7 +53,7 @@ describe('prompt-db update negative branches (Plan 22 gap #1)', () => {
       id: 1, slug: 'duplicate-slug', name: 'n', body: 'b', role: 'plan',
     });
 
-    expect(r.isFail).toBe(true);
+    expect(r.ok === false).toBe(true);
     expect(r.error).toMatch(/UNIQUE constraint/);
   });
 
@@ -62,7 +62,7 @@ describe('prompt-db update negative branches (Plan 22 gap #1)', () => {
       id: 1, slug: 's', name: 'n', body: 'b', role: 'invalid_role' as PromptRole,
     });
 
-    expect(r.isFail).toBe(true);
+    expect(r.ok === false).toBe(true);
     expect(r.error).toMatch(/invalid role/);
   });
 
@@ -82,7 +82,7 @@ describe('prompt-db update negative branches (Plan 22 gap #1)', () => {
       id: 99, slug: 's', name: 'n', body: 'b', role: 'plan',
     });
 
-    expect(r.isFail).toBe(true);
+    expect(r.ok === false).toBe(true);
     expect(r.error).toMatch(/write failed/);
   });
 });

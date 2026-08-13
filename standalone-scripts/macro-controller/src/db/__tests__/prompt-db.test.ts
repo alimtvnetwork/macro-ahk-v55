@@ -54,7 +54,7 @@ describe('listPromptsByRole', () => {
       { Id: 1, Slug: 'plan-default', Name: 'PlanTierType default', Body: '# PlanTierType {{n}}', Role: 'plan', IsDefault: 1, CreatedAt: 10, UpdatedAt: 20 },
     ]};
     const r = await listPromptsByRole('plan');
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -79,7 +79,7 @@ describe('getDefaultPromptForRole', () => {
       { Id: 3, Slug: 'next-default', Name: 'Next', Body: 'go', Role: 'next', IsDefault: 1, CreatedAt: 1, UpdatedAt: 2 },
     ]};
     const r = await getDefaultPromptForRole('next');
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -91,7 +91,7 @@ describe('getDefaultPromptForRole', () => {
   it('returns undefined when no default set (ok=true, value=undefined)', async () => {
     nextResponse = { ok: true, isFail: false, isSuccess: true, rows: [] };
     const r = await getDefaultPromptForRole('plan');
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -103,7 +103,7 @@ describe('getDefaultPromptForRole', () => {
 describe('setDefaultPromptForRole', () => {
   it('delegates to enforceSingleDefaultPerRole (transactional flip)', async () => {
     const r = await setDefaultPromptForRole(5, 'plan');
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -117,7 +117,7 @@ describe('upsertPrompt', () => {
   it('INSERTs a new row when id is omitted', async () => {
     nextResponse = { ok: true, isFail: false, isSuccess: true, lastInsertId: 42 };
     const r = await upsertPrompt({ slug: 's', name: 'n', body: 'b', role: 'generic' });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -133,7 +133,7 @@ describe('upsertPrompt', () => {
       { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 88 }] },
     ];
     const r = await upsertPrompt({ slug: 'plan-default', name: 'PlanTierType', body: 'body {{n}}', role: 'plan' });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -145,7 +145,7 @@ describe('upsertPrompt', () => {
 
   it('UPDATEs when id is provided', async () => {
     const r = await upsertPrompt({ id: 7, slug: 's', name: 'n', body: 'b', role: 'plan' });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -189,7 +189,7 @@ describe('upsertPrompt', () => {
       previousBody: 'a {{x}} b {{y}}',
       body: 'b {{y}} a {{x}}',
     });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -203,7 +203,7 @@ describe('upsertPrompt', () => {
       previousBody: '{{a}}',
       body: 'no tokens',
     });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -213,7 +213,7 @@ describe('upsertPrompt', () => {
   it('persists default ReplaceKey and ReplaceValues on insert when not overridden', async () => {
     nextResponse = { ok: true, isFail: false, isSuccess: true, lastInsertId: 1 };
     const r = await upsertPrompt({ slug: 's', name: 'n', body: 'b', role: 'plan' });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -228,7 +228,7 @@ describe('upsertPrompt', () => {
       slug: 's', name: 'n', body: 'b {{count}}', role: 'plan',
       replaceKey: 'count', replaceValues: ['3', '7', '3', ' 9 '],
     });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -243,7 +243,7 @@ describe('upsertPrompt', () => {
       id: 7, slug: 's', name: 'n', body: 'b', role: 'plan',
       replaceKey: 'k', replaceValues: ['a'],
     });
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -284,7 +284,7 @@ describe('rowToPrompt (via listPromptsByRole)', () => {
       CreatedAt: 10, UpdatedAt: 20,
     }] };
     const r = await listPromptsByRole('plan');
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 
@@ -332,7 +332,7 @@ describe('deletePromptById', () => {
       { ok: true, isFail: false, isSuccess: true },
     ];
     const r = await deletePromptById(2);
-    if (r.isFail) {
+    if (r.ok === false) {
       console.warn('UPSERT ERROR:', r.error);
     }
 

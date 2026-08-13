@@ -1,4 +1,3 @@
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 
 /**
  * MacroLoop Controller — Task Next Automation UI
@@ -11,7 +10,7 @@ import { log, logSub } from '../logger';
 import { LabelType, type PromptEntry, type ResolvedPromptsConfig } from '../types';
 import { showPasteToast, pasteIntoEditor } from './prompt-utils';
 
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { getPersistentTaskQueue, resolveTaskQueueProjectId } from '../queue-control/task-queue-project-store';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { substituteToken } from '../utils/token-substitute';
@@ -283,7 +282,7 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
       return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); 
     },
   );
-  if (res.isFail || !res.value || res.value.length === 0) {
+  if (res.ok === false || !res.value || res.value.length === 0) {
     return null;
   }
 

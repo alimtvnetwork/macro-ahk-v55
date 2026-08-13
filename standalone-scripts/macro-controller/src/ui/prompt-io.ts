@@ -1,5 +1,5 @@
 import { Timings } from "../constants/timing";
-import { ServiceResult } from '../utils/result-wrapper';
+// import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt IO, Core Logic & Types (Issue 131).
  *
@@ -139,7 +139,7 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
 
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
-    if (res.isFail || !res.value) {
+    if (res.ok === false || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
     }
@@ -400,7 +400,6 @@ export interface ParsedPromptsResult {
 }
 
 function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: string[]): ParsedPromptsResult {
-  const rawEntries = (raw as { entries?: unknown }).entries;
   const result = validatePromptsBundle(raw);
   if (!result.isValid || !result.bundle) {
     errors.push(...result.errors);

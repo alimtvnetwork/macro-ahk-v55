@@ -1,4 +1,3 @@
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * reseed-command.ts — on-demand recovery for the PlanTierType/Next prompt library.
  *
@@ -69,7 +68,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       + ', UpdatedAt = ' + String(now)
       + ' WHERE Slug = ' + sqlLit(row.slug);
     const resp = await rawSql('SCHEMA', updateSql);
-    if (resp.isFail) {
+    if (resp.ok === false) {
       const message = 'force update failed for ' + row.slug + ': ' + (resp.errorMessage ?? '?');
       logError('ReseedCommand', message);
       emitPromptSeedEvent({
@@ -102,7 +101,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    if (seedResult.isFail) {
+    if (seedResult.ok === false) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),

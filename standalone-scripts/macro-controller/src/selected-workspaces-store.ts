@@ -1,6 +1,5 @@
 import { logError } from "./error-utils";
 
-const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Selected-workspaces store — pub/sub for multi-workspace bulk operations.
  * (Issue 130 Task 2).
