@@ -61,7 +61,8 @@ export function bindPromptDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-  if (!dbManager) {
+  const isDbManagerMissing = !dbManager;
+  if (isDbManagerMissing) {
     throw new Error("[prompts] DbManager not bound. Call bindPromptDbManager() first.");
   }
 
@@ -160,7 +161,8 @@ function ensurePromptsTable(): void {
 function ensureCategoryId(categoryName: string): string {
   const db = getDb();
   const trimmed = categoryName.trim();
-  if (!trimmed) {
+  const isTrimmedEmpty = !trimmed;
+  if (isTrimmedEmpty) {
     return "";
   }
 
@@ -194,7 +196,8 @@ function findExistingDefaultPromptId(slug: string | undefined, legacySlug: strin
 
 /** Links a prompt to a category via the junction table. */
 function linkPromptToCategory(promptId: string, categoryId: string): void {
-  if (!categoryId) {
+  const isCategoryIdMissing = !categoryId;
+  if (isCategoryIdMissing) {
     return;
   }
 
@@ -319,7 +322,8 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
 
     const localResult = await chrome.storage.local.get(LEGACY_STORAGE_KEY);
     const legacyPrompts = localResult[LEGACY_STORAGE_KEY];
-    if (!Array.isArray(legacyPrompts) || legacyPrompts.length === 0) {
+    const isLegacyPromptsAbsent = !Array.isArray(legacyPrompts) || legacyPrompts.length === 0;
+    if (isLegacyPromptsAbsent) {
       return;
     }
 
@@ -495,7 +499,8 @@ function getBundledFallbackEntries(): RawDefaultPromptEntry[] {
 function mapRawToPromptEntry(entry: RawDefaultPromptEntry, index: number, now: string): PromptEntry | null {
   const name = typeof entry.name === "string" ? entry.name : "";
   const text = typeof entry.text === "string" ? entry.text : "";
-  if (!name || !text) {
+  const isNameOrTextMissing = !name || !text;
+  if (isNameOrTextMissing) {
     return null;
   }
 
@@ -703,7 +708,8 @@ export async function handleDeletePrompt(payload: { promptId: string }): Promise
   }
 
   const numId = Number(promptIdStr);
-  if (!Number.isFinite(numId)) {
+  const isNumIdInvalid = !Number.isFinite(numId);
+  if (isNumIdInvalid) {
     return missingFieldError("promptId (numeric)", "DELETE_PROMPT");
   }
 
@@ -763,7 +769,8 @@ export async function handleReorderPrompts(payload: { promptIds: string[] }): Pr
     } // skip invalid entries instead of crashing
 
     const numId = Number(id);
-    if (!Number.isFinite(numId)) {
+    const isNumIdInvalid = !Number.isFinite(numId);
+    if (isNumIdInvalid) {
       continue;
     }
 

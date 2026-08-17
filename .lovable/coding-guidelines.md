@@ -206,3 +206,7 @@ These rules are summarized from project memory and `spec/02-coding-guidelines/`.
 
 ### Part 8 - Agent Etiquette & Workspace Cleanliness
 - **Temporary Scripts:** If an AI agent creates temporary scripts (e.g., `.cjs` or `.mjs` scripts for refactoring or AST manipulation), they MUST NEVER be placed in the repository root. All temporary scratch scripts must be placed in `.lovable/tmp/` (or the agent's native scratch directory) to keep the repository clean.
+
+### Part 7 - Styling & Layout
+- **If-Statement Padding:** If an \if\ statement is not the very first statement inside a block (like right after a {), there MUST be a blank newline before it. This improves readability and prevents code from clumping together.
+

@@ -76,16 +76,19 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
     ? m.method : "GET").toUpperCase();
   const params = m.params || {};
 
-  if (!slug) {
+  const isSlugMissing = !slug;
+  if (isSlugMissing) {
     return { ...missingFieldError("project", "projectApi") };
   }
 
-  if (!endpoint) {
+  const isEndpointMissing = !endpoint;
+  if (isEndpointMissing) {
     return { ...missingFieldError("endpoint", "projectApi") };
   }
 
   // Ensure project DB is initialized
-  if (!hasProjectDb(slug)) {
+  const isProjectDbMissing = !hasProjectDb(slug);
+  if (isProjectDbMissing) {
     await initProjectDb(slug);
   }
 
@@ -225,12 +228,14 @@ function handleSchemaCommand(
   switch (command) {
     case "createTable": {
       const tableName = requireField(params.tableName);
-      if (!tableName) {
+      const isTableNameMissing = !tableName;
+      if (isTableNameMissing) {
         throw new Error("createTable: missing or invalid 'tableName'");
       }
 
       const columns = Array.isArray(params.columns) ? params.columns as ColumnDef[] : null;
-      if (!columns || columns.length === 0) {
+      const isColumnsAbsent = !columns || columns.length === 0;
+      if (isColumnsAbsent) {
         throw new Error("createTable: missing or empty 'columns' array");
       }
 
@@ -242,7 +247,8 @@ function handleSchemaCommand(
 
     case "dropTable": {
       const tableName = requireField(params.tableName);
-      if (!tableName) {
+      const isTableNameMissing = !tableName;
+      if (isTableNameMissing) {
         throw new Error("dropTable: missing or invalid 'tableName'");
       }
 
@@ -274,7 +280,8 @@ function handleRawSqlCommand(
   params: Record<string, unknown>,
 ): Record<string, unknown> {
   const sql = requireField(params.sql);
-  if (!sql) {
+  const isSqlMissing = !sql;
+  if (isSqlMissing) {
     throw new Error("rawSql: missing or invalid 'sql' parameter");
   }
 

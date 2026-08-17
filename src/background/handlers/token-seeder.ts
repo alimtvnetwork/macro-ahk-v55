@@ -102,8 +102,9 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
   }
 
   const hasTabAccess = await canAccessTabContents(tabId, tabUrl);
+  const isTabAccessDenied = !hasTabAccess;
 
-  if (!hasTabAccess) {
+  if (isTabAccessDenied) {
     return;
   }
 
@@ -304,16 +305,18 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
 
   try {
     const hasPermission = await chrome.permissions.contains({ origins: [originPattern] });
+    const isPermissionDenied = !hasPermission;
 
-    if (!hasPermission) {
+    if (isPermissionDenied) {
       warnInaccessibleTabOnce(tabId, tabUrl, `Host permission is not granted for ${originPattern}.`, "PERMISSION_NOT_GRANTED");
 
       return false;
     }
 
     const canExecuteScript = await probeTabScriptingAccess(tabId, tabUrl);
+    const isScriptExecutionBlocked = !canExecuteScript;
 
-    if (!canExecuteScript) {
+    if (isScriptExecutionBlocked) {
       return false;
     }
 

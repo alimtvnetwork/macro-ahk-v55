@@ -209,7 +209,8 @@ function snapshotVersion(db: ReturnType<typeof getDb>, assetId: number, version:
 
 export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ assetId: number } | HandlerErrorResponse> {
   const asset = payload?.asset;
-  if (!asset) {
+  const isAssetMissing = !asset;
+  if (isAssetMissing) {
     return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
   }
 
@@ -328,7 +329,8 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
 
 export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkId: number } | HandlerErrorResponse> {
   const link = payload?.link;
-  if (!link) {
+  const isLinkMissing = !link;
+  if (isLinkMissing) {
     return missingFieldError("link", "LIBRARY_SAVE_LINK");
   }
 
@@ -536,7 +538,8 @@ export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[]
 
 export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ groupId: number; cascadedCount: number } | HandlerErrorResponse> {
   const group = payload?.group;
-  if (!group) {
+  const isGroupMissing = !group;
+  if (isGroupMissing) {
     return missingFieldError("group", "LIBRARY_SAVE_GROUP");
   }
 
@@ -684,7 +687,8 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
   }
 
   const settingsJson = result[0].values[0][0] as string | null;
-  if (!settingsJson) {
+  const isSettingsJsonMissing = !settingsJson;
+  if (isSettingsJsonMissing) {
     return { cascadedCount: 0 };
   }
 
