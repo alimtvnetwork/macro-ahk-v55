@@ -38,3 +38,4 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 33 | [plan-10](./completed/33-plan-10.md) | - | completed | 2026-08-12 |
 | 35 | [fix-remaining-lint-issues](./completed/35-fix-remaining-lint-issues.md) | - | completed | 2026-08-12 |
 | 36 | [fix-eslint-warnings-ci](./completed/36-fix-eslint-warnings-ci.md) | [subtasks](./subtasks/36-fix-eslint-warnings-ci/) | completed | 2026-08-12 |
+| 37 | [global-guideline-fixes](./pending/37-global-guideline-fixes.md) | [subtasks](./subtasks/37-global-guideline-fixes/) | pending | 2026-08-17 |
