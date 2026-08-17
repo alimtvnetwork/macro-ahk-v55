@@ -259,7 +259,8 @@ export async function maybeShowFirstAttachToast(
  */
 export function registerFirstAttachToastBridge(): void {
   chrome.runtime.onMessage.addListener((message, sender) => {
-    if (!isToastActionMessage(message)) {
+    const isMissing = !isToastActionMessage(message);
+    if (isMissing) {
       return false;
     }
 
