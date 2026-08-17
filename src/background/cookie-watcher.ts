@@ -97,7 +97,8 @@ async function handleCookieChange(
   const isRefreshCookie = REFRESH_COOKIE_NAMES.includes(cookieName as (typeof REFRESH_COOKIE_NAMES)[number]);
   const isRelevantCookie = isTargetDomain && (isSessionCookie || isRefreshCookie);
 
-  if (!isRelevantCookie) {
+  const isMissing = !isRelevantCookie;
+  if (isMissing) {
     return;
   }
 
