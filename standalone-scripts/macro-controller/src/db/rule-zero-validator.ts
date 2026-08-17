@@ -139,7 +139,9 @@ export function countTopLevelSteps(body: string): number {
       continue;
     }
 
-    if (inStepsSection && RE_NEXT_HEADING.test(line) && !RE_STEPS_HEADING.test(line)) {
+    const isNextHeadingInSteps = inStepsSection && RE_NEXT_HEADING.test(line);
+
+    if (isNextHeadingInSteps) {
       inStepsSection = false;
     }
 

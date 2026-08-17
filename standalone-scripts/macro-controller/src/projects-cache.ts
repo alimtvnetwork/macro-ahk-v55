@@ -34,6 +34,14 @@ const KEY_PREFIX = 'MacroProjectListCache:';
 /** Default cache TTL — 48 h. Overridable per call (Step 7 setting). */
 export const DEFAULT_PROJECT_CACHE_TTL_MS = DEFAULT_PROJECTS_CACHE_TTL_HOURS * 60 * 60 * 1000;
 
+function isValidFiniteHeight(h: unknown): h is number {
+  return (
+    typeof h === 'number' &&
+    Number.isFinite(h) &&
+    h >= 0
+  );
+}
+
 /**
  * Resolve the effective TTL for the projects cache, in ms.
  * Reads `projectsCacheTtlHours` from settings-store; falls back to the
@@ -42,7 +50,7 @@ export const DEFAULT_PROJECT_CACHE_TTL_MS = DEFAULT_PROJECTS_CACHE_TTL_HOURS * 6
 export function getProjectsCacheTtlMs(): number {
   const o = getSettingsOverrides();
   const h = o.projectsCacheTtlHours;
-  if (typeof h === 'number' && Number.isFinite(h) && h >= 0) {
+  if (isValidFiniteHeight(h)) {
     return Math.floor(h) * 60 * 60 * 1000;
   }
 

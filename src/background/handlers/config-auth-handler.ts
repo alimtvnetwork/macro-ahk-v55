@@ -742,7 +742,11 @@ async function fetchAuthTokenFromSessionExchange(
   projectId: string | null | undefined,
   hasSessionCookie: boolean,
 ): Promise<string | null> {
-  if (!hasSessionCookie || !projectId) {
+  const isSessionCookieMissing = !hasSessionCookie;
+  const isProjectIdAbsent = !projectId;
+  const isContextInvalid = isSessionCookieMissing || isProjectIdAbsent;
+
+  if (isContextInvalid) {
     return null;
   }
 
