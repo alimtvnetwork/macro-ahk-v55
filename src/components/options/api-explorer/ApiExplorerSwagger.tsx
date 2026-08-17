@@ -28,7 +28,7 @@ export function ApiExplorerSwagger() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as any });
+      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as unknown });
       setStatus({
         service: result.service,
         version: result.version,
