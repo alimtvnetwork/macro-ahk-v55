@@ -346,7 +346,8 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
   const enabledScripts = (scriptsData?.scripts ?? []).filter((s) => s.isEnabled !== false);
   const hasScripts = enabledScripts.length > 0;
 
-  if (!hasScripts) {
+  const isMissing050 = !hasScripts;
+  if (isMissing050) {
     return;
   }
 
