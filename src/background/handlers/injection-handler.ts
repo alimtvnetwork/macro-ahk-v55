@@ -161,7 +161,8 @@ export async function handleInjectScripts(
   // serving the cached payload. Otherwise a previous successful run
   // shadows a new request — including bad-syntax requests that would
   // otherwise be reported as failures (see e2e syntax-error test).
-  if (!isForceRun && !hasInlineSyntaxError) {
+  const isCacheEligible = !isForceRun && !hasInlineSyntaxError;
+  if (isCacheEligible) {
     const requestedFingerprint = buildRequestFingerprint(injectRequest.scripts as Array<Partial<InjectableScript> & { path?: string }>);
     const cachedPayload = await time("cache_gate", () =>
       cacheGet<PipelineCachePayload>(PIPELINE_CACHE_CATEGORY, PIPELINE_CACHE_KEY));
@@ -179,7 +180,8 @@ export async function handleInjectScripts(
       return await executeCachedPayload(injectRequest.tabId, cachedPayload, pipelineStart, timings, time);
     }
 
-    if (cachedPayload && !cacheMatchesRequest) {
+    const isCacheStale = cachedPayload !== null && !cacheMatchesRequest;
+    if (isCacheStale) {
       await cacheDelete(PIPELINE_CACHE_CATEGORY, PIPELINE_CACHE_KEY);
       console.log("[injection] CACHE MISS — cached request fingerprint/source [%s/%s] does not match requested [%s/%s], rebuilding",
         cachedFingerprint || "missing", cacheLaunchSource, requestedFingerprint || "empty", launchSource);
@@ -683,11 +685,13 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
             verifyStack: string;
         } | undefined;
 
-    if (!r) {
+    const isResultMissing = !r;
+    if (isResultMissing) {
       return;
     }
 
     const allOk = r.marcoSdk && r.extRoot && r.mcClass && r.mcInstance && r.uiContainer;
+    const isAnyFailed = !allOk;
     const status = allOk ? "✅ VERIFIED" : "⚠️ INCOMPLETE";
 
     const lines: Array<{ "msg": string; level: MirrorDiagnosticToTabLevelType }> = [
@@ -699,7 +703,7 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
       { "msg": `[data-marco-injected] marker  : ${r.markerEl ? "✅" : "⚠️ (not required)"}`, level: "log" },
     ];
 
-    if (!allOk) {
+    if (isAnyFailed) {
       lines.push({ "msg": `── Stack at verification point ──`, level: "warn" });
       lines.push({ "msg": r.verifyStack, level: "warn" });
     }
@@ -723,7 +727,7 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
       });
     }
 
-    if (!allOk) {
+    if (isAnyFailed) {
       logBgWarnError(
         BgLogTag.INJECTION,
         `Post-injection verification INCOMPLETE on tab ${tabId}: ` +

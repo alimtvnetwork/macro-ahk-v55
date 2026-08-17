@@ -36,11 +36,13 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
       target: { tabId },
       func: () => {
         const win = window as unknown as Record<string, unknown>;
-        if (!win.RiseupAsiaMacroExt) {
+        const isExtRootMissing = !win.RiseupAsiaMacroExt;
+        if (isExtRootMissing) {
           win.RiseupAsiaMacroExt = { Projects: {} };
         } else {
           const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
-          if (!ext.Projects) {
+          const isProjectsMissing = !ext.Projects;
+          if (isProjectsMissing) {
             ext.Projects = {};
           }
         }
@@ -88,7 +90,8 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
       : "default";
 
     const guideKey = `${codeName}:${slug}`;
-    if (!_llmGuideCache.has(guideKey)) {
+    const isCacheMiss = !_llmGuideCache.has(guideKey);
+    if (isCacheMiss) {
       _llmGuideCache.set(guideKey, generateLlmGuide(codeName, slug));
     }
 
@@ -125,12 +128,14 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function injectProjectNamespaces(tabId: number, allProjects: StoredProject[]): Promise<void> {
   const activeId = getActiveProjectId();
-  if (!activeId) {
+  const isActiveIdMissing = !activeId;
+  if (isActiveIdMissing) {
     return;
   }
 
   const activeProject = allProjects.find((p) => p.id === activeId);
-  if (!activeProject) {
+  const isActiveProjectMissing = !activeProject;
+  if (isActiveProjectMissing) {
     return;
   }
 
@@ -153,7 +158,8 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
     const dep = allProjects.find((p) => p.id === depId);
     if (dep?.dependencies) {
       for (const sub of dep.dependencies) {
-        if (!projectIds.has(sub.projectId)) {
+        const isSubProjectExcluded = !projectIds.has(sub.projectId);
+        if (isSubProjectExcluded) {
           queue.push(sub.projectId);
         }
       }
@@ -180,7 +186,8 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
 
   for (const pid of projectIds) {
     const project = allProjects.find((p) => p.id === pid);
-    if (!project) {
+    const isProjectMissing = !project;
+    if (isProjectMissing) {
       continue;
     }
 

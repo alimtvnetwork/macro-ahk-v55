@@ -20,12 +20,14 @@ import { resolveInjectionOrder, type ProjectNode } from "../dependency-resolver"
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function prependDependencyScripts(callerScripts: ScriptEntry[], allProjects: StoredProject[]): Promise<ScriptEntry[]> {
   const activeId = getActiveProjectId();
-  if (!activeId) {
+  const isActiveIdMissing = !activeId;
+  if (isActiveIdMissing) {
     return callerScripts;
   }
 
   const activeProject = allProjects.find((p) => p.id === activeId);
-  if (!activeProject) {
+  const isActiveProjectMissing = !activeProject;
+  if (isActiveProjectMissing) {
     return callerScripts;
   }
 
@@ -50,7 +52,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
     const depProject = allProjects.find((p) => p.id === depId);
     if (depProject?.dependencies) {
       for (const sub of depProject.dependencies) {
-        if (!relevantIds.has(sub.projectId)) {
+        const isSubProjectIrrelevant = !relevantIds.has(sub.projectId);
+        if (isSubProjectIrrelevant) {
           queue.push(sub.projectId);
         }
       }
@@ -98,7 +101,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
 
   const scriptKeyToProjectId = new Map<string, string>();
   for (const project of allProjects) {
-    if (!relevantIds.has(project.id)) {
+    const isProjectIrrelevant = !relevantIds.has(project.id);
+    if (isProjectIrrelevant) {
       continue;
     }
 
@@ -114,7 +118,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
     }
 
     const depProject = allProjects.find((p) => p.id === projectId);
-    if (!depProject?.scripts?.length) {
+    const isDependencyScriptsMissing = !depProject?.scripts?.length;
+    if (isDependencyScriptsMissing) {
       continue;
     }
 
@@ -146,7 +151,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
     }
 
     const scriptKey = getScriptIdentity(script);
-    if (!scriptKey) {
+    const isScriptKeyMissing = !scriptKey;
+    if (isScriptKeyMissing) {
       return script;
     }
 
@@ -175,7 +181,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
 export function collectGlobalScripts(globalProjects: StoredProject[]): ScriptEntry[] {
   const scripts: ScriptEntry[] = [];
   for (const gp of globalProjects) {
-    if (!gp.scripts?.length) {
+    const isGlobalScriptsMissing = !gp.scripts?.length;
+    if (isGlobalScriptsMissing) {
       continue;
     }
 

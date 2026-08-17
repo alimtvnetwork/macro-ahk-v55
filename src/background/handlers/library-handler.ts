@@ -49,7 +49,8 @@ export function bindLibraryDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-  if (!dbManager) {
+  const isDbManagerMissing = !dbManager;
+  if (isDbManagerMissing) {
     throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
   }
 
