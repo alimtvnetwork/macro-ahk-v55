@@ -44,7 +44,7 @@ export function ApiExplorerSwagger() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as unknown });
       const raw = result.endpoints ?? [];
       setEndpoints(raw.map((e) => normalizeEndpoint(e as unknown as Record<string, unknown>)));
     } catch (err) { /* swallowed */
