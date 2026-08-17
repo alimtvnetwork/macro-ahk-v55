@@ -73,7 +73,7 @@ function useDeleteHandler(projectSlug: string, reload: () => Promise<void>) {
     try {
       await sendMessage({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_DELETE" as any,
+        type: "RECORDER_STEP_DELETE" as unknown,
         projectSlug, stepId,
       });
       toast.success("Step deleted");
