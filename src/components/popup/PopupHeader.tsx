@@ -65,7 +65,7 @@ export function PopupHeader({ version, onRefresh }: Props) {
               variant="ghost"
               className="h-7 w-7 hover:bg-primary/15 hover:text-primary"
               onClick={() => {
-                const runtime = (globalThis as any).chrome?.runtime;
+                const runtime = (globalThis as unknown).chrome?.runtime;
                 const canOpenOptionsPage = typeof runtime?.openOptionsPage === "function";
 
                 if (canOpenOptionsPage) {
