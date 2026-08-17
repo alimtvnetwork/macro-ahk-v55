@@ -73,11 +73,11 @@ function buildFieldsAndValues(
   const fields: FormFieldMeta[] = [];
   const values: FormFieldValue[] = [];
   let fallbackIndex = 0;
-  for (const el of elements) {
-    const meta = readFieldMeta(el, () => `field#${++fallbackIndex}`);
+  for (const element of elements) {
+    const meta = readFieldMeta(element, () => `field#${++fallbackIndex}`);
     fields.push(meta);
     if (verbose) {
-      values.push(readFieldValue(el, meta));
+      values.push(readFieldValue(element, meta));
     }
   }
 
@@ -190,13 +190,13 @@ function readFormHeader(container: Element): FormSnapshot["Form"] {
   };
 }
 
-function readFieldMeta(el: Element, fallbackName: () => string): FormFieldMeta {
-  const tag = el.tagName.toLowerCase();
-  const type = inferFieldType(el, tag);
-  const nativeName = nullableAttr(el, "name");
-  const id = nullableAttr(el, "id");
-  const ariaLabel = nullableAttr(el, "aria-label");
-  const placeholder = nullableAttr(el, "placeholder");
+function readFieldMeta(element: Element, fallbackName: () => string): FormFieldMeta {
+  const tag = element.tagName.toLowerCase();
+  const type = inferFieldType(element, tag);
+  const nativeName = nullableAttr(element, "name");
+  const id = nullableAttr(element, "id");
+  const ariaLabel = nullableAttr(element, "aria-label");
+  const placeholder = nullableAttr(element, "placeholder");
   const displayName = nativeName ?? id ?? ariaLabel ?? placeholder ?? fallbackName();
 
   return {
@@ -204,13 +204,13 @@ function readFieldMeta(el: Element, fallbackName: () => string): FormFieldMeta {
     Type: type,
     NativeName: nativeName,
     Id: id,
-    Required: el.hasAttribute("required"),
-    Sensitive: classifySensitive(el, type, nativeName, id),
+    Required: element.hasAttribute("required"),
+    Sensitive: classifySensitive(element, type, nativeName, id),
   };
 }
 
-function readFieldValue(el: Element, meta: FormFieldMeta): FormFieldValue {
-  const raw = readRawValue(el, meta.Type);
+function readFieldValue(element: Element, meta: FormFieldMeta): FormFieldValue {
+  const raw = readRawValue(element, meta.Type);
   if (meta.Sensitive && raw.length > 0) {
     return { Name: meta.Name, Value: "*".repeat(raw.length), Masked: true };
   }
@@ -218,8 +218,8 @@ function readFieldValue(el: Element, meta: FormFieldMeta): FormFieldValue {
   return { Name: meta.Name, Value: raw, Masked: false };
 }
 
-function readMultiSelectValue(el: Element): string {
-  const sel = el as HTMLSelectElement;
+function readMultiSelectValue(element: Element): string {
+  const sel = element as HTMLSelectElement;
   const picked: string[] = [];
   for (let i = 0; i < sel.options.length; i++) {
     if (sel.options[i].selected) {
@@ -230,8 +230,8 @@ function readMultiSelectValue(el: Element): string {
   return JSON.stringify(picked);
 }
 
-function readFileListValue(el: Element): string {
-  const files = (el as HTMLInputElement).files;
+function readFileListValue(element: Element): string {
+  const files = (element as HTMLInputElement).files;
   if (files === null || files.length === 0) {
     return "";
   }
@@ -244,34 +244,34 @@ function readFileListValue(el: Element): string {
   return JSON.stringify(names);
 }
 
-function readRawValue(el: Element, type: FormFieldType): string {
+function readRawValue(element: Element, type: FormFieldType): string {
   if (type === "checkbox" || type === "radio") {
-    return (el as HTMLInputElement).checked === true ? "true" : "false";
+    return (element as HTMLInputElement).checked === true ? "true" : "false";
   }
 
   if (type === "select-multiple") {
-    return readMultiSelectValue(el);
+    return readMultiSelectValue(element);
   }
 
   if (type === "file") {
-    return readFileListValue(el);
+    return readFileListValue(element);
   }
 
-  const v = (el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+  const v = (element as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
 
   return typeof v === "string" ? v : "";
 }
 
-function inferFieldType(el: Element, tag: string): FormFieldType {
+function inferFieldType(element: Element, tag: string): FormFieldType {
   if (tag === "textarea") {
     return "textarea";
   }
 
   if (tag === "select") {
-    return (el as HTMLSelectElement).multiple ? "select-multiple" : "select";
+    return (element as HTMLSelectElement).multiple ? "select-multiple" : "select";
   }
 
-  const raw = (el.getAttribute("type") ?? "text").toLowerCase();
+  const raw = (element.getAttribute("type") ?? "text").toLowerCase();
   const known: ReadonlySet<FormFieldType> = new Set<FormFieldType>([
     "text", "email", "password", "number", "tel", "url", "search",
     "date", "datetime-local", "month", "week", "time", "color", "range",
@@ -282,7 +282,7 @@ function inferFieldType(el: Element, tag: string): FormFieldType {
 }
 
 function classifySensitive(
-  el: Element,
+  element: Element,
   type: FormFieldType,
   nativeName: string | null,
   id: string | null,
@@ -291,7 +291,7 @@ function classifySensitive(
     return true;
   }
 
-  const ac = (el.getAttribute("autocomplete") ?? "").toLowerCase();
+  const ac = (element.getAttribute("autocomplete") ?? "").toLowerCase();
   if (ac.length > 0) {
     for (const token of ac.split(/\s+/)) {
       if (SENSITIVE_AUTOCOMPLETE.has(token)) {
@@ -311,8 +311,8 @@ function classifySensitive(
   return false;
 }
 
-function nullableAttr(el: Element, name: string): string | null {
-  const v = el.getAttribute(name);
+function nullableAttr(element: Element, name: string): string | null {
+  const v = element.getAttribute(name);
   if (v === null) {
     return null;
   }

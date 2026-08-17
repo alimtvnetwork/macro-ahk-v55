@@ -100,6 +100,7 @@ export async function boot(): Promise<void> {
     try {
       await preloadDismissedOrigins();
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(
         BgLogTag.MARCO,
         "[boot] preloadDismissedOrigins failed; C9 gate falls back to in-memory",
@@ -111,6 +112,7 @@ export async function boot(): Promise<void> {
       await preloadSeenOrigins();
       registerFirstAttachToastBridge();
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(
         BgLogTag.MARCO,
         "[boot] first-attach toast bridge init failed",
@@ -134,6 +136,7 @@ export async function boot(): Promise<void> {
           migrationResult.fromVersion, migrationResult.toVersion, migrationResult.applied);
       }
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Storage migrations failed (non-fatal)", err);
     }
 
@@ -143,6 +146,7 @@ export async function boot(): Promise<void> {
       const result = await seedFromManifest();
       console.log("[Marco] ✓ Manifest seeder: %d scripts, %d configs across %d projects", result.scripts, result.configs, result.projects);
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Manifest seeder failed (non-fatal)", err);
     }
 
@@ -157,6 +161,7 @@ export async function boot(): Promise<void> {
         );
       }
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "urlMatches backfill failed (non-fatal)", err);
     }
 
@@ -166,6 +171,7 @@ export async function boot(): Promise<void> {
       await reseedPrompts();
       console.log("[Marco] ✓ Prompts reseeded from dist");
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Prompt reseed failed (non-fatal)", err);
     }
 
@@ -175,6 +181,7 @@ export async function boot(): Promise<void> {
       await ensureDefaultProjectSingleScript();
       console.log("[Marco] ✓ Default project normalized");
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Default project normalization failed (non-fatal)", err);
     }
 
@@ -183,6 +190,7 @@ export async function boot(): Promise<void> {
     try {
       await purgeStaleEntries();
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Cache purge failed (non-fatal)", err);
     }
 
@@ -192,6 +200,7 @@ export async function boot(): Promise<void> {
       await precacheStableScripts();
       console.log("[Marco] Pre-cached stable scripts into IndexedDB");
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       logCaughtError(BgLogTag.BOOT, "Script pre-cache failed (non-fatal)", err);
     }
 
@@ -202,6 +211,7 @@ export async function boot(): Promise<void> {
     await drainBuffer();
     console.log("[Marco] Service worker ready");
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     const bootErrorMessage = formatBootError(step, err);
 
     setBootStep(`failed:${step}`);
@@ -252,6 +262,7 @@ async function persistBootFailure(step: string, err: unknown): Promise<void> {
     };
     await chrome.storage.local.set({ marco_last_boot_failure: payload });
   } catch (storageErr) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: storageErr });
     // Storage may be unavailable during catastrophic boot failure.
     logSampledDebug(
       BgLogTag.BOOT,
@@ -327,6 +338,7 @@ function clearAllLogsAndErrors(): void {
     logsDb.run("DELETE FROM Logs");
     logsDb.run("DELETE FROM Sessions");
   } catch (logsErr) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: logsErr });
     logSampledDebug(
       BgLogTag.BOOT,
       "clearAllLogsAndErrors:logs",
@@ -339,6 +351,7 @@ function clearAllLogsAndErrors(): void {
     const errorsDb = getErrorsDb();
     errorsDb.run("DELETE FROM Errors");
   } catch (errorsErr) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: errorsErr });
     logSampledDebug(
       BgLogTag.BOOT,
       "clearAllLogsAndErrors:errors",
@@ -408,6 +421,7 @@ async function precacheStableScripts(): Promise<void> {
       await cacheScriptCode(path, code);
       cacheResults.push(path + " (cached " + code.length + " chars)");
     } catch (err) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
       cacheResults.push(path + " (error: " + (err instanceof Error ? err.message : String(err)) + ") — halting remaining warms");
       break;
     }

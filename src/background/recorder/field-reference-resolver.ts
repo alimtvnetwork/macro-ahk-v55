@@ -138,13 +138,13 @@ function resolveTemplateToken(
     return valueToReplacement(cached.ResolvedValue);
   }
 
-  const ctx = classifyVariable(name, row, source, rowIndex, expected);
-  seen.set(name, ctx);
-  if (ctx.FailureReason !== "Resolved" && failureRef.first === null) {
-    failureRef.first = ctx;
+  const context = classifyVariable(name, row, source, rowIndex, expected);
+  seen.set(name, context);
+  if (context.FailureReason !== "Resolved" && failureRef.first === null) {
+    failureRef.first = context;
   }
 
-  return valueToReplacement(ctx.ResolvedValue);
+  return valueToReplacement(context.ResolvedValue);
 }
 
 /* ------------------------------------------------------------------ */

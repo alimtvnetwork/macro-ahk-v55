@@ -118,36 +118,38 @@ async function handleCookieChange(
 async function handleCookieRemoved(cookieName: string): Promise<void> {
   const isSessionCookie = SESSION_COOKIE_NAMES.includes(cookieName as (typeof SESSION_COOKIE_NAMES)[number]);
 
-  if (isSessionCookie) {
-    console.log("[cookie-watcher] Session cookie removed — attempting auto-refresh");
-
-    // Proactively try to refresh before notifying scripts
-    const refreshResult = await attemptProactiveRefresh();
-    const isRefreshSuccessful = refreshResult !== null;
-
-    if (isRefreshSuccessful) {
-      console.log("[cookie-watcher] Proactive refresh succeeded");
-      // Reseed the refreshed token into all platform tabs
-      await reseedAllTargetTabs();
-      await broadcastToTargetTabs(MessageType.TOKEN_UPDATED, {
-        token: refreshResult,
-        source: "proactive-refresh",
-      });
-    } else {
-      console.warn("[cookie-watcher] Proactive refresh failed — notifying scripts");
-      await broadcastToTargetTabs(MessageType.TOKEN_EXPIRED, {
-        cookie: cookieName,
-        reason: "cookie_removed",
-      });
-    }
-  } else {
+  if (!isSessionCookie) {
     // Refresh cookie removed — notify but don't attempt refresh
     console.warn("[cookie-watcher] Refresh cookie removed");
     await broadcastToTargetTabs(MessageType.TOKEN_EXPIRED, {
       cookie: cookieName,
       reason: "refresh_cookie_removed",
     });
+    return;
   }
+
+  console.log("[cookie-watcher] Session cookie removed — attempting auto-refresh");
+
+  // Proactively try to refresh before notifying scripts
+  const refreshResult = await attemptProactiveRefresh();
+  const isRefreshSuccessful = refreshResult !== null;
+
+  if (!isRefreshSuccessful) {
+    console.warn("[cookie-watcher] Proactive refresh failed — notifying scripts");
+    await broadcastToTargetTabs(MessageType.TOKEN_EXPIRED, {
+      cookie: cookieName,
+      reason: "cookie_removed",
+    });
+    return;
+  }
+
+  console.log("[cookie-watcher] Proactive refresh succeeded");
+  // Reseed the refreshed token into all platform tabs
+  await reseedAllTargetTabs();
+  await broadcastToTargetTabs(MessageType.TOKEN_UPDATED, {
+    token: refreshResult,
+    source: "proactive-refresh",
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -161,30 +163,30 @@ async function handleCookieUpdated(
 ): Promise<void> {
   const isSessionCookie = SESSION_COOKIE_NAMES.includes(cookieName as (typeof SESSION_COOKIE_NAMES)[number]);
 
-  if (isSessionCookie) {
-    console.log("[cookie-watcher] Session cookie updated — reseeding & notifying scripts");
+  if (!isSessionCookie) return;
 
-    // v1.68.0: Reseed localStorage in all tabs so macro controller picks up the new token
-    await reseedAllTargetTabs();
+  console.log("[cookie-watcher] Session cookie updated — reseeding & notifying scripts");
 
-    // Never broadcast raw cookie value as token; only broadcast verified JWT.
-    const tokenResult = await handleGetToken();
-    const jwtToken = tokenResult.token;
+  // v1.68.0: Reseed localStorage in all tabs so macro controller picks up the new token
+  await reseedAllTargetTabs();
 
-    if (jwtToken && isLikelyJwt(jwtToken)) {
-      await broadcastToTargetTabs(MessageType.TOKEN_UPDATED, {
-        token: jwtToken,
-        source: "cookie-change-jwt",
-      });
+  // Never broadcast raw cookie value as token; only broadcast verified JWT.
+  const tokenResult = await handleGetToken();
+  const jwtToken = tokenResult.token;
 
-      return;
-    }
-
-    await broadcastToTargetTabs(MessageType.TOKEN_EXPIRED, {
-      cookie: cookieName,
-      reason: "session_cookie_updated_but_no_jwt",
+  if (jwtToken && isLikelyJwt(jwtToken)) {
+    await broadcastToTargetTabs(MessageType.TOKEN_UPDATED, {
+      token: jwtToken,
+      source: "cookie-change-jwt",
     });
+
+    return;
   }
+
+  await broadcastToTargetTabs(MessageType.TOKEN_EXPIRED, {
+    cookie: cookieName,
+    reason: "session_cookie_updated_but_no_jwt",
+  });
 }
 
 /* ------------------------------------------------------------------ */

@@ -186,16 +186,16 @@ function toClassSet(value: string | null): Set<string> {
   return new Set(value.trim().split(/\s+/));
 }
 
-function readField(ctx: DomContext, field: DriftFieldName): string | null {
+function readField(context: DomContext, field: DriftFieldName): string | null {
   switch (field) {
-    case "TagName": return ctx.TagName;
-    case "Id": return ctx.Id;
-    case "ClassName": return ctx.ClassName;
-    case "AriaLabel": return ctx.AriaLabel;
-    case "Name": return ctx.Name;
-    case "Type": return ctx.Type;
-    case "TextSnippet": return ctx.TextSnippet;
-    case "OuterHtmlSnippet": return ctx.OuterHtmlSnippet;
+    case "TagName": return context.TagName;
+    case "Id": return context.Id;
+    case "ClassName": return context.ClassName;
+    case "AriaLabel": return context.AriaLabel;
+    case "Name": return context.Name;
+    case "Type": return context.Type;
+    case "TextSnippet": return context.TextSnippet;
+    case "OuterHtmlSnippet": return context.OuterHtmlSnippet;
   }
 }
 

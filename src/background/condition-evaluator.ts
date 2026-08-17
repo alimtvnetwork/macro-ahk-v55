@@ -52,13 +52,7 @@ export async function evaluateConditions(
 
   if (isOnlineRequired) {
     const isOffline = await checkOnlineCondition();
-
-    if (isOffline) {
-      return {
-        isMet: false,
-        failedCondition: "Network offline",
-      };
-    }
+    if (isOffline) return { isMet: false, failedCondition: "Network offline" };
   }
 
   const hasDelay = conditions.minDelayMs > 0;

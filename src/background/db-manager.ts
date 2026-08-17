@@ -317,12 +317,17 @@ async function loadSqlJs(): Promise<SqlJs> {
       `[db-manager] WASM checksum compute step failed (${summarizeChecksumOutcome(checksumOutcome)}); ` +
             `proceeding with initSqlJs — corruption diagnosis will be unavailable for this boot.`,
     );
-  } else if (checksumOutcome.status === "manifest-missing" || checksumOutcome.status === "manifest-malformed") {
+  }
+
+  const isManifestIssue = checksumOutcome.status === "manifest-missing" || checksumOutcome.status === "manifest-malformed";
+  if (isManifestIssue) {
     console.warn(
       `[db-manager] WASM checksum sidecar unavailable (${summarizeChecksumOutcome(checksumOutcome)}); ` +
             `extension may have been built before v2.187.0 — corruption vs CSP cannot be distinguished automatically.`,
     );
-  } else {
+  }
+
+  if (checksumOutcome.status !== "compute-failed" && !isManifestIssue) {
     console.log(`[db-manager] WASM checksum ${summarizeChecksumOutcome(checksumOutcome)}`);
   }
 

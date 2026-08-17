@@ -115,15 +115,13 @@ function requireChordKey(chord: string, parsed: ParsedChord): ParsedChord {
 }
 
 function keyToCode(key: string): string {
-  if (key.length === 1) {
-    const upper = key.toUpperCase();
-    if (upper >= "A" && upper <= "Z") {
-      return `Key${upper}`;
-    }
+  const upper = key.toUpperCase();
+  if (key.length === 1 && upper >= "A" && upper <= "Z") {
+    return `Key${upper}`;
+  }
 
-    if (upper >= "0" && upper <= "9") {
-      return `Digit${upper}`;
-    }
+  if (key.length === 1 && upper >= "0" && upper <= "9") {
+    return `Digit${upper}`;
   }
 
   const map: Record<string, string> = {
@@ -189,7 +187,7 @@ export function parseHotkeyPayload(json: string | null): HotkeyPayload {
 
 export interface HotkeyDispatchEnv {
     readonly document: Pick<Document, HotkeyDispatchEnvDocumentType>;
-    readonly setTimeout: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
+    readonly setTimeout: (callback: () => void, ms: number) => ReturnType<typeof setTimeout>;
     readonly clearTimeout: (timerId: ReturnType<typeof setTimeout>) => void;
 }
 
@@ -240,7 +238,7 @@ export async function executeHotkeyStep(
 ): Promise<void> {
   const dispatchEnv: HotkeyDispatchEnv = {
     document: env?.document ?? (typeof document === "undefined" ? null as unknown as Document : document),
-    setTimeout: env?.setTimeout ?? ((cb, ms) => setTimeout(cb, ms)),
+    setTimeout: env?.setTimeout ?? ((callback, ms) => setTimeout(callback, ms)),
     clearTimeout: env?.clearTimeout ?? ((timerId) => clearTimeout(timerId)),
   };
   if (dispatchEnv.document === null) {

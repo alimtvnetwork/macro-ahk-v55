@@ -229,9 +229,9 @@ function coerceJson(raw: string): CoerceResult {
   try {
     return { Ok: true, Value: JSON.parse(raw) as JsonValue };
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
 
-    return { Ok: false, Reason: `JSON parse error: ${msg}` };
+    return { Ok: false, Reason: `JSON parse error: ${message}` };
   }
 }
 

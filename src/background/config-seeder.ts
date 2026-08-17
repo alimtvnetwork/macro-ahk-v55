@@ -140,10 +140,8 @@ export async function seedConfigToDb(
     const storedHash = String(existing[0].values[0][0]);
     if (storedHash === sourceHash) {
       console.log(`[config-seeder] Hash match for "${configName}" — skipping (user edits preserved)`);
-
       return false;
     }
-
     console.log(`[config-seeder] Hash mismatch for "${configName}" — re-seeding`);
   } else {
     console.log(`[config-seeder] First seed for "${configName}"`);

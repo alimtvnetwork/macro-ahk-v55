@@ -129,16 +129,16 @@ function buildVarEntry(
 }
 
 export function buildJsStepVariableContext(
-  ctx: JsInlineContext,
+  context: JsInlineContext,
 ): ReadonlyArray<VariableContext> {
   const out: VariableContext[] = [];
-  for (const key of Object.keys(ctx.Vars).sort()) {
-    out.push(buildVarEntry(key, ctx.Vars[key], "Vars", null));
+  for (const key of Object.keys(context.Vars).sort()) {
+    out.push(buildVarEntry(key, context.Vars[key], "Vars", null));
   }
 
-  if (ctx.Row !== null) {
-    for (const key of Object.keys(ctx.Row).sort()) {
-      out.push(buildVarEntry(key, ctx.Row[key], "Row", key));
+  if (context.Row !== null) {
+    for (const key of Object.keys(context.Row).sort()) {
+      out.push(buildVarEntry(key, context.Row[key], "Row", key));
     }
   }
 
@@ -191,9 +191,9 @@ function jsStepReasonDetail(err: unknown, body: string): string {
   if (err instanceof JsExecError) {
     // JsExecError prefixes "InlineJs execution failed: " — strip it for
     // the human-readable detail; the original is still on StackTrace.
-    const msg = err.message.replace(/^InlineJs execution failed:\s*/, "");
+    const message = err.message.replace(/^InlineJs execution failed:\s*/, "");
 
-    return `Runtime: ${msg}${bodyHint(body)}`;
+    return `Runtime: ${message}${bodyHint(body)}`;
   }
 
   if (err instanceof Error) {
@@ -327,7 +327,7 @@ export type JsStepRunOutcome = JsStepRunOk | JsStepRunErr;
  */
 export async function runJsStepWithDiagnostics(
   body: string,
-  ctx: JsInlineContext,
+  context: JsInlineContext,
   options: {
         readonly StepId?: number;
         readonly Index?: number;
@@ -337,19 +337,19 @@ export async function runJsStepWithDiagnostics(
         readonly DataRow?: FieldRow;
         readonly Run: (
             body: string,
-            ctx: JsInlineContext,
+            context: JsInlineContext,
         ) => Promise<JsInlineResult>;
     },
 ): Promise<JsStepRunOutcome> {
   try {
-    const result = await options.Run(body, ctx);
+    const result = await options.Run(body, context);
 
     return { IsOk: true, Result: result };
   } catch (err) {
     const report = buildJsStepFailureReport({
       Body: body,
       Error: err,
-      Context: ctx,
+      Context: context,
       LogLines: [],
       StepId: options.StepId,
       Index: options.Index,

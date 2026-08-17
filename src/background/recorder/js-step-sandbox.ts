@@ -78,19 +78,19 @@ export function validateJsBody(body: string): void {
  */
 function compileBody(
   body: string,
-): (ctx: JsInlineContext, log: (msg: string) => void) => unknown {
+): (context: JsInlineContext, log: (message: string) => void) => unknown {
   const wrapped = `"use strict"; ${body}`;
 
   return new Function("Ctx", "Log", wrapped) as (
-        ctx: JsInlineContext,
-        log: (msg: string) => void,
+        context: JsInlineContext,
+        log: (message: string) => void,
     ) => unknown;
 }
 
-function freezeCtx(ctx: JsInlineContext): JsInlineContext {
+function freezeCtx(context: JsInlineContext): JsInlineContext {
   return Object.freeze({
-    Row: ctx.Row ? Object.freeze({ ...ctx.Row }) : null,
-    Vars: Object.freeze({ ...ctx.Vars }),
+    Row: context.Row ? Object.freeze({ ...context.Row }) : null,
+    Vars: Object.freeze({ ...context.Vars }),
   });
 }
 
@@ -99,30 +99,30 @@ function freezeCtx(ctx: JsInlineContext): JsInlineContext {
  * for static rejects and `JsExecError` for runtime failures (with cause).
  */
 async function runCompiledBody(
-  fn: (ctx: JsInlineContext, log: (message: string) => void) => unknown,
-  ctx: JsInlineContext,
+  executeFunc: (context: JsInlineContext, log: (message: string) => void) => unknown,
+  context: JsInlineContext,
   logs: string[],
 ): Promise<unknown> {
-  const frozen = freezeCtx(ctx);
+  const frozen = freezeCtx(context);
   const log = (message: string): void => {
     logs.push(String(message)); 
   };
 
-  const out = fn.call(null, frozen, log);
+  const out = executeFunc.call(null, frozen, log);
 
   return out instanceof Promise ? await out : out;
 }
 
 export async function executeJsBody(
   body: string,
-  ctx: JsInlineContext,
+  context: JsInlineContext,
 ): Promise<JsInlineResult> {
   validateJsBody(body);
-  const fn = compileBody(body);
+  const executeFunc = compileBody(body);
   const logs: string[] = [];
   const start = Date.now();
   try {
-    const value = await runCompiledBody(fn, ctx, logs);
+    const value = await runCompiledBody(executeFunc, context, logs);
 
     return { ReturnValue: value, LogLines: logs, DurationMs: Date.now() - start };
   } catch (err) {

@@ -250,15 +250,15 @@ function resolveFailureReportContext(input: BuildFailureReportInput): FailureRep
   };
 }
 
-function finalizeReport(input: BuildFailureReportInput, ctx: FailureReportContext): FailureReport {
+function finalizeReport(input: BuildFailureReportInput, context: FailureReportContext): FailureReport {
   return {
-    Phase: input.Phase, Message: ctx.Message, Reason: ctx.Reason, ReasonDetail: ctx.ReasonDetail,
-    StackTrace: ctx.Stack, StepId: input.StepId ?? null, Index: input.Index ?? null,
-    StepKind: input.StepKind ?? null, Selectors: ctx.Attempts, Variables: input.Variables ?? [],
-    DomContext: ctx.DomContext, DataRow: input.DataRow ?? null,
-    ResolvedXPath: input.ResolvedXPath ?? null, Timestamp: ctx.Now().toISOString(),
-    SourceFile: input.SourceFile, Verbose: ctx.Verbose,
-    CapturedHtml: ctx.CapturedHtml, FormSnapshot: ctx.FormSnapshot,
+    Phase: input.Phase, Message: context.Message, Reason: context.Reason, ReasonDetail: context.ReasonDetail,
+    StackTrace: context.Stack, StepId: input.StepId ?? null, Index: input.Index ?? null,
+    StepKind: input.StepKind ?? null, Selectors: context.Attempts, Variables: input.Variables ?? [],
+    DomContext: context.DomContext, DataRow: input.DataRow ?? null,
+    ResolvedXPath: input.ResolvedXPath ?? null, Timestamp: context.Now().toISOString(),
+    SourceFile: input.SourceFile, Verbose: context.Verbose,
+    CapturedHtml: context.CapturedHtml, FormSnapshot: context.FormSnapshot,
   };
 }
 
@@ -567,37 +567,37 @@ function formatVariableLine(v: VariableContext): string {
   return `${mark} {{${v.Name}}} = ${tail}`;
 }
 
-function appendDomContextSection(lines: string[], ctx: DomContext | null): void {
-  if (ctx === null) {
+function appendDomContextSection(lines: string[], context: DomContext | null): void {
+  if (context === null) {
     return; 
   }
 
   const attrs: string[] = [];
-  if (ctx.Id !== null) {
-    attrs.push(`id="${ctx.Id}"`);
+  if (context.Id !== null) {
+    attrs.push(`id="${context.Id}"`);
   }
 
-  if (ctx.ClassName !== null) {
-    attrs.push(`class="${ctx.ClassName}"`);
+  if (context.ClassName !== null) {
+    attrs.push(`class="${context.ClassName}"`);
   }
 
-  if (ctx.Name !== null) {
-    attrs.push(`name="${ctx.Name}"`);
+  if (context.Name !== null) {
+    attrs.push(`name="${context.Name}"`);
   }
 
-  if (ctx.Type !== null) {
-    attrs.push(`type="${ctx.Type}"`);
+  if (context.Type !== null) {
+    attrs.push(`type="${context.Type}"`);
   }
 
-  if (ctx.AriaLabel !== null) {
-    attrs.push(`aria-label="${ctx.AriaLabel}"`);
+  if (context.AriaLabel !== null) {
+    attrs.push(`aria-label="${context.AriaLabel}"`);
   }
 
   const attrStr = attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
-  const text = ctx.TextSnippet.length > 0 ? ` "${ctx.TextSnippet}"` : "";
-  lines.push(`  DomContext: <${ctx.TagName}${attrStr}>${text}`);
-  if (ctx.XPath !== undefined && ctx.XPath.length > 0) {
-    lines.push(`    XPath: ${ctx.XPath}`);
+  const text = context.TextSnippet.length > 0 ? ` "${context.TextSnippet}"` : "";
+  lines.push(`  DomContext: <${context.TagName}${attrStr}>${text}`);
+  if (context.XPath !== undefined && context.XPath.length > 0) {
+    lines.push(`    XPath: ${context.XPath}`);
   }
 }
 
@@ -684,30 +684,30 @@ function toAttemptFromEvaluated(a: EvaluatedAttempt): SelectorAttempt {
   };
 }
 
-function nonEmptyAttr(el: Element, attr: string): string | null {
-  const v = el.getAttribute(attr);
+function nonEmptyAttr(element: Element, attr: string): string | null {
+  const v = element.getAttribute(attr);
 
   return v !== null && v.length > 0 ? v : null;
 }
 
-function readBaseDomContext(el: Element, fullText: string, fullOuter: string): DomContext {
+function readBaseDomContext(element: Element, fullText: string, fullOuter: string): DomContext {
   return {
-    TagName: el.tagName.toLowerCase(),
-    Id: nonEmptyAttr(el, "id"),
-    ClassName: nonEmptyAttr(el, "class"),
-    AriaLabel: nonEmptyAttr(el, "aria-label"),
-    Name: nonEmptyAttr(el, "name"),
-    Type: nonEmptyAttr(el, "type"),
+    TagName: element.tagName.toLowerCase(),
+    Id: nonEmptyAttr(element, "id"),
+    ClassName: nonEmptyAttr(element, "class"),
+    AriaLabel: nonEmptyAttr(element, "aria-label"),
+    Name: nonEmptyAttr(element, "name"),
+    Type: nonEmptyAttr(element, "type"),
     TextSnippet: fullText.slice(0, 120),
     OuterHtmlSnippet: fullOuter.slice(0, 240),
-    XPath: xpathOfElement(el),
+    XPath: xpathOfElement(element),
   };
 }
 
-function readDomContext(el: Element, verbose: boolean): DomContext {
-  const fullText = (el.textContent ?? "").trim();
-  const fullOuter = el.outerHTML ?? "";
-  const base = readBaseDomContext(el, fullText, fullOuter);
+function readDomContext(element: Element, verbose: boolean): DomContext {
+  const fullText = (element.textContent ?? "").trim();
+  const fullOuter = element.outerHTML ?? "";
+  const base = readBaseDomContext(element, fullText, fullOuter);
 
   return verbose ? { ...base, OuterHtml: fullOuter, Text: fullText } : base;
 }

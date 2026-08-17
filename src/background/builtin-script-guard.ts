@@ -148,6 +148,7 @@ export async function ensureBuiltinScriptsExist(
       `[builtin-guard] seed-manifest.json returned 0 scripts (projects=${seedResult.projects}, errors=${seedResult.errors.length}). Falling back to instruction.json.`,
     );
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.BUILTIN_GUARD, `Manifest reseed failed\n  Path: chrome.runtime.getURL("seed-manifest.json")\n  Missing: Successful reseed of built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
     void persistInjectionError(
       "BUILTIN_GUARD_MANIFEST_RESEED_FAILED",
@@ -259,6 +260,7 @@ async function seedMissingBuiltinsDirectly(
         );
       }
     } catch (fetchErr) {
+      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: fetchErr });
       logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch instruction.json\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
       void persistInjectionError(
         "BUILTIN_GUARD_INSTRUCTION_FETCH_FAILED",
@@ -266,29 +268,6 @@ async function seedMissingBuiltinsDirectly(
       );
     }
 
-    // Verify the actual script file exists in dist
-    let codeStub = STUB_PREFIX + `console.error("[builtin-guard::fallback] STUB: filePath fetch failed\\n  Path: ${meta.filePath}\\n  Missing: Real script code for \\"${scriptName}\\"\\n  Reason: Stub placeholder — fetch from extension bundle did not succeed");`;
-    const scriptAbsUrl = chrome.runtime.getURL(meta.filePath);
-    console.log("[builtin-guard:fallback] Fetching script file for %s → %s", scriptName, scriptAbsUrl);
-    try {
-      const scriptResp = ServiceResult.wrapFetch(await fetch(scriptAbsUrl));
-      if (scriptResp.isSuccess) {
-        const code = await scriptResp.text();
-        if (code && code.length > 10) {
-          codeStub = code;
-          console.log("[builtin-guard:fallback] ✅ Loaded %s directly (%d chars) from %s",
-            scriptName, code.length, scriptAbsUrl);
-        } else {
-          logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file returned empty/tiny response\n  Path: ${scriptAbsUrl}\n  Missing: Valid script code for "${scriptName}" (got ${code?.length ?? 0} chars, minimum 10 required)\n  Reason: Server returned near-empty response — build artifact may be corrupt or a placeholder`);
-        }
-      } else {
-        logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Script file fetch returned non-OK\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: HTTP ${scriptResp.status} — file may not exist in dist/ or web_accessible_resources`);
-        void persistInjectionWarn(
-          "BUILTIN_GUARD_SCRIPT_FILE_MISSING",
-          `[builtin-guard:fallback] Script file not found\n  Path: ${scriptAbsUrl}\n  Missing: "${scriptName}" built-in script\n  Reason: HTTP ${scriptResp.status}`,
-        );
-      }
-    } catch (fetchErr) {
       logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch script file\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
       void persistInjectionError(
         "BUILTIN_GUARD_SCRIPT_FETCH_FAILED",

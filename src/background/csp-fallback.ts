@@ -391,48 +391,53 @@ async function attemptUserScriptFallback(
   // Check if legacy injection is forced via settings
   const isForceLegacy = await isLegacyInjectionForced();
 
+  if (isForceLegacy) {
+    userScriptTierLabel = "skipped(forceLegacyInjection=true)";
+    logBgWarnError(BgLogTag.INJECTION_CSP, "forceLegacyInjection enabled — skipping userScripts and using legacy ISOLATED chain");
+  }
+
   if (!isForceLegacy) {
     // Ensure USER_SCRIPT world exists before execute() to avoid cold-start race.
     await configureUserScriptWorld();
+  }
 
-    // Try chrome.userScripts.execute() first (Chrome 135+)
-    if (typeof chrome.userScripts?.execute === "function") {
-      try {
-        const executeArgs: Record<string, unknown> = {
-          target: { tabId },
-          js: [{ code }],
-          world: "USER_SCRIPT",
-        };
+  const isUserScriptsSupported = !isForceLegacy && typeof chrome.userScripts?.execute === "function";
 
-        if (userScriptsWorldIdEnabled) {
-          executeArgs.worldId = USER_SCRIPT_WORLD_ID;
-        }
+  if (!isForceLegacy && !isUserScriptsSupported) {
+    userScriptTierLabel = "unavailable";
+    logBgWarnError(BgLogTag.INJECTION_CSP, "userScripts.execute() not available, using legacy ISOLATED chain");
+  }
 
-        await (chrome.userScripts.execute as (i: unknown) => Promise<unknown>)(executeArgs);
+  if (isUserScriptsSupported) {
+    try {
+      const executeArgs: Record<string, unknown> = {
+        target: { tabId },
+        js: [{ code }],
+        world: "USER_SCRIPT",
+      };
 
-        if (userScriptsWorldIdEnabled) {
-          console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (worldId=%s)", tabId, USER_SCRIPT_WORLD_ID);
-        } else {
-          console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (default USER_SCRIPT world)", tabId);
-        }
-
-        console.log("[injection:csp] 🏆 WINNER: userScripts in tab %d | MAIN: ❌ %s → USER_SCRIPT: ✅", tabId, mainErrorMessage ?? "unknown");
-
-        return buildResult(true, "USER_SCRIPT", true);
-      } catch (userScriptError) {
-        userScriptTierError = userScriptError instanceof Error
-          ? userScriptError.message
-          : String(userScriptError);
-        userScriptTierLabel = "failed";
-        logCaughtError(BgLogTag.INJECTION_CSP, `userScripts.execute() failed\n  Path: chrome.userScripts.execute({ target: { tabId: ${tabId} }, world: "USER_SCRIPT" })\n  Missing: Successful script execution in USER_SCRIPT world\n  Reason: ${userScriptTierError} — falling back to legacy ISOLATED chain`, userScriptError);
+      if (userScriptsWorldIdEnabled) {
+        executeArgs.worldId = USER_SCRIPT_WORLD_ID;
       }
-    } else {
-      userScriptTierLabel = "unavailable";
-      logBgWarnError(BgLogTag.INJECTION_CSP, "userScripts.execute() not available, using legacy ISOLATED chain");
+
+      await (chrome.userScripts.execute as (i: unknown) => Promise<unknown>)(executeArgs);
+
+      if (userScriptsWorldIdEnabled) {
+        console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (worldId=%s)", tabId, USER_SCRIPT_WORLD_ID);
+      } else {
+        console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (default USER_SCRIPT world)", tabId);
+      }
+
+      console.log("[injection:csp] 🏆 WINNER: userScripts in tab %d | MAIN: ❌ %s → USER_SCRIPT: ✅", tabId, mainErrorMessage ?? "unknown");
+
+      return buildResult(true, "USER_SCRIPT", true);
+    } catch (userScriptError) {
+      userScriptTierError = userScriptError instanceof Error
+        ? userScriptError.message
+        : String(userScriptError);
+      userScriptTierLabel = "failed";
+      logCaughtError(BgLogTag.INJECTION_CSP, `userScripts.execute() failed\n  Path: chrome.userScripts.execute({ target: { tabId: ${tabId} }, world: "USER_SCRIPT" })\n  Missing: Successful script execution in USER_SCRIPT world\n  Reason: ${userScriptTierError} — falling back to legacy ISOLATED chain`, userScriptError);
     }
-  } else {
-    userScriptTierLabel = "skipped(forceLegacyInjection=true)";
-    logBgWarnError(BgLogTag.INJECTION_CSP, "forceLegacyInjection enabled — skipping userScripts and using legacy ISOLATED chain");
   }
 
   // Legacy tier 1: ISOLATED blob script tag
