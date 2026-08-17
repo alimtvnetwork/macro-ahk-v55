@@ -50,7 +50,7 @@ const EXPECTED_SLUGS = [
 ];
 
 interface FakeSqlCall { method: string; sql: string }
-interface FakeSqlResp { isOk: boolean; rows?: unknown[]; errorMessage?: string }
+interface FakeSqlResp { isOk?: boolean; ok?: boolean; rows?: unknown[]; errorMessage?: string }
 
 let bundleSource = '';
 let browser: Browser | undefined;
@@ -105,7 +105,7 @@ async function newHarnessPage(responses: FakeSqlResp[]): Promise<Page> {
             method: String(message?.method ?? ''),
             sql,
           });
-          const resp = queue.shift() ?? { isOk: true, rows: [] };
+          const resp = queue.shift() ?? { isOk: true, ok: true, rows: [] };
           setTimeout(() => callback(resp), 0);
         },
       },
@@ -126,17 +126,17 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
   test('cold boot: 8 inserts, 2 defaults promoted, telemetry persisted', async () => {
     const page = await newHarnessPage([
       // 1) SELECT existing slugs -> none
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 2) INSERT OR IGNORE (driver ack)
-      { isOk: true },
+      { isOk: true, ok: true },
       // 3) hasDefaultForRole('plan') -> false
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 4) promoteSeedDefault plan-default
-      { isOk: true },
+      { isOk: true, ok: true },
       // 5) hasDefaultForRole('next') -> false
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 6) promoteSeedDefault next-default
-      { isOk: true },
+      { isOk: true, ok: true },
     ]);
 
     const result = await page.evaluate(async () => {
@@ -176,17 +176,17 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
   test('warm boot: all slugs present, defaults intact -> zero inserts, zero promotes', async () => {
     const page = await newHarnessPage([
       // 1) SELECT existing slugs -> all 8 already there
-      { isOk: true, rows: EXPECTED_SLUGS.map(s => ({ Slug: s })) },
+      { isOk: true, ok: true, rows: EXPECTED_SLUGS.map(s => ({ Slug: s })) },
       // 2) INSERT OR IGNORE (driver no-op ack)
-      { isOk: true },
+      { isOk: true, ok: true },
       // 3) readCurrentBody plan-default (legacy-upgrade probe) -> row-missing skip
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 4) readCurrentBody next-default (legacy-upgrade probe) -> row-missing skip
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 5) hasDefaultForRole('plan') -> true
-      { isOk: true, rows: [{ '1': 1 }] },
+      { isOk: true, ok: true, rows: [{ '1': 1 }] },
       // 6) hasDefaultForRole('next') -> true
-      { isOk: true, rows: [{ '1': 1 }] },
+      { isOk: true, ok: true, rows: [{ '1': 1 }] },
     ]);
 
     const result = await page.evaluate(async () => {
@@ -212,12 +212,12 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
     // Prime a fresh cold-boot run so telemetry is present, then reproduce
     // the exact readSeedTelemetryBlock() contract from logging.ts:311-320.
     const page = await newHarnessPage([
-      { isOk: true, rows: [] },
-      { isOk: true },
-      { isOk: true, rows: [] },
-      { isOk: true },
-      { isOk: true, rows: [] },
-      { isOk: true },
+      { isOk: true, ok: true, rows: [] },
+      { isOk: true, ok: true },
+      { isOk: true, ok: true, rows: [] },
+      { isOk: true, ok: true },
+      { isOk: true, ok: true, rows: [] },
+      { isOk: true, ok: true },
     ]);
     await page.evaluate(async () => {
       const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<unknown> } }).__seed;
@@ -245,9 +245,9 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
   test('DB error path: insert failure returns ok=false with an error message and no telemetry write', async () => {
     const page = await newHarnessPage([
       // 1) SELECT existing slugs -> none
-      { isOk: true, rows: [] },
+      { isOk: true, ok: true, rows: [] },
       // 2) INSERT OR IGNORE -> failure
-      { isOk: false, errorMessage: 'disk full' },
+      { isOk: false, ok: false, errorMessage: 'disk full' },
     ]);
 
     // Clear telemetry from any prior context state (fresh context anyway,

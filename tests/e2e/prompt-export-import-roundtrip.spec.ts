@@ -88,7 +88,7 @@ async function newHarnessPage(): Promise<Page> {
             params?: { sql?: string };
         }
         interface RuntimeResponse {
-            isOk: boolean;
+            isOk?: boolean; ok?: boolean;
             rows?: Array<Record<string, unknown>>;
             lastInsertId?: number;
         }
@@ -111,7 +111,7 @@ async function newHarnessPage(): Promise<Page> {
               }
 
               insertSeq += 1;
-              setTimeout(() => callback({ isOk: true, rows, lastInsertId: insertSeq }), 0);
+              setTimeout(() => callback({ isOk: true, ok: true, rows, lastInsertId: insertSeq }), 0);
             },
           },
         };

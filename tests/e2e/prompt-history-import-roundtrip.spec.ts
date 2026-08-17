@@ -83,7 +83,7 @@ async function newHarnessPage(): Promise<Page> {
             params?: { sql?: string };
         }
         interface RuntimeResponse {
-            isOk: boolean;
+            isOk?: boolean; ok?: boolean;
             rows?: Array<Record<string, unknown>>;
             lastInsertId?: number;
         }
@@ -100,7 +100,7 @@ async function newHarnessPage(): Promise<Page> {
                 rows = [{ MaxId: 100 }];
               }
 
-              setTimeout(() => callback({ isOk: true, rows, lastInsertId: 101 }), 0);
+              setTimeout(() => callback({ isOk: true, ok: true, rows, lastInsertId: 101 }), 0);
             },
           },
         };

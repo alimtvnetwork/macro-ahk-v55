@@ -70,7 +70,7 @@ async function newPage(): Promise<Page> {
       runtime: {
         lastError: null,
         sendMessage: (_msg: unknown, callback: (r: unknown) => void) => {
-          setTimeout(() => callback({ isOk: true, rows: [] }), 0);
+          setTimeout(() => callback({ isOk: true, ok: true, rows: [] }), 0);
         },
       },
     };

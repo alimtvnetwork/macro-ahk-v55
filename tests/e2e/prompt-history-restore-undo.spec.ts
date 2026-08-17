@@ -78,7 +78,7 @@ async function newHarnessPage(): Promise<Page> {
 
   await page.addInitScript(() => {
         interface RuntimeMessage { type?: string; method?: string; params?: { sql?: string } }
-        interface RuntimeResponse { isOk: boolean; rows?: Array<Record<string, unknown>>; lastInsertId?: number }
+        interface RuntimeResponse { isOk?: boolean; ok?: boolean; rows?: Array<Record<string, unknown>>; lastInsertId?: number }
         const calls: Array<{ type: string; method?: string; sql?: string }> = [];
         (globalThis as typeof globalThis & { __calls: typeof calls }).__calls = calls;
         (globalThis as typeof globalThis & { chrome: unknown }).chrome = {
@@ -87,7 +87,7 @@ async function newHarnessPage(): Promise<Page> {
             sendMessage: (message: RuntimeMessage, callback: (response: RuntimeResponse) => void) => {
               const sql = message.params?.sql ?? '';
               calls.push({ type: String(message.type ?? ''), method: message.method, sql });
-              setTimeout(() => callback({ isOk: true, rows: [], lastInsertId: 999 }), 0);
+              setTimeout(() => callback({ isOk: true, ok: true, rows: [], lastInsertId: 999 }), 0);
             },
           },
         };

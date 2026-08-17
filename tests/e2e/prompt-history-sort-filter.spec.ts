@@ -71,7 +71,7 @@ async function newHarnessPage(): Promise<Page> {
 
   await page.addInitScript(() => {
         interface RuntimeResponse {
-            isOk: boolean;
+            isOk?: boolean; ok?: boolean;
             rows?: Array<Record<string, unknown>>;
             lastInsertId?: number;
         }
@@ -79,7 +79,7 @@ async function newHarnessPage(): Promise<Page> {
           runtime: {
             lastError: null,
             sendMessage: (_msg: unknown, callback: (r: RuntimeResponse) => void) => {
-              setTimeout(() => callback({ isOk: true, rows: [], lastInsertId: 0 }), 0);
+              setTimeout(() => callback({ isOk: true, ok: true, rows: [], lastInsertId: 0 }), 0);
             },
           },
         };

@@ -17,7 +17,7 @@ test.describe('Cold Start', () => {
     //
     // The current router replies `{ type: '__PONG__' }` (the "v2" shape
     // contracted by src/background/message-router.ts + service-worker-main.ts).
-    // The legacy shape `{ isOk: true }` is still accepted by every internal
+    // The legacy shape `{ isOk: true, ok: true }` is still accepted by every internal
     // caller (src/platform/chrome-adapter.ts:131,
     // src/background/handlers/injection-handler.ts:1244) so this test does
     // the same — otherwise a stale built bundle in CI cascades into ten
@@ -43,7 +43,7 @@ test.describe('Cold Start', () => {
     const isLegacyOkShape = obj.isOk === true;
     expect(
       isPongShape || isLegacyOkShape,
-      `Expected { type: "__PONG__" } or legacy { isOk: true }, got ${JSON.stringify(response)}`,
+      `Expected { type: "__PONG__" } or legacy { isOk: true, ok: true }, got ${JSON.stringify(response)}`,
     ).toBe(true);
   });
 

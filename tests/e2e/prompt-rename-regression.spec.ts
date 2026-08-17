@@ -37,7 +37,7 @@ const DB_ENTRY = path.join(
 );
 
 interface FakeSqlCall { method: string; sql: string }
-interface FakeSqlResp { isOk: boolean; rows?: unknown[]; errorMessage?: string; lastInsertId?: number }
+interface FakeSqlResp { isOk?: boolean; ok?: boolean; rows?: unknown[]; errorMessage?: string; lastInsertId?: number }
 
 let bundleSource = '';
 let browser: Browser | undefined;
@@ -95,7 +95,7 @@ async function newHarnessPage(responses: FakeSqlResp[]): Promise<Page> {
             method: String(message?.method ?? ''),
             sql,
           });
-          const resp = queue.shift() ?? { isOk: true, rows: [], lastInsertId: 1 };
+          const resp = queue.shift() ?? { isOk: true, ok: true, rows: [], lastInsertId: 1 };
           setTimeout(() => callback(resp), 0);
         },
       },
@@ -117,7 +117,7 @@ test.describe('prompt rename regression (plan-15)', () => {
   test('accepts {{n}} -> {{count}} rename and writes ReplaceKey/ReplaceValues in the UPDATE', async () => {
     const page = await newHarnessPage([
       // Single SCHEMA ack for the UPDATE.
-      { isOk: true, lastInsertId: 1 },
+      { isOk: true, ok: true, lastInsertId: 1 },
     ]);
 
     const result = await page.evaluate(async () => {
@@ -174,7 +174,7 @@ test.describe('prompt rename regression (plan-15)', () => {
 
   test('fresh insert (no previousBody) writes ReplaceValues and returns lastInsertId', async () => {
     const page = await newHarnessPage([
-      { isOk: true, lastInsertId: 42 },
+      { isOk: true, ok: true, lastInsertId: 42 },
     ]);
 
     const result = await page.evaluate(async () => {
