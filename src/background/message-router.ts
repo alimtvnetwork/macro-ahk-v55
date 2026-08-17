@@ -63,7 +63,8 @@ function extractMessageType(message: MessageRequest): string {
   const hasType = typeof message === "object"
         && message !== null
         && "type" in message;
-  if (!hasType) {
+  const isMissing = !hasType;
+  if (isMissing) {
     return "(unknown)";
   }
 
