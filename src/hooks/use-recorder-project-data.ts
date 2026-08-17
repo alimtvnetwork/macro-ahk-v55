@@ -151,7 +151,7 @@ async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: St
 async function sendSetStepTags(projectSlug: string, stepId: number, tags: ReadonlyArray<string>): Promise<ReadonlyArray<string>> {
   const res = await sendMessage<{ isOk: true; tags: ReadonlyArray<string> }>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_TAGS_SET" as any,
+    type: "RECORDER_STEP_TAGS_SET" as unknown,
     projectSlug, stepId, tags,
   });
 
