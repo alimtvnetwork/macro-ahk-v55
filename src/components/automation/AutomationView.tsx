@@ -76,7 +76,7 @@ async function toggleChainInDb(chainId: string, project: string): Promise<boolea
     type: "TOGGLE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as any);
+  } as unknown);
 
   return result.isOk;
 }
