@@ -167,7 +167,7 @@ export function DataBrowserPanel() {
 
       {activeCategory === "local" && (
         <DataStoreTable
-          entries={local.entries as any}
+          entries={local.entries as unknown}
           loading={local.loading}
           onRefresh={local.refresh}
         />
