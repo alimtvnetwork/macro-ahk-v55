@@ -141,7 +141,7 @@ async function fetchSelectors(projectSlug: string, stepId: number): Promise<Read
 async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: StepMetaPatch): Promise<StepRow> {
   const res = await sendMessage<{ isOk: true; step: StepRow }>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_UPDATE_META" as any,
+    type: "RECORDER_STEP_UPDATE_META" as unknown,
     projectSlug, stepId, patch,
   });
 
