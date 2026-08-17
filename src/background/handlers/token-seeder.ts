@@ -71,6 +71,9 @@ export interface InaccessibleSeedTarget {
 const inaccessibleSeedTargets = new Map<string, InaccessibleSeedTarget>();
 const INACCESSIBLE_SEED_COOLDOWN_MS = 15_000;
 
+// Same threshold as MIN_TOKEN_LENGTH in config-auth-handler.ts (Rule 8 / subtask 74).
+const MIN_TOKEN_LENGTH = 20;
+
 /* ------------------------------------------------------------------ */
 /*  Diagnostics public API                                             */
 /* ------------------------------------------------------------------ */
@@ -263,7 +266,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
       }
 
       const raw = localStorage.getItem(key);
-      const isRawTokenInvalid = !raw || raw.length < 20;
+      const isRawTokenInvalid = !raw || raw.length < MIN_TOKEN_LENGTH;
       if (isRawTokenInvalid) {
         continue;
       }

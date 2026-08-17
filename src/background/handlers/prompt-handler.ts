@@ -19,6 +19,18 @@ import { ServiceResult } from "../../utils/result-wrapper";
 import type { DbManager } from "../db-manager";
 import { logBgError, logCaughtError, logSampledDebug, BgLogTag} from "../bg-logger";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
+import type {
+  BundledPromptBundle,
+  BundledPromptsApiResponse,
+  DeletePromptCandidate,
+  DeletePromptPayload,
+  GetPromptsResult,
+  PromptEntry,
+  RawDefaultPromptEntry,
+  ReorderPromptsPayload,
+  SavePromptPayload,
+  SavePromptResult,
+} from "./handler-types";
 import bundledPromptBundle from "../../../chrome-extension/prompts/macro-prompts.json";
 
 const LEGACY_STORAGE_KEY = "marco_custom_prompts";
@@ -27,26 +39,7 @@ const LEGACY_STORAGE_KEY = "marco_custom_prompts";
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export interface PromptEntry {
-    id: string;
-    slug?: string;
-    name: string;
-    text: string;
-    version?: string;
-    order: number;
-    isDefault: boolean;
-    isFavorite: boolean;
-    category?: string;
-    categories?: string;
-    tags?: string[];
-    createdAt: string;
-    updatedAt: string;
-}
-
-interface DeletePromptCandidate {
-    name: string;
-    isDefault: boolean;
-}
+export type { PromptEntry };
 
 /* ------------------------------------------------------------------ */
 /*  DbManager binding                                                  */
@@ -478,20 +471,8 @@ function getFallbackDefaultPrompts(): PromptEntry[] {
 
 let bundledDefaultsCache: PromptEntry[] | null = null;
 
-interface RawDefaultPromptEntry {
-    id?: string;
-    slug?: string;
-    name?: string;
-    text?: string;
-    version?: string;
-    order?: number;
-    isDefault: boolean;
-    isFavorite: boolean;
-    category?: string;
-}
-
 function getBundledFallbackEntries(): RawDefaultPromptEntry[] {
-  const bundle = bundledPromptBundle as { prompts?: RawDefaultPromptEntry[] };
+  const bundle = bundledPromptBundle as BundledPromptBundle;
 
   return Array.isArray(bundle.prompts) ? bundle.prompts : [];
 }
@@ -552,7 +533,7 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
       return mapBundledFallbackDefaults();
     }
 
-    const parsed = await response.json() as { prompts?: RawDefaultPromptEntry[] } | RawDefaultPromptEntry[];
+    const parsed = await response.json() as BundledPromptsApiResponse;
     const rawEntries: RawDefaultPromptEntry[] = Array.isArray(parsed)
       ? parsed
       : (Array.isArray(parsed.prompts) ? parsed.prompts : []);
@@ -591,7 +572,7 @@ function mapBundledFallbackDefaults(): PromptEntry[] | null {
   return bundledDefaultsCache;
 }
 
-export async function handleGetPrompts(): Promise<{ prompts: PromptEntry[] }> {
+export async function handleGetPrompts(): Promise<GetPromptsResult> {
   await migrateFromStorageIfNeeded();
 
   // All prompts (defaults + custom) are now in the DB — read via view
@@ -601,7 +582,7 @@ export async function handleGetPrompts(): Promise<{ prompts: PromptEntry[] }> {
 }
 
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
-export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }): Promise<{ isOk: true; prompt: PromptEntry }> {
+export async function handleSavePrompt(payload: SavePromptPayload): Promise<SavePromptResult> {
   await migrateFromStorageIfNeeded();
 
   const input = payload;
@@ -699,7 +680,7 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
   return { isOk: true, prompt: rowToPrompt(row) };
 }
 
-export async function handleDeletePrompt(payload: { promptId: string }): Promise<{ isOk: true } | HandlerErrorResponse> {
+export async function handleDeletePrompt(payload: DeletePromptPayload): Promise<{ isOk: true } | HandlerErrorResponse> {
   await migrateFromStorageIfNeeded();
 
   const promptIdStr = requireField(payload?.promptId);
@@ -752,7 +733,7 @@ function promptDeleteError(promptId: number, reason: string, name = ""): Handler
   return { isOk: false, errorMessage: message };
 }
 
-export async function handleReorderPrompts(payload: { promptIds: string[] }): Promise<{ isOk: true } | HandlerErrorResponse> {
+export async function handleReorderPrompts(payload: ReorderPromptsPayload): Promise<{ isOk: true } | HandlerErrorResponse> {
   await migrateFromStorageIfNeeded();
 
   const promptIds = Array.isArray(payload?.promptIds) ? payload.promptIds : null;

@@ -21,6 +21,17 @@ import {
 } from "../cookie-helpers";
 import { readAllProjects } from "./project-helpers";
 import type { CookieBinding } from "../../shared/project-types";
+import type {
+  AuthStrategyTokenResult,
+  CookieDiscoverySummary,
+  CookieLookupResult,
+  GetConfigResult,
+  GetTokenResult,
+  RefreshTokenResult,
+  ResolvedCookieNames,
+  SessionTokens,
+  TokenValidationResult,
+} from "./handler-types";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -53,7 +64,6 @@ const REFRESH_COOKIE_NAME_CANDIDATES = [
 ] as const;
 
 import { LOVABLE_TAB_PATTERNS } from "../../shared/lovable-tab-patterns";
-import { SourceType } from "../../types/enums";
 import { logBgError } from "@/background/bg-logger";
 
 // Extends the shared platform list with localhost for dev-mode auth probing.
@@ -96,10 +106,7 @@ function isSupabaseAuthKey(key: unknown): boolean {
  * dependency chain. Always appends hardcoded fallbacks for compatibility
  * when stored project bindings are stale.
  */
-async function resolveSessionCookieNamesFromProjects(_projectId?: string | null): Promise<{
-    sessionNames: readonly string[];
-    refreshNames: readonly string[];
-}> {
+async function resolveSessionCookieNamesFromProjects(_projectId?: string | null): Promise<ResolvedCookieNames> {
   try {
     const projects = await readAllProjects();
     const cookieBindings: CookieBinding[] = [];
@@ -160,20 +167,7 @@ export function _resetAuthCacheForTest(): void {
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export interface SessionTokens {
-    sessionId: string | null;
-    refreshToken: string | null;
-}
-
-interface CookieLookupResult {
-    value: string | null;
-    cookieName: string | null;
-}
-
-interface CookieDiscoverySummary {
-    checkedUrls: string[];
-    authLikeCookieNames: string[];
-}
+export type { SessionTokens };
 
 /* ------------------------------------------------------------------ */
 /*  Default Config                                                     */
@@ -195,10 +189,7 @@ function getBundledDefaults(): Record<string, unknown> {
 /* ------------------------------------------------------------------ */
 
 /** Retrieves the merged config using the 3-tier cascade. */
-export async function handleGetConfig(): Promise<{
-    config: Record<string, unknown>;
-    source: SourceType;
-}> {
+export async function handleGetConfig(): Promise<GetConfigResult> {
   const defaults = getBundledDefaults();
   const cascadeResult = await resolveConfigCascade(defaults);
 
@@ -227,7 +218,7 @@ export function getConfigFetchStatus() {
 export async function handleGetToken(
   _projectId?: string,
   tabUrlHint?: string,
-): Promise<{ token: string | null; refreshed: boolean; errorMessage?: string; cookieName?: string }> {
+): Promise<GetTokenResult> {
   const cachedTokenIsJwt = cachedSessionId !== null && isLikelyJwt(cachedSessionId);
   const isCacheValid = cachedTokenIsJwt
         && (Date.now() - cachedAt) < TOKEN_CACHE_TTL_MS;
@@ -276,7 +267,7 @@ export async function handleGetToken(
   return { token: null, refreshed: false, errorMessage: buildMissingCookieMessage(cookieDiscovery, resolvedCookieNames.sessionNames, resolvedCookieNames.refreshNames) };
 }
 
-async function tryStrategy1DirectCookie(names: string[], url: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+async function tryStrategy1DirectCookie(names: readonly string[] | string[], url: string): Promise<AuthStrategyTokenResult | null> {
   const lookup = await readCookieValueByNameCandidates(names, url);
   if (lookup.value !== null && isLikelyJwt(lookup.value)) {
     console.log("[config-auth] GET_TOKEN: found JWT directly in session cookie");
@@ -289,7 +280,7 @@ async function tryStrategy1DirectCookie(names: string[], url: string): Promise<{
   return null;
 }
 
-async function tryStrategy2LocalStorage(hint?: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+async function tryStrategy2LocalStorage(hint?: string): Promise<AuthStrategyTokenResult | null> {
   const jwt = await readSupabaseJwtFromPlatformTabs(hint);
   if (jwt !== null) {
     console.log("[config-auth] GET_TOKEN: found JWT in platform tab localStorage");
@@ -302,7 +293,7 @@ async function tryStrategy2LocalStorage(hint?: string): Promise<{ token: string;
   return null;
 }
 
-async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<AuthStrategyTokenResult | null> {
   const token = await resolveSignedUrlTokenCandidate(hint, url);
   if (token !== null) {
     console.log("[config-auth] GET_TOKEN: using signed URL token fallback");
@@ -315,7 +306,11 @@ async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<{ tok
   return null;
 }
 
-async function tryStrategy4Exchange(projectId: string, sessionLookup: chrome.cookies.Cookie | null | { value: string | null }, refreshLookup: chrome.cookies.Cookie | null | { value: string | null }): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+async function tryStrategy4Exchange(
+  projectId: string,
+  sessionLookup: chrome.cookies.Cookie | null | CookieLookupResult | { value: string | null },
+  refreshLookup: chrome.cookies.Cookie | null | CookieLookupResult | { value: string | null },
+): Promise<AuthStrategyTokenResult | null> {
   const exchangeToken = await fetchAuthTokenFromSessionExchange(projectId, sessionLookup.value !== null || refreshLookup.value !== null);
   if (exchangeToken !== null) {
     console.log("[config-auth] GET_TOKEN: exchanged opaque session cookie for JWT");
@@ -365,7 +360,7 @@ export async function handleGetTokens(): Promise<SessionTokens> {
 export async function handleRefreshToken(
   projectId?: string,
   tabUrlHint?: string,
-): Promise<SessionTokens & { authToken?: string; errorMessage?: string }> {
+): Promise<RefreshTokenResult> {
   cachedSessionId = null;
   cachedRefreshToken = null;
   cachedAt = 0;
@@ -519,11 +514,6 @@ export async function fetchAuthToken(
 /** Checks if a token looks like a JWT (3-part base64 starting with eyJ). */
 function isLikelyJwt(token: string): boolean {
   return token.startsWith("eyJ") && token.split(".").length === JWT_SEGMENT_COUNT;
-}
-
-interface TokenValidationResult {
-    isValid: boolean;
-    status: number | null;
 }
 
 /** Validates a token structurally without any network call. */

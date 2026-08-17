@@ -95,7 +95,7 @@ describe("MacroController runtime namespace healing", () => {
     const content = readFile("standalone-scripts/macro-controller/src/api-namespace.ts");
     // Deep healing pass replaces frozen sub-branches (api, _internal, meta).
     expect(content).toContain("ensureMutableBranch");
-    expect(content).toContain("Object.isExtensible(child)");
+    expect(content).toContain("isNonExtensibleObject(child)");
     // Per-branch defensive checks — were previously only typeof checks.
     expect(content).toContain("!Object.isExtensible(api.loop)");
     expect(content).toContain("!Object.isExtensible(mc._internal)");
