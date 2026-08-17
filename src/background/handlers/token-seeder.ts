@@ -20,6 +20,24 @@ import { logBgWarnError, logCaughtError, BgLogTag} from "../bg-logger";
 import { AccessDeniedCodeType } from "../../types/enums";
 import { logBgError } from "@/background/bg-logger";
 
+function isJwtSessionValue(value: string | null): value is string {
+  return (
+    value !== null &&
+    value.startsWith("eyJ") &&
+    value.split(".").length === 3
+  );
+}
+
+function isValidJwtAccessToken(session: unknown): boolean {
+  if (session === null || typeof session !== "object") {
+    return false;
+  }
+
+  const token = (session as Record<string, unknown>).access_token;
+
+  return typeof token === "string" && token.startsWith("eyJ");
+}
+
 const SESSION_COOKIE_NAME_FALLBACKS = [
   "lovable-session-id-v2",
   "lovable-session-id.id",
@@ -123,7 +141,7 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
   const sessionCookieNames = await resolveSessionCookieNamesFromProjects();
   const sessionLookup = await readCookieValueByNameCandidates(sessionCookieNames, tabUrl);
 
-  if (sessionLookup.value !== null && sessionLookup.value.startsWith("eyJ") && sessionLookup.value.split(".").length === 3) {
+  if (isJwtSessionValue(sessionLookup.value)) {
     console.log("[token-seeder] Found JWT directly in session cookie — seeding into tab %d", tabId);
     await injectJwtIntoTab(tabId, sessionLookup.value);
 
@@ -260,7 +278,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 
         // Check nested session object
         const session = parsed?.currentSession ?? parsed?.session;
-        if (session?.access_token && typeof session.access_token === "string" && session.access_token.startsWith("eyJ")) {
+        if (isValidJwtAccessToken(session)) {
           return session.access_token;
         }
       } catch (err) {                 // Not JSON — check if raw value is a JWT

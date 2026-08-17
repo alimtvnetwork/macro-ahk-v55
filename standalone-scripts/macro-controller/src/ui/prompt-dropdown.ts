@@ -402,7 +402,8 @@ function _appendFilteredItems(
   entries = entries.filter(e => !isHiddenBySlug(e));
   entries = sortEntriesByOrder(entries);
   // 0. Render Suggestions (if no search and not in a specific category)
-  if (!getPromptCategoryFilter() && !_currentSearchQuery) {
+  const hasNoFilterActive = !getPromptCategoryFilter() && !_currentSearchQuery;
+  if (hasNoFilterActive) {
     const suggestions = getSuggestedPrompts(entries);
     if (suggestions.length > 0) {
       const sugHeader = document.createElement('div');
@@ -631,7 +632,8 @@ function _rebindPromptItems(
       || (id && byId.get(id))
       || (idxAttr !== null ? filtered[parseInt(idxAttr, 10)] : undefined)
       || filtered[i];
-    if (!resolved) {
+    const isResolutionFailed = !resolved;
+    if (isResolutionFailed) {
       continue;
     }
 
@@ -657,7 +659,8 @@ function _bindSinglePromptItem(
     (this as HTMLElement).style.background = 'transparent'; 
   };
 
-  if (!p.text) {
+  const isTextEmpty = !p.text;
+  if (isTextEmpty) {
     return;
   }
 
@@ -726,7 +729,9 @@ function _rebindActionIcons(
     } else if (el.title === 'Delete prompt') {
       el.onclick = function(e: Event) {
         e.stopPropagation();
-        if (!confirm('Delete prompt "' + p.name + '"?')) {
+        const isDeleteConfirmed = confirm('Delete prompt "' + p.name + '"?');
+        const isDeleteCancelled = !isDeleteConfirmed;
+        if (isDeleteCancelled) {
           return;
         }
 
@@ -779,7 +784,8 @@ function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDe
  */
 function normalizeCategory(raw: string | undefined): string {
   const cat = (raw || '').trim().toLowerCase();
-  if (!cat) {
+  const isCatMissing = !cat;
+  if (isCatMissing) {
     return '';
   }
 
@@ -1015,7 +1021,8 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
   goBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(customInput.value);
-    if (!n || n < 1 || n > 999) {
+    const isRepeatCountInvalid = !n || n < 1 || n > 999;
+    if (isRepeatCountInvalid) {
       showPasteToast('⚠️ Enter 1–999', true);
 
       return; 
@@ -1083,7 +1090,8 @@ function getPromptVariantValue(p: PromptEntry): number | null {
 
 function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
-  if (!variantValue) {
+  const isVariantValueMissing = !variantValue;
+  if (isVariantValueMissing) {
     return p.text;
   }
 
@@ -1162,7 +1170,8 @@ function bindPromptItemClick(
 }
 
 function _buildPromptItemSourceBadge(p: PromptEntry): HTMLElement | null {
-  if (!p.slug) {
+  const isSlugMissing = !p.slug;
+  if (isSlugMissing) {
     return null;
   }
 
@@ -1303,7 +1312,8 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
   save.style.cssText = 'padding:2px 10px;font-size:9px;background:hsl(var(--primary));border:none;color:hsl(var(--foreground));border-radius:3px;cursor:pointer;font-weight:600;';
   save.onclick = () => {
     const updated = { ...p, name: nameInput.value.trim(), text: textInput.value.trim() };
-    if (!updated.name || !updated.text) {
+    const isPromptDataIncomplete = !updated.name || !updated.text;
+    if (isPromptDataIncomplete) {
       return;
     }
     
@@ -1402,7 +1412,9 @@ function _buildDeleteIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptCont
   const icon = _makeActionIcon('🗑️', 'Delete prompt', '0.6');
   icon.onclick = function(e: Event) {
     e.stopPropagation();
-    if (!confirm('Delete prompt "' + p.name + '"?')) {
+    const isDeleteConfirmed = confirm('Delete prompt "' + p.name + '"?');
+    const isDeleteCancelled = !isDeleteConfirmed;
+    if (isDeleteCancelled) {
       return;
     }
 

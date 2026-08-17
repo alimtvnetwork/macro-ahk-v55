@@ -196,7 +196,10 @@ function classifyEntry(entry: RawEntry, index: number): Classified {
   const fields = readCandidateFields(entry as Record<string, unknown>, index);
 
   // Project store entry shape: has `path` + `order`, no inline `code`.
-  if (fields.rawPath !== null && fields.rawOrder !== null && !fields.hasCodeKey) {
+  const isRawFieldsComplete = fields.rawPath !== null && fields.rawOrder !== null;
+  const isCodeKeyAbsent = !fields.hasCodeKey;
+  const isResolvedByRaw = isRawFieldsComplete && isCodeKeyAbsent;
+  if (isResolvedByRaw) {
     return { kind: "project-entry", value: entry as ScriptEntry };
   }
 

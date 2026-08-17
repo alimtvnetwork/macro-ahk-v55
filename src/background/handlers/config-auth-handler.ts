@@ -64,6 +64,23 @@ const PLATFORM_TAB_PATTERNS: readonly string[] = [
 ];
 
 const AUTH_COOKIE_NAME_PATTERN = /(lovable|session|token|auth)/i;
+const JWT_SEGMENT_COUNT = 3;
+
+function isJwtToken(token: unknown): boolean {
+  return (
+    typeof token === "string" &&
+    token.startsWith("eyJ") &&
+    token.split(".").length === JWT_SEGMENT_COUNT
+  );
+}
+
+function isSupabaseAuthKey(key: unknown): boolean {
+  return (
+    typeof key === "string" &&
+    key.startsWith("sb-") &&
+    key.includes("-auth-token")
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /*  Project Cookie Resolution                                          */
@@ -597,7 +614,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
               try {
                 const parsed = JSON.parse(raw);
                 const token = parsed?.access_token ?? parsed?.currentSession?.access_token ?? parsed?.session?.access_token ?? parsed?.token;
-                if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
+                if (isJwtToken(token)) {
                   return token;
                 }
               } catch { /* ignore */ }
@@ -611,7 +628,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
 
             for (let i = 0; i < localStorage.length; i++) {
               const key = localStorage.key(i);
-              if (key && key.startsWith("sb-") && key.includes("-auth-token")) {
+              if (isSupabaseAuthKey(key)) {
                 const res = check(localStorage.getItem(key));
                 if (res) {
                   return res;
