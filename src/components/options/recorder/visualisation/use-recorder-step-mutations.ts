@@ -46,7 +46,7 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
   return useCallback(async (stepId: number, newName: string) => {
     try {
       await sendMessage({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-unknown
         type: "RECORDER_STEP_RENAME" as unknown,
         projectSlug, stepId, newVariableName: newName,
       });
