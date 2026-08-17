@@ -207,7 +207,8 @@ export async function handleTabActivated(tabId: number): Promise<void> {
     return;
   }
 
-  if (!isProjectPageUrl(url)) {
+  const isMissing045 = !isProjectPageUrl(url);
+  if (isMissing045) {
     return;
   }
 
