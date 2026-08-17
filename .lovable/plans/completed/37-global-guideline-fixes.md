@@ -1,7 +1,7 @@
 # Plan 37: Global Coding Guideline Fixes
 
 - **Slug:** global-guideline-fixes
-- **Status:** pending
+- **Status:** completed
 - **Created:** 2026-08-17
 - **Subtasks:** 120
 
