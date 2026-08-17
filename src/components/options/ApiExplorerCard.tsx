@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- dynamic API explorer message types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { JsonValue } from "@/background/handlers/handler-types";
 import { useEffect, useMemo, useState } from "react";
 import { sendMessage } from "@/lib/message-client";
@@ -21,7 +21,7 @@ type EndpointDoc = {
   category: string;
   description: string;
   isMutating: boolean;
-  exampleRequest?: Record<string, unknown>;
+  exampleRequest?: Record<string, any>;
 };
 
 type ApiEndpointsResponse = {
@@ -69,7 +69,7 @@ export function ApiExplorerCard() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as unknown });
+      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as any });
       setStatus({
         service: result.service,
         version: result.version,
@@ -85,7 +85,7 @@ export function ApiExplorerCard() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as unknown });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
       const docs = result.endpoints ?? [];
       setEndpoints(docs);
       if (docs.length > 0) {
@@ -120,13 +120,13 @@ export function ApiExplorerCard() {
       return;
     }
 
-    const body = parsedBody as Record<string, unknown>;
+    const body = parsedBody as Record<string, any>;
     const { type: _ignoredType, ...rest } = body;
-    const message: Record<string, unknown> = { type: selectedType, ...rest };
+    const message: Record<string, any> = { type: selectedType, ...rest };
 
     setLoading(true);
     try {
-      const response = await sendMessage<unknown>(message as unknown);
+      const response = await sendMessage<any>(message as any);
       setResponseJson(toPrettyJson(response as JsonValue));
     } catch (error) {
       setResponseJson(toPrettyJson({

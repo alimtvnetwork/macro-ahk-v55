@@ -126,6 +126,7 @@ async function handleCookieRemoved(cookieName: string): Promise<void> {
       cookie: cookieName,
       reason: "refresh_cookie_removed",
     });
+
     return;
   }
 
@@ -141,6 +142,7 @@ async function handleCookieRemoved(cookieName: string): Promise<void> {
       cookie: cookieName,
       reason: "cookie_removed",
     });
+
     return;
   }
 
@@ -164,7 +166,9 @@ async function handleCookieUpdated(
 ): Promise<void> {
   const isSessionCookie = SESSION_COOKIE_NAMES.includes(cookieName as (typeof SESSION_COOKIE_NAMES)[number]);
 
-  if (!isSessionCookie) return;
+  if (!isSessionCookie) {
+    return;
+  }
 
   console.log("[cookie-watcher] Session cookie updated — reseeding & notifying scripts");
 

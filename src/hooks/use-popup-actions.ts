@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Events } from "@/constants/events";
-/* eslint-disable @typescript-eslint/no-explicit-any -- chrome runtime detection via globalThis */
+ 
 import type { ScriptEntry } from "@/shared/project-types";
 import type { InjectScriptsResponse, InjectionResult } from "@/shared/injection-types";
 import { normalizeInjectScriptsResponse } from "@/shared/injection-types";
@@ -133,7 +134,7 @@ export function usePopupActions() {
       if (failures > 0) {
         const failedNames = result.results
           .filter((r) => r.isFail && !r.skipReason)
-          .map((r) => `${r.scriptName ?? r.scriptId}: ${r.errorMessage ?? "unknown"}`)
+          .map((r) => `${r.scriptName ?? r.scriptId}: ${r.errorMessage ?? "any"}`)
           .join("\n");
         toast.error(`${failures} script(s) failed:\n${failedNames}`);
       } else {
@@ -170,7 +171,7 @@ export function usePopupActions() {
       case "missing": return "script not found in store — try reinstalling the extension";
       case "empty_code": return "script code is empty — filePath fetch may have failed";
       case "resolver_mismatch": return "script format not recognized";
-      default: return reason ?? "unknown reason";
+      default: return reason ?? "any reason";
     }
   }
 
@@ -202,7 +203,7 @@ export function usePopupActions() {
       const errorCount = data.errors?.length ?? 0;
       toast.info(`Session ${data.sessionId}: ${logCount} logs, ${errorCount} errors`);
 
-      const win = globalThis as unknown;
+      const win = globalThis as any;
       const hasChromeRuntime = win.chrome?.runtime?.getURL;
       const optionsUrl = hasChromeRuntime
         ? win.chrome.runtime.getURL("src/options/options.html#activity")

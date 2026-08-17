@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- untyped extension message types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Extracted from ProjectDetailView.tsx (PERF-R1) — Docs tab.
  *
@@ -30,7 +30,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
     setGenerating(true);
     try {
       const resp = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({
-        type: "GENERATE_SCHEMA_DOCS" as unknown,
+        type: "GENERATE_SCHEMA_DOCS" as any,
         project: slug,
         format: "both",
       });

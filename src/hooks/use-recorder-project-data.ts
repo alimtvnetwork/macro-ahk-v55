@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Marco Extension — Recorder Project Data Hook
  *
@@ -112,12 +113,12 @@ const EMPTY_DATA: RecorderProjectData = { steps: [], dataSources: [], bindings: 
 
 async function fetchProjectData(projectSlug: string): Promise<RecorderProjectData> {
   const [stepsRes, dsRes, fbRes] = await Promise.all([
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as unknown, projectSlug }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as unknown, projectSlug }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as unknown, projectSlug }),
+     
+    sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as any, projectSlug }),
+     
+    sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as any, projectSlug }),
+     
+    sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as any, projectSlug }),
   ]);
 
   return {
@@ -129,8 +130,8 @@ async function fetchProjectData(projectSlug: string): Promise<RecorderProjectDat
 
 async function fetchSelectors(projectSlug: string, stepId: number): Promise<ReadonlyArray<SelectorRow>> {
   const list = await sendMessage<{ selectors: ReadonlyArray<SelectorRow> }>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_SELECTORS_LIST" as unknown,
+     
+    type: "RECORDER_STEP_SELECTORS_LIST" as any,
     projectSlug,
     stepId,
   }).catch(() => ({ selectors: [] as ReadonlyArray<SelectorRow> }));
@@ -140,8 +141,8 @@ async function fetchSelectors(projectSlug: string, stepId: number): Promise<Read
 
 async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: StepMetaPatch): Promise<StepRow> {
   const res = await sendMessage<{ isOk: true; step: StepRow }>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_UPDATE_META" as unknown,
+     
+    type: "RECORDER_STEP_UPDATE_META" as any,
     projectSlug, stepId, patch,
   });
 
@@ -150,8 +151,8 @@ async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: St
 
 async function sendSetStepTags(projectSlug: string, stepId: number, tags: ReadonlyArray<string>): Promise<ReadonlyArray<string>> {
   const res = await sendMessage<{ isOk: true; tags: ReadonlyArray<string> }>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_TAGS_SET" as unknown,
+     
+    type: "RECORDER_STEP_TAGS_SET" as any,
     projectSlug, stepId, tags,
   });
 
@@ -160,8 +161,8 @@ async function sendSetStepTags(projectSlug: string, stepId: number, tags: Readon
 
 async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null): Promise<StepRow> {
   const res = await sendMessage<{ isOk: true; step: StepRow }>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_LINK_SET" as unknown,
+     
+    type: "RECORDER_STEP_LINK_SET" as any,
     projectSlug, stepId, slot, targetProjectSlug,
   });
 

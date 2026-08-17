@@ -145,7 +145,7 @@ interface MonacoModule {
     CompletionItemKind: Record<string, number>;
     CompletionItemInsertTextRule: Record<string, number>;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   [key: string]: unknown;
 }
 

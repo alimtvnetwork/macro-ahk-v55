@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Marco Extension — Recorder Self-Test
  *
@@ -68,7 +69,7 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
     };
   } catch (err) {
     // Best-effort cleanup; do not mask the original error.
-    await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
+    await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: any) => {
       logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
 
       return undefined;
@@ -119,8 +120,8 @@ function createDummyDraft(variableName: string) {
 async function insertDummyStep(projectSlug: string, variableName: string): Promise<number> {
   try {
     const response = await sendMessage<InsertResponse>({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: "RECORDER_STEP_INSERT" as unknown,
+       
+      type: "RECORDER_STEP_INSERT" as any,
       projectSlug,
       draft: createDummyDraft(variableName),
     });
@@ -138,8 +139,8 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
 async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<ListResponse["steps"]> {
   try {
     const response = await sendMessage<ListResponse>({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: "RECORDER_STEP_LIST" as unknown,
+       
+      type: "RECORDER_STEP_LIST" as any,
       projectSlug,
     });
 
@@ -153,8 +154,8 @@ async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<Lis
 async function deleteStep(projectSlug: string, stepId: number): Promise<void> {
   try {
     await sendMessage({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: "RECORDER_STEP_DELETE" as unknown,
+       
+      type: "RECORDER_STEP_DELETE" as any,
       projectSlug,
       stepId,
     });

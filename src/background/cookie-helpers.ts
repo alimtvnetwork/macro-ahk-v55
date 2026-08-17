@@ -59,7 +59,7 @@ export async function readCookieFromCandidates(
         return cookie;
       }
     } catch (cookieErr) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: cookieErr });
+      RiseupAsiaMacroExt?.Logger?.error('NAMESPACE', 'Operation failed', { error: cookieErr });
       // Try the next candidate URL. Debug-only because cookie-store misses are
       // expected (different domain candidates) — escalating would spam the log.
       console.debug(`[cookie-helpers] cookies.get failed for url="${url}" name="${cookieName}", trying next candidate:`, cookieErr);
@@ -100,7 +100,7 @@ function appendUrlCandidate(
     candidates.add(parsed.href);
     candidates.add(`${parsed.origin}/`);
   } catch (urlErr) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: urlErr });
+    RiseupAsiaMacroExt?.Logger?.error('NAMESPACE', 'Operation failed', { error: urlErr });
     // Ignore malformed candidate URLs. Debug breadcrumb so a regression that
     // feeds garbage into the URL list is at least visible during development.
     console.debug(`[cookie-helpers] appendUrlCandidate dropped malformed url="${rawUrl}":`, urlErr);

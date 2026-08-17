@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, max-lines-per-function -- untyped extension message types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines-per-function -- untyped extension message types */
 /**
  * AutomationView — Spec 21
  *
@@ -56,7 +57,7 @@ async function saveChainToDb(chain: Partial<AutomationChain>, project: string): 
     type: "SAVE_AUTOMATION_CHAIN",
     project,
     chain,
-  } as unknown);
+  } as any);
 
   return result.isOk;
 }
@@ -66,7 +67,7 @@ async function deleteChainFromDb(chainId: string, project: string): Promise<bool
     type: "DELETE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as unknown);
+  } as any);
 
   return result.isOk;
 }
@@ -76,7 +77,7 @@ async function toggleChainInDb(chainId: string, project: string): Promise<boolea
     type: "TOGGLE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as unknown);
+  } as any);
 
   return result.isOk;
 }
@@ -86,7 +87,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
     type: "IMPORT_AUTOMATION_CHAINS",
     project,
     chains,
-  } as unknown);
+  } as any);
 
   return result.imported ?? 0;
 }
@@ -94,7 +95,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
 async function loadProjects(): Promise<Array<{ id: string; name: string; slug: string }>> {
   try {
     const result = await sendMessage<{ isOk: boolean; projects?: Array<{ id: string; name: string; slug?: string }> }>({
-      type: "GET_PROJECTS" as unknown,
+      type: "GET_PROJECTS" as any,
     });
     if (result.isOk && result.projects) {
       return result.projects.map((p) => ({

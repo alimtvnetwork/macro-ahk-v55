@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- dynamic API explorer message types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Swagger-Style API Explorer
  * See: spec/05-chrome-extension/64-api-explorer-swagger.md
@@ -28,7 +28,7 @@ export function ApiExplorerSwagger() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as unknown });
+      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as any });
       setStatus({
         service: result.service,
         version: result.version,
@@ -44,9 +44,9 @@ export function ApiExplorerSwagger() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as unknown });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
       const raw = result.endpoints ?? [];
-      setEndpoints(raw.map((e) => normalizeEndpoint(e as unknown as Record<string, unknown>)));
+      setEndpoints(raw.map((e) => normalizeEndpoint(e as any as Record<string, any>)));
     } catch (err) { /* swallowed */
       toast.error("Failed to load API endpoint docs");
     }

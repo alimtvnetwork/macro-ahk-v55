@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- XHR monkey-patching requires unsafe property injection on native prototypes */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RequestType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -93,20 +93,20 @@ function interceptXhr(): void {
   OriginalXhr.prototype.open = function (
     method: string,
     url: string | URL,
-    ...rest: unknown[]
+    ...rest: any[]
   ) {
-    (this as unknown).__marco_method = method;
-    (this as unknown).__marco_url = truncateUrl(String(url));
-    (this as unknown).__marco_startTime = null;
+    (this as any).__marco_method = method;
+    (this as any).__marco_url = truncateUrl(String(url));
+    (this as any).__marco_startTime = null;
 
-    return originalOpen.apply(this, [method, url, ...rest] as unknown);
+    return originalOpen.apply(this, [method, url, ...rest] as any);
   };
 
-  OriginalXhr.prototype.send = function (...args: unknown[]) {
-    (this as unknown).__marco_startTime = performance.now();
+  OriginalXhr.prototype.send = function (...args: any[]) {
+    (this as any).__marco_startTime = performance.now();
 
     this.addEventListener("loadend", function () {
-      const startTime = (this as unknown).__marco_startTime as number | null;
+      const startTime = (this as any).__marco_startTime as number | null;
       const hasStartTime = startTime !== null;
 
       if (hasStartTime) {
@@ -115,7 +115,7 @@ function interceptXhr(): void {
       }
     }, { once: true });
 
-    return originalSend.apply(this, args as unknown);
+    return originalSend.apply(this, args as any);
   };
 }
 
@@ -127,8 +127,8 @@ function buildXhrEntry(
   const endTime = performance.now();
 
   return {
-    method: (xhr as unknown).__marco_method ?? "UNKNOWN",
-    url: (xhr as unknown).__marco_url ?? "",
+    method: (xhr as any).__marco_method ?? "UNKNOWN",
+    url: (xhr as any).__marco_url ?? "",
     status: xhr.status,
     statusText: xhr.statusText || "",
     durationMs: Math.round(endTime - startTime),

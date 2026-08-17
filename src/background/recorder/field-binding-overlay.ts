@@ -368,6 +368,7 @@ function refreshPreview(state: State): void {
   if (state.template === "") {
     state.preview.textContent = "";
     state.preview.dataset.error = "false";
+
     return;
   }
 
@@ -494,6 +495,7 @@ function onClick(state: State, e: MouseEvent): void {
     state.pinned = true;
     show(state, candidate);
     refreshPreview(state);
+
     return;
   }
   

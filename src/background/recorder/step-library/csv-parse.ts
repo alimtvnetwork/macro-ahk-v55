@@ -149,11 +149,13 @@ function makeTokenizerState(): TokenizerState {
 function stepQuoted(source: string, i: number, ch: string, state: TokenizerState): number {
   if (ch === '"' && source[i + 1] === '"') {
     state.field += '"';
+
     return i + 1; 
   }
   
   if (ch === '"') {
     state.inQuotes = false;
+
     return i;
   }
 
@@ -178,17 +180,20 @@ function commitRow(state: TokenizerState): void {
 function stepUnquoted(source: string, i: number, ch: string, delimiter: string, state: TokenizerState): number {
   if (ch === '"' && state.field.length === 0) {
     state.inQuotes = true;
+
     return i; 
   }
 
   if (ch === '"' && state.warnings.length < 5) {
     state.field += ch;
     state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
+
     return i;
   }
   
   if (ch === '"') {
     state.field += ch;
+
     return i;
   }
 

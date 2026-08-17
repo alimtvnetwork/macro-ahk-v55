@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Step CRUD handlers (rename, delete, description, tags, link) for the
  * recorder visualisation panel. Extracted for PlanTierType 33 (15/50-line cap).
@@ -38,7 +39,7 @@ export function useRecorderStepMutations(
   };
 }
 
-function errText(error: unknown, fallback: string): string {
+function errText(error: any, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
@@ -46,8 +47,8 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
   return useCallback(async (stepId: number, newName: string) => {
     try {
       await sendMessage({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-unknown
-        type: "RECORDER_STEP_RENAME" as unknown,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        type: "RECORDER_STEP_RENAME" as any,
         projectSlug, stepId, newVariableName: newName,
       });
       toast.success(`Renamed step #${stepId} -> ${newName}`);
@@ -72,8 +73,8 @@ function useDeleteHandler(projectSlug: string, reload: () => Promise<void>) {
 
     try {
       await sendMessage({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_DELETE" as unknown,
+         
+        type: "RECORDER_STEP_DELETE" as any,
         projectSlug, stepId,
       });
       toast.success("Step deleted");

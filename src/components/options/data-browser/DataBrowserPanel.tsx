@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- dynamic storage query results */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import { useStorageStats, useDataBrowser, useDataStore } from "@/hooks/use-extension-data";
 import { useSessionStorage, useCookies, useLocalStorage } from "@/hooks/use-storage-surfaces";
@@ -167,7 +167,7 @@ export function DataBrowserPanel() {
 
       {activeCategory === "local" && (
         <DataStoreTable
-          entries={local.entries as unknown}
+          entries={local.entries as any}
           loading={local.loading}
           onRefresh={local.refresh}
         />

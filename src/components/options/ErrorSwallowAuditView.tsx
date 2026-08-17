@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpCodes } from "../../constants/http";
 /**
  * Marco Extension — Error-Swallowing Audit View
@@ -84,9 +85,8 @@ const SEVERITY_ORDER: ReadonlyArray<AuditSeverity> = ["P0", "P1", "P2"];
 function isAuditSeverity(value: string): value is AuditSeverity {
   return value === "P0" || value === "P1" || value === "P2";
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateItem(raw: unknown, index: number): AuditItem | string {
+ 
+function validateItem(raw: any, index: number): AuditItem | string {
   if (raw === null || typeof raw !== "object") {
     return `Items[${index}]: not an object`;
   }
@@ -104,9 +104,8 @@ function validateItem(raw: unknown, index: number): AuditItem | string {
 
   return { Id: id, Severity: severity, File: file, Line: line, Rule: rule, Message: message, Snippet: snippet };
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateReport(raw: unknown): AuditReport | string {
+ 
+function validateReport(raw: any): AuditReport | string {
   if (raw === null || typeof raw !== "object") {
     return "Report root is not an object";
   }
