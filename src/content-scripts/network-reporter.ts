@@ -127,7 +127,7 @@ function buildXhrEntry(
   const endTime = performance.now();
 
   return {
-    method: (xhr as any).__marco_method ?? "UNKNOWN",
+    method: (xhr as unknown).__marco_method ?? "UNKNOWN",
     url: (xhr as any).__marco_url ?? "",
     status: xhr.status,
     statusText: xhr.statusText || "",
