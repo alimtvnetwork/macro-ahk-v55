@@ -396,7 +396,8 @@ async function attemptUserScriptFallback(
     logBgWarnError(BgLogTag.INJECTION_CSP, "forceLegacyInjection enabled — skipping userScripts and using legacy ISOLATED chain");
   }
 
-  if (!isForceLegacy) {
+  const isMissing = !isForceLegacy;
+  if (isMissing) {
     // Ensure USER_SCRIPT world exists before execute() to avoid cold-start race.
     await configureUserScriptWorld();
   }
