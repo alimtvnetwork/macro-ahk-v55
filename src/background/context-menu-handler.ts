@@ -334,7 +334,8 @@ async function handleMenuClick(
 
 async function handleRunScripts(tabId: number, forceReload = false): Promise<void> {
   const hasValidTab = tabId > 0;
-  if (!hasValidTab) {
+  const isMissing049 = !hasValidTab;
+  if (isMissing049) {
     return;
   }
 
