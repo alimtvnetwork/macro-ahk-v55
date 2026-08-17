@@ -7,3 +7,4 @@
 - [04-action-download-resolution-hardening](./04-action-download-resolution-hardening.md) - Removed 30 third-party `uses:` steps to shrink action-download outage surface (2026-08-06)
 - [05-ci-not-triggering-and-not-releasing](./05-ci-not-triggering-and-not-releasing.md) - GITHUB_TOKEN push suppression and workflow parser rejection (2026-08-06)
 - [06-release-published-without-assets](./06-release-published-without-assets.md) - v5.9.0 to v5.22.0 published zero-asset releases; three causes, plus the rule to verify releases through the Actions API instead of a file diff (2026-08-07)
+- [07-e2e-class-serialization-2026-08-17](./07-e2e-class-serialization-2026-08-17.md) - Playwright evaluate serialization stripping ServiceResult class getter properties and data wrapper restructuring (2026-08-17)

@@ -256,6 +256,7 @@ test.describe('Script Injection', () => {
     // any failure surfaces the script's `errorMessage` plus the full results
     // table directly in the assertion message.
     const response = injectionResult as InjectionResponse;
+    if (!response.results) console.log('MISSING_RESULTS:', JSON.stringify(response));
     expect(response.results, 'INJECT_SCRIPTS returned no results array').toBeDefined();
     expectScriptSucceeded(response, 'e2e-test-script-001');
     // Clean inline script — preflight ran and passed, flag must be false.

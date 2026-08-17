@@ -342,7 +342,7 @@ export async function handleInjectScripts(
     try {
       const { settings } = await handleGetSettings();
       budgetMs = settings.injectionBudgetMs ?? 500;
-    } catch {
+    } catch (err) {
       logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); /* use default */ 
     } // allow-swallow: settings load failure falls back to default budget
 
@@ -464,7 +464,7 @@ async function executeCachedPayload(
     try {
       const { settings } = await handleGetSettings();
       budgetMs = settings.injectionBudgetMs ?? 500;
-    } catch {
+    } catch (err) {
       logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); /* use default */ 
     } // allow-swallow: settings load failure falls back to default budget
 

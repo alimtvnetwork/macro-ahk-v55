@@ -54,7 +54,7 @@ export async function showInjectionToastInTab(
           loaderTimer = setTimeout(() => {
             loaderTimer = null; 
             loader.remove(); 
-          }, Timings.ANIMATION_DURATION);
+          }, 350);
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -202,7 +202,7 @@ export async function showInjectionFailureToastInTab(
           loaderTimer = setTimeout(() => {
             loaderTimer = null; 
             loader.remove(); 
-          }, Timings.ANIMATION_DURATION);
+          }, 350);
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -422,7 +422,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
             toast.style.transform = exitTransform;
             removeTimer = setTimeout(cleanup, 350);
           }
-        }, Timings.TIMEOUT_VERY_LONG);
+        }, 15000);
       },
       args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM],
     });

@@ -679,22 +679,6 @@ export default defineConfig(({ mode }) => {
             __dirname,
             "src/options/options.html",
           ),
-          "content-scripts/xpath-recorder": resolve(
-            __dirname,
-            "src/content-scripts/xpath-recorder.ts",
-          ),
-          "content-scripts/network-reporter": resolve(
-            __dirname,
-            "src/content-scripts/network-reporter.ts",
-          ),
-          "content-scripts/message-relay": resolve(
-            __dirname,
-            "src/content-scripts/message-relay.ts",
-          ),
-          "content-scripts/prompt-injector": resolve(
-            __dirname,
-            "src/content-scripts/prompt-injector.ts",
-          ),
         },
         output: {
           entryFileNames: "[name].js",

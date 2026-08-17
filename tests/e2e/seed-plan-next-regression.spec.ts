@@ -144,10 +144,10 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
       return seedApi.seedPlanNextPrompts();
     });
-    expect(result.isSuccess).toBe(true);
+    expect(result.ok).toBe(true);
 
     // Role counts contract
-    const telemetry = result.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
+    const telemetry = result.data.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
     expect(telemetry).toHaveLength(2);
     const plan = telemetry.find(t => t.role === 'plan');
     const next = telemetry.find(t => t.role === 'next');
@@ -194,8 +194,8 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
       return seedApi.seedPlanNextPrompts();
     });
-    expect(result.isSuccess).toBe(true);
-    const telemetry = result.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
+    expect(result.ok).toBe(true);
+    const telemetry = result.data.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
     const plan = telemetry.find(t => t.role === 'plan');
     const next = telemetry.find(t => t.role === 'next');
     expect(plan).toEqual({ role: 'plan', inserted: 0, skipped: 4, promotedDefault: 0, alreadyDefault: 1, replaceKey: 'n', replaceValueCount: 5 });
@@ -259,7 +259,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
       return seedApi.seedPlanNextPrompts();
     });
-    expect(result.isSuccess).toBe(false);
+    expect(result.ok).toBe(false);
     expect(result.error).toMatch(/disk full/);
 
     const stored = await page.evaluate((k) => window.localStorage.getItem(k), TELEMETRY_KEY);
