@@ -78,7 +78,8 @@ export function satisfiesVersion(actual: string, range: string): boolean {
         (actualParts.major === rangeParts.major && actualParts.minor > rangeParts.minor) ||
         (actualParts.major === rangeParts.major && actualParts.minor === rangeParts.minor && actualParts.patch >= rangeParts.patch);
 
-  if (!isGteRange) {
+  const isMissing = !isGteRange;
+  if (isMissing) {
     return false;
   }
 
