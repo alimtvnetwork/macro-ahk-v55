@@ -118,7 +118,8 @@ function checkAlreadyAttached(
   const isAlreadyAttached = project.scripts.some(
     (s) => s.path === script.id || s.path === script.name,
   );
-  if (!isAlreadyAttached) {
+  const isMissing = !isAlreadyAttached;
+  if (isMissing) {
     return null;
   }
 
