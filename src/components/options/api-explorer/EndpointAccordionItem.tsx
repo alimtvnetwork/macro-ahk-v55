@@ -12,14 +12,15 @@ import {
   toPrettyJson,
 } from "./types";
 import { logError } from "@/components/options/options-logger";
+import type { SerializableValue } from "@/platform/platform-adapter";
 
-function generateCurl(type: string, payload: Record<string, unknown>): string {
+function generateCurl(type: string, payload: Record<string, SerializableValue>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
 
   return `curl -X POST "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \\\n  -H "Content-Type: application/json" \\\n  -d '${body}'`;
 }
 
-function generatePowerShell(type: string, payload: Record<string, unknown>): string {
+function generatePowerShell(type: string, payload: Record<string, SerializableValue>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
 
   return `Invoke-RestMethod -Uri "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \`\n  -Method POST \`\n  -ContentType "application/json" \`\n  -Body '${body}'`;
@@ -55,9 +56,9 @@ export function EndpointAccordionItem({ endpoint }: Props) {
   const method = endpoint.IsMutating ? "POST" : "GET";
 
   const runRequest = async () => {
-    let parsed: unknown;
+    let parsed: Record<string, SerializableValue> | undefined;
     try {
-      parsed = requestJson.trim() ? JSON.parse(requestJson) : {};
+      parsed = requestJson.trim() ? (JSON.parse(requestJson) as Record<string, SerializableValue>) : {};
     } catch (err) { /* swallowed */
       toast.error("Invalid JSON in request body");
 
@@ -70,13 +71,13 @@ export function EndpointAccordionItem({ endpoint }: Props) {
       return;
     }
 
-    const body = parsed as Record<string, unknown>;
+    const body = parsed;
     const { Type: _, type: _t, ...rest } = body;
     const message = { type: endpoint.Type, ...rest } as import("@/platform/platform-adapter").MessagePayload;
 
     setLoading(true);
     try {
-      const response = await sendMessage<unknown>(message);
+      const response = await sendMessage<Record<string, SerializableValue>>(message);
       setResponseJson(toPrettyJson(response));
     } catch (error) {
       setResponseJson(toPrettyJson({
