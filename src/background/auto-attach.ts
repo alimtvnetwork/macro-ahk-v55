@@ -185,7 +185,8 @@ function checkInjectionConditions(
 ): AttachDecision | null {
   const cond = script.instruction.InjectionConditions;
   const hasCookieRequirement = cond !== undefined && cond.requireCookie != null;
-  if (!hasCookieRequirement) {
+  const isMissing043 = !hasCookieRequirement;
+  if (isMissing043) {
     return null;
   }
 
