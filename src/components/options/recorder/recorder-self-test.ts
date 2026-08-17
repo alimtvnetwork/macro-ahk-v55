@@ -120,7 +120,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
   try {
     const response = await sendMessage<InsertResponse>({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: "RECORDER_STEP_INSERT" as any,
+      type: "RECORDER_STEP_INSERT" as unknown,
       projectSlug,
       draft: createDummyDraft(variableName),
     });
