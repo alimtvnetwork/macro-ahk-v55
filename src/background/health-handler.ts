@@ -194,6 +194,7 @@ function applyQuotaResult(
 
   if (isCritical) {
     details.push("Storage near capacity — auto-prune recommended");
+
     return;
   }
   
@@ -212,6 +213,7 @@ function applyErrorRateResult(
 
   if (isError) {
     details.push("High error rate detected");
+
     return;
   }
   

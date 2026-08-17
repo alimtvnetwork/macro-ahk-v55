@@ -361,20 +361,17 @@ function refreshPreview(state: State): void {
   }
 
   renderPreviewTags(state, extractReferencedColumns(state.template));
+  if (state.bindBtn !== null) {
+    state.bindBtn.disabled = state.template === "";
+  }
+
   if (state.template === "") {
     state.preview.textContent = "";
     state.preview.dataset.error = "false";
-    if (state.bindBtn !== null) {
-      state.bindBtn.disabled = true;
-    }
-
     return;
   }
 
   renderResolvedPreview(state, state.preview);
-  if (state.bindBtn !== null) {
-    state.bindBtn.disabled = false;
-  }
 }
 
 function commitTemplate(state: State): void {
@@ -497,15 +494,16 @@ function onClick(state: State, e: MouseEvent): void {
     state.pinned = true;
     show(state, candidate);
     refreshPreview(state);
-  } else {
-    state.pinned = false;
-    state.template = "";
-    if (state.templateInput !== null) {
-      state.templateInput.value = ""; 
-    }
-
-    hide(state);
+    return;
   }
+  
+  state.pinned = false;
+  state.template = "";
+  if (state.templateInput !== null) {
+    state.templateInput.value = ""; 
+  }
+
+  hide(state);
 }
 
 function buildShadowDom(container: ParentNode): { host: HTMLElement; root: ShadowRoot; popover: HTMLDivElement; outline: HTMLDivElement } {

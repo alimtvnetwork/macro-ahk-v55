@@ -603,13 +603,19 @@ function assignInputValue(element: HTMLInputElement | HTMLTextAreaElement, value
 }
 
 function dispatchType(element: HTMLElement, value: string): void {
+  const isInput = element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement;
+  if (!isInput && !element.isContentEditable) {
+    return; // not typeable
+  }
+
   element.focus({ preventScroll: true });
+
   if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
     assignInputValue(element, value);
-  } else if (element.isContentEditable) {
+  }
+
+  if (!isInput && element.isContentEditable) {
     element.textContent = value;
-  } else {
-    return; // not typeable
   }
 
   element.dispatchEvent(new Event("input", { bubbles: true }));

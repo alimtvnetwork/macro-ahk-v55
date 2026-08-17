@@ -19,51 +19,46 @@ const SMART_GROUP_ROLE_SELECTOR =
 /*  Smart group detection (spec §1.3)                                  */
 /* ------------------------------------------------------------------ */
 
-export function findSmartGroup(el: Element): Element | null {
-  const form = el.closest("form");
+export function findSmartGroup(element: Element): Element | null {
+  const form = element.closest("form");
   if (form !== null) {
     return form;
   }
 
-  const fieldset = el.closest("fieldset");
+  const fieldset = element.closest("fieldset");
   if (fieldset !== null) {
     return fieldset;
   }
 
-  const tr = el.closest("tr");
+  const tr = element.closest("tr");
   if (tr !== null) {
     return tr;
   }
 
-  const role = el.closest(SMART_GROUP_ROLE_SELECTOR);
+  const role = element.closest(SMART_GROUP_ROLE_SELECTOR);
   if (role !== null) {
     return role;
   }
 
-  const cardLike = closestByClassToken(el, ["card", "panel", "field-row", "form-group"]);
+  const cardLike = closestByClassToken(element, ["card", "panel", "field-row", "form-group"]);
   if (cardLike !== null) {
     return cardLike;
   }
 
-  const flexGrid = closestFlexOrGrid(el);
+  const flexGrid = closestFlexOrGrid(element);
   if (flexGrid !== null) {
     return flexGrid;
   }
 
-  return el.parentElement;
+  return element.parentElement;
 }
 
-function closestByClassToken(el: Element, tokens: ReadonlyArray<string>): Element | null {
-  let current: Element | null = el;
+function closestByClassToken(element: Element, tokens: ReadonlyArray<string>): Element | null {
+  let current: Element | null = element;
   while (current !== null) {
     const cls = current.className;
-    const isString = typeof cls === "string";
-    if (isString) {
-      const lower = cls.toLowerCase();
-      const hasToken = tokens.some((t) => lower.includes(t));
-      if (hasToken) {
-        return current;
-      }
+    if (typeof cls === "string" && tokens.some((t) => cls.toLowerCase().includes(t))) {
+      return current;
     }
 
     current = current.parentElement;
@@ -72,8 +67,8 @@ function closestByClassToken(el: Element, tokens: ReadonlyArray<string>): Elemen
   return null;
 }
 
-function closestFlexOrGrid(el: Element): Element | null {
-  let current: Element | null = el.parentElement;
+function closestFlexOrGrid(element: Element): Element | null {
+  let current: Element | null = element.parentElement;
   while (current !== null) {
     const styles = current.ownerDocument?.defaultView?.getComputedStyle(current);
     const display = styles?.display ?? "";
@@ -93,8 +88,8 @@ function closestFlexOrGrid(el: Element): Element | null {
 /*  Ancestor offset                                                    */
 /* ------------------------------------------------------------------ */
 
-export function nthAncestor(el: Element, depth: number): Element {
-  let current: Element = el;
+export function nthAncestor(element: Element, depth: number): Element {
+  let current: Element = element;
   let remaining = depth;
   while (remaining > 0 && current.parentElement !== null) {
     current = current.parentElement;
@@ -318,9 +313,7 @@ function handleHighlighterMouseMove(
 
   if (state.HoverTarget !== target) {
     state.HoverTarget = target;
-    if (!state.AltHeld) {
-      state.AncestorOffset = 0; 
-    }
+    state.AncestorOffset = state.AltHeld ? state.AncestorOffset : 0;
   }
 
   schedulePaint();
@@ -433,17 +426,17 @@ function buildHighlighterHandle(
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function applyRect(el: HTMLElement, r: DOMRect): void {
-  el.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
-  el.style.width = `${Math.round(r.width)}px`;
-  el.style.height = `${Math.round(r.height)}px`;
+function applyRect(element: HTMLElement, r: DOMRect): void {
+  element.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
+  element.style.width = `${Math.round(r.width)}px`;
+  element.style.height = `${Math.round(r.height)}px`;
 }
 
-export function describeElement(el: Element, depthOffset: number): string {
-  const tag = el.tagName.toLowerCase();
-  const id = el.id !== "" ? `#${el.id}` : "";
-  const cls = typeof el.className === "string" && el.className !== ""
-    ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
+export function describeElement(element: Element, depthOffset: number): string {
+  const tag = element.tagName.toLowerCase();
+  const id = element.id !== "" ? `#${element.id}` : "";
+  const cls = typeof element.className === "string" && element.className !== ""
+    ? "." + element.className.trim().split(/\s+/).slice(0, 3).join(".")
     : "";
   const depth = depthOffset > 0 ? `  · depth +${depthOffset}` : "";
 
