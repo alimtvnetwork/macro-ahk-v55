@@ -255,9 +255,9 @@ function validateManifestShape(m: unknown): ImportFailure | null {
     "DbByteLength",
     "DbSha256",
   ];
-  const obj = m as Record<string, unknown>;
+  const manifestObject = m as Record<string, unknown>;
   for (const k of required) {
-    if (!(k in obj)) {
+    if (!(k in manifestObject)) {
       return {
         Reason: "ManifestMalformed",
         Detail: `manifest.json missing required field "${String(k)}".`,
@@ -265,15 +265,15 @@ function validateManifestShape(m: unknown): ImportFailure | null {
     }
   }
 
-  if (typeof obj.FormatVersion !== "number" || !Number.isInteger(obj.FormatVersion)) {
+  if (typeof manifestObject.FormatVersion !== "number" || !Number.isInteger(manifestObject.FormatVersion)) {
     return { Reason: "ManifestMalformed", Detail: "FormatVersion must be an integer." };
   }
 
-  if (typeof obj.DbByteLength !== "number" || obj.DbByteLength < 0) {
+  if (typeof manifestObject.DbByteLength !== "number" || manifestObject.DbByteLength < 0) {
     return { Reason: "ManifestMalformed", Detail: "DbByteLength must be a non-negative integer." };
   }
 
-  if (typeof obj.DbSha256 !== "string" || !/^[0-9a-f]{64}$/.test(obj.DbSha256)) {
+  if (typeof manifestObject.DbSha256 !== "string" || !/^[0-9a-f]{64}$/.test(manifestObject.DbSha256)) {
     return { Reason: "ManifestMalformed", Detail: "DbSha256 must be 64 lowercase hex chars." };
   }
 

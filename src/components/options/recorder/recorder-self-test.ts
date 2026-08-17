@@ -139,7 +139,7 @@ async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<Lis
   try {
     const response = await sendMessage<ListResponse>({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: "RECORDER_STEP_LIST" as unknown,
+      type: "RECORDER_STEP_LIST" as any,
       projectSlug,
     });
 

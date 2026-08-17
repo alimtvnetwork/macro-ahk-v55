@@ -47,7 +47,7 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
     try {
       await sendMessage({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        type: "RECORDER_STEP_RENAME" as any,
+        type: "RECORDER_STEP_RENAME" as unknown,
         projectSlug, stepId, newVariableName: newName,
       });
       toast.success(`Renamed step #${stepId} -> ${newName}`);
