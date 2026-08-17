@@ -95,7 +95,7 @@ function interceptXhr(): void {
     url: string | URL,
     ...rest: unknown[]
   ) {
-    (this as any).__marco_method = method;
+    (this as unknown).__marco_method = method;
     (this as any).__marco_url = truncateUrl(String(url));
     (this as any).__marco_startTime = null;
 
