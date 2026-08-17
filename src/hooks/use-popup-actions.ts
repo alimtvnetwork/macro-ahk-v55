@@ -202,7 +202,7 @@ export function usePopupActions() {
       const errorCount = data.errors?.length ?? 0;
       toast.info(`Session ${data.sessionId}: ${logCount} logs, ${errorCount} errors`);
 
-      const win = globalThis as any;
+      const win = globalThis as unknown;
       const hasChromeRuntime = win.chrome?.runtime?.getURL;
       const optionsUrl = hasChromeRuntime
         ? win.chrome.runtime.getURL("src/options/options.html#activity")
