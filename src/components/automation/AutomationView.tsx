@@ -66,7 +66,7 @@ async function deleteChainFromDb(chainId: string, project: string): Promise<bool
     type: "DELETE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as any);
+  } as unknown);
 
   return result.isOk;
 }

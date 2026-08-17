@@ -293,14 +293,16 @@ export class StepLibraryDb {
     }): void {
     const isRunGroup = input.StepKindId === StepKindId.RunGroup;
     const hasTarget = input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null;
-    if (isRunGroup && !hasTarget) {
+    const missingTarget = !hasTarget;
+    if (isRunGroup && missingTarget) {
       throw new Error(
         "appendStep: StepKind=RunGroup requires TargetStepGroupId. " +
                 "Without a target the runner cannot resolve which group to invoke.",
       );
     }
 
-    if (!isRunGroup && hasTarget) {
+    const notRunGroup = !isRunGroup;
+    if (notRunGroup && hasTarget) {
       throw new Error("appendStep: TargetStepGroupId is only valid when StepKind=RunGroup.");
     }
   }
@@ -399,7 +401,8 @@ export class StepLibraryDb {
       );
     }
 
-    if (!isRunGroup && input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null) {
+    const notRunGroup = !isRunGroup;
+    if (notRunGroup && input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null) {
       throw new Error(
         "updateStep: TargetStepGroupId is only valid when StepKind=RunGroup.",
       );

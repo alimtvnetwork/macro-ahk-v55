@@ -82,17 +82,22 @@ function buildWhere(where?: WhereClause): { clause: string; params: SqlValue[] }
       if ('ilike' in whereObject) {
         conditions.push(`"${col}" LIKE ? COLLATE NOCASE`);
         params.push(whereObject.ilike as SqlValue);
-      } else if ('like' in whereObject) {
+        continue;
+      }
+      
+      if ('like' in whereObject) {
         conditions.push(`"${col}" LIKE ?`);
         params.push(whereObject.like as SqlValue);
-      } else {
-        conditions.push(`"${col}" = ?`);
-        params.push(whereValue as unknown as SqlValue);
+        continue;
       }
-    } else {
+      
       conditions.push(`"${col}" = ?`);
-      params.push(whereValue as SqlValue);
+      params.push(whereValue as unknown as SqlValue);
+      continue;
     }
+    
+    conditions.push(`"${col}" = ?`);
+    params.push(whereValue as SqlValue);
   }
 
   return { clause: ` WHERE ${conditions.join(" AND ")}`, params };

@@ -131,7 +131,8 @@ function sanitiseHeaders(raw: unknown): InputSourceHeader[] {
 
   const out: InputSourceHeader[] = [];
   for (const entry of raw) {
-    if (!isPlainObject(entry)) {
+    const notPlainObject = !isPlainObject(entry);
+    if (notPlainObject) {
       continue;
     }
 
@@ -173,7 +174,8 @@ export function loadInputSourceConfig(): InputSourceConfig {
     }
 
     const parsed = JSON.parse(raw) as StoredShape;
-    if (!isPlainObject(parsed)) {
+    const notPlainObject = !isPlainObject(parsed);
+    if (notPlainObject) {
       return DEFAULT_INPUT_SOURCE_CONFIG;
     }
 

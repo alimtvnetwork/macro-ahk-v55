@@ -53,32 +53,27 @@ export async function ensureDefaultProjectSingleScript(): Promise<void> {
 
   // Ensure SDK project
   const sdkIndex = projects.findIndex((p) => p.id === SDK_PROJECT_ID);
+  const currentSdk = sdkIndex !== -1 ? projects[sdkIndex] : undefined;
+  const normalizedSdk = currentSdk ? normalizeSdkProject(currentSdk) : undefined;
+
   if (sdkIndex === -1) {
     projects.unshift(buildSdkProject());
     changed = true;
-  } else {
-    const currentSdk = projects[sdkIndex];
-    const normalizedSdk = normalizeSdkProject(currentSdk);
-    if (!isProjectEquivalent(currentSdk, normalizedSdk)) {
-      projects[sdkIndex] = normalizedSdk;
-      changed = true;
-    }
+  } else if (currentSdk && normalizedSdk && !isProjectEquivalent(currentSdk, normalizedSdk)) {
+    projects[sdkIndex] = normalizedSdk;
+    changed = true;
   }
 
-  // Ensure default project
   const index = projects.findIndex((project) => project.id === DEFAULT_PROJECT_ID);
+  const current = index !== -1 ? projects[index] : undefined;
+  const normalized = current ? normalizeDefaultProject(current) : undefined;
 
   if (index === -1) {
     projects.push(buildDefaultProject());
     changed = true;
-  } else {
-    const current = projects[index];
-    const normalized = normalizeDefaultProject(current);
-
-    if (!isProjectEquivalent(current, normalized)) {
-      projects[index] = normalized;
-      changed = true;
-    }
+  } else if (current && normalized && !isProjectEquivalent(current, normalized)) {
+    projects[index] = normalized;
+    changed = true;
   }
 
   if (changed) {

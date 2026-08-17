@@ -49,15 +49,16 @@ export async function buildHealthResponse(): Promise<HealthStatusResponse> {
   const computedState = computeOverallState(details);
   const previousState = getHealthState();
 
-  if (computedState !== previousState) {
-    setHealthState(computedState);
-    if (computedState === "HEALTHY") {
-      console.log("[health] %s → HEALTHY (recovered)", previousState);
-    } else {
-      logBgWarnError(BgLogTag.HEALTH, `${previousState} → ${computedState}: ${details.join("; ")}`);
-    }
+  setHealthState(computedState);
+
+  if (computedState === previousState) {
+    return { state: computedState, details };
+  }
+
+  if (computedState === "HEALTHY") {
+    console.log("[health] %s → HEALTHY (recovered)", previousState);
   } else {
-    setHealthState(computedState);
+    logBgWarnError(BgLogTag.HEALTH, `${previousState} → ${computedState}: ${details.join("; ")}`);
   }
 
   return { state: computedState, details };
@@ -193,7 +194,10 @@ function applyQuotaResult(
 
   if (isCritical) {
     details.push("Storage near capacity — auto-prune recommended");
-  } else if (isWarning) {
+    return;
+  }
+  
+  if (isWarning) {
     details.push("Storage usage elevated");
   }
 }
@@ -208,7 +212,10 @@ function applyErrorRateResult(
 
   if (isError) {
     details.push("High error rate detected");
-  } else if (isDegraded) {
+    return;
+  }
+  
+  if (isDegraded) {
     details.push("Elevated error rate");
   }
 }

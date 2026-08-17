@@ -119,20 +119,12 @@ function storageKey(slug: string): string {
 
 export async function initProjectDb(slug: string, extraSchema?: string): Promise<ProjectDbManager> {
   const existing = projectDbs.get(slug);
-  if (existing) {
-    // Cache-hit fast path. The DB handle is already loaded, but we still
-    // guarantee the Phase 14 chain-columns migration has run for this slug
-    // in this worker lifetime. This guards against scenarios where the DB
-    // was first opened by an early-boot caller (e.g. seeder) before the
-    // recorder schema migrations were registered, or where the cache was
-    // populated by a code path that bypassed initProjectDb's migration
-    // block. The `chainMigrationApplied` set keeps this O(1) and idempotent
-    // so repeated initProjectDb() calls remain effectively free.
-    if (!chainMigrationApplied.has(slug)) {
-      applyChainColumnsMigration(existing);
-      chainMigrationApplied.add(slug);
-    }
+  if (existing && !chainMigrationApplied.has(slug)) {
+    applyChainColumnsMigration(existing);
+    chainMigrationApplied.add(slug);
+  }
 
+  if (existing) {
     return buildProjectManager(slug);
   }
 
@@ -293,7 +285,9 @@ export async function flushProjectDb(slug: string): Promise<void> {
   if (persistenceMode === "opfs") {
     const root = await navigator.storage.getDirectory();
     await saveToOpfs(root, dbFileName(slug), db);
-  } else if (persistenceMode === "storage") {
+  }
+  
+  if (persistenceMode === "storage") {
     await chrome.storage.local.set({
       [storageKey(slug)]: Array.from(db.export()),
     });
@@ -338,11 +332,13 @@ export async function dropProjectDb(slug: string): Promise<void> {
     try {
       const root = await navigator.storage.getDirectory();
       await root.removeEntry(dbFileName(slug));
-    }catch (err) {
+    } catch (err) {
       logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, err); 
     }
     // allow-swallow: removeEntry is best-effort cleanup
-  } else if (persistenceMode === "storage") {
+  }
+  
+  if (persistenceMode === "storage") {
     await chrome.storage.local.remove(storageKey(slug));
   }
 

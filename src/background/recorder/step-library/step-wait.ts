@@ -180,7 +180,8 @@ function clampTimeout(raw: unknown): number {
 }
 
 function sanitiseRow(raw: unknown): WaitConfig | null {
-  if (!isPlainObject(raw)) {
+  const notPlainObject = !isPlainObject(raw);
+  if (notPlainObject) {
     return null;
   }
 
@@ -215,7 +216,8 @@ function safeReadStore(): RawStore {
     }
 
     const parsed: unknown = JSON.parse(raw);
-    if (!isPlainObject(parsed)) {
+    const notPlainObject = !isPlainObject(parsed);
+    if (notPlainObject) {
       return {};
     }
 

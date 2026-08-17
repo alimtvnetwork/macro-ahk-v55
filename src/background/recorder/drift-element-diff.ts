@@ -133,7 +133,8 @@ function classifyVerdict(
   fields: ReadonlyArray<DriftFieldDiff>,
   hasChanges: boolean,
 ): DriftVerdict {
-  if (!hasChanges) {
+  const hasNoChanges = !hasChanges;
+  if (hasNoChanges) {
     return "Identical";
   }
 

@@ -177,11 +177,15 @@ export async function mirrorPipelineLogsToTab(
 
           if (entry.level === "error") {
             console.error(`%c${entry["msg"]}`, lineColor);
-          } else if (entry.level === "warn") {
-            console.warn(`%c${entry["msg"]}`, lineColor);
-          } else {
-            console.log(`%c${entry["msg"]}`, lineColor);
+            continue;
           }
+          
+          if (entry.level === "warn") {
+            console.warn(`%c${entry["msg"]}`, lineColor);
+            continue;
+          }
+          
+          console.log(`%c${entry["msg"]}`, lineColor);
         }
 
         console.groupEnd();

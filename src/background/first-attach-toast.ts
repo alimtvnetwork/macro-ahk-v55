@@ -269,13 +269,17 @@ export function registerFirstAttachToastBridge(): void {
       return false;
     }
 
-    if (message.action === "accept") {
-      void markOriginSeen(url);
-    } else if (message.action === "dismiss-tab") {
-      dismissOriginForTab(tabId, url);
-    } else if (message.action === "dismiss-persist") {
-      void persistDismissOrigin(url);
-      void markOriginSeen(url);
+    switch (message.action) {
+      case "accept":
+        void markOriginSeen(url);
+        break;
+      case "dismiss-tab":
+        dismissOriginForTab(tabId, url);
+        break;
+      case "dismiss-persist":
+        void persistDismissOrigin(url);
+        void markOriginSeen(url);
+        break;
     }
 
     console.log(

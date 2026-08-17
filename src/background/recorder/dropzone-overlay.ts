@@ -143,7 +143,8 @@ function createDropZoneHandlers(
 }
 
 function handleDragEnter(event: DragEvent, state: DropZoneState, setActive: (on: boolean) => void): void {
-  if (!hasFiles(event.dataTransfer)) {
+  const noFiles = !hasFiles(event.dataTransfer);
+  if (noFiles) {
     return; 
   }
 
@@ -155,7 +156,8 @@ function handleDragEnter(event: DragEvent, state: DropZoneState, setActive: (on:
 }
 
 function handleDragOver(event: DragEvent): void {
-  if (!hasFiles(event.dataTransfer)) {
+  const noFiles = !hasFiles(event.dataTransfer);
+  if (noFiles) {
     return; 
   }
 

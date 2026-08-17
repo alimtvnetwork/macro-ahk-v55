@@ -191,7 +191,8 @@ export function loadWebhookConfig(): WebhookConfig {
     }
 
     const parsed: unknown = JSON.parse(raw);
-    if (!isPlainRecord(parsed)) {
+    const notPlainRecord = !isPlainRecord(parsed);
+    if (notPlainRecord) {
       return { ...DEFAULT_WEBHOOK_CONFIG };
     }
 
@@ -265,7 +266,8 @@ function buildCorruptPlaceholder(reason: string): WebhookDeliveryFailure {
 }
 
 export function migrateWebhookDeliveryResult(input: unknown): WebhookDeliveryResult {
-  if (!isPlainRecord(input)) {
+  const notPlainRecord = !isPlainRecord(input);
+  if (notPlainRecord) {
     return buildCorruptPlaceholder("entry is not an object");
   }
 

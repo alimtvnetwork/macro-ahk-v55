@@ -591,7 +591,8 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
   const collisions: string[] = [];
   for (const g of sourceGroups) {
     const isRoot = g.ParentStepGroupId === null || !sourceIdSet.has(g.ParentStepGroupId);
-    if (!isRoot) {
+    const notRoot = !isRoot;
+    if (notRoot) {
       continue;
     }
 

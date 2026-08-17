@@ -54,7 +54,8 @@ export async function loadSession(): Promise<RecordingSession | null> {
   const storage = getStorage();
   const result = await storage.get(RECORDER_SESSION_STORAGE_KEY);
   const value = result[RECORDER_SESSION_STORAGE_KEY];
-  if (!isRecordingSession(value)) {
+  const notRecordingSession = !isRecordingSession(value);
+  if (notRecordingSession) {
     return null; 
   }
 
