@@ -146,7 +146,7 @@ interface MonacoModule {
     CompletionItemInsertTextRule: Record<string, number>;
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // eslint-disable-next-line max-lines-per-function
