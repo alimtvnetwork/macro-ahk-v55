@@ -1173,19 +1173,20 @@ function bindPromptItemClick(
 }
 
 function _buildPromptItemSourceBadge(p: PromptEntry): HTMLElement | null {
-  const isSlugMissing = !p.slug;
+  const slug = p.slug;
+  const isSlugMissing = !slug;
   if (isSlugMissing) {
     return null;
   }
 
-  const src = getSlugPositionSource(p.slug);
+  const src = getSlugPositionSource(slug);
   const meta = POSITION_SOURCE_META[src.source];
   const sourceBadge = document.createElement('span');
   sourceBadge.setAttribute('data-position-source', src.source);
   sourceBadge.textContent = meta.glyph;
   sourceBadge.title =
     meta.tooltip +
-    '\nSlug: ' + p.slug +
+    '\nSlug: ' + slug +
     '\nStorage key: ' + src.storageKey +
     '\nMigration rev: ' + src.migrationRev + ' / current ' + src.currentRev;
   sourceBadge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:' + meta.bg + ';color:hsl(var(--foreground));font-size:9px;font-weight:700;margin-right:5px;flex-shrink:0;cursor:help;';
