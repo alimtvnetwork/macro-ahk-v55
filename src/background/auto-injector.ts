@@ -254,7 +254,8 @@ export async function handleNavigationCompleted(
   // URL guard: skip non-project pages
   const isEligible = isProjectPageUrl(details.url);
 
-  if (!isEligible) {
+  const isMissing046 = !isEligible;
+  if (isMissing046) {
     logUrlGuardSkip(details.tabId, details.url);
 
     return;
