@@ -213,7 +213,8 @@ export function deriveUrlTabClickParams(
     return null;
   }
 
-  if (!shouldRecordAsUrlTabClick(hint)) {
+  const isMissing = !shouldRecordAsUrlTabClick(hint);
+  if (isMissing) {
     return null;
   }
 
