@@ -54,7 +54,8 @@ export async function handleDynamicRequire(
   const request = message as DynamicRequireMessage;
   const { target, requesterProjectId, tabId } = request;
 
-  if (!target || !requesterProjectId || !tabId) {
+  const isCallerContextMissing = !target || !requesterProjectId || !tabId;
+  if (isCallerContextMissing) {
     logDynamicLoad(requesterProjectId ?? "unknown", target ?? "unknown", "error", "Missing required fields");
 
     return { isOk: false, errorMessage: "DYNAMIC_REQUIRE: missing target, requesterProjectId, or tabId" };
@@ -64,14 +65,16 @@ export async function handleDynamicRequire(
 
   // --- Resolve requester project ---
   const requester = allProjects.find((p) => p.id === requesterProjectId);
-  if (!requester) {
+  const isRequesterMissing = !requester;
+  if (isRequesterMissing) {
     logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
 
     return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
   }
 
   // --- Check allowDynamicRequests flag ---
-  if (!requester.settings?.allowDynamicRequests) {
+  const isDynamicRequestsDisabled = !requester.settings?.allowDynamicRequests;
+  if (isDynamicRequestsDisabled) {
     logDynamicLoad(requesterProjectId, target, "denied", "allowDynamicRequests is disabled");
 
     return {
@@ -82,7 +85,8 @@ export async function handleDynamicRequire(
 
   // --- Resolve target project + script ---
   const resolved = resolveTarget(target, allProjects);
-  if (!resolved) {
+  const isResolutionFailed = !resolved;
+  if (isResolutionFailed) {
     logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
 
     return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
@@ -103,7 +107,8 @@ export async function handleDynamicRequire(
   // --- Load script code ---
   try {
     const code = await loadScriptCode(targetProject.id, targetScript);
-    if (!code) {
+    const isCodeMissing = !code;
+    if (isCodeMissing) {
       logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
 
       return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };

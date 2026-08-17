@@ -369,17 +369,18 @@ export async function handleRefreshToken(
   }
 
   // Strategy 2: Supabase localStorage JWT
-  if (!authToken) {
+  const isAuthTokenMissing = !authToken;
+  if (isAuthTokenMissing) {
     authToken = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
   }
 
   // Strategy 3: Signed URL token fallback (no network)
-  if (!authToken) {
+  if (isAuthTokenMissing) {
     authToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
   }
 
   // Strategy 4: Opaque session-cookie exchange
-  if (!authToken) {
+  if (isAuthTokenMissing) {
     authToken = await fetchAuthTokenFromSessionExchange(
       projectId,
       sessionId !== null || refreshToken !== null,
@@ -589,7 +590,8 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
         func: function scanLocalStorageForJwt(): string | null {  
           try {
             const check = (raw: string | null) => {
-              if (!raw) {
+              const isRawDataMissing = !raw;
+              if (isRawDataMissing) {
                 return null;
               }
 
@@ -676,7 +678,8 @@ async function resolvePrimaryUrl(tabUrlHint?: string): Promise<string> {
 }
 
 function extractSignedUrlTokenFromUrl(url: string | null | undefined): string | null {
-  if (!url) {
+  const isUrlMissing = !url;
+  if (isUrlMissing) {
     return null;
   }
 
@@ -735,7 +738,8 @@ async function fetchAuthTokenFromSessionExchange(
       method: "GET",
       credentials: "include",
     });
-    if (!response.ok) {
+    const isResponseFailed = !response.ok;
+    if (isResponseFailed) {
       logBgWarnError(
         BgLogTag.CONFIG_AUTH,
         `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +
@@ -882,7 +886,8 @@ async function discoverAuthCookieNames(primaryUrl: string): Promise<CookieDiscov
   const authLikeCookieNames = new Set<string>();
   const canListCookies = typeof chrome.cookies?.getAll === "function";
 
-  if (!canListCookies) {
+  const isListCookiesProhibited = !canListCookies;
+  if (isListCookiesProhibited) {
     return { checkedUrls, authLikeCookieNames: [] };
   }
 

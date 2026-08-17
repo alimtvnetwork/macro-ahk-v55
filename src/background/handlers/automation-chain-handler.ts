@@ -169,7 +169,8 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
   const raw = request as ChainMessage;
   const project = resolveProject(raw);
   const chain = raw.chain;
-  if (!chain || !chain.name || !chain.slug) {
+  const isChainDataInvalid = !chain || !chain.name || !chain.slug;
+  if (isChainDataInvalid) {
     return { isOk: false, errorMessage: "Chain name and slug are required" };
   }
 
@@ -218,7 +219,8 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
   const raw = request as ChainMessage;
   const project = resolveProject(raw);
   const chainId = raw.chainId;
-  if (!chainId) {
+  const isChainIdMissing = !chainId;
+  if (isChainIdMissing) {
     return { isOk: false, errorMessage: "Missing chainId" };
   }
 
@@ -241,7 +243,8 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
   const raw = request as ChainMessage;
   const project = resolveProject(raw);
   const chainId = raw.chainId;
-  if (!chainId) {
+  const isChainIdMissing = !chainId;
+  if (isChainIdMissing) {
     return { isOk: false, errorMessage: "Missing chainId" };
   }
 
@@ -267,7 +270,8 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
   const raw = request as ChainMessage;
   const project = resolveProject(raw);
   const chains = raw.chains;
-  if (!Array.isArray(chains)) {
+  const isChainsArrayMissing = !Array.isArray(chains);
+  if (isChainsArrayMissing) {
     return { isOk: false, errorMessage: "Expected chains array" };
   }
 

@@ -42,7 +42,8 @@ export function bindFileStorageDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-  if (!dbManager) {
+  const isDbManagerMissing = !dbManager;
+  if (isDbManagerMissing) {
     throw new Error("[file-storage] DbManager not bound");
   }
 
@@ -74,11 +75,13 @@ export async function handleFileSave(
   const projectId = requireProjectId(raw.projectId);
   const filename = requireField(raw.filename);
   const dataBase64 = typeof raw.dataBase64 === "string" ? raw.dataBase64 : null;
-  if (!projectId) {
+  const isProjectIdMissing = !projectId;
+  if (isProjectIdMissing) {
     return missingFieldError("projectId", "file:save");
   }
 
-  if (!filename) {
+  const isFilenameMissing = !filename;
+  if (isFilenameMissing) {
     return missingFieldError("filename", "file:save");
   }
 
@@ -120,7 +123,8 @@ export async function handleFileGet(
 ): Promise<{ file: (FileEntry & { dataBase64: string }) | null } | HandlerErrorResponse> {
   const raw = request as MessageRequest & { fileId?: unknown };
   const fileId = requireField(raw.fileId);
-  if (!fileId) {
+  const isFileIdMissing = !fileId;
+  if (isFileIdMissing) {
     return missingFieldError("fileId", "file:get");
   }
 
@@ -159,7 +163,8 @@ export async function handleFileList(
 ): Promise<{ files: FileEntry[] } | HandlerErrorResponse> {
   const raw = request as MessageRequest & { projectId?: unknown };
   const projectId = requireProjectId(raw.projectId);
-  if (!projectId) {
+  const isProjectIdMissing = !projectId;
+  if (isProjectIdMissing) {
     return missingFieldError("projectId", "file:list");
   }
 
@@ -196,7 +201,8 @@ export async function handleFileDelete(
 ): Promise<{ isOk: true } | HandlerErrorResponse> {
   const raw = request as MessageRequest & { fileId?: unknown };
   const fileId = requireField(raw.fileId);
-  if (!fileId) {
+  const isFileIdMissing = !fileId;
+  if (isFileIdMissing) {
     return missingFieldError("fileId", "file:delete");
   }
 
