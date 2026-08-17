@@ -115,7 +115,7 @@ function interceptXhr(): void {
       }
     }, { once: true });
 
-    return originalSend.apply(this, args as any);
+    return originalSend.apply(this, args as unknown);
   };
 }
 
