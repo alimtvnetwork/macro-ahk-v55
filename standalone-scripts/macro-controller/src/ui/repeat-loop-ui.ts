@@ -26,7 +26,6 @@ import { captureChatSubmit } from '../capture/chat-submit-capture';
 import { buildNextSelectorControl } from './next-selector-control';
 import { RepeatPhaseType, CssDisplayType } from "../types/enums";
 
-
 export const PRESETS = [1, 2, 3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 50, 60, 70, 75, 80, 100, 200] as const;
 /**
  * Issue 06 (2026-07-18) — PlanTierType-23 step 3. The repeat preset chip row rendered

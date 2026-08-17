@@ -1,5 +1,3 @@
-
-
 import type { PopoverA11y } from './next-inline-ui';
 
 export interface PopoverDependencies {

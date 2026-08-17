@@ -18,6 +18,7 @@ export default tseslint.config(
       "skipped",
       "test-results",
       "v1.72.3-working-code",
+      "standalone-scripts/**/*.js",
     ],
   },
   {

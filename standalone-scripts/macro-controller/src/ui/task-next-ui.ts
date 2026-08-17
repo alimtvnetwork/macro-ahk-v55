@@ -1,4 +1,3 @@
-
 /**
  * MacroLoop Controller — Task Next Automation UI
  * Step 03e: Extracted from createUI() closure

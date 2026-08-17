@@ -103,8 +103,6 @@ function buildResult(
   return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
 }
 
-
-
 async function handleNonOkResponse(
   response: Response,
   options: FetchCreditBalanceOptions,

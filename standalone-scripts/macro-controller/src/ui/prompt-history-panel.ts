@@ -1,4 +1,3 @@
-
 /**
  * prompt-history-panel.ts - Restore-from-revision UI for PlanTierType/Next prompts.
  *

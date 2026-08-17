@@ -1,4 +1,3 @@
-
 export const STYLE_DISPLAY_FLEX = 'flex';
 export const STYLE_DISPLAY_NONE = 'none';
 export const ATTR_ARIA_EXPANDED = 'aria-expanded';
