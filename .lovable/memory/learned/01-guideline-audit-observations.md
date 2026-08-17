@@ -1,6 +1,6 @@
 # Guideline Audit Observations - 2026-08-17
 
-> Audit date: 2026-08-17T20:50:00+08:00
+> Audit date: 2026-08-17T12:50:00Z
 > Auditor: Self-loop (no subagents)
 > Scope: src/background/handlers/, standalone-scripts/macro-controller/src/
 
