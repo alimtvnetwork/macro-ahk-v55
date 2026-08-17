@@ -86,7 +86,7 @@ function isAuditSeverity(value: string): value is AuditSeverity {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateItem(raw: any, index: number): AuditItem | string {
+function validateItem(raw: unknown, index: number): AuditItem | string {
   if (raw === null || typeof raw !== "object") {
     return `Items[${index}]: not an object`;
   }
