@@ -346,7 +346,8 @@ function _renderFresh(
   // Append Search Bar
   promptsDropdown.appendChild(buildSearchInput(ctx, taskNextDeps));
 
-  if (!entries.length) {
+  const isEntriesEmpty = !entries.length;
+  if (isEntriesEmpty) {
     renderEmptyState(promptsDropdown, ctx, taskNextDeps);
 
     return;
@@ -365,7 +366,9 @@ function _appendHeaderAndSubmenu(
   taskNextDeps: TaskNextDeps,
 ): void {
   // Mark dropdown so the Tasks toggle can find the group from any descendant click.
-  if (!container.hasAttribute('data-prompts-dropdown')) {
+  const isPromptDropdownContainer = container.hasAttribute('data-prompts-dropdown');
+  const isNonDropdownContainer = !isPromptDropdownContainer;
+  if (isNonDropdownContainer) {
     container.setAttribute('data-prompts-dropdown', '1');
   }
 
@@ -533,7 +536,8 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
 /** Re-attach the Load button handler in the dropdown header. */
 function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const header = container.firstElementChild as HTMLElement;
-  if (!header) {
+  const isHeaderMissing = !header;
+  if (isHeaderMissing) {
     return;
   }
 
@@ -939,7 +943,8 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
     queueBtn.onclick = async (e: Event) => {
       e.stopPropagation();
       const prompt = findNextTasksPrompt(taskNextDeps);
-      if (!prompt) {
+      const isPromptMissing = !prompt;
+      if (isPromptMissing) {
         showPasteToast('❌ "Next Tasks" prompt not found', true);
 
         return;

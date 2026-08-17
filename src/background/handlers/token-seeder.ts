@@ -232,18 +232,21 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 
     for (let i = 0; i < len; i++) {
       const key = localStorage.key(i);
-      if (!key) {
+      const isKeyMissing = !key;
+      if (isKeyMissing) {
         continue;
       }
 
       // Match Supabase auth token keys: sb-<ref>-auth-token
       const isSupabaseKey = key.startsWith("sb-") && key.includes("-auth-token");
-      if (!isSupabaseKey) {
+      const isNonSupabaseKey = !isSupabaseKey;
+      if (isNonSupabaseKey) {
         continue;
       }
 
       const raw = localStorage.getItem(key);
-      if (!raw || raw.length < 20) {
+      const isRawTokenInvalid = !raw || raw.length < 20;
+      if (isRawTokenInvalid) {
         continue;
       }
 

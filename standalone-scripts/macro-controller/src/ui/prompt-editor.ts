@@ -198,7 +198,8 @@ function resolveTemplatePreview(input: OpenPromptEditorInput): { body: string; s
  */
 export async function openPromptEditor(input: OpenPromptEditorInput): Promise<void> {
   const rc = getRevalidateContext();
-  if (!rc) {
+  const isRcMissing = !rc;
+  if (isRcMissing) {
     reportEditorFailure(
       'PROMPT_EDIT_E002',
       { role: input.role, action: input.promptId !== undefined ? 'edit' : 'add' },
@@ -246,7 +247,8 @@ function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['pr
   }
 
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  if (!seed) {
+  const isSeedMissing = !seed;
+  if (isSeedMissing) {
     return undefined;
   }
 
@@ -266,7 +268,8 @@ function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: s
   }
 
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  if (!seed) {
+  const isSeedMissing = !seed;
+  if (isSeedMissing) {
     return undefined;
   }
 
@@ -379,7 +382,8 @@ async function openWithDriftCheck(
     detail: isClean ? 'confirmed' : ('drift body=' + String(bodyMatches) + ' name=' + String(nameMatches)),
     metrics: { promptId: dbRow.Id },
   });
-  if (!isClean) {
+  const isDirty = !isClean;
+  if (isDirty) {
     logDiagnosticFromCode('PROMPT_EDIT_E004', {
       role, slug: dbRow.Slug, promptId: dbRow.Id,
       bodyMatches: String(bodyMatches), nameMatches: String(nameMatches),
@@ -639,7 +643,8 @@ async function loadEditablePrompt(role: PromptRole, id: number): Promise<Editabl
   }
 
   const row = listed?.value.find((r: PromptRow) => r.Id === id);
-  if (!row) {
+  const isRowMissing = !row;
+  if (isRowMissing) {
     logDiagnosticFromCode('PROMPT_EDIT_E007', { role, promptId: id });
 
     return null;

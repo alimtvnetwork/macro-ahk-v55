@@ -148,7 +148,8 @@ function initTelemetry(): Map<PromptRole, RoleTelemetry> {
 function tallyInsertCounts(existing: Set<string>, tel: Map<PromptRole, RoleTelemetry>): void {
   for (const row of PLAN_NEXT_SEED_ROWS) {
     const bucket = tel.get(row.role);
-    if (!bucket) {
+    const isBucketMissing = !bucket;
+    if (isBucketMissing) {
       continue;
     }
 
@@ -261,7 +262,8 @@ function isManagedPlanPromptDrift(slug: string, body: string): boolean {
 }
 
 function isBundledDefaultDrift(row: typeof PLAN_NEXT_SEED_ROWS[number], body: string): boolean {
-  if (!row.isDefault) {
+  const isRowAlternate = !row.isDefault;
+  if (isRowAlternate) {
     return false;
   }
 
@@ -404,7 +406,8 @@ async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]):
   }
 
   const match = resolveUpgradeMatch(row, currentBody);
-  if (!match.isMatch) {
+  const isMatchFailed = !match.isMatch;
+  if (isMatchFailed) {
     emitLegacySkip(row, match.detail, currentBody.length);
 
     return false;
