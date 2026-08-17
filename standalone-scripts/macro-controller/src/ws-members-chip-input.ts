@@ -93,12 +93,18 @@ export function createChipInput(options: { // eslint-disable-line max-lines-per-
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addEmail(input.value);
-    } else if (e.key === 'Backspace' && !input.value && validEmails.size > 0) {
-      const last = Array.from(validEmails).pop();
-      if (last) {
-        validEmails.delete(last);
-        renderChips();
-        options.onValidEmailsChange?.(Array.from(validEmails));
+    } else {
+      const isBackspaceKey = e.key === 'Backspace';
+      const isInputEmpty = !input.value;
+      const hasChips = validEmails.size > 0;
+      const isBackspaceOnEmptyWithChips = isBackspaceKey && isInputEmpty && hasChips;
+      if (isBackspaceOnEmptyWithChips) {
+        const last = Array.from(validEmails).pop();
+        if (last) {
+          validEmails.delete(last);
+          renderChips();
+          options.onValidEmailsChange?.(Array.from(validEmails));
+        }
       }
     }
   };

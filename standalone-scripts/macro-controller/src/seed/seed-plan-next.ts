@@ -445,7 +445,13 @@ async function writeSeedAuditRow(params: {
 }): Promise<void> {
   const promoted = params.telemetry.reduce((s, t) => s + t.promotedDefault, 0);
   const isFailure = params.reason.startsWith('failed:') || params.reason.startsWith('caught:');
-  if (!isFailure && params.inserted === 0 && promoted === 0 && params.upgraded === 0) {
+  const isBootSuccessful = !isFailure;
+  const isNoNewData =
+    params.inserted === 0 &&
+    promoted === 0 &&
+    params.upgraded === 0;
+  const isNoChangeBoot = isBootSuccessful && isNoNewData;
+  if (isNoChangeBoot) {
     emitPromptSeedEvent({
       event: 'seed.audit-skip', outcome: 'skipped',
       detail: 'no-observable-change',

@@ -12,6 +12,14 @@
 import type { MacroControllerConfig, MacroThemeRoot, ThemePreset } from './types';
 import { SUPPORTED_CONFIG_SCHEMA, SUPPORTED_THEME_SCHEMA } from './constants';
 
+function isInvalidThemePreset(preset: unknown): boolean {
+  return (
+    !!preset &&
+    preset !== 'dark' &&
+    preset !== 'light'
+  );
+}
+
 // ── Validation warning collector ──
 const validationWarnings: string[] = [];
 
@@ -169,7 +177,7 @@ export function validateTheme(raw: unknown): MacroThemeRoot {
   }
 
   // Validate activePreset
-  if (theme.activePreset && theme.activePreset !== 'dark' && theme.activePreset !== 'light') {
+  if (isInvalidThemePreset(theme.activePreset)) {
     warn('Theme: activePreset "' + theme.activePreset + '" is not "dark" or "light" — falling back to "dark"');
     theme.activePreset = 'dark';
   }

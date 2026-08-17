@@ -402,8 +402,7 @@ function _appendFilteredItems(
   entries = entries.filter(e => !isHiddenBySlug(e));
   entries = sortEntriesByOrder(entries);
   // 0. Render Suggestions (if no search and not in a specific category)
-  const hasNoFilterActive = !getPromptCategoryFilter() && !_currentSearchQuery;
-  if (hasNoFilterActive) {
+  if (isNoFilterActive()) {
     const suggestions = getSuggestedPrompts(entries);
     if (suggestions.length > 0) {
       const sugHeader = document.createElement('div');
@@ -422,7 +421,7 @@ function _appendFilteredItems(
   // 1. Render Favorites (pinned to top)
 
   const favorites = entries.filter(p => p.isFavorite);
-  if (favorites.length > 0 && !getPromptCategoryFilter() && !_currentSearchQuery) {
+  if (favorites.length > 0 && isNoFilterActive()) {
     const favHeader = document.createElement('div');
     favHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:hsl(var(--warning));background:rgba(250,204,21,0.05);text-transform:uppercase;letter-spacing:0.5px;';
     favHeader.textContent = '⭐ Favorites';
@@ -820,6 +819,10 @@ function _computeFilterKey(): string {
   const multi = Array.from(getPromptCategoryFilterSet()).sort().join(',');
 
   return legacy + '|' + multi + '|' + _currentSearchQuery;
+}
+
+function isNoFilterActive(): boolean {
+  return !getPromptCategoryFilter() && !_currentSearchQuery;
 }
 
 function filterByCategory<T extends { name: string; text: string; slug?: string; category?: string; tags?: string[] }>(entries: T[]): T[] {

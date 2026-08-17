@@ -19,6 +19,14 @@ import { TaskQueueManager } from './task-manager';
 import { pushOverlayError } from './ui/error-overlay';
 import type { DiagnosticDump } from './types';
 
+function isReloadShortcut(event: KeyboardEvent): boolean {
+  return (
+    event.ctrlKey &&
+    event.altKey &&
+    event.key.toLowerCase() === 'r'
+  );
+}
+
 /** Install global error and unhandled rejection handlers. */
 export function setupGlobalErrorHandlers(): void {
   window.addEventListener('error', function (event: ErrorEvent) {
@@ -64,7 +72,7 @@ export function setupGlobalErrorHandlers(): void {
 
   // Hotkey: Ctrl + Alt + R to resume queue
   window.addEventListener('keydown', function (e) {
-    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'r') {
+    if (isReloadShortcut(e)) {
       e.preventDefault();
       if (!state.running) {
         log('Hotkey: Loop is not running — cannot resume queue', 'warn');

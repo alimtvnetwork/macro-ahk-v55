@@ -451,7 +451,8 @@ export async function exportDatabaseDump(): Promise<void> {
       endpoint: 'dump'
     });
     
-    if (resp && resp.ok && resp.dump) {
+    const isValidDumpResponse = resp !== null && resp.ok === true && resp.dump !== undefined;
+    if (isValidDumpResponse) {
       const blob = new Blob([resp.dump as string], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

@@ -29,6 +29,14 @@ import type { PromptRow } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { RunSqlMethodType } from "../types/enums";
 
+function isContextWithSlug(value: unknown): value is { slug: string } {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'slug' in (value as object)
+  );
+}
+
 /** Maximum revisions retained per Slug. Older revisions are trimmed on write. */
 export const PROMPT_REVISION_LIMIT_PER_SLUG = 20;
 
@@ -61,8 +69,8 @@ function fail<T>(where: string, message: string, context?: unknown): DbResult<T>
 }
 
 function extractSlugFromContext(context: unknown): string {
-  if (context && typeof context === 'object' && 'slug' in context) {
-    const s = (context as { slug: unknown }).slug;
+  if (isContextWithSlug(context)) {
+    const s = context.slug;
     if (typeof s === 'string') {
       return s;
     }

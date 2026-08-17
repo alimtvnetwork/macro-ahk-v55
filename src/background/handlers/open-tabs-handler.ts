@@ -182,7 +182,12 @@ function resolveProjectBinding(
 ): { projectId: string | null; bindingSource: OpenLovableTabInfo["bindingSource"] } {
   let projectId: string | null = record?.projectId ?? null;
   let bindingSource: OpenLovableTabInfo["bindingSource"] = record !== undefined ? "injection" : "none";
-  if (projectId === null && probePayload && typeof probePayload.projectId === "string" && probePayload.projectId !== "") {
+  const isProjectIdAbsent = projectId === null;
+  const isValidProjectProbe =
+    probePayload !== null &&
+    typeof probePayload.projectId === "string" &&
+    probePayload.projectId !== "";
+  if (isProjectIdAbsent && isValidProjectProbe) {
     projectId = probePayload.projectId;
     bindingSource = "probe";
   }

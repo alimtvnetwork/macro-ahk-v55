@@ -51,6 +51,14 @@ export type {
 /*  Namespace resolution                                               */
 /* ------------------------------------------------------------------ */
 
+function isNonExtensibleObject(value: unknown): boolean {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Object.isExtensible(value as object)
+  );
+}
+
 // CQ11: Singleton for cached namespace reference
 class NamespaceCache {
   private _ns: MacroControllerNamespace | null = null;
@@ -119,7 +127,7 @@ function ensureMutableBranch<T extends object>(node: T): T {
     const n = node as unknown as Record<string, unknown>;
     for (const key of ['api', '_internal', 'meta'] as const) {
       const child = n[key];
-      if (child && typeof child === 'object' && !Object.isExtensible(child)) {
+      if (isNonExtensibleObject(child)) {
         n[key] = { ...(child as Record<string, unknown>) };
       }
     }
@@ -131,7 +139,7 @@ function ensureMutableBranch<T extends object>(node: T): T {
   const clone = { ...(node as unknown as Record<string, unknown>) };
   for (const key of ['api', '_internal', 'meta'] as const) {
     const child = clone[key];
-    if (child && typeof child === 'object' && !Object.isExtensible(child)) {
+    if (isNonExtensibleObject(child)) {
       clone[key] = { ...(child as Record<string, unknown>) };
     }
   }
