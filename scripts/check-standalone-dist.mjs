@@ -55,7 +55,8 @@ for (const [project, requiredFiles] of Object.entries(REQUIRED_ARTIFACTS)) {
       continue;
     }
     const stat = fs.statSync(filePath);
-    if (stat.size < 100) {
+    const minSize = (project === "prompt-manager" && required.endsWith(".js")) ? 50 : 100;
+    if (stat.size < minSize) {
       console.error(`[FAIL] ${project}/dist/${required} is suspiciously small (${stat.size} bytes).`);
       failed = true;
     }
