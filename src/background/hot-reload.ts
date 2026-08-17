@@ -117,7 +117,8 @@ async function pollBuildMeta(): Promise<void> {
     const currentBuildId = meta.buildId ?? null;
     const hasBuildId = currentBuildId !== null;
 
-    if (!hasBuildId) {
+    const isMissing063 = !hasBuildId;
+    if (isMissing063) {
       return;
     }
 
