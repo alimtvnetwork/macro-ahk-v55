@@ -121,7 +121,8 @@ export function setBootStep(step: string): void {
   const now = performance.now();
   const isFirstStep = bootStep === "pre-init" && step === "pre-init";
 
-  if (!isFirstStep) {
+  const isMissing = !isFirstStep;
+  if (isMissing) {
     const durationMs = Math.round(now - stepStartTime);
     bootTimings.push({ step: bootStep, durationMs });
   }
