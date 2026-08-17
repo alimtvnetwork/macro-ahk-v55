@@ -128,7 +128,7 @@ function buildXhrEntry(
 
   return {
     method: (xhr as unknown).__marco_method ?? "UNKNOWN",
-    url: (xhr as any).__marco_url ?? "",
+    url: (xhr as unknown).__marco_url ?? "",
     status: xhr.status,
     statusText: xhr.statusText || "",
     durationMs: Math.round(endTime - startTime),
