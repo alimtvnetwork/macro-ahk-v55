@@ -136,7 +136,8 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
       }
 
       const isVersionSatisfied = satisfiesVersion(depProject.version, dep.version);
-      if (!isVersionSatisfied) {
+      const isMissing059 = !isVersionSatisfied;
+      if (isMissing059) {
         return {
           order: [],
           isSuccess: false,
