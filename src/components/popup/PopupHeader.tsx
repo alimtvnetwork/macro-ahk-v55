@@ -18,7 +18,7 @@ interface Props {
 /** Reads the 4-part manifest version at runtime (e.g. "1.37.0.0"). */
 function getManifestVersion(): string | null {
   try {
-    const runtime = (globalThis as any).chrome?.runtime;
+    const runtime = (globalThis as unknown).chrome?.runtime;
     if (typeof runtime?.getManifest === "function") {
       return runtime.getManifest().version ?? null;
     }
