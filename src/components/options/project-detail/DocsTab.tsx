@@ -30,7 +30,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
     setGenerating(true);
     try {
       const resp = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({
-        type: "GENERATE_SCHEMA_DOCS" as any,
+        type: "GENERATE_SCHEMA_DOCS" as unknown,
         project: slug,
         format: "both",
       });
