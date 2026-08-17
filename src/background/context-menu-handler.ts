@@ -214,7 +214,8 @@ async function doRebuildProjectSubmenu(): Promise<void> {
   const projects = projectData?.allProjects ?? [];
   const hasProjects = projects.length > 0;
 
-  if (!hasProjects) {
+  const isMissing = !hasProjects;
+  if (isMissing) {
     createNoProjectsMenuItem();
 
     return;
