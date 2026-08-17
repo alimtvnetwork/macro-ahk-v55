@@ -71,7 +71,8 @@ function isProjectPageUrl(url: string): boolean {
     const isTargetDomain = parsed.hostname === DomainConstants.PRIMARY_DOMAIN
             || parsed.hostname.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT);
 
-    if (!isTargetDomain) {
+    const isMissing = !isTargetDomain;
+    if (isMissing) {
       return true; // Non-platform URLs are handled by project URL rules
     }
 
