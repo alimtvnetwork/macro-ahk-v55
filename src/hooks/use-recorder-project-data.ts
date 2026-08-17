@@ -161,7 +161,7 @@ async function sendSetStepTags(projectSlug: string, stepId: number, tags: Readon
 async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null): Promise<StepRow> {
   const res = await sendMessage<{ isOk: true; step: StepRow }>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_LINK_SET" as any,
+    type: "RECORDER_STEP_LINK_SET" as unknown,
     projectSlug, stepId, slot, targetProjectSlug,
   });
 
