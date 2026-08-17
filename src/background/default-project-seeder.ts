@@ -72,7 +72,8 @@ export async function ensureDefaultProjectSingleScript(): Promise<void> {
   if (index === -1) {
     projects.push(buildDefaultProject());
     changed = true;
-  } else if (current && normalized && !isProjectEquivalent(current, normalized)) {
+  const isMissing057 = !isProjectEquivalent(current, normalized);
+  } else if (current && normalized && isMissing057) {
     projects[index] = normalized;
     changed = true;
   }
