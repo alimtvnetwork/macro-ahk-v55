@@ -77,7 +77,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
 
     setLoading(true);
     try {
-      const response = await sendMessage<unknown>(message as any);
+      const response = await sendMessage<unknown>(message as unknown);
       setResponseJson(toPrettyJson(response));
     } catch (error) {
       setResponseJson(toPrettyJson({
