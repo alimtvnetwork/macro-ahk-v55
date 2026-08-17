@@ -99,7 +99,7 @@ function interceptXhr(): void {
     (this as unknown).__marco_url = truncateUrl(String(url));
     (this as unknown).__marco_startTime = null;
 
-    return originalOpen.apply(this, [method, url, ...rest] as any);
+    return originalOpen.apply(this, [method, url, ...rest] as unknown);
   };
 
   OriginalXhr.prototype.send = function (...args: unknown[]) {
