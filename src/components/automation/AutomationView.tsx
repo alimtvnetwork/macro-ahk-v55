@@ -56,7 +56,7 @@ async function saveChainToDb(chain: Partial<AutomationChain>, project: string): 
     type: "SAVE_AUTOMATION_CHAIN",
     project,
     chain,
-  } as any);
+  } as unknown);
 
   return result.isOk;
 }
