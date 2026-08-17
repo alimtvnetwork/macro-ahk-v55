@@ -54,7 +54,8 @@ export function startHotReload(): void {
     return;
   }
 
-  if (!isDevBuild()) {
+  const isMissing = !isDevBuild();
+  if (isMissing) {
     console.log("[hot-reload] Disabled (production build) — not polling build-meta.json");
 
     return;
