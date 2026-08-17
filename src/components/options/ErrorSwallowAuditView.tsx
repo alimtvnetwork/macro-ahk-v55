@@ -106,7 +106,7 @@ function validateItem(raw: unknown, index: number): AuditItem | string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function validateReport(raw: any): AuditReport | string {
+function validateReport(raw: unknown): AuditReport | string {
   if (raw === null || typeof raw !== "object") {
     return "Report root is not an object";
   }
