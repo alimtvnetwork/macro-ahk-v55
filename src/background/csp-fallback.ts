@@ -358,13 +358,13 @@ async function tryInjectViaScripting(
 
     const domTarget = results?.[0]?.result as string | undefined;
 
-    return { isSuccess: true, domTarget: domTarget ?? "unknown" };
+    return { isSuccess: true, isFail: false, domTarget: domTarget ?? "unknown" };
   } catch (injectionError) {
     const errorMessage = injectionError instanceof Error
       ? injectionError.message
       : String(injectionError);
 
-    return { isSuccess: false, errorMessage };
+    return { isSuccess: false, isFail: true, errorMessage };
   }
 }
 
@@ -703,7 +703,7 @@ function buildResult(
   errorMessage?: string,
   domTarget?: CspInjectionResult["domTarget"],
 ): CspInjectionResult {
-  return { isSuccess, world, isFallback, errorMessage, domTarget };
+  return { isSuccess, isFail: !isSuccess, world, isFallback, errorMessage, domTarget };
 }
 
 /* ------------------------------------------------------------------ */

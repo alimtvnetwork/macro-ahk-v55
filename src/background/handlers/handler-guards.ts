@@ -122,7 +122,7 @@ export class SqliteBindError extends Error {
 export function safeBind(
   params: ReadonlyArray<unknown>,
   op: string,
-  options: { allowUndefined: boolean } = {},
+  options: { allowUndefined?: boolean } = {},
 ): Array<string | number | null | Uint8Array> {
   const allowUndefined = options.allowUndefined ?? true;
   const out: Array<string | number | null | Uint8Array> = [];

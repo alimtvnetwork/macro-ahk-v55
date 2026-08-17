@@ -180,6 +180,7 @@ export function collectInlineSyntaxFailures(
       scriptId: inlineScript.id,
       scriptName,
       isSuccess: false,
+      isFail: true,
       errorMessage: `Script "${scriptName}" has a syntax error: ${syntaxError}`,
       durationMs: 0,
     });

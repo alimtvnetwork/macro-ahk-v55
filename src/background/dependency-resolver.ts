@@ -131,6 +131,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
         return {
           order: [],
           isSuccess: false,
+          isFail: true,
           errorMessage: `Dependency not found\n  Path: Project dependency graph → "${p.id}".dependencies\n  Missing: Project with id="${dep.projectId}"\n  Reason: "${p.id}" declares dependency on "${dep.projectId}" but no project with that ID exists in the resolved project set`,
         };
       }
@@ -141,6 +142,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
         return {
           order: [],
           isSuccess: false,
+          isFail: true,
           errorMessage: `Version mismatch in dependency\n  Path: Project "${p.id}" → dependsOn "${dep.projectId}@${dep.version}"\n  Missing: Compatible version of "${dep.projectId}" (found v${depProject.version})\n  Reason: "${p.id}" requires "${dep.projectId}@${dep.version}" but installed version is "${depProject.version}" which does not satisfy the range`,
         };
       }
@@ -201,9 +203,10 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
     return {
       order: [],
       isSuccess: false,
+      isFail: true,
       errorMessage: `Circular dependency detected\n  Path: Project dependency graph (topological sort)\n  Missing: Valid acyclic injection order\n  Reason: Projects [${missing.join(", ")}] form a dependency cycle — Kahn's algorithm could not resolve them`,
     };
   }
 
-  return { order, isSuccess: true };
+  return { order, isSuccess: true, isFail: false };
 }

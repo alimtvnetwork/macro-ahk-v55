@@ -145,6 +145,7 @@ describe("resolveInjectionPath", () => {
   it("maps USER_SCRIPT world → userScripts", () => {
     const result: CspInjectionResult = {
       isSuccess: true,
+      isFail: false,
       world: "USER_SCRIPT",
       isFallback: false,
     };
@@ -154,6 +155,7 @@ describe("resolveInjectionPath", () => {
   it("maps ISOLATED + isFallback → isolated-blob", () => {
     const result: CspInjectionResult = {
       isSuccess: true,
+      isFail: false,
       world: "ISOLATED",
       isFallback: true,
     };
@@ -163,6 +165,7 @@ describe("resolveInjectionPath", () => {
   it("maps MAIN world → main-blob", () => {
     const result: CspInjectionResult = {
       isSuccess: true,
+      isFail: false,
       world: "MAIN",
       isFallback: false,
     };
@@ -172,6 +175,7 @@ describe("resolveInjectionPath", () => {
   it("maps ISOLATED without fallback → main-blob (default)", () => {
     const result: CspInjectionResult = {
       isSuccess: true,
+      isFail: false,
       world: "ISOLATED",
       isFallback: false,
     };

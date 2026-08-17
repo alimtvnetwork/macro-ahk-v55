@@ -20,10 +20,10 @@ import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/
 interface SyncBadgeProps {
   state: LinkStateType;
   pinnedVersion?: string | null;
-  updateAvailable: boolean;
+  updateAvailable?: boolean;
 }
 
-export function SyncBadge({ state, pinnedVersion, updateAvailable }: SyncBadgeProps) {
+export function SyncBadge({ state, pinnedVersion, updateAvailable = false }: SyncBadgeProps) {
   const config: Record<LinkStateType, { label: string; className: string; icon: typeof RefreshCw }> = {
     synced: {
       label: "Synced",

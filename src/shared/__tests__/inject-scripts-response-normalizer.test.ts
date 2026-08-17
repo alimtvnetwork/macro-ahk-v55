@@ -23,8 +23,8 @@ import {
 } from "../injection-types";
 
 const sampleResults: InjectionResult[] = [
-  { scriptId: "s1", scriptName: "alpha.js", isSuccess: true, durationMs: 10 },
-  { scriptId: "s2", scriptName: "beta.js", isSuccess: false, durationMs: 4, errorMessage: "boom" },
+  { scriptId: "s1", scriptName: "alpha.js", isSuccess: true, isFail: false, durationMs: 10 },
+  { scriptId: "s2", scriptName: "beta.js", isSuccess: false, isFail: true, durationMs: 4, errorMessage: "boom" },
 ];
 
 describe("normalizeInjectScriptsResponse", () => {

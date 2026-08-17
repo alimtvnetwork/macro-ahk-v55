@@ -42,12 +42,12 @@ export function bindFileStorageDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-  const isDbManagerMissing = !dbManager;
-  if (isDbManagerMissing) {
+  const manager = dbManager;
+  if (!manager) {
     throw new Error("[file-storage] DbManager not bound");
   }
 
-  return dbManager.getLogsDb();
+  return manager.getLogsDb();
 }
 
 function markDirty(): void {

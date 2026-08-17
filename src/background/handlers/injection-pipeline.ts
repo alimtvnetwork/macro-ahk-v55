@@ -198,6 +198,7 @@ export async function injectAllScripts(
           scriptId: meta.id,
           scriptName: meta.name,
           isSuccess: true,
+          isFail: false,
           durationMs,
           injectionPath: execResult.path,
           domTarget: execResult.domTarget,

@@ -85,6 +85,7 @@ function synthesizeCondition(spec: WaitForSpec): Condition {
     Selector: spec.Expression,
     SelectorKind: spec.Kind ?? "Auto",
     Matcher: { Kind: spec.Predicate === "Visible" ? "Visible" : "Exists" },
+    Negate: false,
   };
 
   return predicate;

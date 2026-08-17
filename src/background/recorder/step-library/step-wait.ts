@@ -98,7 +98,7 @@ export type ValidationResult =
 export interface ValidationDeps {
     readonly doc?: Document | null;
     /** When true, force-skip the live document check (useful in non-DOM tests). */
-    readonly skipLiveCheck: boolean;
+    readonly skipLiveCheck?: boolean;
 }
 
 /**

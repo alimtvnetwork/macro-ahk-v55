@@ -116,7 +116,7 @@ export interface NormalizedInjectScriptsResponse {
 export function normalizeInjectScriptsResponse(
   raw: InjectScriptsResponse | null | undefined,
 ): NormalizedInjectScriptsResponse {
-  const safe = raw ?? { results: [] };
+  const safe: Partial<InjectScriptsResponse> = raw ?? { results: [] };
   const results = Array.isArray(safe.results) ? safe.results : [];
   const flag = safe.inlineSyntaxErrorDetected;
   if (typeof flag === "boolean") {

@@ -28,7 +28,7 @@ export interface XPathOptions {
      * (useful when the document has duplicate ids and you want to see the
      * concrete location).
      */
-    readonly UseIdShortcut: boolean;
+    readonly UseIdShortcut?: boolean;
 }
 
 function tryIdShortcut(el: Element, id: string): string | null {

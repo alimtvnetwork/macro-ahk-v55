@@ -20,18 +20,18 @@ interface CookieQueryDetails {
     name?: string;
     url?: string;
     path?: string;
-    secure: boolean;
-    session: boolean;
+    secure?: boolean;
+    session?: boolean;
     storeId?: string;
 }
 
 interface ScriptInjection {
-    target: { tabId: number; allFrames: boolean };
+    target: { tabId: number; allFrames?: boolean };
     func?: (...args: string[]) => void;
     args?: string[];
     files?: string[];
     world?: string;
-    injectImmediately: boolean;
+    injectImmediately?: boolean;
 }
 
 interface BadgeDetails {

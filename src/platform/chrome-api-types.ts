@@ -42,14 +42,14 @@ declare global {
         }
         namespace scripting {
             type ExecutionWorld = WorldType;
-            interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames: boolean }
+            interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames?: boolean }
             interface ScriptInjection {
                 target: InjectionTarget;
                 files?: string[];
                 func?: (...args: any[]) => any;
                 args?: any[];
                 world?: ExecutionWorld;
-                injectImmediately: boolean;
+                injectImmediately?: boolean;
             }
             interface CSSInjection {
                 target: InjectionTarget;

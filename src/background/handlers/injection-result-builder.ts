@@ -35,6 +35,7 @@ export function buildSuccessResult(
   return {
     scriptId,
     isSuccess: true,
+    isFail: false,
     durationMs: Date.now() - startTime,
     injectionPath,
     domTarget,
@@ -60,6 +61,7 @@ export function buildErrorResult(
   return {
     scriptId,
     isSuccess: false,
+    isFail: true,
     errorMessage,
     durationMs: Date.now() - startTime,
   };
@@ -130,6 +132,7 @@ export function buildSyntaxFailureResult(
     scriptId,
     scriptName,
     isSuccess: false,
+    isFail: true,
     durationMs: Date.now() - startTime,
     errorMessage,
   };

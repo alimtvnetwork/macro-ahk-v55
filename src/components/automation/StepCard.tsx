@@ -79,7 +79,7 @@ interface StepCardProps {
   /** Unique sortable id for dnd-kit */
   sortableId: string;
   /** Whether this card can be dragged (default: false for backward compat) */
-  draggable: boolean;
+  draggable?: boolean;
 }
 
 /* ------------------------------------------------------------------ */

@@ -196,7 +196,7 @@ interface FinalizeOutcome {
     readonly Variables?: ReadonlyArray<VariableContext>;
     readonly Reason?: FailureReasonCode;
     readonly ReasonDetail?: string;
-    readonly Skipped: boolean;
+    readonly Skipped?: boolean;
 }
 
 async function executeStep(

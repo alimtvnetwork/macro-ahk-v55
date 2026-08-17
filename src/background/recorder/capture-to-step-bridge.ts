@@ -229,5 +229,6 @@ export function deriveUrlTabClickParams(
     OperationModeType: "OpenNew",
     Selector: payload.XPathFull,
     SelectorKind: "XPath",
+    DirectOpen: false,
   };
 }
