@@ -82,9 +82,9 @@ export interface ColumnValidation {
 export interface JsonColumnDef {
     Name: string;
     Type: Type;
-    Nullable?: boolean;
+    Nullable: boolean;
     Default?: string;
-    Unique?: boolean;
+    Unique: boolean;
     Description?: string;
     Validation?: ColumnValidation;
 }

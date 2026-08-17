@@ -203,7 +203,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
       const result = await sendMessage<{
         isOk: boolean;
         tables?: Array<{ TableName: string; Description?: string }>;
-        columns?: Array<{ TableName: string; Name: string; Type: string; NotNull?: boolean; Unique?: boolean; Default?: string; Description?: string; ValidationJson?: string }>;
+        columns?: Array<{ TableName: string; Name: string; Type: string; NotNull: boolean; Unique: boolean; Default?: string; Description?: string; ValidationJson?: string }>;
         relations?: Array<{ SourceTable: string; SourceColumn: string; TargetTable: string; TargetColumn?: string; OnDelete?: string }>;
         errorMessage?: string;
       }>({
@@ -309,7 +309,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
       const result = await sendMessage<{
         isOk: boolean;
         tables?: Array<{ TableName: string; Description?: string }>;
-        columns?: Array<{ TableName: string; Name: string; Type: string; NotNull?: boolean; Unique?: boolean; Default?: string; Description?: string; ValidationJson?: string }>;
+        columns?: Array<{ TableName: string; Name: string; Type: string; NotNull: boolean; Unique: boolean; Default?: string; Description?: string; ValidationJson?: string }>;
         relations?: Array<{ SourceTable: string; SourceColumn: string; TargetTable: string; TargetColumn?: string; OnDelete?: string }>;
         errorMessage?: string;
       }>({

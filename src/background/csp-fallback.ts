@@ -19,7 +19,7 @@ import { logBgError } from "@/background/bg-logger";
 /** Result of a CSP-aware injection attempt. */
 export interface CspInjectionResult {
     isSuccess: boolean;
-    isFail?: boolean;
+    isFail: boolean;
     world: chrome.scripting.ExecutionWorld | "USER_SCRIPT";
     isFallback: boolean;
     errorMessage?: string;
@@ -347,7 +347,7 @@ async function tryInjectViaScripting(
   code: string,
   world: chrome.scripting.ExecutionWorld,
 ): Promise<{ isSuccess: boolean;
-    isFail?: boolean; errorMessage?: string; domTarget?: string }> {
+    isFail: boolean; errorMessage?: string; domTarget?: string }> {
   try {
     const results = await chrome.scripting.executeScript({
       target: { tabId },

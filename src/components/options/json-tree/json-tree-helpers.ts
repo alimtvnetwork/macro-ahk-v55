@@ -20,7 +20,7 @@ export function isObject(jsonValue: JsonValue): jsonValue is JsonObject {
 }
 
 /** Check if a value is a JSON primitive (string, number, boolean, null). */
-export function isPrimitive(jsonValue: JsonValue): jsonValue is string | number | boolean | null {
+export function isPrimitive(jsonValue: JsonValue): jsonValue is string | number | boolean {
   const isObj = isObject(jsonValue);
   const isArr = Array.isArray(jsonValue);
 

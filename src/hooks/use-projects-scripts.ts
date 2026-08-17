@@ -31,10 +31,10 @@ interface StoredProject {
   cookies?: CookieBinding[];
   /** @deprecated Use cookies[] instead */
   cookieRules?: CookieRule[];
-  settings?: { isolateScripts?: boolean; logLevel?: string; retryOnNavigate?: boolean; chatBoxXPath?: string; variables?: string; [key: string]: string | number | boolean | undefined };
+  settings?: { isolateScripts: boolean; logLevel?: string; retryOnNavigate: boolean; chatBoxXPath?: string; variables?: string; [key: string]: string | number | boolean };
   dependencies?: Array<{ projectId: string; version: string }>;
-  isGlobal?: boolean;
-  isRemovable?: boolean;
+  isGlobal: boolean;
+  isRemovable: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,8 +47,8 @@ interface StoredScript {
   order: number;
   runAt?: string;
   configBinding?: string;
-  isIife?: boolean;
-  hasDomUsage?: boolean;
+  isIife: boolean;
+  hasDomUsage: boolean;
   updateUrl?: string;
   lastUpdateCheck?: string;
   createdAt: string;

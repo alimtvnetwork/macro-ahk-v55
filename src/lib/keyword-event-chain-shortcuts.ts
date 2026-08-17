@@ -47,7 +47,7 @@ export function isTypingTarget(target: EventTarget | null): boolean {
 
   // EventTarget isn't structurally an Element; guard before reading
   // DOM-specific fields so the helper stays safe in jsdom + headless env.
-  const el = target as Partial<HTMLElement> & { tagName?: string; isContentEditable?: boolean };
+  const el = target as Partial<HTMLElement> & { tagName?: string; isContentEditable: boolean };
   const tag = typeof el.tagName === "string" ? el.tagName.toUpperCase() : "";
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
     return true; 

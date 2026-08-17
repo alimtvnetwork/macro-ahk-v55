@@ -34,7 +34,7 @@ function buildSession(phase: BuildSessionPhaseType): RecordingSession {
   };
 }
 
-function fireChord(key: string, opts: { ctrl?: boolean; alt?: boolean; shift?: boolean; target?: EventTarget } = {}): void {
+function fireChord(key: string, opts: { ctrl: boolean; alt: boolean; shift: boolean; target?: EventTarget } = {}): void {
   const ev = new KeyboardEvent("keydown", {
     key,
     ctrlKey: opts.ctrl ?? true,

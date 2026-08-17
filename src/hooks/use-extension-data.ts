@@ -57,7 +57,7 @@ interface LogRow {
   detail?: string;
   message?: string;
   error_code?: string;
-  [key: string]: string | number | boolean | null | undefined;
+  [key: string]: string | number | boolean | undefined;
 }
 
 export function useStatus() {
@@ -105,7 +105,7 @@ export interface DataBrowserFilters {
   source?: string;
   category?: string;
   search?: string;
-  caseSensitive?: boolean;
+  caseSensitive: boolean;
 }
 
 export function useDataBrowser(database: DatabaseType, pageSize = 20, filters: DataBrowserFilters = {}) {

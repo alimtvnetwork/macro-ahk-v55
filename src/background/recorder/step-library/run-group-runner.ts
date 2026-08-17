@@ -661,7 +661,7 @@ export interface ExpandOptions {
      * When `false`, they remain in the plan with their `IsDisabled`
      * flag intact so a previewer can render them greyed-out.
      */
-    readonly skipDisabled?: boolean;
+    readonly skipDisabled: boolean;
 }
 
 /**

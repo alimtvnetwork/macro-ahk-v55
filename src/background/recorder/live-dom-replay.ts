@@ -113,7 +113,7 @@ export interface ReplayOptions {
      * `mem://standards/verbose-logging-and-failure-diagnostics`, default
      * remains OFF; callers must opt in.
      */
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
 }
 
 export interface ReplayStepResult {
@@ -196,7 +196,7 @@ interface FinalizeOutcome {
     readonly Variables?: ReadonlyArray<VariableContext>;
     readonly Reason?: FailureReasonCode;
     readonly ReasonDetail?: string;
-    readonly Skipped?: boolean;
+    readonly Skipped: boolean;
 }
 
 async function executeStep(

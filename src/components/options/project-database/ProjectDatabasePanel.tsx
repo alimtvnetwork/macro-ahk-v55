@@ -38,8 +38,8 @@ import { logError } from "@/components/options/options-logger";
 interface ColumnDef {
   Name: string;
   Type: Type;
-  Nullable?: boolean;
-  Unique?: boolean;
+  Nullable: boolean;
+  Unique: boolean;
   Default?: string;
 }
 

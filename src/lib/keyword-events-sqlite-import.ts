@@ -58,7 +58,7 @@ export interface ImportedKeywordEvent {
     readonly Uid: string;
     readonly Keyword: string;
     readonly Description?: string;
-    readonly Enabled?: boolean;
+    readonly Enabled: boolean;
     readonly Steps?: readonly KeywordEventStep[];
     readonly Target?: KeywordEventTarget;
     readonly Tags?: readonly string[];
@@ -340,7 +340,7 @@ export interface ImportMatchPlan {
  */
 export interface PlanImportMatchesOptions {
     /** When true, disable the Keyword fallback and match strictly by Uid. */
-    readonly strictUidOnly?: boolean;
+    readonly strictUidOnly: boolean;
 }
 
 /* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */

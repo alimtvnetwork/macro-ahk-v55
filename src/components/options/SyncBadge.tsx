@@ -20,7 +20,7 @@ import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/
 interface SyncBadgeProps {
   state: LinkStateType;
   pinnedVersion?: string | null;
-  updateAvailable?: boolean;
+  updateAvailable: boolean;
 }
 
 export function SyncBadge({ state, pinnedVersion, updateAvailable }: SyncBadgeProps) {

@@ -14,7 +14,7 @@ interface Props {
   onChange: (v: string) => void;
   language: LanguageType;
   height?: string;
-  readOnly?: boolean;
+  readOnly: boolean;
 }
 
 function EditorFallback({ height = "240px" }: { height?: string }) {

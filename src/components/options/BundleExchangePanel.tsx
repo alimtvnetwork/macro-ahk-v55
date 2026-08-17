@@ -52,7 +52,7 @@ interface BundleExchangePanelProps {
     readonly onImportFile: (file: File) => void | Promise<void>;
     readonly lastExport: LastExportSummary | null;
     readonly lastImport: LastImportSummary | null;
-    readonly disabled?: boolean;
+    readonly disabled: boolean;
 }
 
 const ACCEPT_ZIP = ".zip,application/zip";

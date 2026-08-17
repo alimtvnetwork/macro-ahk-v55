@@ -24,7 +24,7 @@ export interface XPathValidationEntry {
     found: number;
     status: XPathValidationEntryStatusType;
     error?: string;
-    fallbackUsed?: boolean;
+    fallbackUsed: boolean;
 }
 
 export interface XPathValidationResult {

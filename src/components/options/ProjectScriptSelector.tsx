@@ -76,7 +76,7 @@ interface ScriptEntryCardProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   linkMap?: LibraryLinkMap;
-  isUnbound?: boolean;
+  isUnbound: boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function

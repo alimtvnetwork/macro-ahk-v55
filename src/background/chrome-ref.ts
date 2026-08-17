@@ -6,12 +6,12 @@
  */
 
 /** Shape for storage item values. */
-type StorageValue = string | number | boolean | null | object;
+type StorageValue = string | number | boolean | object;
 
 /** Query/option bags for chrome API calls. */
 interface TabQueryInfo {
-    active?: boolean;
-    currentWindow?: boolean;
+    active: boolean;
+    currentWindow: boolean;
     url?: string;
 }
 
@@ -20,18 +20,18 @@ interface CookieQueryDetails {
     name?: string;
     url?: string;
     path?: string;
-    secure?: boolean;
-    session?: boolean;
+    secure: boolean;
+    session: boolean;
     storeId?: string;
 }
 
 interface ScriptInjection {
-    target: { tabId: number; allFrames?: boolean };
+    target: { tabId: number; allFrames: boolean };
     func?: (...args: string[]) => void;
     args?: string[];
     files?: string[];
     world?: string;
-    injectImmediately?: boolean;
+    injectImmediately: boolean;
 }
 
 interface BadgeDetails {

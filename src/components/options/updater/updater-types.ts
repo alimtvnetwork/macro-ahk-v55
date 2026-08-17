@@ -18,7 +18,7 @@ export interface UpdaterStep {
   resourceType?: ResourceType;
   sourceUrl?: string;
   expectedStatus?: number;
-  isRedirectable?: boolean;
+  isRedirectable: boolean;
   maxRedirectDepth?: number;
   destination?: string;
   postProcess?: string;

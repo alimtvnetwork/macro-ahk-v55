@@ -79,7 +79,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
       const resp = await sendMessage<{
         isOk: boolean;
         tables?: Array<{ Name: string; Description?: string }>;
-        columns?: Array<{ TableName: string; Name: string; Type: string; Nullable?: boolean; Unique?: boolean; DefaultValue?: string; Description?: string }>;
+        columns?: Array<{ TableName: string; Name: string; Type: string; Nullable: boolean; Unique: boolean; DefaultValue?: string; Description?: string }>;
         relations?: Array<{ TableName: string; SourceColumn: string; TargetTable: string; TargetColumn: string; OnDelete?: string }>;
         errorMessage?: string;
       }>({ type: "GENERATE_SCHEMA_DOCS", project: projectSlug, format: "meta" });

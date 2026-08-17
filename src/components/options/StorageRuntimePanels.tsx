@@ -81,7 +81,7 @@ function toPrettyJson(value: JsonValue): string {
   }
 }
 
-function parseEditorValue(raw: string): string | number | boolean | null | object {
+function parseEditorValue(raw: string): string | number | boolean | object {
   const trimmed = raw.trim();
   if (!trimmed) {
     return "";
@@ -106,7 +106,7 @@ function formatBytes(bytes: number): string {
   return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
 }
 
-function downloadJson(filename: string, payload: string | number | boolean | null | object): void {
+function downloadJson(filename: string, payload: string | number | boolean | object): void {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");

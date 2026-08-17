@@ -9,14 +9,14 @@ interface ActiveProjectData {
     name: string;
     version: string;
     description?: string;
-    isGlobal?: boolean;
+    isGlobal: boolean;
   } | null;
   allProjects: Array<{
     id: string;
     name: string;
     version: string;
     description?: string;
-    isGlobal?: boolean;
+    isGlobal: boolean;
   }>;
 }
 
@@ -132,7 +132,7 @@ export function usePopupData() {
       sendMessage<HealthData>({ type: "GET_HEALTH_STATUS" }),
       sendMessage<ActiveProjectData>({ type: "GET_ACTIVE_PROJECT" }),
       sendMessage<{ scripts: PopupScript[] }>({ type: "GET_ALL_SCRIPTS" }),
-      sendMessage<{ settings?: { debugMode?: boolean } }>({ type: "GET_SETTINGS" }).catch(() => ({ settings: undefined })),
+      sendMessage<{ settings?: { debugMode: boolean } }>({ type: "GET_SETTINGS" }).catch(() => ({ settings: undefined })),
     ]);
     const latencyMs = Math.round(performance.now() - t0);
 

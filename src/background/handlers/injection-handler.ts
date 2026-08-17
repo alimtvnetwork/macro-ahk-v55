@@ -86,7 +86,7 @@ export async function handleInjectScripts(
   const injectRequest = message as MessageRequest & {
         tabId: number;
         scripts: ScriptEntry[];
-        forceReload?: boolean;
+        forceReload: boolean;
         launchSource?: InjectionLaunchSource;
     };
 
@@ -575,7 +575,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
           // Accept both `{ isOk: true }` (legacy) and `{ type: '__PONG__' }`
           // (current) reply shapes — the router contract changed in v2.200.
           const pingObj = typeof ping === "object" && ping !== null
-            ? ping as { isOk?: boolean; type?: string }
+            ? ping as { isOk: boolean; type?: string }
             : null;
           const isHealthy = pingObj !== null
                         && (pingObj.ok === true || pingObj.type === "__PONG__");

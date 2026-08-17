@@ -34,8 +34,8 @@ export interface PromptEntry {
     text: string;
     version?: string;
     order: number;
-    isDefault?: boolean;
-    isFavorite?: boolean;
+    isDefault: boolean;
+    isFavorite: boolean;
     category?: string;
     categories?: string;
     tags?: string[];
@@ -481,8 +481,8 @@ interface RawDefaultPromptEntry {
     text?: string;
     version?: string;
     order?: number;
-    isDefault?: boolean;
-    isFavorite?: boolean;
+    isDefault: boolean;
+    isFavorite: boolean;
     category?: string;
 }
 

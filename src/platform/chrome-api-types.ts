@@ -42,14 +42,14 @@ declare global {
         }
         namespace scripting {
             type ExecutionWorld = WorldType;
-            interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames?: boolean }
+            interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames: boolean }
             interface ScriptInjection {
                 target: InjectionTarget;
                 files?: string[];
                 func?: (...args: any[]) => any;
                 args?: any[];
                 world?: ExecutionWorld;
-                injectImmediately?: boolean;
+                injectImmediately: boolean;
             }
             interface CSSInjection {
                 target: InjectionTarget;
@@ -73,17 +73,17 @@ declare global {
                 runAt?: ScriptRunAtType;
             }
             interface Injection {
-                target: { tabId: number; frameIds?: number[]; allFrames?: boolean };
+                target: { tabId: number; frameIds?: number[]; allFrames: boolean };
                 js?: Array<{ code?: string; file?: string }>;
                 world?: UserScriptWorldType;
                 worldId?: string;
-                injectImmediately?: boolean;
+                injectImmediately: boolean;
             }
             function register(scripts: RegisteredUserScript[]): Promise<void>;
             function update(scripts: RegisteredUserScript[]): Promise<void>;
             function unregister(filter?: { ids?: string[] }): Promise<void>;
             function getScripts(filter?: { ids?: string[] }): Promise<RegisteredUserScript[]>;
-            function configureWorld(props: { worldId?: string; csp?: string; messaging?: boolean }): Promise<void>;
+            function configureWorld(props: { worldId?: string; csp?: string; messaging: boolean }): Promise<void>;
             function execute(injection: Injection): Promise<Array<{ frameId: number; result: any }>>;
         }
     }

@@ -13,13 +13,13 @@ import { handleMessage } from "./message-router";
 /* ------------------------------------------------------------------ */
 
 interface MessageResponse {
-    isOk?: boolean;
+    isOk: boolean;
     errorMessage?: string;
-    [key: string]: string | number | boolean | null | undefined | object;
+    [key: string]: string | number | boolean | undefined | object;
 }
 
 interface BufferedMessage {
-    message: MessageRequest | Record<string, string | number | boolean | null | undefined | object>;
+    message: MessageRequest | Record<string, string | number | boolean | undefined | object>;
     sender: chrome.runtime.MessageSender;
     sendResponse: (response: MessageResponse) => void;
 }
@@ -47,7 +47,7 @@ export function markInitialized(): void {
 
 /** Enqueues a message for later processing. */
 export function bufferMessage(
-  message: MessageRequest | Record<string, string | number | boolean | null | undefined | object>,
+  message: MessageRequest | Record<string, string | number | boolean | undefined | object>,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: MessageResponse) => void,
 ): void {

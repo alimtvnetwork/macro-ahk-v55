@@ -169,7 +169,7 @@ export interface BuildJsStepFailureReportInput {
      * Gates whether the captured `LogLines` are persisted in full or
      * truncated to 240 chars per line. Never alters classification.
      */
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
     /** Optional injected clock for deterministic tests. */
     readonly Now?: () => Date;
     /** Optional active data-row to forward into `FailureReport.DataRow`. */
@@ -332,7 +332,7 @@ export async function runJsStepWithDiagnostics(
         readonly StepId?: number;
         readonly Index?: number;
         readonly SourceFile: string;
-        readonly Verbose?: boolean;
+        readonly Verbose: boolean;
         readonly Now?: () => Date;
         readonly DataRow?: FieldRow;
         readonly Run: (

@@ -33,7 +33,7 @@ export interface InjectionResolveResult {
 }
 
 /** Raw entry shape coming from popup / messaging surface (any of three flavors). */
-type RawEntry = ScriptEntry | InjectableScript | Record<string, string | number | boolean | null | undefined>;
+type RawEntry = ScriptEntry | InjectableScript | Record<string, string | number | boolean | undefined>;
 
 /** Classification of a single raw input entry. */
 type Classified =

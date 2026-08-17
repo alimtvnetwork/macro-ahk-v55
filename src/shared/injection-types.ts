@@ -24,7 +24,7 @@ export interface InjectableScript {
     runAt?: ScriptRunAtType;
     configBinding?: string;
     themeBinding?: string;
-    isIife?: boolean;
+    isIife: boolean;
     /** Optional per-script assets (CSS file, template registry). */
     assets?: ScriptAssets;
 }
@@ -36,7 +36,7 @@ export type SkipReason = SkipReasonType;
 export interface InjectionResult {
     scriptId: string;
     isSuccess: boolean;
-    isFail?: boolean;
+    isFail: boolean;
     errorMessage?: string;
     durationMs: number;
     /** Set when the script was skipped before execution. */
@@ -81,7 +81,7 @@ export interface InjectScriptsResponse {
      * builds will omit it. Use `normalizeInjectScriptsResponse` to read
      * it as a guaranteed boolean.
      */
-    inlineSyntaxErrorDetected?: boolean;
+    inlineSyntaxErrorDetected: boolean;
 }
 
 /**

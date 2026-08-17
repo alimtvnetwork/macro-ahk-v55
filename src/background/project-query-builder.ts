@@ -248,7 +248,7 @@ export function queryCount(
 export interface ColumnDef {
     Name: string;
     Type: Type;
-    Nullable?: boolean;
+    Nullable: boolean;
     Default?: string;
 }
 

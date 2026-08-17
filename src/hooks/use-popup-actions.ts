@@ -63,7 +63,7 @@ export function usePopupActions() {
 
   /** Run all enabled scripts into the active tab. */
   // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
-  const handleRun = useCallback(async (_options?: { forceReload?: boolean }) => {
+  const handleRun = useCallback(async (_options?: { forceReload: boolean }) => {
     setRunLoading(true);
     setLastRunResults([]);
     console.log("[popup:handleRun] Starting injection flow... (manual run — always forces re-injection)");

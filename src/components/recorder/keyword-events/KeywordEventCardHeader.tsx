@@ -21,7 +21,7 @@ export interface KeywordEventCardHeaderProps {
     readonly runnable: boolean;
     readonly runDisabledReason: string | null;
     readonly dragHandle?: React.ReactNode;
-    readonly selected?: boolean;
+    readonly selected: boolean;
     readonly onToggleSelect?: (checked: boolean, mouseEvent?: React.MouseEvent<HTMLButtonElement>) => void;
     readonly onUpdate: (patch: Partial<Omit<KeywordEvent, "Id">>) => void;
     readonly onPlay: () => void;

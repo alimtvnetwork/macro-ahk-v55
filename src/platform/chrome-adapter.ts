@@ -29,12 +29,12 @@ const RETRYABLE_ERROR_PATTERN =
 /* ------------------------------------------------------------------ */
 
 interface BackgroundErrorEnvelope {
-    isOk?: boolean;
+    isOk: boolean;
     errorMessage?: string;
 }
 
 interface BackgroundPingResponse {
-    isOk?: boolean;
+    isOk: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -42,13 +42,13 @@ interface BackgroundPingResponse {
 /* ------------------------------------------------------------------ */
 
 const chromeStorage: PlatformStorage = {
-  async get<T = string | number | boolean | null | object>(key: string): Promise<T> {
+  async get<T = string | number | boolean | object>(key: string): Promise<T> {
     const result = await chrome.storage.local.get(key);
 
     return (result[key] ?? null) as T;
   },
 
-  async set(key: string, value: string | number | boolean | null | object): Promise<void> {
+  async set(key: string, value: string | number | boolean | object): Promise<void> {
     await chrome.storage.local.set({ [key]: value });
   },
 
@@ -92,7 +92,7 @@ function isRetryableError(error: Error | string): boolean {
 }
 
 /** Throws if the response is a standardized background error envelope. */
-function throwIfErrorResponse(response: string | number | boolean | null | object): void {
+function throwIfErrorResponse(response: string | number | boolean | object): void {
   const isObjectResponse =
         typeof response === "object" && response !== null;
 

@@ -12,7 +12,6 @@ export type SerializableValue =
     | string
     | number
     | boolean
-    | null
     | undefined
     | SerializableValue[]
     | { [key: string]: SerializableValue };
@@ -25,8 +24,8 @@ export interface MessagePayload {
 
 /** Platform-agnostic storage interface. */
 export interface PlatformStorage {
-    get<T = string | number | boolean | null | object>(key: string): Promise<T>;
-    set(key: string, value: string | number | boolean | null | object): Promise<void>;
+    get<T = string | number | boolean | object>(key: string): Promise<T>;
+    set(key: string, value: string | number | boolean | object): Promise<void>;
     remove(key: string): Promise<void>;
 }
 

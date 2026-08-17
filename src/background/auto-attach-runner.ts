@@ -51,7 +51,7 @@ const TAG = BgLogTag.SCRIPT_RESOLVER;
 /** Optional instruction-shaped extras some StoredScript records carry. */
 interface ScriptAttachExtras {
     urlMatches?: string[];
-    autoAttach?: boolean;
+    autoAttach: boolean;
     world?: WorldType;
     requiredCookies?: string[];
     injectionConditions?: LibraryScriptForAttach["instruction"]["InjectionConditions"];

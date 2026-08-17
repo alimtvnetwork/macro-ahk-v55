@@ -440,7 +440,7 @@ export interface GroupRunPayloadInput {
     readonly Outcome: string;
     readonly FailureReason?: string;
     readonly FailedStepId?: number;
-    readonly IsTest?: boolean;
+    readonly IsTest: boolean;
 }
 
 export function buildGroupRunPayload(input: GroupRunPayloadInput): WebhookPayload {

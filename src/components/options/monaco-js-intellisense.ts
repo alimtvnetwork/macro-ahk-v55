@@ -89,9 +89,9 @@ declare namespace chrome {
       windowId: number;
       index: number;
     }
-    function query(queryInfo: { active?: boolean; currentWindow?: boolean; url?: string }, callback: (tabs: Tab[]) => void): void;
-    function create(createProperties: { url?: string; active?: boolean }, callback?: (tab: Tab) => void): void;
-    function update(tabId: number, updateProperties: { url?: string; active?: boolean }, callback?: (tab?: Tab) => void): void;
+    function query(queryInfo: { active: boolean; currentWindow: boolean; url?: string }, callback: (tabs: Tab[]) => void): void;
+    function create(createProperties: { url?: string; active: boolean }, callback?: (tab: Tab) => void): void;
+    function update(tabId: number, updateProperties: { url?: string; active: boolean }, callback?: (tab?: Tab) => void): void;
     function remove(tabIds: number | number[], callback?: () => void): void;
     function sendMessage(tabId: number, message: any, responseCallback?: (response: any) => void): void;
     function executeScript(tabId: number, details: { code?: string; file?: string }, callback?: (result: any[]) => void): void;

@@ -13,9 +13,9 @@ export interface PromptEntry {
     name: string;
     text: string;
     order: number;
-    isDefault?: boolean;
+    isDefault: boolean;
     category?: string;
-    isFavorite?: boolean;
+    isFavorite: boolean;
     createdAt: string;
     updatedAt: string;
 }

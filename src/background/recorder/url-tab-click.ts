@@ -37,7 +37,7 @@ export interface UrlTabClickParams {
     readonly Selector?: string;
     readonly SelectorKind?: SelectorKindOption;
     readonly TimeoutMs?: number;
-    readonly DirectOpen?: boolean;
+    readonly DirectOpen: boolean;
     readonly Url?: string;
 }
 

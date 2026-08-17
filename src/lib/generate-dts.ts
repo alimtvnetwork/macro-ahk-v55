@@ -262,7 +262,7 @@ interface ApiSchemaModule {
 
 interface NotifyModule {
   /** Show a toast notification. Returns a unique toast ID. */
-  toast(message: string, level?: 'info' | 'warn' | 'error' | 'success', opts?: { duration?: number; copyable?: boolean }): string;
+  toast(message: string, level?: 'info' | 'warn' | 'error' | 'success', opts?: { duration?: number; copyable: boolean }): string;
   /** Dismiss a specific toast by ID. */
   dismiss(id: string): void;
   /** Dismiss all visible toasts. */

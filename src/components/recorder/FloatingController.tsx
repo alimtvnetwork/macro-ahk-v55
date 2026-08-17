@@ -619,7 +619,7 @@ function RecordingDot(props: { isRecording: boolean }): JSX.Element {
   );
 }
 
-function StopButton(props: { armed: boolean; onClick: () => void; compact?: boolean; disabled?: boolean; title?: string }): JSX.Element {
+function StopButton(props: { armed: boolean; onClick: () => void; compact: boolean; disabled: boolean; title?: string }): JSX.Element {
   const { armed, onClick, compact, disabled, title } = props;
 
   return (

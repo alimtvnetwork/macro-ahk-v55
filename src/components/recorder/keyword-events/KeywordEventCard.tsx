@@ -33,7 +33,7 @@ export interface KeywordEventCardProps {
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
     readonly dragHandle?: React.ReactNode;
-    readonly selected?: boolean;
+    readonly selected: boolean;
     readonly onRowClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
     readonly onToggleSelect?: (checked: boolean, mouseEvent?: React.MouseEvent<HTMLButtonElement>) => void;
 }

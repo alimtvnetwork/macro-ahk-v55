@@ -69,7 +69,7 @@ export function ApiExplorerCard() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk?: boolean }>({ type: "GET_API_STATUS" as any });
+      const result = await sendMessage<ApiStatus & { isOk: boolean }>({ type: "GET_API_STATUS" as any });
       setStatus({
         service: result.service,
         version: result.version,

@@ -369,18 +369,17 @@ export async function handleRefreshToken(
   }
 
   // Strategy 2: Supabase localStorage JWT
-  const isAuthTokenMissing = !authToken;
-  if (isAuthTokenMissing) {
+  if (authToken === null) {
     authToken = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
   }
 
   // Strategy 3: Signed URL token fallback (no network)
-  if (isAuthTokenMissing) {
+  if (authToken === null) {
     authToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
   }
 
   // Strategy 4: Opaque session-cookie exchange
-  if (isAuthTokenMissing) {
+  if (authToken === null) {
     authToken = await fetchAuthTokenFromSessionExchange(
       projectId,
       sessionId !== null || refreshToken !== null,

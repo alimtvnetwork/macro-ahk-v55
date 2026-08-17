@@ -64,14 +64,14 @@ function getRunAtLabel(value: string): string {
 export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigEditorProps) {
   const platform = getPlatform();
   const [rows, setRows] = useState<ScriptRow[]>([]);
-  const [allScripts, setAllScripts] = useState<Array<{ id: string; name: string; code: string; runAt?: string; isEnabled?: boolean; configBinding?: string }>>([]);
+  const [allScripts, setAllScripts] = useState<Array<{ id: string; name: string; code: string; runAt?: string; isEnabled: boolean; configBinding?: string }>>([]);
   const [allConfigs, setAllConfigs] = useState<Array<{ id: string; name: string; json: string }>>([]);
 
   // Load scripts and configs
   useEffect(() => {
     void (async () => {
       const [scriptsRes, configsRes] = await Promise.all([
-        platform.sendMessage<{ scripts: Array<{ id: string; name: string; code: string; runAt?: string; isEnabled?: boolean; configBinding?: string }> }>({ type: "GET_ALL_SCRIPTS" }),
+        platform.sendMessage<{ scripts: Array<{ id: string; name: string; code: string; runAt?: string; isEnabled: boolean; configBinding?: string }> }>({ type: "GET_ALL_SCRIPTS" }),
         platform.sendMessage<{ configs: Array<{ id: string; name: string; json: string }> }>({ type: "GET_ALL_CONFIGS" }),
       ]);
       const scripts = scriptsRes.scripts ?? [];

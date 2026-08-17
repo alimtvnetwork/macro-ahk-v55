@@ -31,7 +31,7 @@ import { logCaughtError, BgLogTag } from "../bg-logger";
 interface InstructionManifestScriptAsset {
     File: string;
     Order: number;
-    IsIife?: boolean;
+    IsIife: boolean;
 }
 
 interface InstructionManifest {

@@ -43,7 +43,7 @@ export interface FormSnapshot {
 }
 
 export interface CaptureFormSnapshotOptions {
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
     readonly Now?: () => Date;
 }
 

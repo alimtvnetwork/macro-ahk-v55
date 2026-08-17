@@ -33,7 +33,7 @@ export interface ScriptBundle {
   jsEntries: BundleJsEntry[];
   configEntries: BundleConfigEntry[];
   order: number;
-  isEnabled?: boolean;
+  isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 }

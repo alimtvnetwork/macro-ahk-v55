@@ -46,7 +46,7 @@ export interface StepRow {
 export interface StepMetaPatch {
     readonly LabelType?: string;
     readonly Description?: string | null;
-    readonly IsDisabled?: boolean;
+    readonly IsDisabled: boolean;
     readonly RetryCount?: number;
     readonly TimeoutMs?: number | null;
 }

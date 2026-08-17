@@ -28,7 +28,7 @@ export interface ProjectDependency {
 export interface ResolutionResult {
     order: string[];        // Project IDs in injection order
     isSuccess: boolean;
-    isFail?: boolean;
+    isFail: boolean;
     errorMessage?: string;
 }
 

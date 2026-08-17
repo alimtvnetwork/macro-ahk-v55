@@ -33,7 +33,7 @@ export interface ChainSettingsRowProps {
     readonly enabledCount: number;
     readonly running: boolean;
     readonly progress: { current: number; total: number } | null;
-    readonly autoRunActive?: boolean;
+    readonly autoRunActive: boolean;
     readonly runShortcutLabel?: string;
     readonly stopShortcutLabel?: string;
     readonly onRun: () => void;

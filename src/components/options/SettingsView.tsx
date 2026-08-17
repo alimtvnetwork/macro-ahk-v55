@@ -83,7 +83,7 @@ interface SettingsGroupProps {
   title: string;
   description: string;
   badge?: string;
-  defaultOpen?: boolean;
+  defaultOpen: boolean;
   children: React.ReactNode;
 }
 

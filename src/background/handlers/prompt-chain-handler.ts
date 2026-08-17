@@ -127,7 +127,7 @@ interface PromptInjectResultMessage {
 interface PendingPromptArgs {
     text: string;
     chatBoxXPath?: string;
-    autoSubmit?: boolean;
+    autoSubmit: boolean;
     submitDelayMs?: number;
 }
 

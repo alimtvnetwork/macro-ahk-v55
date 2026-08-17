@@ -15,8 +15,8 @@ interface PromptEntry {
   id?: string;
   slug?: string;
   category?: string;
-  isFavorite?: boolean;
-  isDefault?: boolean;
+  isFavorite: boolean;
+  isDefault: boolean;
 }
 
 function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number }>[]): PromptEntry[] { // eslint-disable-line sonarjs/cognitive-complexity -- mirrors production logic for regression coverage

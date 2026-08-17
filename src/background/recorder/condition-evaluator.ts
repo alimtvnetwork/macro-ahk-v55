@@ -24,8 +24,8 @@ export type SelectorKind = SelectorKindType;
 export type Matcher =
     | { readonly Kind: "Exists" }
     | { readonly Kind: "Visible" }
-    | { readonly Kind: "TextEquals";   readonly Value: string; readonly CaseSensitive?: boolean }
-    | { readonly Kind: "TextContains"; readonly Value: string; readonly CaseSensitive?: boolean }
+    | { readonly Kind: "TextEquals";   readonly Value: string; readonly CaseSensitive: boolean }
+    | { readonly Kind: "TextContains"; readonly Value: string; readonly CaseSensitive: boolean }
     | { readonly Kind: "TextRegex";    readonly Pattern: string; readonly Flags?: string }
     | { readonly Kind: "AttrEquals";   readonly Name: string; readonly Value: string }
     | { readonly Kind: "AttrContains"; readonly Name: string; readonly Value: string }
@@ -35,7 +35,7 @@ export interface Predicate {
     readonly Selector: string;
     readonly SelectorKind?: SelectorKind;
     readonly Matcher: Matcher;
-    readonly Negate?: boolean;
+    readonly Negate: boolean;
 }
 
 export type Condition =
@@ -236,7 +236,7 @@ function recordTrace(
   });
 }
 
-function matchText(actual: string, expected: string, caseSensitive: boolean | undefined, compare: (a: string, b: string) => boolean): boolean {
+function matchText(actual: string, expected: string, caseSensitive: boolean, compare: (a: string, b: string) => boolean): boolean {
   if (caseSensitive === false) {
     return compare(actual.toLowerCase(), expected.toLowerCase());
   }

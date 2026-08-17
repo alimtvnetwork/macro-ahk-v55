@@ -218,7 +218,7 @@ interface ProjectInstruction {
             order: number;          // Injection order within this project
             configBinding?: string; // Which config key this script needs
             themeBinding?: string;  // Which config key provides theme data
-            isIife?: boolean;       // Whether the script is an IIFE wrapper (default: true)
+            isIife: boolean;       // Whether the script is an IIFE wrapper (default: true)
         }>;
 
         /** Template registries loaded alongside configs */
@@ -1656,7 +1656,7 @@ export interface ProjectInstruction {
     assets: {
         css: Array<{ file: string; inject: "head" }>;
         configs: Array<{ file: string; key: string; injectAs?: string }>;
-        scripts: Array<{ file: string; order: number; configBinding?: string; themeBinding?: string; isIife?: boolean }>;
+        scripts: Array<{ file: string; order: number; configBinding?: string; themeBinding?: string; isIife: boolean }>;
         templates: Array<{ file: string; injectAs?: string }>;
         prompts: Array<{ file: string }>;
     };

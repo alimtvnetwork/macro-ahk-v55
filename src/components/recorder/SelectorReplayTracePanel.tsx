@@ -39,7 +39,7 @@ import { TraceStepStatusType, ReplayTraceSummaryOutcomeType } from "../../types/
 interface SelectorReplayTracePanelProps {
     readonly report: FailureReport;
     /** Hide the outer Card chrome — useful when embedding inside another card. */
-    readonly embedded?: boolean;
+    readonly embedded: boolean;
 }
 
 const STATUS_TONE: Readonly<Record<TraceStepStatusType, string>> = {

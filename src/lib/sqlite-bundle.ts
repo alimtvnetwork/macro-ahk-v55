@@ -743,7 +743,7 @@ export interface ImportOptions {
   /** When true, only PascalCase table/column names are accepted.
    *  Legacy snake_case / lowercase fallbacks are skipped.
    *  Default false (backward-compatible). */
-  strictPascalCase?: boolean;
+  strictPascalCase: boolean;
 }
 
 /**

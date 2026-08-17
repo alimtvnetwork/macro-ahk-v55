@@ -77,7 +77,7 @@ export interface UseStepGroupExportApi {
      */
     readonly requestExport: (
         ids: ReadonlyArray<number>,
-        includeDescendants?: boolean,
+        includeDescendants: boolean,
     ) => void;
 
     /**

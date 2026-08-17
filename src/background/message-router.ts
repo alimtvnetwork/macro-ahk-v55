@@ -27,9 +27,9 @@ export { getRecentTrackedMessages } from "./message-tracker";
 /* ------------------------------------------------------------------ */
 
 interface MessageResponse {
-    isOk?: boolean;
+    isOk: boolean;
     errorMessage?: string;
-    [key: string]: string | number | boolean | null | undefined | object;
+    [key: string]: string | number | boolean | undefined | object;
 }
 
 interface ErrorResponse {
@@ -43,7 +43,7 @@ interface ErrorResponse {
 
 /** Dispatches a message to its handler and sends the response. */
 export async function handleMessage(
-  rawMessage: MessageRequest | Record<string, string | number | boolean | null | undefined | object>,
+  rawMessage: MessageRequest | Record<string, string | number | boolean | undefined | object>,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: MessageResponse | ErrorResponse) => void,
 ): Promise<void> {

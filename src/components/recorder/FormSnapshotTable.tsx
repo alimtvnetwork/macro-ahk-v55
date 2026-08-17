@@ -29,7 +29,7 @@ import type { FormSnapshot, FormFieldMeta } from "@/background/recorder/form-sna
 interface FormSnapshotTableProps {
     readonly snapshot: FormSnapshot;
     /** Hide the surrounding section/border — useful inside another card. */
-    readonly embedded?: boolean;
+    readonly embedded: boolean;
     /** Override the section heading. */
     readonly title?: string;
 }

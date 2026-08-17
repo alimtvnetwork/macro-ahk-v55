@@ -26,7 +26,7 @@ const STORAGE_KEY = "marco-keyword-events-v1";
  *     touching the underlying Combo (which carries real keystroke data).
  */
 export interface KeywordEventStepCommon {
-    readonly Enabled?: boolean;
+    readonly Enabled: boolean;
     readonly LabelType?: string;
 }
 export type KeywordEventStep =
@@ -259,7 +259,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             // `Enabled === undefined` already means enabled, so when
             // enabling we strip the field to keep persisted JSON tidy.
             if (enabled) {
-              const { Enabled: _drop, ...rest } = s as KeywordEventStep & { Enabled?: boolean };
+              const { Enabled: _drop, ...rest } = s as KeywordEventStep & { Enabled: boolean };
               void _drop;
 
               return rest as KeywordEventStep;

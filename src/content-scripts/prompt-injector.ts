@@ -233,7 +233,7 @@ function triggerSubmit(): boolean {
 /* ------------------------------------------------------------------ */
 
 export interface InjectOptions {
-    autoSubmit?: boolean;
+    autoSubmit: boolean;
     submitDelayMs?: number;
     chatBoxXPath?: string;
 }
@@ -284,7 +284,7 @@ const PROMPT_INJECT_RESULT = "PROMPT_INJECT_RESULT";
 interface PendingPromptArgs {
     text: string;
     chatBoxXPath?: string;
-    autoSubmit?: boolean;
+    autoSubmit: boolean;
     submitDelayMs?: number;
 }
 

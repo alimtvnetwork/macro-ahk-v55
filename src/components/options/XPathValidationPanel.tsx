@@ -33,7 +33,7 @@ interface ValidationEntry {
     found: number;
     status: XPathValidationEntryStatusType;
     error?: string;
-    fallbackUsed?: boolean;
+    fallbackUsed: boolean;
 }
 
 interface ValidationResult {

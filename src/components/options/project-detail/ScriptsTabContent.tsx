@@ -19,7 +19,7 @@ interface ScriptsTabContentProps {
   onSave: (project: Partial<StoredProject>) => Promise<void>;
 }
 
-function formatJson(input: string | number | boolean | null | undefined): string {
+function formatJson(input: string | number | boolean | undefined): string {
   if (typeof input === "string") {
     try {
       return JSON.stringify(JSON.parse(input), null, 2);

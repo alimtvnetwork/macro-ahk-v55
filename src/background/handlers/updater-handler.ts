@@ -161,11 +161,11 @@ export function handleCreateUpdater(data: {
     versionInfoUrl?: string;
     instructionUrl?: string;
     changelogUrl?: string;
-    isGit?: boolean;
-    isRedirectable?: boolean;
+    isGit: boolean;
+    isRedirectable: boolean;
     maxRedirectDepth?: number;
-    hasChangelogFromVersionInfo?: boolean;
-    hasUserConfirmBeforeUpdate?: boolean;
+    hasChangelogFromVersionInfo: boolean;
+    hasUserConfirmBeforeUpdate: boolean;
     autoCheckIntervalMinutes?: number;
     cacheExpiryMinutes?: number;
 }): number {

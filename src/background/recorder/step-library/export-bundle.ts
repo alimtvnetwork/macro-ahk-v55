@@ -48,7 +48,7 @@ export interface StepGroupExportInput {
     /** Group IDs the user explicitly ticked in the UI. */
     readonly SelectedStepGroupIds: ReadonlyArray<number>;
     /** When true, all transitive descendants of each selection are included. */
-    readonly IncludeDescendants?: boolean;
+    readonly IncludeDescendants: boolean;
     /** Free-form label persisted in the manifest (e.g. "Q2 onboarding macros"). */
     readonly BundleName?: string;
     /** Optional override for the timestamp baked into the manifest. */
@@ -301,7 +301,7 @@ export interface PreviewStepGroupExportInput {
     readonly Source: StepLibraryDb;
     readonly ProjectId: number;
     readonly SelectedStepGroupIds: ReadonlyArray<number>;
-    readonly IncludeDescendants?: boolean;
+    readonly IncludeDescendants: boolean;
 }
 
 /**

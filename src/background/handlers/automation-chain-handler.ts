@@ -58,10 +58,10 @@ interface ChainInput {
     steps?: JsonValue[];
     triggerType?: string;
     triggerConfig?: JsonValue;
-    enabled?: boolean;
+    enabled: boolean;
 }
 
-type JsonValue = string | number | boolean | null | undefined | JsonValue[] | { [key: string]: JsonValue };
+type JsonValue = string | number | boolean | undefined | JsonValue[] | { [key: string]: JsonValue };
 
 interface ChainOutput {
     id: string;

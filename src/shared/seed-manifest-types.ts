@@ -183,10 +183,10 @@ export interface SeedCookieBinding {
  * the manifest-level lens covering every known consumer.
  */
 export interface SeedProjectSettings {
-    IsolateScripts?: boolean;
+    IsolateScripts: boolean;
     LogLevel?: LogLevelType;
-    RetryOnNavigate?: boolean;
+    RetryOnNavigate: boolean;
     ChatBoxXPath?: string;
-    OnlyRunAsDependency?: boolean;
-    AllowDynamicRequests?: boolean;
+    OnlyRunAsDependency: boolean;
+    AllowDynamicRequests: boolean;
 }

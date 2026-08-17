@@ -24,7 +24,7 @@ import { StepLinkSlotType } from "../../../standalone-scripts/macro-controller/s
 export interface StepMetaPatch {
     readonly LabelType?: string;
     readonly Description?: string | null;
-    readonly IsDisabled?: boolean;
+    readonly IsDisabled: boolean;
     readonly RetryCount?: number;
     readonly TimeoutMs?: number | null;
 }
@@ -203,7 +203,7 @@ function pushIfDefined(
 }
 
 function pushIfDefinedBool(
-  value: boolean | undefined,
+  value: boolean,
   column: string,
   sets: string[],
   params: Array<string | number | null>,

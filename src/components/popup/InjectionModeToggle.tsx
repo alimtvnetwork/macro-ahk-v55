@@ -25,7 +25,7 @@ export function InjectionModeToggle() {
   useEffect(() => {
     void (async () => {
       try {
-        const res = await sendMessage<{ settings: { forceLegacyInjection?: boolean } }>({
+        const res = await sendMessage<{ settings: { forceLegacyInjection: boolean } }>({
           type: "GET_SETTINGS",
         });
         setForceLegacy(res.settings.forceLegacyInjection === true);

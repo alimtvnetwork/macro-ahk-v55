@@ -45,7 +45,7 @@ import { ReasonGroupType } from "../../types/enums";
 interface FailureDetailsPanelProps {
     readonly report: FailureReport;
     /** Hide the outer Card chrome — useful when embedding inside another card. */
-    readonly embedded?: boolean;
+    readonly embedded: boolean;
 }
 
 /* ------------------------------------------------------------------ */

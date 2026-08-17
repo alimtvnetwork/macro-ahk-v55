@@ -102,7 +102,7 @@ export async function handleQueryLogs(
         source?: string;
         category?: string;
         search?: string;
-        caseSensitive?: boolean;
+        caseSensitive: boolean;
     };
 
   const db = resolveDb(payload.database);

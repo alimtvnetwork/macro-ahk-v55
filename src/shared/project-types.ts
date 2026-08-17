@@ -41,22 +41,22 @@ export interface CookieBinding {
 
 /** Project-level injection settings. */
 export interface ProjectSettings {
-    isolateScripts?: boolean;
+    isolateScripts: boolean;
     logLevel?: LogLevelType;
-    retryOnNavigate?: boolean;
+    retryOnNavigate: boolean;
     /** Project-specific XPath for the chat input element (overrides global default). */
     chatBoxXPath?: string;
     /** When true, scripts only inject when another project depends on this one. */
-    onlyRunAsDependency?: boolean;
+    onlyRunAsDependency: boolean;
     /** When true, this project's scripts can dynamically request scripts from other approved projects. */
-    allowDynamicRequests?: boolean;
+    allowDynamicRequests: boolean;
     /**
      * Auto-attach gate (default false). When true AND every other condition in
      * mem://features/auto-attach-policy.md (C1..C8) is satisfied, library scripts
      * whose UrlMatches cover this project's URL are auto-attached on save.
      * URL match alone is NEVER sufficient — see background/auto-attach.ts.
      */
-    autoStart?: boolean;
+    autoStart: boolean;
 }
 
 /** Dependency on a shared project. See spec/21-app/02-features/devtools-and-injection/sdk-convention.md */
@@ -82,8 +82,8 @@ export interface StoredProject {
     cookies?: CookieBinding[];
     settings?: ProjectSettings;
     dependencies?: ProjectDependency[];
-    isGlobal?: boolean;
-    isRemovable?: boolean;
+    isGlobal: boolean;
+    isRemovable: boolean;
     createdAt: string;
     updatedAt: string;
 }

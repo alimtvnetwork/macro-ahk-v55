@@ -73,7 +73,7 @@ export interface ReplayBridgeOptions {
     /** Override clock for tests. */
     readonly Now?: () => Date;
     /** Forwarded to `executeReplay` — see its docstring. */
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
 }
 
 /**

@@ -20,7 +20,7 @@ import type {
 /*  In-Memory Storage                                                  */
 /* ------------------------------------------------------------------ */
 
-const memoryStore = new Map<string, string | number | boolean | null | object>();
+const memoryStore = new Map<string, string | number | boolean | object>();
 
 /* ------------------------------------------------------------------ */
 /*  Mutable Mock Error/Log State                                       */
@@ -32,11 +32,11 @@ let mockErrorsCleared = false;
 let mockLogsCleared = false;
 
 const previewStorage: PlatformStorage = {
-  async get<T = string | number | boolean | null | object>(key: string): Promise<T> {
+  async get<T = string | number | boolean | object>(key: string): Promise<T> {
     return (memoryStore.get(key) ?? null) as T;
   },
 
-  async set(key: string, value: string | number | boolean | null | object): Promise<void> {
+  async set(key: string, value: string | number | boolean | object): Promise<void> {
     memoryStore.set(key, value);
   },
 
@@ -135,7 +135,7 @@ function handleRecorderMock(message: MockRecorderMessage): object | null {
 
 /** Returns mock data matching the background service worker protocol. */
 // eslint-disable-next-line max-lines-per-function
-function getMockResponse(message: MessagePayload): string | number | boolean | null | object {
+function getMockResponse(message: MessagePayload): string | number | boolean | object {
   // Handle stateful mutations before building mock lookup
   if (message.type === "CLEAR_ERRORS") {
     mockErrorsCleared = true;
@@ -154,7 +154,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
     }
   }
 
-  const mocks: Record<string, string | number | boolean | null | object> = {
+  const mocks: Record<string, string | number | boolean | object> = {
     GET_STATUS: {
       connection: "online",
       token: { status: "valid", expiresIn: "58m" },

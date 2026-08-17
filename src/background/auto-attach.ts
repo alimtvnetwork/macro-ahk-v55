@@ -28,7 +28,7 @@ export interface LibraryScriptForAttach {
     name: string;
     instruction: {
         UrlMatches?: string[];
-        AutoAttach?: boolean;
+        AutoAttach: boolean;
         RunAt?: ScriptEntry["runAt"];
         World?: WorldType;
         RequiredCookies?: string[];
@@ -37,7 +37,7 @@ export interface LibraryScriptForAttach {
             requireElement?: string | null;
             requireCookie?: string | null;
             minDelayMs?: number;
-            requireOnline?: boolean;
+            requireOnline: boolean;
         };
     };
 }

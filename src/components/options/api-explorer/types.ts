@@ -18,7 +18,7 @@ export type EndpointDoc = {
   displayName?: string;
   category?: string;
   description?: string;
-  isMutating?: boolean;
+  isMutating: boolean;
   exampleRequest?: Record<string, SerializableValue>;
 };
 

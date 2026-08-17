@@ -163,16 +163,16 @@ function toastPagePayload(origin: string): void {
  * chrome.runtime.sendMessage so the background bridge can react.
  */
 function bridgePagePayload(): void {
-  if ((window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge) {
+  if ((window as unknown as { __marcoToastBridge: boolean }).__marcoToastBridge) {
     return;
   }
 
-  (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = true;
+  (window as unknown as { __marcoToastBridge: boolean }).__marcoToastBridge = true;
 
   const cleanup = (): void => {
     window.removeEventListener(Events.MESSAGE, onMessage);
     window.removeEventListener("pagehide", cleanup);
-    (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = false;
+    (window as unknown as { __marcoToastBridge: boolean }).__marcoToastBridge = false;
   };
 
   const onMessage = (e: MessageEvent): void => {

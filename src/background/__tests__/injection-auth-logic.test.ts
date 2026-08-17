@@ -17,7 +17,7 @@ import { logCaughtError, BgLogTag } from "../bg-logger";
 interface MinimalProject {
     id: string;
     name: string;
-    isGlobal?: boolean;
+    isGlobal: boolean;
     scripts?: Array<{ path: string; order: number }>;
     dependencies?: Array<{ projectId: string; version: string }>;
 }

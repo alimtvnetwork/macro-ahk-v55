@@ -59,7 +59,7 @@ export interface ScriptEntry {
     name?: string;
     path: string;
     order: number;
-    isEnabled?: boolean;
+    isEnabled: boolean;
     configBinding?: string | null;
     runAt?: string;
 }

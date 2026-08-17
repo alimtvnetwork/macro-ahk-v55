@@ -33,7 +33,7 @@ export interface StepWaitForElement {
   type: "wait_for_element";
   selector: string;
   /** Wait for appear (true) or disappear (false). Default: true */
-  appear?: boolean;
+  appear: boolean;
   timeoutMs?: number;
 }
 

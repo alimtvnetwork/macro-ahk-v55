@@ -65,7 +65,7 @@ function resolveSetCookieUrl(input: {
     url?: string;
     domain?: string;
     path?: string;
-    secure?: boolean;
+    secure: boolean;
 }): string {
   if (typeof input.url === "string" && input.url.trim().length > 0) {
     return input.url.trim();
@@ -194,8 +194,8 @@ export async function handleStorageCookiesSet(
         url?: string;
         domain?: string;
         path?: string;
-        secure?: boolean;
-        httpOnly?: boolean;
+        secure: boolean;
+        httpOnly: boolean;
         sameSite?: string;
         expirationDate?: number;
     };

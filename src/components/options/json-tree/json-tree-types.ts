@@ -1,5 +1,5 @@
 /** Primitive or nested JSON value. */
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export type JsonValue = string | number | boolean | JsonObject | JsonArray;
 
 /** JSON object with string keys. */
 export type JsonObject = { [key: string]: JsonValue };

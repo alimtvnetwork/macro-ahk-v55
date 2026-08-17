@@ -60,7 +60,7 @@ export interface BuildUrlTabClickReportInput {
     readonly StepId: number;
     readonly Index: number;
     readonly DataRow?: Readonly<Record<string, string>>;
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
     readonly Now?: () => Date;
 }
 
@@ -132,7 +132,7 @@ export interface BuildConditionFailureReportInput {
     readonly Index: number;
     readonly StepKind: string;          // "Wait" | "Condition" | host action kind
     readonly DataRow?: Readonly<Record<string, string>>;
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
     readonly Now?: () => Date;
 }
 
@@ -214,7 +214,7 @@ export interface BuildSelectorPredicateReportInput {
     readonly Index: number;
     readonly StepKind: string;
     readonly DataRow?: Readonly<Record<string, string>>;
-    readonly Verbose?: boolean;
+    readonly Verbose: boolean;
     readonly Now?: () => Date;
 }
 

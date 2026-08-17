@@ -15,19 +15,19 @@ export interface StoredScript {
     /** Relative file path within the extension (e.g., "projects/scripts/macro-controller/macro-looping.js") */
     filePath?: string;
     /** If true, filePath is an absolute URL rather than relative to extension root */
-    isAbsolute?: boolean;
+    isAbsolute: boolean;
     order: number;
     isEnabled: boolean;
     runAt?: ScriptRunAtType;
     configBinding?: string;
     themeBinding?: string;
     cookieBinding?: string;
-    isIife?: boolean;
-    hasDomUsage?: boolean;
+    isIife: boolean;
+    hasDomUsage: boolean;
     /** If false, script is only injected manually (via Popup Run button). Default: true. */
-    autoInject?: boolean;
+    autoInject: boolean;
     /** If true, this script is a global utility loaded before all dependent scripts. */
-    isGlobal?: boolean;
+    isGlobal: boolean;
     /** IDs of scripts this script depends on (loaded first). */
     dependencies?: string[];
     /** Numeric load order (lower = loaded first). Global scripts default to 1. */

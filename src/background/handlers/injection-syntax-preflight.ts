@@ -25,7 +25,7 @@ import type { ScriptEntry } from "../../shared/project-types";
 export type InjectionRequestScript =
     | ScriptEntry
     | InjectableScript
-    | Record<string, string | number | boolean | null | undefined>;
+    | Record<string, string | number | boolean | undefined>;
 
 /** Minimal shape needed to syntax-check an inline script payload. */
 export interface InlineSyntaxCheckScript {

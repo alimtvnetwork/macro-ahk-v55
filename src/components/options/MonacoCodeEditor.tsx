@@ -30,7 +30,7 @@ interface Props {
   onChange: (value: string) => void;
   language: LanguageType;
   height?: string;
-  readOnly?: boolean;
+  readOnly: boolean;
 }
 
 interface ChromeWindow {
