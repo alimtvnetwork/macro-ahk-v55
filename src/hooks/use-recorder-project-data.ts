@@ -130,7 +130,7 @@ async function fetchProjectData(projectSlug: string): Promise<RecorderProjectDat
 async function fetchSelectors(projectSlug: string, stepId: number): Promise<ReadonlyArray<SelectorRow>> {
   const list = await sendMessage<{ selectors: ReadonlyArray<SelectorRow> }>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: "RECORDER_STEP_SELECTORS_LIST" as any,
+    type: "RECORDER_STEP_SELECTORS_LIST" as unknown,
     projectSlug,
     stepId,
   }).catch(() => ({ selectors: [] as ReadonlyArray<SelectorRow> }));
