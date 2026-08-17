@@ -115,7 +115,7 @@ async function fetchProjectData(projectSlug: string): Promise<RecorderProjectDat
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as unknown, projectSlug }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as any, projectSlug }),
+    sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as unknown, projectSlug }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as any, projectSlug }),
   ]);
