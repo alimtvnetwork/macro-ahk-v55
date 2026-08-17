@@ -365,7 +365,8 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
 
 async function handleReinjectScripts(tabId: number): Promise<void> {
   const hasValidTab = tabId > 0;
-  if (!hasValidTab) {
+  const isMissing051 = !hasValidTab;
+  if (isMissing051) {
     return;
   }
 
