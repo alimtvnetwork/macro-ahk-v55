@@ -85,7 +85,7 @@ export function ApiExplorerCard() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as unknown });
       const docs = result.endpoints ?? [];
       setEndpoints(docs);
       if (docs.length > 0) {
