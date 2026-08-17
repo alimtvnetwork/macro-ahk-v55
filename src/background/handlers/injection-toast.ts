@@ -16,6 +16,8 @@ import { handleGetSettings } from "./settings-handler";
 import { logBgError } from "@/background/bg-logger";
 
 const TOAST_EXIT_TRANSFORM = "translateY(8px) scale(0.96)";
+const TOAST_TIMEOUT_MS = 15000;
+const ANIMATION_DURATION_MS = 350;
 
 /** Checks whether the injection toast setting is enabled. */
 export async function isInjectionToastEnabled(): Promise<boolean> {
@@ -43,7 +45,7 @@ export async function showInjectionToastInTab(
       target: { tabId },
       world: "MAIN",
       // eslint-disable-next-line max-lines-per-function
-      func: (ok: number, total: number, ms: number, version: string, exitTransform: string) => {
+      func: (ok: number, total: number, ms: number, version: string, exitTransform: string, animDurationMs: number) => {
         const toastMessage = `✅ Marco v${version} — ${ok}/${total} scripts injected (${ms}ms)`;
 
         const loader = document.getElementById("__marco-inject-toast-loading");
@@ -54,7 +56,7 @@ export async function showInjectionToastInTab(
           loaderTimer = setTimeout(() => {
             loaderTimer = null; 
             loader.remove(); 
-          }, 350);
+          }, animDurationMs);
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -151,7 +153,7 @@ export async function showInjectionToastInTab(
 
           toast.style.opacity = "0";
           toast.style.transform = exitTransform;
-          removeTimer = setTimeout(cleanup, 350);
+          removeTimer = setTimeout(cleanup, animDurationMs);
         };
 
         toast.appendChild(icon);
@@ -167,7 +169,7 @@ export async function showInjectionToastInTab(
         window.addEventListener("pagehide", cleanup, { once: true });
         dismissTimer = setTimeout(dismiss, 4000);
       },
-      args: [successCount, totalCount, Math.round(durationMs), EXTENSION_VERSION, TOAST_EXIT_TRANSFORM],
+      args: [successCount, totalCount, Math.round(durationMs), EXTENSION_VERSION, TOAST_EXIT_TRANSFORM, ANIMATION_DURATION_MS],
     });
   } catch (toastError) {
     logCaughtError(BgLogTag.INJECTION, "showInjectionToastInTab failed", toastError);
@@ -190,7 +192,7 @@ export async function showInjectionFailureToastInTab(
       target: { tabId },
       world: "MAIN",
       // eslint-disable-next-line max-lines-per-function
-      func: (names: string[], failed: number, total: number, ms: number, version: string, exitTransform: string) => {
+      func: (names: string[], failed: number, total: number, ms: number, version: string, exitTransform: string, animDurationMs: number) => {
         const nameList = names.length <= 3 ? names.join(", ") : names.slice(0, 3).join(", ") + ` +${names.length - 3} more`;
         const toastMessage = `❌ Marco v${version} — ${failed}/${total} scripts failed (${ms}ms)\n${nameList}`;
 
@@ -202,7 +204,7 @@ export async function showInjectionFailureToastInTab(
           loaderTimer = setTimeout(() => {
             loaderTimer = null; 
             loader.remove(); 
-          }, 350);
+          }, animDurationMs);
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -312,7 +314,7 @@ export async function showInjectionFailureToastInTab(
 
           toast.style.opacity = "0";
           toast.style.transform = exitTransform;
-          removeTimer = setTimeout(cleanup, 350);
+          removeTimer = setTimeout(cleanup, animDurationMs);
         };
 
         toast.appendChild(icon);
@@ -328,7 +330,7 @@ export async function showInjectionFailureToastInTab(
         window.addEventListener("pagehide", cleanup, { once: true });
         dismissTimer = setTimeout(dismiss, 6000);
       },
-      args: [failedNames, failCount, totalCount, Math.round(durationMs), EXTENSION_VERSION, TOAST_EXIT_TRANSFORM],
+      args: [failedNames, failCount, totalCount, Math.round(durationMs), EXTENSION_VERSION, TOAST_EXIT_TRANSFORM, ANIMATION_DURATION_MS],
     });
   } catch (toastError) {
     logCaughtError(BgLogTag.INJECTION, "showInjectionFailureToastInTab failed", toastError);
@@ -345,7 +347,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
       target: { tabId },
       world: "MAIN",
       // eslint-disable-next-line max-lines-per-function
-      func: (count: number, version: string, exitTransform: string) => {
+      func: (count: number, version: string, exitTransform: string, animDurationMs: number) => {
         const CONTAINER_ID = "__marco-inject-toast";
         let container = document.getElementById(CONTAINER_ID);
         if (!container) {
@@ -420,11 +422,11 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
           if (toast.parentNode) {
             toast.style.opacity = "0";
             toast.style.transform = exitTransform;
-            removeTimer = setTimeout(cleanup, 350);
+            removeTimer = setTimeout(cleanup, animDurationMs);
           }
-        }, 15000);
+        }, TOAST_TIMEOUT_MS);
       },
-      args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM],
+      args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM, ANIMATION_DURATION_MS],
     });
   } catch (e) {
     logCaughtError(BgLogTag.INJECTION, "showInjectionLoadingToast failed", e);

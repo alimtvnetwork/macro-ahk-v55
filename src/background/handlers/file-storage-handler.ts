@@ -227,7 +227,8 @@ export function getFilesByProject(
   projectId: string,
   limit: number = 50,
 ): Array<{ name: string; data: string }> {
-  if (!projectId || typeof projectId !== "string") {
+  const isProjectContextMissing = !projectId || typeof projectId !== "string";
+  if (isProjectContextMissing) {
     return [];
   }
 

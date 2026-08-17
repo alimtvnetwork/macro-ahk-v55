@@ -31,8 +31,20 @@ export function bindKvDbManager(manager: DbManager): void {
   dbManager = manager;
 }
 
+// Same guard pattern as grouped-kv-handler.ts — see subtask 68/69 for context.
+function requireGroupKey(
+  group: string | null | undefined,
+  key: string | null | undefined,
+): boolean {
+  const isGroupMissing = !group;
+  const isKeyMissing = !key;
+
+  return !isGroupMissing && !isKeyMissing;
+}
+
 function getDb(): SqlJsDatabase {
-  if (!dbManager) {
+  const isDbManagerMissing = !dbManager;
+  if (isDbManagerMissing) {
     throw new Error("[kv] DbManager not bound");
   }
 
@@ -49,12 +61,8 @@ export async function handleKvGet(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
-  if (!projectId) {
-    return missingFieldError("projectId", "kv:get");
-  }
-
-  if (!key) {
-    return missingFieldError("key", "kv:get");
+  if (!requireGroupKey(projectId, key)) {
+    return missingFieldError(!projectId ? "projectId" : "key", "kv:get");
   }
 
   const db = getDb();
@@ -80,12 +88,8 @@ export async function handleKvSet(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown; value?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
-  if (!projectId) {
-    return missingFieldError("projectId", "kv:set");
-  }
-
-  if (!key) {
-    return missingFieldError("key", "kv:set");
+  if (!requireGroupKey(projectId, key)) {
+    return missingFieldError(!projectId ? "projectId" : "key", "kv:set");
   }
 
   const value = raw.value;
@@ -111,12 +115,8 @@ export async function handleKvDelete(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
-  if (!projectId) {
-    return missingFieldError("projectId", "kv:delete");
-  }
-
-  if (!key) {
-    return missingFieldError("key", "kv:delete");
+  if (!requireGroupKey(projectId, key)) {
+    return missingFieldError(!projectId ? "projectId" : "key", "kv:delete");
   }
 
   const db = getDb();
@@ -135,7 +135,8 @@ export async function handleKvList(
 ): Promise<{ entries: Array<{ key: string; value: string }> } | HandlerErrorResponse> {
   const raw = message as MessageRequest & { projectId?: unknown };
   const projectId = requireProjectId(raw.projectId);
-  if (!projectId) {
+  const isProjectIdMissing = !projectId;
+  if (isProjectIdMissing) {
     return missingFieldError("projectId", "kv:list");
   }
 

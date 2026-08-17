@@ -30,6 +30,16 @@ export function bindGroupedKvDbManager(manager: DbManager): void {
   dbManager = manager;
 }
 
+function requireGroupKey(
+  group: string | null | undefined,
+  key: string | null | undefined,
+): boolean {
+  const isGroupMissing = !group;
+  const isKeyMissing = !key;
+
+  return !isGroupMissing && !isKeyMissing;
+}
+
 function getDb(): SqlJsDatabase {
   const isDbManagerMissing = !dbManager;
   if (isDbManagerMissing) {
@@ -49,14 +59,8 @@ export async function handleGkvGet(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
-  const isGroupMissing = !group;
-  if (isGroupMissing) {
-    return missingFieldError("group", "gkv:get");
-  }
-
-  const isKeyMissing = !key;
-  if (isKeyMissing) {
-    return missingFieldError("key", "gkv:get");
+  if (!requireGroupKey(group, key)) {
+    return missingFieldError(!group ? "group" : "key", "gkv:get");
   }
 
   const db = getDb();
@@ -83,14 +87,8 @@ export async function handleGkvSet(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown; value?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
-  const isGroupMissing = !group;
-  if (isGroupMissing) {
-    return missingFieldError("group", "gkv:set");
-  }
-
-  const isKeyMissing = !key;
-  if (isKeyMissing) {
-    return missingFieldError("key", "gkv:set");
+  if (!requireGroupKey(group, key)) {
+    return missingFieldError(!group ? "group" : "key", "gkv:set");
   }
 
   const safeValue = bindOpt(raw.value) ?? "";
@@ -115,14 +113,8 @@ export async function handleGkvDelete(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
-  const isGroupMissing = !group;
-  if (isGroupMissing) {
-    return missingFieldError("group", "gkv:delete");
-  }
-
-  const isKeyMissing = !key;
-  if (isKeyMissing) {
-    return missingFieldError("key", "gkv:delete");
+  if (!requireGroupKey(group, key)) {
+    return missingFieldError(!group ? "group" : "key", "gkv:delete");
   }
 
   const db = getDb();

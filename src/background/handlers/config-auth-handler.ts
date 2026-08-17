@@ -64,7 +64,12 @@ const PLATFORM_TAB_PATTERNS: readonly string[] = [
 ];
 
 const AUTH_COOKIE_NAME_PATTERN = /(lovable|session|token|auth)/i;
+
+/** A well-formed JWT consists of exactly 3 dot-separated segments: header, payload, signature. */
 const JWT_SEGMENT_COUNT = 3;
+
+/** Minimum character length for a raw auth token to be considered potentially valid. */
+const MIN_TOKEN_LENGTH = 20;
 
 function isJwtToken(token: unknown): boolean {
   return (
@@ -513,7 +518,7 @@ export async function fetchAuthToken(
 
 /** Checks if a token looks like a JWT (3-part base64 starting with eyJ). */
 function isLikelyJwt(token: string): boolean {
-  return token.startsWith("eyJ") && token.split(".").length === 3;
+  return token.startsWith("eyJ") && token.split(".").length === JWT_SEGMENT_COUNT;
 }
 
 interface TokenValidationResult {
@@ -619,7 +624,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                 }
               } catch { /* ignore */ }
 
-              if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
+              if (raw.startsWith("eyJ") && raw.split(".").length === JWT_SEGMENT_COUNT) {
                 return raw;
               }
 
