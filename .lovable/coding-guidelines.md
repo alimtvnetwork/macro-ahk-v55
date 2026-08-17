@@ -171,6 +171,7 @@ These rules are summarized from project memory and `spec/02-coding-guidelines/`.
 - **No `unknown` except `CaughtError`.** All function parameters and returns are explicitly typed. (`mem://standards/unknown-usage-policy`)
 - **`declare global {}`** for project-wide ambient types; never module-augment `globalThis` ad-hoc. (`mem://architecture/type-safety-standards`)
 - **No `any`, no `interface{}`** (already rule #5; reiterated for blind-AI agents).
+- **No nullable booleans.** Booleans must never be optional (`?`) or unioned with `null`/`undefined`. Default to `false` instead of `null` or `undefined`. This applies to database schemas, TypeScript interfaces, and internal variables. (`mem://no-nullable-booleans.md`)
 
 ### Part 4 - Naming
 - **SCREAMING_SNAKE_CASE constants** with prefix indicating purpose: `ID_*` (DOM ids), `SEL_*` (selectors), `ATTR_*` (data attributes), `CSS_*` (class names). (`mem://architecture/constant-naming-convention`)
