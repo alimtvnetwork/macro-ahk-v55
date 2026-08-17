@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,13 +13,13 @@ import {
 } from "./types";
 import { logError } from "@/components/options/options-logger";
 
-function generateCurl(type: string, payload: Record<string, any>): string {
+function generateCurl(type: string, payload: Record<string, unknown>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
 
   return `curl -X POST "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \\\n  -H "Content-Type: application/json" \\\n  -d '${body}'`;
 }
 
-function generatePowerShell(type: string, payload: Record<string, any>): string {
+function generatePowerShell(type: string, payload: Record<string, unknown>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
 
   return `Invoke-RestMethod -Uri "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \`\n  -Method POST \`\n  -ContentType "application/json" \`\n  -Body '${body}'`;
@@ -56,7 +55,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
   const method = endpoint.IsMutating ? "POST" : "GET";
 
   const runRequest = async () => {
-    let parsed: any;
+    let parsed: unknown;
     try {
       parsed = requestJson.trim() ? JSON.parse(requestJson) : {};
     } catch (err) { /* swallowed */
@@ -71,13 +70,13 @@ export function EndpointAccordionItem({ endpoint }: Props) {
       return;
     }
 
-    const body = parsed as Record<string, any>;
+    const body = parsed as Record<string, unknown>;
     const { Type: _, type: _t, ...rest } = body;
-    const message = { type: endpoint.Type, ...rest };
+    const message = { type: endpoint.Type, ...rest } as import("@/platform/platform-adapter").MessagePayload;
 
     setLoading(true);
     try {
-      const response = await sendMessage<any>(message as any);
+      const response = await sendMessage<unknown>(message);
       setResponseJson(toPrettyJson(response));
     } catch (error) {
       setResponseJson(toPrettyJson({
