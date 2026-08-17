@@ -113,7 +113,7 @@ const EMPTY_DATA: RecorderProjectData = { steps: [], dataSources: [], bindings: 
 async function fetchProjectData(projectSlug: string): Promise<RecorderProjectData> {
   const [stepsRes, dsRes, fbRes] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as any, projectSlug }),
+    sendMessage<{ steps: ReadonlyArray<StepRow> }>({ type: "RECORDER_STEP_LIST" as unknown, projectSlug }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sendMessage<{ dataSources: ReadonlyArray<DataSourceRow> }>({ type: "RECORDER_DATA_SOURCE_LIST" as any, projectSlug }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
