@@ -259,7 +259,8 @@ async function broadcastToTargetTabs(
     const tabs = await chrome.tabs.query({ url: TARGET_TAB_PATTERNS });
     const hasTargetTabs = tabs.length > 0;
 
-    if (!hasTargetTabs) {
+    const isMissing054 = !hasTargetTabs;
+    if (isMissing054) {
       return;
     }
 
