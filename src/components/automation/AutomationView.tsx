@@ -86,7 +86,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
     type: "IMPORT_AUTOMATION_CHAINS",
     project,
     chains,
-  } as any);
+  } as unknown);
 
   return result.imported ?? 0;
 }
