@@ -94,7 +94,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
 async function loadProjects(): Promise<Array<{ id: string; name: string; slug: string }>> {
   try {
     const result = await sendMessage<{ isOk: boolean; projects?: Array<{ id: string; name: string; slug?: string }> }>({
-      type: "GET_PROJECTS" as any,
+      type: "GET_PROJECTS" as unknown,
     });
     if (result.isOk && result.projects) {
       return result.projects.map((p) => ({
