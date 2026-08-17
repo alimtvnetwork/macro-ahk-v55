@@ -133,7 +133,8 @@ function checkAlreadyAttached(
 function checkRunContext(script: LibraryScriptForAttach): AttachDecision | null {
   const declaredWorld = script.instruction.World;
   const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
-  if (!isIncompatibleWorld) {
+  const isMissing042 = !isIncompatibleWorld;
+  if (isMissing042) {
     return null;
   }
 
