@@ -103,7 +103,7 @@ function interceptXhr(): void {
   };
 
   OriginalXhr.prototype.send = function (...args: unknown[]) {
-    (this as any).__marco_startTime = performance.now();
+    (this as unknown).__marco_startTime = performance.now();
 
     this.addEventListener("loadend", function () {
       const startTime = (this as any).__marco_startTime as number | null;
