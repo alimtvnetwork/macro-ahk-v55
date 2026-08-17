@@ -252,11 +252,13 @@ function coerceAuto(raw: string): CoerceResult {
   // Number only when the trimmed text round-trips through Number,
   // avoids e.g. "01" -> 1 surprises by requiring the printed form to match.
   const trimmed = raw.trim();
-  if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
-    const n = Number(trimmed);
-    if (Number.isFinite(n) && String(n) === trimmed) {
-      return { Ok: true, Value: n };
-    }
+  if (!/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
+    return { Ok: true, Value: raw };
+  }
+
+  const n = Number(trimmed);
+  if (Number.isFinite(n) && String(n) === trimmed) {
+    return { Ok: true, Value: n };
   }
 
   return { Ok: true, Value: raw };

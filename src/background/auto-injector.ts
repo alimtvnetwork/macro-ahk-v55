@@ -147,6 +147,7 @@ export function registerAutoInjector(): void {
   try {
     chrome.webNavigation.onCompleted.addListener(handleNavigationCompleted);
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.MARCO, "webNavigation.onCompleted registration failed", err);
   }
 
@@ -155,6 +156,7 @@ export function registerAutoInjector(): void {
       void handleTabActivated(info.tabId);
     });
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.MARCO, "tabs.onActivated registration failed", err);
   }
 
@@ -164,6 +166,7 @@ export function registerAutoInjector(): void {
       clearDismissedOriginsForTab(tabId);
     });
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.MARCO, "tabs.onRemoved cache-clear registration failed", err);
   }
 
@@ -185,6 +188,7 @@ export async function handleTabActivated(tabId: number): Promise<void> {
   try {
     tab = await chrome.tabs.get(tabId);
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("No tab with id")) {
       console.debug(`[auto-injector] tab ${tabId} closed before get`);
@@ -353,6 +357,7 @@ async function processPageNavigation(
   try {
     await maybeShowFirstAttachToast(tabId, url);
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.MARCO, "first-attach toast inject failed", err);
   }
 }
@@ -429,6 +434,7 @@ async function injectSingleResolved(
       logInjectionError(resolved.injectable.id, result.errorMessage);
     }
   } catch (injectionError) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: injectionError });
     logInjectionError(resolved.injectable.id, injectionError);
   }
 }

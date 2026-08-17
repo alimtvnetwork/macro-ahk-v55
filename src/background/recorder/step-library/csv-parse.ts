@@ -147,15 +147,13 @@ function makeTokenizerState(): TokenizerState {
 
 /** Consume one char while inside quotes. Returns new index (may skip an escaped quote). */
 function stepQuoted(source: string, i: number, ch: string, state: TokenizerState): number {
+  if (ch === '"' && source[i + 1] === '"') {
+    state.field += '"';
+    return i + 1; 
+  }
+  
   if (ch === '"') {
-    if (source[i + 1] === '"') {
-      state.field += '"';
-
-      return i + 1; 
-    }
-
     state.inQuotes = false;
-
     return i;
   }
 
@@ -178,18 +176,19 @@ function commitRow(state: TokenizerState): void {
 
 /** Consume one char while not inside quotes. Returns new index. */
 function stepUnquoted(source: string, i: number, ch: string, delimiter: string, state: TokenizerState): number {
-  if (ch === '"') {
-    if (state.field.length === 0) {
-      state.inQuotes = true;
+  if (ch === '"' && state.field.length === 0) {
+    state.inQuotes = true;
+    return i; 
+  }
 
-      return i; 
-    }
-
+  if (ch === '"' && state.warnings.length < 5) {
     state.field += ch;
-    if (state.warnings.length < 5) {
-      state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
-    }
-
+    state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
+    return i;
+  }
+  
+  if (ch === '"') {
+    state.field += ch;
     return i;
   }
 
@@ -293,12 +292,16 @@ function alignRowsToHeaders(dataRows: string[][], width: number, warnings: strin
 
       aligned.push(padded);
       padCount++;
-    } else if (original.length > width) {
+      continue;
+    }
+    
+    if (original.length > width) {
       aligned.push(original.slice(0, width));
       truncCount++;
-    } else {
-      aligned.push(original);
+      continue;
     }
+    
+    aligned.push(original);
   }
 
   if (padCount > 0) {
@@ -319,12 +322,12 @@ function detectDelimiter(source: string): DelimiterType {
   let semis = 0;
   for (let i = 0; i < source.length; i++) {
     const ch = source[i];
-    if (ch === '"') {
-      if (inQuotes && source[i + 1] === '"') {
-        i++;
-        continue; 
-      }
+    if (ch === '"' && inQuotes && source[i + 1] === '"') {
+      i++;
+      continue; 
+    }
 
+    if (ch === '"') {
       inQuotes = !inQuotes;
       continue;
     }
@@ -339,7 +342,10 @@ function detectDelimiter(source: string): DelimiterType {
 
     if (ch === ",") {
       commas++;
-    } else if (ch === ";") {
+      continue;
+    }
+    
+    if (ch === ";") {
       semis++;
     }
   }

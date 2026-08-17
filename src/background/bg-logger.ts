@@ -124,6 +124,7 @@ export function logBgError(
       scriptFile: context?.scriptFile,
     } as MessageRequest).catch(() => { /* fall through to console.error */ }); // allow-swallow: DB/session not ready — console.error below preserves the error
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
   }
 
