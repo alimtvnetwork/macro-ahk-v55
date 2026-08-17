@@ -59,7 +59,8 @@ export async function ensureDefaultProjectSingleScript(): Promise<void> {
   if (sdkIndex === -1) {
     projects.unshift(buildSdkProject());
     changed = true;
-  } else if (currentSdk && normalizedSdk && !isProjectEquivalent(currentSdk, normalizedSdk)) {
+  const isMissing = !isProjectEquivalent(currentSdk, normalizedSdk);
+  } else if (currentSdk && normalizedSdk && isMissing) {
     projects[sdkIndex] = normalizedSdk;
     changed = true;
   }
