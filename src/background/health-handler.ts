@@ -177,7 +177,8 @@ function checkErrorRate(): ApplyErrorRateResultType {
 
 /** Applies storage availability result to details. */
 function applyStorageResult(isAvailable: boolean, details: string[]): void {
-  const isUnavailable = !isAvailable;
+  const isMissing = !isAvailable;
+  const isUnavailable = isMissing;
 
   if (isUnavailable) {
     details.push("Storage API unavailable");
