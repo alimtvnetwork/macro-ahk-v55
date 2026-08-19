@@ -601,6 +601,8 @@ export async function exportProjectAsSqliteZip(project: StoredProject): Promise<
         order: entry.order,
         runAt: entry.runAt,
         configBinding: entry.configBinding,
+        isIife: false,
+        hasDomUsage: false,
         createdAt: now,
         updatedAt: now,
       });
@@ -693,6 +695,8 @@ export async function exportProjectsAsSqliteZip(
           order: entry.order,
           runAt: entry.runAt,
           configBinding: entry.configBinding,
+          isIife: false,
+          hasDomUsage: false,
           createdAt: now,
           updatedAt: now,
         });
@@ -922,7 +926,7 @@ function readProjects(db: Database, strict = false): StoredProject[] {
       cookies: safeJsonParse(rowObject["Cookies"] as string ?? null, []),
       cookieRules: safeJsonParse(col(rowObject, "CookieRules", "cookie_rules", strict) as string, []),
       dependencies,
-      settings,
+      settings: settings as StoredProject["settings"],
       isGlobal: rowObject["IsGlobal"] === 1,
       isRemovable: rowObject["IsRemovable"] == null ? true : rowObject["IsRemovable"] === 1,
       createdAt: (col(rowObject, "CreatedAt", "created_at", strict) as string),

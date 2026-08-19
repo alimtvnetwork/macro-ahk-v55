@@ -36,7 +36,7 @@ function formatDate(iso: string): string {
   }
 }
 
-function DetailField(props: { label: string; value: string; mono: boolean }): JSX.Element {
+function DetailField(props: { label: string; value: string; mono?: boolean }): JSX.Element {
   return (
     <div className="flex items-baseline gap-2">
       <span className="text-[10px] uppercase tracking-wide text-muted-foreground">

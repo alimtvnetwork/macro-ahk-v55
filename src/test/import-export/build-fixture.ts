@@ -37,7 +37,7 @@ export function buildFixtureProject(): StoredProject {
     cookies: [
       { cookieName: "session", url: "https://example.com", role: "session" },
     ],
-    settings: { autoRun: true, theme: "dark", variables },
+    settings: { autoRun: true, theme: "dark", variables, isolateScripts: false, retryOnNavigate: false },
     dependencies: [{ projectId: "dep-a", version: "1.0.0" }],
     isGlobal: false,
     isRemovable: true,

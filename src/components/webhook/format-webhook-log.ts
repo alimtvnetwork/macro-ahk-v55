@@ -14,7 +14,7 @@ export interface WebhookDeliveryResult {
   ProjectId?: string;
   Url?: string;
   StatusCode?: number | null;
-  Success: boolean;
+  Success?: boolean;
   DispatchedAt?: string;
   DurationMs?: number;
   ErrorReason?: string | null;
@@ -26,7 +26,7 @@ export interface WebhookDeliveryResult {
 
 const MISSING = "<missing>";
 
-function fmt(value: string | number | boolean | undefined): string {
+function fmt(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined || value === "") {
     return MISSING;
   }

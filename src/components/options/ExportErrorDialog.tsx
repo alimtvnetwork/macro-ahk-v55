@@ -119,7 +119,7 @@ function TechnicalDetails(props: { ids: ReadonlyArray<number>; failure: ExportEr
   return <Accordion type="single" collapsible className="w-full"><AccordionItem value="tech" className="border-0"><AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">Technical detail</AccordionTrigger><AccordionContent><dl className="space-y-1 rounded-md bg-muted/40 p-3 text-xs"><DetailRow label="Reason" value={props.failure.Reason} mono /><DetailRow label="Detail" value={props.failure.Detail} />{props.ids.length > 0 && <DetailRow label="IDs" value={props.ids.join(", ")} mono />}</dl></AccordionContent></AccordionItem></Accordion>;
 }
 
-function DetailRow({ label, value, mono }: { label: string; value: string; mono: boolean }) {
+function DetailRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex flex-col gap-0.5">
       <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>

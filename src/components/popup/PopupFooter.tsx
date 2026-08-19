@@ -95,7 +95,7 @@ function ShortcutTooltipButton() {
   );
 }
 
-function KbdKey({ label, isArrow = false }: { label: string; isArrow: boolean }) {
+function KbdKey({ label, isArrow = false }: { label: string; isArrow?: boolean }) {
   return (
     <kbd
       className={`inline-flex items-center justify-center min-w-[1.6rem] h-6 px-1.5 rounded-md bg-muted border border-border font-mono font-semibold text-foreground shadow-[0_2px_4px_hsl(var(--border)),inset_0_1px_0_hsl(var(--card))] ${

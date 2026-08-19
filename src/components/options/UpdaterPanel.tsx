@@ -220,6 +220,7 @@ function useUpdaterPanelState() {
           stepId: `step-${u.steps.length + 1}`,
           sortOrder: u.steps.length,
           type: "Download",
+          isRedirectable: false,
         };
 
         return { ...u, steps: [...u.steps, step] };

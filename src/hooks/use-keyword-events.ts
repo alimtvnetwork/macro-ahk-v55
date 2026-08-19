@@ -26,7 +26,7 @@ const STORAGE_KEY = "marco-keyword-events-v1";
  *     touching the underlying Combo (which carries real keystroke data).
  */
 export interface KeywordEventStepCommon {
-    readonly Enabled: boolean;
+    readonly Enabled?: boolean;
     readonly LabelType?: string;
 }
 export type KeywordEventStep =

@@ -52,7 +52,7 @@ export interface EnumValidation {
 export interface NumberValidation {
   min?: number;
   max?: number;
-  integer: boolean;
+  integer?: boolean;
 }
 
 export interface ValidationRule {
@@ -67,7 +67,7 @@ export interface ValidationRule {
 interface ValidationRuleEditorProps {
   rule: ValidationRule | null;
   onChange: (rule: ValidationRule | null) => void;
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 /* ------------------------------------------------------------------ */

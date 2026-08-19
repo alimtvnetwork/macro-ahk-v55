@@ -169,6 +169,7 @@ function emitGroupWebhook(
       Outcome: report.Status,
       FailureReason: failureReason,
       FailedStepId: failedStepId,
+      IsTest: false,
     }),
   );
 }

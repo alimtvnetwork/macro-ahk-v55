@@ -70,7 +70,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
   // Create form state
   const [newTableName, setNewTableName] = useState("");
   const [newColumns, setNewColumns] = useState<ColumnDefinition[]>([
-    { name: "", type: "TEXT" },
+    { name: "", type: "TEXT", nullable: true, unique: false },
   ]);
   const [modalError, setModalError] = useState<ErrorModel | null>(null);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
@@ -175,7 +175,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         toast.success(`Table "${trimmedName}" created`);
         setShowCreateForm(false);
         setNewTableName("");
-        setNewColumns([{ name: "", type: "TEXT" }]);
+        setNewColumns([{ name: "", type: "TEXT", nullable: true, unique: false }]);
         void refreshTables();
       } else {
         toast.error(result.errorMessage || "Failed to create table");

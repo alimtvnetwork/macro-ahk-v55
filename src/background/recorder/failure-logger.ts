@@ -188,7 +188,7 @@ export interface BuildFailureReportInput {
      * truncation behavior. Callers MUST resolve this from
      * `resolveVerboseLogging(projectId)` — never hard-code `true`.
      */
-    readonly Verbose: boolean;
+    readonly Verbose?: boolean;
     /**
      * Pre-captured form snapshot from the recorder (preferred when the
      * step already carries one). When absent and a `Target` is supplied,

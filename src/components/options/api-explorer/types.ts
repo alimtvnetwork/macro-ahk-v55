@@ -44,6 +44,7 @@ export function normalizeEndpoint(raw: Record<string, SerializableValue>): Endpo
     Category: (raw.Category ?? raw.category ?? "General") as string,
     Description: (raw.Description ?? raw.description ?? "") as string,
     IsMutating: Boolean(raw.IsMutating ?? raw.isMutating ?? false),
+    isMutating: Boolean(raw.IsMutating ?? raw.isMutating ?? false),
     ExampleRequest: (raw.ExampleRequest ?? raw.exampleRequest) as Record<string, SerializableValue> | undefined,
   };
 }

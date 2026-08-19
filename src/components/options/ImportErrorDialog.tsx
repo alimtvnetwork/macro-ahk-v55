@@ -120,7 +120,7 @@ function OffendingIdRows({ failure }: { failure: ImportErrorExplanation["Failure
   return failure.OffendingIds !== undefined && failure.OffendingIds.length > 0 ? <DetailRow label="IDs" value={failure.OffendingIds.join(", ")} mono /> : null;
 }
 
-function DetailRow({ label, value, mono }: { label: string; value: string; mono: boolean }) {
+function DetailRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex flex-col gap-0.5">
       <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>

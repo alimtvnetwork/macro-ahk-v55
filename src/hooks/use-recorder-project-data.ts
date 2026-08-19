@@ -46,7 +46,7 @@ export interface StepRow {
 export interface StepMetaPatch {
     readonly LabelType?: string;
     readonly Description?: string | null;
-    readonly IsDisabled: boolean;
+    readonly IsDisabled?: boolean;
     readonly RetryCount?: number;
     readonly TimeoutMs?: number | null;
 }
@@ -163,7 +163,7 @@ async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLi
   const res = await sendMessage<{ isOk: true; step: StepRow }>({
      
     type: "RECORDER_STEP_LINK_SET" as any,
-    projectSlug, stepId, slot, targetProjectSlug,
+    projectSlug, stepId, slot, targetProjectSlug: targetProjectSlug as any,
   });
 
   return res.step;

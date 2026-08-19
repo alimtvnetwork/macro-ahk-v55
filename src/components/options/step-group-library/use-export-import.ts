@@ -49,7 +49,7 @@ interface UseExportImportResult {
     setExportError: Dispatch<SetStateAction<ExportErrorState>>;
     handleExport: (
         idsOverride?: ReadonlyArray<number>,
-        includeDescendants: boolean,
+        includeDescendants?: boolean,
     ) => void;
     confirmExport: () => Promise<void>;
     handleImportClick: () => void;

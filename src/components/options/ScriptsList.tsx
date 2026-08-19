@@ -175,7 +175,7 @@ function FileDropZone({
   label: string;
   icon: typeof FileCode;
   onFile: (name: string, content: string) => void;
-  multiple: boolean;
+  multiple?: boolean;
 }) {
   const [isDragOver, setIsDragOver] = useState(false);
 

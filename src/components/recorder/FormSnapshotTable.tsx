@@ -29,12 +29,12 @@ import type { FormSnapshot, FormFieldMeta } from "@/background/recorder/form-sna
 interface FormSnapshotTableProps {
     readonly snapshot: FormSnapshot;
     /** Hide the surrounding section/border — useful inside another card. */
-    readonly embedded: boolean;
+    readonly embedded?: boolean;
     /** Override the section heading. */
     readonly title?: string;
 }
 
-export function FormSnapshotTable({ snapshot, embedded, title }: FormSnapshotTableProps) {
+export function FormSnapshotTable({ snapshot, embedded = false, title }: FormSnapshotTableProps) {
   const valueByName = new Map<string, { Value: string; Masked: boolean }>();
   if (snapshot.Values !== null) {
     for (const v of snapshot.Values) {

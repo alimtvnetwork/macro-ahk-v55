@@ -35,11 +35,11 @@ interface ColumnEditorProps {
   columns: ColumnDefinition[];
   onChange: (columns: ColumnDefinition[]) => void;
   /** Show advanced fields (unique, default, description). Default: false */
-  advanced: boolean;
+  advanced?: boolean;
   /** Minimum number of columns. Default: 1 */
   minColumns?: number;
   /** Read-only mode. Default: false */
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 const SQLITE_TYPES: SqliteType[] = ["TEXT", "INTEGER", "REAL", "BLOB", "BOOLEAN"];
@@ -55,7 +55,7 @@ export function ColumnEditor({
   readOnly = false,
 }: ColumnEditorProps) {
   const addColumn = () => {
-    onChange([...columns, { name: "", type: "TEXT" }]);
+    onChange([...columns, { name: "", type: "TEXT", nullable: true, unique: false }]);
   };
 
   const updateColumn = (index: number, patch: Partial<ColumnDefinition>) => {

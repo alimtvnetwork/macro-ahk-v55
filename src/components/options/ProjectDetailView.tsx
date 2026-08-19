@@ -216,7 +216,15 @@ function SecondaryTabPanels({ activeTab, project, onSave, sdkNamespace, projectS
       <LazyTabContent value="xpath" activeTab={activeTab}>
         <XPathPanel
           chatBoxXPath={project.settings?.chatBoxXPath}
-          onSaveChatBoxXPath={(xpath) => onSave({ id: project.id, settings: { ...project.settings, chatBoxXPath: xpath } })}
+          onSaveChatBoxXPath={(xpath) => onSave({
+            id: project.id,
+            settings: {
+              isolateScripts: project.settings?.isolateScripts ?? false,
+              retryOnNavigate: project.settings?.retryOnNavigate ?? false,
+              ...project.settings,
+              chatBoxXPath: xpath,
+            },
+          })}
         />
         <DevGuideSection namespace={sdkNamespace} section="xpath" targetUrls={targetUrls} />
       </LazyTabContent>

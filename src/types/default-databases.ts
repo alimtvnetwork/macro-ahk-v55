@@ -41,7 +41,7 @@ export interface DefaultDatabaseDef {
     tables: Array<{
       TableName: string;
       Description: string;
-      Columns: Array<{ Name: string; Type: string; Nullable: boolean; Unique: boolean; Default?: string; Description?: string }>;
+      Columns: Array<{ Name: string; Type: string; Nullable?: boolean; Unique?: boolean; Default?: string; Description?: string }>;
     }>;
   };
 }

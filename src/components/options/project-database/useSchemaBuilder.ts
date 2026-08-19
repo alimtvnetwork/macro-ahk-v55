@@ -56,7 +56,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
   const addTable = () => {
     setTables([
       ...tables,
-      { name: "", description: "", columns: [{ name: "", type: "TEXT" }], relations: [], isOpen: true },
+      { name: "", description: "", columns: [{ name: "", type: "TEXT", nullable: true, unique: false }], relations: [], isOpen: true },
     ]);
   };
 

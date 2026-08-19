@@ -113,7 +113,8 @@ export function XPathValidationPanel() {
         selector,
         found: i < 4 ? 1 : 0,
         status: i < 4 ? "pass" as const : i === 4 ? "fallback" as const : "fail" as const,
-        ...(i === 4 ? { fallbackUsed: true, error: `XPath stale — CSS fallback found 1 element(s). Update XPath config for "${name}".` } : {}),
+        fallbackUsed: i === 4,
+        ...(i === 4 ? { error: `XPath stale — CSS fallback found 1 element(s). Update XPath config for "${name}".` } : {}),
         ...(i >= 5 ? { error: `XPath not found: "${name}". Consider adding a CSS selector fallback.` } : {}),
       }));
       setResult({

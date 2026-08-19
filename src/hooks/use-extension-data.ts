@@ -105,7 +105,7 @@ export interface DataBrowserFilters {
   source?: string;
   category?: string;
   search?: string;
-  caseSensitive: boolean;
+  caseSensitive?: boolean;
 }
 
 export function useDataBrowser(database: DatabaseType, pageSize = 20, filters: DataBrowserFilters = {}) {

@@ -33,7 +33,7 @@ interface ForeignKeyEditorProps {
   availableTables?: string[];
   /** Available column names on the current table */
   availableColumns?: string[];
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 
 const ON_DELETE_OPTIONS: OnDeleteAction[] = ["CASCADE", "SET NULL", "RESTRICT", "NO ACTION"];

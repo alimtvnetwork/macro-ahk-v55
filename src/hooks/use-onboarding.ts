@@ -41,7 +41,7 @@ function getChromePermissions(): ChromePermissionsApi | undefined {
 /** Hook to check and manage onboarding state. */
 // eslint-disable-next-line max-lines-per-function
 export function useOnboarding() {
-  const [isComplete, setIsComplete] = useState<boolean>(null);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -12,6 +12,8 @@ const mockState = vi.hoisted(() => {
     targetUrls: [{ pattern: "lovable.dev/*", matchType: "glob" }],
     scripts: [{ path: "macro-looping.js", order: 1, runAt: "document_idle" }],
     configs: [],
+    isGlobal: false,
+    isRemovable: true,
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-03-18T00:00:00Z",
   };
@@ -20,6 +22,8 @@ const mockState = vi.hoisted(() => {
     name: "macro-looping.js",
     code: "",
     order: 1,
+    isIife: false,
+    hasDomUsage: false,
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-03-18T00:00:00Z",
   };

@@ -45,8 +45,8 @@ function useSidebar() {
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    defaultOpen: boolean;
-    open: boolean;
+    defaultOpen?: boolean;
+    open?: boolean;
     onOpenChange?: (open: boolean) => void;
       }
       // eslint-disable-next-line max-lines-per-function
@@ -441,8 +441,8 @@ const sidebarMenuButtonVariants = cva(
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & {
-    asChild: boolean;
-    isActive: boolean;
+    asChild?: boolean;
+    isActive?: boolean;
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(({ asChild = false, isActive = false, variant = "default", size = "default", tooltip, className, ...props }, ref) => {

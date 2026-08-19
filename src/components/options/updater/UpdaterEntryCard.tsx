@@ -383,7 +383,7 @@ export function UpdaterEntryCard({
   );
 }
 
-function Section({ icon, title, children, collapsible }: { icon: React.ReactNode; title: string; children: React.ReactNode; collapsible: boolean }) {
+function Section({ icon, title, children, collapsible = false }: { icon: React.ReactNode; title: string; children: React.ReactNode; collapsible?: boolean }) {
   if (collapsible) {
     return (
       <Collapsible>
@@ -407,7 +407,7 @@ function Section({ icon, title, children, collapsible }: { icon: React.ReactNode
   );
 }
 
-function FieldInput({ label, value, onChange, mono, small }: { label: string; value: string; onChange: (v: string) => void; mono: boolean; small: boolean }) {
+function FieldInput({ label, value, onChange, mono = false, small = false }: { label: string; value: string; onChange: (v: string) => void; mono?: boolean; small?: boolean }) {
   return (
     <div className="space-y-1">
       <LabelType className={small ? "text-[10px]" : "text-xs"}>{label}</LabelType>
