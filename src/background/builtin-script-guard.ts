@@ -10,6 +10,7 @@
  * project/script store drift.
  */
 
+import { ServiceResult } from "../utils/result-wrapper";
 import type { StoredScript } from "../shared/script-config-types";
 import type { StoredProject } from "../shared/project-types";
 import { STORAGE_KEY_ALL_SCRIPTS } from "../shared/constants";

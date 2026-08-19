@@ -11,6 +11,7 @@
  * See: spec/22-app-issues/88-indexeddb-injection-cache.md
  */
 
+import { ServiceResult } from "../utils/result-wrapper";
 import type { StoredScript } from "../shared/script-config-types";
 import { STORAGE_KEY_ALL_SCRIPTS } from "../shared/constants";
 import { cacheScriptCode } from "./injection-cache";

@@ -9,6 +9,7 @@
  * @see .lovable/memory/architecture/background/service-worker-structure.md — SW architecture
  */
 
+import { ServiceResult } from "../utils/result-wrapper";
 import { initDatabases, type DbManager } from "./db-manager";
 import { bindDbManager, startSession, getLogsDb, getErrorsDb, markLoggingDirty } from "./handlers/logging-handler";
 import { bindStorageDbManager } from "./handlers/storage-handler";

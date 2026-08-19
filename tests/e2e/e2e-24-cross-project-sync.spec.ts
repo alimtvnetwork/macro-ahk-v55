@@ -36,6 +36,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
       const options = await openOptions(context, extensionId);
       options.setDefaultTimeout(90_000);
+      options.on('console', msg => console.log(`[options console] ${msg.type()}: ${msg.text()}`));
       await options.goto(`${optionsUrl(extensionId)}#library`);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
@@ -48,7 +49,8 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await options.getByTestId('project-group-name-input').fill(groupName);
       await options.getByTestId('project-group-settings-input').fill('{"logLevel":"warn","retryOnNavigate":true}');
       await options.getByTestId('project-group-save-button').click();
-
+      await expect(options.getByText(new RegExp(`Group "${groupName}" created`))).toBeVisible({ timeout: 60_000 });
+      await expect(options.getByTestId('project-group-save-button')).toBeHidden({ timeout: 30_000 });
       await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 60_000 });
       const groupId = await readGroupId(options, groupName);
       expect(groupId).not.toBeNull();
