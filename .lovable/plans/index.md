@@ -49,3 +49,4 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 42b | [move-plan-guard-helpers](./completed/42b-move-plan-guard-helpers.md) | - | completed | 2026-08-19 |
 | 43a | [fix-imports-credit-parser](./completed/43a-fix-imports-credit-parser.md) | - | completed | 2026-08-19 |
 | 43b | [fix-imports-workspace-db-ui](./completed/43b-fix-imports-workspace-db-ui.md) | - | completed | 2026-08-19 |
+| 44 | [ci-cd-typecheck-remediation](./pending/44-ci-cd-typecheck-remediation.md) | [subtasks](./subtasks/44-ci-cd-typecheck-remediation/) | pending | 2026-08-19 |
