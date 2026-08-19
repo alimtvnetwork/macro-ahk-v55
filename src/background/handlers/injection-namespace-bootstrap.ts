@@ -30,25 +30,27 @@ const _llmGuideCache = new Map<string, string>();
  * Bootstraps `window.RiseupAsiaMacroExt = { Projects: {} }` in the page's
  * MAIN world before any scripts or namespaces are injected.
  */
+function initExtNamespace() {
+  const win = window as unknown as Record<string, unknown>;
+  const isExtRootMissing = !win.RiseupAsiaMacroExt;
+
+  if (isExtRootMissing) {
+    win.RiseupAsiaMacroExt = { Projects: {} };
+  } else {
+    const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
+    const isProjectsMissing = !ext.Projects;
+
+    if (isProjectsMissing) {
+      ext.Projects = {};
+    }
+  }
+}
+
 export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
   try {
     await chrome.scripting.executeScript({
       target: { tabId },
-      func: () => {
-        const win = window as unknown as Record<string, unknown>;
-        const isExtRootMissing = !win.RiseupAsiaMacroExt;
-
-        if (isExtRootMissing) {
-          win.RiseupAsiaMacroExt = { Projects: {} };
-        } else {
-          const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
-          const isProjectsMissing = !ext.Projects;
-
-          if (isProjectsMissing) {
-            ext.Projects = {};
-          }
-        }
-      },
+      func: initExtNamespace,
       world: "MAIN" as chrome.scripting.ExecutionWorld,
     });
     console.log("[injection:bootstrap] ✅ RiseupAsiaMacroExt root bootstrapped in MAIN world (tab %d)", tabId);
@@ -62,10 +64,8 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
         target: { tabId },
         func: () => {
           console.error(
-            "%c[Marco Extension] ⚠️ MAIN world namespace bootstrap failed",
+            "%c[Marco Extension] ⚠️ MAIN world namespace bootstrap failed\n\nRiseupAsiaMacroExt.Projects.* will NOT be available in the console.\n\nWorkaround: Use window.marco.* API directly (available in the injected script world).",
             "color: red; font-weight: bold; font-size: 14px;",
-            "\n\nRiseupAsiaMacroExt.Projects.* will NOT be available in the console.",
-            "\n\nWorkaround: Use window.marco.* API directly (available in the injected script world).",
           );
         },
         world: "MAIN" as chrome.scripting.ExecutionWorld,

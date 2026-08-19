@@ -4,46 +4,24 @@ import type { StoredConfig, StoredProject, StoredScript } from "@/hooks/use-proj
 
 const mockState = vi.hoisted(() => {
   const project: StoredProject = {
-    id: "proj-1",
-    schemaVersion: 1,
-    name: "Lovable Dashboard",
-    version: "1.2.0",
-    description: "Automation scripts",
-    targetUrls: [{ pattern: "lovable.dev/*", matchType: "glob" }],
-    scripts: [{ path: "macro-looping.js", order: 1, runAt: "document_idle" }],
-    configs: [],
-    isGlobal: false,
-    isRemovable: true,
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-03-18T00:00:00Z",
+    id: "proj-1", schemaVersion: 1, name: "Lovable Dashboard", version: "1.2.0",
+    description: "Automation scripts", targetUrls: [{ pattern: "lovable.dev/*", matchType: "glob" }],
+    scripts: [{ path: "macro-looping.js", order: 1, runAt: "document_idle" }], configs: [],
+    isGlobal: false, isRemovable: true, createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-03-18T00:00:00Z",
   };
   const script: StoredScript = {
-    id: "script-1",
-    name: "macro-looping.js",
-    code: "",
-    order: 1,
-    isIife: false,
-    hasDomUsage: false,
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-03-18T00:00:00Z",
+    id: "script-1", name: "macro-looping.js", code: "", order: 1, isIife: false, hasDomUsage: false,
+    createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-03-18T00:00:00Z",
   };
   const config: StoredConfig = {
-    id: "config-1",
-    name: "Default config",
-    json: "{}",
-    createdAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-03-18T00:00:00Z",
+    id: "config-1", name: "Default config", json: "{}",
+    createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-03-18T00:00:00Z",
   };
 
   return {
-    isComplete: true,
-    onboardingLoading: false,
-    projects: [project],
-    scripts: [script],
-    configs: [config],
-    projectsLoading: false,
-    scriptsLoading: false,
-    configsLoading: false,
+    isComplete: true, onboardingLoading: false,
+    projects: [project], scripts: [script], configs: [config],
+    projectsLoading: false, scriptsLoading: false, configsLoading: false,
     completeOnboarding: vi.fn(),
     saveProject: vi.fn().mockResolvedValue(undefined),
     removeProject: vi.fn().mockResolvedValue(undefined),
