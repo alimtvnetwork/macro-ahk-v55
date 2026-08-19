@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Swagger-Style API Explorer
  * See: spec/05-chrome-extension/64-api-explorer-swagger.md
@@ -18,6 +17,7 @@ import {
 } from "./types";
 import { EndpointAccordionItem } from "./EndpointAccordionItem";
 import { logError } from "@/components/options/options-logger";
+import type { SerializableValue } from "@/platform/platform-adapter";
 
 // eslint-disable-next-line max-lines-per-function
 export function ApiExplorerSwagger() {
@@ -28,7 +28,7 @@ export function ApiExplorerSwagger() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk: boolean }>({ type: "GET_API_STATUS" as any });
+      const result = await sendMessage<ApiStatus & { isOk: boolean }>({ type: "GET_API_STATUS" });
       setStatus({
         service: result.service,
         version: result.version,
@@ -44,9 +44,9 @@ export function ApiExplorerSwagger() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" });
       const raw = result.endpoints ?? [];
-      setEndpoints(raw.map((e) => normalizeEndpoint(e as any as Record<string, any>)));
+      setEndpoints(raw.map((e) => normalizeEndpoint(e as unknown as Record<string, SerializableValue>)));
     } catch (err) { /* swallowed */
       toast.error("Failed to load API endpoint docs");
     }

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { JsonValue } from "@/background/handlers/handler-types";
+import type { MessagePayload, SerializableValue } from "@/platform/platform-adapter";
 import { useEffect, useMemo, useState } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { logError } from "@/components/options/options-logger";
 
 type EndpointDoc = {
   type: string;
@@ -21,7 +19,7 @@ type EndpointDoc = {
   category: string;
   description: string;
   isMutating: boolean;
-  exampleRequest?: Record<string, any>;
+  exampleRequest?: Record<string, unknown>;
 };
 
 type ApiEndpointsResponse = {
@@ -38,7 +36,7 @@ type ApiStatus = {
   persistenceMode: string;
 };
 
-function toPrettyJson(value: JsonValue): string {
+function toPrettyJson(value: unknown): string {
   try {
     return JSON.stringify(value, null, 2);
   } catch (err) { /* swallowed */
@@ -69,7 +67,7 @@ export function ApiExplorerCard() {
 
   const loadStatus = async () => {
     try {
-      const result = await sendMessage<ApiStatus & { isOk: boolean }>({ type: "GET_API_STATUS" as any });
+      const result = await sendMessage<ApiStatus & { isOk: boolean }>({ type: "GET_API_STATUS" });
       setStatus({
         service: result.service,
         version: result.version,
@@ -85,7 +83,7 @@ export function ApiExplorerCard() {
 
   const loadEndpoints = async () => {
     try {
-      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
+      const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" });
       const docs = result.endpoints ?? [];
       setEndpoints(docs);
 
@@ -106,7 +104,7 @@ export function ApiExplorerCard() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const runRequest = async () => {
-    let parsedBody: JsonValue = {};
+    let parsedBody: unknown = {};
     try {
       parsedBody = requestJson.trim() ? JSON.parse(requestJson) : {};
     } catch (err) { /* swallowed */
@@ -121,14 +119,14 @@ export function ApiExplorerCard() {
       return;
     }
 
-    const body = parsedBody as Record<string, any>;
+    const body = parsedBody as Record<string, SerializableValue | object>;
     const { type: _ignoredType, ...rest } = body;
-    const message: Record<string, any> = { type: selectedType, ...rest };
+    const message: MessagePayload = { type: selectedType, ...rest };
 
     setLoading(true);
     try {
-      const response = await sendMessage<any>(message as any);
-      setResponseJson(toPrettyJson(response as JsonValue));
+      const response = await sendMessage<unknown>(message);
+      setResponseJson(toPrettyJson(response));
     } catch (error) {
       setResponseJson(toPrettyJson({
         isOk: false,

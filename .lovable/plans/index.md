@@ -39,7 +39,7 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 35 | [fix-remaining-lint-issues](./completed/35-fix-remaining-lint-issues.md) | - | completed | 2026-08-12 |
 | 36 | [fix-eslint-warnings-ci](./completed/36-fix-eslint-warnings-ci.md) | [subtasks](./subtasks/36-fix-eslint-warnings-ci/) | completed | 2026-08-12 |
 | 37 | [global-guideline-fixes](./completed/37-global-guideline-fixes.md) | - | completed | 2026-08-18 |
-| 38 | [coding-guideline-fixes-v3](./pending/38-coding-guideline-fixes-v3.md) | [tasks](../spec/tasks/38-coding-guideline-fixes-v3.md) | pending | 2026-08-17 |
+| 38 | [coding-guideline-fixes-v3](./pending/38-coding-guideline-fixes-v3.md) | [tasks](../spec/tasks/38-coding-guideline-fixes-v3.md) | pending | 2026-08-19 |
 | 39a | [fix-magic-strings-auth-injector](./completed/39a-fix-magic-strings-auth-injector.md) | - | completed | 2026-08-19 |
 | 39b | [fix-magic-strings-boot-menu](./completed/39b-fix-magic-strings-boot-menu.md) | - | completed | 2026-08-19 |
 | 40 | [fix-if-statement-padding](./completed/40-fix-if-statement-padding.md) | - | completed | 2026-08-19 |

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines-per-function -- untyped extension message types */
 /**
  * AutomationView — Spec 21
@@ -10,6 +9,7 @@
 
 import { useState, useCallback, useRef, useEffect, lazy, Suspense } from "react";
 import { sendMessage } from "@/lib/message-client";
+import type { MessagePayload } from "@/platform/platform-adapter";
 import type { AutomationChain, ChainExecutionState } from "@/lib/automation-types";
 import { flattenSteps, STEP_TYPE_META } from "@/lib/automation-types";
 import { ChainRunner } from "@/lib/chain-runner";
@@ -57,7 +57,7 @@ async function saveChainToDb(chain: Partial<AutomationChain>, project: string): 
     type: "SAVE_AUTOMATION_CHAIN",
     project,
     chain,
-  } as any);
+  } as MessagePayload);
 
   return result.isOk;
 }
@@ -67,7 +67,7 @@ async function deleteChainFromDb(chainId: string, project: string): Promise<bool
     type: "DELETE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as any);
+  } as MessagePayload);
 
   return result.isOk;
 }
@@ -77,7 +77,7 @@ async function toggleChainInDb(chainId: string, project: string): Promise<boolea
     type: "TOGGLE_AUTOMATION_CHAIN",
     project,
     chainId,
-  } as any);
+  } as MessagePayload);
 
   return result.isOk;
 }
@@ -87,7 +87,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
     type: "IMPORT_AUTOMATION_CHAINS",
     project,
     chains,
-  } as any);
+  } as MessagePayload);
 
   return result.imported ?? 0;
 }
@@ -95,7 +95,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
 async function loadProjects(): Promise<Array<{ id: string; name: string; slug: string }>> {
   try {
     const result = await sendMessage<{ isOk: boolean; projects?: Array<{ id: string; name: string; slug?: string }> }>({
-      type: "GET_PROJECTS" as any,
+      type: "GET_PROJECTS",
     });
 
     if (result.isOk && result.projects) {
