@@ -6,6 +6,7 @@
 import type { JsonValue } from "@/background/handlers/handler-types";
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
+import type { DataStoreEntry } from "@/hooks/use-extension-data";
 
 /* ---- Session Storage ---- */
 
@@ -84,12 +85,7 @@ export function useCookies() {
 
 /* ---- chrome.storage.local (IndexedDB/LocalStorage proxy) ---- */
 
-export interface LocalStorageEntry {
-  key: string;
-  value: JsonValue;
-  valuePreview: string;
-  sizeBytes: number;
-}
+export type LocalStorageEntry = DataStoreEntry;
 
 export function useLocalStorage() {
   const [entries, setEntries] = useState<LocalStorageEntry[]>([]);

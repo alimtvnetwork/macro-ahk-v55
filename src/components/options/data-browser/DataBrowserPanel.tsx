@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import { useStorageStats, useDataBrowser, useDataStore } from "@/hooks/use-extension-data";
 import { useSessionStorage, useCookies, useLocalStorage } from "@/hooks/use-storage-surfaces";
@@ -167,7 +166,7 @@ export function DataBrowserPanel() {
 
       {activeCategory === "local" && (
         <DataStoreTable
-          entries={local.entries as any}
+          entries={local.entries}
           loading={local.loading}
           onRefresh={local.refresh}
         />

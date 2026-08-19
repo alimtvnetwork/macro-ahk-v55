@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Marco Extension — Recorder Self-Test
  *
@@ -11,6 +10,7 @@
  */
 
 import { sendMessage } from "@/lib/message-client";
+import { MessageType } from "@/shared/messages";
 import { logError } from "../options-logger";
 import { SelfTestPhaseType } from "../../../types/enums";
 
@@ -43,6 +43,23 @@ export interface SelfTestResult {
 interface InsertResponse { isOk: true; step: { StepId: number } }
 interface ListResponse  { steps: ReadonlyArray<{ StepId: number; VariableName: string }> }
 
+interface DummyDraftSelector {
+  readonly SelectorKindId: number;
+  readonly Expression: string;
+  readonly AnchorSelectorId: null;
+  readonly IsPrimary: boolean;
+}
+
+interface DummyDraft {
+  readonly StepKindId: number;
+  readonly VariableName: string;
+  readonly LabelType: string;
+  readonly InlineJs: null;
+  readonly ParamsJson: null;
+  readonly IsBreakpoint: boolean;
+  readonly Selectors: ReadonlyArray<DummyDraftSelector>;
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTestResult> {
   if (projectSlug.trim().length === 0) {
@@ -69,7 +86,7 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
     };
   } catch (err) {
     // Best-effort cleanup; do not mask the original error.
-    await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: any) => {
+    await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
       logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
 
       return undefined;
@@ -101,7 +118,7 @@ async function verifyInsertedStep(projectSlug: string, insertedStepId: number, v
   return after;
 }
 
-function createDummyDraft(variableName: string) {
+function createDummyDraft(variableName: string): DummyDraft {
   return {
     StepKindId: STEP_KIND_WAIT,
     VariableName: variableName,
@@ -121,8 +138,7 @@ function createDummyDraft(variableName: string) {
 async function insertDummyStep(projectSlug: string, variableName: string): Promise<number> {
   try {
     const response = await sendMessage<InsertResponse>({
-       
-      type: "RECORDER_STEP_INSERT" as any,
+      type: MessageType.RECORDER_STEP_INSERT,
       projectSlug,
       draft: createDummyDraft(variableName),
     });
@@ -141,8 +157,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
 async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<ListResponse["steps"]> {
   try {
     const response = await sendMessage<ListResponse>({
-       
-      type: "RECORDER_STEP_LIST" as any,
+      type: MessageType.RECORDER_STEP_LIST,
       projectSlug,
     });
 
@@ -156,8 +171,7 @@ async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<Lis
 async function deleteStep(projectSlug: string, stepId: number): Promise<void> {
   try {
     await sendMessage({
-       
-      type: "RECORDER_STEP_DELETE" as any,
+      type: MessageType.RECORDER_STEP_DELETE,
       projectSlug,
       stepId,
     });

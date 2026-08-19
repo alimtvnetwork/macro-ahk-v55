@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Step CRUD handlers (rename, delete, description, tags, link) for the
  * recorder visualisation panel. Extracted for PlanTierType 33 (15/50-line cap).
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 
 import { useRecorderProjectData } from "@/hooks/use-recorder-project-data";
 import { sendMessage } from "@/lib/message-client";
+import { MessageType } from "@/shared/messages";
 
 import { logError } from "../../options-logger";
 import { StepLinkSlotType } from "../../../../../standalone-scripts/macro-controller/src/types/enums";
@@ -39,7 +39,7 @@ export function useRecorderStepMutations(
   };
 }
 
-function errText(error: any, fallback: string): string {
+function errText(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
@@ -47,8 +47,7 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
   return useCallback(async (stepId: number, newName: string) => {
     try {
       await sendMessage({
-         
-        type: "RECORDER_STEP_RENAME" as any,
+        type: MessageType.RECORDER_STEP_RENAME,
         projectSlug, stepId, newVariableName: newName,
       });
       toast.success(`Renamed step #${stepId} -> ${newName}`);
@@ -74,8 +73,7 @@ function useDeleteHandler(projectSlug: string, reload: () => Promise<void>) {
 
     try {
       await sendMessage({
-         
-        type: "RECORDER_STEP_DELETE" as any,
+        type: MessageType.RECORDER_STEP_DELETE,
         projectSlug, stepId,
       });
       toast.success("Step deleted");

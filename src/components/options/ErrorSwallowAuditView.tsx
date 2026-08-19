@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { HttpCodes } from "../../constants/http";
 /**
  * Marco Extension — Error-Swallowing Audit View
@@ -86,18 +86,19 @@ function isAuditSeverity(value: string): value is AuditSeverity {
   return value === "P0" || value === "P1" || value === "P2";
 }
  
-function validateItem(raw: any, index: number): AuditItem | string {
+function validateItem(raw: unknown, index: number): AuditItem | string {
   if (raw === null || typeof raw !== "object") {
     return `Items[${index}]: not an object`;
   }
 
-  const id = typeof raw.Id === "string" ? raw.Id : null;
-  const severity = typeof raw.Severity === "string" && isAuditSeverity(raw.Severity) ? raw.Severity : null;
-  const file = typeof raw.File === "string" ? raw.File : null;
-  const line = typeof raw.Line === "number" && Number.isInteger(raw.Line) ? raw.Line : null;
-  const rule = typeof raw.Rule === "string" ? raw.Rule : null;
-  const message = typeof raw.Message === "string" ? raw.Message : null;
-  const snippet = typeof raw.Snippet === "string" ? raw.Snippet : null;
+  const record = raw as Record<string, unknown>;
+  const id = typeof record.Id === "string" ? record.Id : null;
+  const severity = typeof record.Severity === "string" && isAuditSeverity(record.Severity) ? record.Severity : null;
+  const file = typeof record.File === "string" ? record.File : null;
+  const line = typeof record.Line === "number" && Number.isInteger(record.Line) ? record.Line : null;
+  const rule = typeof record.Rule === "string" ? record.Rule : null;
+  const message = typeof record.Message === "string" ? record.Message : null;
+  const snippet = typeof record.Snippet === "string" ? record.Snippet : null;
 
   if (id === null || severity === null || file === null || line === null || rule === null || message === null) {
     return `Items[${index}]: missing required field (Id|Severity|File|Line|Rule|Message)`;
@@ -106,24 +107,25 @@ function validateItem(raw: any, index: number): AuditItem | string {
   return { Id: id, Severity: severity, File: file, Line: line, Rule: rule, Message: message, Snippet: snippet };
 }
  
-function validateReport(raw: any): AuditReport | string {
+function validateReport(raw: unknown): AuditReport | string {
   if (raw === null || typeof raw !== "object") {
     return "Report root is not an object";
   }
 
-  const generatedAt = typeof raw.GeneratedAt === "string" ? raw.GeneratedAt : null;
+  const record = raw as Record<string, unknown>;
+  const generatedAt = typeof record.GeneratedAt === "string" ? record.GeneratedAt : null;
 
   if (generatedAt === null) {
     return "Missing GeneratedAt (ISO timestamp string)";
   }
 
-  if (!Array.isArray(raw.Items)) {
+  if (!Array.isArray(record.Items)) {
     return "Missing Items array";
   }
 
   const items: AuditItem[] = [];
-  for (let i = 0; i < raw.Items.length; i += 1) {
-    const result = validateItem(raw.Items[i], i);
+  for (let i = 0; i < record.Items.length; i += 1) {
+    const result = validateItem(record.Items[i], i);
 
     if (typeof result === "string") {
       return result;

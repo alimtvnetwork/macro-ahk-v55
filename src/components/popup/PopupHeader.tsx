@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import marcoLogo from "@/assets/marco-logo.png";
 import { logError } from "@/hooks/popup-logger";
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,22 @@ interface Props {
   onRefresh: () => void;
 }
 
+interface ChromeRuntimeLike {
+  getManifest?: () => { version?: string };
+  openOptionsPage?: () => void;
+  getURL?: (path: string) => string;
+}
+
+interface ChromeGlobal {
+  chrome?: {
+    runtime?: ChromeRuntimeLike;
+  };
+}
+
 /** Reads the 4-part manifest version at runtime (e.g. "1.37.0.0"). */
 function getManifestVersion(): string | null {
   try {
-    const runtime = (globalThis as any).chrome?.runtime;
+    const runtime = (globalThis as ChromeGlobal).chrome?.runtime;
 
     if (typeof runtime?.getManifest === "function") {
       return runtime.getManifest().version ?? null;
@@ -66,10 +77,10 @@ export function PopupHeader({ version, onRefresh }: Props) {
               variant="ghost"
               className="h-7 w-7 hover:bg-primary/15 hover:text-primary"
               onClick={() => {
-                const runtime = (globalThis as any).chrome?.runtime;
+                const runtime = (globalThis as ChromeGlobal).chrome?.runtime;
                 const canOpenOptionsPage = typeof runtime?.openOptionsPage === "function";
 
-                if (canOpenOptionsPage) {
+                if (canOpenOptionsPage && runtime?.openOptionsPage) {
                   runtime.openOptionsPage();
 
                   return;
