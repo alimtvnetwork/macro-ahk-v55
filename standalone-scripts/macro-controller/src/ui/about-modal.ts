@@ -227,6 +227,7 @@ function _aboutFooterStyles(): string {
 export function showAboutModal(): void {
   // Remove existing if open
   const existing = document.getElementById('macroloop-about-modal');
+
   if (existing) {
     existing.remove();
 
@@ -239,6 +240,7 @@ export function showAboutModal(): void {
   // Render template
   const data = getAboutData();
   let html: string;
+
   if (hasTemplate('about-modal')) {
     html = renderTemplate('about-modal', data);
   } else {
@@ -260,11 +262,13 @@ export function showAboutModal(): void {
   const innerContainer = document.createElement('div');
   innerContainer.innerHTML = html;
   const modal = innerContainer.firstElementChild as HTMLElement;
+
   if (modal) {
     modal.classList.add('marco-enter');
 
     // Bind close button
     const closeBtn = modal.querySelector('[data-action="close"]');
+
     if (closeBtn) {
       (closeBtn as HTMLElement).onclick = function() {
         container.remove(); 

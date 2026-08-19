@@ -37,6 +37,7 @@ export interface RouteContext {
 export function resolveRoute(action: RouteAction, routeContext: RouteContext): RouteResolution {
   const nextJumps = routeContext.JumpsUsed + 1;
   const isRouteLimitExceeded = nextJumps > MAX_ROUTE_JUMPS;
+
   if (isRouteLimitExceeded) {
     return createRouteLoopError();
   }
@@ -71,6 +72,7 @@ function resolveAllowedRoute(action: RouteAction, routeContext: RouteContext, ne
 function resolveLabelRoute(label: string, steps: ReadonlyArray<RouteableStep>, nextJumps: number): RouteResolution {
   const routeIndex = steps.findIndex((step) => step.LabelType === label);
   const isRouteTargetMissing = routeIndex < 0;
+
   if (isRouteTargetMissing) {
     return createInvalidRouteTarget(`No step with LabelType='${label}' in current group`);
   }
@@ -81,6 +83,7 @@ function resolveLabelRoute(label: string, steps: ReadonlyArray<RouteableStep>, n
 function resolveStepIdRoute(stepId: number, steps: ReadonlyArray<RouteableStep>, nextJumps: number): RouteResolution {
   const routeIndex = steps.findIndex((step) => step.StepId === stepId);
   const isRouteTargetMissing = routeIndex < 0;
+
   if (isRouteTargetMissing) {
     return createInvalidRouteTarget(`No step with StepId=${stepId} in current group`);
   }

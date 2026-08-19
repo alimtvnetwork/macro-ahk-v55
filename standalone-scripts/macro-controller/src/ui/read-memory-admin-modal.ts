@@ -50,6 +50,7 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + "OR Name LIKE '" + DUPLICATE_PREFIX + "%' "
     + 'ORDER BY IsDefault DESC, Slug ASC';
   const resp = await runSqlBridge('QUERY', sql);
+
   if (resp.ok === false || !Array.isArray(resp.rows)) {
     return [];
   }
@@ -80,6 +81,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
     "UPDATE Prompt SET IsDefault = 0, Name = '" + escaped + "', "
     + 'UpdatedAt = ' + now + ' WHERE Id = ' + row.Id;
   const resp = await runSqlBridge('SCHEMA', sql);
+
   if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-deactivate',
@@ -125,6 +127,7 @@ function buildDeactivateButton(row: ReadMemoryRow, onDone: () => void): HTMLElem
     'padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;'
     + 'border:1px solid hsl(var(--border));cursor:' + (disabled ? 'not-allowed' : 'pointer') + ';'
     + 'color:hsl(var(--foreground));background:' + (disabled ? 'rgba(75,85,99,0.4)' : 'hsl(var(--destructive))') + ';';
+
   if (isCanonical) {
     btn.title = 'Cannot deactivate the canonical Read Memory prompt';
   }
@@ -140,6 +143,7 @@ async function handleDeactivateClick(row: ReadMemoryRow, btn: HTMLButtonElement,
   btn.disabled = true;
   btn.textContent = '⏳';
   const ok = await deactivateRow(row);
+
   if (ok) {
     log('[ReadMemoryAdmin] Deactivated ' + row.Slug + ' (Id=' + row.Id + ')', 'success');
     onDone();
@@ -170,6 +174,7 @@ function buildTableHeader(): HTMLElement {
 function appendCell(tr: HTMLElement, content: string | HTMLElement, mono = false): void {
   const td = document.createElement('td');
   styleCell(td, mono ? 'font-family:ui-monospace,monospace;' : '');
+
   if (typeof content === 'string') {
     td.textContent = content;
   } else {
@@ -278,6 +283,7 @@ function buildPanel(): HTMLElement {
 
 async function renderBody(panel: HTMLElement, refresh: () => Promise<void>): Promise<void> {
   const body = panel.querySelector<HTMLElement>('[data-role="body"]');
+
   if (!body) {
     return;
   }

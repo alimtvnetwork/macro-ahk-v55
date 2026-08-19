@@ -71,6 +71,7 @@ async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
   try {
     const stored = await chrome.storage.local.get(STORAGE_KEY);
     const raw = stored[STORAGE_KEY] as Partial<SdkSelfTestSnapshot> | undefined;
+
     if (!raw || typeof raw !== "object") {
       return { ...EMPTY_SNAPSHOT };
     }
@@ -93,6 +94,7 @@ function normalizeRow(value: unknown): SdkSelfTestRow | null {
   }
 
   const r = value as Partial<SdkSelfTestRow>;
+
   if (typeof r.surface !== "string" || !VALID_SURFACES.includes(r.surface as Surface)) {
     return null;
   }
@@ -132,6 +134,7 @@ export async function handleSdkSelfTestReport(
 ): Promise<OkResponse | { isOk: false; errorMessage: string }> {
   const raw = payload as MessageRequest & SdkSelfTestReportRequest;
   const surface = typeof raw.surface === "string" ? raw.surface : "";
+
   if (!VALID_SURFACES.includes(surface as Surface)) {
     return {
       isOk: false,

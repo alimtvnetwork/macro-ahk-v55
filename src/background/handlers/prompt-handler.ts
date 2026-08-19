@@ -55,6 +55,7 @@ export function bindPromptDbManager(manager: DbManager): void {
 
 function getDb(): SqlJsDatabase {
   const isDbManagerMissing = !dbManager;
+
   if (isDbManagerMissing) {
     throw new Error("[prompts] DbManager not bound. Call bindPromptDbManager() first.");
   }
@@ -155,11 +156,13 @@ function ensureCategoryId(categoryName: string): string {
   const db = getDb();
   const trimmed = categoryName.trim();
   const isTrimmedEmpty = !trimmed;
+
   if (isTrimmedEmpty) {
     return "";
   }
 
   const existing = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT Id FROM PromptsCategory WHERE Name = ?", [trimmed])).data!).data!;
+
   if (existing.length > 0 && existing[0].values.length > 0) {
     return String(existing[0].values[0][0]);
   }
@@ -176,6 +179,7 @@ function ensureCategoryId(categoryName: string): string {
 
 function findExistingDefaultPromptId(slug: string | undefined, legacySlug: string | undefined): number | null {
   const candidates = [slug, legacySlug].filter((value): value is string => typeof value === "string" && value.length > 0);
+
   if (candidates.length === 0) {
     return null;
   }
@@ -190,6 +194,7 @@ function findExistingDefaultPromptId(slug: string | undefined, legacySlug: strin
 /** Links a prompt to a category via the junction table. */
 function linkPromptToCategory(promptId: string, categoryId: string): void {
   const isCategoryIdMissing = !categoryId;
+
   if (isCategoryIdMissing) {
     return;
   }
@@ -309,6 +314,7 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
     const db = getDb();
     const countResult = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT COUNT(*) as cnt FROM Prompts WHERE IsDefault = 0")).data!).data!;
     const existingCount = countResult.length > 0 ? Number(countResult[0].values[0][0]) : 0;
+
     if (existingCount > 0) {
       return;
     }
@@ -316,11 +322,13 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
     const localResult = await chrome.storage.local.get(LEGACY_STORAGE_KEY);
     const legacyPrompts = localResult[LEGACY_STORAGE_KEY];
     const isLegacyPromptsAbsent = !Array.isArray(legacyPrompts) || legacyPrompts.length === 0;
+
     if (isLegacyPromptsAbsent) {
       return;
     }
 
     const handledBySync = await attemptSyncMigration(legacyPrompts);
+
     if (handledBySync) {
       return;
     }
@@ -346,6 +354,7 @@ function insertPromptRow(prompt: PromptEntry): void {
 
   // Check if a prompt with this slug already exists (for seeding dedup)
   const existingId = findExistingDefaultPromptId(slug, legacySlug);
+
   if (existingId !== null) {
     // Already seeded — update instead
     ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
@@ -354,6 +363,7 @@ function insertPromptRow(prompt: PromptEntry): void {
     )));
     const promptId = String(existingId);
     const category = prompt.category || "";
+
     if (category) {
       const categoryId = ensureCategoryId(category);
       linkPromptToCategory(promptId, categoryId);
@@ -383,6 +393,7 @@ function insertPromptRow(prompt: PromptEntry): void {
 
   // Handle category via junction table
   const category = prompt.category || "";
+
   if (category) {
     const categoryId = ensureCategoryId(category);
     linkPromptToCategory(promptId, categoryId);
@@ -481,6 +492,7 @@ function mapRawToPromptEntry(entry: RawDefaultPromptEntry, index: number, now: s
   const name = typeof entry.name === "string" ? entry.name : "";
   const text = typeof entry.text === "string" ? entry.text : "";
   const isNameOrTextMissing = !name || !text;
+
   if (isNameOrTextMissing) {
     return null;
   }
@@ -499,6 +511,7 @@ function mapRawToPromptEntry(entry: RawDefaultPromptEntry, index: number, now: s
     createdAt: now,
     updatedAt: now,
   };
+
   if (rawSlug) {
     prompt.slug = rawSlug;
   }
@@ -522,6 +535,7 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
   try {
     const url = chrome.runtime.getURL("prompts/macro-prompts.json");
     const response = ServiceResult.wrapFetch(await fetch(url));
+
     if (response.isFail) {
       // HEFF: bundled asset missing/mis-served. No retry; log and return null.
       logSampledDebug(
@@ -592,6 +606,7 @@ export async function handleSavePrompt(payload: SavePromptPayload): Promise<Save
   // Check if updating an existing prompt (id is an integer string)
   let promptId = input.prompt.id;
   let exists = false;
+
   if (promptId) {
     const existingResult = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT Id FROM Prompts WHERE Id = ?", [Number(promptId)])).data!).data!;
     exists = existingResult.length > 0 && existingResult[0].values.length > 0;
@@ -635,6 +650,7 @@ export async function handleSavePrompt(payload: SavePromptPayload): Promise<Save
     // Update category via junction table if provided
     if (input.prompt.category !== undefined) {
       ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [Number(promptId)])));
+
       if (input.prompt.category) {
         const categoryId = ensureCategoryId(input.prompt.category);
         linkPromptToCategory(promptId, categoryId);
@@ -657,6 +673,7 @@ export async function handleSavePrompt(payload: SavePromptPayload): Promise<Save
     )));
 
     const result = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()")).data!).data!);
+
     if (result.Ok === false) {
       throw new Error(String(result.error));
     }
@@ -684,17 +701,20 @@ export async function handleDeletePrompt(payload: DeletePromptPayload): Promise<
   await migrateFromStorageIfNeeded();
 
   const promptIdStr = requireField(payload?.promptId);
+
   if (promptIdStr === null) {
     return missingFieldError("promptId", "DELETE_PROMPT");
   }
 
   const numId = Number(promptIdStr);
   const isNumIdInvalid = !Number.isFinite(numId);
+
   if (isNumIdInvalid) {
     return missingFieldError("promptId (numeric)", "DELETE_PROMPT");
   }
 
   const candidate = getDeletePromptCandidate(numId);
+
   if (candidate === null) {
     return promptDeleteError(numId, "not found");
   }
@@ -706,6 +726,7 @@ export async function handleDeletePrompt(payload: DeletePromptPayload): Promise<
   const db = getDb();
   ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [numId])));
   ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM Prompts WHERE Id = ?", [numId])));
+
   if (db.getRowsModified() < 1) {
     return promptDeleteError(numId, "no rows deleted", candidate.name);
   }
@@ -719,6 +740,7 @@ function getDeletePromptCandidate(promptId: number): DeletePromptCandidate | nul
   const result = getDb().exec("SELECT Name, IsDefault FROM Prompts WHERE Id = ?", [promptId]);
   const firstResult = result[0];
   const firstRow = firstResult?.values[0];
+
   if (firstRow === undefined) {
     return null;
   }
@@ -737,6 +759,7 @@ export async function handleReorderPrompts(payload: ReorderPromptsPayload): Prom
   await migrateFromStorageIfNeeded();
 
   const promptIds = Array.isArray(payload?.promptIds) ? payload.promptIds : null;
+
   if (promptIds === null) {
     return missingFieldError("promptIds (array)", "REORDER_PROMPTS");
   }
@@ -745,12 +768,14 @@ export async function handleReorderPrompts(payload: ReorderPromptsPayload): Prom
 
   for (let i = 0; i < promptIds.length; i++) {
     const id = requireField(promptIds[i]);
+
     if (id === null) {
       continue;
     } // skip invalid entries instead of crashing
 
     const numId = Number(id);
     const isNumIdInvalid = !Number.isFinite(numId);
+
     if (isNumIdInvalid) {
       continue;
     }

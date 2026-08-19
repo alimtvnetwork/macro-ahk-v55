@@ -28,6 +28,7 @@ import {
   invalidateSessionBridgeKey,
   markBearerTokenExpired,
   recoverAuthOnce,
+  isAuthFailure,
 } from './auth';
 import { parseLoopApiResponse, syncCreditStateFromApi, schedulePostParseEnrichment } from './credit-fetch';
 import { MacroController } from './core/MacroController';
@@ -51,10 +52,6 @@ function mc() {
 let _runCycleRef: (() => void) | null = null;
 export function setRunCycleRef(runCycle: () => void): void {
   _runCycleRef = runCycle;
-}
-
-function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
 }
 
 function isLoopStale(): boolean {
@@ -246,6 +243,7 @@ function handleCycleFetchError(err: Error, freshToken: string): void {
 
       if (state.running) {
         log('Retry #' + state.retryCount + ' - re-running cycle...', 'check');
+
         if (_runCycleRef) {
           _runCycleRef();
         } else {

@@ -29,6 +29,7 @@ export function startNewTabTracker(): void {
 export function getRecentlyOpenedTabUrl(sinceTimestampMs: number): string | undefined {
   const cutoff = sinceTimestampMs - 500;
   const recent = recentTabs.filter(t => t.timestamp >= cutoff);
+
   if (recent.length === 0) {
     return undefined;
   }

@@ -71,6 +71,7 @@ export function PromptVariablesCard() {
 
   const addVariable = () => {
     const key = newKey.trim();
+
     if (!key) {
       return;
     }

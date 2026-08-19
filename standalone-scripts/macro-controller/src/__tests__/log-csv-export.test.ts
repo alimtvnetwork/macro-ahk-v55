@@ -58,6 +58,7 @@ beforeEach(() => {
     constructor(parts: BlobPart[], opts?: BlobPropertyBag) {
       super(parts, opts);
       const first = parts && parts[0];
+
       if (typeof first === 'string') {
         capturedCsv = first;
       }
@@ -74,6 +75,7 @@ beforeEach(() => {
   const origCreate = document.createElement.bind(document);
   vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
     const el = origCreate(tag);
+
     if (tag === 'a') {
       (el as HTMLAnchorElement).click = (): void => { /* swallow */ };
     }

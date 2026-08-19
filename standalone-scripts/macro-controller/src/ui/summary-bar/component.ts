@@ -143,6 +143,7 @@ export function createSummaryBar(): SummaryBarHandle {
     // actually loaded — keep the loading placeholder so the user never
     // sees a misleading "0 Pro" / "0 / 0" during cold start.
     const looksEmpty = s.proCount === 0 && s.proCreditsTotal === 0 && s.freeCreditsAvailable === 0;
+
     if (!hydrated && looksEmpty) {
       renderLoading();
       lastDetails = details ?? ZERO_DETAILS;

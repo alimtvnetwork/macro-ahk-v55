@@ -50,6 +50,7 @@ function isValidFiniteHeight(h: unknown): h is number {
 export function getProjectsCacheTtlMs(): number {
   const o = getSettingsOverrides();
   const h = o.projectsCacheTtlHours;
+
   if (isValidFiniteHeight(h)) {
     return Math.floor(h) * 60 * 60 * 1000;
   }
@@ -103,17 +104,20 @@ export async function readProjectListCache(workspaceId: string): Promise<Project
   }
 
   const kv = getKv();
+
   if (!kv) {
     return null;
   }
 
   try {
     const raw = await kv.get(buildKey(workspaceId));
+
     if (!raw) {
       return null;
     }
 
     const parsed = JSON.parse(raw) as Partial<ProjectListCacheRow>;
+
     if (typeof parsed.ExpiresAt !== 'number' || !Array.isArray(parsed.Projects)) {
       return null;
     }
@@ -148,6 +152,7 @@ export function writeProjectListCache(
   }
 
   const kv = getKv();
+
   if (!kv) {
     logError('ProjectsCache.write', 'marco.kv unavailable — skipping SQLite upsert for ws=' + workspaceId);
 
@@ -175,6 +180,7 @@ export function clearProjectListCache(workspaceId: string): void {
   }
 
   const kv = getKv();
+
   if (!kv) {
     return;
   }

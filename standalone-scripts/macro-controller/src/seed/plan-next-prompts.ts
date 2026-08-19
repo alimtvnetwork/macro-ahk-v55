@@ -26,6 +26,7 @@ const NEXT_STEPS_SLUG = 'next-steps';
 
 function findBundledPromptText(slug: string): string {
   const entry = PROMPT_BUNDLE.prompts?.find(candidate => candidate.slug === slug);
+
   if (typeof entry?.text === 'string' && entry.text.length > 0) {
     return entry.text;
   }
@@ -127,6 +128,7 @@ export function getRequiredTokensForRole(role: PromptRole): string[] {
   }
 
   const defaultRow = PLAN_NEXT_SEED_ROWS.find(row => row.role === role && row.isDefault);
+
   if (!defaultRow) {
     return [];
   }

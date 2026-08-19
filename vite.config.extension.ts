@@ -111,6 +111,7 @@ function resolveDeclaredAssetSource(
                 && /config/i.test(file)
                 && !/instruction|theme|prompt/i.test(file),
     );
+
     if (configMatch) {
       return resolve(projectRootDir, configMatch);
     }
@@ -120,6 +121,7 @@ function resolveDeclaredAssetSource(
     const themeMatch = rootFiles.find(
       (file) => /\.json$/i.test(file) && /theme/i.test(file),
     );
+
     if (themeMatch) {
       return resolve(projectRootDir, themeMatch);
     }
@@ -172,6 +174,7 @@ function copyManifest(): Plugin {
         "128": "assets/icons/icon-128.png",
       };
       const isReleaseBuild = process.env.GITHUB_ACTIONS === "true" || process.env.MARCO_RELEASE_BUILD === "1";
+
       if (!isReleaseBuild) {
         manifest.version_name = `${rootVersion} dev`;
       } else {
@@ -320,6 +323,7 @@ function validateNoBackgroundDynamicImport(): Plugin {
         while (i < n) {
           const ch = src[i];
           const next = src[i + 1];
+
           // Line comment
           if (ch === "/" && next === "/") {
             while (i < n && src[i] !== "\n") {
@@ -430,9 +434,11 @@ function copyPrompts(): Plugin {
         // copy as a safety net for the case where a future contributor changes
         // the aggregator's output directory.
         const src = resolve(DIST_DIR, "prompts", "macro-prompts.json");
+
         if (existsSync(src)) {
           const destDir = resolve(DIST_DIR, "prompts");
           mkdirSync(destDir, { recursive: true });
+
           if (resolve(src) !== resolve(destDir, "macro-prompts.json")) {
             copyFileSync(src, resolve(destDir, "macro-prompts.json"));
           }
@@ -460,6 +466,7 @@ function copyProjectScripts(): Plugin {
       mkdirSync(projectsBaseDir, { recursive: true });
 
       const standaloneDir = resolve(__dirname, "standalone-scripts");
+
       if (!existsSync(standaloneDir)) {
         return;
       }
@@ -533,6 +540,7 @@ function copyProjectScripts(): Plugin {
 
           for (const asset of declaredAssets) {
             const dest = resolve(projectDir, asset.File);
+
             if (existsSync(dest)) {
               continue;
             }

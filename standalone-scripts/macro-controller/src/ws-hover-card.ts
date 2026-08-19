@@ -85,6 +85,7 @@ function sectionHeaderHtml(text: string): string {
 
 function pillHtml(status: WorkspaceStatus, ws?: WorkspaceCredit): string {
   const display = classifyFromStatus(status, ws || ({} as WorkspaceCredit));
+
   if (display.kind === 'normal' || !display.label) {
     return '';
   }
@@ -110,6 +111,7 @@ function pillHtml(status: WorkspaceStatus, ws?: WorkspaceCredit): string {
 export function buildSubHeader(ws: WorkspaceCredit): string {
   const parts: string[] = [];
   parts.push(escHtml(formatPlanDisplayLabel(ws.plan) || String(ws.tier || 'FREE')));
+
   if (ws.membershipRole || ws.role) {
     parts.push(escHtml(String(ws.membershipRole || ws.role)));
   }
@@ -133,6 +135,7 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
   const out: string[] = [sectionHeaderHtml('Credits')];
   const availStr = summary.renderDash ? '—' : String(summary.available);
   out.push(rowHtml('Available', availStr, '#34d399'));
+
   if ((ws.freeRemaining || 0) > 0 || (ws.freeGranted || 0) > 0) {
     out.push(rowHtml('Free Trial',
       Math.round(ws.freeRemaining || 0) + ' / ' + Math.round(ws.freeGranted || 0)));
@@ -140,6 +143,7 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
 
   out.push(rowHtml('Daily',
     summary.daily + ' / ' + summary.dailyLimit));
+
   if (summary.rolloverLimit > 0) {
     out.push(rowHtml('Rollover',
       summary.rollover + ' / ' + summary.rolloverLimit));
@@ -147,6 +151,7 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
 
   out.push(rowHtml('Billing',
     summary.billingAvailable + ' / ' + summary.billingLimit));
+
   // Wire fields added 2026-06: shown when /credit-balance supplied them.
   if (summary.availableBalance > 0 || summary.cloudRemaining > 0 || summary.aiRemaining > 0) {
     out.push(rowHtml('Available balance', String(summary.availableBalance), '#86efac'));
@@ -170,14 +175,17 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
 function buildSubscriptionSection(ws: WorkspaceCredit): string {
   const subStatus = (ws.subscriptionStatus || '').trim();
   const changedIso = (ws.subscriptionStatusChangedAt || '').trim();
+
   if (!subStatus && !changedIso) {
     return '';
   }
 
   const out: string[] = [sectionHeaderHtml('Subscription')];
+
   if (subStatus) {
     const norm = subStatus.toLowerCase();
     let color = '#e2e8f0';
+
     if (isHealthyStatus(norm)) {
       color = '#34d399';
     } else if (isPastDueStatus(norm)) {
@@ -244,6 +252,7 @@ function warningStartRow(estimateIso: string, refillWarningDays: number): string
   }
 
   const refillMs = Date.parse(estimateIso);
+
   if (!Number.isFinite(refillMs)) {
     return '';
   }
@@ -252,6 +261,7 @@ function warningStartRow(estimateIso: string, refillWarningDays: number): string
   const warnDate = formatDateDDMMMYY(new Date(warnMs).toISOString());
   const now = Date.now();
   let suffix = '';
+
   if (warnMs > now) {
     suffix = ' (in ' + formatDayCount(Math.ceil((warnMs - now) / 86_400_000)) + ')';
   } else if (refillMs > now) {
@@ -268,6 +278,7 @@ function buildRefillSection(
   config: WorkspaceLifecycleConfig,
 ): string {
   const estimateIso = pickRefillEstimateIso(ws);
+
   if (!estimateIso && status.kind !== KIND_ABOUT_TO_REFILL) {
     return '';
   }
@@ -277,6 +288,7 @@ function buildRefillSection(
     estimatedRefillRow(ws, status, estimateIso),
     warningStartRow(estimateIso, config.refillWarningThresholdDays),
   ].filter((s) => s.length > 0);
+
   if (rows.length === 0) {
     return '';
   }
@@ -314,10 +326,12 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
   }
 
   const out: string[] = [sectionHeaderHtml('Expiry')];
+
   if (status.sinceIso) {
     const date = formatDateDDMMMYY(status.sinceIso);
     const dur = formatDayCount(status.daysSince);
     let color = '#fca5a5';
+
     if (status.kind === 'about-to-expire' || status.kind === KIND_PAST_DUE_EXPIRING) {
       color = '#fde68a';
     }
@@ -346,6 +360,7 @@ function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): stri
 
   const out: string[] = [sectionHeaderHtml('Past Due')];
   out.push(rowHtml(LABEL_STATUS, 'Grants remain active', '#34d399'));
+
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
@@ -361,6 +376,7 @@ function buildMetaSection(ws: WorkspaceCredit): string {
   }
 
   const out: string[] = [sectionHeaderHtml('Meta')];
+
   if (ws.createdAt) {
     out.push(rowHtml('Created', formatDateDDMMMYY(ws.createdAt)));
   }
@@ -419,6 +435,7 @@ function buildStatusTraceSection(explanation: StatusExplanation): string {
   // Inputs snapshot — compact one-liners.
   out.push(rowHtml('subscription_status', escHtml(inp.subscriptionStatus || '—')));
   out.push(rowHtml('tier', escHtml(inp.tier || '—')));
+
   if (inp.subscriptionStatusChangedAt) {
     out.push(rowHtml('status_changed_at',
       formatDateDDMMMYY(inp.subscriptionStatusChangedAt) + ' (' + formatDayCount(inp.daysSinceChange) + ')'));
@@ -479,6 +496,7 @@ function availableColor(available: number, daily: number): string {
 
   const denom = daily > 0 ? daily : Math.max(1, available);
   const ratio = available / denom;
+
   if (ratio < 0.1) {
     return C_DESTRUCTIVE;
   }
@@ -524,6 +542,7 @@ function creditsCompactRow(ws: WorkspaceCredit): string {
   // RCA 2026-06-06: read via resolveCreditSummary so new-free/Lite workspaces
   // show the same Pending dash the row bar shows, instead of a misleading 0.
   const summary = resolveCreditSummary(ws);
+
   if (summary.renderDash) {
     const dashHtml = SPAN_COLOR_OPEN + C_MUTED + ';font-weight:600;">—</span>'
       + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> '
@@ -550,6 +569,7 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
   const iso = status.kind === KIND_ABOUT_TO_REFILL && status.refillIso
     ? status.refillIso
     : pickRefillEstimateIso(ws);
+
   if (!iso) {
     return '';
   }
@@ -567,6 +587,7 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
 function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string {
   const iso = (ws.billingPeriodEndAt || '').trim();
   const expired = status.kind === 'expired' || status.kind === 'fully-expired' || status.kind === 'expired-canceled';
+
   if (!iso && !expired) {
     return '';
   }
@@ -671,6 +692,7 @@ function scheduleHide(): void {
 
 function ensureCardElement(): HTMLDivElement {
   let el = document.getElementById(HOVERCARD_ID) as HTMLDivElement | null;
+
   if (el) {
     return el;
   }
@@ -707,12 +729,14 @@ function positionCard(card: HTMLElement, anchor: HTMLElement): void {
   const vh = window.innerHeight;
   const GAP = 8;
   let left = r.right + GAP;
+
   if (left + cardRect.width > vw - 8) {
     const leftSide = r.left - cardRect.width - GAP;
     left = leftSide >= 8 ? leftSide : Math.max(8, vw - cardRect.width - 8);
   }
 
   let top = r.top;
+
   if (top + cardRect.height > vh - 8) {
     top = Math.max(8, vh - cardRect.height - 8);
   }
@@ -729,6 +753,7 @@ function positionCard(card: HTMLElement, anchor: HTMLElement): void {
 function hideCard(): void {
   cancelHideTimer();
   const el = document.getElementById(HOVERCARD_ID);
+
   if (el) {
     el.style.display = 'none';
   }
@@ -745,31 +770,37 @@ interface WsHoverHandlerStore {
 
 function handleWorkspaceHoverOver(e: MouseEvent, lookup: WsLookup): void {
   const config = getWorkspaceLifecycleConfig();
+
   if (!config.enableWorkspaceHoverDetails) {
     return;
   }
 
   const target = e.target as HTMLElement | null;
+
   if (!target) {
     return;
   }
 
   const nameEl = target.closest(SEL_WS_NAME) as HTMLElement | null;
+
   if (!nameEl) {
     return;
   }
 
   const item = nameEl.closest(SEL_WS_ITEM) as HTMLElement | null;
+
   if (!item) {
     return;
   }
 
   const wsId = item.getAttribute('data-ws-id') || '';
+
   if (!wsId) {
     return;
   }
 
   const ws = lookup(wsId);
+
   if (!ws) {
     return;
   }
@@ -783,6 +814,7 @@ function handleWorkspaceHoverOver(e: MouseEvent, lookup: WsLookup): void {
 
 function handleWorkspaceHoverOut(e: MouseEvent): void {
   const target = e.target as HTMLElement | null;
+
   if (!target) {
     return;
   }
@@ -792,6 +824,7 @@ function handleWorkspaceHoverOut(e: MouseEvent): void {
   }
 
   const related = e.relatedTarget as HTMLElement | null;
+
   if (related && related.closest(SEL_WS_NAME)) {
     return;
   }
@@ -815,6 +848,7 @@ function handleWorkspaceHoverOut(e: MouseEvent): void {
  */
 export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup): void {
   const store = listEl as HTMLElement & WsHoverHandlerStore;
+
   if (store._wsHoverCardOver) {
     listEl.removeEventListener('mouseover', store._wsHoverCardOver);
   }
@@ -850,6 +884,7 @@ export function hideWorkspaceHoverCard(): void {
 export function showWorkspaceHoverCardPinned(wsId: string): void {
   const anchor = document.querySelector('[data-ws-id="' + wsId + '"]') as HTMLElement | null;
   const row = anchor ? anchor.closest(SEL_WS_ITEM) as HTMLElement | null : null;
+
   if (!row) {
     return;
   }
@@ -859,6 +894,7 @@ export function showWorkspaceHoverCardPinned(wsId: string): void {
   };
   const all = sdkWindow.RiseupAsiaMacroExt?.loopCreditState?.perWorkspace || [];
   const ws = all.find((w) => String(w.id) === wsId);
+
   if (!ws) {
     return;
   }
@@ -876,6 +912,7 @@ export function showWorkspaceHoverCardPinned(wsId: string): void {
 
     if (e.type === 'click') {
       const target = e.target as HTMLElement | null;
+
       if (target && (target.closest('#' + HOVERCARD_ID) || row.contains(target))) {
         return;
       }

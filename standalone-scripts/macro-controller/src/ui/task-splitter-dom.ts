@@ -25,6 +25,7 @@ function getCandidateElements(doc: Document): Element[] {
 export function readLatestSplitterReply(doc: Document = document): string {
   const candidates = getCandidateElements(doc);
   const latest = candidates[candidates.length - 1];
+
   if (latest?.textContent) {
     return latest.textContent;
   }

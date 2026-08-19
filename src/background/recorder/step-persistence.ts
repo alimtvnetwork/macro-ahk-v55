@@ -126,6 +126,7 @@ function validateSelectorDrafts(stepId: number, drafts: ReadonlyArray<SelectorDr
   }
 
   const primaryCount = drafts.filter((d) => d.IsPrimary).length;
+
   if (primaryCount !== 1) {
     throw new Error(`Step ${stepId} requires exactly one primary selector, got ${primaryCount}`);
   }
@@ -215,6 +216,7 @@ function assertVariableNameAvailable(
     "SELECT StepId FROM Step WHERE VariableName = ? AND StepId != ?",
     [newVariableName, stepId],
   );
+
   if ((conflict[0]?.values.length ?? 0) > 0) {
     throw new Error(`VariableName "${newVariableName}" already used by another Step`);
   }
@@ -324,6 +326,7 @@ export function readStepRow(db: SqlJsDatabase, stepId: number): PersistedStep {
     [stepId],
   );
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     throw new Error(`Step row missing for StepId ${stepId}`);
   }
@@ -338,6 +341,7 @@ function readSelector(db: SqlJsDatabase, selectorId: number): PersistedSelector 
     [selectorId],
   );
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     throw new Error(`Selector row missing for SelectorId ${selectorId}`);
   }

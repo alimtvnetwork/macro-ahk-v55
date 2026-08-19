@@ -77,6 +77,7 @@ function saveStateBeforeReinject(): void {
 export function restoreReinjectState(): { restored: boolean; loopWasRunning: boolean } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
+
     if (!tsStr) {
       return { restored: false, loopWasRunning: false };
     }
@@ -116,6 +117,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
 export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunning: boolean; wsName: string; wsId: string } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
+
     if (!tsStr) {
       return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
     }
@@ -145,6 +147,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
     }
 
     log('Re-inject: restored state (ws=' + wsName + ', loopWas=' + loopWasRunning + ')', 'success');
+
     if (wsName) {
       state.workspaceName = wsName;
     }
@@ -282,6 +285,7 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
       ctx.statusRow.textContent = '⚠️ Update available · ' + now;
       ctx.reinjectBtn.style.display = '';
       ctx.availVal.style.color = cPrimaryLight;
+
       if (ctx.onVersionMismatch) {
         ctx.onVersionMismatch(ctx.availableVersion); 
       }
@@ -412,6 +416,7 @@ function _buildActionButtons(): { actionRow: HTMLElement; checkBtn: HTMLElement;
 
 function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void {
   const now = Date.now();
+
   if (now - reinjectState.lastAt < REINJECT_COOLDOWN_MS) {
     showToast('Re-inject cooldown — wait ' + Math.ceil((REINJECT_COOLDOWN_MS - (now - reinjectState.lastAt)) / 1000) + 's', 'warn');
 

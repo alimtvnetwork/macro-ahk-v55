@@ -34,6 +34,7 @@ function seedInitial(): void {
 
 function extractInList(sql: string): string[] {
   const match = /IN\s*\(([^)]+)\)/i.exec(sql);
+
   if (!match) {
     return [];
   }
@@ -58,6 +59,7 @@ function handleUpdate(sql: string): { ok: true, isFail: false, isSuccess: true }
     }
 
     row.IsDefault = 0;
+
     if (prefix.includes('||')) {
       row.Name = '[duplicate] ' + row.Name;
     } else if (prefix.length > 0) {
@@ -84,6 +86,7 @@ function handleSelect(sql: string): { ok: true, isFail: false, isSuccess: true; 
     const matchesShape = slug.startsWith('read-memory') || slug.startsWith('rejog')
             || name.startsWith('read memory') || name.startsWith('rejog')
             || name.startsWith('[duplicate] ');
+
     if (!matchesShape) {
       return false;
     }
@@ -105,6 +108,7 @@ function handleSelect(sql: string): { ok: true, isFail: false, isSuccess: true; 
 vi.mock('../../../src/ui/extension-relay', () => ({
   sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
     const sql = payload.params.sql;
+
     if (payload.method === 'SCHEMA' && /^\s*DELETE/i.test(sql)) {
       return handleDelete(sql);
     }

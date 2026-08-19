@@ -47,6 +47,7 @@ export async function handleValidateAllXPaths(
     };
 
   const tabId = await getActiveTabId();
+
   if (tabId === null) {
     const entries = Object.entries(request.xpaths).map(([name, { xpath, selector }]) => ({
       name,

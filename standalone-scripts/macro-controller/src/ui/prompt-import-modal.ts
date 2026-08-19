@@ -108,6 +108,7 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
     + '</tr>';
   table.appendChild(thead);
   const tbody = document.createElement('tbody');
+
   if (rows.length === 0) {
     const tr = document.createElement('tr');
     tr.innerHTML = '<td colspan="4" style="padding:10px;text-align:center;color:hsl(var(--muted-foreground));">No entries to import</td>';
@@ -198,6 +199,7 @@ function buildPreviewRow(row: PreviewRow, index: number, onChange: () => void): 
     const opt = document.createElement('option');
     opt.value = act;
     opt.textContent = actionLabel(act);
+
     if (act === row.action) {
       opt.selected = true;
     }
@@ -233,6 +235,7 @@ function escapeHtml(text: string): string {
 function isDeepEqual(a: PromptEntry, b: PromptEntry): boolean {
   const aKeys = Object.keys(a).sort();
   const bKeys = Object.keys(b).sort();
+
   if (aKeys.length !== bKeys.length) {
     return false;
   }
@@ -284,6 +287,7 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
     ev.preventDefault();
     drop.style.background = 'transparent';
     const file = ev.dataTransfer && ev.dataTransfer.files[0];
+
     if (file) {
       onFile(file);
     }
@@ -295,6 +299,7 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
     input.accept = '.json,.zip,.sqlite,.db';
     input.onchange = () => {
       const f = input.files && input.files[0];
+
       if (f) {
         onFile(f);
       } 
@@ -418,6 +423,7 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   // Code badge + heading row.
   const headRow = document.createElement('div');
   applyStyle(headRow, 'display:flex;align-items:center;gap:8px;margin-bottom:6px;');
+
   if (input.code) {
     const badge = document.createElement('span');
     applyStyle(badge, 'font-family:monospace;font-size:10px;font-weight:700;background:hsl(var(--destructive));color:hsl(var(--foreground));padding:2px 6px;border-radius:3px;letter-spacing:0.5px;');
@@ -554,6 +560,7 @@ function bucketPreviewRows(
     }
 
     const validated = validate(row.incoming);
+
     if (!validated) {
       skippedCount += 1;
       auditActions.push({ slug: row.slug, action: 'skip' });
@@ -647,6 +654,7 @@ async function performImportCommit(
 
 export function openPromptImportModal(deps: ImportModalDeps): void {
   const existing = document.querySelector('[' + MODAL_ATTR + ']');
+
   if (existing) {
     existing.remove();
   }
@@ -750,6 +758,7 @@ function _handleViewAudit(errorAuditId: string): void {
           actions: entry ? entry.actions.length : 0,
         },
       });
+
       if (entry) {
         console.log('[ImportModal] Audit entry:', entry);
       }
@@ -810,8 +819,10 @@ async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Pr
   const raw = JSON.parse(text) as unknown;
   const isEnvelope = raw !== null && typeof raw === 'object' && !Array.isArray(raw)
     && 'schemaVersion' in (raw as Record<string, unknown>);
+
   if (isEnvelope) {
     const result = bundleTypes.validatePromptsBundle(raw);
+
     if (!result.isValid || !result.bundle) {
       throwDiagnostic('PROMPT_IO_ENVELOPE_E001', { errorList: result.errors.join('; ') });
     }

@@ -134,6 +134,7 @@ export function SettingsView() {
     const load = async () => {
       try {
         const result = await sendMessage<{ settings?: SettingsData }>({ type: "GET_SETTINGS" });
+
         if (result.settings) {
           setSettings({ ...DEFAULT_SETTINGS, ...result.settings });
         }

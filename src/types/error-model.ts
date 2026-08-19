@@ -77,6 +77,7 @@ export function createErrorModel(
 /** Derives a machine-readable error code from the message. */
 function deriveErrorCode(message: string): string {
   const lower = message.toLowerCase();
+
   if (lower.includes("missing") && lower.includes("project")) {
     return "MISSING_PROJECT_SLUG";
   }

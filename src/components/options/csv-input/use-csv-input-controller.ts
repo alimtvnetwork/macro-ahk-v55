@@ -182,6 +182,7 @@ function useCsvFileHandlers(
   const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     event.target.value = "";
+
     if (file !== null) {
       void handleFile(file);
     }
@@ -190,6 +191,7 @@ function useCsvFileHandlers(
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files[0] ?? null;
+
     if (file !== null) {
       void handleFile(file);
     }
@@ -224,6 +226,7 @@ function useCsvBuildResult(
     }
 
     const row = parsed.Csv.Rows[rowIndex] ?? null;
+
     if (row === null) {
       return null;
     }

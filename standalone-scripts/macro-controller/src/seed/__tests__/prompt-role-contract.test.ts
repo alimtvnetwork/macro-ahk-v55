@@ -38,6 +38,7 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
     for (const role of ROLES) {
       it('role=' + role + ' — every required token appears in the default body', () => {
         const required = getRequiredTokensForRole(role);
+
         if (role === 'generic') {
           expect(required).toEqual([]);
 

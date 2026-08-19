@@ -16,6 +16,7 @@ export class StateReconciler {
         
     remote.forEach(remoteItem => {
       const index = merged.findIndex(i => i.id === remoteItem.id);
+
       if (index === -1) {
         merged.push(remoteItem);
       } else if (new Date(remoteItem.updatedAt) > new Date(merged[index].updatedAt)) {

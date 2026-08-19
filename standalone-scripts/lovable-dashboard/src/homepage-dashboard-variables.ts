@@ -77,6 +77,7 @@ export function resolveElement(xpath: string): Element | null {
 
 export function clickWorkspaceByXPath(xpath: string): void {
   const el = resolveElement(xpath);
+
   if (el instanceof HTMLElement) {
     el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
   }

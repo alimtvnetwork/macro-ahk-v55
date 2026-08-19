@@ -68,6 +68,7 @@ export function KeywordEventsList(props: KeywordEventsListProps): JSX.Element {
 
   const handleDragEnd = (dragEvent: DragEndEvent): void => {
     const { active, over } = dragEvent;
+
     if (!over || active.id === over.id) {
       return; 
     }

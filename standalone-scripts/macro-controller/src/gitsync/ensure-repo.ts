@@ -79,6 +79,7 @@ export const DEFAULT_ENSURE_DEADLINE_MS = 30_000;
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
     return null;
   }
@@ -115,6 +116,7 @@ async function postSync(
   projectId: string,
 ): Promise<PostSyncResult> {
   const sdk = getSdk();
+
   if (!sdk) {
     const reason = 'sdk_unavailable';
     logError('EnsureRepo', 'postSync: marco.api.call unavailable'
@@ -146,6 +148,7 @@ async function postSync(
   }
 
   const jobId = pickJobId(resp.data as SyncPostBody);
+
   if (!jobId) {
     // Server may key job by the well-known id even when not returned.
     log('[EnsureRepo] postSync ok but no job_id in body → using well-known id', 'info');
@@ -231,6 +234,7 @@ export async function ensureGithubRepo(
 
   // ── 1) Probe first — never POST /sync for already-connected projects.
   const probed = await resolveConnection(wsId, connId, projectId);
+
   if (probed.connected) {
     setGitsyncCache(wsId, projectId, 'found', probed.repoUrl);
 
@@ -239,6 +243,7 @@ export async function ensureGithubRepo(
 
   // ── 2) POST /sync once (no retry).
   const posted = await postSync(wsId, connId, projectId);
+
   if (posted.ok === false || !posted.jobId) {
     setGitsyncCache(wsId, projectId, 'error');
 
@@ -247,6 +252,7 @@ export async function ensureGithubRepo(
 
   // ── 3) Poll the returned job_id until terminal or deadline.
   const terminal = await pollUntilTerminal(wsId, projectId, posted.jobId, deadlineMs);
+
   if (terminal === 'deadline') {
     log('[EnsureRepo] deadline ws=' + wsId + ' pid=' + projectId
             + ' job=' + posted.jobId + ' after ' + deadlineMs + 'ms', 'info');
@@ -267,6 +273,7 @@ export async function ensureGithubRepo(
   }
 
   const url = terminal.result?.repo_url;
+
   if (typeof url === 'string' && url.length > 0) {
     setGitsyncCache(wsId, projectId, 'found', url);
 

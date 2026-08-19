@@ -37,6 +37,7 @@ describe('prompt actions span marker', () => {
     const markerIdx = body.indexOf('[data-prompt-actions]');
     const legacyIdx = body.indexOf('span:last-child');
     expect(markerIdx).toBeGreaterThan(-1);
+
     if (legacyIdx !== -1) {
       expect(markerIdx).toBeLessThan(legacyIdx);
     }

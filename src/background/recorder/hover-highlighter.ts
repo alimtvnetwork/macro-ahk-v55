@@ -21,31 +21,37 @@ const SMART_GROUP_ROLE_SELECTOR =
 
 export function findSmartGroup(element: Element): Element | null {
   const form = element.closest("form");
+
   if (form !== null) {
     return form;
   }
 
   const fieldset = element.closest("fieldset");
+
   if (fieldset !== null) {
     return fieldset;
   }
 
   const tr = element.closest("tr");
+
   if (tr !== null) {
     return tr;
   }
 
   const role = element.closest(SMART_GROUP_ROLE_SELECTOR);
+
   if (role !== null) {
     return role;
   }
 
   const cardLike = closestByClassToken(element, ["card", "panel", "field-row", "form-group"]);
+
   if (cardLike !== null) {
     return cardLike;
   }
 
   const flexGrid = closestFlexOrGrid(element);
+
   if (flexGrid !== null) {
     return flexGrid;
   }
@@ -57,6 +63,7 @@ function closestByClassToken(element: Element, tokens: ReadonlyArray<string>): E
   let current: Element | null = element;
   while (current !== null) {
     const cls = current.className;
+
     if (typeof cls === "string" && tokens.some((t) => cls.toLowerCase().includes(t))) {
       return current;
     }
@@ -74,6 +81,7 @@ function closestFlexOrGrid(element: Element): Element | null {
     const display = styles?.display ?? "";
     const isFlexOrGrid = display === "flex" || display === "grid";
     const hasMultipleChildren = current.childElementCount >= 2;
+
     if (isFlexOrGrid && hasMultipleChildren) {
       return current;
     }
@@ -176,6 +184,7 @@ export function mountHoverHighlighter(
 
 function removeExistingHighlighterHost(doc: Document): void {
   const existing = doc.getElementById(HOVER_HIGHLIGHTER_HOST_ID);
+
   if (existing !== null) {
     existing.remove(); 
   }
@@ -227,6 +236,7 @@ function createPaintScheduler(
     }
 
     const win = doc.defaultView;
+
     if (win === null) {
       return; 
     }
@@ -237,6 +247,7 @@ function createPaintScheduler(
 
 function renderHighlighter(nodes: HighlighterNodes, state: InternalState): void {
   const target = state.HoverTarget;
+
   if (target === null || state.OperationModeType === "off") {
     hideHighlighterNodes(nodes);
 
@@ -262,6 +273,7 @@ function paintPrimary(primaryEl: HTMLDivElement, resolved: Element): void {
 
 function paintGroup(groupEl: HTMLDivElement, resolved: Element): void {
   const group = findSmartGroup(resolved);
+
   if (group !== null && group !== resolved) {
     applyRect(groupEl, group.getBoundingClientRect());
     groupEl.classList.remove("hidden");
@@ -303,6 +315,7 @@ function handleHighlighterMouseMove(
   }
 
   const target = event.target;
+
   if (!(target instanceof Element)) {
     return; 
   }
@@ -327,6 +340,7 @@ function handleHighlighterKeyDown(
   }
 
   state.AltHeld = true;
+
   if (state.AncestorOffset === 0) {
     state.AncestorOffset = 1; 
   }
@@ -353,6 +367,7 @@ function handleReplayStart(event: Event, state: InternalState, schedulePaint: ()
 
   const detail = (event as CustomEvent<{ Element?: Element }>).detail;
   const target = detail?.Element ?? null;
+
   if (target === null) {
     return; 
   }
@@ -400,6 +415,7 @@ function buildHighlighterHandle(
     Host: host,
     SetMode(mode) {
       state.OperationModeType = mode;
+
       if (mode === "off") {
         state.HoverTarget = null;
         state.AncestorOffset = 0; 

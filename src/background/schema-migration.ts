@@ -197,6 +197,7 @@ function applyV6Up(logsDb: SqlJsDatabase, _errorsDb: SqlJsDatabase): void {
   // Seed default global settings row if none exists
   try {
     const existing = logsDb.exec("SELECT COUNT(*) FROM UpdateSettings");
+
     if (existing.length > 0 && (existing[0].values[0][0] as number) === 0) {
       logsDb.run("INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes) VALUES (1440, 0, 1, 10080)");
     }
@@ -421,6 +422,7 @@ function runIgnoringDuplicates(db: SqlJsDatabase, statements: string[]): void {
       const isDuplicate =
                 reason.toLowerCase().includes("duplicate column") ||
                 reason.toLowerCase().includes("already exists");
+
       if (isDuplicate) {
         continue;
       }
@@ -521,6 +523,7 @@ function getTableColumns(db: SqlJsDatabase, tableName: string): Set<string> {
     }
 
     const nameIndex = result[0].columns.indexOf("name");
+
     if (nameIndex === -1) {
       return new Set<string>();
     }

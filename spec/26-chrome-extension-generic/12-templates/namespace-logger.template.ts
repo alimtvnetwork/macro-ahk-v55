@@ -83,6 +83,7 @@ export function registerLogSink(sink: LogSink): () => void {
 
   return () => {
     const idx = sinks.indexOf(sink);
+
     if (idx >= 0) {
       sinks.splice(idx, 1);
     }
@@ -177,6 +178,7 @@ export function attachToRootNamespace(): void {
     Projects: {},
   };
   existing.Logger = { create: createLogger, registerSink: registerLogSink };
+
   if (!existing.Projects) {
     existing.Projects = {};
   }

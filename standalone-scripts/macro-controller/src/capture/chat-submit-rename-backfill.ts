@@ -38,6 +38,7 @@ async function handleRename(projectId: string, oldName: string | null, newName: 
   }
 
   const isRenamed = await renameProjectChatSubmits(projectId, newName);
+
   if (!isRenamed) {
     logError(SCOPE, `renameProjectChatSubmits failed (projectId=${projectId}, oldName=${oldName ?? 'null'}, newName=${newName})`);
   }

@@ -34,6 +34,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
         project: slug,
         format: "both",
       });
+
       if (resp.isOk) {
         setDocsOutput({ markdown: resp.markdown, prisma: resp.prisma });
         toast.success("Schema docs generated");

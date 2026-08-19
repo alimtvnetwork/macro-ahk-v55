@@ -56,6 +56,7 @@ async function hydratePersistent(): Promise<void> {
   try {
     const raw = await chrome.storage.local.get(STORAGE_KEY_DISMISSED_ORIGINS);
     const list = raw[STORAGE_KEY_DISMISSED_ORIGINS];
+
     if (Array.isArray(list)) {
       for (const origin of list) {
         if (typeof origin === "string" && origin.length > 0) {
@@ -85,11 +86,13 @@ export async function preloadDismissedOrigins(): Promise<void> {
 /** Records that the user dismissed the auto-attach prompt for this (tab, origin). */
 export function dismissOriginForTab(tabId: number, url: string): void {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return;
   }
 
   let set = dismissedByTab.get(tabId);
+
   if (set === undefined) {
     set = new Set<string>();
     dismissedByTab.set(tabId, set);
@@ -106,6 +109,7 @@ export function dismissOriginForTab(tabId: number, url: string): void {
  */
 export function isOriginDismissedForTab(tabId: number, url: string): boolean {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return false;
   }
@@ -122,11 +126,13 @@ export function isOriginDismissedForTab(tabId: number, url: string): boolean {
 /** "Don't ask for this site" — promote origin to the persistent layer. */
 export async function persistDismissOrigin(url: string): Promise<void> {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return;
   }
 
   await hydratePersistent();
+
   if (dismissedPersistent.has(origin)) {
     return;
   }
@@ -148,11 +154,13 @@ export async function persistDismissOrigin(url: string): Promise<void> {
 /** Reverses `persistDismissOrigin` (used by Options "Forget site"). */
 export async function unpersistDismissOrigin(url: string): Promise<void> {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return;
   }
 
   await hydratePersistent();
+
   if (!dismissedPersistent.has(origin)) {
     return;
   }

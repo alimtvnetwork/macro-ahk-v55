@@ -97,6 +97,7 @@ function buildTree(files: ProjectFile[]): FileNode[] {
         });
       } else {
         let dir = current.children.find((c) => c.isDir && c.name === part);
+
         if (!dir) {
           dir = { name: part, path, isDir: true, children: [] };
           current.children.push(dir);
@@ -125,6 +126,7 @@ function buildTree(files: ProjectFile[]): FileNode[] {
 
 function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   if (ext === "json") {
     return "json";
   }
@@ -267,6 +269,7 @@ function TreeNode({
 
     const hasInternal = e.dataTransfer.types.includes("application/x-marco-file-path");
     const hasFiles = e.dataTransfer.types.includes("Files");
+
     if (!hasInternal && !hasFiles) {
       return;
     }
@@ -283,12 +286,14 @@ function TreeNode({
     e.preventDefault();
     e.stopPropagation();
     setDragOver(false);
+
     if (!node.isDir) {
       return;
     }
 
     // Internal file move
     const sourcePath = e.dataTransfer.getData("application/x-marco-file-path");
+
     if (sourcePath && onMoveFile) {
       onMoveFile(sourcePath, node.path);
 
@@ -297,6 +302,7 @@ function TreeNode({
 
     // External file upload
     const droppedFiles = Array.from(e.dataTransfer.files);
+
     if (droppedFiles.length > 0 && onDrop) {
       onDrop(droppedFiles, node.path);
     }
@@ -462,6 +468,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
   const handleDelete = async (fileId: string) => {
     try {
       await sendMessage({ type: "FILE_DELETE", fileId });
+
       if (selectedFile?.id === fileId) {
         setSelectedFile(null);
         setFileContent("");
@@ -478,6 +485,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleCreateFile = async () => {
     const name = newFileName.trim();
+
     if (!name) {
       return;
     }
@@ -501,6 +509,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleCreateFolder = async () => {
     const name = newFolderName.trim().replace(/\/+$/, "");
+
     if (!name) {
       return;
     }
@@ -529,6 +538,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
     }
 
     const newName = renameValue.trim();
+
     if (newName === selectedFile.filename) {
       setRenaming(false);
 
@@ -601,6 +611,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputFiles = e.target.files;
+
     if (!inputFiles || inputFiles.length === 0) {
       return;
     }
@@ -615,12 +626,14 @@ export function ProjectFilesPanel({ projectId }: Props) {
 
   const handleMoveFile = async (sourcePath: string, targetDir: string) => {
     const sourceFile = files.find((f) => f.filename === sourcePath);
+
     if (!sourceFile) {
       return;
     }
 
     const baseName = sourcePath.split("/").pop() ?? sourcePath;
     const newPath = targetDir ? `${targetDir}/${baseName}` : baseName;
+
     if (newPath === sourcePath) {
       return;
     }
@@ -642,6 +655,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
       });
       // Delete old
       await sendMessage({ type: "FILE_DELETE", fileId: sourceFile.id });
+
       if (selectedFile?.id === sourceFile.id) {
         setSelectedFile(null);
       }
@@ -670,6 +684,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
     e.preventDefault();
     setRootDragOver(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
+
     if (droppedFiles.length > 0) {
       void uploadFiles(droppedFiles);
     }
@@ -678,6 +693,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
   const handleToggleDir = (path: string) => {
     setExpandedDirs((prev) => {
       const next = new Set(prev);
+
       if (next.has(path)) {
         next.delete(path);
       } else {

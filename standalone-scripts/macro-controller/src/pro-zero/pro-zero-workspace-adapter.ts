@@ -38,6 +38,7 @@ function readMembership(src: Record<string, unknown>): WorkspaceMembership {
  */
 function pickWorkspaceSection(rawApi: WireWorkspaceRaw): WireWorkspaceRaw {
   const inner = toWireWorkspaceRaw(rawApi.workspace);
+
   if (inner) {
     return inner;
   }

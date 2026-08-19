@@ -103,6 +103,7 @@ function formatTimestamp(epochSeconds: number): string {
   const isSameDay = d.getFullYear() === now.getFullYear()
     && d.getMonth() === now.getMonth()
     && d.getDate() === now.getDate();
+
   if (isSameDay) {
     return timeStr;
   }

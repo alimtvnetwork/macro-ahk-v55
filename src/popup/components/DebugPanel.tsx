@@ -45,6 +45,7 @@ export function DebugPanel({ entries, isVisible, onClear }: DebugPanelProps) {
   const handleCopy = useCallback(async () => {
     const lines = DEBUG_ACTIONS.map((a) => {
       const entry = entries.get(a);
+
       if (!entry) {
         return `${a}: —`;
       }

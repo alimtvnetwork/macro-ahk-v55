@@ -31,6 +31,7 @@ export function getProjectStorageChangeArea(): ProjectStorageChangeArea | undefi
 async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Record<string, unknown> | null> {
   try {
     const out = await storage.get("marco_projects");
+
     if (out && typeof out === "object") {
       return out;
     }
@@ -49,6 +50,7 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
 
 export async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
   const storage = getProjectStorageLocal();
+
   if (!storage) {
     return [];
   }
@@ -57,6 +59,7 @@ export async function readProjectsDirectFromChromeStorage(): Promise<StoredProje
   const raw = (out as { marco_projects?: unknown } | null)?.marco_projects;
 
   const isArray = Array.isArray(raw);
+
   if (isArray) {
     return raw as StoredProject[];
   }
@@ -77,6 +80,7 @@ async function readProjectsViaMessage(): Promise<StoredProject[]> {
 async function loadProjectRosterSnapshot(): Promise<StoredProject[]> {
   const direct = await readProjectsDirectFromChromeStorage().catch(() => []);
   const hasDirectProjects = direct.length > 0;
+
   if (hasDirectProjects) {
     return direct;
   }
@@ -93,22 +97,26 @@ async function loadRosterAfterDelay(
   onLoaded: (projects: StoredProject[]) => void,
 ): Promise<boolean> {
   const shouldCancel = isCancelled();
+
   if (shouldCancel) {
     return true;
   }
 
   const hasDelay = delayMs > 0;
+
   if (hasDelay) {
     await new Promise((r) => setTimeout(r, delayMs));
   }
 
   const projects = await loadProjectRosterSnapshot();
   const shouldCancelAfterLoad = isCancelled();
+
   if (shouldCancelAfterLoad) {
     return true;
   }
 
   const isEmpty = projects.length === 0;
+
   if (isEmpty) {
     return false;
   }
@@ -124,6 +132,7 @@ export async function pollProjectRoster(
 ): Promise<void> {
   for (const delayMs of PROJECT_ROSTER_POLL_DELAYS_MS) {
     const isDone = await loadRosterAfterDelay(delayMs, isCancelled, onLoaded);
+
     if (isDone) {
       return;
     }
@@ -131,6 +140,7 @@ export async function pollProjectRoster(
 
   for (let attempt = 0; attempt < PROJECT_ROSTER_TAIL_ATTEMPTS; attempt++) {
     const isDone = await loadRosterAfterDelay(500, isCancelled, onLoaded);
+
     if (isDone) {
       return;
     }

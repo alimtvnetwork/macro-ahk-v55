@@ -1,5 +1,7 @@
 # Task: Enforce Blank Line Padding Before `if` Statements
 
+Status: completed
+
 ## Goal
 The codebase requires a new line gap before any `if` statement, provided it is not the very first line inside a block (e.g., right after a `{`). An audit has identified 1,711 violations across the codebase.
 

@@ -91,6 +91,7 @@ describe('resolveConnection', () => {
     let n = 0;
     installSdk(() => {
       n += 1;
+
       if (n < 3) {
         return { ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'running', step: 'pushing_code' } };
       }
@@ -99,6 +100,7 @@ describe('resolveConnection', () => {
     });
     const r = await resolveConnection('ws1', 'conn1', 'p1', PROBE_POLL_INTERVAL_MS * 5);
     expect(r.connected).toBe(true);
+
     if (r.connected) {
       expect(r.repoUrl).toBe('https://github.com/a/b');
     }

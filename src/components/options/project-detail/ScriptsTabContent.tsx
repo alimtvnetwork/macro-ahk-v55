@@ -42,6 +42,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
 
   const findScript = (path: string) => {
     const exact = availableScripts.find((as) => as.name === path);
+
     if (exact) {
       return exact;
     }
@@ -53,11 +54,13 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
 
   const findConfig = (idOrPath: string) => {
     const byId = availableConfigs.find((c) => c.id === idOrPath);
+
     if (byId) {
       return byId;
     }
 
     const byName = availableConfigs.find((c) => c.name === idOrPath);
+
     if (byName) {
       return byName;
     }
@@ -90,6 +93,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
     console.log("availableScripts names:", libraryNames);
     console.log("unbound paths:", unbound);
     console.groupEnd();
+
     if (unbound.length > 0) {
       logError(
         "ScriptsTab.UnboundBinding",

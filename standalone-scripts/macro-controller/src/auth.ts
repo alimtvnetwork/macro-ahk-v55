@@ -25,6 +25,7 @@ export {
   resolveToken,
   markBearerTokenExpired,
   invalidateSessionBridgeKey,
+  isAuthFailure,
 } from './auth-resolve';
 
 export {

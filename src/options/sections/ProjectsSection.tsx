@@ -64,6 +64,7 @@ export function ProjectsSection() {
 
   const handleDelete = useCallback(async (projectId: string) => {
     const isConfirmed = confirm("Delete this project? This cannot be undone.");
+
     if (!isConfirmed) {
       return;
     }
@@ -96,6 +97,7 @@ export function ProjectsSection() {
     fileInput.accept = ".json";
     fileInput.addEventListener(Events.CHANGE, async () => {
       const file = fileInput.files?.[0];
+
       if (!file) {
         return;
       }
@@ -128,6 +130,7 @@ export function ProjectsSection() {
       const isConfirmed = confirm(
         "⚠️ Replace All will delete all existing projects, scripts, and configs before import. Continue?",
       );
+
       if (!isConfirmed) {
         return;
       }
@@ -229,6 +232,7 @@ export function ProjectsSection() {
           style={{ display: "none" }}
           onChange={(e) => {
             const file = e.target.files?.[0];
+
             if (file) {
               void handleSqliteFileChange(file);
               e.target.value = ""; 

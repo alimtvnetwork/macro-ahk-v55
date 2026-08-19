@@ -89,6 +89,7 @@ export function diluteBadgeBg(bg: string, factor: number): string {
   }
 
   const m = bg.match(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/);
+
   if (!m) {
     return bg;
   }

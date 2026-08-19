@@ -72,11 +72,13 @@ function makeCtx(): PromptContext {
 
 function firstPresetItem(container: HTMLElement): HTMLElement {
   const sub = container.querySelector<HTMLElement>('[data-plan-task-sub]');
+
   if (!sub) {
     throw new Error('sub not rendered');
   }
 
   const first = sub.querySelector<HTMLElement>('[data-plan-preset]');
+
   if (!first) {
     throw new Error('no preset row');
   }

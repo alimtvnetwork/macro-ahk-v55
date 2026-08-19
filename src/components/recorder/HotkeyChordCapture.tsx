@@ -43,6 +43,7 @@ function eventToChord(e: KeyboardEvent): string | null {
   }
 
   const parts: string[] = [];
+
   if (e.ctrlKey) {
     parts.push("Ctrl");
   }
@@ -60,6 +61,7 @@ function eventToChord(e: KeyboardEvent): string | null {
   }
 
   let key = e.key;
+
   if (key === " ") {
     key = "Space"; 
   }
@@ -109,6 +111,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
     }
 
     const chord = eventToChord(e);
+
     if (chord === null) {
       return; 
     }
@@ -125,6 +128,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
     }
 
     const box = boxRef.current;
+
     if (box === null) {
       return; 
     }
@@ -147,6 +151,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
 
     const onPointerDown = (e: PointerEvent) => {
       const root = containerRef.current;
+
       if (root === null) {
         return; 
       }

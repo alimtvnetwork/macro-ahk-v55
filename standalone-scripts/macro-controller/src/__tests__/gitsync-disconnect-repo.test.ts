@@ -79,6 +79,7 @@ describe('disconnectGithubRepo', () => {
     const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
     const out = await disconnectGithubRepo('ws-3', 'pid-3');
     expect(out.status).toBe('error');
+
     if (out.status === 'error') {
       expect(out.httpStatus).toBe(500);
     }

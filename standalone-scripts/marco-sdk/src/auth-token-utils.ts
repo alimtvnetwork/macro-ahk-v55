@@ -63,12 +63,14 @@ export class AuthTokenUtils {
     }
 
     const normalized = AuthTokenUtils.normalizeBearerToken(raw);
+
     if (AuthTokenUtils.isUsableToken(normalized)) {
       return normalized;
     }
 
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
+
       if (parsed === null || typeof parsed !== "object") {
         return "";
       }
@@ -86,6 +88,7 @@ export class AuthTokenUtils {
         }
 
         const nested = AuthTokenUtils.normalizeBearerToken(candidate);
+
         if (AuthTokenUtils.isUsableToken(nested)) {
           return nested;
         }
@@ -120,11 +123,13 @@ export class AuthTokenUtils {
         }
 
         const raw = localStorage.getItem(key) || "";
+
         if (!raw || raw.length < 20) {
           continue;
         }
 
         const token = AuthTokenUtils.extractSupabaseTokenFromRaw(key, raw, onFound);
+
         if (token) {
           return token;
         }
@@ -147,6 +152,7 @@ export class AuthTokenUtils {
     const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
+
       if (key) {
         keys.push(key);
       }
@@ -173,6 +179,7 @@ export class AuthTokenUtils {
 
       // Direct access_token field
       const accessToken = parsed.access_token;
+
       if (typeof accessToken === "string" && AuthTokenUtils.isUsableToken(accessToken)) {
         onFound?.(key, accessToken.length);
 
@@ -183,6 +190,7 @@ export class AuthTokenUtils {
       const session = (parsed.currentSession || parsed.session) as
                 | Record<string, unknown>
                 | undefined;
+
       if (
         session !== undefined &&
                 typeof session.access_token === "string" &&
@@ -202,6 +210,7 @@ export class AuthTokenUtils {
       );
 
       const token = AuthTokenUtils.normalizeBearerToken(raw);
+
       if (AuthTokenUtils.isUsableToken(token)) {
         onFound?.(key, token.length);
 

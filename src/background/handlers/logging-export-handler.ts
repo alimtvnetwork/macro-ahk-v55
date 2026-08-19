@@ -153,6 +153,7 @@ function addPlainTextLogs(zip: JSZip): void {
   const scriptMap = new Map<string, { status: string; detail: string; ts: string }>();
   for (const row of injectionRows) {
     const sid = scriptOf(row);
+
     if (!sid) {
       continue;
     }
@@ -161,6 +162,7 @@ function addPlainTextLogs(zip: JSZip): void {
     const ts = String(row.timestamp || row.Timestamp || "");
     const det = detailOf(row);
     let status = "unknown";
+
     if (act.includes("INJECTED") || act.includes("SUCCESS")) {
       status = "✅ injected";
     } else if (act.includes("SKIP")) {

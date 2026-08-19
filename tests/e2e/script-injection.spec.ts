@@ -242,6 +242,7 @@ test.describe('Script Injection', () => {
           },
           (res) => {
             clearTimeout(timeout);
+
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message));
             } else {
@@ -300,6 +301,7 @@ test.describe('Script Injection', () => {
           },
           (res) => {
             clearTimeout(timeout);
+
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message));
             } else {
@@ -356,6 +358,7 @@ test.describe('Script Injection', () => {
               },
               (res) => {
                 clearTimeout(timeout);
+
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -438,6 +441,7 @@ test.describe('Script Injection', () => {
           },
           (res) => {
             clearTimeout(timeout);
+
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message));
             } else {
@@ -550,6 +554,7 @@ test.describe('Script Injection', () => {
           },
           (res) => {
             clearTimeout(timeout);
+
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message));
             } else {

@@ -50,6 +50,7 @@ export function hasFolderEntry(dt: DataTransfer): boolean {
 function findDirectoryEntry(dt: DataTransfer): FileSystemDirectoryEntry | null {
   for (let i = 0; i < dt.items.length; i++) {
     const entry = dt.items[i].webkitGetAsEntry?.();
+
     if (entry?.isDirectory) {
       return entry as FileSystemDirectoryEntry;
     }
@@ -102,16 +103,19 @@ async function findFile(
     const entries = await readDirEntries(dir);
     const match = entries.find((e) => e.name === segments[i]);
     const isMissing = match === undefined;
+
     if (isMissing) {
       return null;
     }
 
     const isLastSegment = i === segments.length - 1;
+
     if (isLastSegment) {
       return match.isFile ? (match as FileSystemFileEntry) : null;
     }
 
     const isFile = !match.isDirectory;
+
     if (isFile) {
       return null;
     }
@@ -127,18 +131,21 @@ async function findFile(
 export async function parseDroppedFolder(dt: DataTransfer): Promise<ParsedFolder> {
   const folderEntry = findDirectoryEntry(dt);
   const isFolderMissing = folderEntry === null;
+
   if (isFolderMissing) {
     throw new Error("No folder found in drop.");
   }
 
   const manifestEntry = await findFile(folderEntry, "marco-project.json");
   const isManifestMissing = manifestEntry === null;
+
   if (isManifestMissing) {
     throw new Error("No marco-project.json found in folder.");
   }
 
   const raw = JSON.parse(await readEntryAsText(manifestEntry));
   const isNameMissing = !raw.name;
+
   if (isNameMissing) {
     throw new Error("marco-project.json missing 'name' field.");
   }

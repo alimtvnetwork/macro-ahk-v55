@@ -55,6 +55,7 @@ export async function handleDynamicRequire(
   const { target, requesterProjectId, tabId } = request;
 
   const isCallerContextMissing = !target || !requesterProjectId || !tabId;
+
   if (isCallerContextMissing) {
     logDynamicLoad(requesterProjectId ?? "unknown", target ?? "unknown", "error", "Missing required fields");
 
@@ -66,6 +67,7 @@ export async function handleDynamicRequire(
   // --- Resolve requester project ---
   const requester = allProjects.find((p) => p.id === requesterProjectId);
   const isRequesterMissing = !requester;
+
   if (isRequesterMissing) {
     logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
 
@@ -74,6 +76,7 @@ export async function handleDynamicRequire(
 
   // --- Check allowDynamicRequests flag ---
   const isDynamicRequestsDisabled = !requester.settings?.allowDynamicRequests;
+
   if (isDynamicRequestsDisabled) {
     logDynamicLoad(requesterProjectId, target, "denied", "allowDynamicRequests is disabled");
 
@@ -86,6 +89,7 @@ export async function handleDynamicRequire(
   // --- Resolve target project + script ---
   const resolved = resolveTarget(target, allProjects);
   const isResolutionFailed = !resolved;
+
   if (isResolutionFailed) {
     logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
 
@@ -108,6 +112,7 @@ export async function handleDynamicRequire(
   try {
     const code = await loadScriptCode(targetProject.id, targetScript);
     const isCodeMissing = !code;
+
     if (isCodeMissing) {
       logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
 
@@ -150,14 +155,17 @@ function resolveTarget(
 
   // Try "ProjectName.scriptName" format
   const dotIdx = cleaned.indexOf(".");
+
   if (dotIdx > 0) {
     const projectPart = cleaned.slice(0, dotIdx);
     const scriptPart = cleaned.slice(dotIdx + 1);
     const project = findProject(projectPart, allProjects);
+
     if (project) {
       const script = project.scripts.find(
         (s) => s.path.includes(scriptPart) || s.description === scriptPart,
       );
+
       if (script) {
         return { project, script };
       }
@@ -166,6 +174,7 @@ function resolveTarget(
 
   // Try matching just project name — return first script
   const project = findProject(cleaned, allProjects);
+
   if (project && project.scripts.length > 0) {
     return { project, script: project.scripts[0] };
   }
@@ -233,6 +242,7 @@ function logDynamicLoad(
              VALUES (?, ?, ?, ?, ?, ?)`,
       [now, requester, target, status, detail, version],
     ));
+
     if (res.isFail) {
       throw res.error;
     }

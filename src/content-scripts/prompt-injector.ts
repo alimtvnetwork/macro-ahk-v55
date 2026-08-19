@@ -32,6 +32,7 @@ function findEditorByXPath(xpath: string): HTMLElement | null {
   try {
     const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     const node = result.singleNodeValue;
+
     if (!node) {
       return null;
     }
@@ -60,6 +61,7 @@ function findTiptapEditor(chatBoxXPath?: string): HTMLElement | null {
   // Try XPath-based discovery first
   if (chatBoxXPath) {
     const xpathResult = findEditorByXPath(chatBoxXPath);
+
     if (xpathResult) {
       return xpathResult;
     }
@@ -77,6 +79,7 @@ function findTiptapEditor(chatBoxXPath?: string): HTMLElement | null {
 
   for (const sel of selectors) {
     const el = document.querySelector<HTMLElement>(sel);
+
     if (el) {
       return el;
     }
@@ -123,6 +126,7 @@ function appendToContentEditable(editor: HTMLElement, text: string): void {
   editor.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText" }));
   // Move cursor to end of the new content
   const sel = window.getSelection();
+
   if (sel) {
     const range = document.createRange();
     range.selectNodeContents(p);
@@ -141,6 +145,7 @@ function appendToContentEditable(editor: HTMLElement, text: string): void {
 function appendToEditor(editor: HTMLElement, text: string): boolean {
   try {
     editor.focus();
+
     if (editor instanceof HTMLTextAreaElement || editor instanceof HTMLInputElement) {
       appendToInputElement(editor, text);
     } else {
@@ -178,8 +183,10 @@ function findSubmitButton(): HTMLElement | null {
 
   for (const sel of selectors) {
     const el = document.querySelector<HTMLElement>(sel);
+
     if (el) {
       const btn = el.closest("button") ?? el;
+
       if (btn && !btn.hasAttribute("disabled")) {
         return btn as HTMLElement;
       }
@@ -188,10 +195,13 @@ function findSubmitButton(): HTMLElement | null {
 
   // Fallback: last enabled button inside a form containing the editor
   const editor = findTiptapEditor();
+
   if (editor) {
     const form = editor.closest("form");
+
     if (form) {
       const buttons = form.querySelectorAll<HTMLButtonElement>("button:not([disabled])");
+
       if (buttons.length > 0) {
         return buttons[buttons.length - 1];
       }
@@ -203,6 +213,7 @@ function findSubmitButton(): HTMLElement | null {
 
 function triggerSubmit(): boolean {
   const btn = findSubmitButton();
+
   if (btn) {
     console.log("[Marco] Auto-submit: clicking send button");
     btn.click();
@@ -211,6 +222,7 @@ function triggerSubmit(): boolean {
   }
 
   const editor = findTiptapEditor();
+
   if (editor) {
     console.log("[Marco] Auto-submit: sending Enter key");
     editor.dispatchEvent(new KeyboardEvent("keydown", {
@@ -247,6 +259,7 @@ export interface InjectResult {
 
 export async function injectPromptText(text: string, options?: InjectOptions): Promise<InjectResult> {
   const editor = findTiptapEditor(options?.chatBoxXPath);
+
   if (!editor) {
     return { success: false, method: "none", verified: false, submitted: false };
   }
@@ -255,6 +268,7 @@ export async function injectPromptText(text: string, options?: InjectOptions): P
 
   // Auto-submit after injection
   let submitted = false;
+
   if (success && (options?.autoSubmit ?? true)) {
     const delay = options?.submitDelayMs ?? 200;
     console.log(`[Marco] Waiting ${delay}ms before auto-submit`);
@@ -315,6 +329,7 @@ async function bootstrap(): Promise<void> {
   }
 
   const correlationIds = Object.keys(pending);
+
   if (correlationIds.length === 0) {
     return;
   }

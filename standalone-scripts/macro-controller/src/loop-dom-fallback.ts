@@ -74,6 +74,7 @@ export function runCycleDomFallback(): void {
   }
 
   const clicked = ensureProjectDialogOpen();
+
   if (!clicked) {
     logError('DOM Fallback', 'project button not found');
 

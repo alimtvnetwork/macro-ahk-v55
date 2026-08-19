@@ -55,6 +55,7 @@ export function startHotReload(): void {
   }
 
   const isMissing = !isDevBuild();
+
   if (isMissing) {
     console.log("[hot-reload] Disabled (production build) — not polling build-meta.json");
 
@@ -118,6 +119,7 @@ async function pollBuildMeta(): Promise<void> {
     const hasBuildId = currentBuildId !== null;
 
     const isMissing063 = !hasBuildId;
+
     if (isMissing063) {
       return;
     }

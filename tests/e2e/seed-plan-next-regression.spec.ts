@@ -226,6 +226,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
     const block = await page.evaluate((k) => {
       const raw = window.localStorage.getItem(k);
+
       if (!raw) {
         return ['Seed Telemetry: (not run this session)', '---'];
       }

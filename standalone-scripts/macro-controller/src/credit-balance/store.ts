@@ -99,12 +99,14 @@ export async function readCreditBalanceCache(
   }
 
   const kv = getKv();
+
   if (!kv) {
     return null;
   }
 
   try {
     const raw = await kv.get(buildKey(workspaceId));
+
     if (!raw) {
       return null;
     }
@@ -114,6 +116,7 @@ export async function readCreditBalanceCache(
             typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.FetchedAtMs === 'number' &&
             typeof parsed.TotalRemaining === 'number';
+
     if (!hasShape) {
       return null;
     }
@@ -140,6 +143,7 @@ export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
   }
 
   const kv = getKv();
+
   if (!kv) {
     logError(
       'CreditBalanceCache.write',
@@ -174,6 +178,7 @@ export function clearCreditBalanceCache(workspaceId: string): void {
   }
 
   const kv = getKv();
+
   if (!kv) {
     return;
   }
@@ -194,6 +199,7 @@ export function clearCreditBalanceCache(workspaceId: string): void {
  */
 export async function listCreditBalanceCache(): Promise<ReadonlyArray<CreditBalanceCacheRow>> {
   const kv = getKv();
+
   if (!kv || typeof kv.list !== 'function') {
     return [];
   }
@@ -204,6 +210,7 @@ export async function listCreditBalanceCache(): Promise<ReadonlyArray<CreditBala
     for (const entry of entries) {
       try {
         const parsed = JSON.parse(entry.value) as Partial<CreditBalanceCacheRow>;
+
         if (typeof parsed.WorkspaceId === 'string' && typeof parsed.FetchedAtMs === 'number') {
           rows.push(parsed as CreditBalanceCacheRow);
         }

@@ -28,6 +28,7 @@ export function ActivityLogSection({ projectId, projectSlug }: { projectId: stri
         const response = await import("@/lib/message-client").then((m) =>
           m.sendMessage({ type: "GET_ACTIVITY_LOG", projectId })
         );
+
         if (Array.isArray(response)) {
           setLogs(response as ActivityLogEntry[]);
         }

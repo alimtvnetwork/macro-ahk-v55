@@ -110,11 +110,13 @@ export function assertParamTokensUnchanged(
   const newSet = toMultiset(extractParamTokens(newBody));
   const added = diffAdded(newSet, oldSet);
   const removed = diffRemoved(newSet, oldSet);
+
   if (added.length === 0 && removed.length === 0) {
     return;
   }
 
   const parts: string[] = [];
+
   if (added.length > 0) {
     parts.push('added: {{' + added.join('}}, {{') + '}}');
   }

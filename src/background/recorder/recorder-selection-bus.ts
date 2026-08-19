@@ -43,6 +43,7 @@ export function getSelection(): RecorderSelection {
 
 export function setSelection(next: RecorderSelection): void {
   current = next;
+
   if (typeof window === "undefined") {
     return; 
   }

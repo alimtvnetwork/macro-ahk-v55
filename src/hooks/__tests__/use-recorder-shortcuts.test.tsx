@@ -43,6 +43,7 @@ function fireChord(key: string, opts: { ctrl?: boolean; alt?: boolean; shift?: b
     bubbles: true,
     cancelable: true,
   });
+
   if (opts.target !== undefined) {
     opts.target.dispatchEvent(ev);
   } else {

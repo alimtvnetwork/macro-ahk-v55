@@ -46,6 +46,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
     if (!isGlobal) {
       for (const gp of globalProjects) {
         const scripts = gp.scripts ?? [];
+
         if (scripts.length === 0) {
           result.push({ step: step++, label: "SDK Init", scriptName: gp.name, stage: "global", projectName: gp.name, isEnabled: true, order: -1000 });
         } else {
@@ -65,6 +66,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
 
         visited.add(dep.projectId);
         const depProject = allProjects.find((p) => p.id === dep.projectId);
+
         if (!depProject) {
           continue;
         }
@@ -78,6 +80,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
         }
 
         const scripts = depProject.scripts ?? [];
+
         if (scripts.length === 0) {
           result.push({ step: step++, label: depProject.name, scriptName: depProject.name, stage: "dependency", projectName: depProject.name, isEnabled: true, order: -500 });
         } else {
@@ -153,6 +156,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
             <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Stages:</span>
             {(["global", "dependency", "project"] as const).map((stage) => {
               const count = entries.filter((e) => e.stage === stage).length;
+
               if (count === 0) {
                 return null;
               }

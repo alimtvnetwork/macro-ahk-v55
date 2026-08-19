@@ -58,6 +58,7 @@ export function normalizeReplaceValues(input: readonly unknown[]): string[] | nu
     }
 
     const trimmed = raw.trim();
+
     if (trimmed === '' || seen.has(trimmed)) {
       continue;
     }
@@ -99,6 +100,7 @@ import { DiagnosticError } from '../errors/diagnostic-error';
  */
 export function getDefaultBody(role: string, slug: string): string {
   const body = getSeedBodyForSlug(slug);
+
   if (!body) {
     throw new DiagnosticError('PROMPT_DEFAULTS_E001', { role, slug, reason: 'unknown role/slug' });
   }

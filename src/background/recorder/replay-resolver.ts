@@ -36,6 +36,7 @@ export function resolveStepSelector(
   selectors: ReadonlyArray<PersistedSelector>,
 ): ResolvedSelector {
   const primary = selectors.find((s) => s.IsPrimary === 1);
+
   if (primary === undefined) {
     throw new Error("No primary selector found for Step");
   }
@@ -72,6 +73,7 @@ function resolveAnchoredRelative(
   }
 
   const anchor = byId.get(selector.AnchorSelectorId);
+
   if (anchor === undefined) {
     throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set`);
   }
@@ -87,6 +89,7 @@ function resolveOne(
 ): string {
   guardDepthAndCycle(selector, chain, depth);
   chain.push(selector.SelectorId);
+
   if (selector.SelectorKindId === SelectorKindId.XPathFull) {
     return selector.Expression;
   }
@@ -101,6 +104,7 @@ function resolveOne(
 
 function joinRelative(anchor: string, relative: string): string {
   const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
+
   if (stripped.length === 0) {
     return anchor;
   }

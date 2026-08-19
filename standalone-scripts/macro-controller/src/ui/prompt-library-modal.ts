@@ -15,6 +15,7 @@ function focusableNodesIn(root: HTMLElement): HTMLElement[] {
 
 function closeExisting(): void {
   const ex = document.getElementById(MODAL_ID);
+
   if (ex) {
     ex.remove();
   }
@@ -44,6 +45,7 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
   }
 
   const saveCombo = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
+
   if (saveCombo && refs.activeEditor) {
     e.preventDefault();
     refs.activeEditor.save();
@@ -58,6 +60,7 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
 
 function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const nodes = focusableNodesIn(root);
+
   if (nodes.length === 0) {
     return;
   }
@@ -66,6 +69,7 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const last = nodes[nodes.length - 1]!;
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
+
   if (!insideModal) {
     e.preventDefault();
     first.focus();
@@ -133,6 +137,7 @@ export async function openPromptLibraryModal(): Promise<void> {
   });
 
   const closeBtn = shell.root.querySelector<HTMLButtonElement>('button[data-testid="library-close"]');
+
   if (closeBtn) {
     closeBtn.addEventListener('click', closeExisting);
     closeBtn.focus();

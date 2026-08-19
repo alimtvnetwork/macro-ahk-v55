@@ -58,6 +58,7 @@ const VARIABLE_NAME_RE = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
 export function suggestVariableName(header: string): string {
   let cleaned = header.trim().replace(/[^A-Za-z0-9_]+/g, "_");
   cleaned = cleaned.replace(/^_+|_+$/g, "");
+
   if (cleaned === "") {
     cleaned = "Var";
   }
@@ -90,6 +91,7 @@ export function validateVariableName(name: string): string | null {
  */
 export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
   const { Headers, Row, Mappings } = opts;
+
   if (Headers.length !== Row.length) {
     return {
       Ok: false,
@@ -112,6 +114,7 @@ export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
     }
 
     const outcome = applyMapping(m, Row, headerToIdx, seenVars);
+
     if (outcome.Ok === false) {
       return outcome;
     }
@@ -146,6 +149,7 @@ function applyMapping(
   }
 
   const idx = headerToIdx.get(m.Column);
+
   if (idx === undefined) {
     return {
       Ok: false,
@@ -155,6 +159,7 @@ function applyMapping(
   }
 
   const validation = validateVariableName(m.Variable);
+
   if (validation !== null) {
     return { Ok: false, Reason: validation, Column: m.Column };
   }
@@ -169,6 +174,7 @@ function applyMapping(
 
   seenVars.add(m.Variable);
   const coerced = coerceValue(row[idx] ?? "", m.Coerce);
+
   if (coerced.Ok === false) {
     return {
       Ok: false,
@@ -201,6 +207,7 @@ function coerceNumber(raw: string): CoerceResult {
   }
 
   const n = Number(raw);
+
   if (!Number.isFinite(n)) {
     return { Ok: false, Reason: `Expected a number, got "${raw}".` };
   }
@@ -210,6 +217,7 @@ function coerceNumber(raw: string): CoerceResult {
 
 function coerceBoolean(raw: string): CoerceResult {
   const t = raw.trim().toLowerCase();
+
   if (t === "true" || t === "1" || t === "yes" || t === "y") {
     return { Ok: true, Value: true };
   }
@@ -241,6 +249,7 @@ function coerceAuto(raw: string): CoerceResult {
   }
 
   const t = raw.trim().toLowerCase();
+
   if (t === "true") {
     return { Ok: true, Value: true };
   }
@@ -252,11 +261,13 @@ function coerceAuto(raw: string): CoerceResult {
   // Number only when the trimmed text round-trips through Number,
   // avoids e.g. "01" -> 1 surprises by requiring the printed form to match.
   const trimmed = raw.trim();
+
   if (!/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
     return { Ok: true, Value: raw };
   }
 
   const n = Number(trimmed);
+
   if (Number.isFinite(n) && String(n) === trimmed) {
     return { Ok: true, Value: n };
   }

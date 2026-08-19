@@ -25,6 +25,7 @@ function findNextTasksPrompt(
   // Priority 2: id match
   for (const e of entries) {
     const id = (e.id || '').toLowerCase();
+
     if (id === targetSlug || id === 'default-' + targetSlug || id.indexOf(targetSlug) !== -1) {
       return e;
     }
@@ -33,6 +34,7 @@ function findNextTasksPrompt(
   // Priority 3: Derived name slug
   for (const e of entries) {
     const derived = (e.name || '').toLowerCase().replace(/\s+/g, '-');
+
     if (derived === targetSlug) {
       return e;
     }
@@ -41,6 +43,7 @@ function findNextTasksPrompt(
   // Priority 4: Keywords
   for (const e of entries) {
     const name = (e.name || '').toLowerCase();
+
     if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) {
       return e;
     }

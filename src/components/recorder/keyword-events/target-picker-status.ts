@@ -7,6 +7,7 @@ export function classifySelector(kind: string, selectorText: string): SelectorSt
   }
 
   const trimmed = selectorText.trim();
+
   if (trimmed === "") {
     return "empty"; 
   }

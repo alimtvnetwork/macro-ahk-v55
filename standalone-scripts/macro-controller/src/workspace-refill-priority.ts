@@ -28,6 +28,7 @@ function resolvedAvailable(ws: WorkspaceCredit): number {
  */
 export function daysToRefillForWs(ws: WorkspaceCredit, nowMs?: number): number | null {
   const iso = ws.nextRefillAt || ws.billingPeriodEndAt || '';
+
   if (!iso) {
     return null;
   }
@@ -50,6 +51,7 @@ export function computeRefillScore(
   nowMs?: number,
 ): number {
   const days = daysToRefillForWs(ws, nowMs);
+
   if (days === null) {
     return 0;
   }

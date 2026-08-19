@@ -94,6 +94,7 @@ describe("describeElement", () => {
 describe("mountHoverHighlighter, lifecycle", () => {
   afterEach(() => {
     const host = document.getElementById(HOVER_HIGHLIGHTER_HOST_ID);
+
     if (host !== null) {
       host.remove();
     }

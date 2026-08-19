@@ -61,6 +61,7 @@ export function computeRange<Id extends SelectionId>(
 ): Id[] {
   const fromIdx = orderedIds.indexOf(from);
   const toIdx = orderedIds.indexOf(to);
+
   if (fromIdx < 0 || toIdx < 0) {
     return [];
   }
@@ -83,6 +84,7 @@ export function reduceSelectionClick<Id extends SelectionId>(
 ): { next: Set<Id>; nextAnchor: Id | null } {
   if (mods.shiftKey && anchor !== null && anchor !== clickedId) {
     const range = computeRange(orderedIds, anchor, clickedId);
+
     if (range.length > 0) {
       return { next: new Set(range), nextAnchor: anchor };
     }
@@ -91,6 +93,7 @@ export function reduceSelectionClick<Id extends SelectionId>(
 
   if (mods.toggleKey) {
     const next = new Set(current);
+
     if (next.has(clickedId)) {
       next.delete(clickedId);
     } else {

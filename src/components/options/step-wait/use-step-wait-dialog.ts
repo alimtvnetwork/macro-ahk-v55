@@ -38,6 +38,7 @@ function countVisible(matches: ReadonlyArray<ElementLike>): number {
   for (const node of matches) {
     const w = typeof node.offsetWidth === "number" ? node.offsetWidth : 0;
     const h = typeof node.offsetHeight === "number" ? node.offsetHeight : 0;
+
     if (w > 0 || h > 0) {
       n += 1;
       continue; 
@@ -66,6 +67,7 @@ function hydrateFromExisting(stepId: number, setters: {
     setHasExisting: (v: boolean) => void;
 }): void {
   const existing = readStepWait(stepId);
+
   if (existing === null) {
     setters.setSelector("");
     setters.setKindMode("Auto");

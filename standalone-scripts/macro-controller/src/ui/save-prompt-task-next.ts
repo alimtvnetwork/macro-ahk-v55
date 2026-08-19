@@ -51,6 +51,7 @@ export function buildTaskNextSubmenu(
     window.requestAnimationFrame(function () {
       const subRect = submenu.getBoundingClientRect();
       const overflowsBottom = subRect.bottom > window.innerHeight - PAD;
+
       if (overflowsBottom) {
         const newTop = Math.max(PAD, window.innerHeight - subRect.height - PAD);
         submenu.style.top = newTop + 'px';
@@ -71,6 +72,7 @@ export function buildTaskNextSubmenu(
       const isSubmenuHovered = submenu.matches(':hover');
       const isItemHovered = self.matches(':hover');
       const shouldHide = !isSubmenuHovered && !isItemHovered;
+
       if (shouldHide) {
         self.style.background = 'transparent';
         submenu.style.display = 'none';
@@ -152,6 +154,7 @@ function buildCustomCountRow(
     event.stopPropagation();
     const count = parseInt(input.value);
     const isInvalidCount = !count || count < 1 || count > 999;
+
     if (isInvalidCount) {
       showPasteToast('⚠️ Enter 1–999', true);
 
@@ -165,6 +168,7 @@ function buildCustomCountRow(
 
   input.onkeydown = function (event: KeyboardEvent) {
     const isEnter = event.key === 'Enter';
+
     if (isEnter) {
       event.stopPropagation();
       goButton.click();

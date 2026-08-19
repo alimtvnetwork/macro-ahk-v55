@@ -55,6 +55,7 @@ interface Row {
 }
 function healthyRow(role: PromptRowRoleType, overrides: Partial<Row> = {}): Row {
   const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
+
   if (!seed) {
     throw new Error('seed row missing');
   }

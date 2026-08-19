@@ -43,6 +43,7 @@ export function bindFileStorageDbManager(manager: DbManager): void {
 
 function getDb(): SqlJsDatabase {
   const manager = dbManager;
+
   if (!manager) {
     throw new Error("[file-storage] DbManager not bound");
   }
@@ -76,11 +77,13 @@ export async function handleFileSave(
   const filename = requireField(raw.filename);
   const dataBase64 = typeof raw.dataBase64 === "string" ? raw.dataBase64 : null;
   const isProjectIdMissing = !projectId;
+
   if (isProjectIdMissing) {
     return missingFieldError("projectId", "file:save");
   }
 
   const isFilenameMissing = !filename;
+
   if (isFilenameMissing) {
     return missingFieldError("filename", "file:save");
   }
@@ -101,11 +104,13 @@ function saveFileToDb(projectId: string, filename: string, mimeType: string | nu
          VALUES (?, ?, ?, ?, ?, datetime('now'))`,
     [projectId, filename, mimeType, dataBase64, size],
   ));
+
   if (runRes.isFail) {
     return { isOk: false, errorMessage: String(runRes.error) };
   }
 
   const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()"));
+
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) };
   }
@@ -124,6 +129,7 @@ export async function handleFileGet(
   const raw = request as MessageRequest & { fileId?: unknown };
   const fileId = requireField(raw.fileId);
   const isFileIdMissing = !fileId;
+
   if (isFileIdMissing) {
     return missingFieldError("fileId", "file:get");
   }
@@ -133,6 +139,7 @@ export async function handleFileGet(
     "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
     [fileId],
   ));
+
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
   }
@@ -164,6 +171,7 @@ export async function handleFileList(
   const raw = request as MessageRequest & { projectId?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const isProjectIdMissing = !projectId;
+
   if (isProjectIdMissing) {
     return missingFieldError("projectId", "file:list");
   }
@@ -172,6 +180,7 @@ export async function handleFileList(
   const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
   ));
+
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
   }
@@ -202,12 +211,14 @@ export async function handleFileDelete(
   const raw = request as MessageRequest & { fileId?: unknown };
   const fileId = requireField(raw.fileId);
   const isFileIdMissing = !fileId;
+
   if (isFileIdMissing) {
     return missingFieldError("fileId", "file:delete");
   }
 
   const db = getDb();
   const res = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -228,6 +239,7 @@ export function getFilesByProject(
   limit: number = 50,
 ): Array<{ name: string; data: string }> {
   const isProjectContextMissing = !projectId || typeof projectId !== "string";
+
   if (isProjectContextMissing) {
     return [];
   }
@@ -236,6 +248,7 @@ export function getFilesByProject(
   const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
   ));
+
   if (stmtResult.isFail) {
     return [];
   }

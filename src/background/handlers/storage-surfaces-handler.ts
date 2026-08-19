@@ -72,6 +72,7 @@ function resolveSetCookieUrl(input: {
   }
 
   const domain = (input.domain ?? "").trim();
+
   if (!domain) {
     throw new Error("[Storage] Cookie set requires url or domain");
   }
@@ -106,6 +107,7 @@ export async function handleStorageSessionSet(
   message: MessageRequest,
 ): Promise<{ isOk: true }> {
   const { key, value } = message as { key: string; value: JsonValue };
+
   if (!key || typeof key !== "string") {
     throw new Error("[Storage] Session key is required");
   }
@@ -119,6 +121,7 @@ export async function handleStorageSessionDelete(
   message: MessageRequest,
 ): Promise<{ isOk: true }> {
   const { key } = message as { key: string };
+
   if (!key || typeof key !== "string") {
     throw new Error("[Storage] Session key is required");
   }
@@ -143,6 +146,7 @@ export async function handleStorageSessionClear(
 
   const raw = await chrome.storage.session.get(null);
   const keys = Object.keys(raw).filter((key) => key.startsWith(prefix));
+
   if (keys.length > 0) {
     await chrome.storage.session.remove(keys);
   }
@@ -159,6 +163,7 @@ export async function handleStorageCookiesList(
     };
 
   const query: chrome.cookies.GetAllDetails = {};
+
   if (domain && domain.trim()) {
     query.domain = domain.trim();
   }
@@ -175,6 +180,7 @@ export async function handleStorageCookiesList(
     .map(toCookieEntry)
     .sort((a, b) => {
       const byDomain = a.domain.localeCompare(b.domain);
+
       if (byDomain !== 0) {
         return byDomain;
       }
@@ -223,6 +229,7 @@ export async function handleStorageCookiesSet(
   }
 
   const cookie = await chrome.cookies.set(details);
+
   if (!cookie) {
     throw new Error("[Storage] Failed to set cookie");
   }
@@ -257,6 +264,7 @@ export async function handleStorageCookiesClear(
     };
 
   const query: chrome.cookies.GetAllDetails = {};
+
   if (domain && domain.trim()) {
     query.domain = domain.trim();
   }

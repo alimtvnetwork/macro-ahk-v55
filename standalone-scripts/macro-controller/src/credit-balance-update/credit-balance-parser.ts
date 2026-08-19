@@ -19,6 +19,7 @@ function isRecord(value: JsonValue | undefined): value is CreditBalanceWire {
 
 function readNumber(raw: CreditBalanceWire, key: string): number {
   const value = raw[key];
+
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
@@ -49,6 +50,7 @@ function parseGrantTypeBalance(value: JsonValue): GrantTypeBalance | null {
 function readNumberAlias(raw: CreditBalanceWire, keys: ReadonlyArray<string>): number {
   for (const key of keys) {
     const value = raw[key];
+
     if (typeof value === 'number' && Number.isFinite(value)) {
       return value;
     }
@@ -75,6 +77,7 @@ function parseExpiringGrant(value: JsonValue): ExpiringGrant | null {
 
 function parseGrantTypeBalances(raw: CreditBalanceWire): ReadonlyArray<GrantTypeBalance> {
   const values = raw.grant_type_balances;
+
   if (!Array.isArray(values)) {
     return [];
   }
@@ -82,6 +85,7 @@ function parseGrantTypeBalances(raw: CreditBalanceWire): ReadonlyArray<GrantType
   const balances: GrantTypeBalance[] = [];
   for (const value of values) {
     const parsed = parseGrantTypeBalance(value);
+
     if (parsed) {
       balances.push(parsed);
     }
@@ -92,6 +96,7 @@ function parseGrantTypeBalances(raw: CreditBalanceWire): ReadonlyArray<GrantType
 
 function parseExpiringGrants(raw: CreditBalanceWire): ReadonlyArray<ExpiringGrant> {
   const values = raw.expiring_grants;
+
   if (!Array.isArray(values)) {
     return [];
   }
@@ -99,6 +104,7 @@ function parseExpiringGrants(raw: CreditBalanceWire): ReadonlyArray<ExpiringGran
   const grants: ExpiringGrant[] = [];
   for (const value of values) {
     const parsed = parseExpiringGrant(value);
+
     if (parsed) {
       grants.push(parsed);
     }

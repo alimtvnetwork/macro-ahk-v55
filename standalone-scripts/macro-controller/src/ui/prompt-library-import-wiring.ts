@@ -12,6 +12,7 @@ export function formatFileSize(bytes: number): string {
   }
 
   const kb = bytes / 1024;
+
   if (kb < 1024) {
     return kb.toFixed(1) + ' KB';
   }
@@ -33,6 +34,7 @@ export function wireImportDropZone(
 ): void {
   const onDragOver = (e: DragEvent): void => {
     e.preventDefault();
+
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = importBtn.disabled ? 'none' : 'copy';
     }
@@ -40,11 +42,13 @@ export function wireImportDropZone(
 
   const onDrop = (e: DragEvent): void => {
     e.preventDefault();
+
     if (importBtn.disabled) {
       return;
     }
 
     const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+
     if (!file) {
       return;
     }
@@ -100,6 +104,7 @@ export function wireImportExport(
   });
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
+
     if (!file) {
       return;
     }
@@ -127,6 +132,7 @@ export function wirePreviewImport(
   });
   previewFileInput.addEventListener('change', () => {
     const file = previewFileInput.files && previewFileInput.files[0];
+
     if (!file) {
       return;
     }

@@ -50,6 +50,7 @@ export function bindLibraryDbManager(manager: DbManager): void {
 
 function getDb(): SqlJsDatabase {
   const isDbManagerMissing = !dbManager;
+
   if (isDbManagerMissing) {
     throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
   }
@@ -186,6 +187,7 @@ export async function handleGetSharedAsset(payload: AssetIdMsg): Promise<{ asset
   const { assetId } = payload;
   const db = getDb();
   const result = (ServiceResult.wrapDb(() => db.exec("SELECT * FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+
   if (result.length === 0 || result[0].values.length === 0) {
     return { asset: null };
   }
@@ -210,6 +212,7 @@ function snapshotVersion(db: ReturnType<typeof getDb>, assetId: number, version:
 export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ assetId: number } | HandlerErrorResponse> {
   const asset = payload?.asset;
   const isAssetMissing = !asset;
+
   if (isAssetMissing) {
     return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
   }
@@ -330,6 +333,7 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
 export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkId: number } | HandlerErrorResponse> {
   const link = payload?.link;
   const isLinkMissing = !link;
+
   if (isLinkMissing) {
     return missingFieldError("link", "LIBRARY_SAVE_LINK");
   }
@@ -385,6 +389,7 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
 
   // Get the latest asset
   const assetResult = (ServiceResult.wrapDb(() => db.exec("SELECT ContentJson, ContentHash, Version FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+
   if (assetResult.length === 0 || assetResult[0].values.length === 0) {
     return { syncedCount: 0, pinnedNotified: 0 };
   }
@@ -500,6 +505,7 @@ export async function handleForkLibraryAsset(payload: ForkMsg): Promise<{ assetI
   let counter = 2;
   while (true) {
     const check = (ServiceResult.wrapDb(() => db.exec("SELECT Id FROM SharedAsset WHERE Slug = ?", [forkSlug])).data ?? []);
+
     if (check.length === 0 || check[0].values.length === 0) {
       break;
     }
@@ -539,6 +545,7 @@ export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[]
 export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ groupId: number; cascadedCount: number } | HandlerErrorResponse> {
   const group = payload?.group;
   const isGroupMissing = !group;
+
   if (isGroupMissing) {
     return missingFieldError("group", "LIBRARY_SAVE_GROUP");
   }
@@ -682,12 +689,14 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
   const db = getDb();
 
   const result = (ServiceResult.wrapDb(() => db.exec("SELECT SharedSettingsJson FROM ProjectGroup WHERE Id = ?", [groupId])).data ?? []);
+
   if (result.length === 0 || result[0].values.length === 0) {
     throw new Error(`[library] Group ${groupId} not found\n  Path: src/background/handlers/library-handler.ts\n  Missing: ProjectGroup row\n  Reason: groupId does not exist in ProjectGroup table`);
   }
 
   const settingsJson = result[0].values[0][0] as string | null;
   const isSettingsJsonMissing = !settingsJson;
+
   if (isSettingsJsonMissing) {
     return { cascadedCount: 0 };
   }
@@ -725,6 +734,7 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
     "SELECT Version, ContentJson, ContentHash FROM AssetVersion WHERE Id = ? AND SharedAssetId = ?",
     [versionId, assetId],
   )).data ?? []);
+
   if (versionResult.length === 0 || versionResult[0].values.length === 0) {
     throw new Error(`[library] Version ${versionId} not found for asset ${assetId}\n  Path: src/background/handlers/library-handler.ts\n  Missing: AssetVersion row\n  Reason: versionId does not exist or belongs to different asset`);
   }
@@ -733,6 +743,7 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
 
   // Get current version for snapshot
   const currentResult = (ServiceResult.wrapDb(() => db.exec("SELECT Version, ContentJson, ContentHash FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+
   if (currentResult.length > 0 && currentResult[0].values.length > 0) {
     const [curVer, curJson, curHash] = currentResult[0].values[0] as [string, string, string];
     // Snapshot current state before rollback
@@ -801,6 +812,7 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
     const memberResult = (ServiceResult.wrapDb(() => db.exec("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?", [row.Id])).data ?? []);
     const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as string) : [];
     let sharedSettings: JsonValue = null;
+
     if (row.SharedSettingsJson) {
       try {
         sharedSettings = JSON.parse(row.SharedSettingsJson); 
@@ -853,6 +865,7 @@ async function importAsset(
     result.imported++;
   } else {
     const [, existingHash, existingVersion] = existing[0].values[0] as [number, string, string];
+
     if (existingHash === hash) {
       result.skipped++;
     } else {

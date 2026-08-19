@@ -80,6 +80,7 @@ function loadMode(): ControllerModeType {
 
   try {
     const raw = window.localStorage.getItem(MODE_STORAGE_KEY);
+
     if (raw === "mini" || raw === "compact" || raw === "expanded") {
       return raw; 
     }
@@ -108,6 +109,7 @@ function saveMode(mode: ControllerModeType): void {
 
 function formatElapsed(startedAt: string, nowMs: number): string {
   const startMs = Date.parse(startedAt);
+
   if (Number.isNaN(startMs)) {
     return "00:00"; 
   }
@@ -115,6 +117,7 @@ function formatElapsed(startedAt: string, nowMs: number): string {
   const total = Math.max(0, Math.floor((nowMs - startMs) / 1000));
   const m = Math.floor(total / 60).toString().padStart(2, "0");
   const s = (total % 60).toString().padStart(2, "0");
+
   if (total < 3600) {
     return `${m}:${s}`; 
   }
@@ -211,6 +214,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
   useEffect(() => {
     const prev = prevPhaseRef.current;
     prevPhaseRef.current = session.Phase;
+
     if (prev === "Idle" && session.Phase === "Recording" && mode === "mini") {
       prePromoteModeRef.current = "mini";
       setMode("compact");
@@ -231,6 +235,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
 
     if (!stopArmed) {
       setStopArmed(true);
+
       if (stopTimer.current !== null) {
         window.clearTimeout(stopTimer.current); 
       }
@@ -407,6 +412,7 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
 
   const handleAdd = () => {
     setError(null);
+
     if (targetGroup === null) {
       setError("No StepGroup available — create one in the Options page first.");
 
@@ -420,6 +426,7 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
     }
 
     const wait = waitMs.trim() === "" ? undefined : Number(waitMs.trim());
+
     if (wait !== undefined && (!Number.isFinite(wait) || wait < 0)) {
       setError("Wait (ms) must be a non-negative number.");
 

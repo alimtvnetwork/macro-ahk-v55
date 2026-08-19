@@ -15,6 +15,7 @@ export function RecoveryIndicator() {
     const channel = new BroadcastChannel("marco-sync-activity");
     channel.onmessage = () => {
       setStatus("syncing");
+
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }
@@ -24,6 +25,7 @@ export function RecoveryIndicator() {
 
     return () => {
       channel.close();
+
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }

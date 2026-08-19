@@ -73,6 +73,7 @@ export class ChainRunner {
 
     try {
       await this.executeSteps(this.state.flatSteps, 0);
+
       if ((this.state.status as ChainExecutionState["status"]) === "running") {
         this.state.completedAt = new Date().toISOString();
         this.setStatus("completed");

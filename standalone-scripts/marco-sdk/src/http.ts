@@ -177,6 +177,7 @@ async function resolveAuthToken(): Promise<string | null> {
   inflightResolve = resolveAuthTokenInner();
   try {
     const token = await inflightResolve;
+
     if (token) {
       cachedToken = token;
       cacheExpiresAt = Date.now() + TOKEN_CACHE_TTL_MS;
@@ -199,6 +200,7 @@ async function resolveAuthTokenInner(): Promise<string | null> {
       new Promise<null>((resolve) => setTimeout(() => resolve(null), BRIDGE_TIMEOUT_MS)),
     ]);
     const bridgeToken = extractBearerTokenFromBridgePayload(bridgeResult);
+
     if (bridgeToken) {
       const ms = performance.now() - t0;
       bridgeOutcome = "hit";
@@ -220,6 +222,7 @@ async function resolveAuthTokenInner(): Promise<string | null> {
   // Fallback: read from localStorage (written by macro controller's auth module)
   try {
     const stored = localStorage.getItem(LOCALSTORAGE_TOKEN_KEY);
+
     if (stored) {
       const ms = performance.now() - t0;
       lastAuthDiag = { source: "localStorage", durationMs: ms, bridgeOutcome };

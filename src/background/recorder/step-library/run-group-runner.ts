@@ -141,6 +141,7 @@ function preflightRoot(
   trace: RunStepTraceEntry[],
 ): { root: StepGroupRow; failure: null } | { root: null; failure: RunGroupFailure } {
   const root = findGroup(opts.db, opts.rootGroupId);
+
   if (root === null) {
     return { root: null, failure: {
       Ok: false, Reason: "MissingRootGroup",
@@ -171,6 +172,7 @@ export async function runGroup(opts: RunGroupOptions): Promise<RunGroupResult> {
   const now = opts.now ?? defaultNow;
   const trace: RunStepTraceEntry[] = [];
   const pre = preflightRoot(opts, trace);
+
   if (pre.failure !== null) {
     return pre.failure;
   }
@@ -194,6 +196,7 @@ export async function runGroup(opts: RunGroupOptions): Promise<RunGroupResult> {
     executeLeafStep: opts.executeLeafStep,
     trace, now, counters,
   });
+
   if (failure !== null) {
     return failure;
   }
@@ -281,6 +284,7 @@ async function processFrameStep(
   }
 
   const childFrame: FrameContext = { ...frame, callStackIds: newStackIds, callStackNames: newStackNames };
+
   if (step.StepKindId === StepKindId.RunGroup) {
     return invokeRunGroupStep(step, childFrame);
   }
@@ -296,6 +300,7 @@ async function runOne(frame: FrameContext): Promise<RunGroupFailure | null> {
 
   for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
     const failure = await processFrameStep(step, frame, newStackIds, newStackNames);
+
     if (failure !== null) {
       return failure;
     }
@@ -311,18 +316,21 @@ function resolveRunGroupTarget(
   frame: FrameContext,
 ): { target: StepGroupRow; failure: null } | { target: null; failure: RunGroupFailure } {
   const nullFail = failNullTargetGroup(step, frame);
+
   if (nullFail !== null) {
     return { target: null, failure: nullFail };
   }
 
   const target = findGroup(frame.db, step.TargetStepGroupId as number);
   const missingFail = failMissingTargetGroup(step, frame, target);
+
   if (missingFail !== null) {
     return { target: null, failure: missingFail };
   }
 
   const resolvedTarget = target as StepGroupRow;
   const crossFail = failCrossProjectTarget(step, frame, resolvedTarget);
+
   if (crossFail !== null) {
     return { target: null, failure: crossFail };
   }
@@ -420,11 +428,13 @@ function validateRunGroupStepTarget(
   frame: FrameContext,
 ): { target: StepGroupRow; failure: null } | { target: null; failure: RunGroupFailure } {
   const resolved = resolveRunGroupTarget(step, frame);
+
   if (resolved.failure !== null) {
     return resolved;
   }
 
   const stackFailure = checkFrameStackConstraints(step, frame, resolved.target);
+
   if (stackFailure !== null) {
     return { target: null, failure: stackFailure };
   }
@@ -437,6 +447,7 @@ async function invokeRunGroupStep(
   frame: FrameContext,
 ): Promise<RunGroupFailure | null> {
   const check = validateRunGroupStepTarget(step, frame);
+
   if (check.failure !== null) {
     return check.failure;
   }
@@ -494,6 +505,7 @@ async function invokeLeafStep(
   const report = await runLeafExecutor(step, frame, startedAt);
   frame.counters.bumpExecuted();
   traceLeafOutcome(frame, step, startedAt, report);
+
   if (report === null) {
     return null;
   }
@@ -523,6 +535,7 @@ function findGroup(db: StepLibraryDb, stepGroupId: number): StepGroupRow | null 
   );
   try {
     stmt.bind([stepGroupId]);
+
     if (!stmt.step()) {
       return null;
     }
@@ -691,6 +704,7 @@ function preflightExpansionRoot(
   plan: ExpandedStep[],
 ): { root: StepGroupRow; failure: null } | { root: null; failure: ExpansionFailure } {
   const root = findGroup(opts.db, opts.rootGroupId);
+
   if (root === null) {
     return { root: null, failure: {
       Ok: false, Reason: "MissingRootGroup",
@@ -723,6 +737,7 @@ export function expandRunGroups(opts: ExpandOptions): ExpansionResult {
   let disabledSkipped = 0;
 
   const pre = preflightExpansionRoot(opts, plan);
+
   if (pre.failure !== null) {
     return pre.failure;
   }
@@ -737,6 +752,7 @@ export function expandRunGroups(opts: ExpandOptions): ExpansionResult {
       disabledSkipped++; 
     },
   });
+
   if (failure !== null) {
     return failure;
   }
@@ -763,6 +779,7 @@ function walkForExpansion(frame: ExpansionFrame): ExpansionFailure | null {
 
   for (const step of frame.db.listSteps(frame.group.StepGroupId)) {
     const result = processExpansionStep(step, frame, newStackIds, newStackNames);
+
     if (result !== null) {
       return result;
     }
@@ -793,11 +810,13 @@ function processExpansionStep(
   }
 
   const guard = validateRunGroupTarget(frame, step, newStackIds, newStackNames);
+
   if (guard !== null) {
     return guard;
   }
 
   const target = findGroup(frame.db, step.TargetStepGroupId as number);
+
   if (target === null) {
     return expansionFailure(frame, "MissingTargetGroup",
       `Internal: target vanished between validation and recursion (StepId=${step.StepId})`,
@@ -822,6 +841,7 @@ function checkTargetResolution(
   }
 
   const target = findGroup(frame.db, step.TargetStepGroupId);
+
   if (target === null) {
     return { target: null, failure: expansionFailure(frame, "MissingTargetGroup",
       `Step ${step.StepId} targets StepGroupId=${step.TargetStepGroupId} but no such group exists.`,
@@ -869,6 +889,7 @@ function validateRunGroupTarget(
   stackNames: ReadonlyArray<string>,
 ): ExpansionFailure | null {
   const resolved = checkTargetResolution(frame, step, stackNames);
+
   if (resolved.failure !== null) {
     return resolved.failure;
   }
@@ -908,6 +929,7 @@ export type ExecuteRunGroupOutcome = ExecuteRunGroupSuccess | ExecuteRunGroupFai
  */
 export async function executeRunGroup(opts: RunGroupOptions): Promise<ExecuteRunGroupOutcome> {
   const result = await runGroup(opts);
+
   if (result.Ok) {
     return { Ok: true, Result: result };
   }

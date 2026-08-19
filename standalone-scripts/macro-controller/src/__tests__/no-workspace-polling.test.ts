@@ -22,6 +22,7 @@ function walk(dir: string, acc: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     const st = statSync(full);
+
     if (st.isDirectory()) {
       if (entry === '__tests__' || entry === 'node_modules') {
         continue;
@@ -46,6 +47,7 @@ describe('Workspace refetch policy (regression)', () => {
         const line = lines[i];
         const isTimerLine = /\b(set|tracked)Interval\s*\(/.test(line)
           || /\bsetTimeout\s*\(.*fetchLoopCredits/.test(line);
+
         if (!isTimerLine) {
           continue;
         }

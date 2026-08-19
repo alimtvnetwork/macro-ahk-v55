@@ -86,6 +86,7 @@ export function usePopupActions() {
       console.log("[popup:handleRun] Active project response:", JSON.stringify(projRes?.activeProject?.scripts?.length ?? 0), "scripts");
 
       const scripts = projRes?.activeProject?.scripts ?? [];
+
       if (!Array.isArray(scripts) || scripts.length === 0) {
         logError("handleRun", "No scripts found in active project\n  Path: GET_ACTIVE_PROJECT response.activeProject.scripts\n  Missing: at least one ScriptEntry\n  Reason: scripts array is empty or missing");
         toast.error("No scripts to run — check your active project");
@@ -109,6 +110,7 @@ export function usePopupActions() {
       // `if (result.inlineSyntaxErrorDetected)` checks would silently
       // misbehave when talking to a pre-flag service worker.
       const result = normalizeInjectScriptsResponse(rawResult);
+
       if (result.inlineSyntaxFlagSource === "legacy-default") {
         console.warn(
           "[popup:handleRun] Background did not return inlineSyntaxErrorDetected — falling back to false (older background build).",
@@ -283,6 +285,7 @@ export function usePopupActions() {
   const handleFileSelected = useCallback(async (e: Event) => {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
+
     if (!file) {
       return;
     }
@@ -306,6 +309,7 @@ export function usePopupActions() {
 
   const handleConfirmImport = useCallback(async () => {
     const file = fileRef.current;
+
     if (!file) {
       return;
     }

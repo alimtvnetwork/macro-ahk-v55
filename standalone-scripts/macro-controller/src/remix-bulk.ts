@@ -38,11 +38,13 @@ const BULK_CONFIRM_THRESHOLD = 4;
 
 async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   const sdk = window.marco;
+
   if (!sdk || !sdk.api || !sdk.api.projects || typeof sdk.api.projects.list !== 'function') {
     throwDiagnostic('REMIX_BULK_E001', { missingApi: 'window.marco.api.projects.list', wsId });
   }
 
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
+
   if (resp.ok === false) {
     throwDiagnostic('REMIX_BULK_E003', { status: resp.status, wsId });
   }
@@ -53,6 +55,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   for (const p of list) {
     const id = typeof p.id === 'string' ? p.id : '';
     const name = typeof p.name === 'string' ? p.name : '';
+
     if (id) {
       out.push({ id, name: name || id });
     }
@@ -94,6 +97,7 @@ export interface BulkRemixSourceHint {
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promise<void> {
   const checked = Object.keys(getLoopWsCheckedIds());
+
   if (checked.length === 0) {
     showToast('Bulk Remix Next — no workspaces checked', 'warn');
 
@@ -106,6 +110,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
       'Bulk Remix Next will remix the most recent project in '
       + checked.length + ' checked workspaces.\n\nProceed?',
     );
+
     if (!ok) {
       showToast('Bulk Remix Next — cancelled', 'info');
 
@@ -138,6 +143,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
     try {
       const projects = await fetchProjects(wsId);
       const target = pickTargetProject(projects, sourceBase);
+
       if (!target) {
         throwDiagnostic('REMIX_BULK_E002', { wsId, sourceBase: sourceBase || '(none)' });
       }
@@ -175,11 +181,13 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
   const tone = failed === 0 ? 'success' : (success === 0 ? 'error' : 'warn');
   const icon = failed === 0 ? '✅' : (success === 0 ? '❌' : '⚠');
   let summary = icon + ' Bulk Remix Next — ' + success + '/' + checked.length + ' succeeded';
+
   if (failed > 0) {
     summary += ' · ' + failed + ' failed';
   }
 
   showToast(summary, tone);
+
   if (failures.length > 0) {
     log('[BulkRemixNext] failures:\n  - ' + failures.join('\n  - '), 'warn');
   }

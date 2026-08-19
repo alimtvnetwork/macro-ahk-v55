@@ -64,6 +64,7 @@ function quoteOrNull(value: string | null): string {
 async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
   try {
     const resp = await runLoggedQuery('SCHEMA', sql, 'context');
+
     if (resp?.ok) {
       return true;
     }
@@ -81,6 +82,7 @@ async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
 async function runQuerySql<T>(sql: string, scope: string): Promise<T[]> {
   try {
     const resp = await runLoggedQuery('QUERY', sql, 'context');
+
     if (resp?.ok && Array.isArray(resp.rows)) {
       return resp.rows as T[];
     }

@@ -76,6 +76,7 @@ export function pickRepoUrl(body: GitsyncApiResponse): string | null {
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
     return null;
   }
@@ -96,6 +97,7 @@ export async function fetchGitsyncConfig(
   }
 
   const sdk = getSdk();
+
   if (!sdk) {
     logError('GitsyncApi', 'marco.api.call unavailable (SDK not injected yet)');
 
@@ -130,11 +132,13 @@ export async function fetchGitsyncConfig(
   }
 
   const body = (resp.data ?? {}) as GitsyncApiResponse;
+
   if (body.enabled === false || body.synced === false) {
     return { status: 'not_linked' };
   }
 
   const repo = pickRepoUrl(body);
+
   if (!repo) {
     log('[GitsyncApi] ws=' + wsId + ' pid=' + pid + ' returned no repo fields → not_linked', 'info');
 

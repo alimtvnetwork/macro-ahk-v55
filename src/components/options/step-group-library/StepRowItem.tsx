@@ -78,12 +78,14 @@ function useStepRowDrag(
   const onDragEnd = (): void => setDragging(false);
   const onDragOver = (event: React.DragEvent<HTMLLIElement>): void => {
     const types = Array.from(event.dataTransfer.types);
+
     if (!types.includes(STEP_DRAG_MIME)) {
       return;
     }
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+
     if (!dragOver) {
       setDragOver(true);
     }
@@ -112,12 +114,14 @@ function handleDropEvent(
   event.preventDefault();
   setDragOver(false);
   const raw = event.dataTransfer.getData(STEP_DRAG_MIME);
+
   if (raw === "") {
     return;
   }
 
   try {
     const payload = JSON.parse(raw) as { stepId: number; stepGroupId: number };
+
     if (payload.stepGroupId !== stepGroupId) {
       return;
     }

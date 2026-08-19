@@ -17,6 +17,7 @@ export function _resetLibraryImportFailureDedupeForTests(): void {
 export function logLibraryImportFailure(key: string, detail: string, cause?: unknown): void {
   const now = Date.now();
   const prev = _libraryImportFailureDedupe.get(key);
+
   if (prev && (now - prev.lastAt) < 60000) {
     prev.suppressed += 1;
     prev.lastAt = now;
@@ -27,6 +28,7 @@ export function logLibraryImportFailure(key: string, detail: string, cause?: unk
   const suffix = prev && prev.suppressed > 0
     ? ' [dedup: ' + String(prev.suppressed) + ' identical entr' + (prev.suppressed === 1 ? 'y' : 'ies') + ' suppressed in prior 60s window]'
     : '';
+
   if (cause === undefined) {
     logError(LOG_SCOPE, 'handleImportFile[' + key + ']: ' + detail + suffix);
   } else {
@@ -76,6 +78,7 @@ export function renderImportErrorBanner(
   p.textContent = hint;
   refs.errorBanner.appendChild(h);
   refs.errorBanner.appendChild(p);
+
   if (onRetry) {
     const retryBtn = document.createElement('button');
     retryBtn.type = 'button';
@@ -103,6 +106,7 @@ export function focusErrorBanner(refs: ModalRefs): void {
   }
 
   const banner = refs.errorBanner;
+
   if (!banner || banner.hidden) {
     return;
   }

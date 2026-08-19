@@ -46,6 +46,7 @@ async function populate(refs: RenderRefs): Promise<void> {
   let rows: PromptRow[] = [];
   try {
     const listed = await listPromptsByRole('next');
+
     if (listed.ok === false) {
       logError('NextSelector', 'listPromptsByRole failed', new Error(listed.error ?? 'list failed'));
       refs.hint.textContent = '(unavailable)';
@@ -72,6 +73,7 @@ async function populate(refs: RenderRefs): Promise<void> {
     opt.value = String(row.Id);
     const marker = row.IsDefault ? '★ ' : '';
     opt.textContent = marker + row.Name;
+
     if (row.IsDefault) {
       opt.selected = true;
     }
@@ -86,12 +88,14 @@ async function populate(refs: RenderRefs): Promise<void> {
 async function onSelectionChanged(refs: RenderRefs): Promise<void> {
   const raw = refs.select.value;
   const id = Number.parseInt(raw, 10);
+
   if (!Number.isFinite(id) || id <= 0) {
     return;
   }
 
   try {
     const result = await setDefaultPromptForRole(id, 'next');
+
     if (result.ok === false) {
       logError('NextSelector', 'setDefaultPromptForRole failed', new Error(result.error ?? 'set default failed'));
       showPasteToast('❌ Could not switch Next prompt', true);

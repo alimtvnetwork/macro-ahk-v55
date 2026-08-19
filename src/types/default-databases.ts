@@ -159,6 +159,7 @@ export function validateDatabaseName(name: string): NamespaceValidationResult {
   }
 
   const trimmed = name.trim();
+
   if (trimmed.length > 50) {
     return { valid: false, error: "Database name must be 50 characters or less" };
   }

@@ -89,6 +89,7 @@ export function buildDriftTimeline(
   options: BuildDriftTimelineOptions = {},
 ): DriftTimeline {
   const now = options.Now ?? new Date();
+
   if (bucket === null || bucket.Outcomes.length === 0) {
     return EMPTY_TIMELINE;
   }
@@ -115,31 +116,37 @@ export function buildDriftTimeline(
 export function formatRelative(deltaMs: number): string {
   const abs = Math.max(0, deltaMs);
   const sec = Math.floor(abs / 1000);
+
   if (sec < 45)              {
     return "just now";
   }
 
   const min = Math.floor(sec / 60);
+
   if (min < 60)              {
     return `${min}m ago`;
   }
 
   const hr = Math.floor(min / 60);
+
   if (hr < 24)               {
     return `${hr}h ago`;
   }
 
   const day = Math.floor(hr / 24);
+
   if (day < 14)              {
     return `${day}d ago`;
   }
 
   const wk = Math.floor(day / 7);
+
   if (wk < 8)                {
     return `${wk}w ago`;
   }
 
   const mo = Math.floor(day / 30);
+
   if (mo < 12)               {
     return `${mo}mo ago`;
   }
@@ -159,16 +166,19 @@ export function formatDuration(ms: number): string {
   }
 
   const sec = Math.floor(ms / 1000);
+
   if (sec < 60)              {
     return `${sec}s`;
   }
 
   const min = Math.floor(sec / 60);
+
   if (min < 60)              {
     return `${min}m`;
   }
 
   const hr = Math.floor(min / 60);
+
   if (hr < 24) {
     const remMin = min - hr * 60;
 
@@ -204,6 +214,7 @@ function findFirstDriftAfter(
   }
 
   const idx = outcomes.findIndex((o) => o.RunId === lastSuccess.RunId);
+
   if (idx === -1) {
     return null;
   }
@@ -222,6 +233,7 @@ function countFailuresFrom(
   fromRunId: number,
 ): number {
   const idx = outcomes.findIndex((o) => o.RunId === fromRunId);
+
   if (idx === -1) {
     return 0;
   }

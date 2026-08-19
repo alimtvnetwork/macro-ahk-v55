@@ -153,6 +153,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', migration.ddl, 'context');
+
   if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
@@ -164,6 +165,7 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN})`, 'context');
+
   if (resp?.ok) {
     return;
   }
@@ -207,6 +209,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
   const { repairPlanNextOrphans } = await import('../seed/repair-plan-next-orphans');
   const report = await repairPlanNextOrphans();
   const metrics = { inspected: report.inspected, adopted: report.adopted, failures: report.failures };
+
   if (report.failures > 0) {
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, {
       stage: STAGE_ORPHAN_REPAIR,
@@ -223,6 +226,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
+
   if (seedResult.ok === false) {
     const reason = String(seedResult.error ?? UNKNOWN_ERROR);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
@@ -239,6 +243,7 @@ async function runAutoRepairStage(stages: Stage[]): Promise<void> {
   const health = await runPromptHealthCheckWithAutoRepair();
   const initialIssues = health.initialReport.issues.length;
   const finalIssues = health.finalReport.issues.length;
+
   if (!health.isHealthy) {
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: STAGE_AUTO_REPAIR, reason: 'residual issues=' + finalIssues });
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'failed', reason: 'residual issues=' + finalIssues, metrics: { initialIssues, finalIssues } });
@@ -260,6 +265,7 @@ async function runReadMemoryDuplicateStage(stages: Stage[]): Promise<void> {
   const { validateAndDisableReadMemoryDuplicates } = await import('./validate-read-memory-duplicates');
   const report = await validateAndDisableReadMemoryDuplicates();
   const metrics = { detected: report.detected, disabled: report.disabled };
+
   if (report.detected > 0 && report.disabled < report.detected) {
     const reason = 'detected=' + report.detected + ' disabled=' + report.disabled;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'read-memory-duplicate-validation', reason });
@@ -293,6 +299,7 @@ export async function initMacroDb(): Promise<void> {
   let orphanReportRef: OrphanRepairReport | undefined;
   try {
     const resp = await runLoggedQuery('SCHEMA', SCHEMA_SQL, 'context');
+
     if (resp && resp.ok) {
       log('Macro DB initialized: ' + DB_NAME, 'success');
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'ok' });
@@ -397,6 +404,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
 
   const projectId = extractProjectIdFromUrl();
+
   if (!projectId) {
     return;
   }
@@ -452,6 +460,7 @@ export async function exportDatabaseDump(): Promise<void> {
     });
     
     const isValidDumpResponse = resp !== null && resp.ok === true && resp.dump !== undefined;
+
     if (isValidDumpResponse) {
       const blob = new Blob([resp.dump as string], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);

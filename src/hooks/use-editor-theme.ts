@@ -21,6 +21,7 @@ function emit() {
 function getSnapshot(): EditorThemeName {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
+
     if (v && VALID.has(v)) {
       return v as EditorThemeName;
     }

@@ -167,6 +167,7 @@ export function UpdaterManagementView() {
   const loadSettings = useCallback(async () => {
     try {
       const res = await sendMessage<{ settings: GlobalSettings }>({ type: "GET_UPDATE_SETTINGS" });
+
       if (res.settings) {
         setGlobalSettings(res.settings);
       }
@@ -191,6 +192,7 @@ export function UpdaterManagementView() {
   const filtered = updaters.filter((u) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
+
       if (!u.Name.toLowerCase().includes(q) && !u.ScriptUrl.toLowerCase().includes(q)) {
         return false;
       }
@@ -198,6 +200,7 @@ export function UpdaterManagementView() {
 
     if (filterCategory) {
       const cats = (u.Categories ?? "").split(",").map((c) => c.trim());
+
       if (!cats.includes(filterCategory)) {
         return false;
       }
@@ -256,6 +259,7 @@ export function UpdaterManagementView() {
         type: "CHECK_FOR_UPDATE",
         updaterId: id,
       });
+
       if (res.hasUpdate) {
         toast.info(`Update available: v${res.latestVersion}`);
       } else {

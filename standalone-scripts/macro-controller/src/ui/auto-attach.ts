@@ -59,6 +59,7 @@ export function clickByXPath(xpath: string, label: string): boolean {
   }
 
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
   if (!el) {
     log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
 
@@ -77,6 +78,7 @@ export function insertTextIntoElement(xpath: string, text: string, label: string
   }
 
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
+
   if (!el) {
     log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
 
@@ -86,6 +88,7 @@ export function insertTextIntoElement(xpath: string, text: string, label: string
   el.focus();
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value') ||
                                 Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+
   if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
     if (nativeInputValueSetter && nativeInputValueSetter.set) {
       nativeInputValueSetter.set.call(el, text);

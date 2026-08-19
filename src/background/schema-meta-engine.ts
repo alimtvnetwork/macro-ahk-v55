@@ -164,6 +164,7 @@ export function getMetaColumns(db: SqlJsDatabase, tableName?: string): Array<{
          FROM MetaColumns${whereClause}
          ORDER BY TableName, SortOrder, Id`
   );
+
   if (params.length > 0) {
     stmt.bind(params);
   }
@@ -212,6 +213,7 @@ export function getMetaRelations(db: SqlJsDatabase, tableName?: string): Array<{
          FROM MetaRelations${whereClause}
          ORDER BY SourceTable, SourceColumn`
   );
+
   if (params.length > 0) {
     stmt.bind(params);
   }
@@ -246,6 +248,7 @@ export function getMetaRelations(db: SqlJsDatabase, tableName?: string): Array<{
 
 function getExistingSqliteTables(db: SqlJsDatabase): Set<string> {
   const result = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+
   if (result.length === 0) {
     return new Set();
   }
@@ -255,6 +258,7 @@ function getExistingSqliteTables(db: SqlJsDatabase): Set<string> {
 
 function getExistingColumns(db: SqlJsDatabase, tableName: string): Set<string> {
   const result = db.exec(`PRAGMA table_info("${tableName}")`);
+
   if (result.length === 0) {
     return new Set();
   }
@@ -475,6 +479,7 @@ export function generateMarkdownDocs(db: SqlJsDatabase): string {
     const rels = allRelations.filter((r) => r.SourceTable === table.TableName);
 
     lines.push(`## ${table.TableName}`);
+
     if (table.Description) {
       lines.push("", table.Description);
     }
@@ -494,6 +499,7 @@ export function generateMarkdownDocs(db: SqlJsDatabase): string {
 
     // Validation rules
     const colsWithValidation = cols.filter((c) => c.ValidationJson);
+
     if (colsWithValidation.length > 0) {
       lines.push("### Validation Rules", "");
       for (const col of colsWithValidation) {
@@ -591,6 +597,7 @@ export function generatePrismaSchema(db: SqlJsDatabase): string {
 
       // Check if this column has a FK relation
       const rel = rels.find((r) => r.SourceColumn === col.ColumnName);
+
       if (rel) {
         attrs.push(`// FK → ${rel.TargetTable}.${rel.TargetColumn}`);
       }

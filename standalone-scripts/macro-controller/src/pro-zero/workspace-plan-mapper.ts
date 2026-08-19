@@ -23,6 +23,7 @@ function hasProZeroToken(normalized: string): boolean {
 /** Map a wire-string `plan` value to the `WorkspacePlanType` Enum. */
 export function mapWorkspacePlan(rawPlan: string): WorkspacePlanType {
   const normalized = normalize(rawPlan);
+
   if (hasProZeroToken(normalized)) {
     return WorkspacePlanType.PRO_ZERO;
   }

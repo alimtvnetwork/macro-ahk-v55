@@ -111,6 +111,7 @@ export function createCheckButton(deps: CheckButtonDeps): CheckButtonResult {
 
 function _handleCheckClick(ctx: CheckButtonCtx): void {
   const { checkBtn, updateAuthBadge } = ctx;
+
   if (ctx.checkInFlight) {
     log('Check cooldown: already in flight', 'warn');
 
@@ -144,6 +145,7 @@ function _handleCheckClick(ctx: CheckButtonCtx): void {
   }, 15000);
 
   const existingToken = resolveToken();
+
   if (existingToken) {
     log('Manual Check: ✅ Token already available (' + getLastTokenSource() + ') — skipping bridge wait', 'success');
     updateAuthBadge(true, getLastTokenSource());

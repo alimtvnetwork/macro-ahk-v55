@@ -42,12 +42,14 @@ export function normalizeRedirectUrl(
   }
 
   const trimmed = redirectUrl.trim();
+
   if (!trimmed) {
     return null;
   }
 
   try {
     const url = new URL(trimmed, origin);
+
     if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) {
       return null;
     }
@@ -78,6 +80,7 @@ export function navigateActiveTabToRemixedProject(
   redirectUrl: string,
 ): boolean {
   const w = (typeof window !== 'undefined' ? window : null);
+
   if (!w || !w.location) {
     logError('RemixNav', 'navigate refused: window.location unavailable');
 
@@ -86,6 +89,7 @@ export function navigateActiveTabToRemixedProject(
 
   const origin = w.location.origin || DomainConstants.PRIMARY_URL;
   const absolute = normalizeRedirectUrl(redirectUrl, origin);
+
   if (!absolute) {
     logError('RemixNav',
       'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');

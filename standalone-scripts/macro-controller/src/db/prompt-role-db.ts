@@ -17,6 +17,7 @@
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
 import { runLoggedQuery } from './sql-bridge';
+import type { UpsertInput } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 
 import { ServiceResult } from '../utils/result-wrapper';
@@ -58,6 +59,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
   try {
     void DB_NAME;
     const resp = await runLoggedQuery('SCHEMA', sql, 'context');
+
     if (resp && resp.ok) {
       return new ServiceResult(true);
     }
@@ -78,9 +80,10 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
 /**
  * Upsert a prompt and enforce that it becomes the single default for its role.
  */
-export async function upsertForRole(input: import('./prompt-db').UpsertInput): Promise<EnforceResult> {
+export async function upsertForRole(input: UpsertInput): Promise<EnforceResult> {
   const { upsertPrompt } = await import('./prompt-db');
   const result = await upsertPrompt(input);
+
   if (result.ok === false) {
     return new ServiceResult(false, undefined, result.error || 'upsertPrompt failed');
   }

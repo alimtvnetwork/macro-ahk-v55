@@ -131,11 +131,13 @@ const newId = (): string =>
 function load(): KeywordEvent[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return [];
     }
 
     const parsed: unknown = JSON.parse(raw);
+
     if (!Array.isArray(parsed)) {
       return [];
     }
@@ -209,11 +211,13 @@ export function useKeywordEvents(): UseKeywordEventsApi {
       }
 
       const idx = e.Steps.findIndex(s => s.Id === stepId);
+
       if (idx < 0) {
         return e;
       }
 
       const target = direction === "up" ? idx - 1 : idx + 1;
+
       if (target < 0 || target >= e.Steps.length) {
         return e;
       }
@@ -292,11 +296,13 @@ export function useKeywordEvents(): UseKeywordEventsApi {
           ...e,
           Steps: e.Steps.map(s => {
             const next = labelById.get(s.Id);
+
             if (next === undefined) {
               return s;
             }
 
             const trimmed = next.trim();
+
             if (trimmed.length === 0) {
               const { LabelType: _drop, ...rest } = s as KeywordEventStep & { LabelType?: string };
               void _drop;
@@ -320,6 +326,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
     setEvents(prev => {
       const fromIdx = prev.findIndex(e => e.Id === fromId);
       const toIdx = prev.findIndex(e => e.Id === toId);
+
       if (fromIdx < 0 || toIdx < 0) {
         return prev; 
       }

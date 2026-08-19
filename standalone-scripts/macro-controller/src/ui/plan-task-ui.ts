@@ -49,6 +49,7 @@ async function resolvePlanBody(n: number): Promise<string> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
+
     if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
 
@@ -69,6 +70,7 @@ function injectPlanPrompt(n: number): void {
     const text = await resolvePlanBody(n);
     const outcome = await pasteIntoEditor(text, getPromptsConfig(), adapterGetByXPath, 'plan-chip');
     console.log('[PlanTask] Injection outcome: ' + outcome);
+
     // Success ('injected') and clipboard-fallback ('clipboard') already toast from prompt-utils.
     // Only show a caller-side toast on hard failure.
     if (String(outcome) === 'failed') {
@@ -175,6 +177,7 @@ function wireShellToggle(row: HTMLElement, arrow: HTMLElement, sub: HTMLElement,
 
   row.onclick = function(e: Event) {
     e.stopPropagation();
+
     if (sub.style.display === 'none') {
       show();
     } else {
@@ -190,6 +193,7 @@ function keepInView(dropdown: HTMLElement, sub: HTMLElement): void {
   window.requestAnimationFrame(function() {
     const dr = dropdown.getBoundingClientRect();
     const sr = sub.getBoundingClientRect();
+
     if (sr.bottom > dr.bottom) {
       dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
     }
@@ -232,6 +236,7 @@ function appendPresetSteps(sub: HTMLElement, dropdown: HTMLElement): void {
       const values = await resolveConfiguredChipValues('plan', PLAN_TASK_STEP_COUNTS);
       const isSame = values.length === PLAN_TASK_STEP_COUNTS.length
         && values.every((v, i) => v === PLAN_TASK_STEP_COUNTS[i]);
+
       if (isSame) {
         return;
       }
@@ -276,6 +281,7 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   go.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(inp.value, 10);
+
     if (!n || n < 1 || n > 999) {
       showPasteToast('⚠️ Enter 1–999', true);
 

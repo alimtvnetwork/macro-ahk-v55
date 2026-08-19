@@ -111,6 +111,7 @@ export function validateUrlTabClickParams(
   params: UrlTabClickParams,
 ): ValidationError | null {
   const directErr = validateDirectOpen(params);
+
   if (directErr !== null) {
     return directErr;
   }
@@ -120,6 +121,7 @@ export function validateUrlTabClickParams(
   }
 
   const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
+
   if (compiled.Ok === false) {
     return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
   }
@@ -141,6 +143,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export function deriveGlobPattern(url: string): string {
   const noQuery = url.split("?")[0].split("#")[0];
   const split = splitForCaseFold(noQuery);
+
   if (split.Lead === "") {
     return noQuery;
   }
@@ -219,6 +222,7 @@ function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
 
 function selectorKind(params: UrlTabClickParams): PredicateEvaluationKindType {
   const kind = params.SelectorKind ?? "Auto";
+
   if (kind === "XPath") {
     return "XPath";
   }
@@ -228,6 +232,7 @@ function selectorKind(params: UrlTabClickParams): PredicateEvaluationKindType {
   }
 
   const sel = (params.Selector ?? "").trim();
+
   if (sel.startsWith("/") || sel.startsWith("(")) {
     return "XPath";
   }
@@ -264,6 +269,7 @@ async function tryFocusExisting(
 ): Promise<UrlTabClickResult | null> {
   const existing = await tabs.listTabs();
   const hit = existing.find((t) => test(t.Url));
+
   if (hit !== undefined) {
     await tabs.focusTab(hit.Id);
 
@@ -352,6 +358,7 @@ async function awaitOpenedSettle(
 function precheck(base: ResultBase): { readonly test?: (url: string) => boolean; readonly error?: UrlTabClickResult } {
   const validation = validateUrlTabClickParams(base.params);
   const hasValidationError = validation !== null;
+
   if (hasValidationError) {
     const reason: UrlTabClickReason = validation.Reason === "BadParams" ? "BadParams" : "InvalidUrlPattern";
 
@@ -360,6 +367,7 @@ function precheck(base: ResultBase): { readonly test?: (url: string) => boolean;
 
   const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
   const isCompileFailed = compiled.Ok === false;
+
   if (isCompileFailed) {
     return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
   }
@@ -377,6 +385,7 @@ export async function executeUrlTabClick(init: ExecuteUrlTabClickInit): Promise<
 async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
   const pre = precheck(base);
   const hasPrecheckError = pre.error !== undefined;
+
   if (hasPrecheckError) {
     return pre.error!;
   }
@@ -388,6 +397,7 @@ async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): 
   if (shouldTryFocus) {
     const focused = await tryFocusExisting(base, init.Tabs, test);
     const isFocused = focused !== null;
+
     if (isFocused) {
       return focused!;
     }
@@ -395,6 +405,7 @@ async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): 
     
   const outcome = await openNewTab(base, init.Tabs);
   const isErrorOutcome = outcome.Kind === "error";
+
   if (isErrorOutcome) {
     return outcome.Result;
   }

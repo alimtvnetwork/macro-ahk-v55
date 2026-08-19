@@ -13,6 +13,7 @@ const MARKER_VALUE = "credit-append";
 export function appendCreditToProLabel(record: WorkspaceRecord): void {
   try {
     const proEl = resolveElement(record.proLabelXPath);
+
     if (proEl instanceof HTMLElement) {
       upsertCreditSpan(proEl, record.creditAvailable, record.creditTotal);
 
@@ -27,6 +28,7 @@ export function appendCreditToProLabel(record: WorkspaceRecord): void {
 
 function upsertCreditSpan(parent: HTMLElement, available: number, total: number): void {
   const existing = parent.querySelector<HTMLSpanElement>(`[${ATTR}="${MARKER_VALUE}"]`);
+
   if (existing) {
     existing.textContent = formatCredit(available, total);
 

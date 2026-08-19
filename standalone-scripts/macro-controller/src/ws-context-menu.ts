@@ -26,6 +26,7 @@ import { log } from './logger';
 import { renameWorkspace } from './workspace-rename';
 import { logError } from './error-utils';
 import { showToast } from './toast';
+import type { WorkspaceCredit } from './types';
 // PlanTierType-17 step 21: dynamic imports break the ws-list-renderer ↔ ws-context-menu cycle.
 // These helpers are only invoked inside event handlers, so runtime-lazy loading is safe.
 function populateLoopWorkspaceDropdown(): void {
@@ -46,7 +47,7 @@ import { getSelectedWsIds } from './selected-workspaces-store';
 import { actionRemixManual, actionRemixNext } from './remix-dropdown';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { getDisplayProjectName } from './logger';
-import { DataAttrType, DomIdType } from './types';
+import { DataAttrType, DomIdType, isProOnePlan } from './types';
 import { PRO_ZERO_BALANCE_JSON_FIELD, PRO_ZERO_SOURCE_FIELD } from './pro-zero/pro-zero-enrichment';
 import { MacroCreditSourceType } from './pro-zero/macro-credit-source';
 import {
@@ -99,11 +100,8 @@ function buildCtxMenuItem(label: string, onClick: () => void): HTMLElement {
  *
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §10
  */
-function isProOnePlan(ws: import('./types').WorkspaceCredit): boolean {
-  return String(ws.plan || '').toLowerCase().trim() === 'pro_1';
-}
 
-async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Promise<string> {
+async function buildCopyJsonPayload(ws: WorkspaceCredit): Promise<string> {
   const rawWire = toWireWorkspaceRaw(ws.rawApi);
   const workspaceJson = JSON.stringify(rawWire ?? {}, null, 2);
 
@@ -113,6 +111,7 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
   const isBalanceSource = source === MacroCreditSourceType.CREDIT_BALANCE;
   const hasBalanceRaw = typeof balanceRaw === 'string';
   const isBalanceNonEmpty = hasBalanceRaw && balanceRaw.length > 0;
+
   if (isBalanceSource && isBalanceNonEmpty) {
     return JSON.stringify({
       Source: MacroCreditSourceType.CREDIT_BALANCE,
@@ -124,6 +123,7 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
   // PRO_ONE: pull cached /credit-balance row from SQLite (populated by fetcher.ts).
   if (isProOnePlan(ws) && ws.id) {
     const row = await readCreditBalanceCache(ws.id);
+
     if (row && row.RawJson) {
       try {
         return JSON.stringify({
@@ -152,6 +152,7 @@ function copyWorkspaceJson(wsId: string, wsName: string): void {
     return w.id === wsId; 
   });
   const rawWire = ws ? toWireWorkspaceRaw(ws.rawApi) : null;
+
   if (!ws || !rawWire) {
     showToast('❌ No JSON data for "' + wsName + '"', 'error');
     log('[CopyJSON] No rawApi for wsId=' + wsId, 'warn');
@@ -197,6 +198,7 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
     })
       .then(function (summary) {
         const outcome = summary.results[0]?.outcome ?? 'failed';
+
         if (outcome === 'fetched') {
           showToast('💰 Credit refreshed for "' + wsName + '"', 'success');
           fetchLoopCreditsWithDetect(false);
@@ -230,6 +232,7 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 function appendRemixAndGithubItems(menu: HTMLElement, wsId: string): void {
   const projectId = extractProjectIdFromUrl();
   const projectName = getDisplayProjectName();
+
   if (!projectId) {
     return; 
   }
@@ -274,6 +277,7 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
       const hasCachedResult = cached !== null && cached !== undefined;
       const isCachedFound = hasCachedResult && cached!.Status === 'found';
       const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
+
       if (hasCachedRepoUrl) {
         applyConnected(item, wsId, projectId, cached!.RepoUrl!);
 
@@ -281,6 +285,7 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
       }
 
       const state = await resolveConnection(wsId, '', projectId);
+
       if (state.connected) {
         setGitsyncCache(wsId, projectId, 'found', state.repoUrl);
         applyConnected(item, wsId, projectId, state.repoUrl);
@@ -365,6 +370,7 @@ export function showWsContextMenu(
 
   menu.appendChild(buildCtxMenuItem(label, function () {
     removeWsContextMenu();
+
     if (isBulk) {
       showWsMembersBulkPanel(Array.from(selected), x, y);
     } else {
@@ -383,6 +389,7 @@ export function showWsContextMenu(
 
 export function removeWsContextMenu(): void {
   const existing = document.getElementById(ID_CTX_MENU);
+
   if (existing) {
     existing.remove();
   }
@@ -415,6 +422,7 @@ async function openGithubRepoFlow(
   const hasCachedEntry = cached !== null && cached !== undefined;
   const isCachedFound = hasCachedEntry && cached!.Status === 'found';
   const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
+
   if (hasCachedRepoUrl) {
     window.open(cached!.RepoUrl!, '_blank', 'noopener,noreferrer');
 
@@ -422,6 +430,7 @@ async function openGithubRepoFlow(
   }
 
   const isCachedNotLinked = hasCachedEntry && cached!.Status === 'not_linked';
+
   if (isCachedNotLinked) {
     showToast('🐙 No GitHub repo linked (cached). Use Refresh gitsync to re-check.', 'warn');
 
@@ -429,6 +438,7 @@ async function openGithubRepoFlow(
   }
 
   const outcome = await fetchGitsyncConfig(wsId, pid);
+
   if (outcome.status === 'found') {
     setGitsyncCache(wsId, pid, 'found', outcome.repoUrl);
     window.open(outcome.repoUrl, '_blank', 'noopener,noreferrer');
@@ -533,6 +543,7 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 
 function findNameDiv(wsId: string): HTMLElement | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
+
   if (!listEl) {
     return null;
   }
@@ -555,6 +566,7 @@ function findNameDiv(wsId: string): HTMLElement | null {
  */
 export function startInlineRename(wsId: string, currentName: string): void {
   const nameDiv = findNameDiv(wsId);
+
   if (!nameDiv) {
     return;
   }
@@ -581,10 +593,12 @@ export function startInlineRename(wsId: string, currentName: string): void {
 
     const typed = input.value.trim();
     const hasUnsaved = typed.length > 0 && typed !== currentName;
+
     if (hasUnsaved) {
       const ok = window.confirm(
         'Discard unsaved rename?\n\n"' + currentName + '" → "' + typed + '"',
       );
+
       if (!ok) {
         input.focus();
 

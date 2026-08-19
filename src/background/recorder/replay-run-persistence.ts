@@ -237,6 +237,7 @@ function readReplayRun(db: SqlJsDatabase, runId: number): PersistedReplayRun {
     [runId],
   );
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     throw new Error(`ReplayRun row missing for ReplayRunId ${runId} after insert`);
   }

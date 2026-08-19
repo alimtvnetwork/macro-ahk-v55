@@ -70,6 +70,7 @@ const REPEAT_TICK_LABEL = 'RepeatLoopUI.tick';
 function nonHeartbeatIntervals(): number {
   const snap = getIntervalSnapshot();
   let total = snap.total;
+
   if (snap.byLabel[INTERVAL_HEARTBEAT_LABEL]) {
     total -= snap.byLabel[INTERVAL_HEARTBEAT_LABEL];
   }

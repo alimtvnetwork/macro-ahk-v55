@@ -98,6 +98,7 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
   menuBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const isOpen = menuDropdown.style.display !== 'none';
+
     if (isOpen) {
       menuDropdown.style.display = 'none';
     } else {
@@ -231,6 +232,7 @@ async function fetchBundledMacroControllerSource(): Promise<ExtensionResponse> {
 async function fetchBundleSource(): Promise<string | null> {
   const response = await fetchBundledMacroControllerSource();
   const scriptSource = typeof response?.scriptSource === 'string' ? response.scriptSource : '';
+
   if (!response?.ok || scriptSource.length < 100) {
     const reason = response?.errorMessage || 'Bundled macro controller source is unavailable';
     logError('Export', reason);
@@ -289,6 +291,7 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
   }));
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '🔧', 'Diagnostic Dump', 'Run diagnostic dump', function() {
     const result = nsCallTyped('api.loop.diagnostics');
+
     if (result === undefined) {
       log('Diagnostic dump not available', 'warn');
       showToast('⚠️ Diagnostic dump not available', 'warn');
@@ -355,6 +358,7 @@ function _addAutoAttachSection(menuCtx: { menuBtnStyle: string; menuDropdown: HT
   menuDropdown.appendChild(aaHeader);
 
   const aaGroups = resolveAutoAttachConfig().groups;
+
   if (aaGroups.length === 0) {
     const noGroups = document.createElement('div');
     noGroups.style.cssText = 'padding:4px 10px;font-size:10px;color:' + cPanelFgDim + ';font-style:italic;';

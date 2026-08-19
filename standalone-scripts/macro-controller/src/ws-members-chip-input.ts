@@ -42,11 +42,13 @@ export function createChipInput(options: { // eslint-disable-line max-lines-per-
 
   function addEmail(email: string): void {
     const trimmed = email.trim().toLowerCase();
+
     if (!trimmed || validEmails.has(trimmed)) {
       return;
     }
 
     const isValid = validateEmail(trimmed);
+
     if (isValid) {
       validEmails.add(trimmed);
       renderChips();
@@ -98,8 +100,10 @@ export function createChipInput(options: { // eslint-disable-line max-lines-per-
       const isInputEmpty = !input.value;
       const hasChips = validEmails.size > 0;
       const isBackspaceOnEmptyWithChips = isBackspaceKey && isInputEmpty && hasChips;
+
       if (isBackspaceOnEmptyWithChips) {
         const last = Array.from(validEmails).pop();
+
         if (last) {
           validEmails.delete(last);
           renderChips();

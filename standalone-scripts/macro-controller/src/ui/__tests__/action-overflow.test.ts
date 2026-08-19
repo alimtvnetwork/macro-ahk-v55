@@ -36,6 +36,7 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
       let w = 0;
       for (const childElement of body.children) {
         const childHtmlElement = childElement as HTMLElement;
+
         if (childHtmlElement.dataset.role === 'action-overflow') {
           if (childHtmlElement.style.display !== 'none') {
             w += OVERFLOW_W;

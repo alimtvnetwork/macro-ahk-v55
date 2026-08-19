@@ -258,6 +258,7 @@ describe('logDiagnosticFromCode — structured payload schema (all logger varian
     expect(payload.cause).toBeDefined();
     expect(payload.cause?.name).toBe('Error');
     expect(payload.cause?.message).toBe('sqlite: no such row');
+
     // stack is optional; when present it must be a string.
     if (payload.cause?.stack !== undefined) {
       expect(typeof payload.cause.stack).toBe('string');

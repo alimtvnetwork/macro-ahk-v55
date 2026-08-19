@@ -135,6 +135,7 @@ export function resolveSelection(
 
   const allInProject = src.listGroups(projectId);
   const partitioned = partitionSelection(selected, allInProject, projectId);
+
   if ("Reason" in partitioned) {
     return partitioned;
   }
@@ -171,6 +172,7 @@ function partitionSelection(
   const seedIds: number[] = [];
   for (const id of selected) {
     const row = byId.get(id);
+
     if (row === undefined) {
       missing.push(id);
       continue; 
@@ -239,12 +241,14 @@ function expandDescendants(
     }
 
     const id = queue.shift() as number;
+
     if (visited.has(id)) {
       continue;
     }
 
     visited.add(id);
     const kids = childrenOf.get(id);
+
     if (kids !== undefined) {
       for (const k of kids) {
         queue.push(k);
@@ -324,6 +328,7 @@ export function previewStepGroupExport(
     init.SelectedStepGroupIds,
     init.IncludeDescendants ?? false,
   );
+
   if ("Reason" in resolved) {
     return resolved;
   }
@@ -373,11 +378,13 @@ function scanStepsForPreview(
   for (const id of effectiveIds) {
     for (const s of src.listSteps(id)) {
       stepCount += 1;
+
       if (s.StepKindId !== StepKindId.RunGroup) {
         continue;
       }
 
       runGroupRefs += 1;
+
       if (s.TargetStepGroupId !== null && includedSet.has(s.TargetStepGroupId)) {
         continue;
       }
@@ -422,6 +429,7 @@ export function buildFilteredSnapshot(
   effectiveIds: ReadonlyArray<number>,
 ): SnapshotResult | ExportFailure {
   const projectRow = src.listProjects().find((p) => p.ProjectId === projectId);
+
   if (projectRow === undefined) {
     return {
       Reason: "ProjectNotFound",
@@ -431,6 +439,7 @@ export function buildFilteredSnapshot(
   }
 
   const preflight = preflightSnapshotSteps(src, effectiveIds);
+
   if ("Reason" in preflight) {
     return preflight;
   }
@@ -454,11 +463,13 @@ function preflightSnapshotSteps(
   for (const id of effectiveIds) {
     for (const s of src.listSteps(id)) {
       allSteps.push(s);
+
       if (s.StepKindId !== StepKindId.RunGroup) {
         continue;
       }
 
       runGroupRefs += 1;
+
       if (s.TargetStepGroupId === null || !includedSet.has(s.TargetStepGroupId)) {
         danglingRunGroup.push(s.StepId);
       }
@@ -551,6 +562,7 @@ function populateSnapshotDb(
 
 function requireRow(rows: ReadonlyArray<StepGroupRow>, id: number): StepGroupRow {
   const row = rows.find((r) => r.StepGroupId === id);
+
   if (row === undefined) {
     throw new Error(`buildFilteredSnapshot: StepGroupId ${id} disappeared mid-export`);
   }
@@ -568,6 +580,7 @@ function orderGroupsByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[
     let progressed = false;
     for (const [id, r] of remaining) {
       const parent = r.ParentStepGroupId;
+
       if (parent === null || !ids.has(parent) || out.some((o) => o.StepGroupId === parent)) {
         out.push(r);
         remaining.delete(id);
@@ -829,16 +842,19 @@ export async function runStepGroupExport(
   const resolved = resolveSelection(
     init.Source, init.ProjectId, init.SelectedStepGroupIds, init.IncludeDescendants ?? false,
   );
+
   if ("Reason" in resolved) {
     return resolved;
   }
 
   const snapshot = buildFilteredSnapshot(init.Source, init.SqlJs, init.ProjectId, resolved.Ids);
+
   if ("Reason" in snapshot) {
     return snapshot;
   }
 
   const projectRow = init.Source.listProjects().find((p) => p.ProjectId === init.ProjectId);
+
   if (projectRow === undefined) {
     return {
       Reason: "ProjectNotFound",
@@ -850,6 +866,7 @@ export async function runStepGroupExport(
   const sha = await sha256Hex(snapshot.DbBytes);
   const manifest = buildManifest(init, projectRow, resolved.Ids, snapshot, sha, nowIso());
   const packaged = await packageZip(init.JsZip, manifest, snapshot.DbBytes);
+
   if ("Reason" in packaged) {
     return packaged;
   }

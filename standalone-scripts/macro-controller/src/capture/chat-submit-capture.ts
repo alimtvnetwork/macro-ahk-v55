@@ -69,6 +69,7 @@ async function persistCapture(
   isVerbose: boolean,
 ): Promise<CaptureChatSubmitResult> {
   const fileId = await saveEntry(projectId, bodyForDisk(text, isVerbose));
+
   if (!fileId) {
     return { isCaptured: false, projectId, fileId: null, reason: 'opfs-save-failed' };
   }
@@ -77,6 +78,7 @@ async function persistCapture(
     projectId, projectName, source, fileId,
     charCount: text.length, createdAt: Date.now(), metaJson,
   });
+
   if (!isRowInserted) {
     return { isCaptured: false, projectId, fileId, reason: 'db-insert-failed' };
   }
@@ -92,6 +94,7 @@ async function persistCapture(
 
 export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<CaptureChatSubmitResult> {
   const trimmed = (input.text || '').replace(/^\s+|\s+$/g, '');
+
   if (trimmed.length === 0) {
     return { isCaptured: false, projectId: null, fileId: null, reason: 'empty-text' };
   }
@@ -101,6 +104,7 @@ export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<
   installChatSubmitRenameBackfill();
   notifyIfProjectRenamed();
   const { projectId, projectName } = resolveProjectIdentity();
+
   if (!projectId) {
     logError(SCOPE, `captureChatSubmit: no projectId (source=${input.source}, chars=${trimmed.length})`);
 

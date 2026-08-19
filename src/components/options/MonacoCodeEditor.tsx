@@ -47,6 +47,7 @@ function readFileContent(file: File, onContent: (content: string) => void): void
   const reader = new FileReader();
   reader.onload = (event) => {
     const result = event.target?.result;
+
     if (typeof result === "string") {
       onContent(result);
     }
@@ -175,6 +176,7 @@ function highlightJavascript(raw: string): string {
       const isCall = raw[k] === "(";
 
       let cls: string | undefined;
+
       if (JS_KEYWORDS.has(word)) {
         cls = "js-keyword";
       } else if (JS_BUILTINS.has(word)) {
@@ -292,6 +294,7 @@ function wrapSelection(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
+
   if (!textarea) {
     onChange(prefix + value + suffix);
 
@@ -317,6 +320,7 @@ function insertLinePrefix(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
+
   if (!textarea) {
     onChange(prefix + value);
 
@@ -352,6 +356,7 @@ function formatMarkdown(value: string): string {
   let result = value;
   result = result.replace(/\n{3,}/g, "\n\n");
   result = result.replace(/([^\n])\n(#{1,6}\s)/g, "$1\n\n$2");
+
   if (!result.endsWith("\n")) {
     result += "\n";
   }
@@ -485,6 +490,7 @@ function HighlightedFallback({
   const handleScroll = useCallback(() => {
     const textarea = textareaRef.current;
     const pre = preRef.current;
+
     if (textarea && pre) {
       pre.scrollTop = textarea.scrollTop;
       pre.scrollLeft = textarea.scrollLeft;
@@ -493,6 +499,7 @@ function HighlightedFallback({
 
   useEffect(() => {
     const textarea = textareaRef.current;
+
     if (!textarea || !showHighlight) {
       return;
     }
@@ -607,6 +614,7 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
     event.preventDefault();
     event.stopPropagation();
     const file = event.dataTransfer.files[0];
+
     if (file) {
       readFileContent(file, onChange);
     }
@@ -614,6 +622,7 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
 
   const handleFileSelect = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (!file) {
       return;
     }

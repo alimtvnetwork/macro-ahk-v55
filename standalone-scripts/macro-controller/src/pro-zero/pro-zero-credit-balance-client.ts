@@ -39,6 +39,7 @@ function handleResponse(resp: SdkBalanceResponse): CreditBalanceFetchResult {
   }
 
   const parsed = parseCreditBalanceResponse(resp.data);
+
   if (!parsed.isOk) {
     return buildParseError(parsed.reason);
   }

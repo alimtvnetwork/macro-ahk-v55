@@ -32,6 +32,7 @@ beforeEach(() => {
     "fetch",
     vi.fn(async (input: string) => {
       const path = String(input);
+
       if (path.endsWith(".wasm")) {
         const buf = readFileSync(
           resolvePath(__dirname, "../../../node_modules/sql.js/dist/sql-wasm.wasm"),

@@ -141,6 +141,7 @@ describe("resolveSelection", () => {
   it("rejects an empty selection", () => {
     const fx = makeFixture();
     const r = resolveSelection(fx.Lib, fx.ProjectId, [], false);
+
     if (!("Reason" in r)) {
       throw new Error("expected failure");
     }
@@ -151,6 +152,7 @@ describe("resolveSelection", () => {
   it("rejects unknown StepGroupIds", () => {
     const fx = makeFixture();
     const r = resolveSelection(fx.Lib, fx.ProjectId, [fx.Root, 9999], false);
+
     if (!("Reason" in r)) {
       throw new Error("expected failure");
     }
@@ -167,6 +169,7 @@ describe("resolveSelection", () => {
       [fx.Root, fx.OtherProjectGroup],
       false,
     );
+
     if (!("Reason" in r)) {
       throw new Error("expected failure");
     }
@@ -181,6 +184,7 @@ describe("resolveSelection", () => {
   it("returns just the selected ids when descendants disabled", () => {
     const fx = makeFixture();
     const r = resolveSelection(fx.Lib, fx.ProjectId, [fx.Root], false);
+
     if ("Reason" in r) {
       throw new Error("expected ok");
     }
@@ -191,6 +195,7 @@ describe("resolveSelection", () => {
   it("includes the full descendant tree when enabled", () => {
     const fx = makeFixture();
     const r = resolveSelection(fx.Lib, fx.ProjectId, [fx.Root], true);
+
     if ("Reason" in r) {
       throw new Error("expected ok");
     }
@@ -201,6 +206,7 @@ describe("resolveSelection", () => {
   it("dedupes overlapping descendant trees", () => {
     const fx = makeFixture();
     const r = resolveSelection(fx.Lib, fx.ProjectId, [fx.Root, fx.Child], true);
+
     if ("Reason" in r) {
       throw new Error("expected ok");
     }
@@ -219,6 +225,7 @@ describe("buildFilteredSnapshot", () => {
     // Only root selected, but root has a RunGroup step that points
     // to `child`, which is NOT in the bundle.
     const result = buildFilteredSnapshot(fx.Lib, SQL, fx.ProjectId, [fx.Root]);
+
     if (!("Reason" in result)) {
       throw new Error("expected failure");
     }
@@ -235,6 +242,7 @@ describe("buildFilteredSnapshot", () => {
       fx.ProjectId,
       [fx.Root, fx.Child, fx.Grandchild],
     );
+
     if ("Reason" in result) {
       throw new Error(`unexpected failure: ${result.Detail}`);
     }
@@ -269,6 +277,7 @@ async function expectSuccess(
   p: Promise<StepGroupExportSuccess | ExportFailure>,
 ): Promise<StepGroupExportSuccess> {
   const r = await p;
+
   if (r.Reason !== "Ok") {
     throw new Error(`export failed: ${r.Reason}, ${(r as ExportFailure).Detail}`);
   }

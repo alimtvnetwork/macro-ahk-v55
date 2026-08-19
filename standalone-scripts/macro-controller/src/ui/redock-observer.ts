@@ -107,11 +107,13 @@ export function startRedockObserver(ctx: PanelLayoutCtx): void {
  */
 function tryRedock(ctx: PanelLayoutCtx): boolean {
   const target = getByXPath(CONFIG.CONTROLS_XPATH);
+
   if (!target) {
     return false;
   }
 
   const ui = document.getElementById(IDS.CONTAINER);
+
   if (!ui) {
     return false;
   }

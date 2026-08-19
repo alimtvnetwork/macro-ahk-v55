@@ -16,6 +16,7 @@ interface Props {
 
 function reloadExtension(): void {
   const runtime = (globalThis as { chrome?: { runtime?: { reload?: () => void } } }).chrome?.runtime;
+
   if (typeof runtime?.reload === "function") {
     runtime.reload();
   }

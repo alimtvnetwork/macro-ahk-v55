@@ -60,6 +60,7 @@ export function registerTokenBroadcastListener(): void {
 
 function handleTokenBroadcast(event: MessageEvent): void {
   const data = event.data as TokenBroadcast | null;
+
   if (!data || data.source !== LabelType.SourceExtension) {
     return;
   }
@@ -77,6 +78,7 @@ function handleTokenBroadcast(event: MessageEvent): void {
   if (data.type === 'TOKEN_UPDATED' && token) {
     log('[TokenBroadcast] Received TOKEN_UPDATED — persisting new token', 'success');
     const persisted = persistResolvedBearerToken(token);
+
     if (persisted) {
       setLastTokenSource('broadcast[cookie-watcher]');
       updateAuthBadge(true, 'broadcast[cookie-watcher]');

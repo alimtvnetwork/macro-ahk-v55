@@ -111,6 +111,7 @@ interface MergeSnapshotArgs {
  */
 async function applyInputSnapshot(args: MergeSnapshotArgs): Promise<boolean> {
   const snapshot = await resolveBatchInputSnapshot();
+
   if (!snapshot.Result.Ok) {
     if (!snapshot.Result.Continue) {
       toast.error(`Input source failed: ${snapshot.Result.Error}. Run aborted.`);
@@ -418,6 +419,7 @@ function reportBatchOutcome(result: {
 
 async function executeBatch(args: HandleRunArgs): Promise<void> {
   const { db, projectId, state: s, policy, groupsById, groupInputs, onApplyMergedInput } = args;
+
   if (db === null || projectId === null) {
     toast.error("Library not ready");
 
@@ -430,6 +432,7 @@ async function executeBatch(args: HandleRunArgs): Promise<void> {
 
   s.setRunning(true);
   const proceed = await applyInputSnapshot({ order: s.order, groupInputs, onApplyMergedInput });
+
   if (!proceed) {
     s.setRunning(false);
 
@@ -520,6 +523,7 @@ export default function BatchRunDialog(props: BatchRunDialogProps) {
     const out: RunStepTraceEntry[] = [];
     for (const r of s.reports) {
       const trace = r.Result?.Trace;
+
       if (trace !== undefined) {
         out.push(...trace);
       }

@@ -107,6 +107,7 @@ function sortProjectOptions(projects: StoredProject[]): StoredProject[] {
   return [...projects].sort((a, b) => {
     const aGlobal = a.isGlobal === true ? 1 : 0;
     const bGlobal = b.isGlobal === true ? 1 : 0;
+
     if (aGlobal !== bGlobal) {
       return aGlobal - bGlobal;
     }
@@ -123,6 +124,7 @@ function selectPreferredActiveProject(
   // If user explicitly set an active project, honour it even if global
   if (activeId) {
     const explicit = projects.find((project) => project.id === activeId);
+
     if (explicit) {
       return { activeProject: explicit, nextActiveId: activeId };
     }
@@ -218,6 +220,7 @@ export async function handleSaveProject(
   // condition holds for a given library script. Every skip is logged.
   const library = await readStoredScripts();
   const { project: withAutoAttached, attached, decisions } = runAutoAttach(healed, library);
+
   if (attached.length > 0) {
     console.info(`${BgLogTag.SCRIPT_RESOLVER} auto-attach added ${attached.length} script(s) to project "${withAutoAttached.name}": ${attached.map((a) => a.path).join(", ")}`);
   }
@@ -264,6 +267,7 @@ export async function handleSaveProject(
  */
 async function healProjectScriptBindings(project: StoredProject): Promise<StoredProject> {
   const entries = project.scripts ?? [];
+
   if (entries.length === 0) {
     return project;
   }
@@ -282,6 +286,7 @@ async function healProjectScriptBindings(project: StoredProject): Promise<Stored
 
   const healedScripts = entries.map((entry) => {
     const matched = findStoredScriptByProjectPath(storedScripts, entry.path);
+
     if (matched === null) {
       logCaughtError(
         BgLogTag.PROJECT_SAVE_CONFIG_SEED,

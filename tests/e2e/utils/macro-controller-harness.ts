@@ -168,6 +168,7 @@ export async function mountMacroControllerHarness(
   const skipBundle = opts.skipBundle === true;
 
   let bundleSource = '';
+
   if (!skipBundle) {
     // Code-Red: surface the exact missing path + reason per
     // `mem://constraints/file-path-error-logging-code-red.md`.
@@ -208,6 +209,7 @@ export async function mountMacroControllerHarness(
   await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
 
   let bundleError: Error | null = null;
+
   if (!skipBundle) {
     // Capture page-script errors thrown during bundle boot WITHOUT failing
     // the harness — the calling test decides whether bundleError is fatal.

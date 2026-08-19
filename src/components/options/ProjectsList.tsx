@@ -112,6 +112,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 
   const handleSave = async () => {
     const isNameEmpty = form.name.trim() === "";
+
     if (isNameEmpty) {
       toast.error("Project name is required");
 
@@ -151,6 +152,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 
     const dt = e.dataTransfer;
     const isFolder = hasFolderEntry(dt);
+
     if (!isFolder) {
       toast.error("Please drop a folder containing marco-project.json");
 
@@ -490,6 +492,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 /** Displays a badge with variable count for a project. */
 function VariablesBadge({ variables }: { variables?: string }) {
   const isAbsent = !variables || variables === "{}";
+
   if (isAbsent) {
     return null;
   }
@@ -497,6 +500,7 @@ function VariablesBadge({ variables }: { variables?: string }) {
   try {
     const count = Object.keys(JSON.parse(variables)).length;
     const isEmpty = count === 0;
+
     if (isEmpty) {
       return null;
     }

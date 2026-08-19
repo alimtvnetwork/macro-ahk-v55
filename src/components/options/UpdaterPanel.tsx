@@ -87,6 +87,7 @@ function useUpdaterPanelState() {
   const handleRemove = async (id: number) => {
     try {
       await sendMessage({ type: "DELETE_UPDATER", updaterId: id });
+
       if (expandedId === id) {
         setExpandedId(null);
       }

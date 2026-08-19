@@ -100,6 +100,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "ProjectDatabases",
         params: { limit: 100, offset: 0 },
       });
+
       if (result.isOk && result.rows) {
         const userCreated = result.rows.filter((r) => r.IsDefault !== 1).length;
         setUserDbCount(userCreated);
@@ -127,6 +128,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "listTables",
         params: {},
       });
+
       if (result.isOk && result.tables) {
         setTables(result.tables);
       }
@@ -147,6 +149,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
 
   const handleCreateTable = async () => {
     const trimmedName = newTableName.trim();
+
     if (!trimmedName) {
       toast.error("Table name is required");
 
@@ -156,6 +159,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     const validColumns = newColumns.filter((c) => c.name.trim()).map((c) => ({
       Name: c.name, Type: c.type, Nullable: c.nullable, Unique: c.unique, Default: c.defaultValue,
     }));
+
     if (validColumns.length === 0) {
       toast.error("At least one column is required");
 
@@ -171,6 +175,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
           columns: validColumns,
         },
       });
+
       if (result.isOk) {
         toast.success(`Table "${trimmedName}" created`);
         setShowCreateForm(false);

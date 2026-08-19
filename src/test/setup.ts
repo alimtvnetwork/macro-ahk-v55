@@ -15,6 +15,7 @@ if (typeof globalThis !== "undefined" && !("__marcoActRatchetInstalled" in globa
     const message = typeof first === "string"
       ? first
       : (first instanceof Error ? first.message : "");
+
     if (message.includes("not wrapped in act(")) {
       if (allow) {
         originalError(...args);
@@ -135,6 +136,7 @@ try {
     const url = typeof input === "string"
       ? input
       : input instanceof URL ? input.href : input.url;
+
     if (url.includes("sql-wasm.wasm")) {
       return new Response(wasmBytes, {
         status: 200,

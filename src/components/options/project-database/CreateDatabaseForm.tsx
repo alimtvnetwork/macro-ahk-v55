@@ -77,6 +77,7 @@ export function CreateDatabaseForm({
       // Determine which schema to auto-create based on kind
       const kindNum = Number(kindId);
       let extraSchema = "";
+
       if (kindNum === 1) {
         extraSchema = KV_KIND_SCHEMA;
       } else if (kindNum === 3) {

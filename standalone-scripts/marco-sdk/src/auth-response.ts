@@ -43,18 +43,21 @@ export function extractBearerTokenFromBridgePayload(
 
   for (const key of TOKEN_KEYS) {
     const candidate = extractBearerTokenFromBridgePayload(raw[key], depth + 1);
+
     if (candidate) {
       return candidate;
     }
   }
 
   const legacySessionId = raw.sessionId;
+
   if (typeof legacySessionId === "string" && isLikelyJwt(legacySessionId)) {
     return legacySessionId;
   }
 
   for (const key of WRAPPER_KEYS) {
     const candidate = extractBearerTokenFromBridgePayload(raw[key], depth + 1);
+
     if (candidate) {
       return candidate;
     }
@@ -80,17 +83,20 @@ export function extractAuthSourceFromBridgePayload(
   }
 
   const directSource = raw.source;
+
   if (typeof directSource === "string" && directSource.length > 0) {
     return directSource;
   }
 
   const cookieName = raw.cookieName;
+
   if (typeof cookieName === "string" && cookieName.length > 0) {
     return cookieName;
   }
 
   for (const key of WRAPPER_KEYS) {
     const nested = extractAuthSourceFromBridgePayload(raw[key], depth + 1);
+
     if (nested !== "none") {
       return nested;
     }
@@ -121,12 +127,14 @@ export function extractBooleanFromBridgePayload(
   }
 
   const direct = raw[key];
+
   if (typeof direct === "boolean") {
     return direct;
   }
 
   for (const wrapperKey of WRAPPER_KEYS) {
     const nested = extractBooleanFromBridgePayload(raw[wrapperKey], key, depth + 1);
+
     if (nested) {
       return true;
     }
@@ -152,11 +160,13 @@ export function decodeJwtPayload(token: string | null): Record<string, unknown> 
   }
 
   const payloadSegment = token.split(".")[1];
+
   if (!payloadSegment) {
     return null;
   }
 
   const decoded = decodeBase64Url(payloadSegment);
+
   if (!decoded) {
     return null;
   }
@@ -172,11 +182,13 @@ export function decodeJwtPayload(token: string | null): Record<string, unknown> 
 
 export function extractJwtPayloadFromBridgePayload(raw: unknown): Record<string, unknown> | null {
   const directToken = extractBearerTokenFromBridgePayload(raw);
+
   if (directToken) {
     return decodeJwtPayload(directToken);
   }
 
   const jwtLike = getNestedRecordValue(raw, "jwt");
+
   if (typeof jwtLike === "string") {
     return decodeJwtPayload(jwtLike);
   }

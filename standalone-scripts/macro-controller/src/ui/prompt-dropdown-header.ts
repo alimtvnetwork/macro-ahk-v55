@@ -109,6 +109,7 @@ function buildResetOrderButton(rerender: Rerender): HTMLElement {
     const ok = typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm('Reset prompt ordering to the built-in default? Your saved drag order will be cleared.')
       : true;
+
     if (!ok) {
       return;
     }
@@ -118,6 +119,7 @@ function buildResetOrderButton(rerender: Rerender): HTMLElement {
       log('[PromptDropdown] Prompt order reset to DEFAULT_PROMPT_ORDER (' + restored.length + ' slugs)', 'success');
       void import('../toast').then(function(mod) {
         const showToast = (mod as { showToast?: (message: string, kind?: string) => void }).showToast;
+
         if (showToast) {
           showToast('↺ Prompt order reset to default', 'success');
         }

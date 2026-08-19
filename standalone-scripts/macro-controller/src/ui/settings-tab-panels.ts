@@ -389,6 +389,7 @@ export function buildConfigDbPanel(
   sendToExtension('PROJECT_CONFIG_READ', { project: 'macro-controller' }).then(function(resp: ExtensionResponse) {
     loading.remove();
     const rows = resp.rows as Array<{ section: string; key: string; value: string; valueType: string }> | undefined;
+
     if (!resp || !resp.ok || !rows || rows.length === 0) {
       const empty = document.createElement('div');
       empty.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;padding:12px 0;';
@@ -401,6 +402,7 @@ export function buildConfigDbPanel(
     const sections: Record<string, Array<{ key: string; value: string; valueType: string }>> = {};
     for (const row of (rows || [])) {
       const r = row as { section: string; key: string; value: string; valueType: string };
+
       if (!sections[r.section]) {
         sections[r.section] = [];
       }
@@ -436,6 +438,7 @@ function renderConfigSection(
   for (const entry of entries) {
     const isMultiline = entry.valueType === 'object' || entry.valueType === 'array' || entry.value.length > 80;
     const fieldOpts: { type?: string; hint?: string; multiline?: boolean } = {};
+
     if (isMultiline) {
       fieldOpts.multiline = true;
     }
@@ -513,6 +516,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
     const { getCommunicationHistory } = await import('../db/macro-db');
     const { extractProjectIdFromUrl } = await import('../workspace-detection');
     const projectId = extractProjectIdFromUrl();
+
     if (!projectId) {
       return;
     }
@@ -523,6 +527,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
       : rows;
 
     listContainer.innerHTML = '';
+
     if (filtered.length === 0) {
       listContainer.innerHTML = '<div style="color:hsl(var(--muted-foreground));font-size:11px;text-align:center;padding-top:40px;">No history found</div>';
 
@@ -582,6 +587,7 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
     try {
       const { extractProjectIdFromUrl } = await import('../workspace-detection');
       const activeProjectId = extractProjectIdFromUrl();
+
       if (!activeProjectId) {
         const empty = document.createElement('div');
         empty.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;text-align:center;padding:12px;';
@@ -707,6 +713,7 @@ function _renderPerWsList(list: HTMLElement): void {
   const overrides = getSettingsOverrides();
   const map = overrides.perWorkspace || {};
   const ids = Object.keys(map).sort();
+
   if (ids.length === 0) {
     const empty = document.createElement('div');
     empty.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));padding:6px 0;font-style:italic;';
@@ -767,6 +774,7 @@ function _buildPerWsRow(
     const refill = refillInp.value.trim() === '' ? undefined : Number(refillInp.value);
     void _persistPerWs(function (map) {
       const next: PerWorkspaceLifecycleOverride = {};
+
       if (typeof grace === 'number' && Number.isFinite(grace) && grace >= 0) {
         next.expiryGracePeriodDays = Math.floor(grace);
       }
@@ -814,6 +822,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
     + 'padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
   addBtn.onclick = function (): void {
     const wsId = idInp.value.trim();
+
     if (!wsId) {
       showToast('Enter a workspace id first', 'warn');
 
@@ -822,6 +831,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
 
     const grace = graceInp.value.trim() === '' ? undefined : Number(graceInp.value);
     const refill = refillInp.value.trim() === '' ? undefined : Number(refillInp.value);
+
     if (grace === undefined && refill === undefined) {
       showToast('Set at least one of grace / refill', 'warn');
 
@@ -830,6 +840,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
 
     void _persistPerWs(function (map) {
       const next: PerWorkspaceLifecycleOverride = {};
+
       if (typeof grace === 'number' && Number.isFinite(grace) && grace >= 0) {
         next.expiryGracePeriodDays = Math.floor(grace);
       }

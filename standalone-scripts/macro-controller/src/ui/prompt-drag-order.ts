@@ -39,6 +39,7 @@ function runPromptOrderMigrations(): void {
 
   try {
     const storedRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0');
+
     if (Number.isFinite(storedRev) && storedRev >= CURRENT_MIGRATION_REV) {
       return;
     }
@@ -47,6 +48,7 @@ function runPromptOrderMigrations(): void {
     const current = loadPromptOrder();
     const source = current.length > 0 ? current : legacy;
     const migrated = migrateSavedOrder(source);
+
     if (migrated.length > 0) {
       savePromptOrder(migrated);
     }
@@ -65,11 +67,13 @@ function readLegacyOrder(): string[] {
   for (const key of LEGACY_STORAGE_KEYS) {
     try {
       const raw = localStorage.getItem(key);
+
       if (!raw) {
         continue;
       }
 
       const parsed: unknown = JSON.parse(raw);
+
       if (Array.isArray(parsed)) {
         return parsed.filter((v): v is string => typeof v === 'string');
       }
@@ -166,6 +170,7 @@ export const DEFAULT_PROMPT_ORDER: readonly string[] = [
 export function loadPromptOrder(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return [];
     }
@@ -207,11 +212,13 @@ function loadDragTouched(): Set<string> {
     }
 
     const raw = localStorage.getItem(DRAG_TOUCHED_KEY);
+
     if (!raw) {
       return new Set();
     }
 
     const parsed: unknown = JSON.parse(raw);
+
     if (!Array.isArray(parsed)) {
       return new Set();
     }
@@ -275,6 +282,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
   let source: SlugPositionSource;
+
   if (saved.length === 0 || index < 0) {
     source = 'default';
   } else if (touched.has(slug)) {
@@ -334,6 +342,7 @@ function entryKey(p: PromptEntry): string {
 
 export function sortEntriesByOrder<T extends PromptEntry>(entries: T[]): T[] {
   const order = getEffectivePromptOrder();
+
   if (order.length === 0) {
     return entries.slice();
   }
@@ -386,6 +395,7 @@ export function attachDragHandlers(
 
 function handleDragStart(event: DragEvent, slug: string, item: HTMLElement): void {
   dragState.draggingSlug = slug;
+
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', slug);
@@ -406,12 +416,14 @@ function handleDragOver(event: DragEvent, item: HTMLElement): void {
   }
 
   event.preventDefault();
+
   if (event.dataTransfer) {
     event.dataTransfer.dropEffect = 'move';
   }
 
   clearDropIndicators(findDropdownRoot(item));
   const insertBefore = shouldInsertBefore(event, item);
+
   if (insertBefore) {
     item.style.borderTop = '2px solid hsl(var(--primary))';
   } else {
@@ -451,17 +463,20 @@ function handleDrop(event: DragEvent, target: HTMLElement, onReorder: () => void
   clearDropIndicators(root);
   const sourceSlug = dragState.draggingSlug;
   dragState.draggingSlug = null;
+
   if (!sourceSlug || !root) {
     return;
   }
 
   const source = root.querySelector<HTMLElement>('[data-prompt-slug="' + cssEscape(sourceSlug) + '"]');
+
   if (!source || source === target) {
     return;
   }
 
   const insertBefore = shouldInsertBefore(event, target);
   const targetParent = target.parentElement;
+
   if (!targetParent) {
     return;
   }
@@ -493,6 +508,7 @@ function persistDomOrder(root: HTMLElement): void {
   const seenInDom = new Set<string>();
   root.querySelectorAll<HTMLElement>('[data-prompt-slug]').forEach(node => {
     const slug = node.getAttribute('data-prompt-slug');
+
     if (!slug || seenInDom.has(slug)) {
       return;
     }

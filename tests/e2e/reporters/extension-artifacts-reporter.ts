@@ -98,6 +98,7 @@ function pickExtensionDir(): string {
 
 function readManifest(extDir: string): { raw: string; parsed: BuiltManifest | null } {
   const manifestPath = path.join(extDir, 'manifest.json');
+
   if (!fs.existsSync(manifestPath)) {
     return { raw: '', parsed: null };
   }
@@ -157,6 +158,7 @@ function listDirectoryRecursive(root: string): string {
     for (const ent of entries) {
       const full = path.join(dir, ent.name);
       const rel = path.relative(root, full);
+
       if (ent.isDirectory()) {
         out.push(`${'  '.repeat(depth)}📁 ${ent.name}/`);
         walk(full, depth + 1);
@@ -187,6 +189,7 @@ function parseAttemptedUrl(errorMessage: string): {
   filePath: string | null;
 } {
   const match = errorMessage.match(EXT_URL_RE);
+
   if (!match) {
     return { url: null, filePath: null };
   }
@@ -240,6 +243,7 @@ export default class ExtensionArtifactsReporter implements Reporter {
     const errorMessages = result.errors
       .map((e) => `${e.message ?? ''}\n${e.stack ?? ''}`)
       .join('\n');
+
     if (!ERR_PATTERN.test(errorMessages)) {
       return;
     }

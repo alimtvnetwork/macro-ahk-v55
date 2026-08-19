@@ -77,17 +77,20 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
   const params = m.params || {};
 
   const isSlugMissing = !slug;
+
   if (isSlugMissing) {
     return { ...missingFieldError("project", "projectApi") };
   }
 
   const isEndpointMissing = !endpoint;
+
   if (isEndpointMissing) {
     return { ...missingFieldError("endpoint", "projectApi") };
   }
 
   // Ensure project DB is initialized
   const isProjectDbMissing = !hasProjectDb(slug);
+
   if (isProjectDbMissing) {
     await initProjectDb(slug);
   }
@@ -229,12 +232,14 @@ function handleSchemaCommand(
     case "createTable": {
       const tableName = requireField(params.tableName);
       const isTableNameMissing = !tableName;
+
       if (isTableNameMissing) {
         throw new Error("createTable: missing or invalid 'tableName'");
       }
 
       const columns = Array.isArray(params.columns) ? params.columns as ColumnDef[] : null;
       const isColumnsAbsent = !columns || columns.length === 0;
+
       if (isColumnsAbsent) {
         throw new Error("createTable: missing or empty 'columns' array");
       }
@@ -248,6 +253,7 @@ function handleSchemaCommand(
     case "dropTable": {
       const tableName = requireField(params.tableName);
       const isTableNameMissing = !tableName;
+
       if (isTableNameMissing) {
         throw new Error("dropTable: missing or invalid 'tableName'");
       }
@@ -281,11 +287,13 @@ function handleRawSqlCommand(
 ): Record<string, unknown> {
   const sql = requireField(params.sql);
   const isSqlMissing = !sql;
+
   if (isSqlMissing) {
     throw new Error("rawSql: missing or invalid 'sql' parameter");
   }
 
   const statements = classifyRawSql(sql);
+
   if (isRawSqlReadMethod(method)) {
     return handleRawSqlRead(db, method, sql, statements);
   }
@@ -304,11 +312,13 @@ function handleRawSqlRead(
   statements: readonly RawSqlStatement[],
 ): Record<string, unknown> {
   const unsafe = statements.find((statement) => statement.kind !== "read");
+
   if (unsafe) {
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
 
   const execRes = ServiceResult.wrapDb(() => db.exec(sql));
+
   if (execRes.isFail) {
     throw execRes.error;
   }
@@ -326,6 +336,7 @@ function handleRawSqlWrite(
   statements: readonly RawSqlStatement[],
 ): Record<string, unknown> {
   const unsafe = statements.find((statement) => statement.kind === "read");
+
   if (unsafe) {
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
@@ -353,6 +364,7 @@ function isRawSqlWriteMethod(method: string): boolean {
 
 function classifyRawSql(sql: string): RawSqlStatement[] {
   const chunks = splitSqlStatements(sql);
+
   if (chunks.length === 0) {
     throw new Error("rawSql: empty SQL statement");
   }
@@ -362,6 +374,7 @@ function classifyRawSql(sql: string): RawSqlStatement[] {
 
 function classifyStatement(statement: string): RawSqlKind {
   const normalized = statement.trim().replace(/\s+/g, " ").toLowerCase();
+
   if (/^select\b/.test(normalized)) {
     return "read";
   }
@@ -487,6 +500,7 @@ function skipBlockComment(sql: string, start: number): number {
 
 function pushSqlStatement(statements: string[], statement: string): void {
   const trimmed = statement.trim();
+
   if (trimmed.length > 0) {
     statements.push(trimmed);
   }
@@ -510,6 +524,7 @@ function rowsFromExecResults(results: ReturnType<ProjectDb["exec"]>): Array<Reco
 function readLastInsertId(db: ProjectDb): number | undefined {
   try {
     const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid() AS lastInsertId"));
+
     if (execRes.isFail) {
       return undefined;
     }
@@ -527,6 +542,7 @@ function readLastInsertId(db: ProjectDb): number | undefined {
 function getRowsModified(db: ProjectDb): number | undefined {
   try {
     const reader = db.getRowsModified;
+
     if (typeof reader !== "function") {
       return undefined;
     }

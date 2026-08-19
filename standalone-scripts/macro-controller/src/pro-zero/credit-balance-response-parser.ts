@@ -30,6 +30,7 @@ export function parseCreditBalanceResponse(raw: unknown): ParseOutcome {
   }
 
   const d = raw as { [k: string]: unknown };
+
   if (!hasRequiredNumbers(d)) {
     return { isOk: false, reason: 'missing total_granted/total_remaining/total_billing_period_used' };
   }

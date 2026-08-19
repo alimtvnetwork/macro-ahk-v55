@@ -5,6 +5,7 @@ describe("parseCsv, basics", () => {
   it("parses a simple comma-delimited file with header", () => {
     const r = parseCsv("Name,Email\nAlice,a@b.co\nBob,b@b.co");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Delimiter).toBe(",");
       expect(r.Headers).toEqual(["Name", "Email"]);
@@ -15,6 +16,7 @@ describe("parseCsv, basics", () => {
   it("auto-detects semicolon delimiter", () => {
     const r = parseCsv("Name;Age\nAlice;30\nBob;25");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Delimiter).toBe(";");
     }
@@ -23,6 +25,7 @@ describe("parseCsv, basics", () => {
   it("strips a UTF-8 BOM from the start", () => {
     const r = parseCsv("\uFEFFA,B\n1,2");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Headers).toEqual(["A", "B"]);
     }
@@ -34,6 +37,7 @@ describe("parseCsv, basics", () => {
     const r3 = parseCsv("A,B\r1,2\r3,4");
     for (const r of [r1, r2, r3]) {
       expect(r.Ok).toBe(true);
+
       if (r.Ok) {
         expect(r.Rows.length).toBe(2);
       }
@@ -44,6 +48,7 @@ describe("parseCsv, basics", () => {
     const csv = `Name,Bio\n"Doe, John","Line one\nLine two"`;
     const r = parseCsv(csv);
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Rows[0]).toEqual(["Doe, John", "Line one\nLine two"]);
     }
@@ -52,6 +57,7 @@ describe("parseCsv, basics", () => {
   it("unescapes doubled quotes inside a quoted field", () => {
     const r = parseCsv(`A,B\n"He said ""hi""",ok`);
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Rows[0]).toEqual([`He said "hi"`, "ok"]);
     }
@@ -60,6 +66,7 @@ describe("parseCsv, basics", () => {
   it("ignores a single trailing blank line", () => {
     const r = parseCsv("A,B\n1,2\n");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Rows.length).toBe(1);
     }
@@ -75,6 +82,7 @@ describe("parseCsv, failures", () => {
   it("fails on duplicate headers", () => {
     const r = parseCsv("A,A\n1,2");
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toMatch(/Duplicate column/);
     }
@@ -83,6 +91,7 @@ describe("parseCsv, failures", () => {
   it("fails on empty header cell", () => {
     const r = parseCsv("A,,B\n1,2,3");
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toMatch(/empty column name/);
     }
@@ -91,6 +100,7 @@ describe("parseCsv, failures", () => {
   it("fails on unterminated quote with line number", () => {
     const r = parseCsv(`A,B\n"oops,2`);
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toMatch(/Unterminated/);
     }
@@ -98,10 +108,12 @@ describe("parseCsv, failures", () => {
 
   it("rejects files over 5 MB", () => {
     const big = "A,B\n" + "x,y\n".repeat(2_000_000);
+
     // Sanity: this string is > MAX_BYTES.
     if (big.length > MAX_BYTES) {
       const r = parseCsv(big);
       expect(r.Ok).toBe(false);
+
       if (r.Ok === false) {
         expect(r.Reason).toMatch(/in-memory limit/);
       }
@@ -116,6 +128,7 @@ describe("parseCsv, failures", () => {
 
     const r = parseCsv(lines.join("\n"));
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toMatch(/limit is 10000/);
     }
@@ -126,6 +139,7 @@ describe("parseCsv, alignment warnings", () => {
   it("pads short rows and warns", () => {
     const r = parseCsv("A,B,C\n1,2\n3,4,5");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Rows[0]).toEqual(["1", "2", ""]);
       expect(r.Warnings.some((w) => /padded/.test(w))).toBe(true);
@@ -135,6 +149,7 @@ describe("parseCsv, alignment warnings", () => {
   it("truncates long rows and warns", () => {
     const r = parseCsv("A,B\n1,2,3,4");
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Rows[0]).toEqual(["1", "2"]);
       expect(r.Warnings.some((w) => /dropped/.test(w))).toBe(true);

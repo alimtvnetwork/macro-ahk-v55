@@ -81,6 +81,7 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
 async function verifyInsertedStep(projectSlug: string, insertedStepId: number, variableName: string) {
   const after = await listSteps(projectSlug, "verify");
   const found = after.find((s) => s.StepId === insertedStepId);
+
   if (found === undefined) {
     throw new RecorderSelfTestError(
       "verify",
@@ -125,6 +126,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
       projectSlug,
       draft: createDummyDraft(variableName),
     });
+
     if (typeof response?.step?.StepId !== "number") {
       throw new Error("RECORDER_STEP_INSERT returned no StepId");
     }

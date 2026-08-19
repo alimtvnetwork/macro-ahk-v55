@@ -48,6 +48,7 @@ export function buildImportProgressElement(): {
 
 export function showImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -63,6 +64,7 @@ export function showImportProgress(refs: ModalRefs): void {
 
 export function hideImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -73,6 +75,7 @@ export function hideImportProgress(refs: ModalRefs): void {
 
 export function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -159,12 +162,14 @@ export function renderPartialImportErrors(
   parseErrors: readonly string[],
 ): void {
   const panel = refs.partialErrorsPanel;
+
   if (!panel) {
     return;
   }
 
   panel.textContent = '';
   const total = entryErrors.length + parseErrors.length;
+
   if (total === 0) {
     panel.hidden = true;
     panel.style.display = 'none';
@@ -196,6 +201,7 @@ export function renderPartialImportErrors(
 
 export function clearPartialImportErrors(refs: ModalRefs): void {
   const panel = refs.partialErrorsPanel;
+
   if (!panel) {
     return;
   }

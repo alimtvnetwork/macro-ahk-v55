@@ -138,6 +138,7 @@ export async function handleQueryLogs(
     : "";
 
   const countStmt = ServiceResult.wrapDb(() => db.prepare(`SELECT COUNT(*) as cnt FROM ${table}${whereClause}`));
+
   if (params.length > 0) {
     countStmt.bind(params);
   }

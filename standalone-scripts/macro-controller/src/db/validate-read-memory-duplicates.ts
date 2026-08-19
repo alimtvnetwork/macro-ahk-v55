@@ -38,6 +38,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
     const id = typeof row.Id === 'number' ? row.Id : Number(row.Id);
     const slug = typeof row.Slug === 'string' ? row.Slug : '';
     const name = typeof row.Name === 'string' ? row.Name : '';
+
     if (Number.isFinite(id) && slug.length > 0) {
       out.push({ Id: id, Slug: slug, Name: name });
     }
@@ -49,6 +50,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
   const resp = await runLoggedQuery('QUERY', sql, 'context');
+
   if (resp.ok === false || !Array.isArray(resp.rows)) {
     return [];
   }
@@ -65,6 +67,7 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
     + 'UpdatedAt = ' + now + ' '
     + 'WHERE Id IN (' + idList + ')';
   const resp = await runLoggedQuery('SCHEMA', sql, 'context');
+
   if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',
@@ -104,11 +107,13 @@ export interface ReadMemoryDuplicateReport {
 export async function validateAndDisableReadMemoryDuplicates(): Promise<ReadMemoryDuplicateReport> {
   try {
     const duplicates = await findDuplicates();
+
     if (duplicates.length === 0) {
       return { detected: 0, disabled: 0, slugs: [] };
     }
 
     const ok = await demoteDuplicates(duplicates.map((row) => row.Id));
+
     if (!ok) {
       return { detected: duplicates.length, disabled: 0, slugs: duplicates.map((row) => row.Slug) };
     }

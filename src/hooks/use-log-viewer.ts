@@ -52,9 +52,11 @@ export function useLogViewer(limit = 200) {
     }
 
     let result = entries;
+
     if (levelFilter !== "all") {
       result = result.filter(e => {
         const lvl = e.level?.toLowerCase() ?? "info";
+
         if (levelFilter === "info") {
           return lvl === "info" || lvl === "log" || lvl === "debug";
         }

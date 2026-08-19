@@ -82,6 +82,7 @@ function zeroSummary(source: CreditSummary['source'], renderDash: boolean): Cred
 
 export function resolveCreditSummary(ws: WorkspaceCredit): CreditSummary {
   const cached = ws.id ? readCreditBalanceUpdateCacheSync(ws.id) : null;
+
   if (cached?.balance) {
     return buildCachedSummary(ws, cached.balance); 
   }
@@ -106,6 +107,7 @@ export function resolveCreditSummary(ws: WorkspaceCredit): CreditSummary {
   // grant is 315 — Pend until the enrichment fetch settles.
   const staleUnifiedBilling = ws.enriched !== true && isUnifiedBillingWorkspace(ws);
   const noInlineSignal = available === 0 && total === 0;
+
   if ((noInlineSignal || staleUnifiedBilling) && ws.enriched !== true
         && shouldFetchCreditBalanceForPlan(plan) && !hasInlineCredits(ws)) {
     return zeroSummary('Pending', true);

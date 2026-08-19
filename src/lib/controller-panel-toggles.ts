@@ -78,12 +78,14 @@ function readStore(): StoredShape {
 
   try {
     const parsed: unknown = JSON.parse(raw);
+
     if (parsed === null || typeof parsed !== "object") {
       return emptyStore(); 
     }
 
     const shape = parsed as { Sessions?: unknown; Order?: unknown };
     const sessions: Record<string, PanelToggles> = {};
+
     if (shape.Sessions !== null && typeof shape.Sessions === "object") {
       for (const [k, v] of Object.entries(shape.Sessions as Record<string, unknown>)) {
         if (isPanelToggles(v)) {
@@ -148,6 +150,7 @@ export function savePanelToggles(sessionId: string, toggles: PanelToggles): void
   const order: string[] = [...orderWithoutCurrent, sessionId];
   while (order.length > MAX_SESSIONS) {
     const evict = order.shift();
+
     if (evict !== undefined) {
       delete sessions[evict]; 
     }

@@ -97,6 +97,7 @@ async function loadProjects(): Promise<Array<{ id: string; name: string; slug: s
     const result = await sendMessage<{ isOk: boolean; projects?: Array<{ id: string; name: string; slug?: string }> }>({
       type: "GET_PROJECTS" as any,
     });
+
     if (result.isOk && result.projects) {
       return result.projects.map((p) => ({
         id: p.id,
@@ -131,6 +132,7 @@ export function AutomationView() {
   useEffect(() => {
     void loadProjects().then((p) => {
       setProjects(p);
+
       if (p.length > 0 && !selectedProject) {
         setSelectedProject(p[0].slug);
       }
@@ -172,6 +174,7 @@ export function AutomationView() {
 
   const handleSave = useCallback(async (partial: Partial<AutomationChain>) => {
     const ok = await saveChainToDb(partial, selectedProject);
+
     if (ok) {
       toast.success(partial.id ? "Chain updated" : "Chain created");
       setEditing(null);
@@ -183,6 +186,7 @@ export function AutomationView() {
 
   const handleDelete = useCallback(async (id: string) => {
     const ok = await deleteChainFromDb(id, selectedProject);
+
     if (ok) {
       toast.success("Chain deleted");
       void refreshChains();
@@ -227,6 +231,7 @@ export function AutomationView() {
     input.accept = ".json";
     input.onchange = async () => {
       const file = input.files?.[0];
+
       if (!file) {
         return;
       }
@@ -234,6 +239,7 @@ export function AutomationView() {
       try {
         const text = await file.text();
         const imported = JSON.parse(text) as AutomationChain[];
+
         if (!Array.isArray(imported)) {
           throw new Error("Invalid format");
         }

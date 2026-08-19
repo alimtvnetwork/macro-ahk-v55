@@ -51,11 +51,11 @@ export type {
 /*  Namespace resolution                                               */
 /* ------------------------------------------------------------------ */
 
-function isNonExtensibleObject(value: unknown): boolean {
+function isNonExtensibleObject(value: object): boolean {
   return (
     value !== null &&
     typeof value === 'object' &&
-    !Object.isExtensible(value as object)
+    !Object.isExtensible(value)
   );
 }
 
@@ -127,7 +127,8 @@ function ensureMutableBranch<T extends object>(node: T): T {
     const n = node as unknown as Record<string, unknown>;
     for (const key of ['api', '_internal', 'meta'] as const) {
       const child = n[key];
-      if (isNonExtensibleObject(child)) {
+
+      if (child && typeof child === 'object' && isNonExtensibleObject(child)) {
         n[key] = { ...(child as Record<string, unknown>) };
       }
     }
@@ -139,7 +140,8 @@ function ensureMutableBranch<T extends object>(node: T): T {
   const clone = { ...(node as unknown as Record<string, unknown>) };
   for (const key of ['api', '_internal', 'meta'] as const) {
     const child = clone[key];
-    if (isNonExtensibleObject(child)) {
+
+    if (child && typeof child === 'object' && isNonExtensibleObject(child)) {
       clone[key] = { ...(child as Record<string, unknown>) };
     }
   }
@@ -185,6 +187,7 @@ export function getNamespace(): MacroControllerNamespace | null {
 
   try {
     const existing = root.Projects.MacroController as Record<string, unknown> | undefined;
+
     if (!existing) {
       root.Projects.MacroController = {
         meta: { version: VERSION, displayName: 'Macro Controller' },
@@ -194,6 +197,7 @@ export function getNamespace(): MacroControllerNamespace | null {
     } else {
       // Heal frozen branches (collision with generic namespace builder).
       const healed = ensureMutableBranch(existing);
+
       if (healed !== existing) {
         root.Projects.MacroController = healed as unknown as RiseupAsiaProject;
       }
@@ -210,6 +214,7 @@ export function getNamespace(): MacroControllerNamespace | null {
     }
 
     const api = mc.api;
+
     if (!api.loop || typeof api.loop !== 'object' || !Object.isExtensible(api.loop)) {
       api.loop = {} as LoopApi;
     }
@@ -274,6 +279,7 @@ export function getNamespace(): MacroControllerNamespace | null {
  */
 export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P]): void {
   const ns = getNamespace();
+
   if (!ns) {
     return;
   }
@@ -286,6 +292,7 @@ export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P])
     // _internal.key or api.key
     const section = path.slice(0, dot1);
     const key = path.slice(dot1 + 1);
+
     if (section === '_internal') {
       ns._internal[key as keyof MacroControllerInternal] = value as MacroControllerInternal[keyof MacroControllerInternal];
     } else {
@@ -296,6 +303,7 @@ export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P])
     const section = path.slice(dot1 + 1, dot2) as keyof MacroControllerApi;
     const key = path.slice(dot2 + 1);
     const target = ns.api[section];
+
     if (target && typeof target === 'object') {
       (target as Record<string, unknown>)[key] = value;
     }
@@ -308,6 +316,7 @@ export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P])
  */
 export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | undefined {
   const ns = getNamespace();
+
   if (!ns) {
     return undefined;
   }
@@ -318,6 +327,7 @@ export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | 
   if (dot2 === -1) {
     const section = path.slice(0, dot1);
     const key = path.slice(dot1 + 1);
+
     if (section === '_internal') {
       return ns._internal[key as keyof MacroControllerInternal] as NsPathMap[P] | undefined;
     }
@@ -328,6 +338,7 @@ export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | 
   const section = path.slice(dot1 + 1, dot2) as keyof MacroControllerApi;
   const key = path.slice(dot2 + 1);
   const target = ns.api[section];
+
   if (target && typeof target === 'object') {
     return (target as Record<string, unknown>)[key] as NsPathMap[P] | undefined;
   }
@@ -345,6 +356,7 @@ export function nsCallTyped<P extends keyof NsPathMap>(
   ...args: NsPathMap[P] extends (...a: infer A) => unknown ? A : never[]
 ): NsPathMap[P] extends (...a: never[]) => infer R ? R | undefined : undefined {
   const fn = nsReadTyped(path);
+
   if (typeof fn === 'function') {
     return (fn as (...a: unknown[]) => unknown)(...args) as NsPathMap[P] extends (...a: never[]) => infer R ? R | undefined : undefined;
   }
@@ -376,6 +388,7 @@ export function nsRead(_windowKey: string, nsPath: string): unknown {
 /** @deprecated Use nsCallTyped() instead. */
 export function nsCall(_windowKey: string, nsPath: string, ...args: unknown[]): unknown {
   const fn = nsReadTyped(nsPath as keyof NsPathMap);
+
   if (typeof fn === 'function') {
     return (fn as (...a: unknown[]) => unknown)(...args);
   }

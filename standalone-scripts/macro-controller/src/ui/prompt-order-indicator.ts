@@ -54,6 +54,7 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
 
   effective.forEach((slug, idx) => {
     const dIdx = defaultRank.get(slug);
+
     if (dIdx === undefined) {
       rows.push({ slug, effectiveIndex: idx, defaultIndex: null, status: 'unknown' });
 
@@ -88,6 +89,7 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
 function isMonotonicAt(ranks: number[], pos: number): boolean {
   const prev = pos > 0 ? ranks[pos - 1] : undefined;
   const curr = ranks[pos];
+
   if (curr === undefined) {
     return true;
   }

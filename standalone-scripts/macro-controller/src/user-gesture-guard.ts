@@ -31,6 +31,7 @@ export function markUserGesture(source: string): void {
 /** Returns true if a recent user gesture has occurred. Logs CODE RED on miss. */
 export function requireUserGesture(callerId: string): boolean {
   const age = Date.now() - _userGestureAt;
+
   if (_userGestureAt === 0 || age > GESTURE_TTL_MS) {
     // CODE RED: programmatic start attempted without gesture.
     // Use console directly (logger may not be loaded in all callers).

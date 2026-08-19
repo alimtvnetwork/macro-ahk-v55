@@ -77,6 +77,7 @@ export const parseOwnerSwitchCsv = (text: string): OwnerSwitchCsvParseResult => 
   const rows: OwnerSwitchCsvRow[] = [];
 
   const dataRowCount = grid.length - 1;
+
   if (dataRowCount > MAX_ROWS) {
     errors.push({
       RowIndex: 0,

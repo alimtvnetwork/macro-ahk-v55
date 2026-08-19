@@ -86,6 +86,7 @@ vi.mock('../storage/chat-submit-opfs-store', () => ({
   readEntry: vi.fn(async (pid: string, fid: string) => opfsFiles.get(pid)?.get(fid) ?? null),
   deleteEntry: vi.fn(async (pid: string, fid: string) => {
     const dir = opfsFiles.get(pid);
+
     if (!dir || !dir.has(fid)) {
       return false;
     }

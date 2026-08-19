@@ -120,12 +120,14 @@ function renderWaterfallEntries(
 
   for (const entry of entries) {
     const isLarger = entry.endMs > maxEnd;
+
     if (isLarger) {
       maxEnd = entry.endMs;
     }
   }
 
   const isMaxTooSmall = maxEnd < 100;
+
   if (isMaxTooSmall) {
     maxEnd = 100;
   }
@@ -170,6 +172,7 @@ function buildWaterfallRow(
   barFill.style.cssText = 'position:absolute;top:0;bottom:0;left:' + leftPct + '%;width:' + widthPct + '%;background:' + color + ';border-radius:2px;opacity:0.8;';
 
   const isPending = entry.status === 'pending';
+
   if (isPending) {
     barFill.style.animation = 'pulse 1.5s ease-in-out infinite';
   }

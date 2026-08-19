@@ -25,6 +25,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
   if (descriptor.xpath) {
     log("findElement", "  Method 1 (XPath): " + descriptor.xpath);
     const xpathResult = getByXPath(descriptor.xpath);
+
     if (xpathResult) {
       log("findElement", "  " + name + " FOUND via XPath");
 
@@ -57,6 +58,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
     for (let s = 0; s < selectors.length; s++) {
       try {
         const sResult = document.querySelector(selectors[s]);
+
         if (sResult) {
           log("findElement", "  FOUND via selector: " + selectors[s]);
 
@@ -71,6 +73,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
 
   if (descriptor.ariaLabel || descriptor.role) {
     log("findElement", "  Method 4 (ARIA/role)");
+
     if (descriptor.ariaLabel) {
       const ariaLabels = Array.isArray(descriptor.ariaLabel) ? descriptor.ariaLabel : [descriptor.ariaLabel];
       for (let a = 0; a < ariaLabels.length; a++) {
@@ -78,6 +81,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
           const ariaResult = document.querySelector(
             '[aria-label*="' + ariaLabels[a] + '" i], [title*="' + ariaLabels[a] + '" i]'
           );
+
           if (ariaResult) {
             log("findElement", "  " + name + " FOUND via ARIA: " + ariaLabels[a]);
 
@@ -92,6 +96,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
 
     if (descriptor.role) {
       const roleResult = document.querySelector('[role="' + descriptor.role + '"]');
+
       if (roleResult) {
         log("findElement", "  " + name + " FOUND via role: " + descriptor.role);
 

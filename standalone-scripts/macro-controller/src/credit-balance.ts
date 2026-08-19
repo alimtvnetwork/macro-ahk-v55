@@ -1,4 +1,3 @@
-import { HttpCodes } from "./constants/http";
 /**
  * Credit Balance API — Free Credit Detection via /workspaces/{id}/credit-balance
  *
@@ -14,7 +13,7 @@ import { HttpCodes } from "./constants/http";
  */
 
 import { log, logSub } from './logger';
-import { resolveToken, markBearerTokenExpired, recoverAuthOnce } from './auth';
+import { resolveToken, markBearerTokenExpired, recoverAuthOnce, isAuthFailure } from './auth';
 import { CREDIT_API_BASE, state } from './shared-state';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import type { CreditBalanceResponse, CreditBalanceConfig } from './types';
@@ -85,14 +84,6 @@ export function getResolvedWorkspaceName(): string | null {
 
 export function clearResolvedWorkspace(): void {
   creditBalanceState.clear();
-}
-
-// ============================================
-// Helper — auth failure check
-// ============================================
-
-function isAuthFailure(status: number): boolean {
-  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================

@@ -61,6 +61,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
           collapseTargetCount: 0,
           timestamp: Date.now(),
         };
+
         if (this.overlayActive) {
           renderDebugOverlay(this.lastMatch);
         }
@@ -82,6 +83,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
   /** Toggle the on-page debug overlay; returns the last match snapshot. */
   public debug(): BannerDebugMatch | null {
     this.overlayActive = !this.overlayActive;
+
     if (this.overlayActive) {
       renderDebugOverlay(this.lastMatch);
     } else {
@@ -101,6 +103,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
       collapseTargetCount: targets.length,
       timestamp: Date.now(),
     };
+
     if (this.overlayActive) {
       renderDebugOverlay(this.lastMatch);
     }
@@ -134,6 +137,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
     let cur: HTMLElement = element;
     for (let i = 0; i < 3; i++) {
       const parentEl: HTMLElement | null = cur.parentElement;
+
       if (parentEl === null) {
         break;
       }

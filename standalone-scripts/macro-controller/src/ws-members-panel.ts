@@ -50,6 +50,7 @@ function copyToClipboard(value: string, label: string): void {
   };
 
   const nav = navigator as Navigator & { clipboard?: { writeText: (s: string) => Promise<void> } };
+
   if (nav.clipboard && typeof nav.clipboard.writeText === 'function') {
     nav.clipboard.writeText(value).then(onOk).catch(function (err: unknown) {
       onFail(err instanceof Error ? err.message : String(err));
@@ -66,6 +67,7 @@ function copyToClipboard(value: string, label: string): void {
     ta.select();
     const ok = document.execCommand('copy');
     document.body.removeChild(ta);
+
     if (ok) {
       onOk();
     } else {
@@ -80,6 +82,7 @@ function copyToClipboard(value: string, label: string): void {
 /** Escape a single CSV field per RFC 4180 (quote if needed, double inner quotes). */
 function csvField(value: string | number): string {
   const s = value == null ? '' : String(value);
+
   if (/[",\r\n]/.test(s)) {
     return '"' + s.replace(/"/g, '""') + '"';
   }
@@ -174,6 +177,7 @@ function roleBadge(role: string): string {
   const norm = role.toLowerCase();
   let color = '#94a3b8';
   let bg = 'rgba(148,163,184,0.15)';
+
   if (norm === 'admin' || norm === 'owner') {
     color = '#fde68a';
     bg = 'rgba(180,83,9,0.35)';
@@ -195,6 +199,7 @@ function roleBadge(role: string): string {
 function initialsFor(m: WorkspaceMember): string {
   const src = (m.display_name || m.username || m.email || m.user_id || '?').trim();
   const parts = src.split(/[\s@._-]+/).filter(Boolean);
+
   if (parts.length === 0) {
     return '?';
   }
@@ -242,6 +247,7 @@ function shareBarHtml(pct: number): string {
   const label = clamped >= 10 ? clamped.toFixed(0) + '%' : clamped.toFixed(1) + '%';
   // Color ramp: low=slate, mid=cyan, high=emerald, dominant=amber
   let fill = '#475569';
+
   if (clamped >= 40) {
     fill = '#f59e0b';
   } else if (clamped >= 20) {
@@ -327,6 +333,7 @@ function buildBodyHtml(state: PanelState): string {
 
 function loadMoreRowHtml(state: PanelStateSuccess): string {
   const nextLimit = nextPageLimit(state.limit);
+
   if (nextLimit === null) {
     return '';
   }
@@ -357,6 +364,7 @@ function nextPageLimit(current: number): number | null {
 
 function headerHtml(wsName: string, state: PanelState): string {
   let countText = '';
+
   if (state.kind === 'success') {
     countText = state.members.length === state.total
       ? state.members.length + ' member' + (state.members.length === 1 ? '' : 's')
@@ -447,6 +455,7 @@ interface PanelHandlerStore {
 
 function ensurePanelEl(): HTMLDivElement {
   let el = document.getElementById(PANEL_ID) as HTMLDivElement | null;
+
   if (el) {
     return el;
   }
@@ -479,6 +488,7 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
   const vh = window.innerHeight;
   let left = x;
   let top = y;
+
   if (left + r.width > vw - 8) {
     left = Math.max(8, vw - r.width - 8);
   }
@@ -512,8 +522,10 @@ function render(el: HTMLElement, wsName: string, state: PanelState): void {
   // Issue 130: Wire chip input if footer is expanded
   const footer = findFooter(el);
   const chipContainer = footer?.querySelector('#marco-chip-input-container');
+
   if (chipContainer) {
     const inviteBtn = footer?.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
+
     if (inviteBtn) {
       inviteBtn.disabled = true;
     }
@@ -533,6 +545,7 @@ function render(el: HTMLElement, wsName: string, state: PanelState): void {
 
   // v3.30.0 — make the panel draggable by its header.
   const handle = el.querySelector('[data-marco-drag-handle="1"]') as HTMLElement | null;
+
   if (handle) {
     makeDraggable(el, handle);
   }
@@ -544,14 +557,17 @@ function findFooter(el: HTMLElement): HTMLElement | null {
 
 function swapFooter(el: HTMLElement, expanded: boolean): void {
   const footer = findFooter(el);
+
   if (!footer) {
     return;
   }
 
   footer.innerHTML = expanded ? footerFormHtml() : footerCollapsedHtml();
+
   if (expanded) {
     const chipContainer = footer.querySelector('#marco-chip-input-container');
     const inviteBtn = footer.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
+
     if (inviteBtn) {
       inviteBtn.disabled = true;
     }
@@ -566,6 +582,7 @@ function swapFooter(el: HTMLElement, expanded: boolean): void {
         (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails = emails;
       }
     });
+
     if (chipContainer) {
       chipContainer.appendChild(chipInput);
     }
@@ -577,6 +594,7 @@ const MEMBER_MENU_ID = 'marco-ws-member-menu';
 
 function closeMemberActionMenu(): void {
   const existing = document.getElementById(MEMBER_MENU_ID);
+
   if (existing) {
     existing.remove();
   }
@@ -614,6 +632,7 @@ function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userI
 
   const row = panelEl.querySelector('[data-marco-member-row][data-marco-user-id="' + cssEscape(userId) + '"]') as HTMLElement | null;
   const prevOpacity = row ? row.style.opacity : '';
+
   if (row) {
     row.style.opacity = '0.4';
     row.style.pointerEvents = 'none';
@@ -627,6 +646,7 @@ function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userI
     .catch(function (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast('❌ Remove failed: ' + msg, 'error');
+
       if (row) {
         row.style.opacity = prevOpacity;
         row.style.pointerEvents = '';
@@ -636,6 +656,7 @@ function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userI
 
 function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string, userId: string, label: string, nextRole: MemberRoleType): void {
   const verb = nextRole === 'owner' ? 'Promote to Owner' : 'Demote to Member';
+
   if (!window.confirm(verb + ': "' + label + '"?')) {
     return;
   }
@@ -654,6 +675,7 @@ function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string
 // CSS.escape polyfill (Safari/older WebView).
 function cssEscape(value: string): string {
   const css = (window as unknown as { CSS?: { escape?: (s: string) => string } }).CSS;
+
   if (css && typeof css.escape === 'function') {
     return css.escape(value);
   }
@@ -667,6 +689,7 @@ function bindMenuDismissHandlers(menu: HTMLElement): void {
   setTimeout(function () {
     const outside = function (e: MouseEvent): void {
       const t = e.target as Node | null;
+
       if (t && menu.contains(t)) {
         return;
       }
@@ -701,6 +724,7 @@ function openMemberActionMenu(
   label: string,
 ): void {
   closeMemberActionMenu();
+
   if (!userId) {
     return;
   }
@@ -786,11 +810,13 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
 function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): void {
   el.onclick = function (e: MouseEvent): void {
     const target = (e.target as HTMLElement | null)?.closest('[data-marco-action]') as HTMLElement | null;
+
     if (!target) {
       return;
     }
 
     const action = target.getAttribute('data-marco-action');
+
     if (action === 'close') {
       e.stopPropagation();
       hideWsMembersPanel();
@@ -803,6 +829,7 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       const store = el as HTMLElement & PanelHandlerStore;
       const current = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
       const next = nextPageLimit(current);
+
       if (next === null) {
         return;
       }
@@ -813,6 +840,7 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       e.stopPropagation();
       const store = el as HTMLElement & PanelHandlerStore;
       const latest = store._marcoMembersLatest;
+
       if (!latest || latest.members.length === 0) {
         showToast('⏳ Members not loaded yet', 'info');
 
@@ -845,12 +873,14 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
   // current (wsId, wsName) pair so reopening the panel for a different
   // workspace does not stack invite handlers.
   const store = el as HTMLElement & PanelHandlerStore;
+
   if (store._marcoMembersSubmit) {
     el.removeEventListener('submit', store._marcoMembersSubmit);
   }
 
   const submitHandler = function (e: Event): void {
     const target = e.target as HTMLElement | null;
+
     if (!target) {
       return;
     }
@@ -870,6 +900,7 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
 
 function attachDismissHandlers(el: HTMLElement): void {
   const store = el as HTMLElement & PanelHandlerStore;
+
   if (store._marcoMembersOutsideClick) {
     document.removeEventListener('mousedown', store._marcoMembersOutsideClick, true);
   }
@@ -880,6 +911,7 @@ function attachDismissHandlers(el: HTMLElement): void {
 
   const outside = function (e: MouseEvent): void {
     const t = e.target as Node | null;
+
     if (!t) {
       return;
     }
@@ -908,11 +940,13 @@ function attachDismissHandlers(el: HTMLElement): void {
 
 function detachDismissHandlers(): void {
   const el = document.getElementById(PANEL_ID);
+
   if (!el) {
     return;
   }
 
   const store = el as HTMLElement & PanelHandlerStore;
+
   if (store._marcoMembersOutsideClick) {
     document.removeEventListener('mousedown', store._marcoMembersOutsideClick, true);
     delete store._marcoMembersOutsideClick;
@@ -955,6 +989,7 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
 /** Silent refetch — used by the credit-poll subscription. Skips loading state. */
 function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
   const store = el as HTMLElement & PanelHandlerStore;
+
   if (store._marcoMembersAutoBusy) {
     return;
   }
@@ -999,6 +1034,7 @@ export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: n
   detachDismissHandlers();
   const store = el as HTMLElement & PanelHandlerStore;
   store._marcoMembersLimit = DEFAULT_MEMBERS_PAGE_LIMIT;
+
   // Drop any prior credit-poll subscription before resubscribing for this ws.
   if (store._marcoMembersPollUnsub) {
     store._marcoMembersPollUnsub();
@@ -1021,8 +1057,10 @@ export function hideWsMembersPanel(): void {
   detachDismissHandlers();
   closeMemberActionMenu(); // v3.4.3 (task 14) — drop any open action menu
   const el = document.getElementById(PANEL_ID);
+
   if (el) {
     const store = el as HTMLElement & PanelHandlerStore;
+
     if (store._marcoMembersPollUnsub) {
       store._marcoMembersPollUnsub();
       store._marcoMembersPollUnsub = undefined;

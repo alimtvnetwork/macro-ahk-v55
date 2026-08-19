@@ -39,6 +39,7 @@ interface MaybeChromeGlobal {
 export function getExtensionChrome(): ChromeLike | null {
   const maybe = globalThis as MaybeChromeGlobal;
   const candidate = maybe.chrome;
+
   if (candidate === undefined) {
     return null;
   }
@@ -70,6 +71,7 @@ export const extensionChrome: ChromeLike | null = getExtensionChrome();
  */
 export function requireExtension(scope: string): ChromeLike | null {
   const chrome = getExtensionChrome();
+
   if (chrome !== null) {
     return chrome;
   }

@@ -101,6 +101,7 @@ export const messageRegistry = {
       }
 
       const handler = handlers.get(raw.type);
+
       if (!handler) {
         const err = new AppError({
           code: "UNKNOWN_MESSAGE_TYPE",
@@ -144,6 +145,7 @@ export const messageClient = {
       payload,
     };
     const reply = (await chrome.runtime.sendMessage(envelope)) as MessageReply<TRes>;
+
     if (!isReply(reply)) {
       throw new AppError({
         code: "MALFORMED_REPLY",
@@ -186,11 +188,13 @@ export const pageBridge = {
         }
 
         const data = event.data;
+
         if (!isReply(data) || data.id !== envelope.id) {
           return;
         }
 
         window.removeEventListener("message", listener);
+
         if (data.isSuccess) {
           resolve(data.result as TRes);
         } else {
@@ -219,6 +223,7 @@ export function mountContentBridge(): void {
     }
 
     const data = event.data;
+
     if (!isEnvelope(data)) {
       return;
     }

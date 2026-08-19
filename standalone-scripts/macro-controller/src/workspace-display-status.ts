@@ -103,6 +103,7 @@ function clampDays(n: number): number {
 
 export function formatRefillLabel(daysToRefill: number): string {
   const d = clampDays(daysToRefill);
+
   if (d === 0) {
     return 'Refill today';
   }
@@ -112,6 +113,7 @@ export function formatRefillLabel(daysToRefill: number): string {
 
 export function formatExpireSoonLabel(daysUntilExpiry: number): string {
   const d = clampDays(daysUntilExpiry);
+
   if (d === 0) {
     return 'Expire today';
   }
@@ -121,6 +123,7 @@ export function formatExpireSoonLabel(daysUntilExpiry: number): string {
 
 export function formatExpiredLabel(daysSinceExpiry: number): string {
   const d = clampDays(daysSinceExpiry);
+
   if (d === 0) {
     return 'Expired';
   }
@@ -131,6 +134,7 @@ export function formatExpiredLabel(daysSinceExpiry: number): string {
 /** Issue 118: past-due countdown label — 'Today' when 0d, 'Passed Nd' otherwise. */
 export function formatPassedLabel(daysPassed: number): string {
   const d = clampDays(daysPassed);
+
   if (d === 0) {
     return 'Today';
   }
@@ -176,6 +180,7 @@ export function pickPastDueTone(daysPassed: number): WorkspaceDisplayTone {
  */
 function classifyPastDueExpiring(source: PastDueExpiringStatus): WorkspaceDisplayStatus {
   const daysPassed = source.daysSince;
+
   if (clampDays(daysPassed) >= PAST_DUE_GRACE_DAYS) {
     return {
       kind: 'expired-hard',
@@ -303,6 +308,7 @@ function buildCanceledTooltip(source: WorkspaceStatus): string {
  */
 function computeDaysUntilExpiry(ws: WorkspaceCredit, nowMs?: number): number | null {
   const days = daysToRefillForWs(ws, nowMs);
+
   if (days === null) {
     return null;
   }

@@ -63,6 +63,7 @@ function runPostBuild(dict: WorkspaceDictionary): void {
 
 function installRebuildObserver(): () => void {
   const list = resolveElement(HomepageDashboardVariables.WorkspacesList.full);
+
   if (!list) {
     return () => undefined;
   }

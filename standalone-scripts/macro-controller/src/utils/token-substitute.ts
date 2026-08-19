@@ -58,6 +58,7 @@ export function substituteToken(body: string, key: string, value: string | numbe
   }
 
   const numValue = Number(value);
+
   if (!Number.isInteger(numValue)) {
     throw new DiagnosticError('PROMPT_TOKEN_E001', { key, value, reason: 'value must be an integer' }, new Error('value must be an integer'));
   }

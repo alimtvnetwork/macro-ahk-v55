@@ -21,6 +21,7 @@ export interface CreditEnrichmentFanOutResult {
 function isCreditBalanceTarget(workspace: WorkspaceCredit): boolean {
   const plan = mapPlanFromWire(workspace.plan);
   const hasFetchPlan = shouldFetchCreditBalanceForPlan(plan);
+
   if (hasFetchPlan === false) {
     return false;
   }

@@ -147,6 +147,7 @@ interface CaptureResult {
 async function capture(page: Page, selector: string): Promise<CaptureResult> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
+
     if (!el) {
       throw new Error('Fixture element missing: ' + sel);
     }
@@ -164,6 +165,7 @@ async function captureRelative(
   return page.evaluate(({ sel, anc }) => {
     const el = document.querySelector(sel);
     const an = document.querySelector(anc);
+
     if (!el || !an) {
       throw new Error('Fixture element missing');
     }
@@ -176,6 +178,7 @@ async function captureRelative(
 async function captureVariableName(page: Page, selector: string): Promise<string> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
+
     if (!el) {
       throw new Error('Fixture element missing: ' + sel);
     }

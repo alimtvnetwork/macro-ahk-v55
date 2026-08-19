@@ -107,6 +107,7 @@ async function globalSetup() {
   // Step 2: Re-resolve extension dir AFTER the build (build:extension may have created it).
   const builtDir = pickExtensionDir();
   const builtManifest = path.join(builtDir, 'manifest.json');
+
   if (!existsSync(builtDir) || !existsSync(builtManifest)) {
     throw new Error(
       `Build output missing.\n` +
@@ -141,11 +142,13 @@ async function globalSetup() {
 
   // Required permissions
   const permissions = manifest.permissions as string[] | undefined;
+
   if (!Array.isArray(permissions)) {
     throw new Error('manifest.json "permissions" must be an array');
   }
 
   const missing = REQUIRED_PERMISSIONS.filter(p => !permissions.includes(p));
+
   if (missing.length > 0) {
     throw new Error(
       `manifest.json missing required permissions: ${missing.join(', ')}`
@@ -154,6 +157,7 @@ async function globalSetup() {
 
   // Service worker background
   const background = manifest.background as Record<string, unknown> | undefined;
+
   if (!background?.service_worker) {
     console.warn('⚠️  manifest.json has no background.service_worker — SW rehydration tests will fail');
   }

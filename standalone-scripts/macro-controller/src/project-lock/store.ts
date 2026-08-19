@@ -39,6 +39,7 @@ function buildKey(ev: ProjectLockEvent): string {
 function parseRow(raw: string): ProjectLockEvent | null {
   try {
     const parsed = JSON.parse(raw) as Partial<ProjectLockEvent>;
+
     if (
       typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.ProjectId === 'string' &&
@@ -62,6 +63,7 @@ function parseRow(raw: string): ProjectLockEvent | null {
  */
 export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boolean> {
   const kv = getKv();
+
   if (!kv) {
     logError(
       'LoopProjectLockEvent.persist',
@@ -76,12 +78,14 @@ export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boo
       const recent = await kv.list(KEY_PREFIX + ev.WorkspaceId + ':' + ev.ProjectId + ':');
       for (const entry of recent) {
         const prev = parseRow(entry.value);
+
         if (prev === null) {
           continue;
         }
 
         const sameReason = prev.Reason === ev.Reason;
         const within = Math.abs(prev.DetectedAtMs - ev.DetectedAtMs) <= DUPLICATE_WINDOW_MS;
+
         if (sameReason && within) {
           return false;
         }
@@ -111,6 +115,7 @@ export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boo
 /** Enumerate all persisted project-lock events, oldest first. */
 export async function listProjectLockEvents(): Promise<ReadonlyArray<ProjectLockEvent>> {
   const kv = getKv();
+
   if (!kv || typeof kv.list !== 'function') {
     return [];
   }
@@ -120,6 +125,7 @@ export async function listProjectLockEvents(): Promise<ReadonlyArray<ProjectLock
     const rows: ProjectLockEvent[] = [];
     for (const entry of entries) {
       const row = parseRow(entry.value);
+
       if (row !== null) {
         rows.push(row);
       }

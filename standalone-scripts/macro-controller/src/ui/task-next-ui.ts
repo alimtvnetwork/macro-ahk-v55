@@ -96,6 +96,7 @@ export function saveTaskNextSettings(deps: TaskNextDeps) {
 function matchPromptBySlug<T extends { slug?: string }>(entries: ReadonlyArray<T>, aliases: Set<string>): T | null {
   for (const entry of entries) {
     const entrySlug = (entry.slug || '').toLowerCase();
+
     if (aliases.has(entrySlug)) {
       return entry;
     }
@@ -120,6 +121,7 @@ function matchPromptById<T extends { id?: string }>(entries: ReadonlyArray<T>, a
 function matchPromptByDerivedSlugOrKeywords<T extends { name?: string }>(entries: ReadonlyArray<T>, aliases: Set<string>): T | null {
   for (const entry of entries) {
     const derivedSlug = (entry.name || '').toLowerCase().replace(/\s+/g, '-');
+
     if (aliases.has(derivedSlug)) {
       return entry;
     }
@@ -127,6 +129,7 @@ function matchPromptByDerivedSlugOrKeywords<T extends { name?: string }>(entries
 
   for (const entry of entries) {
     const name = (entry.name || '').toLowerCase();
+
     if (name.indexOf('next') !== -1 && (name.indexOf('task') !== -1 || name.indexOf('step') !== -1)) {
       return entry;
     }
@@ -149,6 +152,7 @@ export function findNextTasksPrompt(deps: TaskNextDeps) {
   const found = matchPromptBySlug(entries, aliases)
     || matchPromptById(entries, aliases)
     || matchPromptByDerivedSlugOrKeywords(entries, aliases);
+
   if (found) {
     log('Task Next: Found prompt: "' + found.name + '" (slug=' + (found.slug || '—') + ', id=' + (found.id || '—') + ')', 'info');
 
@@ -166,6 +170,7 @@ function findButtonByXPath(): HTMLElement | null {
   try {
     const result = document.evaluate(taskNextState.settings.buttonXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     const btn = result.singleNodeValue;
+
     if (btn && (btn as HTMLElement).tagName && !(btn as HTMLButtonElement).disabled) {
       return btn as HTMLElement;
     }
@@ -192,11 +197,13 @@ function findButtonBySelectors(): HTMLElement | null {
   for (const selector of sendSelectors) {
     try {
       const el = document.querySelector(selector);
+
       if (!el) {
         continue;
       }
 
       const btn = el.tagName === 'BUTTON' ? el : el.closest('button');
+
       if (!btn || (btn as HTMLButtonElement).disabled) {
         continue;
       }
@@ -235,6 +242,7 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
     const projectId = resolveTaskQueueProjectId();
     const queue = getPersistentTaskQueue();
     const item = await queue.dequeue(projectId);
+
     if (!item) {
       return { selection: null, failed: false };
     }
@@ -257,6 +265,7 @@ export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, PromptSub
 
 function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextPromptSelection | null {
   const prompt = findNextTasksPrompt(deps);
+
   if (!prompt || !prompt.text) {
     return null;
   }
@@ -281,6 +290,7 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
       return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); 
     },
   );
+
   if (res.ok === false || !res.value || res.value.length === 0) {
     return null;
   }
@@ -289,6 +299,7 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
   const active = rows.find(function(r) {
     return r.IsDefault === 1; 
   }) ?? rows[0];
+
   if (!active || !active.Body) {
     return null;
   }
@@ -300,16 +311,19 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
 
 async function selectTaskNextPrompt(deps: TaskNextDeps, n: number): Promise<TaskNextPromptResult> {
   const queued = await dequeueTaskNextPrompt();
+
   if (queued.failed || queued.selection) {
     return queued;
   }
 
   const legacy = selectLegacyTaskNextPrompt(deps, n);
+
   if (legacy) {
     return { selection: legacy, failed: false };
   }
 
   const dbSel = await selectDbTaskNextPrompt(n);
+
   if (dbSel) {
     return { selection: dbSel, failed: false };
   }
@@ -342,11 +356,13 @@ export async function runTaskNextLoop(deps: TaskNextDeps, count: number): Promis
   // the submit button and must NOT loop / chain follow-up tasks. Repeated
   // submissions belong exclusively to the `🔁 Repeat` control.
   const requested = Math.max(1, Math.floor(count) || 1);
+
   if (requested > 1) {
     log('Task Next: multi-run blocked; pasting once only. Use Repeat Start for repeats.', 'warn');
   }
 
   const result = await selectTaskNextPrompt(deps, requested);
+
   if (result.failed || !result.selection) {
     return;
   }
@@ -442,6 +458,7 @@ function tryTaskNextSubmitButton(TAG: string): boolean {
 
 export function dispatchTaskNextSubmit(): boolean {
   const TAG = 'Task Next';
+
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
     log('Task Next: submit aborted — document/body not available', 'warn');
@@ -450,6 +467,7 @@ export function dispatchTaskNextSubmit(): boolean {
   }
 
   const form = getTaskNextForm(TAG);
+
   if (tryTaskNextSubmitForm(TAG, form)) {
     return true;
   }
@@ -473,6 +491,7 @@ const TASK_NEXT_QUEUE_LABEL = 'Task Next queue';
 
 async function resolveCyclePrompt(_deps: TaskNextDeps, legacyText: string): Promise<{ text: string; source: TaskNextPromptSource; remaining: number }> {
   const dequeued = await dequeueTaskNextPrompt();
+
   if (dequeued.failed) {
     return { text: '', source: 'queue', remaining: -1 };
   }
@@ -497,6 +516,7 @@ async function runTaskNextCycle(
 
   const cycleStart = Date.now();
   const chosen = await resolveCyclePrompt(deps, legacyPromptText);
+
   if (chosen.remaining === -1) {
     return 'paste-failed';
   }
@@ -507,6 +527,7 @@ async function runTaskNextCycle(
 
   const promptsCfg = deps.getPromptsConfig();
   const outcome = pasteIntoEditor(chosen.text, promptsCfg, deps.getByXPath);
+
   if (String(outcome) === 'failed') {
     return 'paste-failed';
   }
@@ -520,6 +541,7 @@ async function runTaskNextCycle(
       return taskNextState.cancelled; 
     },
   });
+
   if (idleResult === 'cancelled') {
     return 'idle-cancelled';
   }
@@ -537,6 +559,7 @@ async function runTaskNextCycle(
 
 function reportCycleStatus(status: CycleStatusType, k: number, n: number): void {
   const at = (k + 1) + '/' + n;
+
   if (status === 'cancelled') {
     showPasteToast('🛑 Task Next queue cancelled at ' + k + '/' + n, false);
     log('[TaskNextQueue] cancelled at cycle ' + k + '/' + n, 'warn');
@@ -560,6 +583,7 @@ function reportCycleStatus(status: CycleStatusType, k: number, n: number): void 
 
 export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promise<void> {
   const n = Math.max(1, Math.floor(count) || 1);
+
   if (n === 1) {
     runTaskNextLoop(deps, 1);
 
@@ -600,6 +624,7 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
   try {
     for (let k = 0; k < n; k++) {
       const status = await runTaskNextCycle(deps, legacyText, k, n, waitForLovableIdle);
+
       if (status !== 'ok') {
         reportCycleStatus(status, k, n);
         break; 

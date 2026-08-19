@@ -144,12 +144,14 @@ function createDropZoneHandlers(
 
 function handleDragEnter(event: DragEvent, state: DropZoneState, setActive: (on: boolean) => void): void {
   const noFiles = !hasFiles(event.dataTransfer);
+
   if (noFiles) {
     return; 
   }
 
   event.preventDefault();
   state.dragDepth += 1;
+
   if (state.dragDepth === 1) {
     setActive(true); 
   }
@@ -157,11 +159,13 @@ function handleDragEnter(event: DragEvent, state: DropZoneState, setActive: (on:
 
 function handleDragOver(event: DragEvent): void {
   const noFiles = !hasFiles(event.dataTransfer);
+
   if (noFiles) {
     return; 
   }
 
   event.preventDefault();
+
   if (event.dataTransfer !== null) {
     event.dataTransfer.dropEffect = "copy"; 
   }
@@ -169,6 +173,7 @@ function handleDragOver(event: DragEvent): void {
 
 function handleDragLeave(state: DropZoneState, setActive: (on: boolean) => void): void {
   state.dragDepth = Math.max(0, state.dragDepth - 1);
+
   if (state.dragDepth === 0) {
     setActive(false); 
   }
@@ -184,6 +189,7 @@ function handleDrop(
   state.dragDepth = 0;
   setActive(false);
   const files = event.dataTransfer?.files;
+
   if (files === undefined || files.length === 0) {
     return; 
   }
@@ -242,6 +248,7 @@ async function handleFile(file: File, options: DropZoneOptions): Promise<void> {
   const onError = options.OnError ?? ((err, name) => console.warn(`[DropZone] ${name}: ${err.message}`));
   try {
     const mimeKind = detectMimeKind(file);
+
     if (mimeKind === null) {
       throw new Error(`Unsupported file type — accepts .csv / .json (got '${file.name}')`);
     }
@@ -256,6 +263,7 @@ async function handleFile(file: File, options: DropZoneOptions): Promise<void> {
 
 function detectMimeKind(file: File): "csv" | "json" | null {
   const lower = file.name.toLowerCase();
+
   if (lower.endsWith(".csv"))  {
     return "csv";  
   }

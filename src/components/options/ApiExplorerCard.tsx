@@ -88,6 +88,7 @@ export function ApiExplorerCard() {
       const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
       const docs = result.endpoints ?? [];
       setEndpoints(docs);
+
       if (docs.length > 0) {
         const initialType = docs.some((doc) => doc.type === selectedType)
           ? selectedType

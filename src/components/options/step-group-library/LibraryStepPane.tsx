@@ -107,6 +107,7 @@ function StepPaneActions(props: LibraryStepPaneProps) {
 
 function StepList(props: LibraryStepPaneProps) {
   const { activeGroup, activeSteps, stepWaits } = props;
+
   if (activeGroup === null) {
     return (
       <div className="flex h-full items-center justify-center px-4 py-12 text-sm text-muted-foreground">

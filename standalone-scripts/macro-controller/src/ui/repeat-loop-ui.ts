@@ -111,16 +111,19 @@ function hydrate(): void {
     }
 
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return;
     }
 
     const parsed: unknown = JSON.parse(raw);
+
     if (!parsed || typeof parsed !== 'object') {
       return;
     }
 
     const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown; collapsed?: unknown };
+
     if (typeof o.count === 'number' && o.count >= 1) {
       repeatLoopState.count = Math.max(1, Math.min(1000, Math.floor(o.count)));
     }
@@ -157,6 +160,7 @@ function notify(): void {
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
   if (!target) {
     return '';
   }
@@ -166,6 +170,7 @@ function readEditorText(): string {
 
 function setEditorText(text: string): boolean {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
   if (!target) {
     return false;
   }
@@ -188,6 +193,7 @@ async function waitForSubmitReady(maxMs: number): Promise<HTMLElement | null> {
     }
 
     const btn = findAddToTasksButton();
+
     if (btn && !(btn as HTMLButtonElement).disabled) {
       return btn;
     }
@@ -210,6 +216,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
+
     if (!processing) {
       return;
     }
@@ -321,6 +328,7 @@ function tryRepeatSubmitButton(TAG: string): boolean {
 
 function dispatchChatSubmit(): boolean {
   const TAG = 'Repeat';
+
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
     log('Repeat: submit aborted — document/body not available', 'warn');
@@ -329,6 +337,7 @@ function dispatchChatSubmit(): boolean {
   }
 
   const form = getRepeatChatForm(TAG);
+
   if (tryRepeatSubmitForm(TAG, form)) {
     return true;
   }
@@ -339,6 +348,7 @@ function dispatchChatSubmit(): boolean {
 /** Returns true if iteration submitted successfully; false if loop should break. */
 async function submitOneIteration(): Promise<boolean> {
   setPhase('submitting', 0);
+
   if (!setEditorText(repeatLoopState.capturedText)) {
     showPasteToast('❌ Repeat: editor not found — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
 
@@ -346,6 +356,7 @@ async function submitOneIteration(): Promise<boolean> {
   }
 
   const btn = await waitForSubmitReady(MAX_WAIT_MS);
+
   if (!btn) {
     if (!repeatLoopState.cancelled) {
       showPasteToast('❌ Repeat: submit button never ready — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
@@ -380,6 +391,7 @@ async function runRepeatLoopAsync(): Promise<void> {
     }
 
     const ok = await submitOneIteration();
+
     if (!ok) {
       break;
     }
@@ -420,6 +432,7 @@ export function startRepeatLoop(): void {
   }
 
   const text = readEditorText().trim();
+
   if (!text) {
     showPasteToast('❌ Repeat: chat box is empty — type or paste something first', true);
 
@@ -545,6 +558,7 @@ function buildCountInput(): HTMLInputElement {
   // creeping by ±1 or stopping at the current max.
   input.addEventListener('keydown', function (e: KeyboardEvent) {
     const cur = repeatLoopState.count;
+
     if (cur < PRESET_INLINE_MAX) {
       return;
     }
@@ -565,6 +579,7 @@ function buildCountInput(): HTMLInputElement {
     }
 
     const cur = repeatLoopState.count;
+
     if (cur < PRESET_INLINE_MAX) {
       return;
     }
@@ -599,6 +614,7 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'true');
     document.addEventListener('click', onDocClick, true);
     document.addEventListener('keydown', onKey, true);
+
     if (typeof window !== 'undefined') {
       window.addEventListener('pagehide', close);
     }
@@ -610,6 +626,7 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'false');
     document.removeEventListener('click', onDocClick, true);
     document.removeEventListener('keydown', onKey, true);
+
     if (typeof window !== 'undefined') {
       window.removeEventListener('pagehide', close);
     }
@@ -617,6 +634,7 @@ function wireTogglePopover(
 
   function onDocClick(e: Event): void {
     const target = e.target as Node | null;
+
     if (!target || wrap.contains(target)) {
       return;
     }
@@ -936,6 +954,7 @@ interface ControlRefs {
 function formatPhaseTimer(): string {
   const now = Date.now();
   const phase = repeatLoopState.phase;
+
   if (phase === 'idle') {
     return '';
   }
@@ -969,6 +988,7 @@ function renderControl(refs: ControlRefs): void {
   const stopGradient = 'linear-gradient(135deg,hsl(var(--destructive)) 0%,hsl(var(--destructive)) 50%,#7f1d1d 100%)';
   const startShadow = '0 2px 6px rgba(79,70,229,0.45), inset 0 1px 0 rgba(255,255,255,0.18)';
   const stopShadow = '0 2px 6px rgba(220,38,38,0.45), inset 0 1px 0 rgba(255,255,255,0.18)';
+
   if (repeatLoopState.running) {
     refs.action.textContent = '⏹ Stop';
     refs.action.style.background = stopGradient;
@@ -1156,6 +1176,7 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
     const collapsed = opts.useLocalCollapse && repeatLoopState.collapsed;
     root.style.display = collapsed ? 'none' : 'flex';
     pill.style.display = collapsed ? 'inline-flex' : 'none';
+
     if (collapsed) {
       const status = repeatLoopState.running
         ? '🔁 ' + repeatLoopState.completed + '/' + repeatLoopState.count
@@ -1180,6 +1201,7 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
     }
 
     repeatLoopState.subscribers.delete(render);
+
     if (typeof window !== 'undefined') {
       window.removeEventListener('pagehide', teardown);
     }
@@ -1196,6 +1218,7 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
       render();
     }
   }, 1000);
+
   if (typeof window !== 'undefined') {
     window.addEventListener('pagehide', teardown, { once: true });
   }
@@ -1222,12 +1245,14 @@ function tryMountInline(): boolean {
   }
 
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
   if (!target) {
     return false;
   }
 
   // Mount above the closest form, falling back to the editor's parent.
   const host = (target.closest && target.closest('form')) || target.parentElement;
+
   if (!host || !host.parentElement) {
     return false;
   }
@@ -1235,6 +1260,7 @@ function tryMountInline(): boolean {
   // v4.16+: mount into shared frame body so PlanTierType/Next/Repeat share one visual
   // unit and one minimize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
+
   if (!framed) {
     return false;
   }

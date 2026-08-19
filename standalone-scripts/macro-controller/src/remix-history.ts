@@ -31,6 +31,7 @@ const entries: RemixHistoryEntry[] = [];
 
 export function recordRemix(entry: RemixHistoryEntry): void {
   entries.unshift(entry);
+
   if (entries.length > MAX_HISTORY_ENTRIES) {
     entries.length = MAX_HISTORY_ENTRIES;
   }
@@ -50,6 +51,7 @@ export function clearRemixHistory(): void {
 
 function removeHistoryPanel(): void {
   const old = document.getElementById(HISTORY_PANEL_ID);
+
   if (old) {
     old.remove();
   }
@@ -159,6 +161,7 @@ export function showRemixHistoryPanel(anchorEl: HTMLElement): void {
     }
 
     const lastRow = panel.lastElementChild as HTMLElement | null;
+
     if (lastRow) {
       lastRow.style.borderBottom = 'none';
     }

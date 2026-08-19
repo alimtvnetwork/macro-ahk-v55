@@ -65,6 +65,7 @@ export function filterUserAddedEntries(
 export async function exportPromptsToJson(options: ExportPromptsOptions = {}): Promise<void> {
   try {
     const rawEntries = await collectAllExportEntries();
+
     if (rawEntries.length === 0) {
       showToast('No prompts found to export', 'warn');
 
@@ -72,6 +73,7 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     }
 
     const { kept: entries, defaultsSkipped } = filterUserAddedEntries(rawEntries);
+
     if (entries.length === 0) {
       showToast('Only default prompts exist, nothing to export', 'warn');
 
@@ -87,6 +89,7 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
       ...(promptOrder.length > 0 ? { promptOrder } : {}),
     });
     const skipped = entries.length - bundle.entryCount;
+
     if (bundle.entryCount === 0) {
       showToast('All prompts are flagged excludeFromExport, nothing to export', 'warn');
 
@@ -133,12 +136,14 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
   const seenSlugs = new Set<string>();
   for (const e of entries) {
     const slug = e.slug;
+
     if (!slug || seenSlugs.has(slug)) {
       continue;
     }
 
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
+
     if (res.ok === false || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
@@ -274,6 +279,7 @@ export function validatePromptEntryDetailed(
   }
 
   const e = entry as LoosePromptShape;
+
   if (typeof e.name !== 'string' || !e.name.trim()) {
     return { entry: null, field: 'name', reason: 'missing or empty string' };
   }
@@ -292,6 +298,7 @@ export function validatePromptEntryDetailed(
     // and must never be re-created via bundle import.
     isDefault: false,
   };
+
   if (typeof e.slug === 'string') {
     out.slug = e.slug.trim();
   }
@@ -351,6 +358,7 @@ export function mergePrompts(
   imported.forEach((imp) => {
     const key = imp.slug || imp.name;
     const target = mergedMap.get(key);
+
     if (target) {
       // v4.400.0: never let an import overwrite a default row. Defaults are
       // owned by the re-seed pipeline and are excluded from bundles anyway;
@@ -401,6 +409,7 @@ export interface ParsedPromptsResult {
 
 function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: string[]): ParsedPromptsResult {
   const result = validatePromptsBundle(raw);
+
   if (!result.isValid || !result.bundle) {
     errors.push(...result.errors);
 
@@ -409,6 +418,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
 
   result.bundle.entries.forEach((entry, index) => {
     const detail = validatePromptEntryDetailed(entry);
+
     if (detail.entry) {
       valid.push(detail.entry);
     } else {
@@ -417,6 +427,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
     }
   });
   const out: ParsedPromptsResult = { valid, errors };
+
   if (result.bundle.revisions && result.bundle.revisions.length > 0) {
     out.revisions = result.bundle.revisions;
   }
@@ -450,6 +461,7 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
   const array = Array.isArray(raw) ? raw : [raw];
   array.forEach((item, index) => {
     const detail = validatePromptEntryDetailed(item);
+
     if (detail.entry) {
       valid.push(detail.entry);
     } else {
@@ -564,6 +576,7 @@ async function commitRevisions(
     }
 
     const bucket = groups.get(r.Slug);
+
     if (bucket) {
       bucket.push(r);
     } else {
@@ -578,6 +591,7 @@ async function commitRevisions(
   let groupsDone = 0;
   for (const [slug, rows] of groups) {
     const res = await insertImportedRevisions(slug, rows);
+
     if (res.isSuccess) {
       inserted += rows.length;
     } else {
@@ -629,6 +643,7 @@ function _finalizeImportResults(
   results.total = total;
   results.updated += dbUpserted;
   results.errors.push(...dbErrors);
+
   if (defaultsProtected > 0) {
     results.defaultsProtected = (results.defaultsProtected ?? 0) + defaultsProtected;
   }
@@ -731,6 +746,7 @@ async function collectExistingRoleSlugs(dbEntries: readonly CachedPromptEntry[])
   const existing = new Set<string>();
   for (const role of rolesTouched) {
     const res = await listPromptsByRole(role);
+
     if (res.isSuccess && res.value) {
       for (const r of res.value) {
         if (r.Slug) {
@@ -753,6 +769,7 @@ function tallyPreviewEntries(
   for (const e of dbEntries) {
     if (e.slug && isPromptRole(e.role)) {
       committedSlugs.add(e.slug);
+
       if (existing.has(e.role + ':' + e.slug)) {
         updated++;
       } else {
@@ -772,6 +789,7 @@ function tallyPreviewRevisions(
 ): { revisions: number; orphan: number } {
   let revs = 0;
   let orphan = 0;
+
   if (revisions) {
     for (const r of revisions) {
       if (committedSlugs.has(r.Slug)) {

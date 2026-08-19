@@ -216,6 +216,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   setInterval(() => {
     const mgr = TaskQueueManager.getInstance();
     const pauseBtn = section.querySelector('.task-pause-btn') as HTMLButtonElement;
+
     if (pauseBtn) {
       const isPaused = mgr.isPaused();
       const isStopped = mgr.isStopped();
@@ -309,6 +310,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
 
   clearBtn.oncontextmenu = async (e) => {
     e.preventDefault();
+
     if (confirm('Clear ALL tasks from the queue?')) {
       const { clearAllTasks } = await import('../task-queue');
       await clearAllTasks();
@@ -325,6 +327,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
 
 async function _updateQueueCountdown(badge: HTMLElement, title?: HTMLElement): Promise<void> {
   const until = getQueueDelayUntil();
+
   if (until > Date.now()) {
     const secs = Math.ceil((until - Date.now()) / 1000);
     badge.textContent = `⏳ ${secs}s`;
@@ -356,9 +359,11 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
   
   // Update bulk row visibility
   const bulkRow = document.getElementById('task-queue-bulk-row');
+
   if (bulkRow) {
     bulkRow.style.display = _selectionMode && _selectedTaskIds.size > 0 ? 'flex' : 'none';
     const bulkCount = document.getElementById('task-bulk-count');
+
     if (bulkCount) {
       bulkCount.textContent = `${_selectedTaskIds.size} selected`;
     }
@@ -376,6 +381,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
     const isSelected = _selectedTaskIds.has(task.id);
     
     item.style.cssText = `padding:6px 8px;background:${isSelected ? 'rgba(59,130,246,0.15)' : cPanelBgAlt};border-radius:4px;border-left:3px solid ${getStatusColor(task.status)};display:flex;flex-direction:column;gap:2px;position:relative;cursor:pointer;transition:all 0.1s;`;
+
     if (_activeQueueTab === 'history' && !isSelected) {
       item.style.opacity = '0.7';
     }
@@ -442,6 +448,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
     
     const status = document.createElement('div');
     status.style.cssText = `font-size:9px;color:${getStatusColor(task.status)};font-weight:600;min-width:40px;text-align:right;`;
+
     if (task.status === 'hold' && task.holdUntil) {
       const secs = Math.max(0, Math.ceil((task.holdUntil - Date.now()) / 1000));
       status.textContent = `HOLD ${secs}s`;
@@ -583,6 +590,7 @@ function showTaskDetailModal(task: MacroTask): void {
 
   body.appendChild(field('Project', task.projectName));
   body.appendChild(field('Prompt', task.prompt, true));
+
   if (task.error) {
     body.appendChild(field('Error', task.error));
   }
@@ -609,6 +617,7 @@ function getStatusColor(status: MacroTask['status']): string {
 /** Opens a full-screen modal showing the task queue. */
 export function showTaskQueueModal(): void {
   const existing = document.getElementById('macro-task-queue-modal');
+
   if (existing) {
     existing.remove();
 

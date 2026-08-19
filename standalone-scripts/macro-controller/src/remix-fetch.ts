@@ -39,6 +39,7 @@ const cache: Record<string, CacheEntry> = {};
 
 function getSdk(op: string): MarcoSDKApiModule {
   const sdk = window.marco;
+
   if (!sdk || !sdk.api) {
     throwDiagnostic('REMIX_FETCH_E001', { missingApi: 'window.marco.api', op });
   }
@@ -52,6 +53,7 @@ function getSdk(op: string): MarcoSDKApiModule {
  */
 export async function fetchWorkspaceProjectNames(wsId: string, force = false): Promise<Set<string>> {
   const op = 'fetchWorkspaceProjectNames';
+
   if (!wsId) {
     throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
   }
@@ -60,11 +62,13 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const isForceFetch = force;
   const hasCachedEntry = existing !== undefined && existing !== null;
   const isCacheValid = hasCachedEntry && (Date.now() - existing!.fetchedAt < PROJECTS_TTL_MS);
+
   if (!isForceFetch && isCacheValid) {
     return existing!.names;
   }
 
   const api = getSdk(op);
+
   if (!api.projects || typeof api.projects.list !== 'function') {
     throwDiagnostic('REMIX_FETCH_E001', { missingApi: 'window.marco.api.projects.list', op });
   }
@@ -72,6 +76,7 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const url = '/workspaces/' + wsId + '/projects';
   log('[Remix] GET ' + url, 'delegate');
   const resp = await api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
+
   if (resp.ok === false) {
     const preview = JSON.stringify(resp.data).substring(0, 200);
     logError('Remix', 'projects.list HTTP ' + resp.status + ': ' + preview);
@@ -85,6 +90,7 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
     const hasProject = p !== null && p !== undefined;
     const hasName = hasProject && typeof (p as Record<string, unknown>)?.name === 'string';
     const hasNonEmptyName = hasName && ((p as Record<string, unknown>)?.name as string).trim().length > 0;
+
     if (hasNonEmptyName) {
       names.add(((p as Record<string, unknown>)?.name as string).trim().toLowerCase());
     }
@@ -119,6 +125,7 @@ export async function submitRemix(opts: {
 }): Promise<{ newProjectId: string; redirectUrl: string; raw: RemixInitResponse }> {
   const op = 'submitRemix';
   const api = getSdk(op);
+
   if (!api.remix || typeof api.remix.init !== 'function') {
     throwDiagnostic('REMIX_FETCH_E001', { missingApi: 'window.marco.api.remix.init', op });
   }
@@ -143,6 +150,7 @@ export async function submitRemix(opts: {
   const redirectUrl = String(data.redirect_url || data.url || '');
   // Bust the cache so the new name shows up on the next collision check.
   clearProjectNamesCache(opts.workspaceId);
+
   // Issue 129 Step 6 — persist the new project pointer so the post-remix
   // navigation + sentinel-invalidation steps can pick it up.
   if (newProjectId && redirectUrl) {

@@ -35,6 +35,7 @@ describe("waitForElement", () => {
       { Doc: document },
     );
     expect(out.Ok).toBe(true);
+
     if (out.Ok) {
       expect(out.ResolvedKind).toBe("Css"); 
     }
@@ -53,6 +54,7 @@ describe("waitForElement", () => {
     const origQuerySelector = document.querySelector.bind(document);
     const spy = vi.spyOn(document, "querySelector").mockImplementation((sel: string) => {
       polls += 1;
+
       if (polls >= 3) {
         document.body.innerHTML = `<div id="late"></div>`; 
       }
@@ -83,6 +85,7 @@ describe("waitForElement", () => {
       { Doc: document, Sleep: sleep, Now: now },
     );
     expect(out.Ok).toBe(false);
+
     if (out.Ok === false) {
       expect(out.Reason).toBe("Timeout");
       expect(out.Detail).toContain("#missing");
@@ -96,6 +99,7 @@ describe("waitForElement", () => {
       { Doc: document },
     );
     expect(out.Ok).toBe(true);
+
     if (out.Ok) {
       expect(out.ResolvedKind).toBe("XPath"); 
     }

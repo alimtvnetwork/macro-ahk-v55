@@ -96,6 +96,7 @@ export function _resetLibraryImportFailureDedupeForTests(): void {
 function logLibraryImportFailure(key: string, detail: string, cause?: unknown): void {
   const now = Date.now();
   const prev = _libraryImportFailureDedupe.get(key);
+
   if (prev && (now - prev.lastAt) < IMPORT_LOG_DEDUPE_WINDOW_MS) {
     prev.suppressed += 1;
     prev.lastAt = now;
@@ -106,6 +107,7 @@ function logLibraryImportFailure(key: string, detail: string, cause?: unknown): 
   const suffix = prev && prev.suppressed > 0
     ? ' [dedup: ' + String(prev.suppressed) + ' identical entr' + (prev.suppressed === 1 ? 'y' : 'ies') + ' suppressed in prior ' + String(IMPORT_LOG_DEDUPE_WINDOW_MS / 1000) + 's window]'
     : '';
+
   if (cause === undefined) {
     logError(LOG_SCOPE, 'handleImportFile[' + key + ']: ' + detail + suffix);
   } else {
@@ -178,6 +180,7 @@ function formatFileSize(bytes: number): string {
   }
 
   const kb = bytes / 1024;
+
   if (kb < 1024) {
     return kb.toFixed(1) + ' KB';
   }
@@ -207,6 +210,7 @@ export async function openPromptLibraryModal(): Promise<void> {
   // users start inside the dialog. Focus trap (Tab wrap) is enforced in
   // handleModalKey via focusable-node cycling.
   const closeBtn = refs.root.querySelector<HTMLButtonElement>('button[data-testid="library-close"]');
+
   if (closeBtn) {
     closeBtn.focus();
   }
@@ -224,6 +228,7 @@ function focusableNodesIn(root: HTMLElement): HTMLElement[] {
 
 function closeExisting(): void {
   const prev = document.getElementById(MODAL_ID) as HTMLDivElement | null;
+
   if (!prev) {
     return;
   }
@@ -231,6 +236,7 @@ function closeExisting(): void {
   // Teardown any listeners we attached in buildShell (memory: timer-and-observer-teardown).
   const key = (prev as unknown as { __keyHandler?: (e: KeyboardEvent) => void }).__keyHandler;
   const ph = (prev as unknown as { __pagehideHandler?: () => void }).__pagehideHandler;
+
   if (key) {
     document.removeEventListener('keydown', key, true);
   }
@@ -418,6 +424,7 @@ function buildShell(): ModalRefs {
   chooseFileBtn.style.cssText = btnCss('#243050', '#e6edf7');
   chooseFileBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+
     if (importBtn.disabled) {
       return;
     }
@@ -569,6 +576,7 @@ function wireImportExport(
   });
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
+
     if (!file) {
       return;
     }
@@ -601,6 +609,7 @@ function wirePreviewImport(
   });
   previewFileInput.addEventListener('change', () => {
     const file = previewFileInput.files && previewFileInput.files[0];
+
     if (!file) {
       return;
     }
@@ -619,11 +628,13 @@ async function computeAndRenderPreview(
   fileInput: HTMLInputElement,
 ): Promise<void> {
   const panel = refs.previewPanel;
+
   if (!panel) {
     return;
   }
 
   const invalid = validateImportFile(file);
+
   if (invalid) {
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
@@ -639,6 +650,7 @@ async function computeAndRenderPreview(
   try {
     const text = await file.text();
     const parsed = parsePromptsText(text);
+
     if (parsed.errors.length > 0 && parsed.valid.length === 0) {
       const friendly = buildFriendlyImportError(parsed.errors, file.name);
       refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
@@ -651,6 +663,7 @@ async function computeAndRenderPreview(
     const roleSel = refs.importRoleSelect?.value;
     const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
     const opts: Parameters<typeof previewPromptImport>[1] = {};
+
     if (roleFilter) {
       opts.roleFilter = roleFilter;
     }
@@ -790,6 +803,7 @@ function wireImportDropZone(
 ): void {
   const onDragOver = (e: DragEvent): void => {
     e.preventDefault();
+
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = importBtn.disabled ? 'none' : 'copy';
     }
@@ -797,6 +811,7 @@ function wireImportDropZone(
 
   const onDrop = (e: DragEvent): void => {
     e.preventDefault();
+
     // Concurrency guard mirrors the click path: if an import is running,
     // the drop is a no-op so we never queue a second performPromptImport.
     if (importBtn.disabled) {
@@ -804,6 +819,7 @@ function wireImportDropZone(
     }
 
     const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+
     if (!file) {
       return;
     }
@@ -884,6 +900,7 @@ function renderImportErrorBanner(
   p.textContent = hint;
   refs.errorBanner.appendChild(h);
   refs.errorBanner.appendChild(p);
+
   if (onRetry) {
     const retryBtn = document.createElement('button');
     retryBtn.type = 'button';
@@ -967,12 +984,14 @@ function renderPartialImportErrors(
   parseErrors: readonly string[],
 ): void {
   const panel = refs.partialErrorsPanel;
+
   if (!panel) {
     return;
   }
 
   panel.textContent = '';
   const total = entryErrors.length + parseErrors.length;
+
   if (total === 0) {
     panel.hidden = true;
     panel.style.display = 'none';
@@ -1008,6 +1027,7 @@ function renderPartialImportErrors(
 
 function clearPartialImportErrors(refs: ModalRefs): void {
   const panel = refs.partialErrorsPanel;
+
   if (!panel) {
     return;
   }
@@ -1060,6 +1080,7 @@ function validateImportFile(file: File): { headline: string; hint: string } | nu
   const type = (file.type || '').toLowerCase();
   const extOk = name.endsWith('.json');
   const typeOk = type === '' || type === 'application/json' || type === 'text/json' || type.endsWith('+json');
+
   if (!extOk || !typeOk) {
     return {
       headline: 'Unsupported file type',
@@ -1101,6 +1122,7 @@ async function handleImportFile(
   // Client-side validation runs BEFORE we flip UI state so an invalid file
   // does not put the modal into an "in-flight" state that must be unwound.
   const invalid = validateImportFile(file);
+
   if (invalid) {
     refs.status.textContent = (retrying ? 'Retry rejected: ' : 'Import rejected: ') + invalid.headline;
     // Validation failures are deterministic for the same file, so no Retry
@@ -1132,6 +1154,7 @@ async function handleImportFile(
   try {
     const text = await file.text();
     const parsed = parsePromptsText(text);
+
     if (parsed.errors.length > 0 && parsed.valid.length === 0) {
       const friendly = buildFriendlyImportError(parsed.errors, file.name);
       refs.status.textContent = 'Import parse failed: ' + friendly.headline;
@@ -1149,6 +1172,7 @@ async function handleImportFile(
     const roleSel = refs.importRoleSelect?.value;
     const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
     const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite: true };
+
     if (roleFilter) {
       importOpts.roleFilter = roleFilter;
     }
@@ -1213,6 +1237,7 @@ async function handleImportFile(
     importBtn.removeAttribute('aria-busy');
     hideImportSpinner(importBtn, originalLabel);
     hideImportProgress(refs);
+
     // Focus restoration MUST run after re-enabling: a disabled control
     // cannot receive programmatic focus in the browser.
     if (focusAfter === 'import') {
@@ -1317,6 +1342,7 @@ function buildImportProgressElement(): {
 
 function showImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -1332,6 +1358,7 @@ function showImportProgress(refs: ModalRefs): void {
 
 function hideImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -1343,6 +1370,7 @@ function hideImportProgress(refs: ModalRefs): void {
 // eslint-disable-next-line max-lines-per-function
 function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
   const p = refs.importProgress;
+
   if (!p) {
     return;
   }
@@ -1399,6 +1427,7 @@ function restoreFocusToImportButton(refs: ModalRefs): void {
   }
 
   const btn = refs.root.querySelector<HTMLButtonElement>('[data-testid="library-import"]');
+
   if (btn) {
     btn.focus();
   }
@@ -1415,6 +1444,7 @@ function focusErrorBanner(refs: ModalRefs): void {
   }
 
   const banner = refs.errorBanner;
+
   if (!banner || banner.hidden) {
     return;
   }
@@ -1450,6 +1480,7 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
   }
 
   const saveCombo = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
+
   if (saveCombo && refs.activeEditor) {
     e.preventDefault();
     refs.activeEditor.save();
@@ -1465,6 +1496,7 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
 /** PlanTierType-22 G7 a11y: Tab focus trap keeps keyboard focus within the modal. */
 function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const nodes = focusableNodesIn(root);
+
   if (nodes.length === 0) {
     return;
   }
@@ -1473,6 +1505,7 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const last = nodes[nodes.length - 1]!;
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
+
   if (!insideModal) {
     e.preventDefault();
     first.focus();
@@ -1586,6 +1619,7 @@ function rolesToRender(view: ViewState): PromptRole[] {
 
 function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[] {
   const copy = rows.slice();
+
   if (mode === 'name') {
     return copy.sort((a, b) => a.Name.localeCompare(b.Name));
   }
@@ -1627,6 +1661,7 @@ async function buildRoleSection(refs: ModalRefs, role: PromptRole): Promise<HTML
   wrap.appendChild(h);
 
   const result = await listPromptsByRole(role);
+
   if (result.isFail || !result.value) {
     const err = document.createElement('div');
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
@@ -1637,6 +1672,7 @@ async function buildRoleSection(refs: ModalRefs, role: PromptRole): Promise<HTML
   }
 
   const rows = result.value;
+
   if (rows.length === 0) {
     const empty = document.createElement('div');
     empty.textContent = '(no rows)';
@@ -1658,6 +1694,7 @@ function buildRowContainer(refs: ModalRefs, row: PromptRow): HTMLElement {
   const container = document.createElement('div');
   container.dataset.promptContainer = String(row.Id);
   container.appendChild(buildRowEl(refs, row, container));
+
   if (refs.view.expandedIds.has(row.Id)) {
     container.appendChild(buildPreviewEl(row));
   }
@@ -1754,6 +1791,7 @@ function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElement): HTM
   right.appendChild(editBtn);
   right.appendChild(quickEditBtn);
   right.appendChild(dupBtn);
+
   if (canReset) {
     const resetBtn = document.createElement('button');
     resetBtn.textContent = 'Γå║ Reset';
@@ -1790,6 +1828,7 @@ function buildRowEl(refs: ModalRefs, row: PromptRow, container: HTMLElement): HT
 // eslint-disable-next-line max-lines-per-function
 async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<void> {
   const seedBody = getSeedBodyForSlug(row.Slug);
+
   if (seedBody === null) {
     logError(LOG_SCOPE, 'reset-to-default called for non-seeded slug=' + row.Slug, new Error('no seed body'));
     refs.status.textContent = 'Reset unavailable: ' + row.Slug + ' is not a seeded prompt.';
@@ -1804,6 +1843,7 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
   }
 
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
+
   if (!ok) {
     return;
   }
@@ -1816,6 +1856,7 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
+
     if (result.isFail) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
@@ -1837,6 +1878,7 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
 
 function togglePreview(refs: ModalRefs, row: PromptRow, container: HTMLElement): void {
   const isOpen = refs.view.expandedIds.has(row.Id);
+
   if (isOpen) {
     refs.view.expandedIds.delete(row.Id);
   } else {
@@ -2022,6 +2064,7 @@ async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: EditSave
       replaceKey: payload.replaceKey,
       replaceValues: payload.replaceValues,
     });
+
     if (res.isFail) {
       refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'edit save failed', res);
@@ -2042,6 +2085,7 @@ async function handleSetDefault(refs: ModalRefs, row: PromptRow): Promise<void> 
   refs.status.textContent = 'Setting default: ' + row.Slug + ' ...';
   try {
     const res = await setDefaultPromptForRole(row.Id, row.Role);
+
     if (res.isFail) {
       refs.status.textContent = 'Set-default failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'setDefault failed', res);
@@ -2067,6 +2111,7 @@ async function handleDuplicate(refs: ModalRefs, row: PromptRow): Promise<void> {
       body: row.Body,
       role: row.Role,
     });
+
     if (res.isFail) {
       refs.status.textContent = 'Duplicate failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'duplicate failed', res);
@@ -2085,6 +2130,7 @@ async function handleDuplicate(refs: ModalRefs, row: PromptRow): Promise<void> {
 // eslint-disable-next-line max-lines-per-function
 async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
   const ok = window.confirm('Delete prompt "' + row.Name + '" (' + row.Slug + ')?');
+
   if (!ok) {
     return;
   }
@@ -2092,6 +2138,7 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
   refs.status.textContent = 'Deleting: ' + row.Slug + ' ...';
   try {
     const res = await deletePromptById(row.Id);
+
     if (res.isFail) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
@@ -2141,12 +2188,14 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
  */
 export function uniqueDupSlug(baseSlug: string, existing: readonly string[] = []): string {
   const base = baseSlug.endsWith('-copy') || baseSlug.includes('-copy-') ? baseSlug : baseSlug + '-copy';
+
   if (!existing.includes(base)) {
     return base;
   }
 
   for (let i = 2; i < 1000; i++) {
     const candidate = baseSlug + '-copy-' + i;
+
     if (!existing.includes(candidate)) {
       return candidate;
     }

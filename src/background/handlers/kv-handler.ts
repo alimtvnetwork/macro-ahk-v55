@@ -44,6 +44,7 @@ function requireGroupKey(
 
 function getDb(): SqlJsDatabase {
   const manager = dbManager;
+
   if (!manager) {
     throw new Error("[kv] DbManager not bound");
   }
@@ -61,6 +62,7 @@ export async function handleKvGet(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(projectId, key)) {
     return missingFieldError(!projectId ? "projectId" : "key", "kv:get");
   }
@@ -70,6 +72,7 @@ export async function handleKvGet(
     "SELECT Value FROM ProjectKv WHERE ProjectId = ? AND Key = ?",
     [projectId, key],
   ));
+
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };
   }
@@ -88,6 +91,7 @@ export async function handleKvSet(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown; value?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(projectId, key)) {
     return missingFieldError(!projectId ? "projectId" : "key", "kv:set");
   }
@@ -100,6 +104,7 @@ export async function handleKvSet(
     `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
     [projectId, key, stringified],
   ));
+
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };
   }
@@ -115,12 +120,14 @@ export async function handleKvDelete(
   const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(projectId, key)) {
     return missingFieldError(!projectId ? "projectId" : "key", "kv:delete");
   }
 
   const db = getDb();
   const wrap = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]));
+
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };
   }
@@ -136,6 +143,7 @@ export async function handleKvList(
   const raw = message as MessageRequest & { projectId?: unknown };
   const projectId = requireProjectId(raw.projectId);
   const isProjectIdMissing = !projectId;
+
   if (isProjectIdMissing) {
     return missingFieldError("projectId", "kv:list");
   }

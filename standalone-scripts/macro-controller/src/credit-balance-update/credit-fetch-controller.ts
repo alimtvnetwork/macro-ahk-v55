@@ -71,11 +71,13 @@ function clampTimeoutMs(value: number): number {
 function readRawGrantTypeBalances(ws: WorkspaceCredit): ReadonlyArray<object> | null {
   const wireRaw = toWireWorkspaceRaw(ws.rawApi);
   const fromRawApi = wireRaw?.grant_type_balances;
+
   if (Array.isArray(fromRawApi)) {
     return fromRawApi as ReadonlyArray<object>;
   }
 
   const fromRaw = ws.raw?.grant_type_balances;
+
   if (Array.isArray(fromRaw)) {
     return fromRaw as ReadonlyArray<object>;
   }
@@ -98,6 +100,7 @@ function isNonZeroGrantRow(row: object): boolean {
   const keys = ['granted', 'remaining', 'total_granted', 'total_remaining', 'total_billing_period_used', 'daily_limit', 'daily_remaining'];
   for (const k of keys) {
     const v = Number(r[k]);
+
     if (Number.isFinite(v) && v > 0) {
       return true;
     }
@@ -118,12 +121,14 @@ function isNonZeroGrantRow(row: object): boolean {
  */
 export function isUnifiedBillingWorkspace(ws: WorkspaceCredit): boolean {
   const wirePlan = String(ws.plan || '').trim().toLowerCase();
+
   if (wirePlan.startsWith('ktlo_')) {
     return true;
   }
 
   const wireRaw = toWireWorkspaceRaw(ws.rawApi);
   const candidate: unknown = wireRaw?.experimental_features ?? ws.raw?.experimental_features;
+
   if (candidate === null || typeof candidate !== 'object') {
     return false;
   }
@@ -144,6 +149,7 @@ export function hasInlineCredits(ws: WorkspaceCredit): boolean {
   }
 
   const balances = readRawGrantTypeBalances(ws);
+
   if (Array.isArray(balances) && balances.some(isNonZeroGrantRow)) {
     return true;
   }
@@ -205,6 +211,7 @@ function cacheTtlFor(result: CreditFetchResult): number {
 
 async function fetchWithSingleAuthRetry(ws: WorkspaceCredit, plan: PlanTierType): Promise<CreditFetchResult> {
   const first = await fetchWorkspaceCreditBalance({ workspaceId: ws.id, plan, timeoutMs });
+
   if (first.outcome !== CreditFetchOutcomeType.AuthError) {
     return first;
   }
@@ -215,6 +222,7 @@ async function fetchWithSingleAuthRetry(ws: WorkspaceCredit, plan: PlanTierType)
 async function requestCreditsUncached(ws: WorkspaceCredit, plan: PlanTierType): Promise<CreditFetchResult> {
   const result = await fetchWithSingleAuthRetry(ws, plan);
   void writeCreditBalanceUpdateCache(ws.id, result, cacheTtlFor(result));
+
   if (result.balance) {
     overlayCreditBalanceOnWorkspace(ws, result.balance);
   }
@@ -228,6 +236,7 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
   }
 
   const plan = mapPlanFromWire(ws.plan);
+
   if (!shouldFetchCreditBalanceForPlan(plan)) {
     return buildResult(CreditFetchOutcomeType.Skipped, null, 'PlanTierType does not require /credit-balance');
   }
@@ -237,6 +246,7 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
   }
 
   const cached = await readCreditBalanceUpdateCache(ws.id);
+
   if (cached) {
     if (cached.balance) {
       overlayCreditBalanceOnWorkspace(ws, cached.balance);
@@ -246,6 +256,7 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
   }
 
   const existing = inFlight.get(ws.id);
+
   if (existing) {
     return existing;
   }
@@ -305,6 +316,7 @@ export function __resetCreditFetchControllerForTests(): void {
   timeoutMs = DEFAULT_TIMEOUT_MS;
   inFlight.clear();
   creditResolvedListeners.clear();
+
   if (settingsUnsubscribe) {
     settingsUnsubscribe();
     settingsUnsubscribe = null;

@@ -35,6 +35,7 @@ function useGroupSubmit(
 
   const handleSave = useCallback(async () => {
     const isInvalidName = !name.trim();
+
     if (isInvalidName) {
       toast.error("Group name is required");
 
@@ -53,6 +54,7 @@ function useGroupSubmit(
       } as never);
       const hasCascaded = result.cascadedCount > 0;
       let cascadeMsg = "";
+
       if (hasCascaded) {
         cascadeMsg = ` — settings pushed to ${result.cascadedCount} project(s)`;
       }

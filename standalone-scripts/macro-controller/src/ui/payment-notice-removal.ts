@@ -57,6 +57,7 @@ function isCompactPaymentNotice(element: HTMLElement): boolean {
   }
 
   const text = element.textContent ?? '';
+
   if (text.length > MAX_NOTICE_TEXT_LENGTH) {
     return false;
   }
@@ -98,6 +99,7 @@ function locateKnownXpathNotice(): HTMLElement | null {
 function locatePaymentNotices(): HTMLElement[] {
   const matches = new Set<HTMLElement>();
   const known = locateKnownXpathNotice();
+
   if (known !== null) {
     matches.add(known);
   }
@@ -130,6 +132,7 @@ function hidePaymentNotice(element: HTMLElement): boolean {
 function runExistingPaymentBannerHider(): void {
   try {
     const api = (window as PaymentBannerHiderWindow).PaymentBannerHider;
+
     if (api && typeof api.check === 'function') {
       api.check();
     }

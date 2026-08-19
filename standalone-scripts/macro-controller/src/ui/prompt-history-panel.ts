@@ -182,6 +182,7 @@ function captureLastImportFailure(key: string, detail: string): void {
 
 function renderLastImportError(): void {
   const host = _lastImportErrorEl;
+
   if (!host) {
     return;
   }
@@ -191,6 +192,7 @@ function renderLastImportError(): void {
   }
 
   const err = _lastImportError;
+
   if (!err) {
     host.style.display = 'none';
 
@@ -263,6 +265,7 @@ export async function openPromptHistoryPanel(
 
   const roleLabel = input.role === 'plan' ? 'PlanTierType' : input.role === 'next' ? 'Next' : String(input.role);
   const slug = await resolveSlug(input, getDef, listRole);
+
   if (slug === null) {
     toast(
       '❌ History (last 20 edits): no ' + roleLabel + ' prompt found in database yet. '
@@ -274,6 +277,7 @@ export async function openPromptHistoryPanel(
   }
 
   const revResult = await listRev(slug);
+
   if (revResult.ok === false || !revResult.value) {
     const reason = revResult.error ?? 'unknown';
     reportHistoryFailure(
@@ -301,14 +305,17 @@ async function resolveSlug(
   }
 
   const def = await getDef(input.role);
+
   if (def.isSuccess && def.value) {
     return def.value.Slug;
   }
 
   // Fallback 1: any existing row for this role (default flag may have been lost).
   const listed = await listRole(input.role);
+
   if (listed.isSuccess && Array.isArray(listed.value) && listed.value.length > 0) {
     const first = listed.value[0];
+
     if (first && typeof first.Slug === 'string' && first.Slug.length > 0) {
       return first.Slug;
     }
@@ -316,6 +323,7 @@ async function resolveSlug(
 
   // Fallback 2: canonical seed slug so History still works before first save.
   const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === input.role && r.isDefault);
+
   if (seed) {
     return seed.slug;
   }
@@ -335,6 +343,7 @@ async function resolveSlug(
 
 function removeExistingPanel(doc: Document): void {
   const existing = doc.getElementById(PANEL_ID);
+
   if (existing && existing.parentNode) {
     existing.parentNode.removeChild(existing);
   }
@@ -538,11 +547,13 @@ export function sortRevisions(
   copy.sort((a, b) => {
     if (key === 'reason') {
       const cmp = a.Reason.localeCompare(b.Reason);
+
       if (cmp !== 0) {
         return factor * cmp;
       }
     } else {
       const cmp = a.CreatedAt - b.CreatedAt;
+
       if (cmp !== 0) {
         return factor * cmp;
       }
@@ -573,6 +584,7 @@ export function filterRevisions(
     }
 
     const isImported = r.PromptId === IMPORTED_REVISION_PROMPT_ID;
+
     if (filter.imported === 'only' && !isImported) {
       return false;
     }
@@ -723,12 +735,14 @@ function installRovingTabindex(toolbar: HTMLElement): void {
   const controls = Array.from(
     toolbar.querySelectorAll<HTMLButtonElement>('button'),
   );
+
   if (controls.length === 0) {
     return;
   }
 
   for (let i = 0; i < controls.length; i += 1) {
     const btn = controls[i];
+
     if (!btn) {
       continue;
     }
@@ -739,6 +753,7 @@ function installRovingTabindex(toolbar: HTMLElement): void {
       const key = ev.key;
       const isHoriz = key === 'ArrowRight' || key === 'ArrowLeft';
       const isEdge = key === 'Home' || key === 'End';
+
       if (!isHoriz && !isEdge) {
         return;
       }
@@ -746,6 +761,7 @@ function installRovingTabindex(toolbar: HTMLElement): void {
       ev.preventDefault();
       const currentIdx = controls.indexOf(btn);
       let nextIdx = currentIdx;
+
       if (key === 'ArrowRight') {
         nextIdx = (currentIdx + 1) % controls.length;
       } else if (key === 'ArrowLeft') {
@@ -757,6 +773,7 @@ function installRovingTabindex(toolbar: HTMLElement): void {
       }
 
       const next = controls[nextIdx];
+
       if (!next) {
         return;
       }
@@ -785,6 +802,7 @@ function buildSortButton(
   btn.setAttribute('type', 'button');
   btn.setAttribute('data-role', 'sort-button');
   btn.setAttribute('data-sort-key', key);
+
   if (active) {
     btn.setAttribute('data-sort-dir', state.sortDir);
   }
@@ -793,6 +811,7 @@ function buildSortButton(
   btn.setAttribute(ATTR_ARIA_LABEL,
     'Sort by ' + label + (active ? ', currently ' + dirText + '. Activate to reverse.' : '. Activate to sort.'));
   btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+
   if (active) {
     btn.setAttribute('aria-sort', state.sortDir === 'asc' ? 'ascending' : 'descending');
   }
@@ -852,6 +871,7 @@ function buildRevisionRow(
   meta.appendChild(name);
   meta.appendChild(when);
   meta.appendChild(reason);
+
   if (rev.PromptId === IMPORTED_REVISION_PROMPT_ID) {
     const imported = doc.createElement('span');
     imported.textContent = 'imported';
@@ -949,6 +969,7 @@ async function handleRestoreUpdate(
       replaceKey: preImage.replaceKey,
       replaceValues: preImage.replaceValues,
     });
+
     if (revert.ok === false) {
       const reason = revert.error ?? 'unknown';
       reportHistoryFailure(
@@ -987,6 +1008,7 @@ function handleRestoreInsert(
   undoToast(successMsg, async () => {
     clearPendingRestoreUndo();
     const del = await deleteFn(newId);
+
     if (del.ok === false) {
       const reason = del.error ?? 'unknown';
       reportHistoryFailure(
@@ -1022,11 +1044,13 @@ async function handleRestore(
     'Restore "' + rev.Name + '" from ' + formatWhen(rev.CreatedAt) + '?\n\n'
         + 'The current body will itself be recorded as a new revision, so you can undo this restore later from the same history panel.',
   );
+
   if (!proceed) {
     return;
   }
 
   const listResult = await listByRole(role);
+
   if (listResult.ok === false || !listResult.value) {
     const reason = listResult.error ?? 'unknown';
     reportHistoryFailure(
@@ -1052,6 +1076,7 @@ async function handleRestore(
     replaceKey: rev.ReplaceKey,
     replaceValues,
   });
+
   if (upsertResult.ok === false) {
     const reason = upsertResult.error ?? 'unknown';
     reportHistoryFailure(
@@ -1067,10 +1092,12 @@ async function handleRestore(
   const successMsg = '✅ Restored "' + rev.Name + '" from ' + formatWhen(rev.CreatedAt);
   const undoTimeoutMs = 10_000;
   const now = Date.now();
+
   if (preImage) {
     await handleRestoreUpdate(rev, preImage, upsert, undoToast, toast, successMsg, undoTimeoutMs, now);
   } else {
     const newId = upsertResult.value;
+
     if (typeof newId !== 'number') {
       removeExistingPanel(doc);
 
@@ -1090,6 +1117,7 @@ function parseReplaceValues(raw: string): string[] {
 
   try {
     const parsed: unknown = JSON.parse(raw);
+
     if (Array.isArray(parsed)) {
       return parsed.filter((v): v is string => typeof v === 'string');
     }
@@ -1175,6 +1203,7 @@ function downloadRevisionExport(
     anchor.setAttribute('data-testid', 'history-export-anchor');
     doc.body.appendChild(anchor);
     anchor.click();
+
     if (anchor.parentNode) {
       anchor.parentNode.removeChild(anchor);
     }
@@ -1225,11 +1254,13 @@ function validateImportEnvelope(
   }
 
   const p = parsed as Record<string, unknown>;
+
   if (p['schemaVersion'] !== 1) {
     return { ok: false, error: 'Unsupported schemaVersion (expected 1, got ' + String(p['schemaVersion']) + ')' };
   }
 
   const pSlug = p['slug'];
+
   if (typeof pSlug !== 'string' || pSlug.trim() === '') {
     return { ok: false, error: 'Missing or invalid slug' };
   }
@@ -1239,11 +1270,13 @@ function validateImportEnvelope(
   }
 
   const pRole = p['role'];
+
   if (pRole !== expectedRole) {
     return { ok: false, error: 'Role mismatch: file is "' + String(pRole) + '", panel is "' + expectedRole + '"' };
   }
 
   const pRevisions = p['revisions'];
+
   if (!Array.isArray(pRevisions)) {
     return { ok: false, error: 'revisions is not an array' };
   }
@@ -1265,6 +1298,7 @@ function coerceImportRow(
   const rawBody = raw['Body'];
   const rawName = raw['Name'];
   const rawSlug = raw['Slug'];
+
   if (typeof rawBody !== 'string' || typeof rawName !== 'string' || typeof rawSlug !== 'string') {
     return { ok: false, error: 'revisions[' + String(index) + '] missing required fields' };
   }
@@ -1307,6 +1341,7 @@ export function parseRevisionImportPayload(
   }
 
   const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
+
   if (envelope.ok === false) {
     return { ok: false, error: envelope.error };
   }
@@ -1314,6 +1349,7 @@ export function parseRevisionImportPayload(
   const rows: ImportedRevisionInput[] = [];
   for (let i = 0; i < envelope.revisions.length; i += 1) {
     const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
+
     if (coerced.ok === false) {
       return { ok: false, error: coerced.error };
     }
@@ -1349,6 +1385,7 @@ function validateImportFile(
   const looksLikeJson = /\.json$/i.test(file.name)
         || file.type === 'application/json'
         || file.type === '';
+
   if (!looksLikeJson) {
     const detail = 'name=' + file.name + ' type=' + file.type;
     captureLastImportFailure('wrong-type', 'rejected non-JSON file: ' + detail + ' slug=' + slug + ' role=' + role);
@@ -1373,6 +1410,7 @@ async function writeImportedRevisions(
 ): Promise<void> {
   const snapshotResult = await getMaxRevisionId();
   const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
+
   if (snapshotResult.ok === false) {
     logHistoryDiagnostic(
       'HISTORY_INTERNAL_E001',
@@ -1381,6 +1419,7 @@ async function writeImportedRevisions(
   }
 
   const write = await insertImportedRevisions(slug, rows);
+
   if (write.ok === false) {
     const reason = write.error ?? '?';
     reportHistoryFailure(
@@ -1396,9 +1435,11 @@ async function writeImportedRevisions(
   const count = write.value ?? 0;
   const successMsg = '✓ Imported ' + String(count) + ' revision(s). Reopen History to see them.';
   const undoToast = deps.undoToast ?? showUndoToast;
+
   if (snapshotResult.isSuccess && count > 0) {
     undoToast(successMsg, async () => {
       const del = await deleteImportedRevisionsAfter(slug, sinceId);
+
       if (del.ok === false) {
         const reason = del.error ?? 'unknown';
         reportHistoryFailure(
@@ -1425,11 +1466,13 @@ async function handleImportFile(
   deps: HistoryPanelDeps,
 ): Promise<void> {
   const file = input.files && input.files[0];
+
   if (!file) {
     return;
   }
 
   const toast = deps.toast ?? showToast;
+
   if (!validateImportFile(file, slug, role, toast)) {
     input.value = '';
 
@@ -1439,6 +1482,7 @@ async function handleImportFile(
   try {
     const text = await file.text();
     const parsed = parseRevisionImportPayload(text, slug, role);
+
     if (parsed.ok === false || !parsed.rows) {
       const reason = parsed.error ?? 'unknown';
       captureLastImportFailure('parse', 'parse rejected: ' + reason);

@@ -85,6 +85,7 @@ function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapsh
   }
 
   const snap: RequestDetailSnapshot = {};
+
   if (rd.op !== undefined) {
     snap.op = rd.op;
   }
@@ -140,6 +141,7 @@ function resolveCorrelationId(input: EmitDiagnosticToastInput): string {
   }
 
   const rdId = input.opts?.requestDetail?.correlationId;
+
   if (typeof rdId === 'string' && rdId.length > 0) {
     return rdId;
   }
@@ -154,11 +156,13 @@ function formatLine(evt: DiagnosticToastEvent): string {
     'level=' + evt.level,
     'cid=' + evt.correlationId,
   ];
+
   if (evt.noStop) {
     parts.push('noStop=true');
   }
 
   const rd = evt.requestDetail;
+
   if (rd) {
     if (rd.op) {
       parts.push('op=' + rd.op);
@@ -242,8 +246,10 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
     correlationId: correlationId,
   };
   const rd = redactRequestDetail(input.opts?.requestDetail);
+
   if (rd) {
     const isMissingCorrelationId = !rd.correlationId;
+
     // Ensure the snapshot always carries the same id as the event, even
     // when the caller-supplied requestDetail did not include one.
     if (isMissingCorrelationId) {
@@ -273,6 +279,7 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
+
     if (!raw) {
       return [];
     }

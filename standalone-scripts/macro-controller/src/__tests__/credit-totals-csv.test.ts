@@ -83,6 +83,7 @@ describe('downloadCsv', () => {
     const originalCreateElement = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string, options?: ElementCreationOptions) => {
       const el = originalCreateElement(tagName, options);
+
       if (tagName === 'a') {
         appendedAnchor = el as HTMLAnchorElement;
         vi.spyOn(el, 'click').mockImplementation(clickSpy);

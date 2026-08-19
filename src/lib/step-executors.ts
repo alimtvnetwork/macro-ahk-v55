@@ -24,6 +24,7 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "PROMPT_INJECT_RESPONSE" && event.data?.requestId === id) {
         window.removeEventListener(Events.MESSAGE, handler);
+
         if (event.data.success) {
           resolve();
         } else {
@@ -47,6 +48,7 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
 
 export async function executeClickButton(step: StepClickButton): Promise<void> {
   const el = document.querySelector(step.selector) as HTMLElement | null;
+
   if (!el) {
     throw new Error(`Element not found: ${step.selector}`);
   }
@@ -90,6 +92,7 @@ export async function executeWaitForElement(step: StepWaitForElement, signal?: A
       }
 
       const exists = !!document.querySelector(step.selector);
+
       if ((appear && exists) || (!appear && !exists)) {
         resolve();
 
@@ -154,6 +157,7 @@ export async function executeRunScript(step: StepRunScript): Promise<void> {
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "RUN_SCRIPT_RESPONSE" && event.data?.requestId === id) {
         window.removeEventListener(Events.MESSAGE, handler);
+
         if (event.data.success) {
           resolve();
         } else {

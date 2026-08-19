@@ -28,6 +28,7 @@ export function mountSearchBar(getDict: () => WorkspaceDictionary): () => void {
 
 function doMount(getDict: () => WorkspaceDictionary): () => void {
   const anchor = resolveElement(HomepageDashboardVariables.AllWorkspaceName.full);
+
   if (!(anchor instanceof HTMLElement)) {
     return () => undefined;
   }
@@ -83,6 +84,7 @@ function handleEnter(e: KeyboardEvent, value: string, dict: WorkspaceDictionary)
 
 export function onSearchInput(value: string, dict: WorkspaceDictionary): WorkspaceRecord[] {
   const needle = value.trim().toLowerCase();
+
   if (needle === "") {
     return dict.byIndex;
   }
@@ -92,6 +94,7 @@ export function onSearchInput(value: string, dict: WorkspaceDictionary): Workspa
 
 export function onSearchEnter(matches: WorkspaceRecord[]): void {
   const top = matches[0];
+
   if (top) {
     clickWorkspaceByXPath(top.fullXPath);
   }
@@ -102,6 +105,7 @@ function applyFilter(value: string, dict: WorkspaceDictionary): void {
   const visibleNames = new Set(matches.map((m) => m.name));
   for (const r of dict.byIndex) {
     const el = resolveElement(r.fullXPath);
+
     if (el instanceof HTMLElement) {
       el.style.display = visibleNames.has(r.name) ? "" : "none";
     }

@@ -43,6 +43,7 @@ export function isKnownWorkspaceName(name: string): boolean {
   }
 
   const perWs = loopCreditState.perWorkspace || [];
+
   // Issue 84 Fix 1: When workspace list is not yet loaded, allow the name through
   // so that fetchWorkspaceNameFromNav() and the observer can set an early workspace
   // name. Previously this returned false, blocking ALL name detection until credits loaded.
@@ -89,6 +90,7 @@ function tryApplyWorkspaceName(name: string, source: string): boolean {
     const oldName = state.workspaceName;
     state.workspaceName = name;
     log('Workspace name: ' + name, 'success');
+
     if (oldName && oldName !== name) {
       addWorkspaceChangeEntry(oldName, name);
     }
@@ -101,6 +103,7 @@ function tryApplyWorkspaceName(name: string, source: string): boolean {
 
 export function fetchWorkspaceName(): void {
   const wsXpath = CONFIG.WORKSPACE_XPATH;
+
   if (!wsXpath || wsXpath.indexOf('__') === 0) {
     log('Workspace XPath not configured (placeholder not replaced)', 'warn');
 
@@ -110,8 +113,10 @@ export function fetchWorkspaceName(): void {
   try {
     log('Fetching workspace name from XPath: ' + wsXpath, 'check');
     const el = getByXPath(wsXpath);
+
     if (el) {
       const name = (el.textContent || '').trim();
+
       if (name) {
         tryApplyWorkspaceName(name, 'Workspace XPath');
       } else {
@@ -155,6 +160,7 @@ function collectFromNavButtons(): NavCandidate[] {
   const navButtons = document.querySelectorAll('nav button, nav a, nav span, [role="navigation"] button');
   for (const el of navButtons) {
     const text = (el.textContent || '').trim();
+
     if (!text || text.length < 2 || text.length > 60) {
       continue;
     }
@@ -172,6 +178,7 @@ function collectFromNavButtons(): NavCandidate[] {
     const hasHeight = rect.height > 0;
     const isVisible = hasWidth && hasHeight;
     const isInNavBar = rect.top < 80;
+
     if (isVisible && isInNavBar) {
       results.push({ el, text, y: rect.top, x: rect.left });
     }
@@ -186,6 +193,7 @@ function collectFromTopNav(): NavCandidate[] {
   const topNavEls = document.querySelectorAll('nav div span, nav div p, nav div a, header span, header a');
   for (const el2 of topNavEls) {
     const text2 = (el2.textContent || '').trim();
+
     if (!text2 || text2.length < 3 || text2.length > 60) {
       continue;
     }
@@ -200,6 +208,7 @@ function collectFromTopNav(): NavCandidate[] {
     const isTopNavMatch = isVisible2 && isInTopNav;
     const isLeftNavMatch = isInLeftNav && hasNoChildren;
     const isNavCandidate = isTopNavMatch && isLeftNavMatch;
+
     if (isNavCandidate) {
       results.push({ el: el2, text: text2, y: rect2.top, x: rect2.left });
     }
@@ -223,6 +232,7 @@ export function fetchWorkspaceNameFromNav(): boolean {
   const hasXpath = navXpath && navXpath.indexOf('__') !== 0 && navXpath !== '';
   try {
     let el: Node | null = null;
+
     if (hasXpath) {
       el = getByXPath(navXpath);
     }
@@ -233,8 +243,10 @@ export function fetchWorkspaceNameFromNav(): boolean {
 
     if (el) {
       const name = (el.textContent || '').trim();
+
       if (name) {
         const accepted = tryApplyWorkspaceName(name, 'Nav');
+
         if (accepted) {
           mc().updateUI();
         }
@@ -310,6 +322,7 @@ class WorkspaceObserverState {
    */
   nextMutationBackoffMs(): number | null {
     const now = Date.now();
+
     if (now - this._mutationReinstallWindowStartedAt > MUTATION_REINSTALL_WINDOW_MS) {
       this._mutationReinstallWindowStartedAt = now;
       this._mutationReinstallCount = 0;
@@ -386,6 +399,7 @@ function resolveNavElement(): Node | Element | null {
 
   if (hasXpath) {
     navEl = getByXPath(navXpath);
+
     if (navEl) {
       logSub('Workspace nav element found via XPath', 1);
     }
@@ -407,6 +421,7 @@ function resolveNavElement(): Node | Element | null {
 /** Schedule a retry when the nav element isn't found yet. */
 function scheduleObserverRetry(): void {
   const retryNum = wsObserverState.incrementRetry();
+
   if (retryNum < WORKSPACE_OBSERVER_MAX_RETRIES) {
     const retryDelay = Math.min(retryNum * 3000, 15000);
     log('Workspace observer: element not found — retry ' + retryNum + '/' + WORKSPACE_OBSERVER_MAX_RETRIES + ' in ' + (retryDelay / 1000) + 's', 'warn');
@@ -440,6 +455,7 @@ function applyInitialObserverName(name: string): void {
     const oldName = state.workspaceName;
     state.workspaceName = name;
     log('Workspace name (observer init): ' + name, 'success');
+
     if (oldName && oldName !== name) {
       addWorkspaceChangeEntry(oldName, name);
     }
@@ -455,6 +471,7 @@ function handleObserverMutation(navEl: Node | Element): void {
     wsObserverState.disconnect();
     state.workspaceObserverActive = false;
     const backoff = wsObserverState.nextMutationBackoffMs();
+
     if (backoff === null) {
       logError(
         'standalone-scripts/macro-controller/src/workspace-observer.ts',
@@ -474,6 +491,7 @@ function handleObserverMutation(navEl: Node | Element): void {
   }
 
   const newName = (navEl!.textContent || '').trim();
+
   if (!isKnownWorkspaceName(newName)) {
     logSub('Observer mutation: "' + newName + '" not a known workspace — ignoring', 1);
 
@@ -490,11 +508,13 @@ function handleObserverMutation(navEl: Node | Element): void {
     const oldName = state.workspaceName;
     state.workspaceName = newName;
     log('⚡ Workspace changed (observer): "' + oldName + '" → "' + newName + '"', 'success');
+
     if (oldName) {
       addWorkspaceChangeEntry(oldName, newName);
     }
 
     state.workspaceJustChanged = true;
+
     if (state.workspaceChangedTimer) {
       clearTimeout(state.workspaceChangedTimer);
     }
@@ -534,6 +554,7 @@ export function triggerCreditCheckOnWorkspaceChange(): void {
   }
 
   const opened = ensureProjectDialogOpen();
+
   if (!opened) {
     log('Could not open project dialog for credit check', 'warn');
 
@@ -570,6 +591,7 @@ export function addWorkspaceChangeEntry(fromName: string, toName: string): void 
       projectName: projectName,
       projectId: projectId,
     });
+
     if (history.length > WS_HISTORY_MAX_ENTRIES) {
       history = history.slice(history.length - WS_HISTORY_MAX_ENTRIES);
     }

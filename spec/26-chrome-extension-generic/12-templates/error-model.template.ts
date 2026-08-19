@@ -66,6 +66,7 @@ export class AppError extends Error {
     this.missing = input.missing ?? null;
     this.context = input.context ?? null;
     this.timestamp = new Date().toISOString();
+
     if (input.cause !== undefined) {
       (this as unknown as { cause: unknown }).cause = input.cause;
     }
@@ -120,6 +121,7 @@ export class AppError extends Error {
       missing: json.missing,
       context: json.context,
     });
+
     if (json.stack !== null) {
       (restored as unknown as { stack: string }).stack = json.stack;
     }

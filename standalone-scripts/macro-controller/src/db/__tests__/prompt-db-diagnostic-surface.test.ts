@@ -50,6 +50,7 @@ beforeEach(() => {
 
 function pickWhere(): string | undefined {
   const call = logDiagnosticMock.mock.calls[0];
+
   if (!call) {
     return undefined;
   }

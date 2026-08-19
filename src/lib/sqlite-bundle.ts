@@ -359,6 +359,7 @@ function insertDependencies(db: Database, projects: ReadonlyArray<StoredProject>
     for (const dep of deps) {
       const d = dep as unknown as Record<string, unknown>;
       const dependsOn = typeof d.projectId === "string" ? d.projectId : "";
+
       if (!dependsOn) {
         continue;
       }
@@ -391,6 +392,7 @@ function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): 
   for (const p of projects) {
     const settings = (p.settings ?? {}) as Record<string, unknown>;
     const rawVars = settings.variables;
+
     if (rawVars == null || typeof rawVars !== "object") {
       continue;
     }
@@ -420,6 +422,7 @@ function parsePromptCategories(raw: Record<string, unknown>): string[] {
   const joined = typeof raw.categories === "string" ? raw.categories
     : typeof raw.category === "string" ? raw.category
       : "";
+
   if (!joined) {
     return [];
   }
@@ -428,6 +431,7 @@ function parsePromptCategories(raw: Record<string, unknown>): string[] {
   const out: string[] = [];
   for (const part of joined.split(",")) {
     const trimmed = part.trim();
+
     if (!trimmed || seen.has(trimmed)) {
       continue;
     }
@@ -593,6 +597,7 @@ export async function exportProjectAsSqliteZip(project: StoredProject): Promise<
 
   for (const entry of project.scripts ?? []) {
     const alreadyMatched = matchedIds.has(entry.path) || matchedNames.has(entry.path);
+
     if (!alreadyMatched && entry.code) {
       relatedScripts.push({
         id: `inline_${entry.path.replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -687,6 +692,7 @@ export async function exportProjectsAsSqliteZip(
   for (const project of projects) {
     for (const entry of project.scripts ?? []) {
       const alreadyMatched = matchedIds.has(entry.path) || matchedNames.has(entry.path);
+
       if (!alreadyMatched && entry.code) {
         relatedScripts.push({
           id: `inline_${entry.path.replace(/[^a-zA-Z0-9]/g, "_")}`,
@@ -772,6 +778,7 @@ function col(
  *  In strict mode only Uid / Id (PascalCase) are consulted; lowercase uid/id fallbacks are skipped. */
 function resolveUid(rowObject: Record<string, unknown>, strict = false): string {
   const uid = strict ? rowObject["Uid"] : (rowObject["Uid"] ?? rowObject["uid"]);
+
   if (uid != null && String(uid) !== "") {
     return String(uid);
   }
@@ -806,6 +813,7 @@ function readDependenciesTable(db: Database): Map<string, Array<{ projectId: str
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
     const projectUid = String(rowObject["ProjectUid"] ?? "");
     const dependsOn = String(rowObject["DependsOnProjectId"] ?? "");
+
     if (!projectUid || !dependsOn) {
       continue;
     }
@@ -843,12 +851,14 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
     const projectUid = String(rowObject["ProjectUid"] ?? "");
     const name = String(rowObject["Name"] ?? "");
+
     if (!projectUid || !name) {
       continue;
     }
 
     const rawValue = rowObject["Value"];
     let parsed: unknown = null;
+
     if (rawValue != null) {
       try {
         parsed = JSON.parse(String(rawValue)); 
@@ -872,6 +882,7 @@ function readProjects(db: Database, strict = false): StoredProject[] {
     rows = db.exec("SELECT * FROM Projects"); 
   } catch (err) {
     void 0;
+
     if (strict) {
       return [];
     }
@@ -886,6 +897,7 @@ function readProjects(db: Database, strict = false): StoredProject[] {
   }
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
+
   if (!hasRows) {
     return [];
   }
@@ -941,6 +953,7 @@ function readScripts(db: Database, strict = false): StoredScript[] {
     rows = db.exec("SELECT * FROM Scripts"); 
   } catch (err) {
     void 0;
+
     if (strict) {
       return [];
     }
@@ -955,6 +968,7 @@ function readScripts(db: Database, strict = false): StoredScript[] {
   }
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
+
   if (!hasRows) {
     return [];
   }
@@ -990,6 +1004,7 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
     rows = db.exec("SELECT * FROM Configs"); 
   } catch (err) {
     void 0;
+
     if (strict) {
       return [];
     }
@@ -1004,6 +1019,7 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
   }
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
+
   if (!hasRows) {
     return [];
   }
@@ -1046,6 +1062,7 @@ function readPromptCategoriesTable(db: Database): Map<string, string[]> {
   for (const row of rows[0].values) {
     const uid = String(row[0] ?? "");
     const name = String(row[1] ?? "");
+
     if (!uid || !name) {
       continue;
     }
@@ -1097,6 +1114,7 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
       rows = db.exec("SELECT * FROM Prompts"); 
     } catch (err) {
       void 0;
+
       if (strict) {
         return [];
       }
@@ -1111,6 +1129,7 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
     }
 
     const hasRows = rows.length > 0 && rows[0].values.length > 0;
+
     if (!hasRows) {
       return [];
     }
@@ -1141,6 +1160,7 @@ export async function previewSqliteZip(
   const zip = await JSZipCtor.loadAsync(arrayBuffer);
 
   const dbFile = zip.file(DB_FILENAME);
+
   if (!dbFile) {
     throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
   }
@@ -1151,6 +1171,7 @@ export async function previewSqliteZip(
   // Strict PascalCase v4 contract gate. Block the preview dialog from
   // ever showing rows extracted from a malformed/legacy bundle.
   const validation = validateBundleSchema(db, "full");
+
   if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
@@ -1290,6 +1311,7 @@ async function extractBundle(file: File, options?: ImportOptions) {
   const JSZipCtor = await loadJSZip();
   const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
+
   if (!dbFile) {
     throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
   }
@@ -1301,6 +1323,7 @@ async function extractBundle(file: File, options?: ImportOptions) {
   // so a malformed bundle never reaches the SAVE_* messaging layer (where
   // partial writes could corrupt the live extension state).
   const validation = validateBundleSchema(db, "full");
+
   if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
@@ -1398,6 +1421,7 @@ async function mergeAll(
 
 function safeJsonParse<T>(raw: string | null, fallback: T): T {
   const isAbsent = !raw;
+
   if (isAbsent) {
     return fallback;
   }
@@ -1469,6 +1493,7 @@ async function extractPromptsBundle(
   const JSZipCtor = await loadJSZip();
   const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
+
   if (!dbFile) {
     throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
   }
@@ -1476,6 +1501,7 @@ async function extractPromptsBundle(
   const dbData = await dbFile.async("uint8array");
   const db = await openDb(dbData);
   const validation = validateBundleSchema(db, "prompts-only");
+
   if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
@@ -1483,6 +1509,7 @@ async function extractPromptsBundle(
 
   const prompts = readPrompts(db, strict);
   db.close();
+
   if (prompts.length === 0) {
     throw new Error("No prompts found in bundle");
   }
@@ -1502,6 +1529,7 @@ export async function importPromptsFromSqliteZip(
   const existingList = Array.isArray(existing.prompts) ? existing.prompts : [];
   for (const raw of existingList) {
     const r = raw as unknown as Record<string, unknown>;
+
     if (r.isDefault !== true && typeof r.id === "string") {
       await sendMessage({ type: "DELETE_PROMPT", promptId: r.id });
     }
@@ -1551,6 +1579,7 @@ async function assertIsZipBlob(blob: Blob, context: string): Promise<void> {
   const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
   const isLocalFileHeader = header[0] === 0x50 && header[1] === 0x4b
     && header[2] === 0x03 && header[3] === 0x04;
+
   if (isLocalFileHeader) {
     return;
   }

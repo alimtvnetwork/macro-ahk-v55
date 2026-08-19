@@ -64,6 +64,7 @@ function extractMessageType(message: MessageRequest): string {
         && message !== null
         && "type" in message;
   const isMissing = !hasType;
+
   if (isMissing) {
     return "(unknown)";
   }
@@ -150,6 +151,7 @@ function buildErrorResponse(
     : String(error);
 
   const isBindError = error instanceof BindError;
+
   if (isBindError) {
     const bindErr = error as BindError;
     const contextDetail =

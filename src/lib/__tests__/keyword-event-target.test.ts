@@ -26,6 +26,7 @@ function mkEvent(target: KeywordEventTarget | undefined): KeywordEvent {
 describe("resolveEventTarget", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur(); 
     }

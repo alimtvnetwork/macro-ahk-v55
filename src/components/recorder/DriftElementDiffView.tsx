@@ -119,6 +119,7 @@ export function DriftElementDiffView({ primary, fallback, diff, history, now }: 
 
 function HealthyDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
   const { LastSuccess } = timeline;
+
   if (!LastSuccess) {
     return null;
   }
@@ -141,6 +142,7 @@ function HealthyDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
 
 function AlwaysFailingDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
   const { FirstDrift, FailuresSinceDrift } = timeline;
+
   if (!FirstDrift) {
     return null;
   }
@@ -163,6 +165,7 @@ function AlwaysFailingDriftTimelineStrip({ timeline }: { timeline: DriftTimeline
 // eslint-disable-next-line max-lines-per-function
 function DriftedDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
   const { LastSuccess, FirstDrift, HealthyDurationMs, FailuresSinceDrift } = timeline;
+
   if (!LastSuccess || !FirstDrift) {
     return null;
   }
@@ -235,6 +238,7 @@ function DriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
 
 function VerdictBadge({ verdict, label }: { verdict: DriftVerdict; label: string }) {
   const tone = VERDICT_META[verdict].tone;
+
   if (tone === "ok") {
     return (
       <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 dark:text-emerald-400">

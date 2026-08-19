@@ -12,6 +12,7 @@ import { taskNextState, saveTaskNextSettings, type TaskNextDeps } from './task-n
 // eslint-disable-next-line max-lines-per-function
 export function openTaskNextSettingsModal(deps: TaskNextDeps) {
   const existing = document.getElementById('marco-tasknext-settings');
+
   if (existing) {
     existing.remove();
   }
@@ -47,6 +48,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     row.appendChild(lbl);
     const inp = document.createElement('input');
     inp.type = field.type;
+
     if (field.type === 'checkbox') {
       inp.checked = taskNextState.settings[field.key] === true;
     } else {

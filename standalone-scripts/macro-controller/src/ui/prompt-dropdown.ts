@@ -80,6 +80,7 @@ function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLEl
     const dropRect = promptsDropdown.getBoundingClientRect();
     const subRect = taskNextSub.getBoundingClientRect();
     const PAD = 6;
+
     if (subRect.bottom > dropRect.bottom) {
       promptsDropdown.scrollTop += Math.ceil(subRect.bottom - dropRect.bottom + PAD);
 
@@ -287,6 +288,7 @@ export function isHiddenBySlug(entry: { slug?: string; parentSlug?: string; id?:
   const parentSlug = (entry.parentSlug || '').toLowerCase();
   const id = (entry.id || '').toLowerCase();
   const name = (entry.name || '').toLowerCase();
+
   if (HIDDEN_EXACT_SLUGS.includes(slug) || HIDDEN_EXACT_SLUGS.includes(parentSlug)) {
     return true;
   }
@@ -347,6 +349,7 @@ function _renderFresh(
   promptsDropdown.appendChild(buildSearchInput(ctx, taskNextDeps));
 
   const isEntriesEmpty = !entries.length;
+
   if (isEntriesEmpty) {
     renderEmptyState(promptsDropdown, ctx, taskNextDeps);
 
@@ -368,11 +371,13 @@ function _appendHeaderAndSubmenu(
   // Mark dropdown so the Tasks toggle can find the group from any descendant click.
   const isPromptDropdownContainer = container.hasAttribute('data-prompts-dropdown');
   const isNonDropdownContainer = !isPromptDropdownContainer;
+
   if (isNonDropdownContainer) {
     container.setAttribute('data-prompts-dropdown', '1');
   }
 
   const isMissingPosition = !container.style.position;
+
   // Ensure the container can host an absolutely-positioned right-anchored Tasks panel.
   if (isMissingPosition) {
     container.style.position = 'relative';
@@ -401,9 +406,11 @@ function _appendFilteredItems(
   // suggestions / favorites / folder lists all skip them in one place.
   entries = entries.filter(e => !isHiddenBySlug(e));
   entries = sortEntriesByOrder(entries);
+
   // 0. Render Suggestions (if no search and not in a specific category)
   if (isNoFilterActive()) {
     const suggestions = getSuggestedPrompts(entries);
+
     if (suggestions.length > 0) {
       const sugHeader = document.createElement('div');
       sugHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:hsl(var(--foreground));background:rgba(61,174,233,0.05);text-transform:uppercase;letter-spacing:0.5px;';
@@ -421,6 +428,7 @@ function _appendFilteredItems(
   // 1. Render Favorites (pinned to top)
 
   const favorites = entries.filter(p => p.isFavorite);
+
   if (favorites.length > 0 && isNoFilterActive()) {
     const favHeader = document.createElement('div');
     favHeader.style.cssText = 'padding:6px 10px;font-size:11px;font-weight:700;color:hsl(var(--warning));background:rgba(250,204,21,0.05);text-transform:uppercase;letter-spacing:0.5px;';
@@ -437,6 +445,7 @@ function _appendFilteredItems(
 
   // 2. Render normal filtered items with folder support
   const filtered = filterByCategory(entries);
+
   if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.style.cssText = 'padding:12px 8px;text-align:center;color:' + cPanelFgDim + ';font-size:13px;';
@@ -527,6 +536,7 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
   // v4.12.0: PlanTierType now lives in a single floating popover keyed by
   // [data-plan-group]. Rebuild its contents in-place so listeners are fresh.
   const planGroup = container.querySelector('[data-plan-group]') as HTMLElement | null;
+
   if (planGroup) {
     planGroup.textContent = '';
     renderPlanTaskSubmenu(planGroup, ctx);
@@ -537,11 +547,13 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
 function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const header = container.firstElementChild as HTMLElement;
   const isHeaderMissing = !header;
+
   if (isHeaderMissing) {
     return;
   }
 
   const oldLoadBtn = header.querySelector('span[title="Reload prompts from database"]') as HTMLElement | null;
+
   if (oldLoadBtn) {
     // Rebuild the whole header (5 pills) rather than reach into the extracted
     // header module for a single builder, keeps the graph acyclic.
@@ -553,6 +565,7 @@ function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps:
 /** Rebuild the Next floating popover after snapshot restore. */
 function _rebindTaskNextSubmenu(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const nextGroup = container.querySelector('[data-next-group]') as HTMLElement | null;
+
   if (nextGroup) {
     nextGroup.textContent = '';
     renderTaskNextSubmenu(nextGroup, ctx, taskNextDeps);
@@ -576,8 +589,10 @@ function _rebindFilterMenu(
 ): void {
   // Locate the element with [data-prompt-filter-sub], walk to its item-container and replace it.
   const filterSub = container.querySelector('[data-prompt-filter-sub]');
+
   if (filterSub) {
     const filterItem = filterSub.parentElement;
+
     if (filterItem && filterItem.parentElement === container) {
       const categories = collectUniqueCategories(entries);
       filterItem.textContent = '';
@@ -586,6 +601,7 @@ function _rebindFilterMenu(
       renderFilterMenu(container, categories, ctx, taskNextDeps, renderPromptsDropdown);
       // Try to maintain order if possible, though append is usually fine
       const newItem = container.lastElementChild;
+
       if (newItem && container.children[idx]) {
         container.insertBefore(newItem, container.children[idx]);
       }
@@ -632,6 +648,7 @@ function _rebindPromptItems(
       || (idxAttr !== null ? filtered[parseInt(idxAttr, 10)] : undefined)
       || filtered[i];
     const isResolutionFailed = !resolved;
+
     if (isResolutionFailed) {
       continue;
     }
@@ -659,6 +676,7 @@ function _bindSinglePromptItem(
   };
 
   const isTextEmpty = !p.text;
+
   if (isTextEmpty) {
     return;
   }
@@ -682,6 +700,7 @@ function _bindSinglePromptItem(
 /** Re-attach the Add New Prompt button handler. */
 function _rebindAddButton(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const lastChild = container.lastElementChild as HTMLElement;
+
   if (!lastChild || !lastChild.textContent?.includes('Add New Prompt')) {
     return;
   }
@@ -730,6 +749,7 @@ function _rebindActionIcons(
         e.stopPropagation();
         const isDeleteConfirmed = confirm('Delete prompt "' + p.name + '"?');
         const isDeleteCancelled = !isDeleteConfirmed;
+
         if (isDeleteCancelled) {
           return;
         }
@@ -784,6 +804,7 @@ function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDe
 function normalizeCategory(raw: string | undefined): string {
   const cat = (raw || '').trim().toLowerCase();
   const isCatMissing = !cat;
+
   if (isCatMissing) {
     return '';
   }
@@ -804,6 +825,7 @@ function collectUniqueCategories(entries: Array<{ category?: string }>): string[
   const catSeen: Record<string, boolean> = {};
   for (const entry of entries) {
     const cat = normalizeCategory(entry.category);
+
     if (cat && !catSeen[cat]) {
       categories.push(cat);
       catSeen[cat] = true;
@@ -834,6 +856,7 @@ function filterByCategory<T extends { name: string; text: string; slug?: string;
     filtered = filtered.filter(entry => set.has(normalizeCategory(entry.category)));
   } else {
     const legacy = getPromptCategoryFilter();
+
     if (legacy) {
       filtered = filtered.filter(entry => normalizeCategory(entry.category) === legacy);
     }
@@ -917,6 +940,7 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement, taskNextDeps: Tas
   taskNextArrow.style.cursor = 'pointer';
   taskNextArrow.onclick = function(e: Event) {
     e.stopPropagation();
+
     if (taskNextSub.style.display === 'none') {
       showSub();
     } else {
@@ -953,6 +977,7 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
       e.stopPropagation();
       const prompt = findNextTasksPrompt(taskNextDeps);
       const isPromptMissing = !prompt;
+
       if (isPromptMissing) {
         showPasteToast('❌ "Next Tasks" prompt not found', true);
 
@@ -966,6 +991,7 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
 
       showPasteToast(`✅ Queued ${count} tasks`, false);
       const queueList = document.getElementById('task-queue-list');
+
       if (queueList) {
         // Force refresh Task Queue UI if visible
         queueList.dispatchEvent(new CustomEvent('refresh-queue'));
@@ -988,6 +1014,7 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
       e.stopPropagation();
       promptsDropdown.style.display = 'none';
       taskNextSub.style.display = 'none';
+
       if (count <= 1) {
         runTaskNextLoop(taskNextDeps, count);
       } else {
@@ -1025,6 +1052,7 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
     e.stopPropagation();
     const n = parseInt(customInput.value);
     const isRepeatCountInvalid = !n || n < 1 || n > 999;
+
     if (isRepeatCountInvalid) {
       showPasteToast('⚠️ Enter 1–999', true);
 
@@ -1033,6 +1061,7 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
 
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
+
     if (n <= 1) {
       runTaskNextLoop(taskNextDeps, n);
     } else {
@@ -1094,6 +1123,7 @@ function getPromptVariantValue(p: PromptEntry): number | null {
 function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
   const isVariantValueMissing = !variantValue;
+
   if (isVariantValueMissing) {
     return p.text;
   }
@@ -1113,6 +1143,7 @@ function resolveTags(p: PromptEntry): string[] {
   const rawTags = Array.isArray(p.tags) ? p.tags.slice() : [];
   const nameLc = (p.name || '').toLowerCase();
   const isReleaseFamily = /\b(bump|release|patch bump|minor bump|major bump)\b/.test(nameLc);
+
   if (isReleaseFamily && !rawTags.some(t => (t || '').toLowerCase() === 'release')) {
     rawTags.unshift('release');
   }
@@ -1130,6 +1161,7 @@ function renderTagsWrap(rawTags: string[]): HTMLElement | null {
   const MAX_INLINE_TAGS = 2;
   rawTags.slice(0, MAX_INLINE_TAGS).forEach(tag => tagsWrap.appendChild(makeTagEl(tag)));
   const overflowTags = rawTags.slice(MAX_INLINE_TAGS);
+
   if (overflowTags.length > 0) {
     const moreTag = document.createElement('span');
     moreTag.textContent = '+' + overflowTags.length;
@@ -1166,6 +1198,7 @@ function bindPromptItemClick(
 
     log('Prompt clicked: "' + p.name + '" (' + p.text.length + ' chars)', 'info');
     const outcome = await pasteIntoEditor(resolvePromptPasteText(p), promptsCfg, getByXPathAsElement);
+
     if (outcome === 'injected' || outcome === 'clipboard') {
       promptsDropdown.style.display = 'none';
     }
@@ -1175,6 +1208,7 @@ function bindPromptItemClick(
 function _buildPromptItemSourceBadge(p: PromptEntry): HTMLElement | null {
   const slug = p.slug;
   const isSlugMissing = !slug;
+
   if (isSlugMissing) {
     return null;
   }
@@ -1204,6 +1238,7 @@ function _buildPromptItemContentWrap(p: PromptEntry, hasText: boolean): HTMLElem
   contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:row;align-items:center;gap:6px;overflow:hidden;min-width:0;';
   contentWrap.appendChild(nameSpan);
   const tagsWrap = renderTagsWrap(resolveTags(p));
+
   if (tagsWrap) {
     contentWrap.appendChild(tagsWrap);
   }
@@ -1217,6 +1252,7 @@ function renderPromptItem(
 ): HTMLElement {
   const item = document.createElement('div');
   item.setAttribute('data-prompt-idx', String(idx));
+
   if (p.slug) {
     item.setAttribute('data-prompt-slug', p.slug);
   }
@@ -1241,6 +1277,7 @@ function renderPromptItem(
   item.appendChild(badge);
 
   const sourceBadge = _buildPromptItemSourceBadge(p);
+
   if (sourceBadge) {
     item.appendChild(sourceBadge);
   }
@@ -1317,6 +1354,7 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
   save.onclick = () => {
     const updated = { ...p, name: nameInput.value.trim(), text: textInput.value.trim() };
     const isPromptDataIncomplete = !updated.name || !updated.text;
+
     if (isPromptDataIncomplete) {
       return;
     }
@@ -1379,6 +1417,7 @@ function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: P
 /** Assemble an EditablePrompt object, omitting optional keys when their source value is undefined (required by exactOptionalPropertyTypes). */
 function _buildEditablePromptFromEntry(p: PromptEntry): EditablePrompt {
   const out: EditablePrompt = { name: p.name, text: p.text };
+
   if (typeof p.id === 'string') {
     out.id = p.id;
   }
@@ -1392,6 +1431,7 @@ function _buildEditablePromptFromEntry(p: PromptEntry): EditablePrompt {
   }
 
   const exc = (p as { excludeFromExport?: boolean }).excludeFromExport;
+
   if (typeof exc === 'boolean') {
     out.excludeFromExport = exc;
   }
@@ -1418,6 +1458,7 @@ function _buildDeleteIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptCont
     e.stopPropagation();
     const isDeleteConfirmed = confirm('Delete prompt "' + p.name + '"?');
     const isDeleteCancelled = !isDeleteConfirmed;
+
     if (isDeleteCancelled) {
       return;
     }
@@ -1472,6 +1513,7 @@ function handlePromptDeleteSuccess(p: PromptEntry, ctx: PromptContext, taskNextD
 
         return true;
       });
+
       if (filtered.length !== record.entries.length) {
         return mod.writeJsonCopy(filtered);
       }

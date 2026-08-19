@@ -33,6 +33,7 @@ export function addActivityLog(time: string | null, level: string, message: stri
 
   activityLogLines.push(entry);
   let didTrim = false;
+
   if (activityLogLines.length > maxActivityLines) {
     activityLogLines.shift();
     didTrim = true;
@@ -43,6 +44,7 @@ export function addActivityLog(time: string | null, level: string, message: stri
 
 function _buildLogEntryHtml(entry: ActivityLogEntry): string {
   let color = cLogDefault;
+
   if (entry.level === 'ERROR' || entry.level === 'error') {
     color = cLogError;
   } else if (entry.level === 'INFO') {
@@ -61,6 +63,7 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
 
   const indentPx = (entry.indent || 0) * 12;
   let html = '<div style="font-size:' + tFontSm + ';font-family:' + tFont + ';padding:2px 0;color:' + color + ';margin-left:' + indentPx + 'px;">';
+
   if (entry.indent && entry.indent > 0) {
     html += CssFragmentType.SpanStyleColor + cLogTimestamp + ';">' + entry.time + '</span> ';
   } else {
@@ -76,11 +79,13 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
 
 export function updateActivityLogUI(didTrim: boolean): void {
   const logContainer = document.getElementById('loop-activity-log-content');
+
   if (!logContainer) {
     return;
   }
 
   const total = activityLogLines.length;
+
   if (total === 0) {
     logContainer.innerHTML = '<div style="color:' + cLogTimestamp + ';font-size:' + tFontSm + ';padding:8px;">No activity logs yet</div>';
     logRenderState.count = 0;
@@ -101,6 +106,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
   }
 
   const newCount = total - logRenderState.count;
+
   if (newCount <= 0) {
     return;
   }
@@ -109,6 +115,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
   for (let j = total - 1; j >= total - newCount; j--) {
     const div = document.createElement('div');
     div.innerHTML = _buildLogEntryHtml(activityLogLines[j]);
+
     if (div.firstChild) {
       frag.appendChild(div.firstChild);
     }
@@ -121,6 +128,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
 export function toggleActivityLog(): void {
   setActivityLogVisible(!getActivityLogVisible());
   const logPanel = document.getElementById('loop-activity-log-panel');
+
   if (logPanel) {
     logPanel.style.display = getActivityLogVisible() ? 'block' : 'none';
   }

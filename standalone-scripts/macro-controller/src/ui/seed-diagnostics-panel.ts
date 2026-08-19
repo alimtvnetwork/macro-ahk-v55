@@ -40,6 +40,7 @@ const STATUS_COLOR: Record<SeedStageStatusType, string> = {
 
 export function openSeedDiagnosticsPanel(): void {
   const existing = document.getElementById('marco-seed-diag-panel');
+
   if (existing) {
     existing.remove();
 
@@ -102,6 +103,7 @@ function buildE005Section(): HTMLDivElement {
   headerRow.appendChild(downloadBtn);
   wrap.appendChild(headerRow);
   const summaries = summarizeLatestByRole();
+
   if (summaries.length === 0) {
     wrap.appendChild(muted('No PROMPT_EDIT_E005 snapshots recorded. The editor has not hit that failure since boot.'));
 
@@ -136,6 +138,7 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
     + '  site=' + summary.site;
   row.appendChild(top);
   row.appendChild(detail);
+
   if (summary.reason) {
     const reason = document.createElement('div');
     reason.style.cssText = 'color:hsl(var(--destructive));margin-top:2px;white-space:pre-wrap;';
@@ -159,6 +162,7 @@ function buildE005SummaryText(summaries: PromptEditE005Summary[]): string {
     lines.push('    orphanMismatch   : ' + summary.orphanRoleMismatch);
     lines.push('    site             : ' + summary.site);
     lines.push('    at               : ' + summary.at);
+
     if (summary.reason) {
       lines.push('    reason           : ' + summary.reason);
     }
@@ -243,6 +247,7 @@ function buildErrorTraceSection(title: string, code: string): HTMLDivElement {
   wrap.style.cssText = 'margin-top:12px;';
   wrap.appendChild(sectionTitle(title));
   const events = readDiagnosticToastTrace().filter((e) => String(e.code) === code);
+
   if (events.length === 0) {
     wrap.appendChild(muted('No ' + code + ' events recorded.'));
 
@@ -298,6 +303,7 @@ function buildHeader(): HTMLDivElement {
 function buildSnapshotSection(): HTMLDivElement {
   const wrap = document.createElement('div');
   const snap = readSeedStatusSnapshot();
+
   if (!snap) {
     wrap.appendChild(sectionTitle('Last boot snapshot'));
     wrap.appendChild(muted('No seeding snapshot recorded yet. Reload the extension to capture one.'));
@@ -350,6 +356,7 @@ function renderStageRow(stage: SeedStageReport): HTMLDivElement {
 
 function buildStageDetail(stage: SeedStageReport): string {
   const parts: string[] = [stage.status];
+
   if (stage.reason) {
     parts.push('reason=' + stage.reason);
   }
@@ -368,6 +375,7 @@ function buildTraceSection(): HTMLDivElement {
   wrap.style.cssText = 'margin-top:14px;';
   wrap.appendChild(sectionTitle('Recent diagnostic toasts (seed / prompt-load)'));
   const events = readDiagnosticToastTrace().filter((e) => RELEVANT_CODES.has(String(e.code)));
+
   if (events.length === 0) {
     wrap.appendChild(muted('No relevant diagnostic toasts in the trace.'));
 

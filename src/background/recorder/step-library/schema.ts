@@ -278,6 +278,7 @@ export function applySchema(db: Database): void {
   db.exec("PRAGMA foreign_keys = ON;");
 
   const currentVersion = readUserVersion(db);
+
   if (currentVersion > STEP_LIBRARY_SCHEMA_VERSION) {
     throw new Error(
       `step-library DB at user_version=${currentVersion} but this build only supports ${STEP_LIBRARY_SCHEMA_VERSION}. ` +
@@ -289,6 +290,7 @@ export function applySchema(db: Database): void {
   try {
     createTables(db);
     seedStepKinds(db);
+
     if (currentVersion < STEP_LIBRARY_SCHEMA_VERSION) {
       recordMigration(db); 
     }
@@ -302,6 +304,7 @@ export function applySchema(db: Database): void {
 
 export function readUserVersion(db: Database): number {
   const res = db.exec("PRAGMA user_version;");
+
   if (res.length === 0 || res[0].values.length === 0) {
     return 0;
   }

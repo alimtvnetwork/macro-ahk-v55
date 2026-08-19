@@ -46,6 +46,7 @@ export function StorageCard({
       type: "EXPORT_LOGS_ZIP",
     });
     const hasDataUrl = result.dataUrl !== null;
+
     if (hasDataUrl) {
       triggerDownloadLink(result.dataUrl!, result.filename);
     }

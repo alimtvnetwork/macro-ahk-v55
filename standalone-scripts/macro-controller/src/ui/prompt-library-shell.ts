@@ -216,6 +216,7 @@ function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement
   chooseFileBtn.style.cssText = 'background:hsl(var(--muted));color:hsl(var(--foreground));border:1px solid hsl(var(--border));border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:6px;';
   chooseFileBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+
     if (importBtn.disabled) {
       return;
     }

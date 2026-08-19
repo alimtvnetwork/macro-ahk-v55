@@ -60,6 +60,7 @@ import { NumInputKeyType } from "../types/enums";
 export function renderBulkRenameDialog(): void {
   removeBulkRenameDialog();
   const checkedIds = Object.keys(getLoopWsCheckedIds());
+
   if (checkedIds.length === 0) {
     log('[Rename] No workspaces selected', 'warn');
 
@@ -120,11 +121,13 @@ function _readUiToPreset(inputs: RenameInputsResult): RenamePreset {
 function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult): void {
   inputs.tmplRow.input.value = preset.template || '';
   inputs.prefixRow.input.value = preset.prefix || '';
+
   if (inputs.prefixRow.checkbox) {
     inputs.prefixRow.checkbox.checked = !!preset.prefixEnabled; 
   }
 
   inputs.suffixRow.input.value = preset.suffix || '';
+
   if (inputs.suffixRow.checkbox) {
     inputs.suffixRow.checkbox.checked = !!preset.suffixEnabled; 
   }
@@ -132,6 +135,7 @@ function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult)
   if (preset.delayMs > 0) {
     setRenameDelayMs(preset.delayMs);
     const slider = document.querySelector('#ahk-loop-rename-dialog input[type="range"]') as HTMLInputElement | null;
+
     if (slider) {
       slider.value = String(preset.delayMs);
       slider.dispatchEvent(new Event('input'));
@@ -151,6 +155,7 @@ function _populateUiFromPreset(preset: RenamePreset, inputs: RenameInputsResult)
   // first updatePreview() tick and overwrites the freshly hydrated values
   // with whatever the previous preset's inputs still display.
   const staleStartNums = document.getElementById('rename-start-nums');
+
   if (staleStartNums) {
     staleStartNums.innerHTML = ''; 
   }
@@ -181,11 +186,13 @@ function _cloneActivePreset(
 ): void {
   const suggested = sourceName + ' (copy)';
   const rawName = prompt('Clone "' + sourceName + '" as:', suggested);
+
   if (!rawName || !rawName.trim()) {
     return; 
   }
 
   const newName = rawName.trim();
+
   if (newName === sourceName) {
     showToast('Pick a different name to clone', 'warn');
 
@@ -229,6 +236,7 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
 
   // Load and populate active preset
   const activePreset = await store.loadPreset(_activePresetName);
+
   if (activePreset) {
     _populateUiFromPreset(activePreset, inputs);
   }
@@ -258,6 +266,7 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
     // onNew
     function () {
       const name = prompt('Enter preset name:');
+
       if (!name || !name.trim()) {
         return; 
       }
@@ -294,6 +303,7 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
       store.deletePreset(name).then(function () {
         // Remove from dropdown
         const opt = presetRow.select.querySelector('option[value="' + name.replace(/"/g, '\\"') + '"]');
+
         if (opt) {
           opt.remove(); 
         }
@@ -539,8 +549,10 @@ function _detectVarsAndRenderStarts(
   const hasStar = /\*{2,}/.test(allText);
 
   let html = '';
+
   if (hasDollar || hasHash || hasStar) {
     html += '<div style="font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:3px;">Start Numbers:</div><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+
     if (hasDollar) {
       html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, 'hsl(var(--warning))');
     }
@@ -568,8 +580,10 @@ function _snapshotStartNumInputsInto(startNums: StartNums): void {
   const dollarEl = document.getElementById('rename-start-dollar') as HTMLInputElement | null;
   const hashEl = document.getElementById('rename-start-hash') as HTMLInputElement | null;
   const starEl = document.getElementById('rename-start-star') as HTMLInputElement | null;
+
   if (dollarEl) {
     const n = parseInt(dollarEl.value, 10);
+
     if (Number.isFinite(n) && n >= 0) {
       startNums.dollar = n; 
     }
@@ -577,6 +591,7 @@ function _snapshotStartNumInputsInto(startNums: StartNums): void {
 
   if (hashEl) {
     const n = parseInt(hashEl.value, 10);
+
     if (Number.isFinite(n) && n >= 0) {
       startNums.hash = n; 
     }
@@ -584,6 +599,7 @@ function _snapshotStartNumInputsInto(startNums: StartNums): void {
 
   if (starEl) {
     const n = parseInt(starEl.value, 10);
+
     if (Number.isFinite(n) && n >= 0) {
       startNums.star = n; 
     }
@@ -597,6 +613,7 @@ function _wireStartNumInput(
   updatePreview: () => void,
 ): void {
   const el = document.getElementById(id) as HTMLInputElement | null;
+
   if (!el) {
     return; 
   }
@@ -721,6 +738,7 @@ function _executeRenameApply(
   const prefix = prefixRow.checkbox!.checked ? prefixRow.input.value : '';
   const suffix = suffixRow.checkbox!.checked ? suffixRow.input.value : '';
   const starts = getStartNums();
+
   if (!template && !prefix && !suffix) {
     log('[Rename] Nothing to rename — provide template, prefix, or suffix', 'warn');
 
@@ -731,6 +749,7 @@ function _executeRenameApply(
   for (const [j, ws] of selected.entries()) {
     const origName = ws.fullName || ws.name || '';
     const newName = applyRenameTemplate(template, prefix, suffix, starts, j, origName);
+
     if (!newName.trim()) {
       continue; 
     }
@@ -752,6 +771,7 @@ function _executeRenameApply(
 
   const updateEta = function(completed: number, total: number): void {
     const remaining = total - completed;
+
     if (remaining <= 0) {
       etaRow.style.display = 'none';
 
@@ -814,6 +834,7 @@ export function removeBulkRenameDialog(): void {
   cancelRename();
   _currentInputs = null;
   const d = document.getElementById('ahk-loop-rename-dialog');
+
   if (d) {
     if (typeof (d as DraggableElement).__cleanupDrag === 'function') {
       (d as DraggableElement).__cleanupDrag!();

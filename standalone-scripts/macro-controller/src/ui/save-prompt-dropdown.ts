@@ -57,6 +57,7 @@ export function createPromptsDropdown(): HTMLElement {
     const isVisible = dropdown.style.display !== 'none';
     const isOutsideClick = !dropdown.contains(event.target as Node);
     const shouldClose = isVisible && isOutsideClick;
+
     if (shouldClose) {
       dropdown.style.display = 'none';
     }
@@ -146,6 +147,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
     const itemsContainer = document.createElement('div');
 
     const hasCategories = categories.length > 0;
+
     if (hasCategories) {
       buildCategoryChips(dropdown, categories, () => activeFilter, (filter) => {
         activeFilter = filter;
@@ -158,6 +160,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
 
     dropdown.addEventListener('keydown', function (event: KeyboardEvent) {
       const isCtrlE = event.ctrlKey && event.key === 'e';
+
       if (isCtrlE) {
         event.preventDefault();
         event.stopPropagation();

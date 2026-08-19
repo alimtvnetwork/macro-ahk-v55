@@ -206,6 +206,7 @@ async function executeStep(
   now: () => Date,
 ): Promise<ReplayStepResult> {
   const startedAt = now();
+
   if (step.Kind === "Wait") {
     return runWaitStep(step, options, sleep, startedAt, now);
   }
@@ -252,11 +253,13 @@ async function runActionPipeline(
   state: ActionState,
 ): Promise<ReplayStepResult> {
   const gateResult = await checkPreConditionGate(step, options, sleep, now, startedAt);
+
   if (gateResult !== null) {
     return gateResult; 
   }
 
   const varFailure = applyStepVariables(step, options, state);
+
   if (varFailure !== null) {
     return finalize(step, options, startedAt, now(), varFailure); 
   }
@@ -264,12 +267,14 @@ async function runActionPipeline(
   const resolved = resolveStepSelector(step.Selectors);
   state.resolvedXPath = resolved.Expression;
   state.target = locateElement(resolved, options.Doc);
+
   if (state.target === null) {
     return notFoundResult(step, options, startedAt, now, resolved, state.variables); 
   }
 
   actuateStep(step, state.target, options.Row);
   const waitResult = await checkPostWait(step, options, sleep, now, startedAt, resolved, state);
+
   if (waitResult !== null) {
     return waitResult; 
   }
@@ -292,6 +297,7 @@ async function checkPreConditionGate(
     Doc: options.Doc, TimeoutMs: step.Gate.TimeoutMs, PollMs: step.Gate.PollMs,
     Sleep: sleep, Now: () => now().getTime(),
   });
+
   if (gateOutcome.Ok) {
     return null; 
   }
@@ -307,11 +313,13 @@ function buildGateFailure(
   gateOutcome: Extract<ConditionWaitOutcome, { Ok: false }>,
 ): ReplayStepResult {
   const gate = step.Gate;
+
   if (gate === undefined) {
     throw new Error("buildGateFailure called without Gate"); 
   }
 
   const detail = `polls=${gateOutcome.Polls}, elapsed=${gateOutcome.DurationMs}ms`;
+
   if (gate.OnTimeout === "Skip") {
     return finalize(step, options, startedAt, finishedAt, {
       Ok: true, Skipped: true,
@@ -345,6 +353,7 @@ function applyStepVariables(
     ExpectedType: "string",
   });
   state.variables = detailed.Variables;
+
   if (detailed.FirstFailure === null) {
     return null; 
   }
@@ -396,6 +405,7 @@ async function checkPostWait(
   state: ActionState,
 ): Promise<ReplayStepResult | null> {
   const effectiveWait = step.WaitFor !== undefined ? step.WaitFor : persistedWaitToSpec(readStepWait(step.StepId));
+
   if (effectiveWait === null) {
     return null; 
   }
@@ -403,6 +413,7 @@ async function checkPostWait(
   const waitOutcome = await waitForElement(effectiveWait, {
     Doc: options.Doc, Sleep: sleep, Now: () => now().getTime(),
   });
+
   if (waitOutcome.Ok) {
     return null; 
   }
@@ -412,6 +423,7 @@ async function checkPostWait(
 
 function detectWaitKind(spec: WaitForSpec): PredicateEvaluationKindType {
   const declared = spec.Kind ?? "Auto";
+
   if (declared === "XPath") {
     return "XPath"; 
   }
@@ -595,6 +607,7 @@ function dispatchClick(element: HTMLElement): void {
 function assignInputValue(element: HTMLInputElement | HTMLTextAreaElement, value: string): void {
   const proto = element instanceof HTMLInputElement ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype;
   const setter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
+
   if (setter !== undefined) {
     setter.call(element, value);
   } else {
@@ -604,6 +617,7 @@ function assignInputValue(element: HTMLInputElement | HTMLTextAreaElement, value
 
 function dispatchType(element: HTMLElement, value: string): void {
   const isInput = element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement;
+
   if (!isInput && !element.isContentEditable) {
     return; // not typeable
   }

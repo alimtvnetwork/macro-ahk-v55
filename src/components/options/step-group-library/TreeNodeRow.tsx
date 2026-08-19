@@ -96,12 +96,14 @@ function useTreeNodeDrag(
 
   const onDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
     const types = Array.from(event.dataTransfer.types);
+
     if (!types.includes(DRAG_MIME)) {
       return;
     }
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+
     if (!dragOver) {
       setDragOver(true);
     }
@@ -130,12 +132,14 @@ function handleDropEvent(
   event.preventDefault();
   setDragOver(false);
   const raw = event.dataTransfer.getData(DRAG_MIME);
+
   if (raw === "") {
     return;
   }
 
   try {
     const payload = JSON.parse(raw) as { id: number; parentId: number | null };
+
     if (payload.parentId !== parentId || payload.id === id) {
       return;
     }
@@ -384,6 +388,7 @@ function TreeNodeRowBody(body: RowBodyProps): JSX.Element {
       }}
       onMouseLeave={(e) => {
         e.stopPropagation();
+
         if (hoveredId === id) {
           onHover(null);
         }

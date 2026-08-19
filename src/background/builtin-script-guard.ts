@@ -99,6 +99,7 @@ export async function ensureBuiltinScriptsExist(
   for (const project of projects) {
     for (const entry of project.scripts) {
       const name = bareFilename(entry.path);
+
       if (BUILTIN_SCRIPT_NAMES.has(name) && !storedNames.has(name)) {
         missing.push(name);
       }
@@ -159,6 +160,7 @@ export async function ensureBuiltinScriptsExist(
   // --- Stage 2: Direct instruction.json fallback ---
   try {
     const fallbackCount = await seedMissingBuiltinsDirectly(missing);
+
     if (fallbackCount > 0) {
       console.log(
         "[builtin-guard] ✅ Direct fallback seeded %d built-in script(s)",
@@ -218,6 +220,7 @@ async function seedMissingBuiltinsDirectly(
 
   for (const scriptName of missingNames) {
     const meta = BUILTIN_DIST_MAP[scriptName];
+
     if (!meta) {
       logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `No dist map entry for "${scriptName}"\n  Path: BUILTIN_DIST_MAP["${scriptName}"]\n  Missing: Distribution mapping (folder, seedId, filePath)\n  Reason: Script name not registered in BUILTIN_DIST_MAP — skipping`);
       continue;
@@ -226,6 +229,7 @@ async function seedMissingBuiltinsDirectly(
     // Check if already present (by seedId or name)
     const existsById = stored.some((s) => s.id === meta.seedId);
     const existsByName = stored.some((s) => bareFilename(s.name) === scriptName);
+
     if (existsById || existsByName) {
       console.log("[builtin-guard:fallback] %s already in store (by %s) — skipping",
         scriptName, existsById ? "id" : "name");
@@ -240,6 +244,7 @@ async function seedMissingBuiltinsDirectly(
     console.log("[builtin-guard:fallback] Fetching instruction.json for %s → %s", scriptName, instrAbsUrl);
     try {
       const instrResp = ServiceResult.wrapFetch(await fetch(instrAbsUrl));
+
       if (instrResp.isSuccess) {
         // Phase 2c: instruction.json is the canonical PascalCase
         // artifact. Reads use PascalCase keys with no fallback —
@@ -272,8 +277,10 @@ async function seedMissingBuiltinsDirectly(
     console.log("[builtin-guard:fallback] Fetching script file for %s → %s", scriptName, scriptAbsUrl);
     try {
       const scriptResp = ServiceResult.wrapFetch(await fetch(scriptAbsUrl));
+
       if (scriptResp.isSuccess) {
         const code = await scriptResp.text();
+
         if (code && code.length > 10) {
           codeStub = code;
           console.log("[builtin-guard:fallback] ✅ Loaded %s directly (%d chars) from %s",

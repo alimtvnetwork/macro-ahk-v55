@@ -45,6 +45,7 @@ export function restoreFocusToImportButton(refs: ModalRefs): void {
   }
 
   const btn = refs.root.querySelector<HTMLButtonElement>('[data-testid="library-import"]');
+
   if (btn) {
     btn.focus();
   }
@@ -70,6 +71,7 @@ async function executeImportParse(
   file: File
 ) {
   const parsed = parsePromptsText(text);
+
   if (parsed.errors.length > 0 && parsed.valid.length === 0) {
     const friendly = buildFriendlyImportError(parsed.errors, file.name);
     refs.status.textContent = 'Import parse failed: ' + friendly.headline;
@@ -92,6 +94,7 @@ async function executeImportDb(
   const roleSel = refs.importRoleSelect?.value;
   const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
   const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite: true };
+
   if (roleFilter) {
     importOpts.roleFilter = roleFilter;
   }
@@ -153,6 +156,7 @@ async function _executeImportFileBody(
   try {
     const text = await file.text();
     const parsed = await executeImportParse(refs, text, file);
+
     if (!parsed) {
       return 'banner';
     }
@@ -163,6 +167,7 @@ async function _executeImportFileBody(
     refs.lastImportFailed = false;
     clearImportErrorBanner(refs);
     renderPartialImportErrors(refs, results.errors, parsed.errors);
+
     if (origin === 'drop') {
       return 'import';
     }
@@ -200,6 +205,7 @@ export async function handleImportFile(
   };
   
   const invalid = validateImportFile(file);
+
   if (invalid) {
     _handleImportValidationError(refs, invalid, file, fileInput, retrying);
 
@@ -224,6 +230,7 @@ export async function handleImportFile(
   importBtn.removeAttribute('aria-busy');
   hideImportSpinner(importBtn, originalLabel);
   hideImportProgress(refs);
+
   if (focusAfter === 'import') {
     restoreFocusToImportButton(refs);
   } else if (focusAfter === 'banner') {

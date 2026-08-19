@@ -141,6 +141,7 @@ function findViaXPath(desc: ElementDescriptor): Element | null {
 
   log('  Method 1 (XPath) for ' + desc.name + ': ' + desc.xpath, 'check');
   const result = getByXPath(desc.xpath);
+
   if (result) {
     log('  ' + desc.name + ' FOUND via XPath: ' + desc.xpath, 'success');
 
@@ -187,6 +188,7 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
     try {
       log('    [' + (sIdx + 1) + '/' + selectors.length + '] querySelector("' + sel + '")', 'check');
       const result = document.querySelector(sel);
+
       if (result) {
         log('    ✅ FOUND via selector [' + (sIdx + 1) + ']: ' + sel + ' → <' + result.tagName.toLowerCase() + '>', 'success');
 
@@ -212,6 +214,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
   for (const label of labels) {
     try {
       const result = document.querySelector('[aria-label*="' + label + '" i], [title*="' + label + '" i]');
+
       if (result) {
         log('  ' + desc.name + ' FOUND via ARIA: ' + label, 'success');
 
@@ -233,6 +236,7 @@ function findViaRole(desc: ElementDescriptor): Element | null {
   }
 
   const result = document.querySelector('[role="' + desc.role + '"]');
+
   if (result) {
     log('  ' + desc.name + ' FOUND via role: ' + desc.role, 'success');
 

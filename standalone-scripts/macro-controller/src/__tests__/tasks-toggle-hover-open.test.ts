@@ -42,6 +42,7 @@ function buildHarness(): { btn: HTMLElement; group: HTMLElement; root: HTMLEleme
   btn.addEventListener('mouseenter', open);
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
+
     if (group.style.display === 'none') {
       open();
     } else {

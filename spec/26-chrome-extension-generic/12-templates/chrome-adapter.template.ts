@@ -62,6 +62,7 @@ const scripting: ScriptingApi = {
       args: args as unknown[],
     });
     const first = results[0];
+
     if (!first) {
       throw new AppError({
         code: "SCRIPTING_NO_RESULT",
@@ -99,6 +100,7 @@ const runtime: RuntimeApi = {
         tabId: sender.tab?.id ?? null,
         frameId: sender.frameId ?? null,
       });
+
       if (result instanceof Promise) {
         result.then(sendResponse).catch((err: unknown) => {
           sendResponse({ error: AppError.isAppError(err) ? err.toJSON() : String(err) });
@@ -129,6 +131,7 @@ function toSummary(tab: chrome.tabs.Tab): TabSummary | null {
   }
 
   let origin: string | null = null;
+
   if (tab.url) {
     try {
       origin = new URL(tab.url).origin; 
@@ -166,6 +169,7 @@ const tabs: TabsApi = {
   onUpdated(handler) {
     const listener = (_id: number, _info: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
       const summary = toSummary(tab);
+
       if (summary) {
         handler(summary);
       }

@@ -100,11 +100,13 @@ export function showStartupToast(version: string): void {
  */
 export function updateStartupToast(message: string): void {
   const el = document.getElementById(DomIdType.StartupToast);
+
   if (!el) {
     return;
   }
 
   const textSpan = el.querySelector('span:last-child');
+
   if (textSpan) {
     textSpan.textContent = message;
   }
@@ -121,6 +123,7 @@ export function removeStartupToast(): void {
   }
 
   const el = document.getElementById(DomIdType.StartupToast);
+
   if (!el) {
     return;
   }

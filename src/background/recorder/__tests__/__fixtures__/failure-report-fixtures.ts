@@ -113,6 +113,7 @@ function makeTargetElement(): Element {
   host.innerHTML = `<button id="go" name="submit" type="button" aria-label="Go now">Go</button>`;
   document.body.appendChild(host);
   const btn = host.querySelector("button");
+
   if (btn === null) {
     throw new Error("Fixture setup failed: <button> not found in jsdom.");
   }

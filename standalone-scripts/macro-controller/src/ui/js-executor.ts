@@ -30,8 +30,10 @@ export function addLoopJsHistoryEntry(code: string, success: boolean, resultText
   const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const entry = { time: timeStr, code: code, success: success, result: resultText };
   const isDuplicate = loopJsHistory.length > 0 && loopJsHistory[0].code === code;
+
   if (!isDuplicate) {
     loopJsHistory.unshift(entry);
+
     if (loopJsHistory.length > LOOP_JS_HISTORY_MAX) {
       loopJsHistory.pop();
     }
@@ -45,6 +47,7 @@ export function addLoopJsHistoryEntry(code: string, success: boolean, resultText
 
 export function renderLoopJsHistory(): void {
   const el = document.getElementById('loop-js-history');
+
   if (!el) {
     return;
   }
@@ -75,6 +78,7 @@ export function renderLoopJsHistory(): void {
     (item as HTMLElement).onclick = (function(idx: number) {
       return function() {
         const ta = document.getElementById(IDS.JS_EXECUTOR) as HTMLTextAreaElement | null;
+
         if (ta && loopJsHistory[idx]) {
           ta.value = loopJsHistory[idx].code;
           ta.focus();
@@ -87,6 +91,7 @@ export function renderLoopJsHistory(): void {
 
 export function navigateLoopJsHistory(direction: string): void {
   const ta = document.getElementById(IDS.JS_EXECUTOR) as HTMLTextAreaElement | null;
+
   if (!ta || loopJsHistory.length === 0) {
     return;
   }
@@ -109,6 +114,7 @@ export function navigateLoopJsHistory(direction: string): void {
 
 export function executeJs(): void {
   const textbox = document.getElementById(IDS.JS_EXECUTOR);
+
   if (!textbox) {
     logError('unknown', 'JS textbox element not found');
 
@@ -116,6 +122,7 @@ export function executeJs(): void {
   }
 
   const code = (textbox as HTMLTextAreaElement).value.trim();
+
   if (!code) {
     log('No code to execute', 'warn');
 
@@ -126,6 +133,7 @@ export function executeJs(): void {
   try {
     const result = new Function(code)();
     const resultStr = result !== undefined ? String(result) : '(undefined)';
+
     if (result !== undefined) {
       console.log('[MacroLoop v' + VERSION + '] Result:', result);
     }

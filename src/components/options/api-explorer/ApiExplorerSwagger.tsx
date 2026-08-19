@@ -64,6 +64,7 @@ export function ApiExplorerSwagger() {
 
   const filtered = useMemo(() => {
     let list = endpoints;
+
     if (categoryFilter !== "all") {
       list = list.filter((e) => e.Category === categoryFilter);
     }
@@ -86,6 +87,7 @@ export function ApiExplorerSwagger() {
     const map = new Map<string, EndpointDoc[]>();
     for (const ep of filtered) {
       const cat = ep.Category;
+
       if (!map.has(cat)) {
         map.set(cat, []);
       }

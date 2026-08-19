@@ -144,6 +144,7 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
 
   const addFromLibrary = useCallback((scriptId: string) => {
     const script = allScripts.find((s) => s.id === scriptId);
+
     if (!script) {
       return;
     }

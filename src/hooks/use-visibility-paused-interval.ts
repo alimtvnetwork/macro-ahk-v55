@@ -67,6 +67,7 @@ function installVisibilityLoop(tickRef: TickRef, intervalMs: number): () => void
   };
 
   document.addEventListener("visibilitychange", handleVisibility);
+
   if (!document.hidden) {
     tickRef.current();
     start(); 

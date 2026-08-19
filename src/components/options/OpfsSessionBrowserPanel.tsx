@@ -191,6 +191,7 @@ export function OpfsSessionBrowserPanel() {
     for (const session of data.sessions) {
       lines.push("");
       lines.push(`📁 ${session.absolutePath}  (${formatBytes(session.totalSizeBytes)})`);
+
       if (session.files.length === 0) {
         lines.push("   ⚠ (empty — no files)");
       } else {
@@ -203,6 +204,7 @@ export function OpfsSessionBrowserPanel() {
     navigator.clipboard.writeText(lines.join("\n")).then(() => {
       setCopied(true);
       toast.success("OPFS session tree copied to clipboard");
+
       if (copyTimerRef.current !== null) {
         clearTimeout(copyTimerRef.current);
       }

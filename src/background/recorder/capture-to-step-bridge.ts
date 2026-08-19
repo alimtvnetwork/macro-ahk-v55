@@ -64,6 +64,7 @@ export function inferStepKind(
   tagName: string,
 ): (typeof StepKindId)[keyof typeof StepKindId] {
   const lower = tagName.toLowerCase();
+
   if (SELECT_TAGS.has(lower)) {
     return StepKindId.Select;
   }
@@ -101,6 +102,7 @@ export function findAnchorSelectorId(
     [SelectorKindId.XPathFull, anchorXPath],
   );
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     return null;
   }
@@ -116,6 +118,7 @@ export function findAnchorSelectorId(
 export function buildLabel(payload: XPathCapturePayload): string {
   const trimmed = payload.Text.trim();
   const tag = payload.TagName.toLowerCase();
+
   if (trimmed.length === 0) {
     return `<${tag}>`;
   }
@@ -158,6 +161,7 @@ function buildCaptureSelectors(
     AnchorSelectorId: null,
     IsPrimary: true,
   }];
+
   if (payload.XPathRelative !== null && anchorSelectorId !== null) {
     selectors.push({
       SelectorKindId: SelectorKindId.XPathRelative,
@@ -209,16 +213,19 @@ export function deriveUrlTabClickParams(
   payload: XPathCapturePayload,
 ): UrlTabClickParams | null {
   const hint = payload.UrlTabClickHint;
+
   if (hint === undefined) {
     return null;
   }
 
   const isMissing = !shouldRecordAsUrlTabClick(hint);
+
   if (isMissing) {
     return null;
   }
 
   const observedUrl = hint.OpenedTabUrl ?? hint.Href ?? "";
+
   if (observedUrl === "") {
     return null;
   }

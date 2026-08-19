@@ -48,6 +48,7 @@ export function runIdempotentCheck(): IdempotentResult {
   nsWrite('_internal.destroyed', false);
 
   const existingMarker = document.getElementById(IDS.SCRIPT_MARKER);
+
   if (!existingMarker) {
     return 'proceed';
   }
@@ -78,6 +79,7 @@ function handleVersionMismatch(marker: HTMLElement, existingVersion: string): Id
 
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
+
   if (staleContainer) {
     staleContainer.remove();
   }
@@ -87,6 +89,7 @@ function handleVersionMismatch(marker: HTMLElement, existingVersion: string): Id
 
 function handleGlobalsIntact(marker: HTMLElement): IdempotentResult {
   const existingContainer = document.getElementById(IDS.CONTAINER);
+
   if (existingContainer) {
     console.log(CONSOLE_PREFIX + VERSION + '] Already embedded (marker=' + IDS.SCRIPT_MARKER + '), skipping injection, UI and state intact', STYLE_GREEN);
 
@@ -120,6 +123,7 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
 
     if (existingController?.ui && typeof existingController.ui.create === 'function') {
       existingController.ui.create();
+
       if (typeof existingController.ui.update === 'function') {
         existingController.ui.update();
       }
@@ -160,11 +164,13 @@ function healAllManagers(existingController: RecoverableController | null): void
   // Self-heal UIManager
   if (isMissingUi) {
     const savedUIFactory = nsReadTyped('_internal.createUIManager') as (() => unknown) | undefined;
+
     if (savedUIFactory && typeof existingController.registerUI === 'function') {
       console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted factory');
       existingController.registerUI(savedUIFactory());
     } else {
       const savedCreateFn = nsReadTyped('_internal.createUIWrapper') as (() => void) | undefined;
+
       if (savedCreateFn && typeof existingController.registerUI === 'function') {
         console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted createFn (legacy)');
         const healedUI = new UIManager();
@@ -206,6 +212,7 @@ function healManager(
 
   if (!has) {
     const factory = nsReadTyped(nsKey as keyof import('./api-namespace').NsPathMap) as (() => unknown) | undefined;
+
     if (factory) {
       console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering ' + label + ' from persisted factory');
       register(factory());
@@ -217,6 +224,7 @@ function handleStaleMarker(marker: HTMLElement): IdempotentResult {
   console.warn(LabelType.LogMacroloopV + VERSION + '] Stale marker found (globals missing), removing marker and re-initializing');
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
+
   if (staleContainer) {
     staleContainer.remove();
   }

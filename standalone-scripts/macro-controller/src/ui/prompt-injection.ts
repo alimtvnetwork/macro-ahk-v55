@@ -59,6 +59,7 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
   }
 
   const ext = (file.name || '').split('.').pop()?.toLowerCase() || '';
+
   if (!['md', 'txt', 'prompt'].includes(ext)) {
     showPasteToast('❌ Unsupported file type: .' + ext, true);
 
@@ -76,6 +77,7 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
     const content = e.target?.result as string;
     refs.contentArea.value = content;
     refs.charCount.textContent = content.length + ' chars';
+
     if (!refs.titleInput.value.trim()) {
       refs.titleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
     }
@@ -178,6 +180,7 @@ function formatSaveErrorMessage(
     : input.role === 'next' ? 'Next'
       : input.role === 'generic' ? 'Generic' : 'prompt';
   const f = input.failure;
+
   if (f && f.rule === 'rule-zero') {
     const expected = f.expectedN ?? null;
     const actual = f.actualN ?? null;
@@ -224,6 +227,7 @@ export function openPromptCreationModal(
 ): void {
   ensurePromptModalTheme();
   const existing = document.getElementById('marco-prompt-modal');
+
   if (existing) {
     existing.remove();
   }
@@ -237,6 +241,7 @@ export function openPromptCreationModal(
   // option even when no other entry has surfaced that category yet.
   const initialData: Record<string, unknown> = { ...(baseInitial as Record<string, unknown>) };
   const roleForCategory = options?.role;
+
   if (roleForCategory === 'plan' || roleForCategory === 'next') {
     initialData.category = roleForCategory;
     initialData.__lockedCategory = roleForCategory;
@@ -488,6 +493,7 @@ function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement,
     e.stopPropagation();
     (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary;
     (this as HTMLElement).style.background = 'transparent';
+
     if (e.dataTransfer && e.dataTransfer.files.length > 0) {
       handleFile(e.dataTransfer.files[0], fileRefs);
     }
@@ -550,6 +556,7 @@ function collectExistingCategories(): string[] {
   const catSeen: Record<string, boolean> = {};
   for (const entry of existingEntries) {
     const ec = (entry.category || '').trim();
+
     if (ec && !catSeen[ec.toLowerCase()]) {
       existingCats.push(ec);
       catSeen[ec.toLowerCase()] = true; 
@@ -596,6 +603,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
 
   catSelect.onchange = function() {
     catCustomInput.style.display = catSelect.value === '__custom__' ? 'block' : 'none';
+
     if (catSelect.value !== '__custom__') {
       catCustomInput.value = '';
     }
@@ -648,6 +656,7 @@ function _applyInitialCategory(initialCat: string, existingCats: string[], catSe
     const matchIdx = existingCats.findIndex(function(c) {
       return c.toLowerCase() === initialCat.toLowerCase(); 
     });
+
     if (matchIdx !== -1) {
       catSelect.value = existingCats[matchIdx]; 
     } else {
@@ -683,6 +692,7 @@ function parseDbPromptId(editPrompt: EditablePrompt | null): number | undefined 
 
 function buildLegacyPromptPayload(input: PromptSaveInput): Record<string, unknown> {
   const promptPayload: Record<string, unknown> = { name: input.name, text: input.text, source: 'user' };
+
   if (input.category) {
     promptPayload.category = input.category;
   }
@@ -719,6 +729,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   // Extended to `next` in v4.183.0 to close the asymmetric-validator gap.
   if (role === 'plan' || role === 'next') {
     const check = validateRuleZero(input.text);
+
     if (!check.ok) {
       const slug = buildSlug(role, input.name, input.editPrompt);
       logDiagnosticFromCode(
@@ -773,6 +784,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
 
 function savePromptFromEditor(input: PromptSaveInput): Promise<PromptSaveResult> {
   const role = input.role ?? input.editPrompt?.role;
+
   if (role === 'plan' || role === 'next') {
     return saveRoleScopedPrompt(input, role);
   }
@@ -811,6 +823,7 @@ function _buildPromptModalFooter(
   // PlanTierType-23 step 5: required-tokens chip strip + live drift indicator.
   const requiredTokens = (options?.requiredTokens ?? []).filter((t): t is string => typeof t === 'string' && t.length > 0);
   const tokenStrip = _buildRequiredTokenStrip(requiredTokens);
+
   if (tokenStrip) {
     footer.appendChild(tokenStrip.root);
   }
@@ -824,6 +837,7 @@ function _buildPromptModalFooter(
   // designed to prevent. Mounting the indicator for both roles closes that gap.
   const showRuleZero = options?.role === 'plan' || options?.role === 'next';
   const ruleZeroIndicator = showRuleZero ? _buildRuleZeroIndicator() : null;
+
   if (ruleZeroIndicator) {
     footer.appendChild(ruleZeroIndicator.root);
   }
@@ -853,6 +867,7 @@ function _buildPromptModalFooter(
       roleLabel: options?.roleLabel ?? 'Generic',
       requiredTokens: requiredTokens,
     };
+
     if (guidelineSeedBody !== null) {
       guidelineArg.seedBody = guidelineSeedBody;
     }
@@ -869,6 +884,7 @@ function _buildPromptModalFooter(
   // this is safe to cancel with the ✕ button.
   const editSlug = (isEdit && editPrompt && typeof editPrompt.slug === 'string') ? editPrompt.slug : null;
   const seedBody = editSlug ? getSeedBodyForSlug(editSlug) : null;
+
   if (seedBody !== null) {
     const resetBtn = document.createElement('button');
     resetBtn.textContent = '↺ Reset to default';
@@ -885,8 +901,10 @@ function _buildPromptModalFooter(
 
     resetBtn.onclick = function() {
       const current = contentArea.value;
+
       if (current.trim().length > 0 && current !== seedBody) {
         const ok = window.confirm('Reset the prompt body to the shipped default? Unsaved edits in this editor will be discarded (existing DB row is untouched until you click Save).');
+
         if (!ok) {
           return;
         }
@@ -914,6 +932,7 @@ function _buildPromptModalFooter(
 
   testBtn.onclick = function() {
     let text = contentArea.value.trim();
+
     if (!text) {
       showPasteToast('❌ No content to paste', true);
 
@@ -1011,6 +1030,7 @@ function _buildPromptModalFooter(
 
       const isDiffShortcut = (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey
         && (e.key === 'd' || e.key === 'D');
+
       if (!isDiffShortcut) {
         return;
       }
@@ -1048,6 +1068,7 @@ function _buildPromptModalFooter(
     (saveBtn as HTMLButtonElement).disabled = blocked;
     saveBtn.style.opacity = blocked ? '0.5' : '1';
     saveBtn.style.cursor = blocked ? 'not-allowed' : 'pointer';
+
     if (missing.length > 0) {
       saveBtn.title = 'Save is disabled — missing required tokens: {{' + missing.join('}}, {{') + '}}';
     } else if (ruleZeroBlocks && ruleZero) {
@@ -1073,6 +1094,7 @@ function _buildPromptModalFooter(
   function handleSaveResponse(resp: PromptSaveResult, name: string, text: string): void {
     (saveBtn as HTMLButtonElement).disabled = false;
     saveBtn.textContent = isEdit ? '💾 Update' : '💾 Save';
+
     if (!(resp && resp.isOk)) {
       const fallback = resp.errorMessage || 'Save failed, extension may not be connected';
       const detailedMessage = formatSaveErrorMessage({
@@ -1105,6 +1127,7 @@ function _buildPromptModalFooter(
       && editPrompt.text !== text
       && typeof editPrompt.slug === 'string'
       && editPrompt.slug.length > 0;
+
     if (canUndo) {
       const previousName = editPrompt!.name;
       const previousBody = editPrompt!.text;
@@ -1115,6 +1138,7 @@ function _buildPromptModalFooter(
           slug: previousSlug, name: previousName, body: previousBody,
           role: role, previousBody: text,
         };
+
         if (previousId !== undefined) {
           undoPayload.id = previousId;
         }
@@ -1148,6 +1172,7 @@ function _buildPromptModalFooter(
     const { titleInput, contentArea, catSelect, catCustomInput, tagsInput, excludeFromExportInput } = bodyResult;
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
+
     if (!name) {
       showPasteToast('❌ Title is required', true);
       titleInput.focus();
@@ -1170,6 +1195,7 @@ function _buildPromptModalFooter(
 
     if (tokenStrip) {
       const missing = tokenStrip.recomputeMissing(text);
+
       if (missing.length > 0) {
         const detailedMessage = formatSaveErrorMessage({
           role: options?.role,
@@ -1205,6 +1231,7 @@ function _buildPromptModalFooter(
       excludeFromExport: !!excludeFromExportInput.checked,
       isEdit: isEdit, editPrompt: editPrompt,
     };
+
     if (options?.role) {
       saveInput.role = options.role;
     }
@@ -1264,6 +1291,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
       chip.style.background = ok ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
       chip.style.borderColor = ok ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.7)';
       chip.style.color = ok ? 'hsl(var(--success))' : 'hsl(var(--destructive))';
+
       if (!ok) {
         missing.push(token);
       }
@@ -1306,6 +1334,7 @@ function _ruleZeroPaintText(check: import('../db/rule-zero-validator').RuleZeroC
 
 function _ruleZeroApplyStyle(badge: HTMLElement, paintText: RuleZeroPaintText): void {
   badge.textContent = paintText.text;
+
   if (paintText.neutral) {
     badge.style.background = 'rgba(148,163,184,0.15)';
     badge.style.borderColor = 'rgba(148,163,184,0.5)';

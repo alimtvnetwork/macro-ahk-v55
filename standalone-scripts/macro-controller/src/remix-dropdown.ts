@@ -74,6 +74,7 @@ export async function actionRemixNext(ctx: RemixActionContext): Promise<void> {
       workspaceId: ctx.workspaceId,
       mode: 'next',
     });
+
     if (result.redirectUrl) {
       openRemixRedirect(result.redirectUrl);
     }
@@ -90,6 +91,7 @@ export async function actionRemixNext(ctx: RemixActionContext): Promise<void> {
 
 function removeHeaderDropdown(): void {
   const old = document.getElementById(HEADER_DROPDOWN_ID);
+
   if (old) {
     old.remove();
   }
@@ -164,6 +166,7 @@ export function showHeaderRemixDropdown(anchorEl: HTMLElement, ctx: RemixActionC
 
   // Last item — drop the bottom border.
   const last = dd.lastElementChild as HTMLElement | null;
+
   if (last) {
     last.style.borderBottom = 'none';
   }
@@ -192,6 +195,7 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
   main.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
+
     if (!ctx) {
       showToast('Remix unavailable — project/workspace not detected', 'warn');
 
@@ -210,6 +214,7 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
   arrow.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
+
     if (!ctx) {
       showToast('Remix unavailable — project/workspace not detected', 'warn');
 

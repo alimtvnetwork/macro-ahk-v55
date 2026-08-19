@@ -26,6 +26,7 @@ const HEALTHY_THRESHOLD = 3_000_000;
 export async function checkAndAutoPrune(): Promise<void> {
   const totalRows = getTotalRows();
   const isOverThreshold = totalRows >= PRUNE_TRIGGER_THRESHOLD;
+
   if (isOverThreshold) {
     await performAutoPrune(totalRows);
   }
@@ -41,6 +42,7 @@ export async function checkAndAutoPrune(): Promise<void> {
 async function performAutoPrune(currentTotal: number): Promise<void> {
   const rowsToRemove = currentTotal - PRUNE_TARGET_ROWS;
   const isRemovalNeeded = rowsToRemove > 0;
+
   if (isRemovalNeeded) {
     transitionHealth("DEGRADED", "Auto-pruning storage");
     pruneOldestLogs(rowsToRemove);
@@ -71,6 +73,7 @@ function pruneOldestLogs(count: number): void {
 /** Deletes the oldest N error rows. */
 function pruneOldestErrors(count: number): void {
   const isCountPositive = count > 0;
+
   if (isCountPositive) {
     const db = getErrorsDb();
     db.run(
@@ -90,6 +93,7 @@ function pruneOldestErrors(count: number): void {
 function updateHealthAfterPrune(): void {
   const totalRows = getTotalRows();
   const isHealthy = totalRows < HEALTHY_THRESHOLD;
+
   if (isHealthy) {
     recoverHealth();
   }

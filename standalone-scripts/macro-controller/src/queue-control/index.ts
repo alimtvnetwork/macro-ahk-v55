@@ -33,6 +33,7 @@ function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
       XPathResult.FIRST_ORDERED_NODE_TYPE,
       null,
     ).singleNodeValue;
+
     if (node instanceof HTMLElement) {
       return node;
     }
@@ -55,6 +56,7 @@ export function isQueueResumeVisible(): boolean {
 
 export function pauseQueue(): QueueClickResult {
   const btn = findButton(QUEUE_PAUSE_BUTTON_XPATH, QUEUE_PAUSE_ARIA_LABEL);
+
   if (btn === null) {
     return { clicked: false, reason: 'pause-missing' };
   }
@@ -66,6 +68,7 @@ export function pauseQueue(): QueueClickResult {
 
 export function resumeQueue(): QueueClickResult {
   const btn = findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL);
+
   if (btn === null) {
     return { clicked: false, reason: 'resume-missing' };
   }

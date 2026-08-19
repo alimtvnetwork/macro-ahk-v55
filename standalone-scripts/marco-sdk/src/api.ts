@@ -73,6 +73,7 @@ async function callEndpoint<T = unknown>(
   const responseHeaders: Record<string, string> = {};
   for (const key of Object.keys(response.headers)) {
     const headerValue = response.headers[key];
+
     if (typeof headerValue === "string") {
       responseHeaders[key] = headerValue;
     }

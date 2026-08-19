@@ -99,6 +99,7 @@ interface NextPromptEntry {
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
   if (!target) {
     return '';
   }
@@ -146,11 +147,13 @@ function findNextTemplate(entries: NextPromptEntry[], n: number, source: string)
 function resolveNextVariantText(deps: TaskNextDeps, n: number): string | null {
   const entries = (deps.getPromptsConfig().entries || []) as NextPromptEntry[];
   const variant = findNextVariant(entries, n);
+
   if (variant) {
     return variant;
   }
 
   const template = findNextTemplate(entries, n, 'loaded prompts') || findNextTemplate(DEFAULT_PROMPTS, n, 'DEFAULT_PROMPTS');
+
   if (template) {
     return template;
   }
@@ -185,6 +188,7 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
         return r.isSuccess ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); 
       },
     );
+
     if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using DB next-default (' + result.value.Body.length + ' chars, key=' + key + ') for N=' + n, 'info');
@@ -212,6 +216,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
   }
 
   const text = await resolveNextTextDbFirst(deps, n);
+
   if (!text) {
     showPasteToast('❌ Next ' + n + ': prompt not found in library', true);
     logError('NextInline', 'next-' + n + '-steps prompt missing');
@@ -225,6 +230,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
     : text;
   try {
     const outcome = await pasteIntoEditor(combined, getPromptsConfig(), (xp) => getByXPath(xp) as Element | null, 'next-chip');
+
     if (String(outcome) === 'failed') {
       showPasteToast('❌ Next ' + n + ': paste failed', true);
 
@@ -393,6 +399,7 @@ function handleMenuFocusIn(panel: HTMLElement, event: FocusEvent): void {
   }
 
   const target = event.target;
+
   if (!(target instanceof HTMLElement)) {
     return;
   }
@@ -402,6 +409,7 @@ function handleMenuFocusIn(panel: HTMLElement, event: FocusEvent): void {
   }
 
   const label = itemLabel(target);
+
   if (label) {
     announcePopover(label);
   }
@@ -414,6 +422,7 @@ function createDocumentFocusTrap(panel: HTMLElement, trigger: HTMLElement): (eve
     }
 
     const target = event.target;
+
     if (!(target instanceof Node)) {
       return;
     }
@@ -453,6 +462,7 @@ function attachTriggerTabTrap(panel: HTMLElement, trigger: HTMLElement): void {
     }
 
     const menuItems = getVisibleMenuItems(panel);
+
     if (menuItems.length === 0) {
       return;
     }
@@ -531,12 +541,14 @@ function createMenuKeydownHandler(panel: HTMLElement, trigger: HTMLElement, onCl
     }
 
     const menuItems = getVisibleMenuItems(panel);
+
     if (menuItems.length === 0) {
       return;
     }
 
     const activeElement = document.activeElement as HTMLElement | null;
     const currentIndex = activeElement ? menuItems.indexOf(activeElement) : -1;
+
     if (handleMenuNavigation(event, menuItems, currentIndex)) {
       return;
     }
@@ -696,6 +708,7 @@ export function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): v
   const spaceAbove = rect.top;
   const gap = 4;
   const margin = 8;
+
   if (spaceBelow >= panelH + gap || spaceBelow >= spaceAbove) {
     panel.style.top = String(Math.round(rect.bottom + gap)) + 'px';
     panel.style.bottom = 'auto';
@@ -711,6 +724,7 @@ export function positionPopoverFixed(panel: HTMLElement, button: HTMLElement): v
 
 export function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a11y: PopoverA11y, open: boolean): void {
   const wasOpen = isPopoverOpen(panel);
+
   if (open) {
     positionPopoverFixed(panel, button);
   }
@@ -718,6 +732,7 @@ export function setPopoverVisibility(panel: HTMLElement, button: HTMLElement, a1
   panel.style.display = open ? STYLE_DISPLAY_FLEX : STYLE_DISPLAY_NONE;
   button.setAttribute(ATTR_ARIA_EXPANDED, open ? 'true' : 'false');
   a11y.setTrapActive(open);
+
   if (open) {
     a11y.focusFirst();
     a11y.announceOpen();
@@ -756,6 +771,7 @@ export function createOutsidePopoverCloser(container: HTMLElement, panel: HTMLEl
     }
 
     const target = event.target;
+
     if (target instanceof Node && container.contains(target)) {
       return;
     }
@@ -792,6 +808,7 @@ function collectHiddenChipPresets(body: HTMLElement, chips: HTMLElement[]): Hidd
   const hiddenPresets: HiddenChipPreset[] = [];
   for (let index = chips.length - 1; index >= 0; index--) {
     const chip = chips[index];
+
     if (!chip) {
       continue;
     }
@@ -800,6 +817,7 @@ function collectHiddenChipPresets(body: HTMLElement, chips: HTMLElement[]): Hidd
     const n = Number(chip.dataset['n'] || '0');
     const hi = chip.dataset['highlighted'] === '1';
     hiddenPresets.unshift({ n, hi });
+
     if (body.scrollWidth <= body.clientWidth + 1) {
       break;
     }
@@ -816,6 +834,7 @@ function fillChipOverflowPanel(panel: HTMLElement, hiddenPresets: HiddenChipPres
 
 function recomputeChipOverflow(body: HTMLElement, shell: PopoverShell, buildChipByN: (n: number, highlighted: boolean) => HTMLElement, a11y: PopoverA11y): void {
   const chips = resetChipOverflow(body, shell.panel, shell.wrap);
+
   if (body.scrollWidth <= body.clientWidth + 1) {
     return;
   }
@@ -890,12 +909,14 @@ function collectOverflowActions(body: HTMLElement, actions: HTMLElement[]): HTML
   const hiddenActions: HTMLElement[] = [];
   for (let index = actions.length - 1; index >= 0; index--) {
     const actionElement = actions[index];
+
     if (!actionElement) {
       continue;
     }
 
     actionElement.style.display = STYLE_DISPLAY_NONE;
     hiddenActions.unshift(actionElement);
+
     if (body.scrollWidth <= body.clientWidth + 1) {
       break;
     }
@@ -916,11 +937,13 @@ function recomputeActionOverflow(body: HTMLElement, shell: PopoverShell, origina
   restoreActionOverflowPositions(original);
   shell.wrap.style.display = STYLE_DISPLAY_NONE;
   setOpen(false);
+
   if (body.scrollWidth <= body.clientWidth + 1) {
     return;
   }
 
   const actions = getTrailingActions(body, shell.wrap);
+
   if (actions.length === 0) {
     return;
   }
@@ -1144,6 +1167,7 @@ function buildNextMoreWrap(): HTMLElement {
   moreBtn.onclick = function (ev) {
     ev.stopPropagation();
     const willOpen = panel.style.display !== 'flex';
+
     if (willOpen) {
       positionPopoverFixed(panel, moreBtn);
     }
@@ -1159,6 +1183,7 @@ async function refreshNextChipsFromDb(deps: TaskNextDeps, body: HTMLElement, mor
     const { resolveConfiguredChipValues } = await import('./configured-chip-values');
     const values = await resolveConfiguredChipValues('next', [...NEXT_PRESETS]);
     const isSame = values.length === NEXT_PRESETS.length && values.every((v, i) => v === NEXT_PRESETS[i]);
+
     if (isSame) {
       return;
     }
@@ -1225,11 +1250,13 @@ function tryMountInline(deps: TaskNextDeps): boolean {
   }
 
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
   if (!target) {
     return false;
   }
 
   const host = (target.closest && target.closest('form')) || target.parentElement;
+
   if (!host || !host.parentElement) {
     return false;
   }
@@ -1237,6 +1264,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
   // v4.16+: mount into shared frame so PlanTierType/Next/Repeat share one visual unit
   // and one minimize/maximize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
+
   if (!framed) {
     return false;
   }
@@ -1256,6 +1284,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
     strip.id = INLINE_ID;
     strip.style.margin = '0';
     const splitStrip = document.getElementById(SPLIT_ID);
+
     if (splitStrip && splitStrip.nextSibling) {
       body.insertBefore(strip, splitStrip.nextSibling);
     } else {
@@ -1288,6 +1317,7 @@ export function registerPointerPopoverCloser(handler: (ev: Event) => void): void
 function _teardownPointerPopoverClosers(): void {
   while (_pointerPopoverClosers.length) {
     const handler = _pointerPopoverClosers.pop();
+
     if (!handler) {
       continue;
     }
@@ -1333,6 +1363,7 @@ function _registerNextInlineTeardownOnce(): void {
 
     while (_dropupClosers.length) {
       const c = _dropupClosers.pop();
+
       if (c) {
         document.removeEventListener('click', c, true);
       }
@@ -1351,6 +1382,7 @@ export function __resetNextInlineForTests(): void {
 
   while (_dropupClosers.length) {
     const c = _dropupClosers.pop();
+
     if (c) {
       document.removeEventListener('click', c, true);
     }
@@ -1389,11 +1421,13 @@ export function mountNextInlineStrip(deps: TaskNextDeps): void {
   if (!isLegacyStripsEnabled()) {
     // Strips suppressed — remove any pre-existing mounts so the UI is clean.
     const a = document.getElementById(INLINE_ID);
+
     if (a && a.parentElement) {
       a.parentElement.removeChild(a);
     }
 
     const b = document.getElementById(SPLIT_ID);
+
     if (b && b.parentElement) {
       b.parentElement.removeChild(b);
     }

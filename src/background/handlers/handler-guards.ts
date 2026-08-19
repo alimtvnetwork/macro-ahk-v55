@@ -128,6 +128,7 @@ export function safeBind(
   const out: Array<string | number | null | Uint8Array> = [];
   for (let i = 0; i < params.length; i++) {
     const v = params[i];
+
     if (v === undefined) {
       if (!allowUndefined) {
         throw new SqliteBindError(i, op);

@@ -85,6 +85,7 @@ export function buildMorePopover(config: MorePopoverConfig, deps: PopoverDepende
   
   const rePopulate = (values: readonly number[]): void => {
     populateDropup(panel, values, config.buildChip, config.appendExtra);
+
     if (deps.isPopoverOpen(panel)) {
       deps.positionPopoverFixed(panel, config.trigger);
     }

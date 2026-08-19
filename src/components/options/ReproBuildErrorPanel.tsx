@@ -36,6 +36,7 @@ function useCopyToClipboard(text: string, timeout = 2000) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }

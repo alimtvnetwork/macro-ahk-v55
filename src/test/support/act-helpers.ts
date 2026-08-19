@@ -73,6 +73,7 @@ export async function withFakeTimers(
   vi.useFakeTimers();
   try {
     await body();
+
     if (advanceMs !== undefined) {
       await act(async () => {
         vi.advanceTimersByTime(advanceMs); 

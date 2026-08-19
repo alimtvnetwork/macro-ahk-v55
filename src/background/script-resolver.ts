@@ -65,8 +65,10 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
 
   try {
     const cached = await getCachedScriptCode(script.filePath);
+
     if (cached) {
       const ms = (performance.now() - t0).toFixed(1);
+
       if (isMainBundle) {
         console.log("[script-resolver] ⚡ macro-looping.js CACHE HIT — %d chars in %sms", cached.length, ms);
       } else {
@@ -90,6 +92,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
         : chrome.runtime.getURL(candidate.path);
       const fetchT0 = performance.now();
       const response = ServiceResult.wrapFetch(await fetch(url));
+
       if (response.isFail) {
         // HEFF D-1 (ambiguity #53): an HTTP response means the server
         // received and rejected us. Stop the resolver — do NOT try the
@@ -117,6 +120,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
       cacheScriptCode(candidate.path, code).catch((cacheErr) => {
         logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `cacheScriptCode failed for "${candidate.path}" — code fetched OK but cache miss will repeat next call`, cacheErr);
       });
+
       if (candidate.path !== script.filePath) {
         logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `Recovered ${script.filePath} via bundled fallback ${candidate.path}`);
         cacheScriptCode(script.filePath, code).catch((cacheErr) => {
@@ -211,6 +215,7 @@ async function resolveDependencies(
 
   for (const entry of resolved) {
     const script = allScripts.find((s) => s.id === entry.injectable.id);
+
     if (!script?.dependencies?.length) {
       continue;
     }
@@ -221,6 +226,7 @@ async function resolveDependencies(
       }
 
       const depScript = findScript(allScripts, depId);
+
       if (!depScript) {
         logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `Dependency not found\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Script with id="${depId}" (required by "${script.name}")\n  Reason: Dependency declared in script.dependencies but no matching script exists in storage`);
         continue;
@@ -284,6 +290,7 @@ async function resolveOneBinding(
   configs: StoredConfig[],
 ): Promise<ResolveOutcome> {
   const script = findScript(scripts, binding.scriptId);
+
   if (script === null) {
     // CODE RED: URL matched a project rule but the bound script is missing from the library.
     // Per "no silent failures" policy — escalate to ERROR (not warn). See mem://standards/no-silent-failures.
@@ -401,12 +408,14 @@ function findScript(
 
   // ID-based lookup (default path for dependency IDs, e.g. default-xpath-utils)
   const byId = scripts.find((s) => s.id === scriptId);
+
   if (byId !== undefined) {
     return byId;
   }
 
   // Exact name fallback
   const byName = scripts.find((s) => s.name === scriptId);
+
   if (byName !== undefined) {
     return byName;
   }
@@ -448,6 +457,7 @@ function buildFilePathCandidates(script: StoredScript): FilePathCandidate[] {
   }
 
   const bundledFallback = BUILTIN_BUNDLED_PATHS[normalizeScriptKey(script.name)];
+
   if (
     typeof bundledFallback === "string"
         && bundledFallback.length > 0
@@ -466,12 +476,14 @@ function buildFilePathCandidates(script: StoredScript): FilePathCandidate[] {
 function pickBestScriptCandidate(candidates: StoredScript[]): StoredScript {
   // Prefer runtime filePath-backed scripts (dist/web_accessible_resources source of truth)
   const fileBacked = candidates.find((s) => typeof s.filePath === "string" && s.filePath.length > 0);
+
   if (fileBacked) {
     return fileBacked;
   }
 
   // Then prefer seeded defaults
   const defaultSeed = candidates.find((s) => s.id.startsWith("default-"));
+
   if (defaultSeed) {
     return defaultSeed;
   }
@@ -501,6 +513,7 @@ function findConfig(
   configId: string,
 ): StoredConfig | null {
   const byId = configs.find((c) => c.id === configId);
+
   if (byId !== undefined) {
     return byId;
   }

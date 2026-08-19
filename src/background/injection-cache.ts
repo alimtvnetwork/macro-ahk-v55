@@ -59,6 +59,7 @@ function openDb(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = () => {
       const db = request.result;
+
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: "key" });
       }
@@ -94,6 +95,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
 
       request.onsuccess = () => {
         const entry = request.result as CacheEntry<T> | undefined;
+
         if (!entry) {
           resolve(null);
 

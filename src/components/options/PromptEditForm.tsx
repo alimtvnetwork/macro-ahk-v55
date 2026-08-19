@@ -37,6 +37,7 @@ function usePromptFormState(initial: Partial<PromptEntry> | undefined, onSave: (
 
   const handleSubmit = async () => {
     const isInvalid = !name.trim() || !text.trim();
+
     if (isInvalid) {
       return;
     }

@@ -33,6 +33,7 @@ export type OpfsRootResult = OpfsUnavailableReason | OpfsAvailableRoot;
 
 async function resolveRoot(): Promise<OpfsRootResult> {
   const hasStorage = typeof navigator !== 'undefined' && !!navigator.storage?.getDirectory;
+
   if (!hasStorage) {
     return { isAvailable: false, reason: 'navigator.storage.getDirectory unavailable' };
   }
@@ -48,6 +49,7 @@ async function resolveRoot(): Promise<OpfsRootResult> {
 
 async function getProjectDir(projectId: string, isCreate: boolean): Promise<FileSystemDirectoryHandle | null> {
   const rootResult = await resolveRoot();
+
   if (!rootResult.isAvailable) {
     logError(SCOPE, `OPFS root unavailable (projectId=${projectId}): ${rootResult.reason}`);
 
@@ -61,6 +63,7 @@ async function getProjectDir(projectId: string, isCreate: boolean): Promise<File
 
 function generateFileId(): ChatSubmitFileId {
   const hasRandomUuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function';
+
   if (hasRandomUuid) {
     return crypto.randomUUID();
   }
@@ -71,6 +74,7 @@ function generateFileId(): ChatSubmitFileId {
 export async function saveEntry(projectId: string, text: string): Promise<ChatSubmitFileId | null> {
   try {
     const dir = await getProjectDir(projectId, true);
+
     if (!dir) {
       return null;
     }
@@ -92,6 +96,7 @@ export async function saveEntry(projectId: string, text: string): Promise<ChatSu
 export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Promise<string | null> {
   try {
     const dir = await getProjectDir(projectId, false);
+
     if (!dir) {
       return null;
     }
@@ -110,6 +115,7 @@ export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Pr
 export async function deleteEntry(projectId: string, fileId: ChatSubmitFileId): Promise<boolean> {
   try {
     const dir = await getProjectDir(projectId, false);
+
     if (!dir) {
       return false;
     }
@@ -129,6 +135,7 @@ async function collectFileIds(dir: FileSystemDirectoryHandle): Promise<ChatSubmi
   const iterable = dir as unknown as AsyncIterable<[string, FileSystemHandle]>;
   for await (const [name, handle] of iterable) {
     const isTxtFile = handle.kind === 'file' && name.endsWith(FILE_EXT);
+
     if (isTxtFile) {
       ids.push(name.slice(0, -FILE_EXT.length));
     }
@@ -140,6 +147,7 @@ async function collectFileIds(dir: FileSystemDirectoryHandle): Promise<ChatSubmi
 export async function listProject(projectId: string): Promise<ChatSubmitFileId[]> {
   try {
     const dir = await getProjectDir(projectId, false);
+
     if (!dir) {
       return [];
     }
@@ -154,6 +162,7 @@ export async function listProject(projectId: string): Promise<ChatSubmitFileId[]
 
 export async function deleteProject(projectId: string): Promise<boolean> {
   const rootResult = await resolveRoot();
+
   if (!rootResult.isAvailable) {
     logError(SCOPE, `deleteProject: OPFS unavailable (projectId=${projectId}): ${rootResult.reason}`);
 

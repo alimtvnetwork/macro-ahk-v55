@@ -186,6 +186,7 @@ const PopupPage = () => {
                     const win = globalThis as Record<string, unknown>;
                     const chromeObj = win.chrome as Record<string, unknown> | undefined;
                     const tabsApi = chromeObj?.tabs as { create: (opts: Record<string, unknown>) => void } | undefined;
+
                     if (tabsApi) {
                       tabsApi.create({ url: "chrome://extensions/shortcuts" });
                     }

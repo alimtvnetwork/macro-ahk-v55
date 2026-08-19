@@ -55,6 +55,7 @@ const marco = Object.freeze({
 /* ------------------------------------------------------------------ */
 
 const win = window as unknown as Record<string, unknown>;
+
 if (!win.RiseupAsiaMacroExt) {
   win.RiseupAsiaMacroExt = { Projects: {}, Logger: NamespaceLogger };
 } else {
@@ -88,6 +89,7 @@ window.addEventListener("message", (event) => {
   }
 
   const data = event.data;
+
   if (!data || data.source !== "marco-sdk-event") {
     return;
   }

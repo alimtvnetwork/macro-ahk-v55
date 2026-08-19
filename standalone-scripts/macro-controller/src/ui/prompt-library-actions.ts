@@ -13,6 +13,7 @@ export async function handleSetDefault(
   refs.status.textContent = 'Setting default...';
   try {
     const ok = await setDefaultPromptForRole(row.Id, row.Role);
+
     if (!ok) {
       refs.status.textContent = 'Failed to set default.';
 
@@ -39,6 +40,7 @@ export async function handleDelete(
   }
 
   const ok = window.confirm('Delete prompt "' + row.Name + '"?');
+
   if (!ok) {
     return;
   }
@@ -46,6 +48,7 @@ export async function handleDelete(
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
+
     if (res.ok === false) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
@@ -91,12 +94,14 @@ export async function handleDelete(
 
 export function uniqueDupSlug(baseSlug: string, existing: readonly string[] = []): string {
   const base = baseSlug.endsWith('-copy') || baseSlug.includes('-copy-') ? baseSlug : baseSlug + '-copy';
+
   if (!existing.includes(base)) {
     return base;
   }
 
   for (let i = 2; i < 1000; i++) {
     const candidate = baseSlug + '-copy-' + i;
+
     if (!existing.includes(candidate)) {
       return candidate;
     }
@@ -119,6 +124,7 @@ export async function handleDuplicate(
       body: row.Body,
       role: row.Role,
     });
+
     if (result.ok === false) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
 
@@ -139,6 +145,7 @@ export async function handleResetToDefault(
   renderAllRoles: (r: ModalRefs) => Promise<void>,
 ): Promise<void> {
   const seedBody = getSeedBodyForSlug(row.Slug);
+
   if (seedBody === null) {
     logError(LOG_SCOPE, 'reset-to-default called for non-seeded slug=' + row.Slug, new Error('no seed body'));
     refs.status.textContent = 'Reset unavailable: ' + row.Slug + ' is not a seeded prompt.';
@@ -153,6 +160,7 @@ export async function handleResetToDefault(
   }
 
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
+
   if (!ok) {
     return;
   }
@@ -165,6 +173,7 @@ export async function handleResetToDefault(
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
+
     if (result.ok === false) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');

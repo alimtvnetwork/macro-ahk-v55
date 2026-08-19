@@ -51,6 +51,7 @@ vi.mock('../../db/project-chat-submit-db', () => ({
       .sort((a, b) => a.CreatedAt - b.CreatedAt).slice(0, limit)),
   deleteChatSubmit: vi.fn(async (id: number) => {
     const idx = rows.findIndex((r) => r.Id === id);
+
     if (idx < 0) {
       return false;
     }

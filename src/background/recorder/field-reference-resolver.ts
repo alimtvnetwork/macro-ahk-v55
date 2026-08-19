@@ -66,11 +66,13 @@ export function resolveFieldReferences(
 ): string {
   return template.replace(TOKEN_PATTERN, (match, name: string) => {
     const isEscaped = match.charAt(0) === "\\";
+
     if (isEscaped) {
       return match.slice(1);
     }
 
     const hasColumn = Object.prototype.hasOwnProperty.call(row, name);
+
     if (hasColumn === false) {
       throw new Error(`Field reference {{${name}}} — column missing in row`);
     }
@@ -134,12 +136,14 @@ function resolveTemplateToken(
 
   // Deduplicate per-name so repeated tokens produce one diagnostic.
   const cached = seen.get(name);
+
   if (cached !== undefined) {
     return valueToReplacement(cached.ResolvedValue);
   }
 
   const context = classifyVariable(name, row, source, rowIndex, expected);
   seen.set(name, context);
+
   if (context.FailureReason !== "Resolved" && failureRef.first === null) {
     failureRef.first = context;
   }
@@ -159,6 +163,7 @@ export function extractReferencedColumns(template: string): ReadonlyArray<string
 
   while ((match = pattern.exec(template)) !== null) {
     const isEscaped = match[0].charAt(0) === "\\";
+
     if (isEscaped === false) {
       found.add(match[1]!);
     }
@@ -214,6 +219,7 @@ function classifyTypeMismatch(
   raw: JsonValue, valueType: VariableValueType, expected: VariableValueType,
 ): VariableContext | null {
   const isPrimitive = valueType === "string" || valueType === "number" || valueType === "boolean";
+
   if (isPrimitive || expected === "object" || expected === "array") {
     return null;
   }
@@ -240,6 +246,7 @@ function classifyVariable(
   const raw = row[name];
   const valueType = classifyType(raw);
   const empty = classifyEmptyValue(name, source, rowIndex, raw);
+
   if (empty) {
     return empty;
   }
@@ -247,6 +254,7 @@ function classifyVariable(
   // raw is JsonValue here (not undefined, not null) — narrowed by classifyEmptyValue.
   const rawNarrowed = raw as JsonValue;
   const mismatch = classifyTypeMismatch(name, source, rowIndex, rawNarrowed, valueType, expected);
+
   if (mismatch) {
     return mismatch;
   }
@@ -290,6 +298,7 @@ function classifyType(v: JsonValue | undefined): VariableValueType {
   }
 
   const t = typeof v;
+
   if (t === "string" || t === "number" || t === "boolean" || t === "object") {
     return t; 
   }

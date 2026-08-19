@@ -66,6 +66,7 @@ function attachVisibilityHandler(createUI: () => void): () => void {
     }
 
     const isPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
+
     if (!isPresent) {
       log('visibilitychange: UI missing — re-injecting', 'check');
       tryReinjectUI(createUI);
@@ -122,6 +123,7 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
 
   const observer = new MutationObserver(function (_mutations: MutationRecord[]) {
     const isBothPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
+
     if (isBothPresent) {
       return;
     }
@@ -133,6 +135,7 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
   // forces every direct-child mutation through our callback.
   const scopedTarget = document.querySelector('main') || document.querySelector('#root');
   const observeTarget = scopedTarget || document.body;
+
   if (!scopedTarget) {
     log('Persistence observer: no <main> or #root found — falling back to document.body (higher mutation volume)', 'warn');
   }

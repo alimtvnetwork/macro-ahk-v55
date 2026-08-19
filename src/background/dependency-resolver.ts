@@ -44,6 +44,7 @@ interface SemverParts {
 
 function parseSemver(version: string): SemverParts | null {
   const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
+
   if (!match) {
     return null;
   }
@@ -79,6 +80,7 @@ export function satisfiesVersion(actual: string, range: string): boolean {
         (actualParts.major === rangeParts.major && actualParts.minor === rangeParts.minor && actualParts.patch >= rangeParts.patch);
 
   const isMissing = !isGteRange;
+
   if (isMissing) {
     return false;
   }
@@ -127,6 +129,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
 
     for (const dep of p.dependencies) {
       const depProject = projectMap.get(dep.projectId);
+
       if (!depProject) {
         return {
           order: [],
@@ -138,6 +141,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
 
       const isVersionSatisfied = satisfiesVersion(depProject.version, dep.version);
       const isMissing059 = !isVersionSatisfied;
+
       if (isMissing059) {
         return {
           order: [],
@@ -155,6 +159,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
             adjacency.get(dep.projectId)!.add(p.id);
 
             inDegree.set(p.id, (inDegree.get(p.id) ?? 0) + 1);
+
             if (!inDegree.has(dep.projectId)) {
               inDegree.set(dep.projectId, 0);
             }
@@ -195,6 +200,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
   }
 
   const hasCircularDependency = order.length !== projects.length;
+
   if (hasCircularDependency) {
     const missing = projects
       .filter((p) => !order.includes(p.id))

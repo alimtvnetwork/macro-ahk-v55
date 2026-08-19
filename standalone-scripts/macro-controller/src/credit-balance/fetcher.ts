@@ -97,12 +97,14 @@ export async function fetchAndPersist(
   }
 
   const decision = shouldFetch(workspaceId, Date.now(), options.force === true);
+
   if (!decision.allowed) {
     return buildThrottledResult(workspaceId, decision.reason, decision.waitMs);
   }
 
   try {
     const response = await fetchCreditBalance(workspaceId);
+
     if (!response) {
       const cached = await readCreditBalanceCache(workspaceId);
       logError(

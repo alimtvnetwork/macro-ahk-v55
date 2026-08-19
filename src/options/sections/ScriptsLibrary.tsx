@@ -63,6 +63,7 @@ export function ScriptsLibrary() {
 
   const handleDelete = useCallback(async (scriptId: string) => {
     const isConfirmed = confirm("Delete this script?");
+
     if (!isConfirmed) {
       return;
     }

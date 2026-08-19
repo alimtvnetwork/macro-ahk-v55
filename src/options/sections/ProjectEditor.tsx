@@ -58,6 +58,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
     }
 
     const vars = (project.settings as Record<string, unknown>).variables;
+
     if (vars === undefined) {
       return "{}";
     }

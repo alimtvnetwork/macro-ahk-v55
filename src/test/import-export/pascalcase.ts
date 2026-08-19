@@ -56,6 +56,7 @@ export function findSchemaViolations(db: Database): SchemaViolation[] {
 
 export function assertSchemaPascalCase(db: Database): void {
   const violations = findSchemaViolations(db);
+
   if (violations.length > 0) {
     const lines = violations.map((v) => `  - ${v.reason}`);
     throw new Error(`Schema has ${violations.length} non-PascalCase identifier(s):\n${lines.join("\n")}`);

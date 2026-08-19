@@ -35,6 +35,7 @@ export const validateSplitterN = (n: number): number => {
 export const getSplitterPrompt = (options: SplitterPromptOptions): string => {
   const n = validateSplitterN(options.n);
   const raw = options.rawInstruction.trim();
+
   if (raw.length === 0) {
     throwDiagnostic('SPLITTER_EMPTY_INSTRUCTION_E001', { inputLength: options.rawInstruction.length });
   }

@@ -161,6 +161,7 @@ export function invalidatePromptCache(): void {
   promptLoaderState.loadedJsonPrompts = null;
   // Also invalidate SDK cache if available
   const sdk = window.marco as { prompts?: { invalidateCache(): Promise<void> } } | undefined;
+
   if (sdk && sdk.prompts && typeof sdk.prompts.invalidateCache === 'function') {
     sdk.prompts.invalidateCache().catch(function(e: unknown) {
       log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
@@ -185,6 +186,7 @@ export function clearLoadedPrompts(): void {
   promptLoaderState.loadedJsonPrompts = null;
   // Also invalidate SDK cache
   const sdk = window.marco as { prompts?: { invalidateCache(): Promise<void> } } | undefined;
+
   if (sdk && sdk.prompts && typeof sdk.prompts.invalidateCache === 'function') {
     sdk.prompts.invalidateCache().catch(function(e: unknown) {
       log('[PromptLoader] SDK cache invalidation failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); 
@@ -246,6 +248,7 @@ export function setRenderDropdownFn(fn: (ctx: PromptContext, deps: TaskNextDeps)
 export function rerenderPromptsDropdown(): void {
   const fn = promptLoaderState.renderDropdownFn;
   const c = promptLoaderState.revalidateCtx;
+
   if (!fn || !c) {
     return;
   }
@@ -263,6 +266,7 @@ function finishLegacyLoad(
   source: string,
 ): PromptEntry[] | null {
   promptLoaderState.jsonPromptsLoading = false;
+
   if (prompts && prompts.length > 0) {
     promptLoaderState.loadedJsonPrompts = prompts;
     log('Loaded ' + prompts.length + ' prompts from ' + source, 'success');
@@ -282,6 +286,7 @@ function finishLegacyLoad(
 function handleSdkSuccess(entries: unknown[], loadStartMs: number): PromptEntry[] {
   const prompts = normalizePromptEntries(entries as Partial<PromptEntry>[]);
   const elapsed = Date.now() - loadStartMs;
+
   if (prompts.length > 0) {
     promptLoaderState.loadedJsonPrompts = prompts;
     log('[PromptLoad] ✅ SDK returned ' + prompts.length + ' prompts (' + elapsed + 'ms)', 'success');
@@ -336,6 +341,7 @@ export function loadPromptsFromJson(): Promise<PromptEntry[] | null> {
   const loadStartMs = Date.now();
 
   const sdk = window.marco as { prompts?: { getAll(): Promise<unknown[]> } } | undefined;
+
   if (sdk && sdk.prompts && typeof sdk.prompts.getAll === 'function') {
     return loadViaSdk(sdk.prompts, loadStartMs);
   }

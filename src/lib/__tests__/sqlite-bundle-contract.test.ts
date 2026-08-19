@@ -60,9 +60,11 @@ function makeDb(spec: BundleSpec): SqlExecCapable {
       }
 
       const pragmaMatch = /^PRAGMA table_info\("([^"]+)"\)$/.exec(trimmed);
+
       if (pragmaMatch) {
         const tableName = pragmaMatch[1];
         const table = spec.tables.find((t) => t.name === tableName);
+
         if (!table) {
           return [];
         }

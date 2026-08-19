@@ -105,6 +105,7 @@ function announceRepairResult(report: { Removed: number; Kept: number; Errors: r
 function useDraftHandlers(setDraft: React.Dispatch<React.SetStateAction<WebhookConfig>>) {
   const toggleEvent = (kind: WebhookEventKind, on: boolean) => setDraft((prev) => {
     const next = new Set(prev.Events);
+
     if (on) {
       next.add(kind);
     } else {
@@ -156,6 +157,7 @@ function useTestHandler(draft: WebhookConfig, setDraft: React.Dispatch<React.Set
   return async () => {
     const cfgToUse = saveWebhookConfig({ ...draft, Enabled: true });
     setDraft(cfgToUse);
+
     if (cfgToUse.Url.trim().length === 0) {
       toast.error("Add a URL before sending a test ping");
 

@@ -58,6 +58,7 @@ export function toWireWorkspace(source: Record<string, unknown>): WireWorkspace 
  */
 export function resolveWireSection(rawRow: Record<string, unknown>): Record<string, unknown> {
   const nested = rawRow.workspace;
+
   if (nested !== null && typeof nested === 'object') {
     return nested as Record<string, unknown>;
   }

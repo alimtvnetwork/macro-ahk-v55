@@ -83,6 +83,7 @@ function toPrettyJson(value: JsonValue): string {
 
 function parseEditorValue(raw: string): string | number | boolean | object {
   const trimmed = raw.trim();
+
   if (!trimmed) {
     return "";
   }
@@ -156,6 +157,7 @@ function readStoreRecords(store: IDBObjectStore, limit = 100): Promise<IndexedRe
     request.onerror = () => reject(request.error ?? new Error("Failed reading store cursor"));
     request.onsuccess = () => {
       const cursor = request.result;
+
       if (!cursor || rows.length >= limit) {
         resolve(rows);
 
@@ -212,6 +214,7 @@ async function saveIndexedRecord(
   try {
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
+
     if (store.keyPath === null) {
       store.put(value as IDBValidKey, key);
     } else {
@@ -353,6 +356,7 @@ function SessionPanel() {
     const warning = scoped
       ? `Clear all session keys with prefix "${scoped}"?`
       : "Clear all session storage keys?";
+
     if (!confirm(warning)) {
       return;
     }
@@ -594,6 +598,7 @@ function CookiesPanel() {
   const handleClear = async () => {
     const domainSuffix = domain.trim() ? ` for domain ${domain.trim()}` : "";
     const warning = `Clear cookies${domainSuffix}?`;
+
     if (!confirm(warning)) {
       return;
     }

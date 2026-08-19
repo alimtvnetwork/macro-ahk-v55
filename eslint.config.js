@@ -44,8 +44,8 @@ export default tseslint.config(
       "padded-blocks": ["error", "never"],
       "padding-line-between-statements": [
         "error",
-        { "blankLine": "always", "prev": "*", "next": "return" },
-        { "blankLine": "always", "prev": ["if", "multiline-block-like"], "next": "*" }
+        { "blankLine": "always", "prev": "*", "next": "if" },
+        { "blankLine": "any", "prev": "block-like", "next": "if" }
       ],
       "curly": ["error", "all"],
       "brace-style": ["error", "1tbs", { "allowSingleLine": false }],

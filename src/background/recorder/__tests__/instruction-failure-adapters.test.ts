@@ -709,6 +709,7 @@ describe("LastEvaluation order preservation in ReasonDetail", () => {
     const out: string[] = [];
     for (let i = start + 1; i < lines.length; i++) {
       const l = lines[i]!;
+
       if (l.startsWith("ConditionSerialized:")) {
         break;
       }

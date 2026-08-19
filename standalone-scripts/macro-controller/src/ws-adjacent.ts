@@ -1,4 +1,3 @@
-import { HttpCodes } from "./constants/http";
 /**
  * Workspace Adjacent Navigation — Move to adjacent workspace with fresh fetch and skip logic.
  *
@@ -13,7 +12,7 @@ import { HttpCodes } from "./constants/http";
 
 import { MacroController } from './core/MacroController';
 import { log, logSub } from './logger';
-import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce } from './auth';
+import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce, isAuthFailure } from './auth';
 import { parseLoopApiResponse } from './credit-fetch';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, loopCreditState, state } from './shared-state';
@@ -24,14 +23,6 @@ import { throwDiagnostic } from './errors/diagnostic-error';
 
 function mc() {
   return MacroController.getInstance(); 
-}
-
-// ============================================
-// Helper — auth failure check
-// ============================================
-
-function isAuthFailure(status: number): boolean {
-  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================

@@ -71,6 +71,7 @@ function fail<T>(where: string, message: string, context?: unknown): DbResult<T>
 function extractSlugFromContext(context: unknown): string {
   if (isContextWithSlug(context)) {
     const s = context.slug;
+
     if (typeof s === 'string') {
       return s;
     }
@@ -109,6 +110,7 @@ export interface RecordRevisionInput {
  */
 export async function recordPromptRevision(input: RecordRevisionInput): Promise<DbResult<number>> {
   const { previous, reason } = input;
+
   if (!Number.isInteger(previous.Id) || previous.Id <= 0) {
     return fail('recordPromptRevision', 'previous.Id must be a positive integer');
   }
@@ -139,6 +141,7 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
   ].join(', ');
   const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
   const insertResp = await runSql('SCHEMA', insertSql);
+
   if (insertResp.ok === false) {
     return fail('recordPromptRevision', insertResp.errorMessage ?? 'insert failed');
   }
@@ -151,6 +154,7 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(previous.Slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
   const trimResp = await runSql('SCHEMA', trimSql);
+
   if (trimResp.ok === false) {
     // Trim failure is not fatal: the insert succeeded, history is preserved
     // (just over-cap). Log so we notice recurring cases.
@@ -173,6 +177,7 @@ export async function listPromptRevisions(slug: string): Promise<DbResult<Prompt
         'SELECT * FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC';
   const resp = await runSql('QUERY', sql);
+
   if (resp.ok === false) {
     return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
   }
@@ -190,11 +195,13 @@ export async function getPromptRevisionById(id: number): Promise<DbResult<Prompt
 
   const sql = 'SELECT * FROM PromptRevision WHERE Id = ' + String(id) + ' LIMIT 1';
   const resp = await runSql('QUERY', sql);
+
   if (resp.ok === false) {
     return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
   }
 
   const rows = Array.isArray(resp.rows) ? resp.rows : [];
+
   if (rows.length === 0) {
     return new DbResult(true, undefined);
   }
@@ -259,6 +266,7 @@ export async function insertImportedRevisions(
     ].join(', ');
     const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
     const resp = await runSql('SCHEMA', insertSql);
+
     if (resp.ok === false) {
       return fail('insertImportedRevisions', resp.errorMessage ?? 'insert failed');
     }
@@ -272,6 +280,7 @@ export async function insertImportedRevisions(
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
   const trimResp = await runSql('SCHEMA', trimSql);
+
   if (trimResp.ok === false) {
     logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'import', slug, reason: trimResp.errorMessage ?? 'unknown error' });
   }
@@ -288,6 +297,7 @@ export async function insertImportedRevisions(
  */
 export async function getMaxRevisionId(): Promise<DbResult<number>> {
   const resp = await runSql('QUERY', 'SELECT MAX(Id) AS MaxId FROM PromptRevision');
+
   if (resp.ok === false) {
     return fail('getMaxRevisionId', resp.errorMessage ?? 'query failed');
   }
@@ -325,6 +335,7 @@ export async function deleteImportedRevisionsAfter(
   const sql = 'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(slug)
         + ' AND PromptId = 0 AND Id > ' + String(Math.floor(sinceId));
   const resp = await runSql('SCHEMA', sql);
+
   if (resp.ok === false) {
     return fail('deleteImportedRevisionsAfter', resp.errorMessage ?? 'delete failed');
   }

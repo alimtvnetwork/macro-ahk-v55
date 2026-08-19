@@ -97,6 +97,7 @@ export async function handleInjectScripts(
   try {
     const tab = await chrome.tabs.get(injectRequest.tabId);
     const tabUrl = tab.url ?? "";
+
     if (/^(chrome|edge|brave|opera|about|devtools|chrome-extension):\/\//i.test(tabUrl)) {
       console.warn("[injection] BLOCKED — cannot inject into restricted URL: %s (tabId=%d)", tabUrl, injectRequest.tabId);
 
@@ -124,6 +125,7 @@ export async function handleInjectScripts(
 
   // Show loading spinner toast at start of injection
   const toastEnabledEarly = await isInjectionToastEnabled();
+
   if (toastEnabledEarly) {
     void showInjectionLoadingToast(injectRequest.tabId, injectRequest.scripts.length).catch((toastErr) => {
       logBgWarnError(BgLogTag.INJECTION, `showInjectionLoadingToast failed (tab ${injectRequest.tabId}, ${injectRequest.scripts.length} scripts) — UI cosmetic only, pipeline continues`, toastErr);
@@ -147,6 +149,7 @@ export async function handleInjectScripts(
   const inlineSyntaxFailures = hasInlineSyntaxError
     ? collectInlineSyntaxFailures(injectRequest.scripts as InjectionRequestScript[])
     : [];
+
   if (hasInlineSyntaxError) {
     await cacheDelete(PIPELINE_CACHE_CATEGORY, PIPELINE_CACHE_KEY);
     console.warn(
@@ -162,6 +165,7 @@ export async function handleInjectScripts(
   // shadows a new request — including bad-syntax requests that would
   // otherwise be reported as failures (see e2e syntax-error test).
   const isCacheEligible = !isForceRun && !hasInlineSyntaxError;
+
   if (isCacheEligible) {
     const requestedFingerprint = buildRequestFingerprint(injectRequest.scripts as Array<Partial<InjectableScript> & { path?: string }>);
     const cachedPayload = await time("cache_gate", () =>
@@ -172,6 +176,7 @@ export async function handleInjectScripts(
             && cachedFingerprint.length > 0
             && requestedFingerprint === cachedFingerprint
             && cacheLaunchSource === launchSource;
+
     if (cachedPayload && cacheMatchesRequest) {
       console.log("[injection] CACHE HIT — skipping Stages 0–3, using cached payload (%d chars, %d scripts) in %.1fms",
         cachedPayload.code.length, cachedPayload.scriptMeta.length, timings["cache_gate"]);
@@ -181,6 +186,7 @@ export async function handleInjectScripts(
     }
 
     const isCacheStale = cachedPayload !== null && !cacheMatchesRequest;
+
     if (isCacheStale) {
       await cacheDelete(PIPELINE_CACHE_CATEGORY, PIPELINE_CACHE_KEY);
       console.log("[injection] CACHE MISS — cached request fingerprint/source [%s/%s] does not match requested [%s/%s], rebuilding",
@@ -196,6 +202,7 @@ export async function handleInjectScripts(
 
   // ✅ Auto-reseed missing built-in scripts before resolving
   const didReseedBuiltins = await time("stage0_guard", () => ensureBuiltinScriptsExist(allProjects));
+
   if (didReseedBuiltins) {
     await mirrorDiagnosticToTab(
       injectRequest.tabId,
@@ -377,6 +384,7 @@ export async function handleInjectScripts(
 
   // ── Show injection toasts if enabled ──
   const toastEnabled = await isInjectionToastEnabled();
+
   if (toastEnabled && successCount > 0) {
     void showInjectionToastInTab(injectRequest.tabId, successCount, execResults.length, totalMs).catch((toastErr) => {
       logBgWarnError(BgLogTag.INJECTION, `showInjectionToastInTab (success) failed (tab ${injectRequest.tabId}) — UI cosmetic only`, toastErr);
@@ -486,6 +494,7 @@ async function executeCachedPayload(
   }
 
   const toastEnabled = await isInjectionToastEnabled();
+
   if (toastEnabled && successCount > 0) {
     void showInjectionToastInTab(tabId, successCount, results.length, totalMs).catch((toastErr) => {
       logBgWarnError(BgLogTag.INJECTION, `showInjectionToastInTab (cached path success) failed (tab ${tabId}) — UI cosmetic only`, toastErr);
@@ -568,6 +577,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
       world: "ISOLATED",
       func: async () => {
         const hasSentinel = !!(window as unknown as Record<string, unknown>).__marcoRelayActive;
+
         if (!hasSentinel) {
           return { status: "needs_injection" as const };
         }
@@ -581,6 +591,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
             : null;
           const isHealthy = pingObj !== null
                         && (pingObj.ok === true || pingObj.type === "__PONG__");
+
           if (isHealthy) {
             return { status: "healthy" as const };
           }
@@ -686,6 +697,7 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
         } | undefined;
 
     const isResultMissing = !r;
+
     if (isResultMissing) {
       return;
     }
@@ -712,6 +724,7 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
 
     // Store verification results on the tab injection record for diagnostics copy
     const existingRecord = getTabInjections()[tabId];
+
     if (existingRecord) {
       setTabInjection(tabId, {
         ...existingRecord,

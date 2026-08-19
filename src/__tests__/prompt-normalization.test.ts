@@ -29,8 +29,10 @@ function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number 
     const raw = p || {};
     const name = typeof raw.name === 'string' ? raw.name : '';
     const text = typeof raw.text === 'string' ? raw.text : '';
+
     if (name && text) {
       const entry: PromptEntry = { name, text };
+
       if (raw.id) {
         entry.id = raw.id; 
       }
@@ -81,6 +83,7 @@ function findNextTasksPrompt(entries: PromptEntry[], targetSlug = 'next-tasks'):
   // Priority 2: id match
   for (const entry of entries) {
     const id = (entry.id || '').toLowerCase();
+
     if (id === targetSlug || id === 'default-' + targetSlug || id.indexOf(targetSlug) !== -1) {
       return entry;
     }
@@ -89,6 +92,7 @@ function findNextTasksPrompt(entries: PromptEntry[], targetSlug = 'next-tasks'):
   // Priority 3: Derived slug from name
   for (const entry of entries) {
     const derived = (entry.name || '').toLowerCase().replace(/\s+/g, '-');
+
     if (derived === targetSlug) {
       return entry;
     }
@@ -97,6 +101,7 @@ function findNextTasksPrompt(entries: PromptEntry[], targetSlug = 'next-tasks'):
   // Priority 4: Name contains both 'next' and 'task'
   for (const entry of entries) {
     const name = (entry.name || '').toLowerCase();
+
     if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) {
       return entry;
     }

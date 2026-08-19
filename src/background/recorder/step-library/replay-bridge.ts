@@ -104,6 +104,7 @@ async function executeLeaf(
   };
   const outcome = await executeReplay([input], replayOpts);
   const result = outcome.Results[0];
+
   if (result === undefined) {
     return logEmptyResultsFailure(step, opts);
   }
@@ -257,6 +258,7 @@ export function stepRowToReplayInput(step: StepRow): ReplayStepInput {
 
 function buildWait(step: StepRow, payload: StepPayload): ReplayStepInput {
   const ms = payload.WaitMs;
+
   if (typeof ms !== "number" || !Number.isFinite(ms) || ms < 0) {
     throw new Error(
       `Wait step #${step.StepId} has invalid PayloadJson.WaitMs `
@@ -295,6 +297,7 @@ function parsePayload(step: StepRow): StepPayload {
 
   try {
     const parsed: unknown = JSON.parse(step.PayloadJson);
+
     if (parsed === null || typeof parsed !== "object") {
       throw new Error(`PayloadJson must be a JSON object, got ${typeof parsed}`);
     }
@@ -309,6 +312,7 @@ function parsePayload(step: StepRow): StepPayload {
 
 function requireSelector(step: StepRow, payload: StepPayload): PersistedSelector {
   const expr = payload.Selector;
+
   if (typeof expr !== "string" || expr.trim() === "") {
     throw new Error(
       `Step #${step.StepId} (kind=${stepKindLabel(step.StepKindId)}) `

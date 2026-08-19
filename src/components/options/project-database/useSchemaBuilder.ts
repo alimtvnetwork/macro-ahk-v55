@@ -158,6 +158,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string);
+
         if (data._type !== "marco-schema-export" || !Array.isArray(data.tables)) {
           toast.error("Invalid schema file");
 
@@ -183,6 +184,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
   // eslint-disable-next-line max-lines-per-function
   const handleApply = useCallback(async () => {
     const validTables = tables.filter((t) => t.name.trim() && t.columns.some((c) => c.name.trim()));
+
     if (validTables.length === 0) {
       toast.error("Add at least one table with columns");
 
@@ -198,6 +200,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         type: "APPLY_JSON_SCHEMA", project: projectSlug, schema: JSON.stringify(schema),
       });
       setLastResult(result);
+
       if (result.isOk) {
         toast.success(`Schema applied: ${result.created ?? 0} created, ${result.migrated ?? 0} migrated`);
         onMigrationComplete();
@@ -230,6 +233,7 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
     version: "1.0.0",
     tables: validTables.map((t) => {
       const tableDef: Record<string, unknown> = { TableName: t.name.trim() };
+
       if (t.description.trim()) {
         tableDef.Description = t.description.trim();
       }
@@ -252,6 +256,7 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
 
 function buildColumnDef(c: ColumnWithValidation) {
   const col: Record<string, unknown> = { Name: c.name.trim(), Type: c.type };
+
   if (c.nullable) {
     col.Nullable = true;
   }

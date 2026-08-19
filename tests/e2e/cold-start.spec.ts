@@ -28,6 +28,7 @@ test.describe('Cold Start', () => {
         const timeout = setTimeout(() => reject(new Error('__PING__ timed out')), 10_000);
         chrome.runtime.sendMessage({ type: '__PING__' }, (res) => {
           clearTimeout(timeout);
+
           if (chrome.runtime.lastError) {
             reject(new Error(chrome.runtime.lastError.message));
           } else {
@@ -56,6 +57,7 @@ test.describe('Cold Start', () => {
         const timeout = setTimeout(() => reject(new Error('Health check timed out')), 5000);
         chrome.runtime.sendMessage({ type: 'GET_BOOT_DIAGNOSTICS' }, (res) => {
           clearTimeout(timeout);
+
           if (chrome.runtime.lastError) {
             reject(new Error(chrome.runtime.lastError.message));
           } else {
@@ -68,6 +70,7 @@ test.describe('Cold Start', () => {
     // Boot diagnostics should indicate success
     const diag = health as Record<string, unknown>;
     expect(diag).toBeTruthy();
+
     // The final step should be "ready", not "failed:*"
     if (diag.step !== undefined) {
       expect(String(diag.step)).not.toMatch(/^failed:/);

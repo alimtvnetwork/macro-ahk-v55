@@ -167,6 +167,7 @@ async function iterateGroups(
     }
 
     const outcome = await runOneGroup(opts, reports, i, now);
+
     if (outcome.ok === true) {
       succeeded++;
     } else {

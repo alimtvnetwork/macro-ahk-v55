@@ -250,7 +250,8 @@ export async function handleStorageUpdateRow(
         primaryKey: Record<string, unknown>;
         updates: Record<string, unknown>;
     };
-    // Views are read-only
+
+  // Views are read-only
   if (BROWSABLE_VIEWS.has(table)) {
     throw new Error(`[Storage] Cannot update view "${table}"`);
   }
@@ -291,6 +292,7 @@ export async function handleStorageDeleteRow(
         table: string;
         primaryKey: Record<string, unknown>;
     };
+
   if (BROWSABLE_VIEWS.has(table)) {
     throw new Error(`[Storage] Cannot delete from view "${table}"`);
   }
@@ -322,6 +324,7 @@ export async function handleStorageClearTable(
   message: MessageRequest,
 ): Promise<{ isOk: true; table: string; deleted: number }> {
   const { table } = message as { table: string };
+
   if (BROWSABLE_VIEWS.has(table)) {
     throw new Error(`[Storage] Cannot clear view "${table}"`);
   }

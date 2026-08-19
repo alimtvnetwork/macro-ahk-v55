@@ -87,6 +87,7 @@ async function newPage(): Promise<Page> {
             __repeatUi: { buildCountPresets: () => DocumentFragment };
         }).__repeatUi;
     const host = document.getElementById('host');
+
     if (!host) {
       throw new Error('host missing');
     }
@@ -101,6 +102,7 @@ async function newClippedPage(): Promise<Page> {
   const page = await newPage();
   await page.evaluate(() => {
     const host = document.getElementById('host');
+
     if (!host) {
       throw new Error('host missing');
     }

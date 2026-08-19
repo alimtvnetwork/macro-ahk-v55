@@ -59,6 +59,7 @@ export type ParseResult =
  */
 export function parseGroupInputJson(raw: string): ParseResult {
   const trimmed = raw.trim();
+
   if (trimmed === "") {
     return { Ok: false, Reason: "Input is empty. Paste or upload a JSON object." };
   }
@@ -104,11 +105,13 @@ function extractPositionHint(message: string, source: string): string | null {
   // V8 / SpiderMonkey commonly include "position N" or "at position N"
   // in JSON parse error messages; convert to line:col for legibility.
   const match = /position\s+(\d+)/i.exec(message);
+
   if (match === null) {
     return null;
   }
 
   const offset = Number(match[1]);
+
   if (!Number.isFinite(offset) || offset < 0 || offset > source.length) {
     return null;
   }
@@ -136,11 +139,13 @@ interface RawStore { readonly [stepGroupId: string]: GroupInputBag }
 function safeReadStore(): RawStore {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (raw === null) {
       return {};
     }
 
     const parsed = JSON.parse(raw) as JsonValue;
+
     if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
       return {};
     }
@@ -174,6 +179,7 @@ export function readAllGroupInputs(): GroupInputsMap {
   const map = new Map<number, GroupInputBag>();
   for (const [k, v] of Object.entries(store)) {
     const id = Number(k);
+
     if (Number.isInteger(id) && id > 0) {
       map.set(id, v);
     }
@@ -206,6 +212,7 @@ export function writeGroupInput(stepGroupId: number, bag: GroupInputBag): void {
 /** Removes the bag for one group (no-op when absent). */
 export function clearGroupInput(stepGroupId: number): void {
   const store = { ...safeReadStore() };
+
   if (Object.prototype.hasOwnProperty.call(store, String(stepGroupId))) {
     delete store[String(stepGroupId)];
     safeWriteStore(store);

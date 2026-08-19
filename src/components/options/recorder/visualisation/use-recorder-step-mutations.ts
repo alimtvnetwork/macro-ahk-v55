@@ -47,7 +47,7 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
   return useCallback(async (stepId: number, newName: string) => {
     try {
       await sendMessage({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         type: "RECORDER_STEP_RENAME" as any,
         projectSlug, stepId, newVariableName: newName,
       });
@@ -67,6 +67,7 @@ function useRenameHandler(projectSlug: string, reload: () => Promise<void>) {
 function useDeleteHandler(projectSlug: string, reload: () => Promise<void>) {
   return useCallback(async (stepId: number) => {
     const confirmed = confirm(`Delete step #${stepId}? This cannot be undone.`);
+
     if (!confirmed) {
       return;
     }

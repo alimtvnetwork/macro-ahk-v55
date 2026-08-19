@@ -48,6 +48,7 @@ function useAutoSelectFirstStep(
     }
 
     const stillExists = data.steps.some((s) => s.StepId === selectedStepId);
+
     if (!stillExists) {
       setSelectedStepId(data.steps[0].StepId);
     }

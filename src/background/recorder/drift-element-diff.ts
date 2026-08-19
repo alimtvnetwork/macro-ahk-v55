@@ -134,6 +134,7 @@ function classifyVerdict(
   hasChanges: boolean,
 ): DriftVerdict {
   const hasNoChanges = !hasChanges;
+
   if (hasNoChanges) {
     return "Identical";
   }
@@ -144,6 +145,7 @@ function classifyVerdict(
 
   const idChanged = fields.find((f) => f.Field === "Id")?.Change !== "Unchanged";
   const ariaChanged = fields.find((f) => f.Field === "AriaLabel")?.Change !== "Unchanged";
+
   if (idChanged || ariaChanged) {
     return "RenamedIdentity";
   }

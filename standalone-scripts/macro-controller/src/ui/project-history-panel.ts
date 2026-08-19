@@ -76,6 +76,7 @@ function makeEl<K extends keyof HTMLElementTagNameMap>(
   textContent?: string,
 ): HTMLElementTagNameMap[K] {
   const elem = document.createElement(tag);
+
   if (className) {
     elem.className = className;
   }
@@ -184,6 +185,7 @@ export function openProjectHistoryPanel(
   function setStatus(message: string, isError: boolean): void {
     status.textContent = message;
     status.dataset.state = isError ? 'error' : 'ok';
+
     if (isError) {
       lastError = message;
     }
@@ -209,6 +211,7 @@ export function openProjectHistoryPanel(
   async function handleDelete(entry: HistoryEntry): Promise<void> {
     try {
       const result = await deps.deleteEntry(projectId, entry.id, entry.fileId);
+
       if (!result.isDeleted) {
         setStatus(`Delete failed (row=${entry.id})`, true);
 

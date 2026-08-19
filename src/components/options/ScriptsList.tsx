@@ -184,6 +184,7 @@ function FileDropZone({
       const reader = new FileReader();
       reader.onload = (ev) => {
         const text = ev.target?.result;
+
         if (typeof text === "string") {
           onFile(file.name.replace(/\.[^.]+$/, ""), text);
         }
@@ -533,6 +534,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const entries = [...f.jsEntries];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
+
       if (newIdx < 0 || newIdx >= entries.length) {
         return f;
       }
@@ -571,6 +573,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
     }
 
     const config = configs.find((c) => c.id === configId);
+
     if (!config) {
       return;
     }
@@ -604,6 +607,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const entries = [...f.configEntries];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
+
       if (newIdx < 0 || newIdx >= entries.length) {
         return f;
       }

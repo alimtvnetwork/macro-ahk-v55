@@ -187,6 +187,7 @@ function buildLogClipboardText(entry: WebhookDeliveryResult): string {
   sections.push(CLIP_SEPARATOR);
   sections.push(variantStatusBlock(entry));
   const payloadJson = formatPayloadJson(entry);
+
   if (payloadJson !== null) {
     sections.push(CLIP_SEPARATOR);
     sections.push("Payload:");
@@ -246,6 +247,7 @@ function csvCell(value: string | number | null): string {
   }
 
   const s = String(value);
+
   if (/[",\n\r]/.test(s)) {
     return `"${s.replace(/"/g, '""')}"`;
   }
@@ -304,6 +306,7 @@ export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>,
   }
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+
   if (format === "json") {
     downloadFile(`webhook-log-${stamp}.json`, "application/json", buildJsonExport(entries));
   } else {

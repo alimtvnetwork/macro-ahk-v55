@@ -417,6 +417,7 @@ function migrateSequencePayload(payload: Partial<SequenceRenameInput>, fromVersi
   let v = fromVersion;
   while (v < CURRENT_SEQUENCE_VERSION) {
     const migration = SEQUENCE_MIGRATIONS[v - 1];
+
     if (!migration) {
       break;
     }  // no migration registered → stop and let coerce fix it
@@ -436,8 +437,10 @@ function loadPersistedSequence(): SequenceRenameInput {
   try {
     // 1. Prefer the current versioned key.
     const raw = localStorage.getItem(SEQUENCE_RENAME_STORAGE_KEY);
+
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<VersionedSequenceEnvelope> | Partial<SequenceRenameInput>;
+
       // Versioned envelope?
       if (parsed && typeof parsed === "object" && "v" in parsed && typeof parsed.v === "number" && "data" in parsed && parsed.data) {
         const migrated = migrateSequencePayload(parsed.data, parsed.v);
@@ -454,6 +457,7 @@ function loadPersistedSequence(): SequenceRenameInput {
     // 2. Fall back to the legacy v1 key (one-shot migration; we'll
     //    rewrite under the new key on the next persist).
     const legacy = localStorage.getItem(LEGACY_SEQUENCE_KEY_V1);
+
     if (legacy) {
       const parsed = JSON.parse(legacy) as Partial<SequenceRenameInput>;
       const migrated = migrateSequencePayload(parsed, 1);
@@ -475,6 +479,7 @@ function persistSequence(input: SequenceRenameInput): void {
   try {
     const envelope: VersionedSequenceEnvelope = { v: CURRENT_SEQUENCE_VERSION, data: input };
     localStorage.setItem(SEQUENCE_RENAME_STORAGE_KEY, JSON.stringify(envelope));
+
     // Best-effort cleanup of the legacy key once we've successfully
     // written the new one — keeps user storage tidy across upgrades.
     if (localStorage.getItem(LEGACY_SEQUENCE_KEY_V1) !== null) {
@@ -782,6 +787,7 @@ function PreviewSummaryBanner({ summary }: { readonly summary: ReturnType<typeof
   }
 
   const parts: string[] = [];
+
   if (summary.DuplicateCount > 0) {
     parts.push(`${summary.DuplicateCount} duplicate${summary.DuplicateCount === 1 ? "" : "s"}`);
   }

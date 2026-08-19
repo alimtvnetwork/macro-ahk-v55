@@ -48,6 +48,7 @@ async function flush(): Promise<void> {
 
 function resetButtonForSlug(slug: string): HTMLButtonElement | null {
   const row = document.querySelector('[data-prompt-slug="' + slug + '"]');
+
   if (!row) {
     return null;
   }

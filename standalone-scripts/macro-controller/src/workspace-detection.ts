@@ -1,5 +1,3 @@
-import { HttpCodes } from "./constants/http";
-
 /**
  * MacroLoop Controller — Workspace Detection Module (barrel)
  *
@@ -17,18 +15,11 @@ import { HttpCodes } from "./constants/http";
 
 import { CREDIT_API_BASE, loopCreditState, state } from './shared-state';
 import { log, logSub } from './logger';
-import { resolveToken, markBearerTokenExpired } from './auth';
+import { resolveToken, markBearerTokenExpired, isAuthFailure } from './auth';
 import { matchWorkspaceByName } from './ws-name-matching';
 import { detectWorkspaceViaProjectDialog } from './ws-dialog-detection';
 import { logError } from './error-utils';
-
-// ============================================
-// Helper — auth failure check
-// ============================================
-
-function isAuthFailure(status: number): boolean {
-  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
-}
+import type { WorkspaceCredit } from './types';
 
 // ============================================
 // Extract project ID from URL
@@ -41,6 +32,7 @@ let _cachedProjectId: string | null = null;
 
 export function extractProjectIdFromUrl(): string | null {
   const url = window.location.href;
+
   if (url === _cachedHref) {
     return _cachedProjectId;
   }
@@ -291,7 +283,7 @@ async function processTier1Response(
 // Tier 3: Passive no-op fallback (no dialog interaction)
 // ============================================
 /** Handle single-workspace case. Returns true if resolved. */
-function handleSingleWorkspace(fn: string, perWs: import('./types').WorkspaceCredit[]): boolean {
+function handleSingleWorkspace(fn: string, perWs: WorkspaceCredit[]): boolean {
   if (perWs.length !== 1) {
     return false;
   }
@@ -310,12 +302,13 @@ function handleSingleWorkspace(fn: string, perWs: import('./types').WorkspaceCre
 }
 
 /** Check if workspace is already authoritatively set. Returns true if resolved. */
-function checkAuthoritativeGuard(fn: string, perWs: import('./types').WorkspaceCredit[]): boolean {
+function checkAuthoritativeGuard(fn: string, perWs: WorkspaceCredit[]): boolean {
   if (!state.workspaceFromApi || !state.workspaceName) {
     return false;
   }
 
   const matched = matchWorkspaceByName(state.workspaceName, perWs);
+
   if (matched) {
     loopCreditState.currentWs = matched;
     log(fn + ': ✅ GUARD — workspace already set authoritatively: "' + state.workspaceName + '" (skipping detection)', 'success');
@@ -343,6 +336,7 @@ export async function autoDetectLoopCurrentWorkspace(
   }
 
   const perWs = loopCreditState.perWorkspace || [];
+
   if (perWs.length === 0) {
     log(fn + ': No workspaces loaded', 'warn');
 

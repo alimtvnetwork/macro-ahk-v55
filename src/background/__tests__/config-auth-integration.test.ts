@@ -46,6 +46,7 @@ function buildChromeMock(options: {
         for (const [candidateUrl, cookieMap] of cookieStore) {
           if (url.startsWith(candidateUrl) || candidateUrl.startsWith(url.replace(/\/$/, ""))) {
             const cookie = cookieMap.get(name);
+
             if (cookie) {
               return cookie;
             }

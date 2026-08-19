@@ -77,6 +77,7 @@ function KindSelector(props: {
 
 function SelectorHint(props: { status: SelectorStatusType }): JSX.Element {
   const { status } = props;
+
   if (status === "invalid") {
     return <p className="text-[10px] text-destructive">Invalid CSS selector, playback will fall back to document.body.</p>;
   }

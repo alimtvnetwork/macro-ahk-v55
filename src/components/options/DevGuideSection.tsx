@@ -99,6 +99,7 @@ function tryResolveWildcardHost(rule: DevGuideTargetUrl): string | null {
 function resolveOpenableUrl(rules: DevGuideTargetUrl[]): string | null {
   for (const rule of rules) {
     const url = tryResolveOne(rule);
+
     if (url) {
       return url;
     }
@@ -106,6 +107,7 @@ function resolveOpenableUrl(rules: DevGuideTargetUrl[]): string | null {
 
   for (const rule of rules) {
     const url = tryResolveWildcardHost(rule);
+
     if (url) {
       return url;
     }
@@ -235,6 +237,7 @@ function buildFullGuideText(namespace: string, sections: string[]): string {
 
   for (const s of sections) {
     const doc = sectionDocs[s]?.(namespace);
+
     if (!doc) {
       continue;
     }
@@ -433,6 +436,7 @@ export function DevGuideSection({ namespace, section, targetUrls }: Props) {
 
           {sections.map((s) => {
             const doc = sectionDocs[s]?.(namespace);
+
             if (!doc) {
               return null;
             }

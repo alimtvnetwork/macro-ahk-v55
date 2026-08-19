@@ -38,6 +38,7 @@ function projectBindsScript(
   script: StoredScript,
 ): boolean {
   const scriptKeys = new Set<string>();
+
   if (script.name) {
     scriptKeys.add(basename(script.name));
   }
@@ -108,6 +109,7 @@ function processScript(
   result: BackfillResult,
 ): boolean {
   const hasMatches = Array.isArray(script.urlMatches) && script.urlMatches.length > 0;
+
   if (hasMatches) {
     result.skippedAlreadyPopulated += 1;
 
@@ -115,6 +117,7 @@ function processScript(
   }
 
   const patterns = collectPatternsForScript(script, projects);
+
   if (patterns.size === 0) {
     result.skippedNoBindingFound += 1;
     console.log(

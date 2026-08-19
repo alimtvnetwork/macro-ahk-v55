@@ -48,6 +48,7 @@ export async function warmScriptCache(): Promise<{ warmed: number; failed: numbe
     // Promise.allSettled fanout). See mem://constraints/http-error-fail-fast.
     for (const script of fileBackedScripts) {
       const success = await warmOneScript(script);
+
       if (success) {
         warmed++;
       } else {
@@ -83,6 +84,7 @@ async function warmOneScript(script: StoredScript): Promise<boolean> {
     }
 
     const code = await response.text();
+
     if (!code || code.length < 10) {
       logCaughtError(BgLogTag.CACHE_WARMER, `Empty/tiny response for script file\n  Path: ${url}\n  Missing: Valid script code (got ${code?.length ?? 0} chars, minimum 10 required)\n  Reason: Server returned an empty or near-empty response — file may be a placeholder or build artifact is corrupt`, new Error("Empty response"));
 

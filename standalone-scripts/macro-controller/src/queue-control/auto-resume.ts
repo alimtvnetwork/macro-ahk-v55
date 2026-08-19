@@ -28,6 +28,7 @@ export interface AutoResumeDeps {
 function findButton(xpath: string, ariaLabel: string): HTMLButtonElement | null {
   // 1. Try ARIA label (more robust against UI shifts)
   const aria = document.querySelector<HTMLButtonElement>(`button[aria-label="${ariaLabel}"]`);
+
   if (aria !== null) {
     return aria;
   }
@@ -68,6 +69,7 @@ export function autoResumeQueueIfNeeded(deps: AutoResumeDeps): AutoResumeResult 
 
     // Q1 — Queue visibility
     const count = readQueueCount();
+
     if (count === null) {
       return { acted: false, reason: 'queue-missing' };
     }
@@ -79,12 +81,14 @@ export function autoResumeQueueIfNeeded(deps: AutoResumeDeps): AutoResumeResult 
 
     // R1 — Double-run guard (Pause visible = already running)
     const pauseBtn = findButton('', QUEUE_PAUSE_ARIA_LABEL);
+
     if (pauseBtn !== null && pauseBtn.offsetParent !== null) {
       return { acted: false, reason: 'already-running', count };
     }
 
     // R2 — Resume availability
     const resumeBtn = findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL);
+
     if (resumeBtn === null || resumeBtn.offsetParent === null) {
       return { acted: false, reason: 'no-resume-button', count };
     }

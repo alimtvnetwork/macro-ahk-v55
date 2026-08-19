@@ -99,6 +99,7 @@ export async function readNamespaceCaches(
   const map = new Map<string, string>();
   for (const pid of projectIds) {
     const entry = result[nsCacheKey(pid)] as NsCacheEntry | undefined;
+
     if (entry?.script) {
       map.set(pid, entry.script);
     }

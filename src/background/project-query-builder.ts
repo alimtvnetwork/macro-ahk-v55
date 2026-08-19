@@ -79,6 +79,7 @@ function buildWhere(where?: WhereClause): { clause: string; params: SqlValue[] }
   for (const [col, whereValue] of Object.entries(where)) {
     if (typeof whereValue === 'object' && whereValue !== null && !(whereValue instanceof Uint8Array)) {
       const whereObject = whereValue as Record<string, unknown>;
+
       if ('ilike' in whereObject) {
         conditions.push(`"${col}" LIKE ? COLLATE NOCASE`);
         params.push(whereObject.ilike as SqlValue);
@@ -125,6 +126,7 @@ function buildOrderBy(orderBy?: OrderByClause): string {
 
 function collectRows(db: SqlJsDatabase, sql: string, params: SqlValue[]): Record<string, SqlValue>[] {
   const stmt = db.prepare(sql);
+
   if (params.length > 0) {
     stmt.bind(params);
   }

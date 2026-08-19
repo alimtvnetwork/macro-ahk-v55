@@ -46,6 +46,7 @@ const checkWorkspaceUrl = (value: string): WorkspaceUrlCheck => {
   }
 
   const hostOk = parsed.host === LOVABLE_HOST || parsed.host.endsWith(`.${LOVABLE_HOST}`);
+
   if (!hostOk) {
     return { Ok: false, Reason: `Host is not a Lovable domain: ${parsed.host}` };
   }
@@ -53,6 +54,7 @@ const checkWorkspaceUrl = (value: string): WorkspaceUrlCheck => {
   // Reject bare `lovable.dev/` or `lovable.dev` — every workspace URL
   // includes at least one path segment (slug, project id, or `/projects/...`).
   const trimmedPath = parsed.pathname.replace(/^\/+|\/+$/g, "");
+
   if (trimmedPath.length === 0) {
     return { Ok: false, Reason: "URL is missing a workspace path segment" };
   }
@@ -72,6 +74,7 @@ export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> =>
   }
 
   const urlCheck = checkWorkspaceUrl(row.WorkspaceUrl);
+
   if (!urlCheck.Ok) {
     errors.push({
       RowIndex: row.RowIndex,

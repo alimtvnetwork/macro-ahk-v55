@@ -12,6 +12,7 @@ const makeMemoryStorage = (): QueueStorage => {
   return {
     read: async (projectId) => {
       const rec = store.get(projectId);
+
       if (!rec) {
         return null;
       }

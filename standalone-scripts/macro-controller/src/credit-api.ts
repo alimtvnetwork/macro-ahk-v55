@@ -32,6 +32,7 @@ export function assertNotLegacyCalcForProZero(plan: string | undefined, fnName: 
 
   const isProd = typeof process !== 'undefined' && process?.env?.NODE_ENV === 'production';
   const ctx = { fnName, plan: PRO_ZERO_PLAN_LITERAL };
+
   if (!isProd) {
     throwDiagnostic('CREDIT_ASSERT_E001', ctx);
   }
@@ -161,6 +162,7 @@ export function renderCreditBar(opts: CreditBarOpts): string {
   h += '</div>';
   const icoStyle = 'display:inline-block;min-width:42px;text-align:right;';
   const icoStyleWide = 'display:inline-block;min-width:60px;text-align:right;font-weight:700;';
+
   if (compact) {
     h += '<span style="font-size:' + tFontSm + ';font-family:' + tFont + ';white-space:nowrap;">';
     h += CssFragmentType.SpanStyleColor + cPrimaryLight + ';' + icoStyle + '" title="🎁 Bonus — Promotional one-time credits (remaining/granted)">🎁' + fmtPair(fr, fg) + '</span> ';

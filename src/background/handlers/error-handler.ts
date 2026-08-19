@@ -64,6 +64,7 @@ export async function handleGetActiveErrors(): Promise<{ errors: SqlRow[] }> {
   const db = getErrorsDb();
   const errors = queryUnresolvedErrors(db);
   const hasErrors = errors.length > 0;
+
   if (hasErrors) {
     setHealthState("DEGRADED");
   }
@@ -102,6 +103,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
          ORDER BY Timestamp DESC
          LIMIT 100`,
   ));
+
   if (stmtResult.isFail) {
     return [];
   }
@@ -147,12 +149,14 @@ function broadcastErrorCountChange(): void {
   try {
     const db = getErrorsDb();
     const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0"));
+
     if (stmtResult.isFail) {
       return;
     }
 
     const stmt = stmtResult.data!;
     let count = 0;
+
     if (stmt.step()) {
       const row = stmt.getAsObject() as { cnt: number };
       count = row.cnt;
@@ -180,6 +184,7 @@ function broadcastErrorCountChange(): void {
 export async function handleClearErrors(): Promise<OkResponse> {
   const db = getErrorsDb();
   const res = ServiceResult.wrapDb(() => db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0"));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -217,6 +222,7 @@ function insertUserScriptError(request: {
       bindReq(version, "0.0.0"),
     ],
   ));
+
   if (res.isFail) {
     throw res.error;
   }

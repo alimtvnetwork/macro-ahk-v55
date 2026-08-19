@@ -114,6 +114,7 @@ export function DependencyChainPanel() {
       const ms = e.executeMs !== null ? `${e.executeMs}ms`.padEnd(6) : "  —   ";
       const src = e.codeSource ?? "";
       lines.push(`  ${count} ${name} ${role} ${r}  ${f}  ${x}  ${ms} ${src}`);
+
       if (e.error) {
         lines.push(`     ⚠ ${e.error}`);
       }

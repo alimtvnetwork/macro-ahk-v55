@@ -48,6 +48,7 @@ function tryPattern(pattern: BannerPattern): { element: HTMLElement; text: strin
     null,
   );
   const node = result.singleNodeValue;
+
   if (!isHtmlElement(node)) {
     return null;
   }
@@ -82,16 +83,19 @@ function considerNode(
   }
 
   const text = node.textContent ?? "";
+
   if (text.length === 0 || text.length >= TEXT_MAX_LEN) {
     return best;
   }
 
   const needle = matchNeedle(text);
+
   if (needle === null) {
     return best;
   }
 
   const size = node.getElementsByTagName("*").length;
+
   if (best === null || size < best.size) {
     return { element: node, text: needle, size };
   }
@@ -116,6 +120,7 @@ function textFallback(root: ParentNode): { element: HTMLElement; text: string } 
   let node = walker.nextNode();
   while (node !== null && count < TEXT_SCAN_MAX_NODES) {
     count++;
+
     if (isHtmlElement(node)) {
       best = considerNode(node, best);
     }
@@ -138,6 +143,7 @@ export class BannerLocator {
 
     for (const pattern of BANNER_PATTERNS) {
       const hit = tryPattern(pattern);
+
       if (hit !== null) {
         return {
           element: hit.element,
@@ -149,11 +155,13 @@ export class BannerLocator {
     }
 
     const root = document.documentElement ?? document.body;
+
     if (root === null) {
       return null;
     }
 
     const fb = textFallback(root);
+
     if (fb === null) {
       return null;
     }

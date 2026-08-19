@@ -61,6 +61,7 @@ export function toPascalCaseKeys(source: Record<string, SerializableValue>): Rec
   const result: Record<string, SerializableValue> = {};
   for (const [key, value] of Object.entries(source)) {
     const pascal = key.replace(/(^|_)(\w)/g, (_, _p, c) => c.toUpperCase());
+
     if (value && typeof value === "object" && !Array.isArray(value)) {
       result[pascal] = toPascalCaseKeys(value as Record<string, SerializableValue>);
     } else {

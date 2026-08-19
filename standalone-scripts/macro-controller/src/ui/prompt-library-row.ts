@@ -87,6 +87,7 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
   right.appendChild(editBtn);
   right.appendChild(quickEditBtn);
   right.appendChild(dupBtn);
+
   if (canReset) {
     const resetBtn = document.createElement('button');
     resetBtn.textContent = '↺ Reset';
@@ -129,6 +130,7 @@ export function buildRowContainer(refs: ModalRefs, row: PromptRow, renderAllRole
   const container = document.createElement('div');
   container.dataset.promptContainer = String(row.Id);
   container.appendChild(buildRowEl(refs, row, container, renderAllRoles));
+
   if (refs.view.expandedIds.has(row.Id)) {
     container.appendChild(buildPreviewEl(row));
   }
@@ -138,6 +140,7 @@ export function buildRowContainer(refs: ModalRefs, row: PromptRow, renderAllRole
 
 export function togglePreview(refs: ModalRefs, row: PromptRow, container: HTMLElement, renderAllRoles: (r: ModalRefs) => Promise<void>): void {
   const isOpen = refs.view.expandedIds.has(row.Id);
+
   if (isOpen) {
     refs.view.expandedIds.delete(row.Id);
   } else {

@@ -76,6 +76,7 @@ function buildFieldsAndValues(
   for (const element of elements) {
     const meta = readFieldMeta(element, () => `field#${++fallbackIndex}`);
     fields.push(meta);
+
     if (verbose) {
       values.push(readFieldValue(element, meta));
     }
@@ -95,11 +96,13 @@ export function captureFormSnapshot(
   const verbose = options?.Verbose === true;
   const now = options?.Now ?? defaultNow;
   const container = findFormContainer(target);
+
   if (container === null) {
     return null;
   }
 
   const elements = collectFormFields(container);
+
   if (elements.length === 0) {
     return null;
   }
@@ -126,6 +129,7 @@ export function isSubmitTarget(target: Element | null): boolean {
   }
 
   const tag = target.tagName.toLowerCase();
+
   if (tag === "button") {
     const type = (target.getAttribute("type") ?? "submit").toLowerCase();
 
@@ -148,6 +152,7 @@ export function isSubmitTarget(target: Element | null): boolean {
 function findFormContainer(target: Element): Element | null {
   // Prefer a real <form>.
   const form = target.closest("form");
+
   if (form !== null) {
     return form;
   }
@@ -211,6 +216,7 @@ function readFieldMeta(element: Element, fallbackName: () => string): FormFieldM
 
 function readFieldValue(element: Element, meta: FormFieldMeta): FormFieldValue {
   const raw = readRawValue(element, meta.Type);
+
   if (meta.Sensitive && raw.length > 0) {
     return { Name: meta.Name, Value: "*".repeat(raw.length), Masked: true };
   }
@@ -232,6 +238,7 @@ function readMultiSelectValue(element: Element): string {
 
 function readFileListValue(element: Element): string {
   const files = (element as HTMLInputElement).files;
+
   if (files === null || files.length === 0) {
     return "";
   }
@@ -292,6 +299,7 @@ function classifySensitive(
   }
 
   const ac = (element.getAttribute("autocomplete") ?? "").toLowerCase();
+
   if (ac.length > 0) {
     for (const token of ac.split(/\s+/)) {
       if (SENSITIVE_AUTOCOMPLETE.has(token)) {
@@ -313,6 +321,7 @@ function classifySensitive(
 
 function nullableAttr(element: Element, name: string): string | null {
   const v = element.getAttribute(name);
+
   if (v === null) {
     return null;
   }

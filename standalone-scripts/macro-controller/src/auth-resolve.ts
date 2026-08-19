@@ -11,6 +11,7 @@
 
 import { toErrorMessage, logError } from './error-utils';
 import { log } from './logger';
+import { HttpCodes } from './constants/http';
 import {
   getLastSessionBridgeSource,
   SESSION_BRIDGE_KEYS,
@@ -32,6 +33,7 @@ const fallbackAuthUtils: MarcoSDKAuthTokenUtils = {
   },
   isUsableToken(raw: string): boolean {
     const token = (raw || '').trim().replace(/^Bearer\s+/i, '');
+
     if (!token || token.length < 10) {
       return false;
     }
@@ -52,12 +54,14 @@ const fallbackAuthUtils: MarcoSDKAuthTokenUtils = {
     }
 
     const normalized = this.normalizeBearerToken(raw);
+
     if (this.isUsableToken(normalized)) {
       return normalized;
     }
 
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
+
       if (parsed === null || typeof parsed !== 'object') {
         return '';
       }
@@ -69,6 +73,7 @@ const fallbackAuthUtils: MarcoSDKAuthTokenUtils = {
         }
 
         const nested = this.normalizeBearerToken(candidate);
+
         if (this.isUsableToken(nested)) {
           return nested;
         }
@@ -93,6 +98,7 @@ const fallbackAuthUtils: MarcoSDKAuthTokenUtils = {
  */
 function getAuthUtils(): MarcoSDKAuthTokenUtils {
   const sdkUtils = window.marco?.authUtils;
+
   if (sdkUtils) {
     return sdkUtils;
   }
@@ -246,6 +252,7 @@ function extractSessionNamesFromProject(ns: RiseupAsiaProject): string[] {
 export function getSessionCookieNames(): string[] {
   try {
     const root = (typeof window !== 'undefined' ? window.RiseupAsiaMacroExt : undefined);
+
     if (!root?.Projects) {
       return FALLBACK_SESSION_COOKIE_NAMES;
     }
@@ -253,6 +260,7 @@ export function getSessionCookieNames(): string[] {
     const names: string[] = [];
     for (const projectKey of Object.keys(root.Projects)) {
       const project = root.Projects[projectKey];
+
       if (!project) {
         continue;
       }
@@ -276,11 +284,13 @@ function findTokenInCookies(cookies: string[], sessionNames: string[]): { token:
     const trimmedCookie = cookieStr.trim();
     for (const sessionName of sessionNames) {
       const prefix = sessionName + '=';
+
       if (trimmedCookie.indexOf(prefix) !== 0) {
         continue;
       }
 
       const normalized = utils.normalizeBearerToken(trimmedCookie.substring(prefix.length));
+
       if (!utils.isUsableToken(normalized)) {
         continue;
       }
@@ -303,12 +313,14 @@ export function getBearerTokenFromCookie(): string {
     const sessionNames = getSessionCookieNames();
 
     const result = findTokenInCookies(cookies, sessionNames);
+
     if (result.token) {
       return result.token;
     }
 
     const now = Date.now();
     const shouldLogDiagnostics = (now - cookieDiagState.lastAt) >= COOKIE_DIAGNOSTIC_COOLDOWN_MS;
+
     if (!shouldLogDiagnostics) {
       return '';
     }
@@ -413,6 +425,7 @@ export function persistResolvedBearerToken(token: string): boolean {
 
 export function updateAuthBadge(hasToken: boolean, source: string): void {
   const badge = document.getElementById('loop-auth-badge');
+
   if (!badge) {
     return;
   }
@@ -486,4 +499,8 @@ export function invalidateSessionBridgeKey(token: string): string {
   }
 
   return removedKeys.join(',');
+}
+
+export function isAuthFailure(status: number): boolean {
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }

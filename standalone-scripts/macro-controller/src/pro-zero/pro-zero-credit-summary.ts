@@ -35,6 +35,7 @@ export function buildSummary(balance: CreditBalanceResponseTyped): MacroCreditSu
 
 async function resolveBalance(workspaceId: string): Promise<CreditBalanceFetchResult> {
   const cached = await readProZeroCache(workspaceId);
+
   if (cached) {
     return { status: CreditBalanceFetchStatusType.SUCCESS, data: cached };
   }
@@ -49,6 +50,7 @@ function persistOnSuccess(workspace: WorkspaceInfoTyped, balance: CreditBalanceR
 
 export async function buildProZeroCreditSummary(workspace: WorkspaceInfoTyped): Promise<ProZeroSummaryOutcome> {
   const plan = mapWorkspacePlan(workspace.plan);
+
   if (!isProZeroPlan(plan)) {
     logSkippedNonProZero(plan);
 
@@ -56,6 +58,7 @@ export async function buildProZeroCreditSummary(workspace: WorkspaceInfoTyped): 
   }
 
   const result = await resolveBalance(workspace.id);
+
   if (result.status !== CreditBalanceFetchStatusType.SUCCESS) {
     return { isOk: false, failure: result };
   }

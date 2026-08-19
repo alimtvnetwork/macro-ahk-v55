@@ -40,6 +40,7 @@ function isJsonPrefix(bytes: Uint8Array): boolean {
   for (let i = 0; i < Math.min(bytes.length, 64); i++) {
     const b = bytes[i];
     const isWhitespace = b === 0x20 || b === 0x09 || b === 0x0a || b === 0x0d || b === 0xef || b === 0xbb || b === 0xbf;
+
     if (isWhitespace) {
       continue;
     }

@@ -135,9 +135,11 @@ export function logStructured(input: {
   fields?: Record<string, string | number | boolean | null | undefined>;
 }): void {
   const parts: string[] = ['code=' + input.code];
+
   if (input.fields) {
     Object.keys(input.fields).forEach((k) => {
       const v = input.fields![k];
+
       if (v === undefined) {
         return;
       }

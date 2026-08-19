@@ -72,6 +72,7 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
 
   const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       void handleJsonFileImport(file);
     }

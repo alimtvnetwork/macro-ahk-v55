@@ -259,6 +259,7 @@ async function executeInMainWorld(code: string): Promise<string> {
   });
 
   const target = document.body ?? document.documentElement;
+
   if (!target) {
     URL.revokeObjectURL(url);
     throw new Error("No HTML target available for MAIN blob script injection");
@@ -397,6 +398,7 @@ async function attemptUserScriptFallback(
   }
 
   const isMissing = !isForceLegacy;
+
   if (isMissing) {
     // Ensure USER_SCRIPT world exists before execute() to avoid cold-start race.
     await configureUserScriptWorld();
@@ -443,6 +445,7 @@ async function attemptUserScriptFallback(
 
   // Legacy tier 1: ISOLATED blob script tag
   const blobResult = await attemptBlobFallback(tabId, code);
+
   if (blobResult.isSuccess) {
     console.log(
       "[injection:csp] 🏆 WINNER: isolated-blob in tab %d | MAIN: ❌ %s → USER_SCRIPT: %s → ISOLATED_BLOB: ✅",
@@ -456,6 +459,7 @@ async function attemptUserScriptFallback(
 
   // Legacy tier 2: ISOLATED eval
   const evalResult = await attemptIsolatedEvalFallback(tabId, code);
+
   if (evalResult.isSuccess) {
     console.log(
       "[injection:csp] 🏆 WINNER: isolated-eval in tab %d | MAIN: ❌ %s → USER_SCRIPT: %s → ISOLATED_BLOB: ❌ %s → ISOLATED_EVAL: ✅",
@@ -587,6 +591,7 @@ async function executeBlobInjection(code: string): Promise<string> {
   });
 
   const target = document.body ?? document.documentElement;
+
   if (!target) {
     URL.revokeObjectURL(url);
     throw new Error("No HTML target available for ISOLATED script tag injection");

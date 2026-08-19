@@ -96,6 +96,7 @@ async function runOneWorkspace(
   try {
     const result = await fetchAndPersist(candidate.workspaceId, { force, source });
     results.push({ workspaceId: candidate.workspaceId, outcome: result.outcome });
+
     if (result.outcome === 'fetched') {
       counters.fetched += 1; 
     } else if (result.outcome === 'throttled') {

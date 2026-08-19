@@ -59,6 +59,7 @@ describe('Badge visual regression matrix (Issue 119 Step 9)', () => {
     for (const tone of ALL_TONES) {
       const style = resolveBadgeStyle(tone);
       const usesRed = styleContainsRedPalette(style);
+
       if (tone === 'danger') {
         expect(usesRed, `${tone} must use red`).toBe(true);
       } else {

@@ -117,6 +117,7 @@ function isSdkLogger(value: unknown): value is SdkLogger {
 /** Resolve the SDK logger, or undefined if the namespace is not ready. */
 function getLogger(): SdkLogger | undefined {
   const ns = readSdkNamespace();
+
   if (!ns) {
     return undefined;
   }
@@ -132,6 +133,7 @@ function prefix(scope: string): string {
 /** Structured error logging, delegates to console.error(). */
 export function logError(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
+
   if (logger) {
     logger.error(scope, message, error);
 
@@ -157,6 +159,7 @@ function hasLoggerMethod(logger: object, name: string): boolean {
 /** Structured debug logging, delegates to RiseupAsiaMacroExt.Logger.debug(). */
 export function logDebug(scope: string, message: string): void {
   const logger = getLogger();
+
   if (logger && hasLoggerMethod(logger, 'debug')) {
     logger.debug(scope, message);
 
@@ -169,6 +172,7 @@ export function logDebug(scope: string, message: string): void {
 /** Structured warn logging, delegates to RiseupAsiaMacroExt.Logger.warn(). */
 export function logWarn(scope: string, message: string): void {
   const logger = getLogger();
+
   if (logger && hasLoggerMethod(logger, 'warn')) {
     logger.warn(scope, message);
 
@@ -181,6 +185,7 @@ export function logWarn(scope: string, message: string): void {
 /** General structured console output, delegates to RiseupAsiaMacroExt.Logger.console(). */
 export function logConsole(scope: string, message: string, ...args: RiseupAsiaLogArg[]): void {
   const logger = getLogger();
+
   if (logger) {
     logger.console(scope, message, ...args);
 
@@ -188,6 +193,7 @@ export function logConsole(scope: string, message: string, ...args: RiseupAsiaLo
   }
 
   const base = prefix(scope) + message;
+
   if (args.length > 0) {
     console.log(base, ...args); 
   } else {
@@ -198,6 +204,7 @@ export function logConsole(scope: string, message: string, ...args: RiseupAsiaLo
 /** Stack trace logging, delegates to RiseupAsiaMacroExt.Logger.stackTrace(). */
 export function logStackTrace(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
+
   if (logger && hasLoggerMethod(logger, 'stackTrace')) {
     logger.stackTrace(scope, message, error);
 
@@ -279,6 +286,7 @@ function reportToLogArg(report: DiagnosticReport): RiseupAsiaLogArg {
     timestamp: report.timestamp,
     context: JSON.parse(JSON.stringify(report.context)) as RiseupAsiaLogArg,
   };
+
   if (report.cause) {
     out.cause = report.cause.stack
       ? { name: report.cause.name, message: report.cause.message, stack: report.cause.stack }
@@ -297,6 +305,7 @@ export function logDiagnostic(err: DiagnosticError): DiagnosticReport {
   const report = err.toReport();
   const scope = report.area;
   const logger = getLogger();
+
   if (logger) {
     logger.error(scope, '[' + report.code + '] ' + report.message, err);
     logger.console(scope, 'diagnostic-report', reportToLogArg(report));

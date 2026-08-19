@@ -88,6 +88,7 @@ export function wellKnownJobId(projectId: string): string {
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
     return null;
   }
@@ -114,6 +115,7 @@ export async function probeProgress(
 ): Promise<GitsyncProgressBody | null> {
   if (!wsId || !projectId || !jobId) {
     const missing: string[] = [];
+
     if (!wsId) {
       missing.push('wsId');
     }
@@ -130,6 +132,7 @@ export async function probeProgress(
   }
 
   const sdk = getSdk();
+
   if (!sdk) {
     const reason = 'marco.api.call unavailable (SDK not injected)';
     logError('GitsyncProbe', 'probeProgress: ' + reason
@@ -187,6 +190,7 @@ function isTerminal(body: GitsyncProgressBody | null): boolean {
 
 function toConnected(body: GitsyncProgressBody): GitsyncConnectionState | null {
   const url = body.result?.repo_url;
+
   if (typeof url === 'string' && url.length > 0) {
     return {
       connected: true,
@@ -245,6 +249,7 @@ export async function resolveConnection(
   }
 
   const initial = toConnected(body);
+
   if (initial) {
     return initial;
   }
@@ -270,6 +275,7 @@ export async function resolveConnection(
     }
 
     const next = toConnected(body);
+
     if (next) {
       return next;
     }

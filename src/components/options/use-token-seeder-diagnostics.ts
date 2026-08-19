@@ -84,6 +84,7 @@ function computeNextRetry(
   for (const t of targets) {
     const retryAt = t.lastFailureAt + t.cooldownMs;
     const remaining = Math.max(0, retryAt - now);
+
     if (remaining < minRemaining) {
       minRemaining = remaining;
       minRetryAt = retryAt;

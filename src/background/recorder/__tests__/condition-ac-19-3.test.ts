@@ -84,6 +84,7 @@ describe("Spec 19 §3.7, Condition AC suite", () => {
       },
     );
     expect(outcome.Ok).toBe(false);
+
     if (outcome.Ok === false) {
       expect(outcome.Reason).toBe("ConditionTimeout");
       expect(outcome.LastEvaluation.length).toBeGreaterThan(0);

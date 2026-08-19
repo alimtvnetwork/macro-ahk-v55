@@ -26,6 +26,7 @@ export class TaskQueueManager {
     const time = new Date().toLocaleTimeString();
     const logMsg = `[${time}] ${msg}`;
     this._executionLogs.push(logMsg);
+
     if (this._executionLogs.length > 100) {
       this._executionLogs.shift();
     }
@@ -78,6 +79,7 @@ export class TaskQueueManager {
     
     this._isStopped = false;
     const queueState = await loadTaskQueue();
+
     if (queueState.isPaused || this._isPaused || queueState.tasks.length === 0) {
       return;
     }
@@ -151,6 +153,7 @@ export class TaskQueueManager {
 
     // Attempt to click submit button
     const submitBtn = this.findSubmitButton();
+
     if (submitBtn) {
       this._logExecution('Submit button found, clicking...', 'success');
       submitBtn.click();
@@ -182,6 +185,7 @@ export class TaskQueueManager {
       
       const queueState = await loadTaskQueue();
       const t = queueState.tasks.find(t => t.id === task.id);
+
       if (t) {
         t.status = 'hold';
         t.error = reason;
@@ -213,6 +217,7 @@ export class TaskQueueManager {
 
     for (const selector of sendSelectors) {
       const el = document.querySelector(selector);
+
       if (el instanceof HTMLButtonElement && !el.disabled) {
         return el;
       }
@@ -228,6 +233,7 @@ export class TaskQueueManager {
   stopProcessing(): void {
     this._isProcessing = false;
     this._isStopped = true;
+
     if (this._abortController) {
       this._abortController.abort();
     }

@@ -59,12 +59,14 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
  */
 export function daysBetween(isoOrMs: string | number, nowMs?: number): number {
   const t = typeof isoOrMs === 'number' ? isoOrMs : Date.parse(isoOrMs);
+
   if (!Number.isFinite(t)) {
     return 0;
   }
 
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = now - t;
+
   if (diffMs <= 0) {
     return 0;
   }
@@ -79,12 +81,14 @@ export function daysUntil(iso: string, nowMs?: number): number {
   }
 
   const t = Date.parse(iso);
+
   if (!Number.isFinite(t)) {
     return -1;
   }
 
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = t - now;
+
   if (diffMs < 0) {
     return -1;
   }
@@ -102,6 +106,7 @@ export function formatDateDDMMMYY(iso: string): string {
   }
 
   const t = Date.parse(iso);
+
   if (!Number.isFinite(t)) {
     return '';
   }
@@ -223,11 +228,13 @@ function resolveRefillStatus(
   ws: WorkspaceCredit, config: WorkspaceLifecycleConfig, nowMs?: number,
 ): WorkspaceStatus | null {
   const refillIso = pickRefillIso(ws);
+
   if (!refillIso) {
     return null;
   }
 
   const dToRefill = daysUntil(refillIso, nowMs);
+
   if (dToRefill >= 0 && dToRefill <= config.refillWarningThresholdDays) {
     return buildStatus('about-to-refill', { refillIso, daysToRefill: dToRefill });
   }
@@ -271,6 +278,7 @@ export function getEffectiveStatus(
   }
 
   const refillStatus = resolveRefillStatus(ws, config, nowMs);
+
   if (refillStatus) {
     return refillStatus;
   }

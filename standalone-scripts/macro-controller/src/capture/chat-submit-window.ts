@@ -44,6 +44,7 @@ export function clampCap(value: number): number {
   }
 
   const floored = Math.floor(value);
+
   if (floored < MIN_CHAT_SUBMIT_CAP) {
     return MIN_CHAT_SUBMIT_CAP;
   }
@@ -59,6 +60,7 @@ async function readCapFromStorage(projectId: string): Promise<number | null> {
   try {
     const chromeApi = (globalThis as { chrome?: { storage?: { local?: { get?: (k: string) => Promise<Record<string, unknown>> } } } }).chrome;
     const get = chromeApi?.storage?.local?.get;
+
     if (typeof get !== 'function') {
       return null;
     }
@@ -66,6 +68,7 @@ async function readCapFromStorage(projectId: string): Promise<number | null> {
     const key = `${CAP_STORAGE_PREFIX}${projectId}`;
     const bag = await get.call(chromeApi!.storage!.local, key);
     const raw = bag?.[key];
+
     if (typeof raw !== 'number') {
       return null;
     }
@@ -84,6 +87,7 @@ export async function resolveCap(projectId: string, override?: number): Promise<
   }
 
   const stored = await readCapFromStorage(projectId);
+
   if (stored !== null) {
     return stored;
   }
@@ -97,6 +101,7 @@ export async function enforceChatSubmitWindow(
 ): Promise<EnforceWindowResult> {
   const cap = await resolveCap(projectId, override);
   const countBefore = await countChatSubmits(projectId);
+
   if (countBefore <= cap) {
     return { cap, countBefore, prunedCount: 0, failedCount: 0 };
   }
@@ -109,12 +114,14 @@ export async function enforceChatSubmitWindow(
     // Delete OPFS first — an orphan blob is worse than an orphan row
     // (the row can be re-linked by FileId; a blob has no back-pointer).
     const isOpfsGone = await deleteOpfsEntry(projectId, row.FileId);
+
     if (!isOpfsGone) {
       failed += 1;
       continue;
     }
 
     const isRowGone = await deleteChatSubmit(row.Id);
+
     if (isRowGone) {
       pruned += 1;
     } else {

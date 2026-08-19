@@ -71,6 +71,7 @@ const XPATH_LEADING_RE = /^\s*(?:\(\s*)?\.?\//;
  */
 export function detectSelectorKind(raw: string): SelectorKind {
   const s = raw.trim();
+
   if (s.length === 0) {
     return "Css";
   }
@@ -114,6 +115,7 @@ export function validateSelector(
   deps: ValidationDeps = {},
 ): ValidationResult {
   const s = raw.trim();
+
   if (s.length === 0) {
     return { Ok: false, Reason: "Selector is empty." };
   }
@@ -181,11 +183,13 @@ function clampTimeout(raw: unknown): number {
 
 function sanitiseRow(raw: unknown): WaitConfig | null {
   const notPlainObject = !isPlainObject(raw);
+
   if (notPlainObject) {
     return null;
   }
 
   const sel = typeof raw.Selector === "string" ? raw.Selector.trim() : "";
+
   if (sel.length === 0) {
     return null;
   }
@@ -211,12 +215,14 @@ function safeReadStore(): RawStore {
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (raw === null) {
       return {};
     }
 
     const parsed: unknown = JSON.parse(raw);
     const notPlainObject = !isPlainObject(parsed);
+
     if (notPlainObject) {
       return {};
     }
@@ -224,6 +230,7 @@ function safeReadStore(): RawStore {
     const out: Record<string, WaitConfig> = {};
     for (const [k, v] of Object.entries(parsed)) {
       const sanitised = sanitiseRow(v);
+
       if (sanitised !== null && /^\d+$/.test(k)) {
         out[k] = sanitised;
       }
@@ -252,6 +259,7 @@ export function readAllStepWaits(): ReadonlyMap<number, WaitConfig> {
   const map = new Map<number, WaitConfig>();
   for (const [k, v] of Object.entries(store)) {
     const id = Number(k);
+
     if (Number.isInteger(id) && id > 0) {
       map.set(id, v);
     }
@@ -280,6 +288,7 @@ export function writeStepWait(stepId: number, config: WaitConfig): WaitConfig {
     Condition: config.Condition,
     TimeoutMs: config.TimeoutMs,
   });
+
   if (sanitised === null) {
     throw new Error("writeStepWait: selector is required and must be non-empty.");
   }
@@ -293,6 +302,7 @@ export function writeStepWait(stepId: number, config: WaitConfig): WaitConfig {
 
 export function clearStepWait(stepId: number): void {
   const store = { ...safeReadStore() };
+
   if (Object.prototype.hasOwnProperty.call(store, String(stepId))) {
     delete store[String(stepId)];
     safeWriteStore(store);
@@ -338,6 +348,7 @@ function evaluateXPath(
   const out: ElementLike[] = [];
   for (let i = 0; i < it.snapshotLength; i++) {
     const node = it.snapshotItem(i);
+
     if (node !== null) {
       out.push(node as unknown as ElementLike);
     }
@@ -364,6 +375,7 @@ export function evaluateSelector(
 ): ReadonlyArray<ElementLike> {
   const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
   const root = deps.root ?? doc;
+
   if (doc === null || root === null) {
     return [];
   }
@@ -386,6 +398,7 @@ function isElementVisible(el: ElementLike): boolean {
 
   if (typeof el.getClientRects === "function") {
     const rects = el.getClientRects();
+
     if (rects.length > 0) {
       return true;
     }
@@ -456,6 +469,7 @@ export async function waitForSelector(
   const pollMs = Math.max(10, deps.pollIntervalMs ?? POLL_INTERVAL_MS);
 
   const validation = validateSelector(config.Selector, config.Kind, { doc: deps.doc ?? null });
+
   if (validation.Ok === false) {
     return { Ok: false, Reason: "InvalidSelector", DurationMs: 0, Detail: validation.Reason };
   }
@@ -486,6 +500,7 @@ async function pollUntilSatisfied(
     }
 
     const elapsed = now() - startedAt;
+
     if (elapsed >= config.TimeoutMs) {
       return {
         Ok: false, Reason: "Timeout", DurationMs: elapsed,

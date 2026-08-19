@@ -8,6 +8,7 @@ project.addSourceFilesAtPaths("d:/work/macro-ahk/standalone-scripts/macro-contro
 
 function getRelativeImportPath(sourceFile, targetPath) {
   let rel = path.relative(path.dirname(sourceFile.getFilePath()), targetPath).replace(/\\/g, '/');
+
   if (!rel.startsWith('.')) {
     rel = './' + rel;
   }
@@ -30,9 +31,11 @@ for (const sourceFile of project.getSourceFiles()) {
   for (const call of calls) {
     if (call.getExpression().getText() === 'fetch') {
       const parent = call.getParent();
+
       if (parent && parent.getKind() === SyntaxKind.AwaitExpression) {
         // Check if it's already wrapped
         const grandParent = parent.getParent();
+
         if (grandParent && grandParent.getKind() === SyntaxKind.CallExpression && grandParent.getExpression().getText() === 'ServiceResult.wrapFetch') {
           continue;
         }
@@ -53,6 +56,7 @@ for (const sourceFile of project.getSourceFiles()) {
     if (access.getName() === 'ok') {
       // Check if it's negated
       const parent = access.getParent();
+
       if (parent && parent.getKind() === SyntaxKind.PrefixUnaryExpression && parent.getOperatorToken() === SyntaxKind.ExclamationToken) {
         // !resp.isSuccess -> !resp.isSuccess
         parent.replaceWithText(`${access.getExpression().getText()}.isFail`);
@@ -78,6 +82,7 @@ for (const sourceFile of project.getSourceFiles()) {
   if (modified) {
     // Add import
     const importPath = getRelativeImportPath(sourceFile, targetPath);
+
     if (!sourceFile.getImportDeclaration(decl => decl.getModuleSpecifierValue() === importPath)) {
       sourceFile.addImportDeclaration({
         namedImports: ['ServiceResult'],

@@ -114,6 +114,7 @@ export class DiagnosticError extends Error {
 
   constructor(code: string, context: DiagnosticContext, cause?: unknown) {
     const entry = getErrorCodeEntry(code);
+
     if (!entry) {
       throw new DiagnosticMetaError(
         `Unknown error code "${code}". Add it to ERROR_CODES before throwing.`,
@@ -131,6 +132,7 @@ export class DiagnosticError extends Error {
     this.entry = entry;
     this.context = context;
     this.timestamp = new Date().toISOString();
+
     if (cause !== undefined) {
       this.cause = cause;
     }

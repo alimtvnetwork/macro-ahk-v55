@@ -12,6 +12,7 @@ export const NAME_MAX_LEN = 120;
 
 export function validateName(raw: string, siblingNames: ReadonlyArray<string>): string | null {
   const trimmed = raw.trim();
+
   if (trimmed === "") {
     return "Name is required.";
   }
@@ -22,6 +23,7 @@ export function validateName(raw: string, siblingNames: ReadonlyArray<string>): 
 
   const lower = trimmed.toLowerCase();
   const clash = siblingNames.find((s) => s.toLowerCase() === lower);
+
   if (clash !== undefined) {
     return "Another group at this level already has that name.";
   }
@@ -65,6 +67,7 @@ function useRenameValidation(lib: UseStepLibraryApi, renameGroup: StepGroupRow |
     }
 
     const baseError = validateName(renameName, renameSiblingNames);
+
     if (baseError !== null) {
       return baseError;
     }
@@ -154,6 +157,7 @@ export function makeSubmitDelete(
     const name = deleteDialog.group.Name;
     try {
       deps.lib.deleteGroup(id);
+
       if (deps.activeGroupId === id) {
         deps.setActiveGroupId(null);
       }

@@ -31,11 +31,13 @@ function isReloadShortcut(event: KeyboardEvent): boolean {
 export function setupGlobalErrorHandlers(): void {
   window.addEventListener('error', function (event: ErrorEvent) {
     const hasNoMessage = !event || !event.message;
+
     if (hasNoMessage) {
       return;
     }
 
     const isUnrelatedFile = event.filename && event.filename.indexOf('macro') === -1 && event.filename.indexOf('blob:') === -1;
+
     if (isUnrelatedFile) {
       return;
     }
@@ -54,6 +56,7 @@ export function setupGlobalErrorHandlers(): void {
 
   window.addEventListener('unhandledrejection', function (event: PromiseRejectionEvent) {
     const hasNoReason = !event || !event.reason;
+
     if (hasNoReason) {
       return;
     }
@@ -74,6 +77,7 @@ export function setupGlobalErrorHandlers(): void {
   window.addEventListener('keydown', function (e) {
     if (isReloadShortcut(e)) {
       e.preventDefault();
+
       if (!state.running) {
         log('Hotkey: Loop is not running — cannot resume queue', 'warn');
         showToast('Loop must be ON to resume queue', 'warn');
@@ -82,6 +86,7 @@ export function setupGlobalErrorHandlers(): void {
       }
 
       const hasReturnButton = checkForReturnButton();
+
       if (hasReturnButton) {
         log('Hotkey: Cannot resume while "Return to Extension" button is present', 'warn');
         showToast('Close the extension overlay first', 'warn');

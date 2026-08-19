@@ -233,6 +233,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
 
   const handleSubmit = (): void => {
     let result: BuildResult;
+
     if (kind === StepKindId.Hotkey) {
       result = buildHotkeyPayload(label, hotkeyChords, hotkeyWaitMs);
     } else if (kind === StepKindId.UrlTabClick) {
@@ -283,6 +284,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
               onValueChange={(value) => {
                 const nextKind = Number(value) as StepKindId;
                 setKind(nextKind);
+
                 if (nextKind !== StepKindId.RunGroup) {
                   setTargetGroupId(null);
                 }

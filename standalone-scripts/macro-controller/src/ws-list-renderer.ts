@@ -62,6 +62,7 @@ function computeMaxTotalCredits(workspaces: WorkspaceCredit[]): number {
   let maxTotalCredits = 1;
   for (const ws of workspaces) {
     const mtc = Math.round(resolveCreditSummary(ws).total);
+
     if (mtc > maxTotalCredits) {
       maxTotalCredits = mtc;
     }
@@ -78,6 +79,7 @@ export function filterAndSortWorkspaces(
   const survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }> = [];
   for (const [wsIndex, ws] of workspaces.entries()) {
     const isFilteredOut = !passesFilters(ws, fs);
+
     if (isFilteredOut) {
       continue;
     }
@@ -96,6 +98,7 @@ export function filterAndSortWorkspaces(
       const statusB = getEffectiveStatus(b.ws, config);
       const daysA = statusA.daysSince || 0;
       const daysB = statusB.daysSince || 0;
+
       if (daysB !== daysA) {
         return daysB - daysA;
       }
@@ -125,6 +128,7 @@ export function filterAndSortWorkspaces(
 
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
+
   if (!countLabel) {
     return;
   }
@@ -143,6 +147,7 @@ export function renderLoopWorkspaceList(
   filter: string,
 ): void {
   const listEl = document.getElementById('loop-ws-list');
+
   if (!listEl) {
     return;
   }
@@ -176,6 +181,7 @@ function buildWorkspaceNodes(
 
   for (const { ws, wsIndex } of survivors) {
     const isCurrent = isCurrentWorkspace(ws, currentName);
+
     if (isCurrent) {
       currentIdx = count;
     }
@@ -185,6 +191,7 @@ function buildWorkspaceNodes(
   }
 
   const isEmpty = count === 0;
+
   if (isEmpty) {
     const emptyEl = document.createElement('div');
     emptyEl.style.cssText = 'padding:8px;color:' + cPrimaryLight + ';font-size:10px;text-align:center;';
@@ -200,6 +207,7 @@ function attachHoverCardForList(listEl: HTMLElement): void {
     const list = loopCreditState.perWorkspace || [];
     for (const w of list) {
       const wid = String(w.id || (w.raw && w.raw.id) || '');
+
       if (wid === id) {
         return w;
       }
@@ -223,6 +231,7 @@ function attachWsListEventDelegation(
 
 function removeExistingDelegation(listEl: HTMLElement, elWithHandlers: HTMLElementWithHandlers): void {
   const hasExistingHandler = !!elWithHandlers._wsDelegateHandler;
+
   if (hasExistingHandler) {
     listEl.removeEventListener('click', elWithHandlers._wsDelegateHandler!);
     listEl.removeEventListener('dblclick', elWithHandlers._wsDblHandler!);
@@ -249,10 +258,12 @@ function attachNewDelegation(listEl: HTMLElement, elWithHandlers: HTMLElementWit
 function scrollToCurrentIfNeeded(listEl: HTMLElement, currentIdx: number, filter: string): void {
   const hasNoFilter = !filter;
   const isEligible = currentIdx >= 0 && hasNoFilter;
+
   if (isEligible) {
     setTimeout(function () {
       const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
       const hasCurrentItem = !!currentItem;
+
       if (hasCurrentItem) {
         currentItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
@@ -263,6 +274,7 @@ function scrollToCurrentIfNeeded(listEl: HTMLElement, currentIdx: number, filter
 function _createClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+
     if (!item) {
       return;
     }
@@ -287,12 +299,14 @@ function _createClickHandler(): (e: MouseEvent) => void {
 function _createDblClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+
     if (!item) {
       return;
     }
 
     e.preventDefault();
     e.stopPropagation();
+
     if (item.getAttribute(DataAttrType.WsCurrent) === 'true') {
       log('Double-click on current workspace "' + item.getAttribute(DataAttrType.WsName) + '" — no move needed', 'warn');
 
@@ -307,6 +321,7 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
 function _createCtxHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+
     if (!item) {
       return;
     }
@@ -324,11 +339,13 @@ function _createCtxHandler(): (e: MouseEvent) => void {
 function _createHoverHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+
     if (!item) {
       return;
     }
 
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
+
     if (isCurrent) {
       return;
     }
@@ -336,6 +353,7 @@ function _createHoverHandler(): (e: MouseEvent) => void {
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
     const itemId = item.getAttribute(DataAttrType.WsId);
+
     if (selId && selId === itemId) {
       return;
     }
@@ -347,11 +365,13 @@ function _createHoverHandler(): (e: MouseEvent) => void {
 function _createOutHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+
     if (!item) {
       return;
     }
 
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
+
     if (isCurrent) {
       return;
     }
@@ -359,6 +379,7 @@ function _createOutHandler(): (e: MouseEvent) => void {
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
     const itemId = item.getAttribute(DataAttrType.WsId);
+
     if (selId && selId === itemId) {
       return;
     }
@@ -373,6 +394,7 @@ class WsDropdownState {
 
   static getInstance(): WsDropdownState {
     const isDropdownStateUninitialized = !WsDropdownState.instance;
+
     if (isDropdownStateUninitialized) {
       WsDropdownState.instance = new WsDropdownState();
     }
@@ -403,11 +425,13 @@ function dropdownState(): WsDropdownState {
 
 export function populateLoopWorkspaceDropdown(): void {
   const listEl = document.getElementById('loop-ws-list');
+
   if (!listEl) {
     return;
   }
 
   const workspaces = loopCreditState.perWorkspace || [];
+
   if (workspaces.length === 0) {
     if (dropdownState().getHash() === '_empty') {
       dropdownState().recordSkip();
@@ -477,6 +501,7 @@ class CreditResolvedRepaintScheduler {
 
   static get(): CreditResolvedRepaintScheduler {
     const isRepaintSchedulerUninitialized = !CreditResolvedRepaintScheduler.instance;
+
     if (isRepaintSchedulerUninitialized) {
       CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
     }

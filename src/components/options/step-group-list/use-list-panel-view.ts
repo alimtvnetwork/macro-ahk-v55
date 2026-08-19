@@ -15,11 +15,13 @@ function matchesQuery(group: StepGroupRow, query: string): boolean {
   }
 
   const q = query.toLowerCase();
+
   if (group.Name.toLowerCase().includes(q)) {
     return true;
   }
 
   const desc = group.Description ?? "";
+
   if (desc !== "" && desc.toLowerCase().includes(q)) {
     return true;
   }

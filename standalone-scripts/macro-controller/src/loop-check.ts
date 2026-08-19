@@ -35,12 +35,14 @@ function normalizeWorkspaceName(name: string): string {
 
 function findExactWorkspaceMatch(name: string, wsList: WorkspaceCredit[]): WorkspaceCredit | null {
   const normalized = normalizeWorkspaceName(name);
+
   if (!normalized || !wsList || wsList.length === 0) {
     return null;
   }
 
   for (const ws of wsList) {
     const wsName = (ws.fullName || ws.name || '') as string;
+
     if (normalizeWorkspaceName(wsName) === normalized) {
       return ws; 
     }
@@ -78,6 +80,7 @@ function restoreOnFailure(
 function syncCurrentWsFromName(wsList: WorkspaceCredit[]): void {
   const isMissingWorkspaceName = !state.workspaceName;
   const isMissingWorkspaceList = !wsList || wsList.length === 0;
+
   if (isMissingWorkspaceName) {
     return;
   }
@@ -87,6 +90,7 @@ function syncCurrentWsFromName(wsList: WorkspaceCredit[]): void {
   }
 
   const matched = findExactWorkspaceMatch(state.workspaceName, wsList);
+
   if (matched) {
     loopCreditState.currentWs = matched; 
   }
@@ -123,6 +127,7 @@ function runCheckInitialState(): { statusEl: HTMLElement | null; previousWsName:
   log('Spec: spec/05-chrome-extension/60-check-button-spec.md', 'check');
 
   const statusEl = document.getElementById(IDS.STATUS);
+
   if (statusEl) {
     statusEl.innerHTML = '<span style="color:#38bdf8;">🔍</span> Checking...';
   }
@@ -147,12 +152,14 @@ function buildDetectPromise(
   }
 
   log('No workspaces loaded — fetching credits first, then detecting via XPath...', 'warn');
+
   if (statusEl) {
     statusEl.innerHTML = '<span style="color:#38bdf8;">🔍</span> Fetching workspaces...';
   }
 
   return fetchLoopCreditsAsync().then(function() {
     const freshPerWs = loopCreditState.perWorkspace || [];
+
     if (freshPerWs.length === 0) {
       log('Credit fetch returned 0 workspaces — will try raw XPath text as workspace name', 'warn');
     }

@@ -11,6 +11,7 @@ const CSS_BG = ';background:';
 
 export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): string {
   const display: WorkspaceDisplayStatus = classifyFromStatus(status, ws);
+
   if (display.kind === 'normal' || !display.label) {
     return '';
   }
@@ -18,6 +19,7 @@ export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit
   const style = resolveBadgeStyle(display.tone);
 
   const tipParts: string[] = [display.label];
+
   if (display.sublabel) {
     tipParts.push(display.sublabel);
   }
@@ -55,6 +57,7 @@ export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit
 
 export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
   const days = daysToRefillForWs(ws);
+
   if (days === null) {
     return '';
   }
@@ -66,6 +69,7 @@ export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
   let fg = '#cbd5e1';
   let bg = 'rgba(71,85,105,0.35)';
   let border = 'rgba(148,163,184,0.5)';
+
   if (days === 0) {
     fg = '#bae6fd';
     bg = 'rgba(2,132,199,0.45)';
@@ -93,8 +97,10 @@ export function resolveStatusPill(
   const status = getEffectiveStatus(ws, config);
   const pillHtml = buildStatusPillHtml(status, ws);
   let suppressTier = false;
+
   if (isExpiredTier(wsTier)) {
     const display = classifyFromStatus(status, ws);
+
     if (display.kind !== 'normal') {
       suppressTier = true;
     }
@@ -105,6 +111,7 @@ export function resolveStatusPill(
 
 export function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
   const days = expiredDays(ws);
+
   if (days === null) {
     return '';
   }
@@ -112,6 +119,7 @@ export function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
   const startDate = formatExpiryStartDate(ws);
   const duration = formatExpiredDuration(ws);
   const tipParts = ['Expired'];
+
   if (startDate) {
     tipParts.push('since ' + startDate);
   }

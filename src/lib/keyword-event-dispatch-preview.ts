@@ -44,6 +44,7 @@ export function buildDispatchPreview(step: KeywordEventStep): DispatchPreview {
 
   const parsed = parseCombo(step.Combo);
   const modifiers: string[] = [];
+
   if (parsed.Ctrl) {
     modifiers.push("Ctrl"); 
   }
@@ -76,6 +77,7 @@ export function buildDispatchPreview(step: KeywordEventStep): DispatchPreview {
  */
 function formatKeyLabel(raw: string): string {
   const k = raw.trim();
+
   if (k === "") {
     return ""; 
   }

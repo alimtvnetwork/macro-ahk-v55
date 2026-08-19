@@ -14,6 +14,7 @@ export function rolesToRender(view: ModalRefs['view']): PromptRole[] {
 
 export function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[] {
   const copy = rows.slice();
+
   if (mode === 'name') {
     return copy.sort((a, b) => a.Name.localeCompare(b.Name));
   }
@@ -54,6 +55,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
   wrap.appendChild(h);
 
   const result = await listPromptsByRole(role);
+
   if (result.ok === false || !result.value) {
     const err = document.createElement('div');
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
@@ -64,6 +66,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
   }
 
   const rows = result.value;
+
   if (rows.length === 0) {
     const empty = document.createElement('div');
     empty.textContent = '(no rows)';

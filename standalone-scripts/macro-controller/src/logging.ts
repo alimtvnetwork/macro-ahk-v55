@@ -134,8 +134,10 @@ export function getWsHistoryKey(): string {
 export function getProjectNameFromDom(): string | null {
   try {
     const node = domCache.getByXPath(CONFIG.PROJECT_NAME_XPATH);
+
     if (node && node.textContent) {
       const name = node.textContent.trim();
+
       if (name.length > 0) {
         state.projectNameFromDom = name;
 
@@ -167,6 +169,7 @@ export function getDisplayProjectName(): string {
 
   // Priority 3: document title parse
   const titleMatch = (document.title || '').match(/^(.+?)\s*[-–—]\s*(?:Lovable|lovable)/);
+
   if (titleMatch) {
     return titleMatch[1].trim();
   }
@@ -175,6 +178,7 @@ export function getDisplayProjectName(): string {
   // project UUID as a name (v3.93.1). Logging once per page so we can see which
   // upstream source is broken (almost always a stale PROJECT_NAME_XPATH).
   const pid = getProjectIdFromUrl();
+
   if (!state._projectNameFallbackLogged) {
     state._projectNameFallbackLogged = true;
     log(
@@ -314,6 +318,7 @@ export function clearAllLogs(): void {
 function readSeedTelemetryBlock(): string[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
+
     if (!raw) {
       return ['Seed Telemetry: (not run this session)', '---'];
     }

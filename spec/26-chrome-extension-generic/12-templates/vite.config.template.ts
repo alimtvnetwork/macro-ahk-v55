@@ -27,6 +27,7 @@ export default defineConfig({
       apply: "build",
       writeBundle() {
         const distDir = path.resolve(__dirname, "dist");
+
         if (!existsSync(distDir)) {
           mkdirSync(distDir, { recursive: true });
         }

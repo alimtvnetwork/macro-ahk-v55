@@ -15,6 +15,7 @@ export class ChromeTabsAdapter implements TabsAdapter {
   async focusTab(id: number): Promise<void> {
     await chrome.tabs.update(id, { active: true });
     const tab = await chrome.tabs.get(id);
+
     if (tab.windowId) {
       await chrome.windows.update(tab.windowId, { focused: true });
     }

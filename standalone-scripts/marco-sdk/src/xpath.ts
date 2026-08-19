@@ -29,6 +29,7 @@ export function createXPathApi(): XPathApi {
     },
     resolve(key: string): Element | null {
       const expression = xpathCache[key];
+
       if (!expression) {
         return null;
       }
@@ -45,6 +46,7 @@ export function createXPathApi(): XPathApi {
     },
     resolveAll(key: string): Element[] {
       const expression = xpathCache[key];
+
       if (!expression) {
         return [];
       }
@@ -59,6 +61,7 @@ export function createXPathApi(): XPathApi {
       const elements: Element[] = [];
       for (let i = 0; i < result.snapshotLength; i++) {
         const node = result.snapshotItem(i);
+
         if (node) {
           elements.push(node as Element);
         }

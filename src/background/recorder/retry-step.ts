@@ -69,6 +69,7 @@ export async function retryStep(
 
 function buildRetryNotes(stepId: number, callerNotes: string | undefined): string {
   const tag = `Retry of step #${stepId}`;
+
   if (callerNotes === undefined || callerNotes.trim() === "") {
     return tag; 
   }

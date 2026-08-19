@@ -50,6 +50,7 @@ export async function readProZeroCache(workspaceId: string): Promise<CreditBalan
   try {
     const db = await openProZeroDb();
     const entry = await readFromStore(db, workspaceId);
+
     if (!entry || !isFresh(entry)) {
       return null;
     }

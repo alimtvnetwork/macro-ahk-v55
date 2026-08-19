@@ -159,6 +159,7 @@ export function StorageBrowserView() {
       const chromeObj = chromeAny.chrome as Record<string, unknown> | undefined;
       const storageObj = chromeObj?.storage as Record<string, unknown> | undefined;
       const sessionApi = storageObj?.session as { get?: (keys: null, cb: (items: Record<string, unknown>) => void) => void } | undefined;
+
       if (sessionApi?.get) {
         sessionApi.get(null, (items: Record<string, unknown>) => {
           const keys = Object.keys(items ?? {});
@@ -184,6 +185,7 @@ export function StorageBrowserView() {
       const chromeAny = globalThis as Record<string, unknown>;
       const chromeObj = chromeAny.chrome as Record<string, unknown> | undefined;
       const cookiesApi = chromeObj?.cookies as { getAll?: (filter: object, cb: (cookies: Array<Record<string, string | number | boolean>>) => void) => void } | undefined;
+
       if (cookiesApi?.getAll) {
         cookiesApi.getAll({}, (cookies: Array<Record<string, string | number | boolean>>) => {
           setCookieCount(cookies?.length ?? 0);
@@ -201,6 +203,7 @@ export function StorageBrowserView() {
       const chromeObj = chromeAny.chrome as Record<string, unknown> | undefined;
       const storageObj = chromeObj?.storage as Record<string, unknown> | undefined;
       const localApi = storageObj?.local as { get?: (keys: null, cb: (items: Record<string, unknown>) => void) => void } | undefined;
+
       if (localApi?.get) {
         localApi.get(null, (items: Record<string, unknown>) => {
           const keys = Object.keys(items ?? {});
@@ -734,6 +737,7 @@ function TableDataView({
       const colInfo = schema.find(s => s.name === col);
       const newVal = editValues[col] ?? "";
       const oldVal = editRow[col] === null || editRow[col] === undefined ? "" : String(editRow[col]);
+
       if (newVal !== oldVal) {
         updates[col] = colInfo?.type === "INTEGER" ? parseInt(newVal) || 0
           : colInfo?.type === "REAL" ? parseFloat(newVal) || 0
@@ -979,6 +983,7 @@ function CellValue({ value }: { value: SqlValue }) {
   }
 
   const raw = String(value);
+
   if (raw.length > 80) {
     return <span title={raw}>{raw.slice(0, 80)}…</span>;
   }

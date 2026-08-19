@@ -22,6 +22,7 @@ import { logBgError } from "@/background/bg-logger";
 export function sessionsHasTextPk(db: SqlJsDatabase): boolean {
   try {
     const result = db.exec("PRAGMA table_info(Sessions)");
+
     if (result.length === 0) {
       return false;
     }

@@ -72,6 +72,7 @@ function isBootFastPathMessage(message: unknown): boolean {
   }
 
   const type = (message as { type?: unknown }).type;
+
   if (typeof type !== "string") {
     return false;
   }
@@ -105,6 +106,7 @@ chrome.runtime.onMessage.addListener(
             typeof message === "object" && message !== null && "type" in message
               ? (message as { type?: unknown }).type
               : undefined;
+
     if (messageType === "__PING__") {
       sendResponse({ type: "__PONG__" });
 

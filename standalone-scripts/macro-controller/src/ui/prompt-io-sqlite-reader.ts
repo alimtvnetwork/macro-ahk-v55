@@ -48,6 +48,7 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
       const row = stmt.getAsObject();
       const key = String(row.Key ?? '');
       const value = String(row.Value ?? '');
+
       if (key.length > 0) {
         meta.set(key, value);
       }
@@ -61,6 +62,7 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
 
 function requireMeta(meta: Map<string, string>, key: string): string {
   const value = meta.get(key);
+
   if (!value) {
     throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
   }
@@ -74,6 +76,7 @@ function parseTags(raw: unknown): string[] | undefined {
   }
 
   const parsed = JSON.parse(raw) as unknown;
+
   if (!Array.isArray(parsed)) {
     return undefined;
   }
@@ -84,11 +87,13 @@ function parseTags(raw: unknown): string[] | undefined {
 function rowToEntry(row: Record<string, unknown>): PromptEntry {
   const name = String(row.Name ?? '').trim();
   const text = typeof row.BodyMarkdown === 'string' ? row.BodyMarkdown : '';
+
   if (!name) {
     throwDiagnostic('PROMPT_IO_SQLITE_E002', { rowId: String(row.rowid ?? row.Slug ?? 'unknown') });
   }
 
   const entry: PromptEntry = { name, text };
+
   if (typeof row.Slug === 'string' && row.Slug.length > 0) {
     entry.slug = row.Slug;
   }
@@ -98,6 +103,7 @@ function rowToEntry(row: Record<string, unknown>): PromptEntry {
   }
 
   const tags = parseTags(row.Tags);
+
   if (tags) {
     entry.tags = tags;
   }
@@ -107,6 +113,7 @@ function rowToEntry(row: Record<string, unknown>): PromptEntry {
   }
 
   const excludeRaw = row.ExcludeFromExport;
+
   if (typeof excludeRaw === 'number') {
     entry.excludeFromExport = excludeRaw !== 0;
   }
@@ -134,6 +141,7 @@ function assertSchema(db: SqlDatabaseRO): void {
   const rows = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('Meta','Prompts');");
   const names = new Set<string>();
   rows.forEach((r) => r.values.forEach((v) => names.add(String(v[0]))));
+
   if (!names.has('Meta')) {
     throwDiagnostic('PROMPT_IO_SQLITE_E003', { tableName: 'Meta' });
   }
@@ -157,6 +165,7 @@ export async function parsePromptsBundleSqlite(bytes: Uint8Array): Promise<Sqlit
     assertSchema(db);
     const meta = readMeta(db);
     const schemaVersion = Number(requireMeta(meta, 'SchemaVersion'));
+
     if (schemaVersion !== PROMPTS_BUNDLE_SCHEMA_VERSION) {
       throwDiagnostic('PROMPT_IO_SQLITE_E004', { actualVersion: schemaVersion, expectedVersion: PROMPTS_BUNDLE_SCHEMA_VERSION });
     }

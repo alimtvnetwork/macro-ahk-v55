@@ -100,6 +100,7 @@ export function ScriptToggleList({ scripts, onToggle, lastRunResults = [] }: Pro
                     </Tooltip>
                     {(() => {
                       const result = resultsByName.get(script.name) ?? resultsByName.get(script.id);
+
                       if (!result) {
                         return null;
                       }
@@ -114,6 +115,7 @@ export function ScriptToggleList({ scripts, onToggle, lastRunResults = [] }: Pro
                       }
 
                       const skipCfg = result.skipReason ? SKIP_BADGE_CONFIG[result.skipReason] : null;
+
                       if (!skipCfg) {
                         return null;
                       }

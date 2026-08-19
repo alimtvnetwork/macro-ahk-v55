@@ -40,6 +40,7 @@ const DEFAULT_GEOMETRY: Geometry = {
 function loadGeometry(): Geometry {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (raw) {
       return { ...DEFAULT_GEOMETRY, ...JSON.parse(raw) };
     }

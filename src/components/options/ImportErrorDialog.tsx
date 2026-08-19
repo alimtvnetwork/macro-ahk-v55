@@ -54,6 +54,7 @@ const SEVERITY_STYLE: Record<ImportErrorSeverity, string> = {
 
 function SeverityIcon({ severity }: { severity: ImportErrorSeverity }) {
   const cls = `h-5 w-5 ${SEVERITY_STYLE[severity]}`;
+
   if (severity === "Conflict") {
     return <AlertTriangle className={cls} />;
   }
@@ -67,6 +68,7 @@ function SeverityIcon({ severity }: { severity: ImportErrorSeverity }) {
 
 export default function ImportErrorDialog(props: ImportErrorDialogProps) {
   const { open, onOpenChange, explanation, fileName } = props;
+
   if (explanation === null) {
     return null;
   }

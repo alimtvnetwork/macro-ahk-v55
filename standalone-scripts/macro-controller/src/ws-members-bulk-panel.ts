@@ -51,6 +51,7 @@ export function showWsMembersBulkPanel(wsIds: string[], x: number, y: number): v
 
 function renderShell(x: number, y: number): void {
   let panel = document.getElementById(PANEL_ID);
+
   if (!panel) {
     panel = document.createElement('div');
     panel.id = PANEL_ID;
@@ -93,6 +94,7 @@ function renderShell(x: number, y: number): void {
 
 function renderBody(): void {
   const body = document.getElementById('bulk-members-body');
+
   if (!body || !activeState) {
     return;
   }
@@ -125,6 +127,7 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
   body.querySelectorAll('.bulk-member-row').forEach(row => {
     const userId = row.getAttribute('data-user-id')!;
     const member = union.find(m => m.userId === userId);
+
     if (!member) {
       return;
     }
@@ -136,6 +139,7 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
     });
 
     const moreBtn = row.querySelector('.bulk-member-more');
+
     if (moreBtn) {
       moreBtn.addEventListener('click', (e: Event) => {
         const mouseEvent = e as MouseEvent;
@@ -148,6 +152,7 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
 
 function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number): void {
   const existing = document.getElementById('bulk-member-row-ctx');
+
   if (existing) {
     existing.remove();
   }
@@ -224,6 +229,7 @@ function renderMemberRow(m: AggregatedMember, totalWs: number): string {
 
 function renderFooter(): void {
   const footer = document.getElementById('bulk-members-footer');
+
   if (!footer) {
     return;
   }
@@ -248,6 +254,7 @@ function renderFooter(): void {
     onValidEmailsChange: (emails) => {
       validEmails = emails;
       const btn = document.getElementById('bulk-invite-btn') as HTMLButtonElement;
+
       if (btn) {
         btn.disabled = emails.length === 0;
       }
@@ -260,6 +267,7 @@ function renderFooter(): void {
   inviteBtn.disabled = true;
   inviteBtn.onclick = () => {
     const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as MemberRole;
+
     if (activeState) {
       inviteMemberMany(activeState.wsIds, validEmails, role, loopCreditState.perWorkspace || []);
     }

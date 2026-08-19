@@ -65,6 +65,7 @@ function clampLimit(limit: number | undefined): number {
   }
 
   const floored = Math.floor(limit);
+
   if (floored < 1) {
     return 1;
   }
@@ -132,6 +133,7 @@ export async function deleteHistoryEntry(
   // OPFS first (same reason as the window enforcer: rows can be
   // re-linked by FileId, orphan blobs cannot).
   const opfsRemoved = await deleteOpfsEntry(projectId, fileId);
+
   if (!opfsRemoved) {
     return { isDeleted: false, opfsRemoved: false, rowRemoved: false };
   }

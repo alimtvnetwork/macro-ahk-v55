@@ -122,6 +122,7 @@ export function ScriptsList({
     (script: ScriptEntry) => {
       setHiddenScripts((prev) => new Set(prev).add(script.path));
       const scriptId = script.id ?? "";
+
       if (scriptId) {
         void platform.sendMessage({
           type: "TOGGLE_SCRIPT",

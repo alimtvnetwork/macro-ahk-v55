@@ -126,6 +126,7 @@ function startLoopTimers(): void {
   }
 
   const cws = loopCreditState.currentWs;
+
   if (cws) {
     log('Credit state at loop start: workspace="' + cws.fullName + '" dailyFree=' + (cws.dailyFree || 0) + ' available=' + (cws.available || 0), 'check');
   } else {
@@ -150,6 +151,7 @@ async function handleAuthAndStartCheck(): Promise<void> {
 
   refreshBearerTokenFromBestSource(function(authToken: string, authSource: string) {
     logAuthResult(authToken, authSource);
+
     if (!state.running) {
       log('Loop was stopped during auth resolution — aborting', 'warn');
 
@@ -258,12 +260,14 @@ export function stopLoop(): boolean {
 
 function refreshStatusStopped(): void {
   const gotNavName = mc().workspaces.fetchNameFromNav();
+
   if (gotNavName) {
     logSub('Workspace name updated from nav (passive, loop stopped)', 1);
   }
 
   const isMissingWorkspaceName = !state.workspaceName;
   const isEmptyPerWorkspace = !loopCreditState.perWorkspace || loopCreditState.perWorkspace.length === 0;
+
   if (isMissingWorkspaceName && isEmptyPerWorkspace) {
     triggerBackgroundCreditFetch();
   }
@@ -273,6 +277,7 @@ function refreshStatusStopped(): void {
 
 function triggerBackgroundCreditFetch(): void {
   const token = resolveToken();
+
   if (!token) {
     return;
   }
@@ -294,12 +299,14 @@ function refreshStatusRunning(): void {
   }
 
   const gotNavName = mc().workspaces.fetchNameFromNav();
+
   if (gotNavName) {
     logSub('Workspace name updated from nav — skipping dialog open for name', 1);
   }
 
   logSub('Workspace auto-check: opening dialog for credit check...', 1);
   const opened = ensureProjectDialogOpen();
+
   if (!opened) {
     logSub('Workspace auto-check: could not open project dialog', 1);
     mc().updateUILight();
@@ -317,6 +324,7 @@ function readDialogCreditStatus(gotNavName: boolean): void {
     const oldName = state.workspaceName;
     mc().workspaces.fetchName();
     const nameChanged = oldName && state.workspaceName && oldName !== state.workspaceName;
+
     if (nameChanged) {
       log('Workspace changed during auto-check: "' + oldName + '" -> "' + state.workspaceName + '"', 'success');
     }

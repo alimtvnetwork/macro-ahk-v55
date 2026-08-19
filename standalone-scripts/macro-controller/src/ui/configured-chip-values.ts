@@ -21,6 +21,7 @@ export function parseNumericValues(raw: readonly string[]): number[] {
   const seen = new Set<number>();
   for (const s of raw) {
     const n = Number.parseInt(s, 10);
+
     if (!Number.isFinite(n) || n < 1 || seen.has(n)) {
       continue;
     }
@@ -45,6 +46,7 @@ export async function resolveConfiguredChipValues(
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole(role);
+
     if (result.ok === false || !result.value) {
       return [...fallback];
     }
@@ -55,6 +57,7 @@ export async function resolveConfiguredChipValues(
     // (e.g. PlanTierType preset ramp 5..200) with the seed default ["1","2","3","5","8"].
     const isDefault = raw.length === REPLACE_VALUES_DEFAULT.length
             && raw.every((v, i) => v === REPLACE_VALUES_DEFAULT[i]);
+
     if (isDefault) {
       return [...fallback];
     }

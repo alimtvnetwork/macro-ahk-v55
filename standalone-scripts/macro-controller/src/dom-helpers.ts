@@ -238,6 +238,7 @@ export function ensureProjectDialogOpen(): boolean {
 
   for (const [buttonIndex, btn] of buttons.entries()) {
     const clickResult = tryClickVisibleButton(btn as Element, buttonIndex);
+
     if (clickResult !== null) {
       return clickResult;
     }
@@ -263,6 +264,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
   }
 
   let btnInfo = 'Button: ' + btn.tagName;
+
   if (btn.textContent) {
     btnInfo += ', text: "' + btn.textContent.substring(0, 30) + '"';
   }
@@ -270,6 +272,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
   log(btnInfo, 'check');
 
   const isExpanded = btn.getAttribute('aria-expanded') === 'true' || btn.getAttribute('data-state') === 'open';
+
   if (isExpanded) {
     log('Dialog is ALREADY OPEN (aria-expanded=true) — skipping click', 'success');
 

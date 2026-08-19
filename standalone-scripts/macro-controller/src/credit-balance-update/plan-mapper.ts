@@ -63,11 +63,13 @@ export function shouldFetchCreditBalanceForPlan(plan: PlanTierType): boolean {
  */
 export function formatPlanDisplayLabel(wirePlan: string | null | undefined): string {
   const normalized = (wirePlan || '').trim().toLowerCase();
+
   if (!normalized) {
     return '';
   }
 
   const ktloTier = /^ktlo_(\d+)$/.exec(normalized);
+
   if (ktloTier) {
     return 'Light ' + ktloTier[1];
   }
@@ -77,6 +79,7 @@ export function formatPlanDisplayLabel(wirePlan: string | null | undefined): str
   }
 
   const proTier = /^pro_(\d+)$/.exec(normalized);
+
   if (proTier) {
     return 'Pro ' + proTier[1];
   }

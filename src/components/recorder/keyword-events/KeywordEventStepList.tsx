@@ -235,6 +235,7 @@ function StepRow(props: StepRowProps): JSX.Element {
 
 function StepKindDetail(props: { readonly step: KeywordEventStep; readonly hasIssue: boolean }): JSX.Element {
   const { step, hasIssue } = props;
+
   if (step.Kind === "Key") {
     return (
       <>

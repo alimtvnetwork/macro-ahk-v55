@@ -126,6 +126,7 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions):
       return await fn();
     } catch (error: unknown) {
       lastError = error;
+
       if (attempt === options.maxAttempts) {
         throw error; 
       }
@@ -135,6 +136,7 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions):
       }
 
       await delay(currentDelay);
+
       if (options.backoffMultiplier !== undefined) {
         currentDelay = currentDelay * options.backoffMultiplier;
       }
@@ -190,9 +192,11 @@ export function createConcurrencyLock<T>(): ConcurrencyLock<T> {
       if (inFlight !== null) {
         return new Promise<ConcurrencyLockResult<T>>(function (resolve) {
           const entry: WaiterEntry<T> = { resolve, timer: null };
+
           if (timeoutMs !== undefined && fallback !== undefined) {
             entry.timer = setTimeout(function () {
               const idx = waiters.indexOf(entry);
+
               if (idx !== -1) {
                 waiters.splice(idx, 1); 
               }
@@ -270,6 +274,7 @@ export function pollUntil<T>(
 
       if (result) {
         trackedClearInterval(timer);
+
         if (options.onFound) {
           options.onFound(elapsed); 
         }
@@ -281,6 +286,7 @@ export function pollUntil<T>(
 
       if (elapsed >= timeoutMs) {
         trackedClearInterval(timer);
+
         if (options.onTimeout) {
           options.onTimeout(); 
         }

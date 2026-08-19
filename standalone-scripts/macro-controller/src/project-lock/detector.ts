@@ -53,6 +53,7 @@ export function detectProjectLocked(input: DetectInput): ProjectLockEvent | null
 
   let reason: ProjectLockReason | null = null;
   let detail = '';
+
   if (input.status === 423) {
     reason = 'api-423';
     detail = (input.body ?? '').slice(0, 500) || 'HTTP 423 Locked';

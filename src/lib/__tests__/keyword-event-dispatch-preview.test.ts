@@ -13,6 +13,7 @@ describe("buildDispatchPreview, Key steps", () => {
   it("splits modifiers and key for a simple combo", () => {
     const p = buildDispatchPreview({ Id: "s", Kind: "Key", Combo: "Ctrl+Enter" });
     expect(p.Kind).toBe("Key");
+
     if (p.Kind !== "Key") {
       return;
     }
@@ -24,6 +25,7 @@ describe("buildDispatchPreview, Key steps", () => {
 
   it("normalises modifier order to Ctrl → Shift → Alt → Meta", () => {
     const p = buildDispatchPreview({ Id: "s", Kind: "Key", Combo: "Meta+Alt+Shift+Ctrl+a" });
+
     if (p.Kind !== "Key") {
       throw new Error("expected Key");
     }
@@ -34,6 +36,7 @@ describe("buildDispatchPreview, Key steps", () => {
 
   it("upper-cases single-character keys", () => {
     const p = buildDispatchPreview({ Id: "s", Kind: "Key", Combo: "z" });
+
     if (p.Kind !== "Key") {
       throw new Error("expected Key");
     }
@@ -44,6 +47,7 @@ describe("buildDispatchPreview, Key steps", () => {
 
   it("title-cases named keys", () => {
     const p = buildDispatchPreview({ Id: "s", Kind: "Key", Combo: "tab" });
+
     if (p.Kind !== "Key") {
       throw new Error("expected Key");
     }
@@ -53,6 +57,7 @@ describe("buildDispatchPreview, Key steps", () => {
 
   it("flags modifier-only combos as having no key", () => {
     const p = buildDispatchPreview({ Id: "s", Kind: "Key", Combo: "Ctrl+Shift" });
+
     if (p.Kind !== "Key") {
       throw new Error("expected Key");
     }

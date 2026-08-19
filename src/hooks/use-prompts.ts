@@ -113,6 +113,7 @@ export function usePrompts() {
 
   const toggleFavorite = useCallback(async (promptId: string) => {
     const target = prompts.find((prompt) => prompt.id === promptId);
+
     if (!target) {
       return;
     }
@@ -141,6 +142,7 @@ export function usePrompts() {
     return [...filteredPrompts].sort((a, b) => {
       const aFavorite = a.isFavorite ? 1 : 0;
       const bFavorite = b.isFavorite ? 1 : 0;
+
       if (aFavorite !== bFavorite) {
         return bFavorite - aFavorite;
       }

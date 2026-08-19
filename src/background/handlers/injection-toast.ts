@@ -50,6 +50,7 @@ export async function showInjectionToastInTab(
 
         const loader = document.getElementById("__marco-inject-toast-loading");
         let loaderTimer: ReturnType<typeof setTimeout> | null = null;
+
         if (loader) {
           loader.style.opacity = "0";
           loader.style.transform = exitTransform;
@@ -60,6 +61,7 @@ export async function showInjectionToastInTab(
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
+
         if (m?.notify?.success) {
           try {
             m.notify.success(toastMessage, { duration: 4000 });
@@ -72,6 +74,7 @@ export async function showInjectionToastInTab(
 
         const CONTAINER_ID = "__marco-inject-toast";
         let container = document.getElementById(CONTAINER_ID);
+
         if (!container) {
           container = document.createElement("div");
           container.id = CONTAINER_ID;
@@ -198,6 +201,7 @@ export async function showInjectionFailureToastInTab(
 
         const loader = document.getElementById("__marco-inject-toast-loading");
         let loaderTimer: ReturnType<typeof setTimeout> | null = null;
+
         if (loader) {
           loader.style.opacity = "0";
           loader.style.transform = exitTransform;
@@ -208,6 +212,7 @@ export async function showInjectionFailureToastInTab(
         }
 
         const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
+
         if (m?.notify?.error) {
           try {
             m.notify.error(toastMessage, { duration: 6000 });
@@ -220,6 +225,7 @@ export async function showInjectionFailureToastInTab(
 
         const CONTAINER_ID = "__marco-inject-toast";
         let container = document.getElementById(CONTAINER_ID);
+
         if (!container) {
           container = document.createElement("div");
           container.id = CONTAINER_ID;
@@ -350,6 +356,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
       func: (count: number, version: string, exitTransform: string, animDurationMs: number) => {
         const CONTAINER_ID = "__marco-inject-toast";
         let container = document.getElementById(CONTAINER_ID);
+
         if (!container) {
           container = document.createElement("div");
           container.id = CONTAINER_ID;
@@ -419,6 +426,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
         window.addEventListener("pagehide", cleanup, { once: true });
         dismissTimer = setTimeout(() => {
           dismissTimer = null;
+
           if (toast.parentNode) {
             toast.style.opacity = "0";
             toast.style.transform = exitTransform;

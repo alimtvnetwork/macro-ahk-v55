@@ -71,6 +71,7 @@ function openDb(dbName: string): Promise<IDBDatabase> {
 
     request.onupgradeneeded = function () {
       const db = request.result;
+
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'key' });
       }
@@ -163,6 +164,7 @@ const dbCache: Record<string, IDBDatabase> = {};
 
 async function getDb(projectName: string): Promise<IDBDatabase> {
   const dbName = buildDbName(projectName);
+
   if (dbCache[dbName]) {
     return dbCache[dbName];
   }

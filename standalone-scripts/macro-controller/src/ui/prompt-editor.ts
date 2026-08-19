@@ -44,6 +44,7 @@ function reportEditorFailure(
   cause?: unknown,
 ): void {
   logDiagnosticFromCode(code, context, cause);
+
   if (code === 'PROMPT_EDIT_E005') {
     const role = (context['role'] as PromptRole | undefined) ?? 'generic';
     recordPromptEditE005(role, context, cause);
@@ -82,6 +83,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
   try {
     const listed = await listPromptsByRole(role);
     snapshot.roleListOk = String(listed.ok);
+
     if (listed.ok && listed?.value) {
       snapshot.roleListCount = String(listed?.value.length);
       snapshot.roleDefaultIds = listed?.value
@@ -105,6 +107,7 @@ function recordSlugOwner(
   snapshot: RoleSnapshot,
 ): void {
   snapshot.slugLookupOk = String(bySlug.ok);
+
   if (bySlug.ok && bySlug?.value) {
     snapshot.slugOwnerRole = bySlug?.value.Role ?? '(null)';
     snapshot.slugOwnerId = String(bySlug?.value.Id);
@@ -115,6 +118,7 @@ function recordSlugOwner(
   }
 
   snapshot.slugOwnerRole = '(no-row)';
+
   if (bySlug.ok === false) {
     snapshot.slugLookupError = bySlug?.error ?? 'unknown';
   }
@@ -142,6 +146,7 @@ async function buildRoleDiagnosticSnapshot(role: PromptRole): Promise<Diagnostic
     seedRowKnown: String(Boolean(seedRow)),
   };
   await collectRoleList(role, snapshot);
+
   if (seedRow) {
     await collectSlugOwner(seedRow.slug, role, snapshot);
   }
@@ -199,6 +204,7 @@ function resolveTemplatePreview(input: OpenPromptEditorInput): { body: string; s
 export async function openPromptEditor(input: OpenPromptEditorInput): Promise<void> {
   const rc = getRevalidateContext();
   const isRcMissing = !rc;
+
   if (isRcMissing) {
     reportEditorFailure(
       'PROMPT_EDIT_E002',
@@ -224,6 +230,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
     const templatePreview = resolveTemplatePreview(input);
 
     const modalOptions: Parameters<typeof openPromptCreationModal>[4] = { requiredTokens, roleLabel, role: input.role };
+
     if (templatePreview) {
       modalOptions.templatePreview = templatePreview;
     }
@@ -248,6 +255,7 @@ function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['pr
 
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
   const isSeedMissing = !seed;
+
   if (isSeedMissing) {
     return undefined;
   }
@@ -269,6 +277,7 @@ function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: s
 
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
   const isSeedMissing = !seed;
+
   if (isSeedMissing) {
     return undefined;
   }
@@ -285,12 +294,14 @@ function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: s
  */
 async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]> {
   const tokens = new Set<string>(getRequiredTokensForRole(role));
+
   if (role === 'generic') {
     return Array.from(tokens);
   }
 
   try {
     const result = await getDefaultPromptForRole(role);
+
     if (result?.ok && result?.value && typeof result?.value.Body === 'string') {
       for (const t of extractParamTokens(result?.value.Body)) {
         tokens.add(t);
@@ -314,6 +325,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
 async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
+
   if (seed.ok === false) {
     logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: String(seed?.error ?? 'seed failed') });
     emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: String(seed?.error ?? 'seed failed') });
@@ -325,11 +337,13 @@ async function selfHealMissingDefault(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const existingSlugId = await repairExistingSeedSlugBeforeInsert(role, seedRow);
+
   if (existingSlugId !== null) {
     return existingSlugId;
   }
 
   const inserted = await tryInsertAndPromoteSeed(role, seedRow);
+
   if (inserted !== null) {
     emitPromptSeedEvent({
       event: 'editor.prefill.direct-insert', role, slug: seedRow.slug,
@@ -352,6 +366,7 @@ async function repairExistingSeedSlugBeforeInsert(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
+
   if (lookup.ok === false || !lookup?.value) {
     return null;
   }
@@ -361,6 +376,7 @@ async function repairExistingSeedSlugBeforeInsert(
   }
 
   const adopted = await adoptSeedSlugRole(role, seedRow, lookup?.value);
+
   if (adopted === null) {
     return null;
   }
@@ -383,6 +399,7 @@ async function openWithDriftCheck(
     metrics: { promptId: dbRow.Id },
   });
   const isDirty = !isClean;
+
   if (isDirty) {
     logDiagnosticFromCode('PROMPT_EDIT_E004', {
       role, slug: dbRow.Slug, promptId: dbRow.Id,
@@ -416,6 +433,7 @@ async function handleOpenDefaultError(
   err: unknown,
 ): Promise<void> {
   const message = err instanceof Error ? err.message : String(err);
+
   if (seedRow) {
     emitPromptSeedEvent({
       event: 'editor.prefill.static-fallback', role, slug: seedRow.slug,
@@ -447,6 +465,7 @@ async function handleMissingDefault(
 ): Promise<{ handled: boolean; newResult?: Awaited<ReturnType<typeof getDefaultPromptForRole>> }> {
   const repairedId = await selfHealMissingDefault(role, seedRow);
   const newResult = await getDefaultPromptForRole(role);
+
   if (newResult.ok && !newResult?.value && repairedId !== null) {
     await openPromptEditor({ role, promptId: repairedId });
 
@@ -469,6 +488,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
 
     if (result.ok && !result?.value && seedRow) {
       const heal = await handleMissingDefault(role, seedRow);
+
       if (heal.handled) {
         return;
       }
@@ -521,6 +541,7 @@ async function tryInsertAndPromoteSeed(
       body: seedRow.body,
       role,
     });
+
     if (inserted.ok === false || typeof inserted?.value !== 'number' || inserted?.value <= 0) {
       const reason = inserted.ok ? 'no id returned' : (inserted?.error ?? 'upsert failed');
       logDiagnosticFromCode('DB_WRITE_E002', { role, slug: seedRow.slug, reason });
@@ -529,6 +550,7 @@ async function tryInsertAndPromoteSeed(
     }
 
     const promoted = await setDefaultPromptForRole(inserted?.value, role);
+
     if (promoted.ok === false) {
       logDiagnosticFromCode('DB_WRITE_E003', {
         role, promptId: inserted?.value, reason: promoted?.error ?? 'setDefault failed',
@@ -553,6 +575,7 @@ async function tryPromoteExistingSeedRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const roleRow = await findSeedRowInRole(role, seedRow.slug);
+
   if (roleRow) {
     return promoteExistingPromptId(role, seedRow, roleRow.Id, 'promoted-existing');
   }
@@ -562,6 +585,7 @@ async function tryPromoteExistingSeedRow(
 
 async function findSeedRowInRole(role: PromptRole, slug: string): Promise<PromptRow | null> {
   const listed = await listPromptsByRole(role);
+
   if (listed.ok === false || !listed?.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed?.error ?? 'list failed' });
 
@@ -578,6 +602,7 @@ async function promoteExistingPromptId(
   detail: string,
 ): Promise<number> {
   const promoted = await setDefaultPromptForRole(promptId, role);
+
   if (promoted.ok === false) {
     logDiagnosticFromCode('DB_WRITE_E003', {
       role, promptId, reason: promoted?.error ?? 'setDefault failed',
@@ -598,6 +623,7 @@ async function tryAdoptSeedSlugRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
+
   if (lookup.ok === false) {
     logDiagnosticFromCode('DB_READ_E001', { role, slug: seedRow.slug, reason: lookup?.error ?? 'slug lookup failed' });
   }
@@ -607,6 +633,7 @@ async function tryAdoptSeedSlugRow(
   }
 
   const adopted = await adoptSeedSlugRole(role, seedRow, lookup?.value);
+
   if (adopted === null) {
     return null;
   }
@@ -625,6 +652,7 @@ async function adoptSeedSlugRole(
     previousReplaceKey: row.ReplaceKey, replaceKey: row.ReplaceKey,
     replaceValues: row.ReplaceValues,
   });
+
   if (saved.ok && typeof saved?.value === 'number') {
     return saved?.value;
   }
@@ -636,6 +664,7 @@ async function adoptSeedSlugRole(
 
 async function loadEditablePrompt(role: PromptRole, id: number): Promise<EditablePrompt | null> {
   const listed = await listPromptsByRole(role);
+
   if (listed.ok === false || !listed?.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed?.error ?? 'list failed' });
 
@@ -644,6 +673,7 @@ async function loadEditablePrompt(role: PromptRole, id: number): Promise<Editabl
 
   const row = listed?.value.find((r: PromptRow) => r.Id === id);
   const isRowMissing = !row;
+
   if (isRowMissing) {
     logDiagnosticFromCode('PROMPT_EDIT_E007', { role, promptId: id });
 

@@ -18,6 +18,7 @@ async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
   const before = snapshot(ws);
   try {
     const result = await requestCredits(ws);
+
     if (result.outcome === CreditFetchOutcomeType.Skipped || result.outcome === CreditFetchOutcomeType.InlineHit) {
       return false;
     }

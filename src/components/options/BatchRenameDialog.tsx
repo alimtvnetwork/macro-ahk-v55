@@ -113,11 +113,13 @@ function formatSequenceNumber(n: number, padding: number): string {
 /** Builds the new name for the `index`-th selected target (0-based). */
 function applySequence(t: TransformInput, index: number): string {
   const n = formatSequenceNumber(t.SequenceStart + index, t.SequencePadding);
+
   if (t.SequenceBase.includes(SEQUENCE_TOKEN)) {
     return t.SequenceBase.split(SEQUENCE_TOKEN).join(n);
   }
 
   const base = t.SequenceBase.trim();
+
   if (base.length === 0) {
     return n;
   }
@@ -190,12 +192,14 @@ function resolveIntraBatchDuplicates(
     }
 
     const target = targets.find((g) => g.StepGroupId === r.Id);
+
     if (!target) {
       return r;
     }
 
     const parent = target.ParentStepGroupId ?? null;
     const count = newNamesByParent.get(parent)?.get(r.NewName.trim().toLowerCase()) ?? 0;
+
     if (count > 1) {
       return { ...r, Issue: "Two selected groups would share this name." };
     }

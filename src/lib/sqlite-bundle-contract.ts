@@ -304,6 +304,7 @@ export function validateBundleSchema(
 
   /* ---- 4. format_version gate ---- */
   let formatVersion: string | null = null;
+
   if (actualTables.includes("Meta")) {
     try {
       const rows = db.exec(

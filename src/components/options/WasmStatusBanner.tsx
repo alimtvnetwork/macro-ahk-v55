@@ -89,6 +89,7 @@ function readDeclaredCsp(): string | null {
   try {
     const chr = (globalThis as { chrome?: { runtime?: { getManifest?: () => unknown } } }).chrome;
     const manifest = chr?.runtime?.getManifest?.();
+
     if (manifest === undefined || manifest === null) {
       return null;
     }
@@ -195,6 +196,7 @@ function buildReport(args: {
   lines.push(`Boot error:     ${bootError ?? "(none)"}`);
   lines.push("");
   lines.push("── WASM HEAD probe (boot snapshot) ────────");
+
   if (wasmProbe !== null && wasmProbe !== undefined) {
     lines.push(`URL:            ${wasmProbe.url}`);
     lines.push(`HTTP status:    ${wasmProbe.status ?? "n/a"}`);
@@ -208,6 +210,7 @@ function buildReport(args: {
 
   lines.push("");
   lines.push("── Runtime CSP probe (live in options page) ──");
+
   if (cspProbe === null) {
     lines.push("(probe pending — has not run yet)");
   } else {
@@ -284,6 +287,7 @@ export function WasmStatusBanner() {
       await navigator.clipboard.writeText(report);
       setCopied(true);
       toast({ title: "Report copied", description: "WASM/CSP diagnostics report copied to clipboard." });
+
       if (copyTimerRef.current !== null) {
         clearTimeout(copyTimerRef.current);
       }

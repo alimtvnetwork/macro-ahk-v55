@@ -40,3 +40,12 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 36 | [fix-eslint-warnings-ci](./completed/36-fix-eslint-warnings-ci.md) | [subtasks](./subtasks/36-fix-eslint-warnings-ci/) | completed | 2026-08-12 |
 | 37 | [global-guideline-fixes](./completed/37-global-guideline-fixes.md) | - | completed | 2026-08-18 |
 | 38 | [coding-guideline-fixes-v3](./pending/38-coding-guideline-fixes-v3.md) | [tasks](../spec/tasks/38-coding-guideline-fixes-v3.md) | pending | 2026-08-17 |
+| 39a | [fix-magic-strings-auth-injector](./completed/39a-fix-magic-strings-auth-injector.md) | - | completed | 2026-08-19 |
+| 39b | [fix-magic-strings-boot-menu](./completed/39b-fix-magic-strings-boot-menu.md) | - | completed | 2026-08-19 |
+| 40 | [fix-if-statement-padding](./completed/40-fix-if-statement-padding.md) | - | completed | 2026-08-19 |
+| 41a | [tighten-unknown-validator-settings](./completed/41a-tighten-unknown-validator-settings.md) | - | completed | 2026-08-19 |
+| 41b | [tighten-unknown-api-template](./completed/41b-tighten-unknown-api-template.md) | - | completed | 2026-08-19 |
+| 42a | [move-theme-auth-helpers](./completed/42a-move-theme-auth-helpers.md) | - | completed | 2026-08-19 |
+| 42b | [move-plan-guard-helpers](./completed/42b-move-plan-guard-helpers.md) | - | completed | 2026-08-19 |
+| 43a | [fix-imports-credit-parser](./completed/43a-fix-imports-credit-parser.md) | - | completed | 2026-08-19 |
+| 43b | [fix-imports-workspace-db-ui](./completed/43b-fix-imports-workspace-db-ui.md) | - | completed | 2026-08-19 |

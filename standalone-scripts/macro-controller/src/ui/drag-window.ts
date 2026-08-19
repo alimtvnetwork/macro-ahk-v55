@@ -47,6 +47,7 @@ export function makeDraggable(
     }
 
     const target = e.target as HTMLElement | null;
+
     if (target && target.closest(INTERACTIVE_SELECTOR)) {
       return;
     }

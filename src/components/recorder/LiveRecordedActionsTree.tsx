@@ -128,6 +128,7 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
   useEffect(() => {
     if (activeStepId === null && steps.length > lastCountRef.current) {
       const node = scrollRef.current;
+
       if (node !== null) {
         node.scrollTop = node.scrollHeight; 
       }
@@ -148,6 +149,7 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
     }
 
     const node = rowRefs.current.get(activeStepId);
+
     if (node === undefined) {
       return; 
     }

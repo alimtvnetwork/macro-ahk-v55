@@ -51,6 +51,7 @@ describe('saveRoleScopedPrompt Rule-0 save gate (PlanTierType 22 gap #5)', () =>
     const body = 'EXACTLY 3 steps\n\n1. a\n2. b\n';
     const res = await saveRoleScopedPrompt({ ...baseInput, text: body }, 'plan');
     expect(res.isOk).toBe(false);
+
     if (res.isOk) {
       return;
     }
@@ -72,6 +73,7 @@ describe('saveRoleScopedPrompt Rule-0 save gate (PlanTierType 22 gap #5)', () =>
     const body = 'EXACTLY 5 steps\n\n1. a\n';
     const res = await saveRoleScopedPrompt({ ...baseInput, name: 'Next', text: body }, 'next');
     expect(res.isOk).toBe(false);
+
     if (res.isOk) {
       return;
     }

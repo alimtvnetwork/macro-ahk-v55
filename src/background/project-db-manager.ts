@@ -119,6 +119,7 @@ function storageKey(slug: string): string {
 
 export async function initProjectDb(slug: string, extraSchema?: string): Promise<ProjectDbManager> {
   const existing = projectDbs.get(slug);
+
   if (existing && !chainMigrationApplied.has(slug)) {
     applyChainColumnsMigration(existing);
     chainMigrationApplied.add(slug);
@@ -178,6 +179,7 @@ function ensureDefaultDatabases(db: SqlJsDatabase, slug: string): void { // esli
         `SELECT COUNT(*) FROM ProjectDatabases WHERE DatabaseName = '${def.databaseName}'`,
       );
       const count = existing.length > 0 ? (existing[0].values[0][0] as number) : 0;
+
       if (count === 0) {
         db.run(
           `INSERT INTO ProjectDatabases (DatabaseName, Namespace, DatabaseKindId, IsDefault, Description)
@@ -201,6 +203,7 @@ function buildCreateTableSql(
     "Id INTEGER PRIMARY KEY AUTOINCREMENT",
     ...tableDef.Columns.map((c) => {
       let col = `${c.Name} ${c.Type}`;
+
       if (!c.Nullable) {
         col += " NOT NULL";
       }
@@ -261,6 +264,7 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
 
 export function getProjectDb(slug: string): SqlJsDatabase {
   const db = projectDbs.get(slug);
+
   if (!db) {
     throw new Error(`[project-db] Not initialized: ${slug}`);
   }
@@ -278,6 +282,7 @@ export function hasProjectDb(slug: string): boolean {
 
 export async function flushProjectDb(slug: string): Promise<void> {
   const db = projectDbs.get(slug);
+
   if (!db) {
     return;
   }
@@ -299,6 +304,7 @@ export async function flushProjectDb(slug: string): Promise<void> {
 function scheduleDirtyFlush(slug: string): void {
   dirtySet.add(slug);
   const existing = flushTimers.get(slug);
+
   if (existing) {
     clearTimeout(existing);
   }
@@ -315,6 +321,7 @@ function scheduleDirtyFlush(slug: string): void {
 
 export async function dropProjectDb(slug: string): Promise<void> {
   const db = projectDbs.get(slug);
+
   if (db) {
     db.close();
     projectDbs.delete(slug);
@@ -323,6 +330,7 @@ export async function dropProjectDb(slug: string): Promise<void> {
   dirtySet.delete(slug);
   chainMigrationApplied.delete(slug);
   const timer = flushTimers.get(slug);
+
   if (timer) {
     clearTimeout(timer);
     flushTimers.delete(slug);

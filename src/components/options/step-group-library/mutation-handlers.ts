@@ -64,6 +64,7 @@ export interface MutationDeps {
 
 function undoBatchRename(outcome: ReturnType<BatchActions["applyBatchRename"]>): void {
   const undone = outcome.undo();
+
   if (undone.Error !== null && undone.Applied === 0) {
     toast.error("Undo failed", { description: undone.Error });
 
@@ -78,6 +79,7 @@ export function doBatchRenameApply(
   changes: ReadonlyArray<BatchRenameChange>,
 ): void {
   const outcome = deps.batchActions.applyBatchRename(changes);
+
   if (outcome.Error !== null && outcome.Applied === 0) {
     toast.error("Batch rename failed", { description: outcome.Error });
 
@@ -122,6 +124,7 @@ export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<numb
     return next;
   });
   deps.setSelectionOrder((prev) => prev.filter((sid) => !ids.includes(sid)));
+
   if (deps.activeGroupId !== null && ids.includes(deps.activeGroupId)) {
     deps.setActiveGroupId(null);
   }
@@ -139,6 +142,7 @@ export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<numb
 
 export function doCreate(deps: MutationDeps): void {
   const name = deps.createDialog.name.trim();
+
   if (name === "") {
     toast.error("Group name is required");
 
@@ -149,6 +153,7 @@ export function doCreate(deps: MutationDeps): void {
     const newId = deps.lib.createGroup({ Name: name, ParentStepGroupId: deps.createDialog.parent });
     deps.setCreateDialog({ open: false, parent: null, name: "" });
     deps.setActiveGroupId(newId);
+
     if (deps.createDialog.parent !== null) {
       deps.setExpanded((p) => new Set(p).add(deps.createDialog.parent as number));
     }
@@ -165,6 +170,7 @@ export function doRename(deps: MutationDeps): void {
   }
 
   const name = deps.renameDialog.name.trim();
+
   if (name === "") {
     toast.error("Group name is required");
 
@@ -195,6 +201,7 @@ export function doDelete(deps: MutationDeps): void {
       return next;
     });
     deps.setSelectionOrder((prev) => prev.filter((sid) => sid !== id));
+
     if (deps.activeGroupId === id) {
       deps.setActiveGroupId(null);
     }
@@ -256,6 +263,7 @@ function runStepEditorUpdate(
 
 export function doStepEditorSubmit(deps: MutationDeps, input: StepEditorSubmitInput): void {
   const mode = deps.stepEditor.mode;
+
   if (mode === null) {
     return;
   }
@@ -283,6 +291,7 @@ export function doStepMove(deps: MutationDeps, stepId: number, direction: Direct
 
 export function doStepDeleteConfirm(deps: MutationDeps): void {
   const target = deps.deleteStepDialog.step;
+
   if (target === null) {
     return;
   }
@@ -315,6 +324,7 @@ function reorderList(
 ): ReadonlyArray<number> | null {
   const fromIdx = siblings.indexOf(sourceId);
   const toIdx = siblings.indexOf(targetId);
+
   if (fromIdx === -1 || toIdx === -1) {
     return null;
   }
@@ -338,6 +348,7 @@ export function doDropReorder(
 
   const siblings = computeSiblingOrder(deps.lib, parentId, deps.showArchived);
   const next = reorderList(siblings, sourceId, targetId);
+
   if (next === null) {
     return;
   }
@@ -373,6 +384,7 @@ export function doStepDropReorder(
 
   const ordered = (deps.lib.StepsByGroup.get(stepGroupId) ?? []).map((s: StepRow) => s.StepId);
   const next = reorderList(ordered, sourceStepId, targetStepId);
+
   if (next === null) {
     return;
   }

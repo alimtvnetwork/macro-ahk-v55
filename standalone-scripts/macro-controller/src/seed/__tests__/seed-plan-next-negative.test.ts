@@ -11,6 +11,7 @@ vi.mock('../../db/extension-bridge', () => ({
   sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
     captured.push({ method: p.method, sql: p.params.sql });
     callCount++;
+
     if (doThrowOnThird && callCount === 3) {
       throw new Error('mid-batch throw');
     }

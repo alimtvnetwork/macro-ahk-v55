@@ -197,6 +197,7 @@ function executeHandleExport(
   }
 
   const ids = resolveExportIds(idsOverride, selected);
+
   if (ids.length === 0) {
     toast.error("Select at least one group to export");
 
@@ -213,6 +214,7 @@ async function executeConfirmExport(
 ): Promise<void> {
   const pending = exportPreview.Pending;
   setExportPreview({ Open: false, Preview: null, Pending: null });
+
   if (pending === null) {
     return;
   }

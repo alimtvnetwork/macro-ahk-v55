@@ -80,11 +80,13 @@ function normaliseLabel(label: string): string | null {
 
 function parseNonNegativeMs(raw: string, fieldLabel: string): { Ok: false; value: number | undefined } | { Ok: true; message: string } {
   const trimmed = raw.trim();
+
   if (trimmed === "") {
     return { Ok: false, value: undefined }; 
   }
 
   const value = Number(trimmed);
+
   if (!Number.isFinite(value) || value < 0) {
     return { Ok: true, message: `${fieldLabel} must be a non-negative number.` };
   }
@@ -102,6 +104,7 @@ export function buildHotkeyPayload(
   }
 
   const parsedWait = parseNonNegativeMs(waitMsRaw, "Wait (ms)");
+
   if (parsedWait.Ok) {
     return { Ok: false, ErrorMessage: parsedWait.message }; 
   }
@@ -153,6 +156,7 @@ function buildUrlTabClickPayloadObject(form: UrlTabClickFormState, timeoutMs: nu
     UrlMatch:   form.UrlMatch,
     OperationModeType:       form.OperationModeType,
   };
+
   if (form.Selector.trim() !== "") {
     payload.Selector = form.Selector.trim(); 
   }
@@ -178,11 +182,13 @@ function buildUrlTabClickPayloadObject(form: UrlTabClickFormState, timeoutMs: nu
 
 export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormState): BuildResult {
   const validation = validateUrlTabClickForm(form);
+
   if (validation !== null) {
     return validation; 
   }
 
   const parsedTimeout = parseNonNegativeMs(form.TimeoutMs, "Timeout (ms)");
+
   if (parsedTimeout.Ok) {
     return { Ok: false, ErrorMessage: parsedTimeout.message }; 
   }
@@ -202,6 +208,7 @@ export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormStat
 
 function validateGenericPayload(kind: StepKindId, payloadJson: string, targetGroupId: number | null): BuildResult | null {
   const trimmed = payloadJson.trim();
+
   if (trimmed !== "" && kind !== StepKindId.RunGroup) {
     try {
       JSON.parse(trimmed); 
@@ -226,6 +233,7 @@ export function buildGenericPayload(
   targetGroupId: number | null,
 ): BuildResult {
   const invalid = validateGenericPayload(kind, payloadJson, targetGroupId);
+
   if (invalid !== null) {
     return invalid; 
   }

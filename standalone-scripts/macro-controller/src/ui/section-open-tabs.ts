@@ -68,17 +68,20 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
 function attachCopyDelegation(panel: HTMLElement): void {
   panel.addEventListener('click', function (e: Event): void {
     const target = e.target as HTMLElement | null;
+
     if (!target) {
       return;
     }
 
     const btn = target.closest('[data-copy-url]') as HTMLElement | null;
+
     if (!btn) {
       return;
     }
 
     e.stopPropagation();
     const url = btn.getAttribute('data-copy-url') ?? '';
+
     if (!url) {
       return;
     }
@@ -99,6 +102,7 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
     panel.innerHTML = renderEmpty('Loading…');
     try {
       const resp = await sendToExtension('GET_OPEN_LOVABLE_TABS', {}) as unknown as OpenLovableTabsResponseView;
+
       if (!resp || (resp as Record<string, unknown>).ok === false) {
         const reason = resp?.errorMessage ?? 'no response';
         panel.innerHTML = renderError(reason);
@@ -129,12 +133,14 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
     }
 
     const isVisible = col.body.style.display !== 'none';
+
     if (isVisible) {
       void refresh();
     }
   };
 
   const isInitiallyVisible = col.body.style.display !== 'none';
+
   if (isInitiallyVisible) {
     void refresh();
   }
@@ -241,6 +247,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
       ta.select();
       const ok = document.execCommand('copy');
       document.body.removeChild(ta);
+
       if (!ok) {
         throwDiagnostic('UI_COPY_E001', { reason: 'execCommand("copy") returned false', strategy: 'execCommand' });
       }
@@ -278,6 +285,7 @@ function renderWhyLine(t: OpenLovableTabInfoView): string {
       : '<span style="color:hsl(var(--muted-foreground));">none</span>';
 
   let ruleLabel: string;
+
   if (t.matchedRule !== null) {
     const originTag = t.matchedRule.origin === 'injection-record'
       ? ''

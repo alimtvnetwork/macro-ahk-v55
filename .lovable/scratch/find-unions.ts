@@ -19,6 +19,7 @@ function isStringLiteralUnion(node) {
   }
 
   const types = node.getTypeNodes();
+
   if (types.length === 0) {
     return false;
   }

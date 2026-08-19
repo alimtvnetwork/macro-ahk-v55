@@ -92,6 +92,7 @@ export class StepLibraryDb {
     );
     try {
       stmt.bind([input.ExternalId, input.Name]);
+
       if (!stmt.step()) {
         throw new Error("upsertProject: RETURNING returned no row");
       }
@@ -147,6 +148,7 @@ export class StepLibraryDb {
         input.Description ?? null,
         input.OrderIndex ?? 0,
       ]);
+
       if (!stmt.step()) {
         throw new Error("createGroup: RETURNING returned no row");
       }
@@ -294,6 +296,7 @@ export class StepLibraryDb {
     const isRunGroup = input.StepKindId === StepKindId.RunGroup;
     const hasTarget = input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null;
     const missingTarget = !hasTarget;
+
     if (isRunGroup && missingTarget) {
       throw new Error(
         "appendStep: StepKind=RunGroup requires TargetStepGroupId. " +
@@ -302,6 +305,7 @@ export class StepLibraryDb {
     }
 
     const notRunGroup = !isRunGroup;
+
     if (notRunGroup && hasTarget) {
       throw new Error("appendStep: TargetStepGroupId is only valid when StepKind=RunGroup.");
     }
@@ -329,6 +333,7 @@ export class StepLibraryDb {
         input.PayloadJson ?? null,
         input.TargetStepGroupId ?? null,
       ]);
+
       if (!stmt.step()) {
         throw new Error("appendStep: RETURNING returned no row"); 
       }
@@ -395,6 +400,7 @@ export class StepLibraryDb {
         TargetStepGroupId?: number | null;
     }): void {
     const isRunGroup = input.StepKindId === StepKindId.RunGroup;
+
     if (isRunGroup && (input.TargetStepGroupId === undefined || input.TargetStepGroupId === null)) {
       throw new Error(
         "updateStep: StepKind=RunGroup requires TargetStepGroupId.",
@@ -402,6 +408,7 @@ export class StepLibraryDb {
     }
 
     const notRunGroup = !isRunGroup;
+
     if (notRunGroup && input.TargetStepGroupId !== undefined && input.TargetStepGroupId !== null) {
       throw new Error(
         "updateStep: TargetStepGroupId is only valid when StepKind=RunGroup.",
@@ -475,6 +482,7 @@ export class StepLibraryDb {
     const stmt = this.db.prepare(sql);
     try {
       stmt.bind(params as Array<number | string | null>);
+
       if (!stmt.step()) {
         return 0;
       }

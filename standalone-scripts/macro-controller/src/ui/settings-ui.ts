@@ -84,6 +84,7 @@ function makeField(label: string, value: string, opts?: FieldOptions) {
   inp.value = value || '';
   inp.style.cssText = 'width:100%;padding:6px 8px;border:1px solid ' + cInputBorder + ';border-radius:5px;background:' + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:11px;box-sizing:border-box;' + (o.multiline ? 'min-height:60px;resize:vertical;' : '');
   row.appendChild(inp);
+
   if (o.hint) {
     const h = document.createElement('div');
     h.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:2px;';
@@ -122,6 +123,7 @@ function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
 // ============================================
 export function showSettingsDialog(deps: SettingsDeps) {
   const existing = document.getElementById('macroloop-settings-dialog');
+
   if (existing) {
     existing.remove();
 
@@ -322,12 +324,14 @@ function _importOverridesJson(
   input.accept = 'application/json,.json';
   input.onchange = function() {
     const file = input.files && input.files[0];
+
     if (!file) {
       return;
     }
 
     file.text().then(function(text: string) {
       const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
+
       if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
         showToast('❌ Invalid overrides file', 'error');
 
@@ -360,6 +364,7 @@ function _applyTimingInputOverrides(inputs: NonNullable<TimingPanelResult['input
 
   if (inputs.maxQueueSize) {
     const v = parseInt(inputs.maxQueueSize.value, 10);
+
     if (!isNaN(v) && v > 0) {
       next.maxQueueSize = v;
     }
@@ -367,6 +372,7 @@ function _applyTimingInputOverrides(inputs: NonNullable<TimingPanelResult['input
 
   if (inputs.creditFetchDelayMs) {
     const v = parseInt(inputs.creditFetchDelayMs.value, 10);
+
     if (!isNaN(v)) {
       next.creditFetchDelayMs = Math.max(500, Math.min(15000, v));
     }
@@ -403,16 +409,19 @@ function _applyXPathSettings(xpResult: XPathPanelResult): void {
   }
 
   const pInp = document.getElementById('xpath-project-btn') as HTMLInputElement;
+
   if (pInp) {
     pInp.value = CONFIG.PROJECT_BUTTON_XPATH;
   }
 
   const prInp = document.getElementById('xpath-progress-bar') as HTMLInputElement;
+
   if (prInp) {
     prInp.value = CONFIG.PROGRESS_XPATH;
   }
 
   const wInp = document.getElementById('xpath-workspace-name') as HTMLInputElement;
+
   if (wInp) {
     wInp.value = CONFIG.WORKSPACE_XPATH;
   }
@@ -421,6 +430,7 @@ function _applyXPathSettings(xpResult: XPathPanelResult): void {
 function _applyTimingSettings(tmResult: TimingPanelResult): void {
   for (const k in tmResult.inputs) {
     const numericValue = parseInt(tmResult.inputs[k].value, 10);
+
     if (!isNaN(numericValue) && numericValue >= 0) {
       TIMING[k] = numericValue;
     }
@@ -430,8 +440,10 @@ function _applyTimingSettings(tmResult: TimingPanelResult): void {
 function _applyTaskNextSettings(tnResult: TaskNextPanelResult, taskNextDeps: TaskNextDeps): void {
   for (const k in tnResult.inputs) {
     const isNum = k !== 'buttonXPath' && k !== 'promptSlug';
+
     if (isNum) {
       const v = parseInt(tnResult.inputs[k].value, 10);
+
       if (!isNaN(v)) {
         taskNextState.settings[k] = v;
       }
@@ -484,6 +496,7 @@ function _saveGeneralSettings(genResult: GeneralPanelResult, deps: SettingsDeps)
   } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
 
   const newChatXPath = genResult.inputs.pasteTargetXPath.value;
+
   if (newChatXPath) {
     deps.sendToExtension('KV_SET', { key: 'chatbox_xpath_override', value: newChatXPath, projectId: '_global' });
   }

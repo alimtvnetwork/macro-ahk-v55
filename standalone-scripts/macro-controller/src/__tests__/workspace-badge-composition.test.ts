@@ -42,6 +42,7 @@ function mockStatus(overrides: Partial<WorkspaceStatus>): WorkspaceStatus {
 /** Mirror of the production composition in `buildStatusPillHtml`. */
 function buildBadgeFragment(status: WorkspaceStatus, ws: WorkspaceCredit): string {
   const display = classifyFromStatus(status, ws);
+
   if (display.kind === 'normal' || !display.label) {
     return '';
   }

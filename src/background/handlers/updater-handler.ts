@@ -171,6 +171,7 @@ export function handleCreateUpdater(data: {
 }): number {
   const name = requireField(data?.name);
   const scriptUrl = requireField(data?.scriptUrl);
+
   if (name === null) {
     throw new Error("[updater] CREATE_UPDATER missing required field: name");
   }
@@ -230,6 +231,7 @@ export function handleDeleteUpdater(updaterId: number): void {
  */
 export async function handleCheckForUpdate(updaterId: number): Promise<UpdateCheckResult> {
   const entry = handleGetUpdater(updaterId);
+
   if (!entry) {
     return { updaterId, name: "Unknown", currentVersion: null, latestVersion: null, hasUpdate: false, errorMessage: "Updater not found" };
   }
@@ -338,6 +340,7 @@ export async function fetchInstructions(
 /** Ensure a category exists, return its ID. */
 export function ensureUpdaterCategory(name: string): number {
   const trimmed = requireField(name);
+
   if (trimmed === null) {
     throw new Error("[updater] ensureUpdaterCategory called with empty name");
   }
@@ -345,6 +348,7 @@ export function ensureUpdaterCategory(name: string): number {
   const db = getDb();
 
   const existing = ServiceResult.wrapDb(() => db.exec("SELECT Id FROM UpdaterCategory WHERE Name = ?", [trimmed]));
+
   if (existing.length > 0 && existing[0].values.length > 0) {
     return existing[0].values[0][0] as number;
   }

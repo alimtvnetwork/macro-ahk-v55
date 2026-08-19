@@ -46,6 +46,7 @@ export function assertEmittedShape(emittedSource: string, where: string): void {
     // Match `key: ` at the start of an object property — tolerant of
     // surrounding whitespace and Object.freeze(...) wrapping.
     const re = new RegExp(`(^|[\\s,{])${key}\\s*:`, "m");
+
     if (!re.test(emittedSource)) {
       missing.push(key);
     }

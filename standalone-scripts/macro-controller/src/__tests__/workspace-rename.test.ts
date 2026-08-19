@@ -8,6 +8,7 @@ vi.mock('../logging', () => ({
 vi.mock('../auth', () => ({
   resolveToken: vi.fn(() => 'test-token'),
   invalidateSessionBridgeKey: vi.fn(() => 'invalidated-key'),
+  isAuthFailure: (status: number) => status === 401 || status === 403,
 }));
 vi.mock('../toast', () => ({
   showToast: vi.fn(),

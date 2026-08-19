@@ -58,6 +58,7 @@ export function useBenignWarningStats(bumpKey: number, limit = 500): BenignWarni
             message: e.message ?? "",
           })),
         ];
+
         if (cancelled === false) {
           setTally(tallyBenignWarnings(merged));
         }

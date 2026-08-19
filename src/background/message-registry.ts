@@ -324,11 +324,13 @@ function getTabUrlHint(
   sender: chrome.runtime.MessageSender,
 ): string | undefined {
   const senderUrl = sender.tab?.url;
+
   if (typeof senderUrl === "string" && senderUrl.length > 0) {
     return senderUrl;
   }
 
   const maybeTabUrl = (message as Record<string, string | undefined>).tabUrl;
+
   if (typeof maybeTabUrl === "string" && maybeTabUrl.length > 0) {
     return maybeTabUrl;
   }

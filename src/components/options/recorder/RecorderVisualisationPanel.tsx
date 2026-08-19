@@ -38,6 +38,7 @@ function RecorderDataView({
   projectSlug: string;
 }) {
   const { data } = ctrl;
+
   if (data === null) {
     return null;
   }

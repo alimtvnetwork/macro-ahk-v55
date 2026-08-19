@@ -60,11 +60,13 @@ export function shouldFetch(
 
   const lastWs = lastFetchedAt.get(workspaceId) ?? 0;
   const perWsWait = lastWs + PER_WS_MIN_INTERVAL_MS - nowMs;
+
   if (perWsWait > 0) {
     return { allowed: false, waitMs: perWsWait, reason: 'per-ws-cooldown' };
   }
 
   const interWsWait = lastAnyFetchAt + INTER_WS_GAP_MS - nowMs;
+
   if (interWsWait > 0) {
     return { allowed: false, waitMs: interWsWait, reason: 'inter-ws-cooldown' };
   }
@@ -79,6 +81,7 @@ export function recordFetch(workspaceId: string, nowMs: number = Date.now()): vo
   }
 
   lastFetchedAt.set(workspaceId, nowMs);
+
   if (nowMs > lastAnyFetchAt) {
     lastAnyFetchAt = nowMs;
   }
@@ -96,6 +99,7 @@ export function seedLastFetched(workspaceId: string, fetchedAtMs: number): void 
   }
 
   const existing = lastFetchedAt.get(workspaceId) ?? 0;
+
   if (fetchedAtMs > existing) {
     lastFetchedAt.set(workspaceId, fetchedAtMs);
   }

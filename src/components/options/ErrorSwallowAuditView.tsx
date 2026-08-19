@@ -98,6 +98,7 @@ function validateItem(raw: any, index: number): AuditItem | string {
   const rule = typeof raw.Rule === "string" ? raw.Rule : null;
   const message = typeof raw.Message === "string" ? raw.Message : null;
   const snippet = typeof raw.Snippet === "string" ? raw.Snippet : null;
+
   if (id === null || severity === null || file === null || line === null || rule === null || message === null) {
     return `Items[${index}]: missing required field (Id|Severity|File|Line|Rule|Message)`;
   }
@@ -111,6 +112,7 @@ function validateReport(raw: any): AuditReport | string {
   }
 
   const generatedAt = typeof raw.GeneratedAt === "string" ? raw.GeneratedAt : null;
+
   if (generatedAt === null) {
     return "Missing GeneratedAt (ISO timestamp string)";
   }
@@ -122,6 +124,7 @@ function validateReport(raw: any): AuditReport | string {
   const items: AuditItem[] = [];
   for (let i = 0; i < raw.Items.length; i += 1) {
     const result = validateItem(raw.Items[i], i);
+
     if (typeof result === "string") {
       return result;
     }
@@ -176,6 +179,7 @@ export default function ErrorSwallowAuditView() {
     try {
       const fetchRes = await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" });
       const res = ServiceResult.wrapFetch(fetchRes);
+
       if (fetchRes.status === HttpCodes.NOT_FOUND) {
         setState({ kind: "missing" });
 
@@ -194,6 +198,7 @@ export default function ErrorSwallowAuditView() {
 
       const raw = await fetchRes.json();
       const validated = validateReport(raw);
+
       if (typeof validated === "string") {
         setState({ kind: "error", message: `Malformed audit report — ${validated}` });
 
@@ -203,6 +208,7 @@ export default function ErrorSwallowAuditView() {
       setState({ kind: "ok", report: validated });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+
       // Network failures in dev (no file present) commonly surface as
       // "Failed to fetch" or syntax errors when the dev server returns
       // an HTML 404 — treat both as "missing" so the page degrades to
@@ -223,6 +229,7 @@ export default function ErrorSwallowAuditView() {
 
   const grouped = useMemo(() => {
     const empty: Record<AuditSeverity, AuditItem[]> = { P0: [], P1: [], P2: [] };
+
     if (state.kind !== "ok") {
       return empty;
     }
@@ -334,6 +341,7 @@ export default function ErrorSwallowAuditView() {
 
 function SeverityGroup({ severity, items }: { severity: AuditSeverity; items: ReadonlyArray<AuditItem> }) {
   const meta = severityMeta(severity);
+
   if (items.length === 0) {
     return (
       <section className="rounded-md border border-dashed border-muted-foreground/30 bg-muted/10 p-3">
@@ -470,6 +478,7 @@ function AuditSummaryPanel({ state, onReload }: { state: LoadState; onReload: ()
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(AUDIT_CLI_COMMAND).then(() => {
       setCopied(true);
+
       if (copyTimerRef.current !== null) {
         clearTimeout(copyTimerRef.current);
       }

@@ -117,6 +117,7 @@ async function handleNonOkResponse(
 
   const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
   const reasonStr = status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN ? 'AuthError' : status >= HttpCodes.INTERNAL_SERVER_ERROR ? 'Http5xx' : 'HttpError';
+
   if (reasonStr === 'AuthError') {
     markBearerTokenExpired('credit-balance-update');
   }

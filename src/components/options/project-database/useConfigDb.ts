@@ -34,6 +34,7 @@ async function saveBulkUpdates(projectSlug: string, dirtyEntries: [string, strin
     const [section, key] = ek.split("::");
     try {
       const resp = await updateConfigValue(projectSlug, section, key, editedValue);
+
       if (resp.isOk) {
         saved++;
       } else {
@@ -63,6 +64,7 @@ export function useConfigDb(projectSlug: string) {
       const resp = await sendMessage<{ isOk: boolean; rows?: ConfigRow[]; errorMessage?: string }>({
         type: "PROJECT_CONFIG_READ", project: projectSlug,
       });
+
       if (resp.isOk && resp.rows) {
         setRows(resp.rows);
         setEdits({}); 
@@ -84,6 +86,7 @@ export function useConfigDb(projectSlug: string) {
   const handleSave = async (row: ConfigRow) => {
     const ek = editKey(row.Section, row.Key);
     const newValue = edits[ek];
+
     if (newValue === undefined || newValue === row.Value) {
       return;
     }
@@ -91,6 +94,7 @@ export function useConfigDb(projectSlug: string) {
     setSaving(ek);
     try {
       const resp = await updateConfigValue(projectSlug, row.Section, row.Key, newValue);
+
       if (resp.isOk) {
         toast.success(`Updated ${row.Section}.${row.Key}`);
         setEdits((prev) => {
@@ -116,6 +120,7 @@ export function useConfigDb(projectSlug: string) {
 
       return row && editedValue !== row.Value;
     });
+
     if (dirtyEntries.length === 0) {
       return;
     }
@@ -124,6 +129,7 @@ export function useConfigDb(projectSlug: string) {
     const { saved, failed } = await saveBulkUpdates(projectSlug, dirtyEntries);
 
     setBulkSaving(false);
+
     if (failed > 0) {
       toast.warning(`Saved ${saved}, failed ${failed}`); 
     } else {
@@ -140,6 +146,7 @@ export function useConfigDb(projectSlug: string) {
       const resp = await sendMessage<{ isOk: boolean; errorMessage?: string }>({
         type: "PROJECT_CONFIG_RECONSTRUCT", project: projectSlug,
       });
+
       if (resp.isOk) {
         toast.success("Config reconstructed from source");
         void load(); 

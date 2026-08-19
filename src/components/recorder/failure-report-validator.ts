@@ -119,6 +119,7 @@ export function validateFailureReportPayload(
   input: unknown,
 ): ValidationResult {
   const parsed = coercePayloadToObject(input);
+
   if ("Issue" in parsed) {
     return failResult([parsed.Issue], [], 0);
   }
@@ -138,11 +139,13 @@ type CoerceResult =
 
 function coercePayloadToObject(input: unknown): CoerceResult {
   const parsed = parseIfString(input);
+
   if ("Issue" in parsed) {
     return parsed;
   }
 
   const payload = parsed.Value;
+
   if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
     return {
       Issue: {
@@ -189,6 +192,7 @@ function isBundleShape(obj: Record<string, unknown>): boolean {
 function validateBundle(bundle: Record<string, unknown>): ValidationResult {
   const rootIssues = collectBundleRootIssues(bundle);
   const reports = bundle.Reports;
+
   if (!Array.isArray(reports)) {
     rootIssues.push({
       Path: "Reports", Problem: PROBLEM_WRONG_TYPE,
@@ -222,6 +226,7 @@ function collectReportIssues(reports: ReadonlyArray<unknown>): FieldIssue[] {
   const reportIssues: FieldIssue[] = [];
   for (let i = 0; i < reports.length; i++) {
     const r = reports[i];
+
     if (r === null || typeof r !== "object" || Array.isArray(r)) {
       reportIssues.push({
         Path: `Reports[${i}]`, Problem: PROBLEM_WRONG_TYPE,
@@ -246,6 +251,7 @@ function validateOneReport(
   for (const [field, spec] of Object.entries(REPORT_FIELD_SPEC)) {
     const path = pathPrefix === "$" ? field : `${pathPrefix}.${field}`;
     const issue = validateReportField(r, field, path, spec);
+
     if (issue !== null) {
       out.push(issue);
     }
@@ -265,6 +271,7 @@ function validateReportField(
   }
 
   const v = r[field];
+
   if (matchesKind(v, spec.kind)) {
     return null;
   }
@@ -316,6 +323,7 @@ function finalize(
   reportsChecked: number,
 ): ValidationResult {
   const total = rootIssues.length + reportIssues.length;
+
   if (total === 0) {
     return okResult(reportsChecked);
   }

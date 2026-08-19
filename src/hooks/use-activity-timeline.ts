@@ -48,6 +48,7 @@ interface RawError {
 
 function normalizeLevel(level: string): string {
   const lower = (level ?? "info").toLowerCase();
+
   if (lower === "warning") {
     return "warn";
   }
@@ -129,6 +130,7 @@ export function useActivityTimeline(limit = 500) {
     if (severityFilter !== "all") {
       result = result.filter((e) => {
         const lvl = e.level;
+
         if (severityFilter === "info") {
           return lvl === "info" || lvl === "log" || lvl === "debug";
         }
@@ -169,6 +171,7 @@ export function useActivityTimeline(limit = 500) {
     let errorCount = 0;
     for (const e of merged) {
       const lvl = e.level;
+
       if (lvl === "error") {
         errorCount++;
       } else if (lvl === "warn") {

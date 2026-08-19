@@ -24,6 +24,7 @@ export function mountNavControls(getDict: () => WorkspaceDictionary): () => void
 
 function doMount(getDict: () => WorkspaceDictionary): () => void {
   const anchor = resolveElement(HomepageDashboardVariables.LifetimeDeal.full);
+
   if (!(anchor instanceof HTMLElement)) {
     return () => undefined;
   }
@@ -58,6 +59,7 @@ export function readStep(): number {
 export function computeTargetIndex(currentOneBased: number, total: number, dir: NavDirectionType, step: number): number {
   const delta = dir === NavDirectionType.UP ? -step : step;
   const next = currentOneBased + delta;
+
   if (next >= 1 && next <= total) {
     return next;
   }
@@ -80,6 +82,7 @@ function clampToRange(n: number, total: number): number {
 export function onNavClick(dir: NavDirectionType, dict: WorkspaceDictionary): void {
   try {
     const current = getSelected(dict);
+
     if (current) {
       jumpFromCurrent(current.index, dir, dict);
     }
@@ -91,6 +94,7 @@ export function onNavClick(dir: NavDirectionType, dict: WorkspaceDictionary): vo
 function jumpFromCurrent(currentIndex: number, dir: NavDirectionType, dict: WorkspaceDictionary): void {
   const target = computeTargetIndex(currentIndex, dict.byIndex.length, dir, readStep());
   const record = findByIndex(dict, target);
+
   if (record) {
     clickWorkspaceByXPath(record.fullXPath);
   }

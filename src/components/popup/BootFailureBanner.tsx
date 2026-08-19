@@ -591,6 +591,7 @@ function buildReport(input: ReportInput): string {
 
   if (input.bootErrorContext !== null) {
     lines.push("── Failing operation ─────────────────────");
+
     if (input.bootErrorContext.migrationVersion !== null) {
       lines.push(`  Migration:  v${input.bootErrorContext.migrationVersion}`);
     }
@@ -628,6 +629,7 @@ function buildReport(input: ReportInput): string {
     lines.push(`  Content-Length: ${p.contentLength ?? "(absent)"}`);
     lines.push(`  OK:             ${p.ok ? "true" : "false"}`);
     lines.push(`  Probed at:      ${p.at}`);
+
     if (p.headError !== null) {
       lines.push(`  HEAD error:     ${p.headError}`);
     }
@@ -638,6 +640,7 @@ function buildReport(input: ReportInput): string {
   // Filtered benign warnings — short mode emits totals only; full mode
   // enumerates each pattern + label so suppression is auditable.
   lines.push(`── Filtered benign warnings (${input.benignTally.total}) ─`);
+
   if (input.benignTally.matched.length === 0) {
     lines.push("  (no benign warnings suppressed)");
   } else if (isShort) {
@@ -669,6 +672,7 @@ function buildReport(input: ReportInput): string {
   lines.push(input.bootErrorStack ?? "(unavailable)");
   lines.push("");
   lines.push(`── Recent UI actions (${input.trail.length})${input.isFrozenTrail ? " — snapshot at failure" : " — live"} ─────────`);
+
   if (input.trail.length === 0) {
     lines.push("  (none captured)");
   } else {

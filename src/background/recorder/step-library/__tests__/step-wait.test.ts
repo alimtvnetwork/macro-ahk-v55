@@ -72,6 +72,7 @@ describe("validateSelector", () => {
     } as unknown as Document;
     const r = validateSelector(":nope:nope", "Css", { doc });
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toContain("bad pseudo");
     }
@@ -85,6 +86,7 @@ describe("validateSelector", () => {
     } as unknown as Document;
     const r = validateSelector("//bad[", "XPath", { doc });
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toContain("bad axis");
     }
@@ -259,6 +261,7 @@ describe("waitForSelector", () => {
       },
     });
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.MatchCount).toBe(1);
     }
@@ -276,6 +279,7 @@ describe("waitForSelector", () => {
       pollIntervalMs: 50,
     });
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.DurationMs).toBeGreaterThanOrEqual(300);
     }
@@ -293,6 +297,7 @@ describe("waitForSelector", () => {
       pollIntervalMs: 100,
     });
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toBe("Timeout");
       expect(r.DurationMs).toBeGreaterThanOrEqual(1_000);
@@ -305,6 +310,7 @@ describe("waitForSelector", () => {
       { doc: stubDoc, root: {} as ParentNode },
     );
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Reason).toBe("InvalidSelector");
     }

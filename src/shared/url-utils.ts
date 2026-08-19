@@ -45,6 +45,7 @@ export function isNewTabOrBlankUrl(url: string | undefined | null): boolean {
   }
 
   const lower = url.trim().toLowerCase();
+
   if (lower === "") {
     return true;
   }

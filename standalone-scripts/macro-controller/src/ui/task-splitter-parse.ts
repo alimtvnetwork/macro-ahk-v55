@@ -56,11 +56,13 @@ function isJsonObject(value: JsonValue): value is JsonObject {
 
 function validateSubtasks(raw: string, candidate: string, expectedN: number): string[] {
   const parsed = JSON.parse(candidate) as JsonValue;
+
   if (!isJsonObject(parsed)) {
     fail(raw, "SubtasksMissing", "Top-level JSON value is not an object", expectedN, 0);
   }
 
   const subtasks = parsed.subtasks;
+
   if (Array.isArray(subtasks) === false) {
     fail(raw, "SubtasksMissing", "JSON object does not contain a subtasks array", expectedN, 0);
   }
@@ -71,6 +73,7 @@ function validateSubtasks(raw: string, candidate: string, expectedN: number): st
 function normalizeSubtasks(raw: string, values: JsonValue[], expectedN: number): string[] {
   const texts = values.filter((value): value is string => typeof value === "string").map((value) => value.trim());
   const hasInvalidItem = texts.length !== values.length || texts.some((value) => value.length === 0);
+
   if (hasInvalidItem) {
     fail(raw, "SubtaskInvalid", "Every subtask must be a non-empty string", expectedN, texts.length);
   }
@@ -143,6 +146,7 @@ function scanJsonStructure(char: string, state: JsonScanState, objects: string[]
 
 function closeJsonObject(state: JsonScanState, objects: string[], raw: string, index: number): JsonScanState {
   const depth = state.depth - 1;
+
   if (depth !== 0) {
     return { ...state, depth };
   }
@@ -154,6 +158,7 @@ function closeJsonObject(state: JsonScanState, objects: string[], raw: string, i
 
 export function parseSplitterSubtasks(rawReply: string, expectedN: number): string[] {
   const candidates = collectJsonObjects(rawReply);
+
   if (candidates.length === 0) {
     fail(rawReply, "JsonMissing", "No JSON object found in assistant reply", expectedN, 0);
   }

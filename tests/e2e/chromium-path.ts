@@ -26,6 +26,7 @@ const SYSTEM_CHROMIUM_CANDIDATES = [
 /** Scan the Playwright browser registry for any installed chromium build. */
 function resolveFromPlaywrightRegistry(): string | undefined {
   const registry = process.env.PLAYWRIGHT_BROWSERS_PATH || '/opt/ms-playwright';
+
   if (!fs.existsSync(registry)) {
     return undefined;
   }
@@ -44,6 +45,7 @@ function resolveFromPlaywrightRegistry(): string | undefined {
   for (const build of builds) {
     for (const layout of ['chrome-linux64/chrome', 'chrome-linux/chrome']) {
       const candidate = path.join(registry, build, layout);
+
       if (fs.existsSync(candidate)) {
         return candidate;
       }

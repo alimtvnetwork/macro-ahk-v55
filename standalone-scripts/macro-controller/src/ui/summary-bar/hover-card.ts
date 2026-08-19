@@ -80,6 +80,7 @@ function renderProCard(d: SummaryDetails): string {
   parts.push(row('Expiring / canceled', fmt(d.pro.expiringCount), 'hsl(var(--warning))'));
 
   const kinds = Object.keys(d.pro.expiringByKind);
+
   if (kinds.length > 0) {
     parts.push(sectionTitle('Expiring breakdown'));
     for (const k of kinds) {
@@ -88,6 +89,7 @@ function renderProCard(d: SummaryDetails): string {
   }
 
   const plans = Object.keys(d.pro.byPlan).sort();
+
   if (plans.length > 0) {
     parts.push(sectionTitle('By plan'));
     for (const p of plans) {
@@ -109,6 +111,7 @@ function renderProCreditsCard(d: SummaryDetails): string {
   parts.push(row('Expiring credits',
     fmt(d.pro.creditsExpiringAvailable),
     d.pro.creditsExpiringAvailable > 0 ? 'hsl(var(--warning))' : cPanelFgDim));
+
   if (d.pro.expiringCount === 0) {
     parts.push(emptyHint('No expiring pro workspaces.'));
   }
@@ -153,6 +156,7 @@ function titleFor(kind: SummaryPillKind): string {
 /** Remove the hover card from the DOM if present. */
 export function removeSummaryHoverCard(): void {
   const old = document.getElementById(CARD_ID);
+
   if (old) {
     old.remove();
   }

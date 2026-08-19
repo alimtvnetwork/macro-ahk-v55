@@ -19,18 +19,21 @@ function resolveProjectId(): string {
     const href = window.location.href;
     // Pattern 1: /projects/{uuid}
     const projMatch = href.match(/\/projects\/([a-f0-9-]{36})/i);
+
     if (projMatch) {
       return projMatch[1];
     }
 
     // Pattern 2: {id}-preview--{uuid}.lovable.app
     const previewMatch = href.match(/([a-f0-9-]{36})\.lovable(?:project)?\.(?:app|com)/i);
+
     if (previewMatch) {
       return previewMatch[1];
     }
 
     // Pattern 3: id-preview--{uuid}
     const altMatch = href.match(/id-preview--([a-f0-9-]{36})/i);
+
     if (altMatch) {
       return altMatch[1];
     }
@@ -76,6 +79,7 @@ export function getCachedWorkspaceId(): string {
 export function cacheWorkspaceName(name: string, id?: string): void {
   try {
     const pid = resolveProjectId();
+
     if (name) {
       localStorage.setItem(cacheKey(pid, 'name'), name);
     } else {
@@ -110,6 +114,7 @@ export function invalidateCacheOnProjectSwitch(): void {
     const isProjectSwitched = lastPid !== currentPid;
     const isDefaultProject = currentPid === '_default';
     const shouldUpdate = hasPreviousProject && isProjectSwitched;
+
     if (shouldUpdate && !isDefaultProject) {
       // Different project — clear old project's cache (it stays for that project)
       // Just update the tracker; each project has its own scoped keys
@@ -129,9 +134,11 @@ export function migrateLegacyCache(): void {
   try {
     const oldName = localStorage.getItem('marco_last_workspace_name');
     const oldId = localStorage.getItem('marco_last_workspace_id');
+
     if (oldName || oldId) {
       // Migrate to scoped format for current project
       const pid = resolveProjectId();
+
       if (oldName) {
         localStorage.setItem(cacheKey(pid, 'name'), oldName);
         localStorage.removeItem('marco_last_workspace_name');

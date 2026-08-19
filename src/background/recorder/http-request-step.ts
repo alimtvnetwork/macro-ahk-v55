@@ -118,6 +118,7 @@ export async function executeHttpStep(
   const url = interpolateTemplate(init.Params.Url, init.Row);
   const method = init.Params.Method;
   const headersOutcome = tryInterpolateHeaders(init.Params.HeadersJson, init.Row);
+
   if (headersOutcome.error !== null) {
     return badParamsResult(url, method, now() - startedAt, headersOutcome.error);
   }
@@ -165,6 +166,7 @@ async function performHttpRequest(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const fetchOutcome = await tryFetch(fetchImpl, context, controller);
   clearTimeout(timer);
+
   if (fetchOutcome.error !== null) {
     return networkFailureResult(context, fetchOutcome.error, controller.signal.aborted);
   }
@@ -193,11 +195,13 @@ async function processHttpResponse(
   response: Response, context: HttpRequestContext, params: HttpRequestParams,
 ): Promise<HttpStepResult> {
   const snippet = await safeReadSnippet(response);
+
   if (response.ok === false) {
     return httpErrorResult(response.status, snippet, context);
   }
 
   const captureOutcome = tryCaptureJson(snippet, params.CaptureAs);
+
   if (captureOutcome.error !== null) {
     return parseErrorResult(response.status, captureOutcome.error, context);
   }

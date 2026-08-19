@@ -60,9 +60,11 @@ interface LoadState {
 async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; initialReason: string | null }> {
   let res = await listPromptsByRole(role);
   let initialReason = res.isSuccess ? null : (res.error ?? 'listPromptsByRole returned !ok');
+
   if (res.ok === false && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
+
     if (retry.isSuccess) {
       res = retry;
       initialReason = null; 
@@ -75,6 +77,7 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
 async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ res: ListRes; stage: LoadStage; seedReason: string | null; seedAttempted: boolean }> {
   const isManaged = role === 'plan' || role === 'next';
   const emptyOrFailed = current.ok === false || ((current.value ?? []).length === 0);
+
   if (!isManaged || !emptyOrFailed) {
     return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
@@ -85,6 +88,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   try {
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
+
     if (seedRes.ok === false) {
       seedReason = String(seedRes.error ?? 'seedPlanNextPrompts returned !ok');
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason || 'auto-seed failed'));
@@ -106,9 +110,11 @@ async function retryOnContractError(role: PromptRole, state: LoadState): Promise
   }
 
   const dbReason = state.res.error ?? 'listPromptsByRole returned !ok';
+
   if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(state.seedReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
+
     if (retry.isSuccess) {
       return retry;
     }
@@ -152,11 +158,13 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
+
   if (state.res.ok === false) {
     return emitLoadFailure(opts, state);
   }
 
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
+
   if (rows.length === 0) {
     return emitEmptyToast(opts, state.seedReason);
   }
@@ -177,6 +185,7 @@ interface LoadFailureDetailInput {
 function buildLoadFailureDetail(input: LoadFailureDetailInput): string {
   const parts: string[] = [];
   parts.push('db=' + input.dbReason);
+
   if (input.initialReason !== null && input.stage !== 'initial-list') {
     parts.push('initial-list=' + input.initialReason);
   }

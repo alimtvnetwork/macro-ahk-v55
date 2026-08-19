@@ -181,6 +181,7 @@ function buildRejectedLine(err: DiagnosticError): string {
 
 function buildNextFixLine(err: DiagnosticError): string {
   const hint = err.entry.nextFixHint;
+
   if (!hint) {
     return '';
   }
@@ -229,6 +230,7 @@ export const _forTests = { assertProfessionalWording, FORBIDDEN_WORDS };
  */
 export function previewToast(code: string, context: DiagnosticContext): DiagnosticToast {
   const entry = getErrorCodeEntry(code);
+
   if (!entry) {
     throw new Error('[DIAGNOSTIC_META_E001] Unknown error code "' + code + '".');
   }

@@ -80,6 +80,7 @@ function showSub(ctx: SubmenuCtx): void {
   ctx.subPanel.style.display = 'block';
   positionSub(ctx);
   ctx.subPanel.style.visibility = 'visible';
+
   if (!ctx.reflowHandler) {
     let raf = 0;
     const handler = (): void => {
@@ -89,6 +90,7 @@ function showSub(ctx: SubmenuCtx): void {
 
       raf = window.requestAnimationFrame(function() {
         raf = 0;
+
         if (ctx.subPanel.style.display !== 'none') {
           positionSub(ctx); 
         }
@@ -103,6 +105,7 @@ function showSub(ctx: SubmenuCtx): void {
 
 function hideSub(ctx: SubmenuCtx): void {
   ctx.subPanel.style.display = 'none';
+
   if (ctx.reflowHandler) {
     window.removeEventListener('scroll', ctx.reflowHandler, true);
     window.removeEventListener('resize', ctx.reflowHandler);
@@ -135,6 +138,7 @@ function attachSubmenuEvents(trigger: HTMLElement, subPanel: HTMLElement, wrappe
   trigger.onclick = function(e) {
     e.stopPropagation();
     const open = subPanel.style.display === 'none' || subPanel.style.display === '';
+
     if (open) {
       showSub(subCtx); 
     } else {

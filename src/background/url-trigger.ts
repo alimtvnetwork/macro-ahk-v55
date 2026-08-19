@@ -82,6 +82,7 @@ async function handleLoad(
   details: chrome.webNavigation.WebNavigationFramedCallbackDetails,
 ): Promise<void> {
   const isSubFrame = details.frameId !== 0;
+
   if (isSubFrame) {
     return;
   }
@@ -97,11 +98,13 @@ async function handleCommitted(
   details: chrome.webNavigation.WebNavigationTransitionCallbackDetails,
 ): Promise<void> {
   const isSubFrame = details.frameId !== 0;
+
   if (isSubFrame) {
     return;
   }
 
   const isReload = details.transitionType === "reload";
+
   if (!isReload) {
     return;
   }
@@ -129,6 +132,7 @@ async function handleActivated(
 
   const url = tab.url ?? "";
   const hasUrl = url.length > 0;
+
   if (!hasUrl) {
     return;
   }
@@ -138,6 +142,7 @@ async function handleActivated(
 
 function handleTabsGetError(tabId: number, err: unknown): void {
   const message = err instanceof Error ? err.message : String(err);
+
   if (matchedRefusalMarker(message) !== null) {
     console.debug(`[url-trigger] tab ${tabId} closed before get (expected)`);
 
@@ -189,6 +194,7 @@ function classifyRestriction(url: string): RestrictionMatch {
   }
 
   const hit = RESTRICTED_URL_PREFIXES.find((prefix) => url.startsWith(prefix)) ?? null;
+
   if (hit !== null) {
     return { restricted: true, branch: "prefix", matchedPrefix: hit }; 
   }
@@ -205,6 +211,7 @@ const restrictedLogSeen = new Map<number, string>();
 
 function logRestrictedOnce(tabId: number, url: string, trigger: string, match: RestrictionMatch): void {
   const key = `${match.branch}:${match.matchedPrefix ?? ""}`;
+
   if (restrictedLogSeen.get(tabId) === key) {
     return; 
   }
@@ -222,6 +229,7 @@ async function runGate(
   trigger: TabDecision["trigger"],
 ): Promise<void> {
   const restriction = classifyRestriction(url);
+
   if (restriction.restricted) {
     // Scripting is forbidden here — clear any stale decision and exit
     // silently after ONE contextual debug log per (tab, prefix) pair.
@@ -236,6 +244,7 @@ async function runGate(
   const fp = urlFingerprint(url);
 
   const isDuplicate = isSameDecisionFingerprint(tabId, fp);
+
   if (isDuplicate) {
     // Cache hit — the whole point of the gate. Stay silent.
     return;
@@ -331,6 +340,7 @@ function matchedRefusalMarker(message: string): string | null {
 function handleSentinelError(tabId: number, decision: TabDecision, err: unknown): void {
   const message = err instanceof Error ? err.message : String(err);
   const marker = matchedRefusalMarker(message);
+
   if (marker !== null) {
     clearTabDecision(tabId);
     console.debug(
@@ -367,6 +377,7 @@ function writeSentinelInPage(
   try {
     const existing = document.getElementById(id);
     const isSameFp = existing !== null && existing.getAttribute(attrFp) === fp;
+
     if (isSameFp) {
       return;
     }
@@ -380,6 +391,7 @@ function writeSentinelInPage(
     element.setAttribute(attrDecidedAt, String(decidedAt));
     element.style.display = "none";
     const isNew = existing === null;
+
     if (isNew) {
       const host = document.body ?? document.documentElement;
       host.appendChild(element);

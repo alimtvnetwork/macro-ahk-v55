@@ -33,8 +33,10 @@ function groupEntriesByFolder(entries: LoaderPromptEntry[]): FolderGroups {
   const rootItems: LoaderPromptEntry[] = [];
   entries.forEach(p => {
     const cat = p.category || '';
+
     if (cat.includes('/')) {
       const folderName = cat.split('/')[0];
+
       if (!folders[folderName]) {
         folders[folderName] = [];
       }
@@ -83,6 +85,7 @@ function buildFolderNode(
     const isOpen = folderBody.style.display !== 'none';
     folderBody.style.display = isOpen ? 'none' : 'block';
     const icon = folderHeader.querySelector('span');
+
     if (icon) {
       icon.textContent = isOpen ? '📁' : '📂';
     }

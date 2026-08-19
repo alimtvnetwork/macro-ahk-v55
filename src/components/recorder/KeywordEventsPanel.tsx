@@ -125,6 +125,7 @@ function KeywordEventsEditor(): JSX.Element {
   const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/i.test(navigator.platform);
   const handleEventRowClick = (id: string, mouseEvent: React.MouseEvent): void => {
     const tag = (mouseEvent.target as HTMLElement | null)?.tagName?.toLowerCase();
+
     if (tag === "input" || tag === "button" || tag === "textarea" || tag === "select" || tag === "label") {
       return;
     }
@@ -138,6 +139,7 @@ function KeywordEventsEditor(): JSX.Element {
 
   const handleAdd = (): void => {
     const trimmed = newKeyword.trim();
+
     if (!trimmed) {
       return;
     }
@@ -160,12 +162,14 @@ function KeywordEventsEditor(): JSX.Element {
       },
       { chainRunning: chainRunner.running, enabledCount },
     );
+
     if (action === null) {
       return; 
     }
 
     keyEvent.preventDefault();
     keyEvent.stopPropagation();
+
     if (action === "run") {
       void chainRunner.run(); 
     } else {

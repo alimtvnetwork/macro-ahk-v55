@@ -76,6 +76,7 @@ function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, 
   const required = getRequiredTokensForRole(role);
   const present = new Set(extractParamTokens(row.Body));
   const missing = required.filter(t => !present.has(t));
+
   if (missing.length > 0) {
     issues.push({
       role, slug: row.Slug, code: 'missing-required-token',
@@ -114,6 +115,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
     const seedSlug = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault)?.slug ?? (role + '-default');
     try {
       const res = await getDefaultPromptForRole(role);
+
       if (res.ok === false) {
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;

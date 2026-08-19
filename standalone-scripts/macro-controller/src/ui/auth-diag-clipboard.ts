@@ -76,6 +76,7 @@ function buildDiagnosticClipboardText(
   // Append SDK auth resolution diagnostic if available
   try {
     const authDiag = window.marco?.auth?.getLastAuthDiag?.();
+
     if (authDiag) {
       const bridgeTag = authDiag.bridgeOutcome === 'hit' ? '✅ bridge hit'
         : authDiag.bridgeOutcome === 'timeout' ? '⏱ bridge timeout'

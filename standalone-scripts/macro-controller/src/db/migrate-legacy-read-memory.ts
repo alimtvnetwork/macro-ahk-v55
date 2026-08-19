@@ -41,6 +41,7 @@ function buildInList(): string {
 async function countLegacyRows(): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Slug IN (' + buildInList() + ')';
   const resp = await runLoggedQuery('QUERY', sql, 'context');
+
   if (resp.ok === false || !Array.isArray(resp.rows) || resp.rows.length === 0) {
     return 0;
   }
@@ -57,6 +58,7 @@ async function deleteLegacyPromptRows(): Promise<void> {
     'DELETE FROM PromptRevision WHERE Slug IN (' + inList + '); ' +
     'DELETE FROM Prompt WHERE Slug IN (' + inList + ');';
   const resp = await runLoggedQuery('SCHEMA', sql, 'context');
+
   if (resp.ok === false) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
@@ -85,6 +87,7 @@ async function invalidateJsonCopy(): Promise<void> {
 export async function migrateRemoveLegacyReadMemoryDuplicates(): Promise<void> {
   try {
     const before = await countLegacyRows();
+
     if (before === 0) {
       return;
     }

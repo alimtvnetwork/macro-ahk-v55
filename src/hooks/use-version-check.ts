@@ -85,6 +85,7 @@ function getManifestVersion(): ManifestVersionInfo {
  */
 function normaliseVersion(v: string): string {
   const numericVersion = extractVersionNumber(v);
+
   if (!numericVersion) {
     return v;
   }
@@ -117,6 +118,7 @@ export function useVersionCheck(): VersionCheckResult {
   // eslint-disable-next-line max-lines-per-function
   const check = useCallback(async () => {
     const manifestVersion = getManifestVersion();
+
     if (!manifestVersion.displayVersion || !manifestVersion.comparableVersion) {
       // Not running inside a Chrome extension — skip
       setResult({

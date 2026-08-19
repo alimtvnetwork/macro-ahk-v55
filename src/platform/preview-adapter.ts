@@ -94,6 +94,7 @@ interface MockRecorderMessage {
 
 function handleRecorderMock(message: MockRecorderMessage): object | null {
   const slug = typeof message.projectSlug === "string" ? message.projectSlug : "";
+
   if (slug.length === 0) {
     return null; 
   }
@@ -149,6 +150,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | o
         || message.type === "RECORDER_STEP_INSERT"
         || message.type === "RECORDER_STEP_DELETE") {
     const result = handleRecorderMock(message as unknown as MockRecorderMessage);
+
     if (result !== null) {
       return result; 
     }

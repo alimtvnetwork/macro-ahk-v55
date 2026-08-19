@@ -30,6 +30,7 @@ interface MarcoSdkShape {
 function getMemberships(mutation: string): MembershipsApi {
   const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
   const api = sdk?.api?.memberships;
+
   if (!api) {
     throwDiagnostic('WS_MEMBERS_MUTATE_E003', { mutation });
   }
@@ -57,6 +58,7 @@ export async function inviteMember(wsId: string, email: string, role: MemberRole
 
   log('[Members] POST invite ' + email + ' (' + role + ') → ' + wsId, 'delegate');
   const resp = await getMemberships('invite').invite(wsId, email, role, { baseUrl: CREDIT_API_BASE });
+
   if (!resp.ok) {
     const body = previewBody(resp.data);
     logError('Members', 'invite HTTP ' + resp.status + ': ' + body);
@@ -79,6 +81,7 @@ export async function removeMember(wsId: string, userId: string): Promise<void> 
 
   log('[Members] DELETE ' + userId + ' ← ' + wsId, 'delegate');
   const resp = await getMemberships('remove').remove(wsId, userId, { baseUrl: CREDIT_API_BASE });
+
   if (!resp.ok) {
     const body = previewBody(resp.data);
     logError('Members', 'remove HTTP ' + resp.status + ': ' + body);
@@ -101,6 +104,7 @@ export async function updateMemberRole(wsId: string, userId: string, role: Membe
 
   log('[Members] PATCH role=' + role + ' ' + userId + ' @ ' + wsId, 'delegate');
   const resp = await getMemberships('updateRole').updateRole(wsId, userId, role, { baseUrl: CREDIT_API_BASE });
+
   if (!resp.ok) {
     const body = previewBody(resp.data);
     logError('Members', 'updateRole HTTP ' + resp.status + ': ' + body);
@@ -197,6 +201,7 @@ export async function updateMemberRoleMany(
 export async function promoteMemberMany(wsIds: string[], userId: string, workspaces: WorkspaceCredit[] = []): Promise<void> {
   showToast(`Promoting member in ${wsIds.length} workspaces...`, 'info');
   const res = await updateMemberRoleMany(wsIds, userId, 'owner', workspaces as WorkspaceCredit[]);
+
   if (res.fail > 0) {
     showToast(`Promotion partial: ${res.success} ok, ${res.fail} failed`, 'warn');
   } else {
@@ -207,6 +212,7 @@ export async function promoteMemberMany(wsIds: string[], userId: string, workspa
 export async function demoteMemberMany(wsIds: string[], userId: string, workspaces: WorkspaceCredit[] = []): Promise<void> {
   showToast(`Demoting member in ${wsIds.length} workspaces...`, 'info');
   const res = await updateMemberRoleMany(wsIds, userId, 'member', workspaces as WorkspaceCredit[]);
+
   if (res.fail > 0) {
     showToast(`Demotion partial: ${res.success} ok, ${res.fail} failed`, 'warn');
   } else {

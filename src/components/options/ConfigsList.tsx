@@ -67,6 +67,7 @@ export function ConfigsList({ configs, loading, onSave, onDelete }: Props) {
 
   const handleSave = async () => {
     const isNameEmpty = form.name.trim() === "";
+
     if (isNameEmpty) {
       toast.error("Config name is required");
 
@@ -74,6 +75,7 @@ export function ConfigsList({ configs, loading, onSave, onDelete }: Props) {
     }
 
     const isJsonInvalid = !validateJson(form.json);
+
     if (isJsonInvalid) {
       toast.error("Invalid JSON");
 

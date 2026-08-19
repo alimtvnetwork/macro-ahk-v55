@@ -110,6 +110,7 @@ function parseJsonField<T>(raw: unknown): T | undefined {
 function rowToEvent(row: Record<string, unknown>): ImportedKeywordEvent | null {
   const uid = typeof row.Uid === "string" ? row.Uid : null;
   const keyword = typeof row.Keyword === "string" ? row.Keyword : null;
+
   if (!uid || !keyword) {
     return null;
   }
@@ -145,6 +146,7 @@ function readMeta(db: Database, key: string): string | null {
   const stmt = db.prepare(`SELECT Value FROM Meta WHERE Key = ?`);
   try {
     stmt.bind([key]);
+
     if (!stmt.step()) {
       return null;
     }
@@ -166,6 +168,7 @@ function listTables(db: Database): Set<string> {
   try {
     while (stmt.step()) {
       const name = stmt.get()[0];
+
       if (typeof name === "string") {
         tables.add(name);
       }
@@ -188,6 +191,7 @@ function listColumns(db: Database, tableName: string): Set<string> {
   try {
     while (stmt.step()) {
       const row = stmt.getAsObject() as Record<string, unknown>;
+
       if (typeof row.name === "string") {
         cols.add(row.name);
       }
@@ -207,6 +211,7 @@ function listColumns(db: Database, tableName: string): Set<string> {
 function assertKeywordEventsSchema(db: Database): void {
   const tables = listTables(db);
   const missingTables = REQUIRED_TABLES.filter((t) => !tables.has(t));
+
   if (missingTables.length > 0) {
     throw new Error(
       `Invalid keyword-events bundle: missing required table(s) `
@@ -219,6 +224,7 @@ function assertKeywordEventsSchema(db: Database): void {
 
   const cols = listColumns(db, "KeywordEvents");
   const missingCols = REQUIRED_KEYWORD_EVENTS_COLUMNS.filter((c) => !cols.has(c));
+
   if (missingCols.length > 0) {
     throw new Error(
       `Invalid keyword-events bundle: KeywordEvents table is missing `
@@ -236,6 +242,7 @@ function readKeywordEvents(db: Database): ImportedKeywordEvent[] {
     while (stmt.step()) {
       const row = stmt.getAsObject() as Record<string, unknown>;
       const ev = rowToEvent(row);
+
       if (ev) {
         rows.push(ev);
       }
@@ -267,6 +274,7 @@ export async function readKeywordEventsSqliteDb(
     assertKeywordEventsSchema(db);
 
     const bundleKind = readMeta(db, "bundle_kind");
+
     if (bundleKind !== KEYWORD_EVENTS_BUNDLE_KIND) {
       throw new Error(
         `Not a keyword-events bundle: Meta.bundle_kind = `
@@ -298,6 +306,7 @@ export async function readKeywordEventsZip(
   const JSZipCtor = await loadJSZip();
   const zip = await JSZipCtor.loadAsync(file);
   const entry = zip.file(DB_FILENAME);
+
   if (!entry) {
     const present = Object.keys(zip.files);
     throw new Error(
@@ -359,6 +368,7 @@ export function planImportMatches(
   for (const ev of selected) {
     byUid.set(ev.Id, ev);
     const key = ev.Keyword.trim().toLowerCase();
+
     if (key && !byKeyword.has(key)) {
       byKeyword.set(key, ev);
     }
@@ -373,12 +383,14 @@ export function planImportMatches(
   for (const src of imported) {
     let target = byUid.get(src.Uid);
     let matchedBy: MatchedByType = "uid";
+
     if (!target || consumedSelectedIds.has(target.Id)) {
       if (strictUidOnly) {
         target = undefined;
       } else {
         const key = src.Keyword.trim().toLowerCase();
         const candidate = key ? byKeyword.get(key) : undefined;
+
         if (candidate && !consumedSelectedIds.has(candidate.Id)) {
           target = candidate;
           matchedBy = "keyword";
@@ -416,6 +428,7 @@ export function buildPatchFromImport(
 ): Partial<Omit<KeywordEvent, "Id">> {
   const patch: { -readonly [K in keyof Omit<KeywordEvent, "Id">]?: KeywordEvent[K] } = {};
   patch.Keyword = src.Keyword;
+
   if (src.Description !== undefined) {
     patch.Description = src.Description;
   }
@@ -477,6 +490,7 @@ export function diffMatchedFields(
 
     const a = stringifyForDiff(before);
     const b = stringifyForDiff(after);
+
     if (a !== b) {
       diffs.push({ field, before: a, after: b });
     }

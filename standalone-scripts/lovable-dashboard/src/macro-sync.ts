@@ -28,6 +28,7 @@ function isOnDashboard(): boolean {
 
 function doSync(dict: WorkspaceDictionary): WorkspaceRecord | null {
   const name = readCurrentWorkspaceName();
+
   if (!name) {
     logWarn("syncMacro", `CODE RED: CurrentWorkspaceName missing at ${HomepageDashboardVariables.CurrentWorkspaceName.full}`);
 
@@ -35,6 +36,7 @@ function doSync(dict: WorkspaceDictionary): WorkspaceRecord | null {
   }
 
   const match = findByName(dict, name);
+
   if (!match) {
     logWarn("syncMacro", `name "${name}" not in dictionary`);
   }

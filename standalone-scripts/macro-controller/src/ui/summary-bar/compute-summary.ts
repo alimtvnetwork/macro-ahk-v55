@@ -88,6 +88,7 @@ export function computeDashboardSummary(
     proCreditsTotal += summary.total;
 
     const kind = getDisplayKind(ws);
+
     if (PRO_EXPIRING_KINDS.has(kind)) {
       proExpiringCount += 1;
     }
@@ -142,6 +143,7 @@ export function computeSummaryDetails(
   for (const ws of rows) {
     const daily = num0(ws.dailyFree);
     freeDaily += daily;
+
     if (daily > 0) {
       freeWorkspaces += 1;
     }
@@ -158,6 +160,7 @@ export function computeSummaryDetails(
     const planKey = String(ws.plan).trim().toLowerCase();
     byPlan[planKey] = (byPlan[planKey] ?? 0) + 1;
     const kind = getDisplayKind(ws);
+
     if (PRO_EXPIRING_KINDS.has(kind)) {
       proExpiringCount += 1;
       proExpiringAvailable += avail;

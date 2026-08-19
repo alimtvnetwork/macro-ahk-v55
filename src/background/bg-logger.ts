@@ -214,6 +214,7 @@ export function logBgWarnSampled(
 ): void {
   const fullKey = `${tag}::${key}`;
   const seen = sampledWarnCounters.get(fullKey) ?? 0;
+
   if (seen >= budget) {
     return;
   }
@@ -221,6 +222,7 @@ export function logBgWarnSampled(
   sampledWarnCounters.set(fullKey, seen + 1);
 
   const suffix = seen === budget - 1 ? " (further occurrences suppressed)" : "";
+
   if (error !== undefined) {
     console.warn(`${tag} ${message}${suffix}`, error);
   } else {
@@ -271,6 +273,7 @@ export function logSampledDebug(
 ): void {
   const fullKey = `${tag}::${key}`;
   const seen = sampledCounters.get(fullKey) ?? 0;
+
   if (seen >= SAMPLED_DEBUG_BUDGET) {
     return;
   }
@@ -280,6 +283,7 @@ export function logSampledDebug(
   const suffix = seen === SAMPLED_DEBUG_BUDGET - 1
     ? " (further occurrences suppressed)"
     : "";
+
   if (error !== undefined) {
     console.debug(`${tag} ${message}${suffix}`, error);
   } else {

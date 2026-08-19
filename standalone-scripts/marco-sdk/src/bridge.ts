@@ -51,11 +51,13 @@ function initResponseListener(): void {
     }
 
     const data = event.data;
+
     if (!data || data.source !== `${SDK_SOURCE}-response`) {
       return;
     }
 
     const pending = pendingRequests.get(data.requestId);
+
     if (!pending) {
       return;
     }

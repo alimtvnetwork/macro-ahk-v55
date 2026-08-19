@@ -45,6 +45,7 @@ export function formatLocalReset(iso: string): string {
   }
 
   const d = new Date(iso);
+
   if (Number.isNaN(d.getTime())) {
     return '—';
   }
@@ -180,6 +181,7 @@ export function sortWorkspaces(
   values.sort((a, b) => {
     const av = pickSortValue(a, state.key);
     const bv = pickSortValue(b, state.key);
+
     if (typeof av === 'number' && typeof bv === 'number') {
       return (av - bv) * mult;
     }
@@ -204,6 +206,7 @@ function pickSortValue(ws: WorkspaceCredit, key: SortKey): number | string {
   }
 
   const summary = resolveCreditSummary(ws);
+
   if (key === 'used') {
     return summary.totalUsed;
   }
@@ -218,6 +221,7 @@ function pickSortValue(ws: WorkspaceCredit, key: SortKey): number | string {
 /** Next sort dir in the cycle: none → desc (numeric) / asc (text) → asc/desc → none. */
 export function nextSortDir(key: SortKey, current: SortState): SortState {
   const isNumeric = NUMERIC_KEYS.has(key);
+
   if (current.key !== key) {
     return { key, dir: isNumeric ? 'desc' : 'asc' };
   }
@@ -274,6 +278,7 @@ function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
   }
 
   const needle = q.trim().toLowerCase();
+
   if (!needle) {
     return true;
   }
@@ -295,6 +300,7 @@ export function applyFilters(
 ): ReadonlyArray<WorkspaceCredit> {
   const anyChipActive = filters.low || filters.empty || filters.free;
   const hasQuery = (filters.query || '').trim().length > 0;
+
   if (!anyChipActive && !hasQuery) {
     return workspaces;
   }
@@ -309,6 +315,7 @@ export function applyFilters(
     }
 
     const rem = resolveCreditSummary(ws).available;
+
     if (filters.low && rem < 100 && rem > 0) {
       return true;
     }
@@ -452,6 +459,7 @@ function renderHeaderCells(ctx: TableCtx): void {
     const isActive = ctx.sortState.key === col.key && ctx.sortState.dir !== 'none';
     const arrow = isActive ? (ctx.sortState.dir === 'asc' ? ' ▲' : ' ▼') : '';
     cell.textContent = col.label + arrow;
+
     if (isActive) {
       cell.style.color = HSL_FOREGROUND;
     }
@@ -471,12 +479,14 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   row.draggable = isManualOrder;
   row.style.cursor = isManualOrder ? 'grab' : 'default';
   row.setAttribute('data-row-index', String(dispIdx));
+
   if (!isManualOrder) {
     return;
   }
 
   row.addEventListener('dragstart', (e: DragEvent) => {
     row.style.opacity = '0.4';
+
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', String(dispIdx));
@@ -491,6 +501,7 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   });
   row.addEventListener('dragover', (e: DragEvent) => {
     e.preventDefault();
+
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'move';
     }
@@ -507,6 +518,7 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
     const fromStr = e.dataTransfer?.getData('text/plain') || '';
     const from = Number(fromStr);
     const to = dispIdx;
+
     if (!Number.isFinite(from) || from === to) {
       return;
     }
@@ -536,6 +548,7 @@ function renderBodyRows(ctx: TableCtx): void {
 
   const filtered = applyFilters(ctx.order, ctx.filters);
   const sorted = sortWorkspaces(filtered, ctx.sortState);
+
   if (sorted.length === 0) {
     appendEmptyState(ctx.body, 'No workspaces match the active filters.');
 
@@ -601,6 +614,7 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
 function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   const row = document.createElement('div');
   row.setAttribute('data-credit-totals-row', '1');
+
   if (index % 2 === 1) {
     row.setAttribute('data-zebra', '1');
   }
@@ -748,6 +762,7 @@ function installA11yHandlers(panel: HTMLElement): void {
     const focusables = panel.querySelectorAll<HTMLElement>(
       'button, [href], [tabindex]:not([tabindex="-1"])'
     );
+
     if (focusables.length === 0) {
       return;
     }
@@ -755,6 +770,7 @@ function installA11yHandlers(panel: HTMLElement): void {
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     const active = document.activeElement as HTMLElement | null;
+
     if (e.shiftKey && active === first) {
       e.preventDefault();
       last.focus();
@@ -774,8 +790,10 @@ function installA11yHandlers(panel: HTMLElement): void {
 /** Public: remove the modal if present. */
 export function removeCreditTotalsModal(): void {
   const existing = document.getElementById(DIALOG_ID);
+
   if (existing && existing.parentNode) {
     const cleanup = (existing as HTMLElement & { __marcoCleanup?: () => void }).__marcoCleanup;
+
     if (typeof cleanup === 'function') {
       cleanup();
     }
@@ -856,16 +874,19 @@ export function formatSnapshotAge(lastCheckedAt: number | null): string {
   }
 
   const ageMs = Date.now() - lastCheckedAt;
+
   if (ageMs < 0) {
     return 'just now';
   }
 
   const sec = Math.floor(ageMs / 1000);
+
   if (sec < 60) {
     return sec + 's ago';
   }
 
   const min = Math.floor(sec / 60);
+
   if (min < 60) {
     return min + 'm ago';
   }

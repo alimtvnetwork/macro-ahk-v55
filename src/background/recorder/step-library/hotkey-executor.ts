@@ -41,6 +41,7 @@ const MODIFIERS = new Set(["ctrl", "control", "alt", "shift", "meta", "cmd", "co
 
 function parseModifier(part: string): Partial<ParsedChord> | null {
   const lower = part.toLowerCase();
+
   if (lower === "ctrl" || lower === "control") {
     return { CtrlKey: true };
   }
@@ -67,6 +68,7 @@ function assignModifier(chord: ParsedChord, modifier: Partial<ParsedChord>): Par
 /** Parse a chord string ("Ctrl+Shift+S") into its keyboard-event parts. */
 export function parseChord(chord: string): ParsedChord {
   const trimmed = chord.trim();
+
   if (trimmed === "") {
     throw new Error(`parseChord: empty chord string`);
   }
@@ -84,6 +86,7 @@ function parseChordParts(chord: string, parts: readonly string[]): ParsedChord {
   let parsed = emptyParsedChord();
   for (const part of parts) {
     const modifier = parseModifier(part);
+
     if (modifier !== null) {
       parsed = assignModifier(parsed, modifier);
     } else {
@@ -116,6 +119,7 @@ function requireChordKey(chord: string, parsed: ParsedChord): ParsedChord {
 
 function keyToCode(key: string): string {
   const upper = key.toUpperCase();
+
   if (key.length === 1 && upper >= "A" && upper <= "Z") {
     return `Key${upper}`;
   }
@@ -154,6 +158,7 @@ export function parseHotkeyPayload(json: string | null): HotkeyPayload {
 
   const payloadRecord = raw as Record<string, unknown>;
   const keys = payloadRecord.Keys;
+
   if (!Array.isArray(keys) || keys.length === 0) {
     throw new Error("Hotkey PayloadJson.Keys must be a non-empty array of chord strings");
   }
@@ -165,11 +170,13 @@ export function parseHotkeyPayload(json: string | null): HotkeyPayload {
   }
 
   const waitMs = payloadRecord.WaitMs;
+
   if (waitMs !== undefined && (typeof waitMs !== "number" || !Number.isFinite(waitMs) || waitMs < 0)) {
     throw new Error("Hotkey PayloadJson.WaitMs must be a non-negative number when present");
   }
 
   const selector = payloadRecord.Selector;
+
   if (selector !== undefined && typeof selector !== "string") {
     throw new Error("Hotkey PayloadJson.Selector must be a string when present");
   }
@@ -241,6 +248,7 @@ export async function executeHotkeyStep(
     setTimeout: env?.setTimeout ?? ((callback, ms) => setTimeout(callback, ms)),
     clearTimeout: env?.clearTimeout ?? ((timerId) => clearTimeout(timerId)),
   };
+
   if (dispatchEnv.document === null) {
     throw new Error("executeHotkeyStep: no document available — cannot dispatch keyboard events");
   }
@@ -248,6 +256,7 @@ export async function executeHotkeyStep(
   const target = payload.Selector !== undefined && payload.Selector !== ""
     ? dispatchEnv.document.querySelector(payload.Selector)
     : null;
+
   if (payload.Selector !== undefined && payload.Selector !== "" && target === null) {
     throw new Error(`Hotkey step: target selector "${payload.Selector}" did not match any element`);
   }
@@ -255,12 +264,14 @@ export async function executeHotkeyStep(
   for (let i = 0; i < payload.Keys.length; i++) {
     const chord = parseChord(payload.Keys[i]);
     dispatchChord(dispatchEnv, chord, target);
+
     if (i < payload.Keys.length - 1) {
       await waitForHotkeyDelay(dispatchEnv, 16);
     }
   }
 
   const wait = payload.WaitMs ?? 0;
+
   if (wait > 0) {
     await waitForHotkeyDelay(dispatchEnv, wait);
   }

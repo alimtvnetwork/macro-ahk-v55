@@ -97,6 +97,7 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
     `projects/scripts/${folder}/instruction.json`,
   );
   const res = ServiceResult.wrapFetch(await fetch(url));
+
   if (res.isFail) {
     throw new Error(`Failed to fetch instruction.json: ${res.status}`);
   }
@@ -107,6 +108,7 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
 /** Gets the primary output file from an instruction manifest. */
 function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
   const scripts = instruction.Assets?.Scripts;
+
   if (!scripts?.length) {
     return null;
   }
@@ -126,6 +128,7 @@ async function getScriptFileSize(folder: string, outputFile: string): Promise<nu
     const scriptUrl = chrome.runtime.getURL(`projects/scripts/${folder}/${outputFile}`);
     const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
     const cl = headRes.headers.get("content-length");
+
     if (cl) {
       return parseInt(cl, 10);
     }
@@ -144,6 +147,7 @@ export async function handleGetScriptInfo(
   const scriptName = request.scriptName;
 
   const folder = resolveScriptFolder(scriptName);
+
   if (!folder) {
     return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
   }
@@ -185,6 +189,7 @@ export async function handleHotReloadScript(
   const scriptName = request.scriptName;
 
   const folder = resolveScriptFolder(scriptName);
+
   if (!folder) {
     return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
   }
@@ -201,6 +206,7 @@ export async function handleHotReloadScript(
       `projects/scripts/${folder}/${outputFile}`,
     );
     const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
+
     if (scriptRes.isFail) {
       return {
         isOk: false,
@@ -212,6 +218,7 @@ export async function handleHotReloadScript(
 
     let sizeBytes: number | null = null;
     const contentLength = scriptRes.headers.get("content-length");
+
     if (contentLength) {
       sizeBytes = parseInt(contentLength, 10);
     }

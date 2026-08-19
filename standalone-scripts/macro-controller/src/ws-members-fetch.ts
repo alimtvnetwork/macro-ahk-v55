@@ -37,6 +37,7 @@ interface MarcoSdkShape {
 function getMemberships(op: string) {
   const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
   const api = sdk?.api?.memberships;
+
   if (!api) {
     throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
   }
@@ -50,12 +51,14 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
   const hasCachedEntry = cached !== null && cached !== undefined;
   const isCacheNotExpired = hasCachedEntry && cached!.expires > now;
   const isCacheSufficient = isCacheNotExpired && cached!.members.length >= limit;
+
   if (isCacheSufficient) {
     return { members: cached!.members.slice(0, limit), total: cached!.total };
   }
 
   log('[Members] GET list wsId=' + wsId + ' limit=' + limit, 'delegate');
   const resp = await getMemberships('list').list(wsId, { limit, baseUrl: CREDIT_API_BASE });
+
   if (!resp.ok) {
     throwDiagnostic('WS_MEMBERS_FETCH_E002', {
       status: resp.status,

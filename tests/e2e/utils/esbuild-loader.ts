@@ -44,6 +44,7 @@ function findDirectEsbuildEntry(repoRoot: string): string | undefined {
 
 function listPnpmEsbuildEntries(repoRoot: string): string[] {
   const pnpmDir = path.join(repoRoot, 'node_modules', '.pnpm');
+
   if (!fs.existsSync(pnpmDir)) {
     return [];
   }
@@ -55,11 +56,13 @@ function listPnpmEsbuildEntries(repoRoot: string): string[] {
 
 function resolveEsbuildEntry(repoRoot: string): string {
   const directEntry = findDirectEsbuildEntry(repoRoot);
+
   if (directEntry) {
     return directEntry;
   }
 
   const pnpmEntry = listPnpmEsbuildEntries(repoRoot).find(candidate => fs.existsSync(candidate));
+
   if (pnpmEntry) {
     return pnpmEntry;
   }
@@ -95,6 +98,7 @@ export async function bundleBrowserIife(
   }
 
   const firstOutputFile = built.outputFiles[0];
+
   if (!firstOutputFile) {
     throw new Error('esbuild emitted no bundled output file');
   }

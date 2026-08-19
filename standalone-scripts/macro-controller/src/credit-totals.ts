@@ -33,18 +33,11 @@
  * No retry, no network, no side effects. Pure.
  */
 
-import type { WorkspaceCredit } from './types';
+import { WorkspaceCredit, isFreeTierWorkspace, isProZeroPlan } from './types';
 import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
 
 /** Lovable Free plan: 5 daily credits per account. */
 export const FREE_DAILY_CAP = 5;
-
-/** Wire-string plan literal for the pro_0 branch (enriched fields). */
-const PLAN_PRO_ZERO = 'pro_0';
-/** Wire-string plan literal for the unsubscribed/free tier. */
-const PLAN_FREE = 'free';
-/** Tier value for the unsubscribed/free tier. */
-const TIER_FREE = 'FREE';
 
 export interface CreditTotals {
   /** Sum of credits used this billing cycle across all (non-FREE) workspaces. */
@@ -79,17 +72,6 @@ function n(value: number | undefined | null): number {
 }
 
 /** True for FREE/unsubscribed workspaces — excluded from billing totals. */
-function isFreeTierWorkspace(ws: WorkspaceCredit): boolean {
-  const plan = (ws.plan || '').toLowerCase().trim();
-  const tier = (ws.tier || '').toUpperCase().trim();
-
-  return plan === PLAN_FREE || tier === TIER_FREE;
-}
-
-/** True when the workspace plan is the pro_0 (enriched) branch. */
-function isProZeroPlan(ws: WorkspaceCredit): boolean {
-  return (ws.plan || '').toLowerCase().trim() === PLAN_PRO_ZERO;
-}
 
 /** Per-workspace contribution to the (used, remaining, granted) sums. */
 interface CreditTriple { used: number; remaining: number; granted: number }
@@ -167,6 +149,7 @@ export function aggregateCreditTotals(
     // dailyFree is per-account; sample it on every row (incl. FREE) so the
     // free-daily card populates even when the user only has FREE workspaces.
     const dailyFree = n(ws.dailyFree);
+
     if (dailyFree > freeDailyRemaining) {
       freeDailyRemaining = dailyFree;
     }

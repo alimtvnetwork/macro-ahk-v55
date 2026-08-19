@@ -184,6 +184,7 @@ function HiddenFileInput(props: {
       className="hidden"
       onChange={(event) => {
         const file = event.target.files?.[0];
+
         if (file !== undefined) {
           props.onImportFile(file);
           event.target.value = "";

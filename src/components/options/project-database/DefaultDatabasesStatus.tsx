@@ -51,6 +51,7 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
 
     for (const def of DEFAULT_PROJECT_DATABASES) {
       const tableName = def.schema.tables[0]?.TableName;
+
       if (!tableName) {
         updated.push({ name: def.databaseName, exists: false, rowCount: 0, loading: false });
         continue;

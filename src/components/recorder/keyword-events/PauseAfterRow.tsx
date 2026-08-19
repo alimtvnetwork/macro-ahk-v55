@@ -141,11 +141,13 @@ export function PauseAfterRow(props: PauseAfterRowProps): JSX.Element {
 
   const handleDraftChange = (raw: string): void => {
     setDraft(raw);
+
     if (!enabled) {
       return; 
     }
 
     const n = Number(raw);
+
     if (raw.trim() === "" || Number.isNaN(n) || !Number.isFinite(n)) {
       return; 
     }

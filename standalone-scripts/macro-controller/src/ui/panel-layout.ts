@@ -68,6 +68,7 @@ function savePanelGeometry(ui: HTMLElement): void {
 export function loadPanelGeometry(): PanelGeometry | null {
   try {
     const raw = localStorage.getItem(StorageKeyType.PanelGeometry);
+
     if (!raw) {
       return null;
     }
@@ -195,6 +196,7 @@ export function setBackdropOpacity(opacity: number): void {
   }
 
   const backdrop = document.getElementById(BACKDROP_ID);
+
   if (!backdrop) {
     return;
   }
@@ -217,8 +219,10 @@ export function enableFloating(ctx: PanelLayoutCtx) {
   ctx.isFloating = true;
 
   const opacity = getBackdropOpacity();
+
   if (opacity === 0) {
     const existingBackdrop = document.getElementById(BACKDROP_ID);
+
     if (existingBackdrop) {
       existingBackdrop.remove();
     }
@@ -236,11 +240,13 @@ export function enableFloating(ctx: PanelLayoutCtx) {
 
   // Restore saved geometry or use defaults
   const geo = loadPanelGeometry();
+
   if (geo && geo.top && geo.left) {
     ctx.ui.style.top = geo.top;
     ctx.ui.style.left = geo.left;
     ctx.ui.style.right = 'auto';
     ctx.ui.style.bottom = 'auto';
+
     if (geo.width) {
       ctx.ui.style.width = geo.width;
     }
@@ -275,6 +281,7 @@ export function disableFloating(ctx: PanelLayoutCtx): void {
 
   // Remove backdrop when docking
   const backdrop = document.getElementById('marco-panel-backdrop');
+
   if (backdrop) {
     backdrop.remove();
   }
@@ -294,6 +301,7 @@ export function disableFloating(ctx: PanelLayoutCtx): void {
 export function positionLoopController(ctx: PanelLayoutCtx, position: string) {
   enableFloating(ctx);
   const margin = 20;
+
   if (position === 'bottom-left') {
     ctx.ui.style.left = margin + 'px';
     ctx.ui.style.right = 'auto';
@@ -318,6 +326,7 @@ export function startDragHandler(ctx: PanelLayoutCtx, e: PointerEvent) {
   ctx.dragStartPos.x = e.clientX;
   ctx.dragStartPos.y = e.clientY;
   enableFloating(ctx);
+
   if ((e.target as HTMLElement).setPointerCapture && ctx.dragPointerId != null) {
     (e.target as HTMLElement).setPointerCapture(ctx.dragPointerId);
   }
@@ -354,6 +363,7 @@ export function setupDragListeners(ctx: PanelLayoutCtx) {
     }
 
     ctx.isDragging = false;
+
     if ((e.target as HTMLElement).releasePointerCapture && ctx.dragPointerId != null) {
       try {
         (e.target as HTMLElement).releasePointerCapture(ctx.dragPointerId); 
@@ -373,21 +383,25 @@ export function setupDragListeners(ctx: PanelLayoutCtx) {
 export function applyResizeResponsiveLayout(ctx: PanelLayoutCtx, panelHeight: number) {
   const extra = Math.max(0, panelHeight - ctx.resizeStartH);
   const wsListEl = document.getElementById('loop-ws-list');
+
   if (wsListEl) {
     wsListEl.style.maxHeight = (160 + Math.floor(extra * 0.75)) + 'px';
   }
 
   const activityPanelEl = document.getElementById('loop-activity-log-panel');
+
   if (activityPanelEl) {
     activityPanelEl.style.maxHeight = (120 + Math.floor(extra * 0.35)) + 'px';
   }
 
   const wsHistoryPanelEl = document.getElementById('loop-ws-history-panel');
+
   if (wsHistoryPanelEl) {
     wsHistoryPanelEl.style.maxHeight = (120 + Math.floor(extra * 0.35)) + 'px';
   }
 
   const jsHistoryEl = document.getElementById('loop-js-history');
+
   if (jsHistoryEl) {
     jsHistoryEl.style.maxHeight = (80 + Math.floor(extra * 0.25)) + 'px';
   }
@@ -395,6 +409,7 @@ export function applyResizeResponsiveLayout(ctx: PanelLayoutCtx, panelHeight: nu
 
 export function createResizeHandle(ctx: PanelLayoutCtx, type: string): HTMLElement {
   const handle = document.createElement('div');
+
   if (type === 'corner') {
     handle.style.cssText = 'position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;z-index:99999;display:flex;align-items:center;justify-content:center;';
     const grip = document.createElement('div');
@@ -486,6 +501,7 @@ export function setupResizeListeners(ctx: PanelLayoutCtx) {
     }
 
     ctx.isResizing = false;
+
     if ((e.target as HTMLElement).releasePointerCapture && ctx.resizePointerId != null) {
       try {
         (e.target as HTMLElement).releasePointerCapture(ctx.resizePointerId); 
@@ -552,6 +568,7 @@ function runMinimizeTransition(ctx: PanelLayoutCtx, isExpanded: boolean): void {
     ctx.expandedOverflow = ctx.ui.style.overflow;
     ctx.expandedOverflowY = ctx.ui.style.overflowY;
     applyMinimizedDom(ctx);
+
     if (ctx.panelToggleSpan) {
       ctx.panelToggleSpan.textContent = '[ + ]';
     }
@@ -560,6 +577,7 @@ function runMinimizeTransition(ctx: PanelLayoutCtx, isExpanded: boolean): void {
   } else {
     log('Expanding MacroLoop panel', 'info');
     applyExpandedDom(ctx);
+
     if (ctx.panelToggleSpan) {
       ctx.panelToggleSpan.textContent = '[ - ]';
     }
@@ -576,6 +594,7 @@ function rollbackMinimize(ctx: PanelLayoutCtx, snapshot: ToggleSnapshot, isExpan
   ctx.ui.style.maxHeight = snapshot.maxHeight;
   ctx.ui.style.overflow = snapshot.overflow;
   ctx.ui.style.overflowY = snapshot.overflowY;
+
   if (ctx.panelToggleSpan && snapshot.label !== null) {
     ctx.panelToggleSpan.textContent = snapshot.label;
   }

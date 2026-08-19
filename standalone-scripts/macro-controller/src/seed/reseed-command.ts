@@ -68,6 +68,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       + ', UpdatedAt = ' + String(now)
       + ' WHERE Slug = ' + sqlLit(row.slug);
     const resp = await rawSql('SCHEMA', updateSql);
+
     if (resp.ok === false) {
       const message = 'force update failed for ' + row.slug + ': ' + (resp.errorMessage ?? '?');
       logError('ReseedCommand', message);
@@ -101,6 +102,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
+
     if (seedResult.ok === false) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
@@ -111,9 +113,11 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     }
 
     let forcedUpdates: number | undefined;
+
     if (force) {
       const { forced, error } = await forceResetDefaultBodies();
       forcedUpdates = forced;
+
       if (error) {
         emitPromptSeedEvent({
           event: EV_RESEED_COMPLETE, outcome: 'failed', detail: error,
@@ -128,12 +132,14 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     const completeEvent: Parameters<typeof emitPromptSeedEvent>[0] = {
       event: EV_RESEED_COMPLETE, outcome: 'ok', detail: mode,
     };
+
     if (forcedUpdates !== undefined) {
       completeEvent.metrics = { forcedUpdates };
     }
 
     emitPromptSeedEvent(completeEvent);
     const result: ReseedResult = { ok: true, mode };
+
     if (forcedUpdates !== undefined) {
       result.forcedUpdates = forcedUpdates;
     }
@@ -157,6 +163,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
  */
 export function installReseedCommandGlobal(): void {
   const w = window;
+
   if (!w.__marcoReseedPrompts) {
     w.__marcoReseedPrompts = reseedPromptsOnDemand;
     log('[ReseedCommand] window.__marcoReseedPrompts installed', 'info');

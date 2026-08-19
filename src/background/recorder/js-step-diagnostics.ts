@@ -210,6 +210,7 @@ function jsStepReasonDetail(err: unknown, body: string): string {
 /** First line of the body, capped at 80 chars, formatted as `(in: <line>)`. */
 function bodyHint(body: string): string {
   const first = body.split("\n", 1)[0]?.trim() ?? "";
+
   if (first.length === 0) {
     return "";
   }

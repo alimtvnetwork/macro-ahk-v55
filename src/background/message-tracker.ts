@@ -22,6 +22,7 @@ export function trackMessage(type: string, durationMs: number, ok: boolean): voi
     durationMs,
     ok,
   });
+
   if (trackedMessages.length > MAX_TRACKED) {
     trackedMessages.shift();
   }

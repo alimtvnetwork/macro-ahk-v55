@@ -82,6 +82,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
 
   /* Check 1 — Root + Projects map */
   checks++;
+
   if (!root || !root.Projects) {
     failures.push("RiseupAsiaMacroExt.Projects missing");
 
@@ -91,6 +92,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
   /* Check 2 — Self-namespace registered */
   checks++;
   const ns = root.Projects[SDK_CODE_NAME] as Record<string, unknown> | undefined;
+
   if (!ns) {
     failures.push(`Projects.${SDK_CODE_NAME} not registered`);
 
@@ -120,6 +122,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
     }
 
     const files = ns.files as FilesApi | undefined;
+
     if (files) {
       void runFilesRoundTrip(files);
     }
@@ -132,6 +135,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
 
 function checkShape(ns: Record<string, unknown>, failures: string[]): void {
   const missingKeys = REQUIRED_KEYS.filter((k) => !(k in ns));
+
   if (missingKeys.length > 0) {
     failures.push(`missing sub-namespaces: ${missingKeys.join(", ")}`);
   }
@@ -145,6 +149,7 @@ function checkMeta(
   const meta = metaUnknown as
         | { version?: string; codeName?: string; id?: string; name?: string }
         | undefined;
+
   if (!meta) {
     failures.push(".meta missing");
 
@@ -173,6 +178,7 @@ function checkKvListSync(kv: KvApi | undefined, failures: string[]): void {
 
   try {
     const result = kv.list();
+
     if (!result || typeof (result as { then?: unknown }).then !== "function") {
       failures.push(".kv.list() did not return a Promise");
 
@@ -244,6 +250,7 @@ async function verifyKvGetEquals(
 async function verifyKvGetCleared(kv: KvApi, failures: string[]): Promise<void> {
   try {
     const after = await kv.get!(RT_KEY);
+
     if (after !== null && after !== undefined) {
       failures.push(`kv.get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
     }
@@ -315,6 +322,7 @@ async function verifyFilesListIncludes(
 
     return e !== null && (e.filename === RT_FILE_PATH || e.path === RT_FILE_PATH);
   });
+
   if (expectPresent && !found) {
     failures.push(`${label} missing test file ${RT_FILE_PATH}`);
   }
@@ -339,6 +347,7 @@ async function verifyFilesReadEquals(
   }
 
   const content = (observed as { content?: unknown } | null)?.content;
+
   if (content !== expected) {
     failures.push(`files.read returned content ${JSON.stringify(content)} ≠ ${JSON.stringify(expected)}`);
   }
@@ -383,6 +392,7 @@ async function verifyGkvGetEquals(expected: string, failures: string[]): Promise
   const raw = typeof observed === "string"
     ? observed
     : (observed as { value?: unknown } | null)?.value;
+
   if (raw !== expected) {
     failures.push(`gkv:get returned ${JSON.stringify(observed)} ≠ ${JSON.stringify(expected)}`);
   }
@@ -394,6 +404,7 @@ async function verifyGkvGetCleared(failures: string[]): Promise<void> {
     const raw = typeof after === "string"
       ? after
       : (after as { value?: unknown } | null)?.value;
+
     if (raw !== null && raw !== undefined) {
       failures.push(`gkv:get after delete returned ${JSON.stringify(after)} (expected null/undefined)`);
     }
@@ -459,6 +470,7 @@ function finalize(
   version: string,
 ): SelfTestResult {
   const pass = failures.length === 0;
+
   if (pass) {
     NamespaceLogger.info(
       fn,

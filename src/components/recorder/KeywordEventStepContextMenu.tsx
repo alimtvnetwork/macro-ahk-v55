@@ -88,6 +88,7 @@ function loadPersistedSequence(): SequenceRenameInput {
     const raw = typeof localStorage !== "undefined"
       ? localStorage.getItem(SEQUENCE_STORAGE_KEY)
       : null;
+
     if (!raw) {
       return { ...DEFAULT_SEQUENCE_RENAME, Base: "Step {n}" };
     }

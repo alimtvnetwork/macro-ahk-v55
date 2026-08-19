@@ -23,26 +23,31 @@ const FALLBACK_NAME = "Element";
 /** Resolves the raw label text for an element, or null when none is found. */
 export function resolveLabelText(element: Element): string | null {
   const fromForLabel = readForLabel(element);
+
   if (fromForLabel !== null) {
     return fromForLabel;
   }
 
   const fromWrapLabel = readWrappingLabel(element);
+
   if (fromWrapLabel !== null) {
     return fromWrapLabel;
   }
 
   const aria = element.getAttribute("aria-label");
+
   if (aria !== null && aria.trim() !== "") {
     return aria;
   }
 
   const placeholder = element.getAttribute("placeholder");
+
   if (placeholder !== null && placeholder.trim() !== "") {
     return placeholder;
   }
 
   const id = element.getAttribute("id");
+
   if (id !== null && id.trim() !== "") {
     return id;
   }
@@ -109,6 +114,7 @@ const labelCache: WeakMap<Element, string> = new WeakMap();
 /** End-to-end: element → suggested PascalCase variable name (cached). */
 export function suggestVariableName(element: Element): string {
   const cached = labelCache.get(element);
+
   if (cached !== undefined) {
     return cached;
   }

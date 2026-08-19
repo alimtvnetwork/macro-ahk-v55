@@ -35,6 +35,7 @@ function submitButtonPresent(): boolean {
   }
 
   const byId = document.getElementById(SUBMIT_BUTTON_ID);
+
   if (byId !== null) {
     return true;
   }

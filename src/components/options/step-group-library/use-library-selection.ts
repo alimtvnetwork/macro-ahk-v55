@@ -64,6 +64,7 @@ function doApplySelection(
 function toggleExpandedAction(setExpanded: UseLibrarySelectionArgs["setExpanded"], id: number) {
   setExpanded((prev) => {
     const next = new Set(prev);
+
     if (next.has(id)) {
       next.delete(id);
     } else {

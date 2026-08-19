@@ -65,6 +65,7 @@ export function buildAiGuidelineMarkdown(input: AiGuidelineInput): string {
     'A refused save costs the user more time than a conservative no-op.',
     '',
   ];
+
   if (typeof input.seedBody === 'string' && input.seedBody.length > 0) {
     lines.push(
       '## Canonical default (shipped body for this slug)',

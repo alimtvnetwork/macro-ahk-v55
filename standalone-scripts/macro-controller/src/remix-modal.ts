@@ -101,6 +101,7 @@ interface ModalHandlerStore {
 
 function ensureBackdrop(): HTMLDivElement {
   let bd = document.getElementById(BACKDROP_ID) as HTMLDivElement | null;
+
   if (bd) {
     return bd;
   }
@@ -115,6 +116,7 @@ function ensureBackdrop(): HTMLDivElement {
 
 function ensureModalEl(): HTMLDivElement {
   let el = document.getElementById(MODAL_ID) as HTMLDivElement | null;
+
   if (el) {
     return el;
   }
@@ -139,11 +141,13 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
+
   if (!el) {
     return;
   }
 
   const store = el as HTMLElement & ModalHandlerStore;
+
   if (store._marcoRemixKey) {
     document.removeEventListener('keydown', store._marcoRemixKey, true);
     delete store._marcoRemixKey;
@@ -155,6 +159,7 @@ export function hideRemixModal(): void {
   detachKeyHandler();
   const el = document.getElementById(MODAL_ID);
   const bd = document.getElementById(BACKDROP_ID);
+
   if (el) {
     el.style.display = 'none';
   }
@@ -185,11 +190,13 @@ export function showRemixModal(opts: RemixModalOpts): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
+
       if (!t) {
         return;
       }
 
       const action = t.getAttribute('data-marco-action');
+
       if (action === 'close' || action === 'cancel') {
         if (state.submitting) {
           return;
@@ -214,11 +221,13 @@ export function showRemixModal(opts: RemixModalOpts): void {
     const nameInput = el.querySelector<HTMLInputElement>('[data-marco-el="name"]');
     const histInput = el.querySelector<HTMLInputElement>('[data-marco-el="hist"]');
     const knowInput = el.querySelector<HTMLInputElement>('[data-marco-el="know"]');
+
     if (!nameInput || !histInput || !knowInput) {
       return;
     }
 
     const projectName = nameInput.value.trim();
+
     if (!projectName) {
       state = { submitting: false, error: 'Project name cannot be empty.' };
       rerender();
@@ -247,6 +256,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
         mode: 'manual',
       });
       hideRemixModal();
+
       if (result.redirectUrl) {
         openRemixRedirect(result.redirectUrl);
       }
@@ -279,6 +289,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
   // Focus name input for quick edit.
   setTimeout(function () {
     const ni = el.querySelector<HTMLInputElement>('[data-marco-el="name"]');
+
     if (ni) {
       ni.focus();
       ni.select(); 

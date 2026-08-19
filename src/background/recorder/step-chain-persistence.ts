@@ -84,6 +84,7 @@ function assertLabel(s: string): void {
   }
 
   const trimmed = s.trim();
+
   if (trimmed.length === 0) {
     throw new Error("LabelType cannot be empty");
   }
@@ -113,6 +114,7 @@ function assertTagName(s: string): void {
   }
 
   const trimmed = s.trim();
+
   if (trimmed.length === 0) {
     throw new Error("Tag name cannot be empty");
   }
@@ -177,6 +179,7 @@ export function updateStepMetaRow(
 ): PersistedStep {
   validateMetaPatch(patch);
   const { sets, params } = buildMetaSets(patch);
+
   if (sets.length === 0) {
     return readStepRow(db, stepId);
   }
@@ -241,6 +244,7 @@ function dedupeTags(names: ReadonlyArray<string>): string[] {
   for (const raw of names) {
     assertTagName(raw);
     const trimmed = raw.trim();
+
     if (seen.has(trimmed)) {
       continue;
     }
@@ -294,6 +298,7 @@ function normaliseProjectSlug(raw: string | null): string | null {
   }
 
   const trimmed = raw.trim();
+
   if (trimmed.length === 0) {
     return null;
   }

@@ -154,6 +154,7 @@ interface ChainRunControlsProps {
 // eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 16
 function ChainRunControls(props: ChainRunControlsProps): JSX.Element {
   const { running, progress, enabledCount, runShortcutLabel, stopShortcutLabel, onRun, onCancel } = props;
+
   if (running) {
     return (
       <Button

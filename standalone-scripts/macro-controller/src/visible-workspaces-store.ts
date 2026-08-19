@@ -32,6 +32,7 @@ export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): 
 
 export function subscribeVisibleWorkspaces(cb: Listener): () => void {
   listeners.add(cb);
+
   // Push the current snapshot immediately so late subscribers stay in sync.
   if (lastRows.length > 0) {
     try {

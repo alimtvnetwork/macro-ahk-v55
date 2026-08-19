@@ -108,6 +108,7 @@ export function pickLastFailureReport(
   let best: FailureReport = reports[0];
   for (let i = 1; i < reports.length; i++) {
     const candidate = reports[i];
+
     if (candidate.Timestamp >= best.Timestamp) {
       best = candidate;
     }

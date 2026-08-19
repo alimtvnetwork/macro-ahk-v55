@@ -93,6 +93,7 @@ function ChainEndRow(props: { entry: Extract<TimelineEntry, { Kind: "ChainEnd" }
 
 export function TimelineRow(props: TimelineRowProps): JSX.Element {
   const { entry } = props;
+
   if (entry.Kind === "EventStart") {
     return <EventStartRow entry={entry} />;
   }

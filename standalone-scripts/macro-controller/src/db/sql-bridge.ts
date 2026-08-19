@@ -79,6 +79,7 @@ const rejections: Record<Bucket, SqlBridgeRejection[]> = {
 function recordRejection(bucket: Bucket, method: string, message: string): void {
   const history = rejections[bucket];
   history.push({ bucket, method, message, at: new Date().toISOString() });
+
   if (history.length > REJECTION_LIMIT) {
     history.splice(0, history.length - REJECTION_LIMIT);
   }
@@ -180,8 +181,10 @@ async function sendOnce(method: string, sql: string, project: string): Promise<S
 export async function runSql(legacy: LegacyMethod, sql: string, project: string = DB_NAME): Promise<SqlBridgeResp> {
   const bucket = classify(legacy, sql);
   const cached = winning[bucket];
+
   if (typeof cached === 'string') {
     const resp = await sendOnce(cached, sql, project);
+
     if (resp.ok || !isContractError(resp.errorMessage)) {
       return resp;
     }
@@ -194,6 +197,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
   let lastResp = new SqlBridgeResp(false, undefined, 'no candidate methods tried');
   for (const method of CANDIDATES[bucket]) {
     const resp = await sendOnce(method, sql, project);
+
     if (resp.ok) {
       winning[bucket] = method;
 
@@ -227,6 +231,7 @@ export async function runLoggedQuery(
   project: string = DB_NAME
 ): Promise<SqlBridgeResp> {
   const resp = await runSql(legacy, sql, project);
+
   if (resp.ok === false) {
     logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
 
@@ -268,6 +273,7 @@ export async function runWithBridgeRetry<T>(
   try {
     const first = await operation();
     const message = isFailure(first);
+
     if (message && isSqlBridgeContractError(message)) {
       resetSqlBridgeCache();
 
@@ -277,6 +283,7 @@ export async function runWithBridgeRetry<T>(
     return first;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+
     if (isSqlBridgeContractError(message)) {
       resetSqlBridgeCache();
 

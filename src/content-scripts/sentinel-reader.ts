@@ -33,6 +33,7 @@ export function readSentinel(): SentinelSnapshot | null {
   try {
     const sentinelEl = document.getElementById(SENTINEL_ID);
     const isMissing = sentinelEl === null;
+
     if (isMissing) {
       return null;
     }

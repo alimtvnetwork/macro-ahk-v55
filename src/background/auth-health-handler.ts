@@ -52,6 +52,9 @@ export interface AuthHealthResponse {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
+const LOGGER_NAMESPACE = 'NAMESPACE';
+const LOGGER_ERR_MSG = 'Operation failed';
+
 const AUTH_API_BASE = DomainConstants.API_URL;
 
 import { LOVABLE_TAB_PATTERNS as PLATFORM_TAB_PATTERNS } from "../shared/lovable-tab-patterns";
@@ -81,7 +84,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     tabUrl = tab?.url ?? null;
     projectId = extractProjectId(tabUrl);
   } catch (queryErr) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: queryErr });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: queryErr });
     logBgWarnError(BgLogTag.AUTH_HEALTH, "chrome.tabs.query({active,currentWindow}) failed — proceeding with tabUrl=null and projectId=null; downstream strategies will skip URL-dependent checks", queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
   }
 
@@ -91,6 +94,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
       "lovable-session-id.id",
       tabUrl,
     );
+
     if (cookie !== null) {
       return { isSuccess: true, detail: "Session cookie found" };
     }
@@ -99,6 +103,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
       "lovable-session-id.refresh",
       tabUrl,
     );
+
     if (refreshCookie !== null) {
       return { isSuccess: true, detail: "Refresh cookie found (no session cookie)" };
     }
@@ -112,8 +117,10 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
+
         if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
           const raw = localStorage.getItem(key);
+
           if (!raw) {
             continue;
           }
@@ -121,6 +128,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
           const parsed = JSON.parse(raw);
           const token = parsed?.access_token;
           const isValidToken = typeof token === "string" && token.startsWith("eyJ");
+
           if (!isValidToken) {
             continue;
           }
@@ -129,7 +137,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         }
       }
     } catch (parseErr) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: parseErr });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: parseErr });
       console.debug("[auth-health] localStorage JWT parse skipped:", parseErr); 
     }
 
@@ -138,6 +146,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 
   const s2 = await timedStrategy("localStorage JWT scan", 2, async () => {
     const tabs = await getActivePlatformTabs();
+
     if (tabs.length === 0) {
       return { isSuccess: false, detail: "No platform tabs available" };
     }
@@ -154,11 +163,12 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
           func: jwtScanScript,
         });
         const scanResult = result?.[0]?.result;
+
         if (typeof scanResult === "string" && scanResult.startsWith("found:")) {
           return { isSuccess: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
         }
       } catch (tabErr) {
-        RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: tabErr });
+        RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: tabErr });
         logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));
       }
     }
@@ -166,6 +176,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     return { isSuccess: false, detail: `Scanned ${tabs.length} tab(s) — no JWT found` };
   });
   strategies.push(s2);
+
   if (s2.isSuccess && !resolvedVia) {
     resolvedVia = s2.name;
   }
@@ -185,7 +196,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         return { isSuccess: true, detail: "JWT found in active URL" };
       }
     } catch (urlErr) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: urlErr });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: urlErr });
       // Malformed tab URL — strategy result already returns success=false below;
       // log at warn level so a recurring pattern surfaces in diagnostics without
       // promoting a single bad URL to an error.
@@ -199,6 +210,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     return { isSuccess: false, detail: "No signed URL token found" };
   });
   strategies.push(s3);
+
   if (s3.isSuccess && !resolvedVia) {
     resolvedVia = s3.name;
   }
@@ -212,6 +224,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     return { isSuccess: false, detail };
   });
   strategies.push(s4);
+
   if (s4.isSuccess && !resolvedVia) {
     resolvedVia = s4.name;
   }
@@ -223,6 +236,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
       const sessionCookie = (cookies as Array<{ name: string; domain: string; expirationDate?: number }>).find(
         (c) => c.name.includes("session") || c.name.includes("auth"),
       );
+
       if (!sessionCookie) {
         const count = Array.isArray(cookies) ? cookies.length : 0;
 
@@ -231,6 +245,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 
       const isExpired = sessionCookie.expirationDate !== undefined &&
                   sessionCookie.expirationDate < Date.now() / 1000;
+
       if (isExpired) {
         return { isSuccess: false, detail: `Cookie "${sessionCookie.name}" expired` };
       }
@@ -306,11 +321,12 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
   for (const pattern of PLATFORM_TAB_PATTERNS) {
     try {
       const tabs = await _chrome.tabs!.query({ url: pattern });
+
       if (Array.isArray(tabs)) {
         results.push(...tabs);
       }
     } catch (queryErr) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: queryErr });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: queryErr });
       logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.tabs.query({url:"${pattern}"}) failed — pattern skipped, other platform tabs (if any) still scanned`, queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
     }
   }

@@ -97,6 +97,7 @@ function ScriptEntryCard({
     }
 
     const config = availableConfigs.find((c) => c.id === configId);
+
     if (!config) {
       return;
     }
@@ -121,6 +122,7 @@ function ScriptEntryCard({
         .filter((b) => b.configId !== configId)
         .map((b, i) => ({ ...b, order: i })),
     });
+
     if (activeTab === configId) {
       setActiveTab("js");
     }
@@ -138,6 +140,7 @@ function ScriptEntryCard({
     const entries = [...binding.configBindings].sort((a, b) => a.order - b.order);
     const idx = entries.findIndex((e) => e.configId === configId);
     const newIdx = idx + direction;
+
     if (newIdx < 0 || newIdx >= entries.length) {
       return;
     }
@@ -387,6 +390,7 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 
   const handleAddFromLibrary = (scriptId: string) => {
     const script = availableScripts.find((s) => s.id === scriptId);
+
     if (!script) {
       return;
     }
@@ -465,6 +469,7 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
     const entries = [...selectedScripts];
     const idx = entries.findIndex((s) => s.scriptId === scriptId);
     const newIdx = idx + direction;
+
     if (newIdx < 0 || newIdx >= entries.length) {
       return;
     }

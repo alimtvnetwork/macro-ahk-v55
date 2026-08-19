@@ -38,6 +38,7 @@ export function CsvMappingTable(props: CsvMappingTableProps): JSX.Element {
         <tbody>
           {csv.Headers.map((header) => {
             const mapping = mappings.find((entry) => entry.Column === header);
+
             if (mapping === undefined) {
               return null;
             }

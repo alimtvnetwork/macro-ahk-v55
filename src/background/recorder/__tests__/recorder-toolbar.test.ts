@@ -38,6 +38,7 @@ function mount(onPhase?: (p: RecordingPhase) => void): RecorderToolbarHandle {
 
 function btn(h: RecorderToolbarHandle, action: BtnActionType): HTMLButtonElement {
   const element = h.Root.querySelector<HTMLButtonElement>(`button[data-action="${action}"]`);
+
   if (element === null) {
     throw new Error(`button[data-action="${action}"] not found`); 
   }

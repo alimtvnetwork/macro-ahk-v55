@@ -36,6 +36,7 @@ class FakeDir {
 
   async getDirectoryHandle(name: string, opts?: { create?: boolean }): Promise<FakeDir> {
     let child = this.dirs.get(name);
+
     if (!child) {
       if (!opts?.create) {
         throw new Error(`NotFoundError: ${name}`);
@@ -50,6 +51,7 @@ class FakeDir {
 
   async getFileHandle(name: string, opts?: { create?: boolean }) {
     let file = this.files.get(name);
+
     if (!file) {
       if (!opts?.create) {
         throw new Error(`NotFoundError: ${name}`);
@@ -80,6 +82,7 @@ class FakeDir {
     }
 
     const hadDir = this.dirs.delete(name);
+
     if (!hadDir) {
       throw new Error(`NotFoundError: ${name}`);
     }

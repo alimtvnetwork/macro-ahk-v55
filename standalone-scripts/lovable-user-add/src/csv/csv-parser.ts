@@ -88,6 +88,7 @@ export const parseUserAddCsv = (text: string): UserAddCsvParseResult => {
   const rows: UserAddCsvRow[] = [];
 
   const dataRowCount = grid.length - 1;
+
   if (dataRowCount > MAX_ROWS) {
     errors.push({
       RowIndex: 0,

@@ -51,6 +51,7 @@ function normalizeStartNumbers(startNums: number | Record<string, number>): Vari
 
 function applyVars(text: string, starts: VariableStartNumbers, index: number): string {
   const isEmpty = !text;
+
   if (isEmpty) {
     return text;
   }

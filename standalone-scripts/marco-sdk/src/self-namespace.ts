@@ -79,6 +79,7 @@ export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): v
   /* If a real project namespace already registered itself (rare collision),
        respect it — never clobber a fully-built per-project runtime. */
   const existing = root.Projects[SDK_CODE_NAME] as { _internal?: unknown } | undefined;
+
   if (existing && existing._internal) {
     console.log(
       "[marco-sdk] Preserved existing RiseupAsiaMacroExt.Projects.RiseupMacroSdk runtime namespace",

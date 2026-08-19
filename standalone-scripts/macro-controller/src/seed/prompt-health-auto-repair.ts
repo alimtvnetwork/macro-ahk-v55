@@ -93,6 +93,7 @@ function emitRepairFailed(finalReport: PromptHealthReport, reseedError?: string)
  */
 export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairResult> {
   const initialReport = await runPromptHealthCheck({ silent: true });
+
   if (!shouldAttemptRepair(initialReport)) {
     return {
       initialReport,
@@ -110,6 +111,7 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
   // short-circuits before the toast, so a healthy state stays quiet.
   const finalReport = await runPromptHealthCheck({ silent: false });
   const isHealthy = finalReport.ok;
+
   if (isHealthy) {
     emitRepairRecovered();
   } else {
@@ -123,6 +125,7 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
     finalReport,
     isHealthy,
   };
+
   if (reseed.error) {
     result.reseedError = reseed.error;
   }

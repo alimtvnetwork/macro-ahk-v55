@@ -31,6 +31,7 @@ export interface SelectorTestResult {
 /** Detect the selector kind from the expression's leading character. */
 export function detectSelectorKind(expression: string): PredicateEvaluationKindType {
   const trimmed = expression.trimStart();
+
   if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
     return "XPath";
   }
@@ -45,6 +46,7 @@ export function testSelector(
   kind: SelectorTestKind = "Auto",
 ): SelectorTestResult {
   const trimmed = expression.trim();
+
   if (trimmed.length === 0) {
     return emptyExpressionResult(expression, kind); 
   }

@@ -31,6 +31,7 @@ function openDb(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = function (): void {
       const db = request.result;
+
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'workspaceId' });
       }
@@ -134,6 +135,7 @@ export function readCreditBalanceUpdateCacheSync(
   nowMs: number = Date.now(),
 ): CreditFetchResult | null {
   const entry = memoryCache.get(workspaceId);
+
   if (!entry || !isFresh(entry, nowMs)) {
     return null;
   }
@@ -146,6 +148,7 @@ export async function readCreditBalanceUpdateCache(
   nowMs: number = Date.now(),
 ): Promise<CreditFetchResult | null> {
   const memory = readCreditBalanceUpdateCacheSync(workspaceId, nowMs);
+
   if (memory) {
     return memory;
   }
@@ -154,6 +157,7 @@ export async function readCreditBalanceUpdateCache(
     const db = await openDb();
     const entry = await readStoreEntry(db, workspaceId);
     db.close();
+
     if (!entry || !isFresh(entry, nowMs)) {
       return null;
     }

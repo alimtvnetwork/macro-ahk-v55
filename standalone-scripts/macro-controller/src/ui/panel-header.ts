@@ -88,6 +88,7 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   const remixSplit = buildHeaderRemixSplitButton(function () {
     const projectId = extractProjectIdFromUrl();
     const wsId = loopCreditState.currentWs ? loopCreditState.currentWs.id : '';
+
     if (!projectId || !wsId) {
       return null;
     }
@@ -204,6 +205,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
       wsNameEl.textContent = nextTitleBarState.text;
       wsNameEl.title = nextTitleBarState.title;
       const ws = getCurrentWorkspaceDisplayName();
+
       if (ws) {
         log('Title bar: ✅ Workspace re-detected: "' + ws + '"', 'success');
         showToast('Workspace: ' + ws, 'success');
@@ -246,6 +248,7 @@ function buildAuthBadge(): HTMLElement {
     log('Auth badge clicked — triggering manual token refresh', 'check');
     refreshBearerTokenFromBestSource(function(token: string, source: string) {
       authBadge.style.opacity = '1';
+
       if (token) {
         log('Auth badge refresh: ✅ Token resolved from ' + source, 'success');
         updateAuthBadge(true, source);
@@ -258,6 +261,7 @@ function buildAuthBadge(): HTMLElement {
     });
   });
   const currentToken = resolveToken();
+
   if (currentToken) {
     authBadge.textContent = '🟢';
     authBadge.title = 'Auth: token available (' + (getLastTokenSource() || 'cached') + ') — click to refresh';

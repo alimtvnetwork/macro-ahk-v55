@@ -119,6 +119,7 @@ function assertMigrationCeiling(): void {
   const overCeiling = MIGRATIONS.filter(
     (m) => m.version > MAX_ALLOWED_STORAGE_SCHEMA_VERSION,
   );
+
   if (overCeiling.length > 0) {
     const versions = overCeiling.map((m) => `v${m.version}`).join(", ");
     assertNoPascalCaseStorageMigration(
@@ -149,6 +150,7 @@ export async function runStorageMigrations(): Promise<StorageMigrationResult> {
   assertMigrationCeiling();
   const fromVersion = await readStorageSchemaVersion();
   const pending = MIGRATIONS.filter((m) => m.version > fromVersion);
+
   if (pending.length === 0) {
     return { fromVersion, toVersion: fromVersion, applied: 0, failed: false };
   }
@@ -156,6 +158,7 @@ export async function runStorageMigrations(): Promise<StorageMigrationResult> {
   let lastApplied = fromVersion;
   for (const migration of pending) {
     const outcome = await applyMigration(migration);
+
     if (outcome.isFail) {
       return {
         fromVersion,

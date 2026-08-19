@@ -81,6 +81,7 @@ function csvEscape(value: string | number | null): string {
   }
 
   const s = String(value);
+
   if (/[",\r\n]/.test(s)) {
     return `"${s.replace(/"/g, '""')}"`; 
   }
@@ -120,6 +121,7 @@ export function buildCsvExport(opts: ExportOptions): string {
       }
 
       const v = step[key as keyof StepRow];
+
       if (typeof v === "string" || typeof v === "number" || v === null) {
         return csvEscape(v);
       }

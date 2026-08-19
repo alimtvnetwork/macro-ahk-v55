@@ -10,15 +10,9 @@
  */
 
 import type { MacroControllerConfig, MacroThemeRoot, ThemePreset } from './types';
+import { isInvalidThemePreset } from './types';
 import { SUPPORTED_CONFIG_SCHEMA, SUPPORTED_THEME_SCHEMA } from './constants';
-
-function isInvalidThemePreset(preset: unknown): boolean {
-  return (
-    !!preset &&
-    preset !== 'dark' &&
-    preset !== 'light'
-  );
-}
+import { isPlainObject } from './utils/type-guards';
 
 // ── Validation warning collector ──
 const validationWarnings: string[] = [];
@@ -53,10 +47,6 @@ function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial
   }
 
   return result as T;
-}
-
-function isPlainObject(v: unknown): v is Record<string, unknown> {
-  return v !== null && typeof v === 'object' && !Array.isArray(v);
 }
 
 // ── Default config (matches 02-macro-controller-config.json) ──
@@ -185,6 +175,7 @@ export function validateTheme(raw: unknown): MacroThemeRoot {
   // Ensure presets object has at least the active preset
   const merged = deepMerge(DEFAULT_THEME as Record<string, unknown>, theme as Record<string, unknown>) as unknown as MacroThemeRoot;
   const activeKey = (merged.activePreset || 'dark') as string;
+
   if (merged.presets && !(merged.presets as Record<string, unknown>)[activeKey]) {
     warn('Theme: active preset "' + activeKey + '" not found in presets — using default');
     (merged.presets as Record<string, unknown>)[activeKey] = DEFAULT_THEME_PRESET;
@@ -214,11 +205,13 @@ function validateFieldType(
   label: string,
 ): void {
   const fieldValue = obj[field];
+
   if (fieldValue === undefined || fieldValue === null) {
     return;
   }
 
   const actual = Array.isArray(fieldValue) ? 'array' : typeof fieldValue;
+
   if (actual !== expected) {
     warn(label + '.' + field + ': expected ' + expected + ', got ' + actual + ' — using default');
     delete obj[field];

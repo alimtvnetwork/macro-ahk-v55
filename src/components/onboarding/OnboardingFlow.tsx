@@ -44,6 +44,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   useEffect(() => {
     const previous = stepHistoryRef.current[stepHistoryRef.current.length - 1];
+
     if (previous === step) {
       return; // ignore re-renders that don't change step
     }

@@ -186,6 +186,7 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
 
     function applySearch(rows: ReadonlyArray<WorkspaceCredit>, q: string): WorkspaceCredit[] {
       const needle = q.trim().toLowerCase();
+
       if (needle === '') {
         return rows.slice(); 
       }
@@ -211,6 +212,7 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
 
     function applySort(rows: WorkspaceCredit[], key: SortKeyType): WorkspaceCredit[] {
       const out = rows.slice();
+
       if (key === SortKeyType.Name) {
         out.sort((a, b) => a.fullName.localeCompare(b.fullName));
       } else if (key === SortKeyType.Available) {

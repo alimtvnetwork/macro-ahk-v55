@@ -199,12 +199,14 @@ function classifyEntry(entry: RawEntry, index: number): Classified {
   const isRawFieldsComplete = fields.rawPath !== null && fields.rawOrder !== null;
   const isCodeKeyAbsent = !fields.hasCodeKey;
   const isResolvedByRaw = isRawFieldsComplete && isCodeKeyAbsent;
+
   if (isResolvedByRaw) {
     return { kind: "project-entry", value: entry as ScriptEntry };
   }
 
   // Inline injectable shape: needs id + code + order.
   const missing: string[] = [];
+
   if (fields.rawId === null) {
     missing.push("id");
   }

@@ -121,6 +121,7 @@ function walkCondition(node: Condition, depth: number, path: string, state: Walk
   }
 
   state.count++;
+
   if (state.count > MAX_PREDICATE_COUNT) {
     throw new Error(`InvalidSelector: condition exceeds ${MAX_PREDICATE_COUNT} predicates at ${joinPath(path, node.Matcher.Kind)}`);
   }
@@ -138,6 +139,7 @@ function joinPath(prefix: string, segment: string): string {
 
 function validateMatcher(predicate: Predicate, path: string): void {
   const matcher = predicate.Matcher;
+
   if (matcher.Kind === "TextRegex") {
     try {
       new RegExp(matcher.Pattern, matcher.Flags ?? ""); 
@@ -204,6 +206,7 @@ function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): bool
   }
 
   const element = locateFirst(predicate.Selector, kind, options.Doc);
+
   if (element === null) {
     recordTrace(options, predicate, kind, predicate.Matcher.Kind === "Exists" ? false : false, "no match");
 
@@ -254,6 +257,7 @@ function matchTextContains(element: Element, matcher: Matcher & { Kind: "TextCon
 
 function matchAttr(element: Element, name: string, expected: string, mode: MatchAttrModeType): boolean {
   const value = element.getAttribute(name);
+
   if (value === null) {
     return false;
   }
@@ -276,16 +280,19 @@ function applyMatcher(element: Element, matcher: Matcher): boolean {
 
 function isVisible(element: Element): boolean {
   const windowObject = element.ownerDocument?.defaultView;
+
   if (windowObject === null || windowObject === undefined) {
     return false;
   }
 
   const rect = element.getBoundingClientRect();
+
   if (rect.width === 0 || rect.height === 0) {
     return false;
   }
 
   const styles = windowObject.getComputedStyle(element);
+
   if (styles.display === "none") {
     return false;
   }
@@ -344,6 +351,7 @@ function locateAll(expression: string, kind: PredicateEvaluationKindType, doc: D
     const out: Element[] = [];
     for (let i = 0; i < r.snapshotLength; i++) {
       const node = r.snapshotItem(i);
+
       if (node instanceof Element) {
         out.push(node);
       }
@@ -364,6 +372,7 @@ export async function waitForCondition(
   options: WaitOptions,
 ): Promise<ConditionWaitOutcome> {
   const validationFailure = validateConditionForWait(condition);
+
   if (validationFailure !== null) {
     return validationFailure;
   }
@@ -375,11 +384,13 @@ export async function waitForCondition(
   for (;;) {
     polls++;
     const poll = evaluateConditionPoll(condition, options, clock, polls);
+
     if (poll.Outcome !== null) {
       return poll.Outcome;
     }
 
     lastTrace = poll.Trace;
+
     if (isConditionTimedOut(polls, clock)) {
       return createTimeoutOutcome(options, clock, polls, lastTrace);
     }

@@ -14,6 +14,7 @@ const { getBearerTokenSpy, markBearerTokenExpiredSpy, logErrorSpy, logWarnSpy } 
 vi.mock('../auth', () => ({
   getBearerToken: getBearerTokenSpy,
   markBearerTokenExpired: markBearerTokenExpiredSpy,
+  isAuthFailure: (status: number) => status === 401 || status === 403,
 }));
 vi.mock('../shared-state', () => ({ CREDIT_API_BASE: 'https://api.example.test' }));
 vi.mock('../error-utils', () => ({ logError: logErrorSpy, logWarn: logWarnSpy }));

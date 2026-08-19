@@ -39,6 +39,7 @@ function accumulateReport(acc: AggregateCounts, r: BatchGroupReport): AggregateC
   }
 
   const result = r.Result;
+
   if (result === null) {
     return { GroupsRun, StepsExecuted, StepsSkipped, GroupsEntered, Failures };
   }

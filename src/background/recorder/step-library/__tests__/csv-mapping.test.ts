@@ -48,6 +48,7 @@ describe("buildBagFromRow", () => {
     ];
     const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Bag).toEqual({
         Email: "a@b.co",
@@ -64,6 +65,7 @@ describe("buildBagFromRow", () => {
     ];
     const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(r.Bag).toEqual({ Meta: { plan: "pro" } });
     }
@@ -76,6 +78,7 @@ describe("buildBagFromRow", () => {
     ];
     const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
     expect(r.Ok).toBe(true);
+
     if (r.Ok) {
       expect(Object.keys(r.Bag)).toEqual(["Email"]);
       expect(r.UsedColumns).toBe(1);
@@ -105,6 +108,7 @@ describe("buildBagFromRow", () => {
     ];
     const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Column).toBe("Email");
       expect(r.Reason).toMatch(/number/);
@@ -117,6 +121,7 @@ describe("buildBagFromRow", () => {
     ];
     const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
     expect(r.Ok).toBe(false);
+
     if (r.Ok === false) {
       expect(r.Column).toBe("Nope");
     }

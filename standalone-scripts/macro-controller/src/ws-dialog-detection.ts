@@ -50,6 +50,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   }
 
   const hasWorkspaces = perWs.length > 0;
+
   if (!hasWorkspaces) {
     log(fn + ': No workspaces loaded — will still try to read workspace name from dialog XPath directly', 'warn');
   }
@@ -57,6 +58,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   log(fn + ': Tier 2 — Opening project dialog to read workspace name...', 'check');
   logSub('ProjectButtonXPath: ' + CONFIG.PROJECT_BUTTON_XPATH, 1);
   logSub('WorkspaceNameXPath: ' + CONFIG.WORKSPACE_XPATH, 1);
+
   if (keepDialogOpen) {
     logSub('keepDialogOpen=true — caller will close dialog after Step 3', 1);
   }
@@ -92,6 +94,7 @@ function tryFindProjectButton(ctx: ProjectBtnRetryCtx): void {
 
   if (!btn) {
     btn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
+
     if (btn) {
       logSub('Project button found via fallback findElement (attempt ' + ctx.attempt + ')', 1); 
     }
@@ -127,6 +130,7 @@ function findProjectButtonWithRetry(_fn: string, maxRetries: number, delayMs: nu
 // ============================================
 function openDialogAndPoll(fn: string, btn: Element, perWs: WorkspaceCredit[], keepDialogOpen: boolean): Promise<void> {
   const isExpanded = btn.getAttribute('aria-expanded') === 'true' || btn.getAttribute('data-state') === 'open';
+
   if (isExpanded) {
     logSub('Dialog is already open — closing first for clean re-read', 1);
     reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);
@@ -162,6 +166,7 @@ function resolveChosenWorkspace(
     logSub('  Node[' + ni + ']: "' + (node.textContent || '').trim() + '"', 1);
     for (const candidate of collectWorkspaceNameCandidatesFromNode(node)) {
       const matched = matchWorkspaceByName(candidate.name, perWs);
+
       if (matched) {
         matchedCandidates.push({ matched, rawName: candidate.name, selected: candidate.selected });
       }
@@ -172,6 +177,7 @@ function resolveChosenWorkspace(
   for (const c of matchedCandidates) {
     const key = c.matched.id || normalizeWorkspaceName(c.matched.fullName || c.matched.name || '');
     const existing = uniqueById[key];
+
     if (!existing || (!existing.selected && c.selected)) {
       uniqueById[key] = c;
     }
@@ -179,6 +185,7 @@ function resolveChosenWorkspace(
 
   const uniqueMatches = Object.values(uniqueById);
   const selected = uniqueMatches.find(m => m.selected);
+
   if (selected) {
     return selected;
   }
@@ -240,10 +247,12 @@ function handlePollTimeout(
 ): void {
   log(fn + ': WorkspaceNameXPath not found — trying CSS selector fallback (S-012)', 'warn');
   const cssFallback = findWorkspaceNameViaCss(fn, perWs);
+
   if (cssFallback.matched) {
     state.workspaceName = cssFallback.matched.fullName || cssFallback.matched.name;
     loopCreditState.currentWs = cssFallback.matched;
     log(fn + ': ⚠️ Workspace detected via CSS fallback: "' + cssFallback.rawName + '" → ' + state.workspaceName, 'warn');
+
     if (!keepDialogOpen) {
       closeProjectDialogSafe(btn);
     }
@@ -254,6 +263,7 @@ function handlePollTimeout(
   }
 
   log(fn + ': CSS fallback also failed — preserving existing workspace', 'warn');
+
   if (!keepDialogOpen) {
     closeDialogAndDefault(fn, btn, perWs, resolve);
   } else {
@@ -271,6 +281,7 @@ function pollForWorkspaceName(fn: string, btn: Element, perWs: WorkspaceCredit[]
     elapsed += pollInterval;
 
     const allNodes = getAllByXPath(CONFIG.WORKSPACE_XPATH);
+
     if (allNodes.length > 0) {
       trackedClearInterval(pollTimer);
       logSub('WorkspaceNameXPath found ' + allNodes.length + ' node(s) after ' + elapsed + 'ms', 1);
@@ -353,6 +364,7 @@ function closeDialogAndDefault(fn: string, btn: Element, _perWs: WorkspaceCredit
 export function closeProjectDialogSafe(btn: Element): void {
   try {
     const isExpanded = btn && (btn.getAttribute('aria-expanded') === 'true' || btn.getAttribute('data-state') === 'open');
+
     if (isExpanded) {
       logSub('Closing project dialog after workspace read', 1);
       reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);

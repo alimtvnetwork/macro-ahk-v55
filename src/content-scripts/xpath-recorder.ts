@@ -52,16 +52,19 @@ interface FullCapture {
 /** Generates an XPath for the given element using priority strategy. */
 function generateXPath(element: Element): FullCapture {
   const byId = tryIdStrategy(element);
+
   if (byId !== null) {
     return byId;
   }
 
   const byTestId = tryTestIdStrategy(element);
+
   if (byTestId !== null) {
     return byTestId;
   }
 
   const byRole = tryRoleTextStrategy(element);
+
   if (byRole !== null) {
     return byRole;
   }
@@ -138,6 +141,7 @@ function onElementClick(event: MouseEvent): void {
   }
 
   const target = event.target as Element;
+
   if (isExcludedElement(target)) {
     return;
   }
@@ -159,17 +163,20 @@ function onElementInput(event: Event): void {
   }
 
   const target = event.target as Element;
+
   if (isExcludedElement(target)) {
     return;
   }
 
   const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
+
   if (value === undefined) {
     return;
   }
 
   // Debounce input events to avoid spamming the backend on every keystroke.
   const existingTimer = inputDebounceMap.get(target);
+
   if (existingTimer !== undefined) {
     window.clearTimeout(existingTimer);
   }
@@ -190,16 +197,19 @@ function onElementChange(event: Event): void {
   }
 
   const target = event.target as Element;
+
   if (isExcludedElement(target)) {
     return;
   }
 
   const value = (target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+
   if (value === undefined) {
     return;
   }
 
   const existingTimer = inputDebounceMap.get(target);
+
   if (existingTimer !== undefined) {
     window.clearTimeout(existingTimer);
     inputDebounceMap.delete(target);
@@ -216,6 +226,7 @@ function onElementKeydown(event: KeyboardEvent): void {
   }
 
   const target = event.target as Element;
+
   if (isExcludedElement(target)) {
     return;
   }
@@ -240,6 +251,7 @@ const activeHighlights = new Map<HTMLElement, { timerId: number; originalOutline
 /** Clears a single element's highlight and restores its outline. */
 function clearHighlight(htmlElement: HTMLElement): void {
   const entry = activeHighlights.get(htmlElement);
+
   if (entry === undefined) {
     return;
   }
@@ -261,6 +273,7 @@ function trimHighlightStack(): void {
   }
 
   const oldest = activeHighlights.keys().next().value;
+
   if (oldest !== undefined) {
     clearHighlight(oldest);
   }
@@ -277,6 +290,7 @@ function highlightElement(element: Element): void {
 
   const timerId = window.setTimeout(() => {
     const entry = activeHighlights.get(htmlElement);
+
     if (entry === undefined) {
       return;
     }

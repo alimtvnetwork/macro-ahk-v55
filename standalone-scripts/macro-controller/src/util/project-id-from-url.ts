@@ -74,11 +74,13 @@ export function subscribeProjectNameChange(callback: ProjectNameChangeListener):
 /** Explicit poll hook — call after project navigation or name-refresh events. */
 export function notifyIfProjectRenamed(): void {
   const { projectId, projectName } = resolveProjectIdentity();
+
   if (!projectId) {
     return;
   }
 
   const isFirstSeen = !lastKnownName.has(projectId);
+
   if (isFirstSeen) {
     lastKnownName.set(projectId, projectName);
 
@@ -86,6 +88,7 @@ export function notifyIfProjectRenamed(): void {
   }
 
   const prev = lastKnownName.get(projectId) ?? null;
+
   if (prev === projectName) {
     return;
   }

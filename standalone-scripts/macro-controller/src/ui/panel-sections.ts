@@ -192,6 +192,7 @@ function _buildVersionBadge(
   badge.style.cssText = 'display:none;font-size:9px;background:hsl(var(--background));color:hsl(var(--foreground));padding:1px 5px;border-radius:8px;margin-left:6px;font-weight:700;line-height:1.2;animation:pulse 2s ease-in-out infinite;cursor:pointer;';
   badge.onclick = function(e: Event) {
     e.stopPropagation();
+
     if (toolsMasterBody.style.display === 'none') {
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
@@ -204,6 +205,7 @@ function _buildVersionBadge(
     }
 
     const target = getReinjectSection();
+
     if (target) {
       setTimeout(function() {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' }); 

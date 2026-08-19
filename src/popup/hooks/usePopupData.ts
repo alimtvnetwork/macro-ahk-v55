@@ -132,6 +132,7 @@ export function usePopupData() {
         intervalId = null;
       } else if (!document.hidden) {
         void loadData();
+
         if (intervalId === null) {
           intervalId = setInterval(() => void loadData(), 30_000);
         }

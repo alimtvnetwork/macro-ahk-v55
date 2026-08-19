@@ -49,8 +49,10 @@ export function registerShortcutCommands(): void {
   // Log registered commands for debugging — verify shortcut is actually assigned
   chrome.commands.getAll((commands) => {
     const runCmd = commands.find((c) => c.name === RUN_SCRIPTS_COMMAND);
+
     if (runCmd) {
       const shortcut = runCmd.shortcut || "";
+
       if (shortcut) {
         console.log("[Marco] ✅ Shortcut registered: %s → %s", RUN_SCRIPTS_COMMAND, shortcut);
       } else {
@@ -69,6 +71,7 @@ export function registerShortcutCommands(): void {
 /** Resolves the active tab and its URL; logs + returns null on any abort condition. */
 async function resolveShortcutTarget(): Promise<{ tabId: number; url: string } | null> {
   const tab = await getActiveTab();
+
   if (tab === null || typeof tab.id !== "number") {
     logBgWarnError(BgLogTag.SHORTCUT, "Aborting: no active tab found (reason=no-active-tab)");
 
@@ -76,6 +79,7 @@ async function resolveShortcutTarget(): Promise<{ tabId: number; url: string } |
   }
 
   const url = tab.url ?? "";
+
   if (isNewTabOrBlankUrl(url)) {
     logBgWarnError(BgLogTag.SHORTCUT, `Aborting: active tab is a new-tab/blank page (tabId=${tab.id}, url='${url}', reason=new-tab-blank-url)`);
 
@@ -104,6 +108,7 @@ async function dispatchShortcutInjection(
     forceReload: true,
   });
   const response = normalizeInjectScriptsResponse(rawResponse);
+
   if (response.inlineSyntaxFlagSource === "legacy-default") {
     console.warn("[Marco] Shortcut: response missing inlineSyntaxErrorDetected — older background build, defaulting to false");
   }
@@ -118,6 +123,7 @@ async function runScriptsFromShortcut(forceReload: boolean): Promise<void> {
   const t0 = performance.now();
   try {
     const target = await resolveShortcutTarget();
+
     if (target === null) {
       return;
     }
@@ -240,6 +246,7 @@ async function toggleRecordingFromShortcut(): Promise<void> {
   try {
     const current = (await loadSession()) ?? IDLE_SESSION;
     const projectSlug = await getActiveProjectSlug();
+
     if (current.Phase === "Idle" && projectSlug === null) {
       logBgWarnError(BgLogTag.SHORTCUT, "Toggle-recording: no active project — aborting Start");
 
@@ -254,6 +261,7 @@ async function toggleRecordingFromShortcut(): Promise<void> {
     // Phase 1: Inject the recorder script into the active tab when starting
     if (next.Phase === "Recording" && current.Phase === "Idle") {
       const target = await getActiveTab();
+
       if (target && target.id) {
         await chrome.scripting.executeScript({
           target: { tabId: target.id },

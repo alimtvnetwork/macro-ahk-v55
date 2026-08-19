@@ -33,6 +33,7 @@ export interface StepEditorKindBodyProps {
 
 export function StepEditorKindBody(props: StepEditorKindBodyProps): JSX.Element {
   const { kind } = props;
+
   if (kind === StepKindId.RunGroup) {
     return (
       <RunGroupTargetField

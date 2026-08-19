@@ -72,6 +72,7 @@ const SUPPORTED_SCHEMA_VERSIONS = { min: 2, max: 2 };
 export async function seedFromManifest(): Promise<SeedResult> {
   console.log("[manifest-seeder] Fetching seed-manifest.json from extension dist...");
   const manifest = await fetchManifest();
+
   if (!manifest) {
     logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
             "Ensure the build pipeline runs compile-instruction + generate-seed-manifest.");
@@ -81,6 +82,7 @@ export async function seedFromManifest(): Promise<SeedResult> {
 
   // Schema version validation
   const sv = manifest.SchemaVersion;
+
   if (typeof sv !== "number" || !Number.isFinite(sv)) {
     logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Invalid schemaVersion: ${sv} — aborting seed`);
 
@@ -183,6 +185,7 @@ async function fetchManifest(): Promise<SeedManifest | null> {
   console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
   try {
     const resp = ServiceResult.wrapFetch(await fetch(url));
+
     if (resp.isFail) {
       logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
 
@@ -244,6 +247,7 @@ async function seedScriptsFromManifest(
 
         // Refresh if stale
         const current = stored[idx];
+
         if (isScriptStale(current, scriptDef, project, manifest)) {
           console.log("[manifest-seeder:scripts] ↻ REFRESH %s (seedId=%s, was stale)",
             scriptDef.File, scriptDef.SeedId);
@@ -409,6 +413,7 @@ async function seedConfigsFromManifest(
         }
 
         const current = stored[idx];
+
         if (current.name !== configDef.File || current.json !== configJson) {
           stored[idx] = {
             ...current,
@@ -457,6 +462,7 @@ async function fetchConfigJson(filePath: string): Promise<string> {
   // mem://constraints/http-error-fail-fast. Bundled-asset fetch failures
   // mean the file is missing from dist/ — retrying cannot help.
   const resp = ServiceResult.wrapFetch(await fetch(url));
+
   if (resp.isFail) {
     throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
   }

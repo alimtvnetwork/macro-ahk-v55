@@ -45,6 +45,7 @@ function normalize(query: string): string {
 
 function stepMatches(step: StepRow, q: string): boolean {
   const label = (step.LabelType ?? "").toLowerCase();
+
   if (label.includes(q)) {
     return true; 
   }
@@ -59,6 +60,7 @@ export function filterLiveTree(
   rawQuery: string,
 ): LiveTreeFilterResult {
   const q = normalize(rawQuery);
+
   if (q.length === 0) {
     return {
       Forest: forest.map((n) => cloneNode(n)),
@@ -97,6 +99,7 @@ export function filterLiveTree(
       .filter((c): c is LiveTreeNode => c !== null);
 
     const hasOwnMatch = effectiveMatch || matchedSteps.length > 0;
+
     if (!hasOwnMatch && children.length === 0) {
       return null; 
     }
@@ -109,6 +112,7 @@ export function filterLiveTree(
     // when the parent group matched, so the result count matches what the
     // user actually sees in the tree.
     stepMatchCount += matchedSteps.length;
+
     if (matchedSteps.length > 0) {
       filteredSteps.set(node.Group.StepGroupId, matchedSteps);
     }

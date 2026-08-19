@@ -31,6 +31,7 @@ interface ChromeApiLike {
 
 function getChrome(): ChromeApiLike | null {
   const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
+
   if (api === undefined) {
     return null; 
   }

@@ -27,6 +27,7 @@ vi.mock('../auth', () => ({
   resolveToken: resolveTokenSpy,
   markBearerTokenExpired: markBearerTokenExpiredSpy,
   recoverAuthOnce: recoverAuthOnceSpy,
+  isAuthFailure: (status: number) => status === 401 || status === 403,
 }));
 
 vi.mock('../workspace-detection', () => ({

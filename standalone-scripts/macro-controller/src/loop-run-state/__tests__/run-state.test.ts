@@ -17,10 +17,12 @@ import { isRunActive, isRunIdle, waitForRunIdle } from '../index';
 function mountComposer(opts: { submit: boolean; iconPath: string | null }): HTMLElement {
   const root = document.createElement('div');
   root.id = 'composer-test-root';
+
   if (opts.submit) {
     const btn = document.createElement('button');
     btn.id = SUBMIT_BUTTON_ID;
     btn.type = 'submit';
+
     if (opts.iconPath !== null) {
       const span = document.createElement('span');
       span.setAttribute('data-button-content', 'true');

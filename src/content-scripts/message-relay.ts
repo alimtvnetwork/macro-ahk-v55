@@ -218,6 +218,7 @@ function handleRelayCallback(
   isSdkSource: boolean,
 ): void {
   const hasError = chrome.runtime.lastError;
+
   if (hasError) {
     release();
     postResponseToPage(requestId, {
@@ -403,6 +404,7 @@ function probeDetectedWorkspaceFromPage(
 
   const onReply = (event: MessageEvent): void => {
     const data = event.data as Record<string, unknown> | null;
+
     if (
       event.source !== window ||
       !data ||

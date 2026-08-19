@@ -238,6 +238,7 @@ class ToastManager {
       // consecutive misses (~30 * TOAST_QUEUE_POLL_MS) we stop the timer;
       // a future enqueue() will restart it via startQueueDrain().
       this.sdkMissCount += 1;
+
       if (this.sdkMissCount >= 30) {
         log('[Toast/queue] Stopping drain — SDK unavailable for 30 ticks', 'warn');
         this.stopQueueDrain();

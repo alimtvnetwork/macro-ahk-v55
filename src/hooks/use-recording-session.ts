@@ -38,6 +38,7 @@ export interface UseRecordingSessionResult {
 
 function newSessionId(): string {
   const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+
   if (c?.randomUUID !== undefined) {
     return c.randomUUID(); 
   }
@@ -73,6 +74,7 @@ async function dispatchAction(
   setSession: (s: RecordingSession | null) => void,
 ): Promise<void> {
   const current = await readSession();
+
   if (current === null) {
     return; 
   }
@@ -87,6 +89,7 @@ async function startSession(
   setSession: (s: RecordingSession) => void,
 ): Promise<void> {
   const current = await readSession();
+
   if (current !== null && current.Phase !== "Idle") {
     return; 
   }

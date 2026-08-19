@@ -209,6 +209,7 @@ async function verifyWasmPresence(wasmUrl: string): Promise<void> {
   let headResponse: Response | null = null;
   for (let attempt = 1; attempt <= HEAD_PROBE_ATTEMPTS; attempt += 1) {
     headResponse = await runWasmHeadAttempt(wasmUrl, probe, probeStartedAt, attempt);
+
     if (headResponse !== null) {
       break; 
     }
@@ -219,6 +220,7 @@ async function verifyWasmPresence(wasmUrl: string): Promise<void> {
   }
 
   probe.totalDurationMs = Math.round(performance.now() - probeStartedAt);
+
   if (headResponse === null) {
     throwAllAttemptsFailed(wasmUrl, probe); 
   }
@@ -320,6 +322,7 @@ async function loadSqlJs(): Promise<SqlJs> {
   }
 
   const isManifestIssue = checksumOutcome.status === "manifest-missing" || checksumOutcome.status === "manifest-malformed";
+
   if (isManifestIssue) {
     console.warn(
       `[db-manager] WASM checksum sidecar unavailable (${summarizeChecksumOutcome(checksumOutcome)}); ` +

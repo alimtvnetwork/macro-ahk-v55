@@ -27,6 +27,7 @@ interface ChromeStorageLike {
 function getStorage(): ChromeStorageLike {
   const api = (globalThis as { chrome?: { storage?: { local?: ChromeStorageLike } } }).chrome;
   const local = api?.storage?.local;
+
   if (local === undefined) {
     throw new Error(
       "[recorder-session-storage] chrome.storage.local unavailable. " +
@@ -40,6 +41,7 @@ function getStorage(): ChromeStorageLike {
 /** Writes the session if Phase is non-Idle; clears the draft when Idle. */
 export async function persistSession(session: RecordingSession): Promise<void> {
   const storage = getStorage();
+
   if (session.Phase === "Idle") {
     await storage.remove(RECORDER_SESSION_STORAGE_KEY);
 
@@ -55,6 +57,7 @@ export async function loadSession(): Promise<RecordingSession | null> {
   const result = await storage.get(RECORDER_SESSION_STORAGE_KEY);
   const value = result[RECORDER_SESSION_STORAGE_KEY];
   const notRecordingSession = !isRecordingSession(value);
+
   if (notRecordingSession) {
     return null; 
   }

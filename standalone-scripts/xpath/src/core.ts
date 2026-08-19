@@ -34,6 +34,7 @@ export function getAllByXPath(xpath: string): Node[] {
     const nodes: Node[] = [];
     for (let i = 0; i < result.snapshotLength; i++) {
       const item = result.snapshotItem(i);
+
       if (item) {
         nodes.push(item);
       }

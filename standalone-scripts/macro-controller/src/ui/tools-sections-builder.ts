@@ -110,6 +110,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   jsTextbox.spellcheck = false;
   jsTextbox.onkeydown = function(e: KeyboardEvent) {
     const isCtrlEnter = e.ctrlKey && e.key === 'Enter';
+
     if (isCtrlEnter) {
       e.preventDefault();
       executeJs();
@@ -118,6 +119,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
     }
 
     const isSingleLine = (jsTextbox.value || '').indexOf('\n') === -1;
+
     if (e.key === 'ArrowUp' && isSingleLine) {
       e.preventDefault();
       navigateLoopJsHistory('up');
@@ -176,6 +178,7 @@ function _buildActivityLogSection(): HTMLElement {
   activityDownloadBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const logContent = activityContent.innerText || activityContent.textContent || '';
+
     if (!logContent || logContent.trim() === 'No activity logs yet') {
       showToast('No activity logs to download', 'warn');
 
@@ -237,6 +240,7 @@ function _buildJsLogsSection(): HTMLElement {
     e.stopPropagation();
     copyLogsToClipboard();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
+
     if (countEl) {
       countEl.textContent = 'Copied! (' + getAllLogs().length + ' entries)';
     }
@@ -267,6 +271,7 @@ function _buildJsLogsSection(): HTMLElement {
     e.stopPropagation();
     clearAllLogs();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
+
     if (countEl) {
       countEl.textContent = 'JS Logs (0 entries)';
     }
@@ -363,6 +368,7 @@ function _buildRecentErrorsSection(): HTMLElement {
     recentErrors.length = 0;
     _renderRecentErrorsList(errListContainer);
     const countEl = document.getElementById('loop-recent-errors-count');
+
     if (countEl) {
       countEl.textContent = '0 error(s)';
     }
@@ -382,6 +388,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   onRecentErrorsChange(function() {
     _renderRecentErrorsList(errListContainer);
     const countEl = document.getElementById('loop-recent-errors-count');
+
     if (countEl) {
       countEl.textContent = recentErrors.length + ' error(s)';
     }
@@ -395,6 +402,7 @@ function _buildRecentErrorsSection(): HTMLElement {
 // ============================================
 function _renderRequestDetail(detail: { method?: string; url?: string; status?: number }): string {
   let h = '<div style="font-size:9px;color:hsl(var(--muted-foreground));margin-top:1px;margin-left:12px;">';
+
   if (detail.method) {
     h += detail.method + ' '; 
   }
@@ -425,6 +433,7 @@ function _renderRecentErrorsList(container: HTMLElement): void {
     const icon = err.level === 'error' ? '❌' : '⚠️';
     html += '<div style="font-size:10px;font-family:monospace;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:' + color + ';">';
     html += '<span style="color:hsl(var(--muted-foreground));">[' + err.timestamp + ']</span> ' + icon + ' ' + _escHtml(err.message);
+
     if (err.requestDetail) {
       html += _renderRequestDetail(err.requestDetail); 
     }

@@ -47,6 +47,7 @@ interface DbShape {
 }
 function healthyRow(role: PromptRowRoleType, overrides: Partial<DbShape> = {}): DbShape {
   const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
+
   if (!seed) {
     throw new Error('seed row missing for role=' + role);
   }

@@ -100,6 +100,7 @@ function checkUrlOverlap(
       isUrlMatch(projectPattern, { pattern: scriptPattern, matchType: "glob" }),
     ),
   );
+
   if (hasUrlOverlap) {
     return null;
   }
@@ -119,6 +120,7 @@ function checkAlreadyAttached(
     (s) => s.path === script.id || s.path === script.name,
   );
   const isMissing = !isAlreadyAttached;
+
   if (isMissing) {
     return null;
   }
@@ -134,6 +136,7 @@ function checkRunContext(script: LibraryScriptForAttach): AttachDecision | null 
   const declaredWorld = script.instruction.World;
   const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
   const isMissing042 = !isIncompatibleWorld;
+
   if (isMissing042) {
     return null;
   }
@@ -151,6 +154,7 @@ function checkCookieBindings(
 ): AttachDecision | null {
   const requiredCookies = script.instruction.RequiredCookies ?? [];
   const missingCookie = requiredCookies.find((name) => !projectCookieNames.has(name));
+
   if (missingCookie === undefined) {
     return null;
   }
@@ -168,6 +172,7 @@ function checkDependencies(
 ): AttachDecision | null {
   const declaredDeps = script.instruction.Dependencies ?? [];
   const missingDep = declaredDeps.find((depId) => !libraryIds.has(depId));
+
   if (missingDep === undefined) {
     return null;
   }
@@ -186,11 +191,13 @@ function checkInjectionConditions(
   const cond = script.instruction.InjectionConditions;
   const hasCookieRequirement = cond !== undefined && cond.requireCookie != null;
   const isMissing043 = !hasCookieRequirement;
+
   if (isMissing043) {
     return null;
   }
 
   const cookieName = cond!.requireCookie as string;
+
   if (projectCookieNames.has(cookieName)) {
     return null;
   }
@@ -222,6 +229,7 @@ export function evaluateAutoAttach(
   ];
   for (const gate of gates) {
     const skip = gate();
+
     if (skip !== null) {
       return skip;
     }

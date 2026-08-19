@@ -61,6 +61,7 @@ export const statusRenderStats = statusRenderState.stats;
  */
 function _updateQueueStatusEl(): void {
   const queueStatusEl = document.getElementById('marco-queue-status');
+
   if (queueStatusEl) {
     import('../task-queue').then(m => {
       m.loadTaskQueue().then(queue => {
@@ -95,6 +96,7 @@ function _ensureStatusElements(el: HTMLElement): { statusLine: HTMLElement, prog
   let statusLine = document.getElementById('marco-status-line');
   let progressContainer = document.getElementById('marco-progress-container');
   let creditContainer = document.getElementById('marco-credit-container');
+
   if (!statusLine || !progressContainer || !creditContainer) {
     el.innerHTML = '';
     statusLine = document.createElement('div');
@@ -125,6 +127,7 @@ function _ensureStatusElements(el: HTMLElement): { statusLine: HTMLElement, prog
 
 export function updateStatus(): void {
   const el = document.getElementById(IDS.STATUS);
+
   if (!el) {
     return;
   }
@@ -188,11 +191,13 @@ export function updateQueueBadge(): void {
       const pending = queue.tasks.filter(t => t.status === 'pending').length;
       const isProcessing = TaskQueueManager.getInstance().isProcessing();
       const badge = document.getElementById('loop-queue-badge');
+
       if (badge) {
         if (pending > 0) {
           badge.textContent = String(pending);
           badge.style.display = 'block';
           badge.style.background = isProcessing ? COLOR_PRIMARY : 'hsl(var(--destructive))';
+
           if (isProcessing) {
             badge.style.animation = 'marco-pulse 2s infinite';
           } else {
@@ -212,6 +217,7 @@ function buildCreditBarsHtml(): string {
   }
 
   const cws = loopCreditState.currentWs;
+
   if (!cws) {
     return '';
   }
@@ -219,6 +225,7 @@ function buildCreditBarsHtml(): string {
   const summary = resolveCreditSummary(cws);
   const cacheKey = (loopCreditState.lastCheckedAt || 0) + '|'
     + (cws.name || '') + '|' + summary.source + '|' + summary.available + '|' + summary.total;
+
   if (window._creditBarCache && window._creditBarCache.key === cacheKey) {
     return window._creditBarCache.html;
   }
@@ -241,6 +248,7 @@ function buildCreditBarsHtml(): string {
   let _maxTc = 0;
   for (const _ws of _perWs) {
     const _mtc = Math.round(resolveCreditSummary(_ws).total);
+
     if (_mtc > _maxTc) {
       _maxTc = _mtc;
     }
@@ -267,6 +275,7 @@ function renderRunningStatus(statusLine: HTMLElement, progressContainer: HTMLEle
   for (const p of parts) {
     const span = document.createElement('span');
     span.textContent = p.text;
+
     if (p.color) {
       span.style.color = p.color;
     }
@@ -297,8 +306,10 @@ function buildDelegateText(): string {
 
 function buildRunningStatusParts(creditIcon: string, creditLabel: string, delegateText: string): Array<{ text: string; color?: string; bold?: boolean; id?: string }> {
   const parts: Array<{ text: string; color?: string; bold?: boolean; id?: string }> = [];
+
   if (state.workspaceName) {
     parts.push({ text: state.workspaceName, color: COLOR_WARNING, bold: true });
+
     if (state.workspaceJustChanged) {
       parts.push({ text: ' ⚡ WS Changed', color: COLOR_WARNING, bold: true });
     }
@@ -311,6 +322,7 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
   parts.push({ text: creditIcon + ' ' + creditLabel, color: COLOR_WARNING });
   parts.push({ text: ' | ' });
   parts.push({ text: state.countdown + 's', color: COLOR_WARNING, bold: true, id: 'marco-countdown-text' });
+
   if (delegateText) {
     const dColor = state.forceDirection ? COLOR_WARNING : COLOR_PRIMARY;
     parts.push({ text: delegateText, color: dColor, bold: !!state.forceDirection });
@@ -325,6 +337,7 @@ function renderProgressBar(progressContainer: HTMLElement): void {
   const pct = totalSec > 0 ? Math.max(0, Math.min(100, ((totalSec - state.countdown) / totalSec) * 100)) : 0;
   const barColor = pct > 80 ? 'hsl(var(--destructive))' : pct > 50 ? COLOR_WARNING : 'hsl(var(--success))';
   let barEl = document.getElementById('marco-progress-bar');
+
   if (!barEl) {
     progressContainer.innerHTML = '<div style="width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">'
       + '<div id="marco-progress-bar" style="width:0%;height:100%;border-radius:3px;transition:width 0.8s linear;"></div></div>';
@@ -357,6 +370,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
   stopIcon.style.color = 'hsl(var(--muted-foreground))';
   statusLine.appendChild(stopIcon);
   statusLine.appendChild(document.createTextNode(' Stopped | Cycles: ' + state.cycleCount));
+
   if (state.lastStatusCheck > 0) {
     const creditIconStop = state.hasFreeCredit ? '[Y]' : '[N]';
     const creditLabelStop = state.hasFreeCredit ? 'Free Credit' : 'No Credit';
@@ -367,6 +381,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
   }
 
   const hasWorkspaces = (loopCreditState.perWorkspace || []).length > 0;
+
   if (!wsName && !hasWorkspaces) {
     const hint = document.createElement('div');
     hint.style.cssText = 'margin-top:4px;font-size:' + tFontTiny + ';color:' + cWarning + ';';
@@ -405,6 +420,7 @@ function ensureRecordChildren(el: HTMLElement): { dot: HTMLSpanElement; label: T
 
 export function updateRecordIndicator(): void {
   const el = document.getElementById(IDS.RECORD_INDICATOR);
+
   if (!el) {
     return;
   }
@@ -412,6 +428,7 @@ export function updateRecordIndicator(): void {
   if (state.running) {
     el.style.display = 'flex';
     const { dot, label } = ensureRecordChildren(el);
+
     if (state.isDelegating) {
       if (state.forceDirection) {
         dot.style.background = COLOR_WARNING;

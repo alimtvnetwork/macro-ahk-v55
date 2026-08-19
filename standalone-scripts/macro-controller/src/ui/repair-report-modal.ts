@@ -85,6 +85,7 @@ export function buildRepairReport(result: AutoRepairResult): RepairReportSummary
     finalCount: result.finalReport.issues.length,
     checkedAt: result.finalReport.checkedAt,
   };
+
   if (result.reseedError) {
     summary.reseedError = result.reseedError;
   }
@@ -104,6 +105,7 @@ export function formatRepairReportText(report: RepairReportSummary): string {
     : '⚠️ Prompts still have issues after repair';
   lines.push(headline);
   lines.push('Initial issues: ' + report.initialCount + ' → after repair: ' + report.finalCount);
+
   if (report.reseedAttempted) {
     lines.push('Reseed attempted: ' + (report.reseedOk ? 'ok' : ('failed — ' + (report.reseedError ?? 'unknown'))));
   } else {
@@ -112,6 +114,7 @@ export function formatRepairReportText(report: RepairReportSummary): string {
 
   lines.push('');
   lines.push('✅ Fixed / restored (' + report.fixed.length + '):');
+
   if (report.fixed.length === 0) {
     lines.push('  (none)');
   } else {
@@ -122,6 +125,7 @@ export function formatRepairReportText(report: RepairReportSummary): string {
 
   lines.push('');
   lines.push('⚠️ Still broken (' + report.stillBroken.length + '):');
+
   if (report.stillBroken.length === 0) {
     lines.push('  (none)');
   } else {
@@ -151,6 +155,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
   }
 
   const text = formatRepairReportText(report);
+
   if (report.reseedAttempted && !report.reseedOk) {
     logDiagnosticFromCode('REPAIR_RESEED_E001', {
       initialCount: report.initialCount,
@@ -217,6 +222,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
 
   body.appendChild(renderIssueList('✅ Fixed / restored', report.fixed, cSuccess));
   body.appendChild(renderIssueList('⚠️ Still broken', report.stillBroken, 'hsl(var(--warning))'));
+
   if (report.newlyFlagged.length > 0) {
     body.appendChild(renderIssueList('➕ Newly flagged after repair', report.newlyFlagged, 'hsl(var(--destructive))'));
   }
@@ -281,6 +287,7 @@ function renderIssueList(heading: string, issues: PromptHealthIssue[], accent: s
   h.textContent = heading + ' (' + issues.length + ')';
   h.style.cssText = 'font-size:12px;font-weight:700;color:' + accent + ';margin-bottom:4px;';
   wrap.appendChild(h);
+
   if (issues.length === 0) {
     const none = document.createElement('div');
     none.textContent = '(none)';

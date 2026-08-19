@@ -58,6 +58,7 @@ let lastProjectId: string | null = null;
  */
 export function installSpaRouteGuard(): () => void {
   const alreadyInstalled = window.__marcoRouteGuardInstalled === true;
+
   if (alreadyInstalled) {
     return noopTeardown;
   }
@@ -135,6 +136,7 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
   invalidateProjectIdCache();
   const currentProjectId = extractProjectIdFromUrl();
   const isSame = currentProjectId === lastProjectId;
+
   if (isSame) {
     return;
   }

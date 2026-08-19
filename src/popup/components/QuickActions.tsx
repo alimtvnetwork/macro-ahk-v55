@@ -229,6 +229,7 @@ export function QuickActions({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
+
           if (file) {
             void handleImportFile(file);
             e.target.value = "";

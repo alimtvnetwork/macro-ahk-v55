@@ -101,6 +101,7 @@ export function enqueueCapture(payload: CapturePayload): void {
  */
 export async function flushNow(): Promise<void> {
   cancelTimer();
+
   if (state.flushing !== null) {
     await state.flushing;
   }

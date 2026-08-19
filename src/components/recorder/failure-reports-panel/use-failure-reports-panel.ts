@@ -76,6 +76,7 @@ interface ActionContext {
 
 function toggleInSet(prev: ReadonlySet<string>, key: string): Set<string> {
   const next = new Set(prev);
+
   if (next.has(key)) {
     next.delete(key); 
   } else {
@@ -87,6 +88,7 @@ function toggleInSet(prev: ReadonlySet<string>, key: string): Set<string> {
 
 function warnOrSuccess(filename: string, contents: string, okMessage: string, warnMessage: string): void {
   const validation = validateFailureReportPayload(contents);
+
   if (!validation.Valid) {
     toast.warning(warnMessage, { description: validation.Summary });
   } else {
@@ -153,6 +155,7 @@ function buildActions(context: ActionContext) {
 
 function handleExport(context: ActionContext): void {
   const picked = context.reports.filter((report, index) => context.state.selected.has(rowKey(report, index)));
+
   if (picked.length === 0) {
     toast.error("Select at least one failure to export");
 
@@ -168,6 +171,7 @@ function handleExport(context: ActionContext): void {
 
 function handleExportLast(context: ActionContext): void {
   const last = pickLastFailureReport(context.reports);
+
   if (last === null) {
     toast.error("No failures recorded yet");
 
@@ -182,6 +186,7 @@ function handleExportLast(context: ActionContext): void {
 
 async function handleCopyLast(context: ActionContext): Promise<void> {
   const last = pickLastFailureReport(context.reports);
+
   if (last === null) {
     toast.error("No failures recorded yet");
 
@@ -210,6 +215,7 @@ function handleExportByStep(context: ActionContext): void {
 
   const stepId = context.validPickedStep === STEP_OPTION_NULL ? null : Number(context.validPickedStep);
   const report = pickFailureReportByStepId(context.reports, stepId);
+
   if (report === null) {
     showMissingStepToast(stepId);
 

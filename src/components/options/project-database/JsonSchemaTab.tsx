@@ -224,6 +224,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((c) => c.TableName === t.TableName)
           .map((c) => {
             const col: Record<string, unknown> = { Name: c.Name, Type: c.Type };
+
             if (c.Description) {
               col.Description = c.Description;
             }
@@ -255,6 +256,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((r) => r.SourceTable === t.TableName)
           .map((r) => {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
+
             if (r.TargetColumn && r.TargetColumn !== "Id") {
               rel.TargetColumn = r.TargetColumn;
             }
@@ -267,11 +269,13 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           });
 
         const def: Record<string, unknown> = { TableName: t.TableName };
+
         if (t.Description) {
           def.Description = t.Description;
         }
 
         def.Columns = cols;
+
         if (rels.length > 0) {
           def.Relations = rels;
         }
@@ -331,6 +335,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((c) => c.TableName === t.TableName)
           .map((c) => {
             const col: Record<string, unknown> = { Name: c.Name, Type: c.Type };
+
             if (c.Description) {
               col.Description = c.Description;
             }
@@ -362,6 +367,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           .filter((r) => r.SourceTable === t.TableName)
           .map((r) => {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
+
             if (r.TargetColumn && r.TargetColumn !== "Id") {
               rel.TargetColumn = r.TargetColumn;
             }
@@ -374,11 +380,13 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           });
 
         const def: Record<string, unknown> = { TableName: t.TableName };
+
         if (t.Description) {
           def.Description = t.Description;
         }
 
         def.Columns = cols;
+
         if (rels.length > 0) {
           def.Relations = rels;
         }
@@ -409,6 +417,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
   const parseSchema = useCallback(() => {
     try {
       const parsed = JSON.parse(schemaJson);
+
       if (!parsed || !Array.isArray(parsed.tables)) {
         return { valid: false, error: "Root must have a 'tables' array" };
       }
@@ -456,6 +465,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           `Migration complete: ${result.result.tablesCreated} table(s), ${result.result.columnsAdded} column(s), ${result.result.relationsCreated} relation(s)`,
         );
         onMigrationComplete?.();
+
         if (autoGenDocs) {
           void handleGenerateDocs("both");
         }

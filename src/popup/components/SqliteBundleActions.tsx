@@ -73,6 +73,7 @@ export function SqliteBundleActions({
       const isConfirmed = confirm(
         "⚠️ Replace All will DELETE all existing projects, scripts, and configs before importing.\n\nThis is destructive and cannot be undone. Continue?",
       );
+
       if (!isConfirmed) {
         return;
       }
@@ -116,6 +117,7 @@ export function SqliteBundleActions({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
+
           if (file) {
             void handleFileChange(file);
             e.target.value = "";

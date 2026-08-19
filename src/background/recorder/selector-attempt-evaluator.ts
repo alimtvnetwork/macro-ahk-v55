@@ -195,6 +195,7 @@ function resolveRelativeAnchor(
   }
 
   const anchor = byId.get(selector.AnchorSelectorId);
+
   if (anchor === undefined) {
     throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set.`);
   }
@@ -210,6 +211,7 @@ function resolveOne(
 ): string {
   assertDepthAndCycle(selector, chain, depth);
   chain.push(selector.SelectorId);
+
   if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
     return resolveRelativeAnchor(selector, byId, chain, depth);
   }
@@ -219,6 +221,7 @@ function resolveOne(
 
 function joinRelative(anchor: string, relative: string): string {
   const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
+
   if (stripped.length === 0) {
     return anchor; 
   }

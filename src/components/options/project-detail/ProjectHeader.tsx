@@ -24,6 +24,7 @@ import { slugify, toCodeName } from "@/lib/slug-utils";
 
 function bumpPatch(v: string): string {
   const parts = v.split(".");
+
   if (parts.length === 3) {
     parts[2] = String(Number(parts[2] || 0) + 1);
 

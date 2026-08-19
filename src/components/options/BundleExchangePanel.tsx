@@ -170,6 +170,7 @@ function useImportDropzone(onImportFile: (file: File) => void | Promise<void>) {
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files?.[0];
+
     if (file === undefined) {
       return;
     }
@@ -183,6 +184,7 @@ function useImportDropzone(onImportFile: (file: File) => void | Promise<void>) {
 
   const handlePicked = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
+
     if (file !== undefined) {
       void onImportFile(file);
     }

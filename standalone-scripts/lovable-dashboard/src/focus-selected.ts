@@ -10,6 +10,7 @@ import type { WorkspaceDictionary } from "./types";
 export function focusSelectedWorkspace(dict: WorkspaceDictionary): void {
   try {
     const selected = getSelected(dict);
+
     if (selected) {
       scrollWorkspaceIntoView(selected.fullXPath);
 
@@ -24,6 +25,7 @@ export function focusSelectedWorkspace(dict: WorkspaceDictionary): void {
 
 function scrollWorkspaceIntoView(fullXPath: string): void {
   const el = resolveElement(fullXPath);
+
   if (el) {
     el.scrollIntoView({ block: "center", behavior: "smooth" });
   }

@@ -62,6 +62,7 @@ export async function handleRecorderCapturePersist(
     selectors: ReadonlyArray<PersistedSelector>;
 }> {
   const req = message as unknown as CaptureRequest;
+
   if (!req.payload || typeof req.payload.XPathFull !== "string") {
     throw new Error(
       "RECORDER_CAPTURE_PERSIST requires payload.XPathFull (string)",
@@ -87,6 +88,7 @@ export async function handleRecorderCapturePersistBatch(
     results: ReadonlyArray<PersistedCaptureResult>;
 }> {
   const req = message as unknown as CaptureBatchRequest;
+
   if (!Array.isArray(req.payloads) || req.payloads.length === 0) {
     throw new Error(
       "RECORDER_CAPTURE_PERSIST_BATCH requires payloads (non-empty array)",
@@ -127,9 +129,11 @@ async function persistOneCapture(
     
   // Type casting because CapturedAt is injected by content script but isn't typed in XPathCapturePayload
   const capturedAtStr = (payload as unknown as Record<string, unknown>).CapturedAt as string | undefined;
+
   if (capturedAtStr) {
     const capturedAtMs = new Date(capturedAtStr).getTime();
     const openedUrl = getRecentlyOpenedTabUrl(capturedAtMs);
+
     if (openedUrl) {
       finalPayload = {
         ...payload,
@@ -146,6 +150,7 @@ async function persistOneCapture(
   }
 
   let anchorSelectorId: number | null = null;
+
   if (finalPayload.XPathRelative !== null && finalPayload.AnchorXPath !== null) {
     const mgr = await initProjectDb(projectSlug);
     anchorSelectorId = findAnchorSelectorId(
@@ -170,6 +175,7 @@ async function resolveProjectSlug(override?: string): Promise<string> {
   }
 
   const session = await loadSession();
+
   if (session === null || session.Phase === "Idle") {
     throw new Error(
       "RECORDER_CAPTURE_PERSIST: no active recording session — start the recorder first",

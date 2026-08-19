@@ -57,6 +57,7 @@ const CHUNK_STACK_PATTERN = /\b(chunk-[a-z0-9]+|assets\/[a-z0-9-]+)\.(js|mjs|cjs
 function cleanStackTrace(raw: string): string {
   const lines = raw.split("\n");
   const useful = lines.filter((line) => !CHUNK_STACK_PATTERN.test(line));
+
   // If all lines were chunks, keep original first line for minimal context
   if (useful.length === 0 && lines.length > 0) {
     return lines[0];
@@ -113,6 +114,7 @@ function buildInjectionReport(
   // Errors section
   sections.push("");
   sections.push(`── INJECTION ERRORS (${errors.length}) ──────────────`);
+
   if (errors.length > 0) {
     sections.push(...errors.map(formatError));
   } else {
@@ -138,6 +140,7 @@ function buildInjectionReport(
 
   sections.push("");
   sections.push(`── PROMPT & INJECTION LOGS (${diagLogs.length}) ─────`);
+
   if (diagLogs.length > 0) {
     sections.push(...diagLogs.map(formatLog));
   } else {
@@ -147,6 +150,7 @@ function buildInjectionReport(
   // Post-injection verification
   sections.push("");
   sections.push("── POST-INJECTION VERIFICATION ───────────");
+
   if (verification) {
     const icon = (ok: boolean) => ok ? "✅" : "❌";
     sections.push(`  window.marco (SDK)           : ${icon(verification.marcoSdk)}`);
@@ -163,6 +167,7 @@ function buildInjectionReport(
   // Health details
   if (health && Array.isArray((health as { details?: string[] }).details)) {
     const details = (health as { details: string[] }).details;
+
     if (details.length > 0) {
       sections.push("");
       sections.push("── HEALTH DETAILS ────────────────────────");
@@ -173,6 +178,7 @@ function buildInjectionReport(
   // Extension status (version, boot step, persistence mode, etc.)
   sections.push("");
   sections.push("── EXTENSION STATUS ─────────────────────");
+
   if (status) {
     const { bootTimings, ...rest } = status as Record<string, unknown> & { bootTimings?: unknown };
     const keys = Object.entries(rest);
@@ -242,6 +248,7 @@ export function InjectionCopyButton() {
 
     const handleBroadcast = (message: unknown): void => {
       const msg = message as { type?: string; count?: number } | null;
+
       if (msg?.type === "ERROR_COUNT_CHANGED") {
         applyCount(msg.count ?? 0);
       }
@@ -284,6 +291,7 @@ export function InjectionCopyButton() {
     };
 
     void poll();
+
     if (!document.hidden) {
       startPoll();
     }
@@ -294,6 +302,7 @@ export function InjectionCopyButton() {
       cancelled = true;
       stopPoll();
       document.removeEventListener("visibilitychange", onVisChange);
+
       if (listenerAttached) {
         try {
  runtime!.onMessage!.removeListener(handleBroadcast); 
@@ -317,6 +326,7 @@ export function InjectionCopyButton() {
         // Fetch verification from active tab's injection record
         (async () => {
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
           if (!tab?.id) {
             return null;
           }

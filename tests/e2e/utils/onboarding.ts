@@ -47,6 +47,7 @@ export const ASSERT_TIMEOUT_MS = 15_000;
 export async function throwIfOnboardingErrorVisible(page: Page): Promise<void> {
   // Step-level boundary (rendered inside <OnboardingFlow />).
   const stepError = page.locator('[data-testid="onboarding-step-error"]').first();
+
   if ((await stepError.count()) > 0 && (await stepError.isVisible().catch(() => false))) {
     const failedStep = await stepError.getAttribute('data-onboarding-error-step');
     const message = await page
@@ -62,6 +63,7 @@ export async function throwIfOnboardingErrorVisible(page: Page): Promise<void> {
   // Page-level "stuck loading" gate (rendered by Options.tsx if the
   // useOnboarding() promise never resolves).
   const loadError = page.locator('[data-testid="onboarding-load-error"]').first();
+
   if ((await loadError.count()) > 0 && (await loadError.isVisible().catch(() => false))) {
     const message = await page
       .locator('[data-testid="onboarding-load-error-message"]')
@@ -144,6 +146,7 @@ export async function assertOnboardingA11yContract(
   await expect(cta, `CTA for "${expectedStep}" step must be a button with descriptive aria-label`)
     .toBeVisible({ timeout: ASSERT_TIMEOUT_MS });
   const ariaLabel = await cta.getAttribute('aria-label');
+
   if (!ariaLabel || ariaLabel.trim().length === 0) {
     throw new Error(`ARIA contract broken: CTA on "${expectedStep}" step is missing aria-label.`);
   }
@@ -260,6 +263,7 @@ export async function installStepHistoryRecorder(context: BrowserContext): Promi
     w.__marcoOnboardingHistory = [];
     window.addEventListener('marco:onboarding-step-change', (ev: Event) => {
       const detail = (ev as CustomEvent<{ from: string | null; to: string; index: number }>).detail;
+
       if (detail && typeof detail.to === 'string') {
         w.__marcoOnboardingHistory!.push({
           from: detail.from,

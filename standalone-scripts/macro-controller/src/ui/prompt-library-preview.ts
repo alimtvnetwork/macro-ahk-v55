@@ -10,6 +10,7 @@ import { logError } from "../error-utils";
 
 export function validateImportFile(file: File): { headline: string; hint: string } | null {
   const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
+
   if (!file || !(file instanceof File)) {
     return { headline: 'No file selected', hint: 'Please select a valid JSON file.' };
   }
@@ -28,6 +29,7 @@ export function validateImportFile(file: File): { headline: string; hint: string
   const type = (file.type || '').toLowerCase();
   const extOk = name.endsWith('.json');
   const typeOk = type === '' || type === 'application/json' || type === 'text/json' || type.endsWith('+json');
+
   if (!extOk || !typeOk) {
     return { headline: 'Unsupported file type', hint: 'Choose a .json file.' };
   }
@@ -142,6 +144,7 @@ async function doPreviewImport(
 ): Promise<void> {
   const text = await file.text();
   const parsed = parsePromptsText(text);
+
   if (parsed.errors.length > 0 && parsed.valid.length === 0) {
     const friendly = buildFriendlyImportError(parsed.errors, file.name);
     refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
@@ -154,6 +157,7 @@ async function doPreviewImport(
   const roleSel = refs.importRoleSelect?.value;
   const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
   const opts: Parameters<typeof previewPromptImport>[1] = {};
+
   if (roleFilter) {
     opts.roleFilter = roleFilter;
   }
@@ -184,11 +188,13 @@ export async function computeAndRenderPreview(
   handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: PreviewTriggerType) => Promise<void>,
 ): Promise<void> {
   const panel = refs.previewPanel;
+
   if (!panel) {
     return;
   }
 
   const invalid = validateImportFile(file);
+
   if (invalid) {
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);

@@ -21,6 +21,7 @@ export function shouldInject(): boolean {
   // Block preview iframe: id-preview--{uuid}.lovable.app
   // Auth cookies are unavailable here and DOM scraping returns false workspace names.
   const isPreviewIframe = currentHostname.indexOf('id-preview--') === 0 && currentHostname.indexOf('.lovable.app') !== -1;
+
   if (isPreviewIframe) {
     console.warn(
       '[MacroLoop] DOMAIN GUARD ABORT — Preview iframe detected\n' +

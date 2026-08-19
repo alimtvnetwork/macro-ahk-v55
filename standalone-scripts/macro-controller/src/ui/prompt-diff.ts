@@ -66,6 +66,7 @@ function walkLcsTable(table: number[][], a: readonly string[], b: readonly strin
 
     const up = (table[i - 1] as number[])[j] as number;
     const left = (table[i] as number[])[j - 1] as number;
+
     if (up >= left) {
       out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string });
       i -= 1; 
@@ -124,6 +125,7 @@ export function renderDiffPane(before: string, after: string): HTMLElement {
   const diff = diffLines(before, after);
   const stats = summarizeDiff(diff);
   pane.appendChild(buildDiffHeader(stats));
+
   if (stats.added === 0 && stats.removed === 0) {
     pane.appendChild(buildEmptyRow());
 

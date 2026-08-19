@@ -30,6 +30,7 @@ export function JsonTreeEditor({ value, onChange }: Props) {
   );
 
   const isInvalidRoot = !isValidRoot;
+
   if (isInvalidRoot) {
     return <InvalidRootMessage onReset={() => onChange("{}")} />;
   }

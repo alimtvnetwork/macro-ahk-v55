@@ -15,6 +15,7 @@ const SCHEME_HOST_RE = /^([a-z][a-z0-9+.-]*:\/\/)([^/?#]+)(.*)$/i;
 
 export function splitForCaseFold(url: string): { readonly Lead: string; readonly Tail: string } {
   const match = SCHEME_HOST_RE.exec(url);
+
   if (!match) {
     return { Lead: "", Tail: url };
   }
@@ -30,6 +31,7 @@ function stripTrailingSlash(s: string): string {
 
 function globTokenAt(pattern: string, i: number): { readonly Out: string; readonly Advance: number } {
   const ch = pattern[i];
+
   if (ch !== "*") {
     return { Out: ch.replace(/[.+?^${}()|[\]\\]/g, "\\$&"), Advance: 1 };
   }
@@ -74,6 +76,7 @@ function compilePrefix(pattern: string): CompileResult {
     Ok: true,
     Test: (url) => {
       const gotSplit = splitForCaseFold(url);
+
       if (wantSplit.Lead === "") {
         return url.startsWith(pattern);
       }
@@ -89,6 +92,7 @@ function compilePrefix(pattern: string): CompileResult {
 
 function compileGlob(pattern: string): CompileResult {
   const split = splitForCaseFold(pattern);
+
   if (split.Lead === "") {
     const re = globToRegex(pattern);
 

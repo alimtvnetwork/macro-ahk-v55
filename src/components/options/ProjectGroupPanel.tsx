@@ -102,6 +102,7 @@ function getProjectStorageChangeArea(): ProjectStorageChangeArea | undefined {
 
 async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
   const storage = getProjectStorageLocal();
+
   if (!storage) {
     return [];
   }
@@ -115,6 +116,7 @@ async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
 async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Record<string, unknown> | null> {
   try {
     const out = await storage.get("marco_projects");
+
     if (out && typeof out === "object") {
       return out;
     }
@@ -144,6 +146,7 @@ async function readProjectsViaMessage(): Promise<StoredProject[]> {
 
 async function loadProjectRosterSnapshot(): Promise<StoredProject[]> {
   const direct = await readProjectsDirectFromChromeStorage().catch(() => []);
+
   if (direct.length > 0) {
     return direct;
   }
@@ -185,6 +188,7 @@ async function loadRosterAfterDelay(
   }
 
   const projects = await loadProjectRosterSnapshot();
+
   if (isCancelled()) {
     return true;
   }
@@ -349,6 +353,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
       | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
+
     if (!runtime?.onMessage) {
       return;
     }
@@ -356,6 +361,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const listener = (message: unknown) => {
       const msg = message as { type?: string } | null;
+
       if (msg?.type !== "LIBRARY_CHANGED") {
         return;
       }
@@ -396,6 +402,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       }
 
       const next = changes.marco_projects?.newValue;
+
       if (Array.isArray(next)) {
         setAllProjects(next as StoredProject[]);
       }
@@ -495,6 +502,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
         type: "LIBRARY_CASCADE_GROUP_SETTINGS" as never,
         groupId: group.Id,
       } as never);
+
       if (result.cascadedCount > 0) {
         toast.success(`Settings pushed to ${result.cascadedCount} project(s)`);
       } else {
@@ -508,6 +516,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   }, [group.Id]);
 
   let parsedSettings: Record<string, unknown> | null = null;
+
   if (group.SharedSettingsJson) {
     try {
       parsedSettings = JSON.parse(group.SharedSettingsJson); 
@@ -630,6 +639,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
             if (e.dataTransfer.types.includes("application/x-marco-project-uuid")) {
               e.preventDefault();
               e.dataTransfer.dropEffect = "copy";
+
               if (!dropActive) {
                 setDropActive(true);
               }
@@ -640,6 +650,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
             e.preventDefault();
             setDropActive(false);
             const uuid = e.dataTransfer.getData("application/x-marco-project-uuid");
+
             if (uuid) {
               void addMemberById(uuid);
             }

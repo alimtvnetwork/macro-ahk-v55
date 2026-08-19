@@ -37,6 +37,7 @@ async function hydrate(): Promise<void> {
   try {
     const raw = await chrome.storage.local.get(STORAGE_KEY_SEEN_ORIGINS);
     const list = raw[STORAGE_KEY_SEEN_ORIGINS];
+
     if (Array.isArray(list)) {
       for (const o of list) {
         if (typeof o === "string" && o.length > 0) {
@@ -64,6 +65,7 @@ export async function preloadSeenOrigins(): Promise<void> {
 /** Sync, hot-path read. Requires preloadSeenOrigins() to have run. */
 export function isOriginSeen(url: string): boolean {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return true;
   } // unparseable → never show toast
@@ -74,11 +76,13 @@ export function isOriginSeen(url: string): boolean {
 /** Mark origin as seen (idempotent). Returns true if newly added. */
 export async function markOriginSeen(url: string): Promise<boolean> {
   const origin = safeOrigin(url);
+
   if (origin === "") {
     return false;
   }
 
   await hydrate();
+
   if (seen.has(origin)) {
     return false;
   }

@@ -19,6 +19,7 @@ vi.mock('../settings-store', () => ({
 
     return () => {
       const idx = settingsListeners.indexOf(fn);
+
       if (idx >= 0) {
         settingsListeners.splice(idx, 1);
       }

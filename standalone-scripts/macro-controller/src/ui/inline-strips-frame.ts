@@ -89,6 +89,7 @@ function applyHiddenState(hidden: boolean): void {
   const chevron = document.getElementById(FRAME_CHEVRON_ID);
   const remove = document.getElementById(FRAME_REMOVE_ID);
   const restore = document.getElementById(FRAME_RESTORE_ID);
+
   if (!frame || !body || !chevron || !remove || !restore) {
     return;
   }
@@ -199,6 +200,7 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   body: HTMLElement;
 } | null {
   const parent = formHost.parentElement;
+
   if (!parent) {
     log('InlineStripsFrame: form host has no parent — cannot mount frame', 'warn');
 
@@ -206,6 +208,7 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   }
 
   let frame = document.getElementById(FRAME_ID) as HTMLElement | null;
+
   if (frame && !parent.contains(frame)) {
     // Detached (SPA rerender) — reinsert at correct anchor.
     parent.insertBefore(frame, formHost);
@@ -218,11 +221,13 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
     subscribeInlineStripGroupCollapse(function (): void {
       applyInlineStripGroupCollapse();
       const chevron = document.getElementById(FRAME_CHEVRON_ID);
+
       if (chevron) {
         chevron.textContent = getInlineStripGroupCollapsed() ? '+' : '−';
       }
 
       const body = document.getElementById(FRAME_BODY_ID);
+
       if (body && frame && frame.dataset.hidden !== '1') {
         body.style.display = getInlineStripGroupCollapsed() ? 'none' : 'flex';
       }
@@ -231,6 +236,7 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   }
 
   const body = document.getElementById(FRAME_BODY_ID) as HTMLElement | null;
+
   if (!body) {
     log('InlineStripsFrame: body element missing after mount — DOM corrupted', 'error');
 

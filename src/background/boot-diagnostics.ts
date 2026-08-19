@@ -122,6 +122,7 @@ export function setBootStep(step: string): void {
   const isFirstStep = bootStep === "pre-init" && step === "pre-init";
 
   const isMissing = !isFirstStep;
+
   if (isMissing) {
     const durationMs = Math.round(now - stepStartTime);
     bootTimings.push({ step: bootStep, durationMs });
@@ -269,6 +270,7 @@ function parseBootErrorContext(message: string | null): BootErrorContext | null 
   }
 
   const migrationMatch = MIGRATION_TAG_RE.exec(message);
+
   if (migrationMatch !== null) {
     return {
       sql: extractSql(migrationMatch[3]),
@@ -279,6 +281,7 @@ function parseBootErrorContext(message: string | null): BootErrorContext | null 
   }
 
   const schemaMatch = SCHEMA_INIT_TAG_RE.exec(message);
+
   if (schemaMatch !== null) {
     return {
       sql: extractSql(schemaMatch[2]),
@@ -297,6 +300,7 @@ function parseBootErrorContext(message: string | null): BootErrorContext | null 
  */
 function extractSql(body: string): string | null {
   const sqlMatch = SQL_LINE_RE.exec(body);
+
   if (sqlMatch !== null) {
     return sqlMatch[1].trim();
   }

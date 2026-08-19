@@ -4,6 +4,7 @@ import { ProjectFile, FileNode } from "./types";
 function sortNodes(nodes: FileNode[]) {
   nodes.sort((a, b) => {
     const hasDifferentType = a.isDir !== b.isDir;
+
     if (hasDifferentType) {
       return a.isDir ? -1 : 1;
     }
@@ -32,6 +33,7 @@ function insertFileIntoTree(root: FileNode, file: ProjectFile) {
     }
     
     let dir = current.children.find((c) => c.isDir && c.name === part);
+
     if (!dir) {
       dir = { name: part, path, isDir: true, children: [] };
       current.children.push(dir);
@@ -56,11 +58,13 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
 export function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   const isJson = ext === "json";
+
   if (isJson) {
     return "json";
   }
   
   const isMarkdown = ["md", "markdown", "txt", "prompt"].includes(ext);
+
   if (isMarkdown) {
     return "markdown";
   }
@@ -102,11 +106,13 @@ export function buildDataUrl(base64: string, mimeType: string): string {
 
 export function formatSize(bytes: number): string {
   const isSmall = bytes < 1024;
+
   if (isSmall) {
     return `${bytes} B`;
   }
   
   const isMedium = bytes < 1024 * 1024;
+
   if (isMedium) {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }

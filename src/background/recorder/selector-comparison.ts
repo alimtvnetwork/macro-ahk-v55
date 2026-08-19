@@ -114,6 +114,7 @@ function evaluateOne(
 ): SelectorAttemptComparison {
   const base = buildAttemptBase(selector);
   const resolveOutcome = resolveExpression(selector, all);
+
   if (resolveOutcome.error !== null) {
     return failedAttempt(base, selector.Expression, resolveOutcome.error);
   }

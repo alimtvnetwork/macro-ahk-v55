@@ -69,11 +69,13 @@ export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean 
 
 export function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
   const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
+
   if (tier === WsTierValueType.FREE) {
     return false;
   }
 
   const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
+
   if (sub === 'canceled' || sub === 'cancelled') {
     return false;
   }

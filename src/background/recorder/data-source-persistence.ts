@@ -66,6 +66,7 @@ function readLatestRow(
   );
 
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     throw new Error(`DataSource row missing for "${filePath}" after insert`);
   }

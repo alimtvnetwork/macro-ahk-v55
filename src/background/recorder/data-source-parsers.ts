@@ -203,11 +203,13 @@ function runJsEvaluator(body: string): unknown {
 
 export function evaluateJsDataSource(body: string): ParsedDataSource {
   const result = runJsEvaluator(body);
+
   if (Array.isArray(result) === false) {
     throw new Error("JsDataSourceThrew: function must return an array of objects");
   }
 
   const rows = result as ReadonlyArray<unknown>;
+
   if (rows.length === 0) {
     throw new Error("JsDataSourceThrew: returned array is empty");
   }

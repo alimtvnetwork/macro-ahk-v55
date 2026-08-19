@@ -38,6 +38,7 @@ describe("Spec 19 §2.4, Appearance-Wait AC suite", () => {
     let sleepCalls = 0;
     const sleep = vi.fn(async (ms: number) => {
       sleepCalls++;
+
       if (sleepCalls === 1) {
         const element = document.createElement("div");
         element.id = "target";
@@ -123,6 +124,7 @@ describe("Spec 19 §2.4, Appearance-Wait AC suite", () => {
       { Doc: document },
     );
     expect(outcome.Ok).toBe(false);
+
     if (outcome.Ok === false) {
       // The unified primitive still surfaces a timeout, legacy callers
       // see the same "Timeout" reason they always have.
@@ -143,6 +145,7 @@ describe("Spec 19 §2.4, Appearance-Wait AC suite", () => {
       },
     });
     expect(result.Ok).toBe(false);
+
     if (result.Ok === false) {
       // The loop must evaluate at least twice (initial probe + retry).
       expect(result.Polls).toBeGreaterThanOrEqual(2);
@@ -156,6 +159,7 @@ describe("Spec 19 §2.4, Appearance-Wait AC suite", () => {
       { Doc: document, TimeoutMs: 100, PollMs: 10 },
     );
     expect(result.Ok).toBe(true);
+
     if (result.Ok) {
       expect(result.DurationMs).toBeGreaterThanOrEqual(0);
       expect(result.Polls).toBeGreaterThanOrEqual(1);

@@ -66,6 +66,7 @@ test.describe('E2E-23 — Multi-Tab State Synchronization', () => {
     // 7. Add step group in Tab 1
     console.log('Adding step group in Tab 1...');
     const firstGroupBtn = tab1.getByRole('button', { name: /create your first group/i });
+
     if (await firstGroupBtn.isVisible()) {
       await firstGroupBtn.click();
     } else {
@@ -92,6 +93,7 @@ async function navigateToSection(page: Page, sectionName: string) {
   // Wait for marker to be attached and NOT in 'loading' state
   await expect(async () => {
     const branch = await marker.getAttribute('data-branch');
+
     if (branch === 'loading' || branch === null) {
       throw new Error('Still loading or marker not found');
     }
@@ -101,6 +103,7 @@ async function navigateToSection(page: Page, sectionName: string) {
   let attempts = 0;
   while (attempts < 10) {
     const branch = await marker.getAttribute('data-branch');
+
     if (branch === 'ready') {
       break;
     }
@@ -113,6 +116,7 @@ async function navigateToSection(page: Page, sectionName: string) {
 
     console.log(`[Nav] Bypassing onboarding step ${attempts + 1} (current branch: ${branch})...`);
     const cta = page.locator('[data-onboarding-cta]');
+
     if (await cta.isVisible()) {
       await cta.click();
       // Wait a bit for the animation/transition

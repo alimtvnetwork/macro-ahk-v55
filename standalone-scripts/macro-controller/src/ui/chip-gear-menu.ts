@@ -263,6 +263,7 @@ function wrapAction(name: string, role: PromptRole, action: () => Promise<void> 
 
   try {
     const r = action();
+
     if (r && typeof (r as Promise<void>).catch === 'function') {
       (r as Promise<void>).catch((err: unknown) => {
         handleFailure('rejected', err); 
@@ -284,6 +285,7 @@ async function openLibraryModal(): Promise<void> {
     const mod: PromptLibraryModule = await import('./prompt-library-modal');
     // The module exports a single opener; fall back to any of the common names.
     const opener = mod.openPromptLibraryModal ?? mod.openPromptLibrary ?? mod.default;
+
     if (typeof opener !== 'function') {
       reportGearFailure(
         'PROMPT_IO_E001',
@@ -311,6 +313,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
       'Force reset will overwrite the "plan-default" and "next-default" prompt bodies with the shipped canonical text. '
       + 'Any edits you made to those two rows will be lost. Custom prompts you added are untouched.\n\nProceed?'
     );
+
     if (!ok) {
       return;
     }
@@ -318,6 +321,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
 
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
+
   if (result.ok === false) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
@@ -348,6 +352,7 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
   const { buildRepairReport, stashRepairReport, showRepairReportModal } = await import('./repair-report-modal');
   const report = buildRepairReport(result);
   stashRepairReport(report);
+
   if (!result.isHealthy) {
     const durationMs = Date.now() - startedAt;
     reportGearFailure(
@@ -373,6 +378,7 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
 
 async function editSpecific(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Edit which ' + roleLabel + ' prompt?', confirmLabel: 'Edit' });
+
   if (!picked) {
     return;
   }
@@ -382,6 +388,7 @@ async function editSpecific(role: PromptRole, roleLabel: string): Promise<void> 
 
 async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Set active ' + roleLabel + ' prompt', confirmLabel: 'Set active' });
+
   if (!picked) {
     return;
   }
@@ -393,6 +400,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   }
 
   const res = await setDefaultPromptForRole(picked.Id, role);
+
   if (res.ok === false) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
@@ -416,6 +424,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Delete which custom ' + roleLabel + ' prompt?', excludeDefault: true, confirmLabel: 'Delete' });
+
   if (!picked) {
     return;
   }
@@ -428,11 +437,13 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
     cancelLabel: 'Cancel',
     destructive: true,
   });
+
   if (!ok) {
     return;
   }
 
   const res = await deletePromptById(picked.Id);
+
   if (res.ok === false) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(

@@ -369,6 +369,7 @@ function LogEntryRow({
 function LogEntryDetails({ entry }: { readonly entry: WebhookDeliveryResult }) {
   let httpText: string;
   let httpClass = "font-mono";
+
   if (isWebhookSuccess(entry)) {
     httpText = `${entry.Status}`;
   } else if (isWebhookSkipped(entry)) {

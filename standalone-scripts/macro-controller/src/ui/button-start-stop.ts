@@ -28,6 +28,7 @@ export function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): 
   
   startStopBtn.onclick = function() {
     const isRunning = state.running;
+
     if (isRunning) {
       deps.stopLoop();
 

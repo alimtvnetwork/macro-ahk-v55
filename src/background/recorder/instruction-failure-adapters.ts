@@ -100,6 +100,7 @@ function serializeUrlTabClickDetail(f: UrlTabClickFailure): string {
     `TimeoutMs=${f.TimeoutMs}`,
     `DurationMs=${f.DurationMs}`,
   ];
+
   if (f.ObservedUrl !== undefined) {
     parts.push(`ObservedUrl=${f.ObservedUrl}`);
   }

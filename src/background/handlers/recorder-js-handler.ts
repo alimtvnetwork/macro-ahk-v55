@@ -50,6 +50,7 @@ export async function handleRecorderJsSnippetUpsert(
   message: MessageRequest,
 ): Promise<{ isOk: true; snippet: JsSnippetRow }> {
   const req = message as unknown as UpsertRequest;
+
   if (!req.projectSlug || !req.draft) {
     throw new Error(
       "RECORDER_JS_SNIPPET_UPSERT requires projectSlug and draft",
@@ -65,6 +66,7 @@ export async function handleRecorderJsSnippetList(
   message: MessageRequest,
 ): Promise<{ snippets: ReadonlyArray<JsSnippetRow> }> {
   const req = message as unknown as ListRequest;
+
   if (!req.projectSlug) {
     throw new Error("RECORDER_JS_SNIPPET_LIST requires projectSlug");
   }
@@ -78,6 +80,7 @@ export async function handleRecorderJsSnippetDelete(
   message: MessageRequest,
 ): Promise<{ isOk: true }> {
   const req = message as unknown as DeleteRequest;
+
   if (!req.projectSlug || typeof req.jsSnippetId !== "number") {
     throw new Error(
       "RECORDER_JS_SNIPPET_DELETE requires projectSlug and jsSnippetId",
@@ -93,6 +96,7 @@ export async function handleRecorderJsStepDryRun(
   message: MessageRequest,
 ): Promise<{ isOk: true; result: JsInlineResult }> {
   const req = message as unknown as DryRunRequest;
+
   if (typeof req.body !== "string" || !req.context) {
     throw new Error(
       "RECORDER_JS_STEP_DRYRUN requires body and context",

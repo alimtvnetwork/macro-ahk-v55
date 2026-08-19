@@ -58,6 +58,7 @@ describe("timeline reducer", () => {
     expect(s1.Entries.length).toBe(1);
     const e = s1.Entries[0];
     expect(e.Kind).toBe("EventStart");
+
     if (e.Kind === "EventStart") {
       expect(e.AtMs).toBe(120);
       expect(e.Keyword).toBe("go");
@@ -70,6 +71,7 @@ describe("timeline reducer", () => {
     const s0 = startTimeline(2_000);
     const s1 = recordEventStart(s0, ev("a"), 0, 1, 1_500);
     const e = s1.Entries[0];
+
     if (e.Kind === "EventStart") {
       expect(e.AtMs).toBe(0); 
     }
@@ -82,6 +84,7 @@ describe("timeline reducer", () => {
     expect(s2.Entries.length).toBe(2);
     const a = s2.Entries[0];
     const b = s2.Entries[1];
+
     if (a.Kind === "Step") {
       expect(a.LabelType).toBe("Key Ctrl+Enter"); 
     }
@@ -99,6 +102,7 @@ describe("timeline reducer", () => {
     expect(s.Entries.length).toBe(2);
     const end = s.Entries[0];
     const chain = s.Entries[1];
+
     if (end.Kind === "EventEnd") {
       expect(end.Completed).toBe(true); 
     }
@@ -131,6 +135,7 @@ describe("timeline reducer", () => {
     expect(s.Entries.length).toBe(MAX_TIMELINE_ENTRIES);
     const first = s.Entries[0];
     const last = s.Entries[s.Entries.length - 1];
+
     if (first.Kind === "Step") {
       expect(first.StepIndex).toBe(25); 
     }

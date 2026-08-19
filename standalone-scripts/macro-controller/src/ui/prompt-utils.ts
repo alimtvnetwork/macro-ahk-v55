@@ -51,6 +51,7 @@ export function normalizePromptEntries(entries: Partial<PromptEntry & { order?: 
       }
 
       const entry: PromptEntry = { name, text };
+
       if (raw.id) {
         entry.id = raw.id; 
       }
@@ -109,6 +110,7 @@ function buildExpandedEntry(
   const slugBase = raw.slugTemplate || raw.slug || expandedName.toLowerCase().replace(/\s+/g, '-');
   const expandedSlug = substituteKey(slugBase, key, value);
   const entry: PromptEntry = { name: expandedName, text: expandedText, slug: expandedSlug };
+
   if (raw.id) {
     entry.id = substituteKey(String(raw.id), key, value) + '-' + value; 
   }
@@ -128,6 +130,7 @@ function buildExpandedEntry(
   // Bridge fields per spec/30-next-button-reference/01-spec.md §1: let future
   // chip-row UI collapse expanded variants back into their parent group.
   entry.parentTitle = name;
+
   if (raw.slug) {
     entry.parentSlug = raw.slug; 
   }
@@ -184,8 +187,10 @@ export function parseWithRecovery(content: string): unknown {
     logError('parseWithRecovery', 'JSON parse failed, attempting recovery', e);
     const trimmed = String(content || '').trim();
     const lastBrace = trimmed.lastIndexOf('}');
+
     if (lastBrace > 0) {
       let repaired = trimmed.substring(0, lastBrace + 1);
+
       if (trimmed.charAt(0) === '[') {
         repaired += ']';
       }
@@ -206,6 +211,7 @@ export function parseWithRecovery(content: string): unknown {
 
 function _getOrCreateToastContainer(): HTMLElement {
   let container = document.getElementById(DomIdType.ToastStack);
+
   if (!container) {
     container = document.createElement('div');
     container.id = DomIdType.ToastStack;
@@ -223,6 +229,7 @@ export function showPasteToast(message: string, isError: boolean): void {
   // Enforce max stack — remove oldest if at limit
   while (container.children.length >= TOAST_MAX_STACK) {
     const oldest = container.lastElementChild;
+
     if (oldest) {
       oldest.remove();
     }
@@ -375,6 +382,7 @@ function _buildCountdown(durationMs: number): {
     tickId = setInterval(function() {
       const remaining = Math.max(0, durationMs - (Date.now() - startedAt.t));
       label.textContent = Math.ceil(remaining / 1000) + 's';
+
       if (remaining <= 0 && tickId !== null) {
         clearInterval(tickId);
         tickId = null;
@@ -420,6 +428,7 @@ function _wireUndoAction(
     try {
       const result = onUndo();
       const isPromise = result !== undefined && result !== null && typeof (result as Promise<void>).then === 'function';
+
       if (isPromise) {
         (result as Promise<void>).catch(function(err) {
           logError('showUndoToast', 'onUndo threw', err);
@@ -448,6 +457,7 @@ export function showUndoToast(
   const container = _getOrCreateToastContainer();
   while (container.children.length >= TOAST_MAX_STACK) {
     const oldest = container.lastElementChild;
+
     if (oldest) {
       oldest.remove();
     }
@@ -501,8 +511,10 @@ export function showUndoToast(
 // ── Find editor paste target via XPath/CSS selectors ──
 export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null): Element | null {
   let el: Element | null = null;
+
   if (promptsCfg.pasteTargetXPath) {
     el = getByXPath(promptsCfg.pasteTargetXPath);
+
     if (el) {
       return el;
     }
@@ -510,6 +522,7 @@ export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: stri
 
   if (promptsCfg.pasteTargetSelector) {
     el = document.querySelector(promptsCfg.pasteTargetSelector);
+
     if (el) {
       return el;
     }
@@ -539,6 +552,7 @@ function pasteIntoTextarea(target: HTMLElement, text: string): void {
   const newVal = currentVal + (currentVal.length > 0 ? '\n' : '') + text;
   const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value') ||
                      Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+
   if (nativeSetter?.set) {
     nativeSetter.set.call(target, newVal);
   } else {
@@ -553,6 +567,7 @@ function pasteIntoTextarea(target: HTMLElement, text: string): void {
 function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   // Move cursor to end
   const sel = window.getSelection();
+
   if (sel) {
     const range = document.createRange();
     range.selectNodeContents(target);
@@ -566,6 +581,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   const fullText = prefix + text;
 
   const execResult = document.execCommand('insertText', false, fullText);
+
   if (execResult) {
     target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: fullText }));
 
@@ -612,6 +628,7 @@ export async function resolveDynamicVariables(text: string): Promise<string | nu
 
   // Show input modal
   const values = await showVariableInputModal(uniqueVars);
+
   if (!values) {
     return null;
   } // User cancelled
@@ -701,6 +718,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     // Focus first input
     const firstVar = vars[0];
+
     if (firstVar) {
       inputs[firstVar].focus();
     }
@@ -727,6 +745,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
 
   // 2. Handle dynamic variables
   const resolved = await resolveDynamicVariables(text);
+
   if (resolved === null) {
     return 'cancelled';
   }
@@ -757,6 +776,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
       pasteIntoTextarea(target, text);
     } else {
       const ok = pasteIntoContentEditable(target, text);
+
       if (!ok) {
         return 'failed';
       }
@@ -797,6 +817,7 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
 
     timer = window.setTimeout(async () => {
       const projectId = extractProjectIdFromUrl();
+
       if (!projectId) {
         return;
       }
@@ -815,6 +836,7 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
   setInterval(() => {
     const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
     const capturedTarget = target as HTMLElement & { __captured?: boolean };
+
     if (capturedTarget && !capturedTarget.__captured) {
       capturedTarget.__captured = true;
       const isInput = target && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT');
@@ -822,6 +844,7 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
       
       target?.addEventListener(eventType, () => {
         const text = isInput ? (target as HTMLInputElement).value : target?.textContent || '';
+
         if (text.trim().length > 2) {
           throttleSave(text.trim());
         }
@@ -836,6 +859,7 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
  */
 export async function visualSyncConfirm(): Promise<void> {
   const dot = document.querySelector('#marco-queue-status span[style*="color"]');
+
   if (dot) {
     const origColor = (dot as HTMLElement).style.color;
     (dot as HTMLElement).style.color = 'hsl(var(--accent))'; // light blue sync color

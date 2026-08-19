@@ -81,11 +81,13 @@ import { CssFragmentType } from '../types';
 
 function focusCurrentWorkspaceInList(): void {
   const listEl = document.getElementById('loop-ws-list');
+
   if (!listEl) {
     return;
   }
 
   const currentName = state.workspaceName;
+
   if (!currentName) {
     log('Credits: no current workspace name to focus', 'warn');
 
@@ -93,6 +95,7 @@ function focusCurrentWorkspaceInList(): void {
   }
 
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
+
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
     (currentItem as HTMLElement).style.outline = '2px solid hsl(var(--warning))';
@@ -463,9 +466,11 @@ function handlePromptsButtonClick(
   e.stopPropagation();
   const isOpen = promptsDropdown.style.display !== 'none';
   promptsDropdown.style.display = isOpen ? 'none' : 'block';
+
   if (!isOpen) {
     positionPromptsDropdown(promptsBtn, promptsDropdown);
     loadTaskNextSettings(taskNextDeps);
+
     if (isPromptsCached()) {
       renderPromptsDropdown(promptCtx, taskNextDeps);
     } else {
@@ -496,12 +501,14 @@ function attachPromptsDropdownBehavior(
     const target = ev.target as Node | null;
     const insideDropdown = target !== null && promptsDropdown.contains(target);
     const onButton = target !== null && promptsBtn.contains(target);
+
     if (insideDropdown || onButton) {
       return; 
     }
 
     promptsDropdown.style.display = 'none';
     const sub = document.querySelector('[data-task-next-sub]') as HTMLElement | null;
+
     if (sub) {
       sub.style.display = 'none'; 
     }
@@ -518,6 +525,7 @@ function attachPromptsDropdownBehavior(
   // causing layout thrash that prevents scrolling past the initial viewport.
   const onScrollReflow = function(ev: Event): void {
     const tgt = ev.target as Node | null;
+
     if (tgt !== null && (tgt === promptsDropdown || (tgt instanceof Node && promptsDropdown.contains(tgt)))) {
       return;
     }
@@ -565,12 +573,14 @@ function positionPromptsDropdown(triggerBtn: HTMLElement, dropdown: HTMLElement)
   // finally clamp into viewport with safe gutter.
   let left = Math.round(btnRect.left);
   const overflowsRight = left + dropWidth + DROPDOWN_SAFE_GUTTER > vw;
+
   if (overflowsRight) {
     left = Math.round(btnRect.right - dropWidth);
   }
 
   const minLeft = DROPDOWN_SAFE_GUTTER;
   const maxLeft = Math.max(minLeft, vw - dropWidth - DROPDOWN_SAFE_GUTTER);
+
   if (left < minLeft) {
     left = minLeft; 
   }

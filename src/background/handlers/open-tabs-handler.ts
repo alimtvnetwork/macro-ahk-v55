@@ -187,6 +187,7 @@ function resolveProjectBinding(
     probePayload !== null &&
     typeof probePayload.projectId === "string" &&
     probePayload.projectId !== "";
+
   if (isProjectIdAbsent && isValidProjectProbe) {
     projectId = probePayload.projectId;
     bindingSource = "probe";
@@ -213,6 +214,7 @@ function resolveMatchedRule(args: {
     injectionMatchedRuleId: string | null;
 }): MatchedRuleInfo | null {
   const { url, projectId, project, injectionMatchedRuleId } = args;
+
   if (project === null || projectId === null) {
     return null;
   }
@@ -265,11 +267,13 @@ async function probeTabWorkspace(tabId: number | null): Promise<ProbeResult> {
 
   try {
     const response: unknown = await chrome.tabs.sendMessage(tabId, { type: "PROBE_DETECTED_WORKSPACE" });
+
     if (response === undefined || response === null) {
       return emitProbeFailure(tabId, "EmptyResponse", "relay returned no payload (controller may be loading)");
     }
 
     const r = response as { isOk: boolean; payload?: ProbePayload | null; errorMessage?: string };
+
     if (r.ok === false) {
       return emitProbeFailure(tabId, "ProbeFailed", r.errorMessage ?? "probe failed (no errorMessage from controller)");
     }
@@ -299,6 +303,7 @@ function emitProbeFailure(
   reasonDetail: string,
 ): ProbeResult {
   const tagged = `${BgLogTag.OPEN_TABS} probe failure Reason=${reason} ReasonDetail="${reasonDetail}" tabId=${tabId ?? "null"}`;
+
   if (reason === "NoReceiver") {
     // Expected when the controller has not yet been injected — keep noise low.
     console.debug(tagged);

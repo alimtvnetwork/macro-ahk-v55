@@ -28,11 +28,13 @@ function readOverride(flag: FeatureFlagNameType): boolean | null {
   }
 
   const sdk = (window as unknown as { marco?: FlagBridge }).marco;
+
   if (!sdk || !sdk.featureFlags) {
     return null;
   }
 
   const override = sdk.featureFlags[flag];
+
   if (override === true || override === false) {
     return override;
   }
@@ -42,6 +44,7 @@ function readOverride(flag: FeatureFlagNameType): boolean | null {
 
 export function isFeatureFlagEnabled(flag: FeatureFlagNameType): boolean {
   const override = readOverride(flag);
+
   if (override !== null) {
     return override;
   }
@@ -58,6 +61,7 @@ export function setFeatureFlagOverrideForTests(flag: FeatureFlagNameType, value:
   const root = window as unknown as { marco?: FlagBridge };
   const sdk = root.marco ?? {};
   const flags = sdk.featureFlags ?? {};
+
   if (value === null) {
     delete flags[flag];
   } else {

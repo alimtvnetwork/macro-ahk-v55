@@ -79,6 +79,7 @@ function assertStructuredPayload(
   expect(typeof payload.timestamp).toBe('string');
   expect(payload.context).toBeDefined();
   expect(payload.context?.slug).toBe('plan-default');
+
   if (expected.contextMasked) {
     expect(payload.context?.bearer).toBe('[REDACTED]');
     expect(payload.context?.authorization).toBe('[REDACTED]');

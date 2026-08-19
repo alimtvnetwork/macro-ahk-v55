@@ -59,14 +59,17 @@ export interface WsDropdownResult {
 /** Scroll to and highlight the current workspace item in the list. */
 function scrollToCurrentItem(setLoopWsNavIndex: (v: number) => void, label: string): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
+
   if (!listEl) {
     return;
   }
 
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
+
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
     const idx = parseInt(currentItem.getAttribute('data-ws-idx') || '', 10);
+
     if (!isNaN(idx)) {
       setLoopWsNavIndex(idx);
     }
@@ -188,6 +191,7 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
     e.stopPropagation();
     const perWs = loopCreditState.perWorkspace || [];
     const allChecked = Object.keys(getLoopWsCheckedIds()).length >= perWs.length && perWs.length > 0;
+
     if (allChecked) {
       setLoopWsCheckedIds({});
     } else {
@@ -250,6 +254,7 @@ function _buildUndoBtn(
   wsUndoBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
+
     if (getRenameHistory().length === 0) {
       log('[Rename] Nothing to undo', 'warn');
 
@@ -305,11 +310,13 @@ function _buildWsSearchInput(
 
   wsSearchInput.onkeydown = function(e: KeyboardEvent) {
     const listEl = document.getElementById(DomIdType.LoopWsList);
+
     if (!listEl) {
       return;
     }
 
     const items = listEl.querySelectorAll('.loop-ws-item');
+
     if (items.length === 0) {
       return;
     }

@@ -275,6 +275,7 @@ function buildCreditSortHeader(): HTMLElement {
 function syncVisualState(activeMode: CreditSortModeType): void {
   for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
     const el = document.getElementById(id);
+
     if (!el) {
       continue;
     }
@@ -282,6 +283,7 @@ function syncVisualState(activeMode: CreditSortModeType): void {
     const isActive = mode === activeMode;
     el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
     const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
+
     if (chip) {
       chip.textContent = isActive ? '◉' : '○';
     }
@@ -424,6 +426,7 @@ popover!.style.display = 'none';
       }
 
       const isOpen = popover!.style.display !== 'none';
+
       if (isOpen) {
         close();
 
@@ -433,6 +436,7 @@ popover!.style.display = 'none';
       popover!.style.display = 'block';
       outsideHandler = function (ev: MouseEvent) {
         const target = ev.target as Node | null;
+
         if (popover && target && !popover.contains(target) && target !== btn) {
           close();
         }

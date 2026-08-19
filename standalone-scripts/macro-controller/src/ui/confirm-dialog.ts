@@ -81,6 +81,7 @@ export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
 
     const cleanup = (result: boolean): void => {
       document.removeEventListener('keydown', onKey, true);
+
       if (overlay.parentNode) {
         overlay.parentNode.removeChild(overlay);
       }

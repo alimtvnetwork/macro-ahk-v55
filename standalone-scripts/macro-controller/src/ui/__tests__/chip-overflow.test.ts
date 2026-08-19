@@ -50,6 +50,7 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
       }
 
       const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]');
+
       if (wrap && wrap.style.display !== 'none') {
         w += OVERFLOW_W;
       }

@@ -26,6 +26,7 @@ const SENTINEL_ID = "marco-css-sentinel";
 /** Ensures the `dark` class is on <html> at all times. */
 function enforceDarkClass() {
   const root = document.documentElement;
+
   if (!root.classList.contains("dark")) {
     root.classList.add("dark");
   }

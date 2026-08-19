@@ -99,11 +99,13 @@ function hydrate(): void {
     }
 
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return;
     }
 
     const o = JSON.parse(raw) as Partial<SplitterState>;
+
     if (typeof o.bigText === 'string') {
       state.bigText = o.bigText;
     }
@@ -176,6 +178,7 @@ function findPromptBySlug(slug: string): PromptEntry | null {
 function resolvePerStepPrompt(): PromptEntry | null {
   if (state.perStepPromptSlug) {
     const p = findPromptBySlug(state.perStepPromptSlug);
+
     if (p) {
       return p;
     }
@@ -190,6 +193,7 @@ function resolvePerStepPrompt(): PromptEntry | null {
 
 function resolvePerStepPromptText(): string | null {
   const per = resolvePerStepPrompt();
+
   if (!per || !per.text) {
     return null;
   }
@@ -271,6 +275,7 @@ function trySubmitButton(TAG: string): boolean {
 
 function dispatchSubmit(): boolean {
   const TAG = 'Splitter';
+
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
     log('TaskSplitter: submit aborted — document/body not available', 'warn');
@@ -279,6 +284,7 @@ function dispatchSubmit(): boolean {
   }
 
   const form = getChatForm(TAG);
+
   if (trySubmitForm(TAG, form)) {
     return true;
   }
@@ -296,6 +302,7 @@ async function pasteAndSubmit(text: string): Promise<boolean> {
   try {
     const promptsConfig = getPromptsConfig();
     const outcome = await pasteIntoEditor(text, promptsConfig, (xp) => getByXPath(xp) as Element | null);
+
     if (String(outcome) === 'failed') {
       log('TaskSplitter: pasteIntoEditor returned failed', 'warn');
 
@@ -323,6 +330,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
+
     if (!processing) {
       return;
     }
@@ -336,6 +344,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 function readEditorText(): string {
   try {
     const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
+
     if (!target) {
       return '';
     }
@@ -360,6 +369,7 @@ async function breakIntoSteps(): Promise<void> {
   }
 
   const text = readEditorText().trim();
+
   if (!text) {
     showPasteToast('❌ Task Splitter: type your instruction in the Lovable chat box first', true);
 
@@ -383,6 +393,7 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   const prompt = getSplitterPrompt({ rawInstruction: text, n: expectedN });
   log('TaskSplitter: sending split JSON prompt (' + prompt.length + ' chars, n=' + expectedN + ')', 'info');
   const ok = await pasteAndSubmit(prompt);
+
   if (!ok) {
     showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
@@ -393,6 +404,7 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   const idle = await waitForLovableIdle({ isCancelled: function () {
     return state.cancelled; 
   } });
+
   if (idle !== 'idle') {
     showPasteToast('❌ Task Splitter: idle wait ' + idle, true);
 
@@ -407,6 +419,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     const rawReply = readLatestSplitterReply(document);
     const subtasks = parseSplitterSubtasks(rawReply, expectedN);
     const overrides = getSettingsOverrides();
+
     if (overrides.splitterAutoEnqueue === false) {
       log('TaskSplitter: auto-enqueue disabled — parsed ' + subtasks.length + ' subtasks, skipped enqueue', 'info');
       showPasteToast('ℹ Task Splitter: parsed ' + subtasks.length + ' (auto-enqueue off)', false);
@@ -443,6 +456,7 @@ function reportSplitterParseFailure(caught: CaughtError, expectedN: number): voi
 
 async function sendOneStep(): Promise<boolean> {
   const perText = resolvePerStepPromptText();
+
   if (!perText) {
     logError('TaskSplitter', 'per-step prompt not found (slug="' + state.perStepPromptSlug + '" / auto next-${N}-steps)');
     showPasteToast('❌ Task Splitter: per-step prompt not found', true);
@@ -451,6 +465,7 @@ async function sendOneStep(): Promise<boolean> {
   }
 
   const ok = await pasteAndSubmit(perText);
+
   if (!ok) {
     showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
@@ -486,6 +501,7 @@ async function runAuto(): Promise<void> {
   try {
     while (state.completed < state.stepCount && !state.cancelled) {
       const ok = await sendOneStep();
+
       if (!ok) {
         break;
       }
@@ -496,6 +512,7 @@ async function runAuto(): Promise<void> {
 
       // Wait for Lovable to finish, then fixed delay
       await waitForCompletion(MAX_WAIT_MS);
+
       if (state.cancelled) {
         break;
       }
@@ -517,6 +534,7 @@ async function runAuto(): Promise<void> {
     state.cancelled = false;
     state.phaseDeadlineAt = 0;
     notify();
+
     if (cancelled) {
       showPasteToast('⏹ Task Splitter: stopped at ' + done + '/' + total, false);
     } else if (done >= total) {
@@ -586,6 +604,7 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
   const seenParents = new Set<string>();
   for (const e of entries) {
     const slug = e.slug || '';
+
     if (!slug) {
       continue;
     }
@@ -597,6 +616,7 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
       : (e.name || slug);
     o.textContent = label;
     sel.appendChild(o);
+
     if (e.parentSlug) {
       seenParents.add(e.parentSlug);
     }
@@ -762,6 +782,7 @@ function buildControl(): HTMLElement {
     dSel.value = String(state.delaySec);
     breakBtn.disabled = state.running;
     nextBtn.disabled = state.running;
+
     if (state.running) {
       autoBtn.textContent = '⏹ Stop';
       const remain = Math.max(0, Math.ceil((state.phaseDeadlineAt - Date.now()) / 1000));
@@ -806,6 +827,7 @@ export function buildTaskSplitterPanelSection(): HTMLElement {
  */
 export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   const n = clamp(stepCount, STEP_MIN, STEP_MAX);
+
   if (n !== state.stepCount) {
     state.stepCount = n;
     persist();
@@ -823,6 +845,7 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   try {
     const prompt = await resolvePlanPromptDbFirst(n);
     const ok = await pasteAndSubmit(prompt);
+
     if (ok) {
       showPasteToast('✂ Split: sent "PlanTierType ' + n + '"', false);
     } else {
@@ -854,6 +877,7 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
+
     if (result.ok === false || !result.value || result.value.Body.length === 0) {
       return null;
     }
@@ -873,6 +897,7 @@ function resolveRawPlanTemplate(entries: PlanPromptEntry[], n: number, source: P
   for (const entry of entries) {
     const isPlanTemplate = (entry.slug || '').toLowerCase() === 'plan-steps';
     const hasTemplate = entry.text.indexOf('${') >= 0 || entry.text.indexOf('{{') >= 0;
+
     if (isPlanTemplate && hasTemplate) {
       const key = entry.replaceKey || REPLACE_KEY_DEFAULT;
       logPlanSource(n, source, detail + ', replaceKey=' + key);
@@ -903,6 +928,7 @@ function resolveSlugPlanVariant(entries: PlanPromptEntry[], n: number): string |
   for (const entry of entries) {
     const isSlugMatch = (entry.slug || '').toLowerCase() === wantSlug;
     const isNameMatch = (entry.name || '').toLowerCase() === 'plan ' + n;
+
     if (isSlugMatch || isNameMatch) {
       const key = entry.replaceKey || REPLACE_KEY_DEFAULT;
       logPlanSource(n, 'slug-variant', 'expanded slug/name match for N=' + n);
@@ -918,28 +944,33 @@ function resolvePlanPrompt(n: number): string | null {
   const rawCfg = (window.__MARCO_CONFIG__ || {}).prompts || {};
   const rawWindowEntries = (rawCfg.entries || rawCfg.prompts || []) as PlanPromptEntry[];
   const fromWindow = resolveRawPlanTemplate(rawWindowEntries, n, 'window-config', '__MARCO_CONFIG__.prompts raw entry');
+
   if (fromWindow) {
     return fromWindow;
   }
 
   const preambleEntries = (window.__MARCO_PROMPTS__ || []) as PlanPromptEntry[];
   const fromPreamble = resolveRawPlanTemplate(preambleEntries, n, 'preamble-prompts', '__MARCO_PROMPTS__ raw entry');
+
   if (fromPreamble) {
     return fromPreamble;
   }
 
   const fromDefaults = resolveRawPlanTemplate(DEFAULT_PROMPTS, n, 'default-prompts', 'DEFAULT_PROMPTS raw entry');
+
   if (fromDefaults) {
     return fromDefaults;
   }
 
   const entries = (getPromptsConfig().entries || []) as PlanPromptEntry[];
   const fromParent = resolveExpandedPlanVariant(entries, n);
+
   if (fromParent) {
     return fromParent;
   }
 
   const fromSlug = resolveSlugPlanVariant(entries, n);
+
   if (fromSlug) {
     return fromSlug;
   }
@@ -951,11 +982,13 @@ function resolvePlanPrompt(n: number): string | null {
 
 async function resolvePlanPromptDbFirst(n: number): Promise<string> {
   const dbBody = await resolvePlanPromptFromDb(n);
+
   if (dbBody) {
     return dbBody;
   }
 
   const libraryBody = resolvePlanPrompt(n);
+
   if (libraryBody) {
     return libraryBody;
   }
@@ -976,6 +1009,7 @@ export function isSplitterRunning(): boolean {
  */
 export async function triggerPlanPasteFromInline(stepCount: number): Promise<void> {
   const n = clamp(stepCount, 2, 200);
+
   if (state.running) {
     showPasteToast('⏸ Task Splitter is already running', true);
 
@@ -990,6 +1024,7 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
   try {
     const promptsCfg = getPromptsConfig();
     const outcome = await pasteIntoEditor(combined, promptsCfg, (xp) => getByXPath(xp) as Element | null);
+
     if (String(outcome) === 'failed') {
       showPasteToast('❌ PlanTierType: paste failed', true);
 

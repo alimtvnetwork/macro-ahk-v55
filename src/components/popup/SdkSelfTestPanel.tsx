@@ -57,12 +57,14 @@ function formatRelative(iso: string): string {
   }
 
   const then = Date.parse(iso);
+
   if (Number.isNaN(then)) {
     return "—";
   }
 
   const diffMs = Date.now() - then;
   const sec = Math.round(diffMs / 1000);
+
   if (sec < 5) {
     return "just now";
   }
@@ -72,11 +74,13 @@ function formatRelative(iso: string): string {
   }
 
   const min = Math.round(sec / 60);
+
   if (min < 60) {
     return `${min}m ago`;
   }
 
   const hr = Math.round(min / 60);
+
   if (hr < 24) {
     return `${hr}h ago`;
   }
@@ -92,6 +96,7 @@ function formatAbsolute(iso: string): string {
   }
 
   const d = new Date(iso);
+
   if (Number.isNaN(d.getTime())) {
     return "—";
   }

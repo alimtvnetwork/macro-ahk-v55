@@ -15,6 +15,7 @@ const OVERLAY_ID = "marco-banner-hider-debug";
 
 function ensureOverlay(): HTMLElement {
   const existing = document.getElementById(OVERLAY_ID);
+
   if (existing !== null) {
     return existing;
   }
@@ -48,6 +49,7 @@ export function renderDebugOverlay(match: BannerDebugMatch | null): void {
   }
 
   const element = ensureOverlay();
+
   if (match === null) {
     element.textContent = "BannerHider: no match yet";
 
@@ -67,6 +69,7 @@ export function renderDebugOverlay(match: BannerDebugMatch | null): void {
 
 export function hideDebugOverlay(): void {
   const existing = document.getElementById(OVERLAY_ID);
+
   if (existing !== null) {
     existing.remove();
   }

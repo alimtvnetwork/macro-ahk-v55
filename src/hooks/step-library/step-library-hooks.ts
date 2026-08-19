@@ -127,6 +127,7 @@ async function runBootstrapSequence(
   }
 
   const readResult = await deps.readBytesFromStorage();
+
   if (isCancelled()) {
     return;
   }
@@ -138,6 +139,7 @@ async function runBootstrapSequence(
   }
 
   const opened = await deps.openLibraryAndMaybeSeed(sqljs, readResult);
+
   if (isCancelled()) {
     return;
   }
@@ -252,11 +254,13 @@ export interface LibraryMutations {
 
 function moveWithinArray(ids: readonly number[], id: number, direction: DirectionType): readonly number[] | null {
   const idx = ids.indexOf(id);
+
   if (idx === -1) {
     return null;
   }
 
   const swapWith = direction === "up" ? idx - 1 : idx + 1;
+
   if (swapWith < 0 || swapWith >= ids.length) {
     return null;
   }
@@ -352,6 +356,7 @@ function useGroupOrdering(deps: MutationDeps, after: () => void) {
 
     const all = deps.lib.listGroups(deps.project.ProjectId);
     const target = all.find((g) => g.StepGroupId === id);
+
     if (target === undefined) {
       return;
     }
@@ -362,6 +367,7 @@ function useGroupOrdering(deps: MutationDeps, after: () => void) {
       .sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name))
       .map((g) => g.StepGroupId);
     const next = moveWithinArray(siblings, id, direction);
+
     if (next === null) {
       return;
     }
@@ -427,12 +433,14 @@ function useStepOrdering(deps: MutationDeps, after: () => void) {
     }
 
     const owningGroupId = findOwningGroupId(deps.stepsByGroup, stepId);
+
     if (owningGroupId === null) {
       return;
     }
 
     const ordered = (deps.stepsByGroup.get(owningGroupId) ?? []).map((s) => s.StepId);
     const next = moveWithinArray(ordered, stepId, direction);
+
     if (next === null) {
       return;
     }

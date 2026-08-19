@@ -259,6 +259,7 @@ function buildClearButton(state: State): HTMLButtonElement {
   btn.addEventListener(Events.CLICK, (e) => {
     e.stopPropagation();
     state.template = "";
+
     if (state.templateInput !== null) {
       state.templateInput.value = ""; 
     }
@@ -296,6 +297,7 @@ function handleColumnClick(state: State, col: string): void {
   }
 
   const token = `{{${col}}}`;
+
   if (state.pinned) {
     insertTokenIntoTemplate(state, token);
     refreshPreview(state);
@@ -361,6 +363,7 @@ function refreshPreview(state: State): void {
   }
 
   renderPreviewTags(state, extractReferencedColumns(state.template));
+
   if (state.bindBtn !== null) {
     state.bindBtn.disabled = state.template === "";
   }
@@ -383,6 +386,7 @@ function commitTemplate(state: State): void {
   emitBinding(state, state.template);
   state.pinned = false;
   state.template = "";
+
   if (state.templateInput !== null) {
     state.templateInput.value = ""; 
   }
@@ -399,6 +403,7 @@ function emitBinding(state: State, tpl: string): void {
   const cols = extractReferencedColumns(tpl);
   const primary = cols[0] ?? "";
   let previewValue: string | null = null;
+
   if (state.options.SampleRow !== undefined) {
     try {
       previewValue = resolveFieldReferences(tpl, state.options.SampleRow); 
@@ -446,6 +451,7 @@ function hide(state: State): void {
   state.hovered = null;
   state.outline.dataset.open = "false";
   state.popover.dataset.open = "false";
+
   if (state.composer !== null) {
     state.composer.dataset.open = "false"; 
   }
@@ -461,6 +467,7 @@ function onMove(state: State, e: MouseEvent): void {
   }
 
   const t = e.target;
+
   if (isOurNode(state, t)) {
     return; 
   }
@@ -472,6 +479,7 @@ function onMove(state: State, e: MouseEvent): void {
   }
 
   const candidate = t.closest(BINDABLE_SELECTOR);
+
   if (candidate instanceof HTMLElement) {
     show(state, candidate); 
   } else {
@@ -481,6 +489,7 @@ function onMove(state: State, e: MouseEvent): void {
 
 function onClick(state: State, e: MouseEvent): void {
   const t = e.target;
+
   if (isOurNode(state, t)) {
     return; 
   }
@@ -490,6 +499,7 @@ function onClick(state: State, e: MouseEvent): void {
   }
 
   const candidate = t.closest(BINDABLE_SELECTOR);
+
   if (candidate instanceof HTMLElement) {
     e.preventDefault();
     state.pinned = true;
@@ -501,6 +511,7 @@ function onClick(state: State, e: MouseEvent): void {
   
   state.pinned = false;
   state.template = "";
+
   if (state.templateInput !== null) {
     state.templateInput.value = ""; 
   }

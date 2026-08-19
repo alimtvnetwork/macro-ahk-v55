@@ -47,6 +47,7 @@ function schemaResp(
 /** Validate a single table definition. */
 function validateSingleTable(t: NonNullable<JsonSchema['tables']>[number], logEl: HTMLElement): number {
   let issues = 0;
+
   if (!t.name || !/^[A-Z][A-Za-z0-9]+$/.test(t.name)) {
     appendLog(logEl, 'err', `Table "${t.name || '?'}": name must be PascalCase`);
     issues++;
@@ -88,6 +89,7 @@ function validateTables(tables: JsonSchema['tables'], logEl: HTMLElement): numbe
 /** Validate migration definitions, returning the number of issues found. */
 function validateMigrations(migrations: JsonSchema['migrations'], logEl: HTMLElement): number {
   let issues = 0;
+
   if (!migrations) {
     return 0;
   }
@@ -156,6 +158,7 @@ export function validateSchema(raw: string, logEl: HTMLElement): JsonSchema | nu
 // eslint-disable-next-line max-lines-per-function
 export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElement): void {
   const schema = validateSchema(raw, logEl);
+
   if (!schema) {
     return;
   }

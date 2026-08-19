@@ -77,6 +77,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
 async function seedCrossProjectSyncState(context: BrowserContext): Promise<void> {
   let [serviceWorker] = context.serviceWorkers();
+
   if (!serviceWorker) {
     serviceWorker = await context.waitForEvent('serviceworker', { timeout: 30_000 });
   }
@@ -91,6 +92,7 @@ async function seedCrossProjectSyncState(context: BrowserContext): Promise<void>
 
       return Boolean(c?.storage?.local);
     });
+
     if (ready) {
       break;
     }
@@ -175,6 +177,7 @@ async function dragProjectIntoMembers(page: Page, projectId: string): Promise<vo
   await page.evaluate((sourceId) => {
     const source = document.querySelector(`[data-testid="${sourceId}"]`);
     const target = document.querySelector('[data-testid="project-group-member-drop-target"]');
+
     if (!source || !target) {
       throw new Error(`CODE RED: Cross-Project Sync drag failed. Path: tests/e2e/e2e-24-cross-project-sync.spec.ts. Missing: ${!source ? sourceId : 'project-group-member-drop-target'}. Reason: drag source/drop target not rendered.`);
     }
@@ -190,6 +193,7 @@ async function readGroupMembers(page: Page, groupName: string): Promise<string[]
   return await page.evaluate(async (name) => {
     const groupsResponse = await chrome.runtime.sendMessage({ type: 'LIBRARY_GET_GROUPS' });
     const group = groupsResponse.groups.find((candidate: { Name: string }) => candidate.Name === name);
+
     if (!group) {
       return [];
     }

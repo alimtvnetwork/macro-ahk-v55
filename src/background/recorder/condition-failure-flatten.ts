@@ -53,6 +53,7 @@ export function flattenConditionSelectors(c: Condition): FlattenedSelectors {
   function collectLeaf(p: Predicate): void {
     all.push(p.Selector);
     const kind = resolveSelectorKind(p.SelectorKind ?? "Auto", p.Selector);
+
     if (kind === "XPath") {
       xpath.push(p.Selector);
     }

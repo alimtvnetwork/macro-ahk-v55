@@ -52,6 +52,7 @@ export async function enrichProOneWorkspaces(perWs: WorkspaceCredit[]): Promise<
     }
 
     const row = await readCreditBalanceCache(ws.id);
+
     if (!row) {
       logSub('[ProOne] cache miss ws=' + ws.id + ' (' + (ws.fullName || ws.name) + ')', 2);
       continue;

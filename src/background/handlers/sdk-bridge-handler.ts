@@ -45,6 +45,7 @@ export async function handleSdkAuthGetToken(): Promise<string | null> {
 /** AUTH_GET_SOURCE — returns the source that resolved the current auth token. */
 export async function handleSdkAuthGetSource(): Promise<string> {
   const result = await handleGetToken();
+
   if (!result.token) {
     return "none";
   }
@@ -62,12 +63,14 @@ export async function handleSdkAuthRefresh(): Promise<string | null> {
 /** AUTH_IS_EXPIRED — checks if the current token appears expired. */
 export async function handleSdkAuthIsExpired(): Promise<{ isExpired: boolean }> {
   const result = await handleGetToken();
+
   if (!result.token) {
     return { isExpired: true };
   }
 
   try {
     const payload = JSON.parse(atob(result.token.split('.')[1]));
+
     if (payload && payload.exp) {
       return { isExpired: payload.exp * 1000 < Date.now() };
     }
@@ -81,6 +84,7 @@ export async function handleSdkAuthIsExpired(): Promise<{ isExpired: boolean }> 
 /** AUTH_GET_JWT — returns the parsed JWT payload. */
 export async function handleSdkAuthGetJwt(): Promise<{ jwtPayload: Record<string, unknown> | null }> {
   const result = await handleGetToken();
+
   if (!result.token) {
     return { jwtPayload: null };
   }
@@ -121,6 +125,7 @@ export async function handleSdkCookiesGetAll(
   const { url, domain } = payload as MessageRequest & { url?: string; domain?: string };
   try {
     const details: chrome.cookies.GetAllDetails = {};
+
     if (url) {
       details.url = url;
     }
@@ -162,6 +167,7 @@ export async function handleSdkConfigSet(
   payload: MessageRequest,
 ): Promise<{ isOk: boolean }> {
   const { key, value } = payload as MessageRequest & { key: string; value: JsonValue };
+
   if (!key) {
     return { isOk: false };
   }

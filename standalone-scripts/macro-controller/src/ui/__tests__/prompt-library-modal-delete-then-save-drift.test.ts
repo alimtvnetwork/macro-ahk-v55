@@ -60,6 +60,7 @@ function findRow(slug: string): HTMLElement | null {
 
 function clickButton(scope: ParentNode, label: string): void {
   const btn = Array.from(scope.querySelectorAll('button')).find((b) => b.textContent === label);
+
   if (!btn) {
     throw new Error('button not found: ' + label);
   }

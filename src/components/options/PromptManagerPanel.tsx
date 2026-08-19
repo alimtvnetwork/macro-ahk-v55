@@ -400,6 +400,7 @@ export function PromptManagerPanel() {
 
   const handleMoveUp = async (id: string) => {
     const index = prompts.findIndex((prompt) => prompt.id === id);
+
     if (index <= 0) {
       return;
     }
@@ -417,6 +418,7 @@ export function PromptManagerPanel() {
 
   const handleMoveDown = async (id: string) => {
     const index = prompts.findIndex((prompt) => prompt.id === id);
+
     if (index < 0 || index >= prompts.length - 1) {
       return;
     }
@@ -446,6 +448,7 @@ export function PromptManagerPanel() {
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) {
       return;
     }
@@ -487,6 +490,7 @@ export function PromptManagerPanel() {
         for (const entry of entries) {
           const name = typeof entry?.name === "string" ? entry.name.trim() : "";
           const text = typeof entry?.text === "string" ? entry.text : "";
+
           if (!name || !text) {
             continue;
           }
@@ -666,6 +670,7 @@ export function PromptManagerPanel() {
             e.preventDefault();
             setDragOver(false);
             const files = Array.from(e.dataTransfer.files);
+
             if (files.length > 0) {
               void handleFileDrop(files);
             }

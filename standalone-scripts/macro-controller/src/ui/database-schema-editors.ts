@@ -192,6 +192,7 @@ function buildValidationTypeSelector(
     option.value = validationType;
     option.textContent = validationType;
     const isSelected = validationType === validation.type;
+
     if (isSelected) {
       option.selected = true;
     }
@@ -340,6 +341,7 @@ function renderFkTableSelector(
     option.value = table.name;
     option.textContent = table.name;
     const isSelected = table.name === foreignKey.table;
+
     if (isSelected) {
       option.selected = true;
     }
@@ -387,6 +389,7 @@ function addCascadeSelect(
     option.value = cascadeOption;
     option.textContent = cascadeOption;
     const isSelected = cascadeOption === currentValue;
+
     if (isSelected) {
       option.selected = true;
     }

@@ -63,9 +63,11 @@ export function CopyLogButton({ entry, className, size = "sm" }: CopyLogButtonPr
   const handleCopy = useCallback(async () => {
     const text = formatWebhookDeliveryLog(entry);
     const ok = await writeToClipboard(text);
+
     if (ok) {
       setCopied(true);
       toast.success("Webhook log copied");
+
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }

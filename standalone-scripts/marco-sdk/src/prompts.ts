@@ -99,6 +99,7 @@ function openIdb(): Promise<IDBDatabase> {
       const req = indexedDB.open(IDB_NAME, IDB_VERSION);
       req.onupgradeneeded = () => {
         const db = req.result;
+
         if (!db.objectStoreNames.contains(IDB_STORE)) {
           db.createObjectStore(IDB_STORE, { keyPath: "id" });
         }
@@ -123,6 +124,7 @@ function readCache(): Promise<CacheRecord | null> {
           const req = store.get(IDB_KEY);
           req.onsuccess = () => {
             const record = req.result as CacheRecord | undefined;
+
             if (record?.schemaVersion !== CACHE_SCHEMA_VERSION) {
               resolve(null);
 
@@ -211,6 +213,7 @@ function normalize(raw: Array<Partial<PromptEntry>>): PromptEntry[] {
   for (const p of raw) {
     const name = typeof p.name === "string" ? p.name : "";
     const text = typeof p.text === "string" ? p.text : "";
+
     if (name && text) {
       out.push({
         id: p.id,
@@ -247,6 +250,7 @@ async function fetchFromBridge(): Promise<PromptEntry[]> {
     try {
       const resp = await sendMessage<{ prompts?: Array<Partial<PromptEntry>> }>("GET_PROMPTS");
       const entries = normalize(resp?.prompts ?? []);
+
       if (entries.length > 0) {
         return entries;
       }
@@ -280,6 +284,7 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
   if (xpath) {
     try {
       const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+
       if (result.singleNodeValue instanceof HTMLElement) {
         return result.singleNodeValue;
       }
@@ -291,6 +296,7 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
   // Try selector
   if (selector) {
     const found = document.querySelector<HTMLElement>(selector);
+
     if (found) {
       return found;
     }
@@ -305,6 +311,7 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
   ];
   for (const sel of fallbacks) {
     const found = document.querySelector<HTMLElement>(sel);
+
     if (found) {
       return found;
     }
@@ -323,6 +330,7 @@ function injectText(text: string, target: HTMLElement): boolean {
     const nativeSetter =
             Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value") ??
             Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value");
+
     if (nativeSetter?.set) {
       nativeSetter.set.call(target, newVal);
     } else {
@@ -337,6 +345,7 @@ function injectText(text: string, target: HTMLElement): boolean {
 
   // Contenteditable
   const sel = window.getSelection();
+
   if (sel) {
     const range = document.createRange();
     range.selectNodeContents(target);
@@ -350,6 +359,7 @@ function injectText(text: string, target: HTMLElement): boolean {
   const fullText = prefix + text;
 
   const execOk = document.execCommand("insertText", false, fullText);
+
   if (!execOk) {
     const dt = new DataTransfer();
     dt.setData("text/plain", fullText);
@@ -358,6 +368,7 @@ function injectText(text: string, target: HTMLElement): boolean {
       bubbles: true,
       cancelable: true,
     });
+
     if (!target.dispatchEvent(pasteEvent)) {
       return false;
     }
@@ -387,6 +398,7 @@ async function getAllCached(): Promise<PromptEntry[]> {
     try {
       // 2. IndexedDB cache
       const cached = await readCache();
+
       if (cached && cached.entries.length > 0) {
         memoryCache = cached.entries;
         // Background revalidation (fire-and-forget)
@@ -397,6 +409,7 @@ async function getAllCached(): Promise<PromptEntry[]> {
 
       // 3. Extension bridge with retry
       const bridgePrompts = await fetchFromBridge();
+
       if (bridgePrompts.length > 0) {
         memoryCache = bridgePrompts;
         await writeCache(bridgePrompts);
@@ -416,11 +429,13 @@ async function getAllCached(): Promise<PromptEntry[]> {
 async function backgroundRevalidate(cachedHash: string): Promise<void> {
   try {
     const fresh = await fetchFromBridge();
+
     if (fresh.length === 0) {
       return;
     }
 
     const freshHash = computeHash(fresh);
+
     if (freshHash === cachedHash) {
       return;
     }
@@ -469,6 +484,7 @@ export function createPromptsApi(): PromptsApi {
         options?.pasteTargetXPath ?? DEFAULT_PASTE_XPATH,
         options?.pasteTargetSelector,
       );
+
       if (!target) {
         // Fallback: copy to clipboard
         navigator.clipboard.writeText(text).catch((e) => {

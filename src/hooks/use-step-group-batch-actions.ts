@@ -106,6 +106,7 @@ export function buildDeletePreview(
   const rows: BatchDeleteRow[] = [];
   for (const id of selectedIds) {
     const g = byId.get(id);
+
     if (g === undefined) {
       continue;
     }

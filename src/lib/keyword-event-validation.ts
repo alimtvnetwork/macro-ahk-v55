@@ -54,6 +54,7 @@ const NAMED_KEYS: ReadonlySet<string> = new Set([
 
 function isKnownKey(token: string): boolean {
   const t = token.trim();
+
   if (t === "") {
     return false; 
   }
@@ -86,16 +87,19 @@ export type ComboInvalidReason =
  */
 export function validateCombo(raw: string): ComboValidation {
   const trimmed = raw.trim();
+
   if (trimmed === "") {
     return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
   }
 
   const tokens = trimmed.split("+").map(t => t.trim()).filter(t => t !== "");
+
   if (tokens.length === 0) {
     return { Valid: false, Reason: "Empty", Message: "Key combo cannot be empty." };
   }
 
   const nonModifier = tokens.filter(t => !MODIFIER_TOKENS.has(t.toLowerCase()));
+
   if (nonModifier.length === 0) {
     return {
       Valid: false,
@@ -113,6 +117,7 @@ export function validateCombo(raw: string): ComboValidation {
   }
 
   const key = nonModifier[0];
+
   if (!isKnownKey(key)) {
     return {
       Valid: false,
@@ -143,11 +148,13 @@ const MAX_WAIT_MS = 600_000; // 10 minutes — generous upper bound
  */
 export function validateWait(raw: string): WaitValidation {
   const trimmed = raw.trim();
+
   if (trimmed === "") {
     return { Valid: false, Reason: "Empty", Message: "Wait duration is required." };
   }
 
   const n = Number(trimmed);
+
   if (Number.isNaN(n)) {
     return { Valid: false, Reason: "NotANumber", Message: "Wait duration must be a number." };
   }
@@ -191,12 +198,14 @@ export function validateEventSteps(event: KeywordEvent): readonly StepIssue[] {
   event.Steps.forEach((step, index) => {
     if (step.Kind === "Key") {
       const v = validateCombo(step.Combo);
+
       if (!v.Valid) {
         issues.push({ StepId: step.Id, Index: index, Kind: "Key", Message: v.Message });
       }
     } else {
       // Wait steps are stored as numbers — re-run the same checks.
       const ms = step.DurationMs;
+
       if (typeof ms !== "number" || Number.isNaN(ms)) {
         issues.push({ StepId: step.Id, Index: index, Kind: "Wait", Message: "Wait duration must be a number." });
       } else if (!Number.isFinite(ms)) {

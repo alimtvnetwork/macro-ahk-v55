@@ -70,6 +70,7 @@ export function buildPresetRow(
     const opt = document.createElement('option');
     opt.value = name;
     opt.textContent = name;
+
     if (name === activePresetName) {
       opt.selected = true; 
     }
@@ -86,6 +87,7 @@ export function buildPresetRow(
   select.onchange = function () {
     if (select.value === '__new__') {
       onNew();
+
       // Reset to previous selection if new was cancelled
       if (select.value === '__new__') {
         select.value = activePresetName;
@@ -147,6 +149,7 @@ export function formatEta(ms: number): string {
   }
 
   const secs = Math.ceil(ms / 1000);
+
   if (secs < 60) {
     return secs + 's';
   }
@@ -168,6 +171,7 @@ export function buildInputRow(
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
   let checkbox: HTMLInputElement | null = null;
+
   if (withCheckbox) {
     checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -249,6 +253,7 @@ export function buildTokenRow(): HTMLElement {
 
       resolveToken();
       const lbl = document.getElementById('rename-auth-label');
+
       if (lbl) {
         lbl.textContent = 'Auth: ' + getLastTokenSource();
       }

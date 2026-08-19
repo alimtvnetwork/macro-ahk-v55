@@ -89,6 +89,7 @@ export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
 
   try {
     const before = assertState(banner, "before-check", null);
+
     if (before !== null) {
       failures.push(before);
     }
@@ -97,18 +98,21 @@ export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
     hider.check();
 
     const fading = assertState(banner, "after-check", BannerStateType.Fading);
+
     if (fading !== null) {
       failures.push(fading);
     }
 
     await wait(FADING_WAIT_MS);
     const hiding = assertState(banner, "post-microtask", BannerStateType.Hiding);
+
     if (hiding !== null) {
       failures.push(hiding);
     }
 
     await wait(DONE_WAIT_MS);
     const done = assertState(banner, "post-delay", BannerStateType.Done);
+
     if (done !== null) {
       failures.push(done);
     }

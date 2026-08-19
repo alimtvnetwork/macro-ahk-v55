@@ -39,6 +39,7 @@ const SUFFIX_REGEX = /^(.*?)([-_ ]?)([Vv])(\d+)$/;
 export function parseName(name: string): ParsedName {
   const trimmed = name.trim();
   const match = SUFFIX_REGEX.exec(trimmed);
+
   if (!match) {
     return { base: trimmed, separator: '', vLetter: '', current: 1 };
   }
@@ -102,6 +103,7 @@ export function resolveNextName(
   while (existingNames.has(candidate.toLowerCase())) {
     candidateNum += 1;
     collisions += 1;
+
     if (collisions > config.maxCollisionIncrements) {
       throwDiagnostic('REMIX_RESOLVE_E002', {
         currentName,

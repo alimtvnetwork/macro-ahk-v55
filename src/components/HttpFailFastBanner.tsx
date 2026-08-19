@@ -13,6 +13,7 @@ function useHeffLatestDetail(): [HttpFailFastEventDetail | null, (next: HttpFail
   useEffect(() => {
     const onEvent = (evt: Event): void => {
       const ce = evt as CustomEvent<HttpFailFastEventDetail>;
+
       if (ce.detail === null || ce.detail === undefined) {
         return;
       }
@@ -47,6 +48,7 @@ function useCopyReport(detail: HttpFailFastEventDetail | null): { copied: boolea
     try {
       await navigator.clipboard.writeText(detail.report);
       setCopied(true);
+
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }
@@ -113,6 +115,7 @@ function HeffBannerActions({ copied, onCopy, onDismiss }: { copied: boolean; onC
 export function HttpFailFastBanner() {
   const [detail, setDetail] = useHeffLatestDetail();
   const { copied, handleCopy } = useCopyReport(detail);
+
   if (detail === null) {
     return null;
   }

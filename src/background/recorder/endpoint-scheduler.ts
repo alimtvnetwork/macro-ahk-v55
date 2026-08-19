@@ -41,6 +41,7 @@ function registerFetch(
 ): void {
   const capped = acc.active.length >= MAX_ACTIVE_TIMERS;
   const tooSmall = spec.IntervalMs < MIN_INTERVAL_MS;
+
   if (capped || tooSmall) {
     acc.skipped.push(spec.DataSourceId);
 

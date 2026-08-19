@@ -104,6 +104,7 @@ async function exportAsJson(): Promise<void> {
 
 async function exportAsZip(): Promise<void> {
   const { entries, defaultsSkipped } = await readUserAddedEntries();
+
   if (entries.length === 0) {
     showPasteToast('No user prompts to export', true);
 
@@ -120,6 +121,7 @@ async function exportAsZip(): Promise<void> {
 
 async function exportAsSqlite(): Promise<void> {
   const { entries, defaultsSkipped } = await readUserAddedEntries();
+
   if (entries.length === 0) {
     showPasteToast('No user prompts to export', true);
 
@@ -180,6 +182,7 @@ function attachPopoverToggle(
   e.stopPropagation();
   const target = e.currentTarget as HTMLElement;
   const existing = document.querySelector(popoverSelector);
+
   if (existing) {
     existing.remove();
 
@@ -262,6 +265,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
     pop.remove();
     try {
       const r = run();
+
       if (r && typeof (r as Promise<void>).catch === 'function') {
         (r as Promise<void>).catch(function(err: unknown) {
           showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
@@ -374,6 +378,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
   try {
     const io = await import('./prompt-io');
     const parsed = (io as { parsePromptsText: (t: string) => { valid: CachedPromptEntry[]; errors: string[] } }).parsePromptsText(text);
+
     if (parsed.errors.length && parsed.valid.length === 0) {
       showPasteToast('❌ Import failed: ' + parsed.errors[0], true);
 
@@ -399,6 +404,7 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const bytes = new Uint8Array(await file.arrayBuffer());
     const detector = await import('./prompt-io-format-detect');
     const detection = detector.detectBundleFormat(bytes);
+
     if (detection.format === 'zip') {
       await runZipImport(bytes, rerender);
 

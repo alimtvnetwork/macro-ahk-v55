@@ -162,6 +162,7 @@ const SDK_UPDATER_NAME = "Riseup Macro SDK";
 function ensureSdkUpdaterEntry(): void {
   try {
     const existing = handleListUpdaters();
+
     if (existing.some((u) => u.Name === SDK_UPDATER_NAME)) {
       return;
     }

@@ -36,6 +36,7 @@ function eventCards(): HTMLElement[] {
 
   return all.filter(el => {
     const tid = el.getAttribute("data-testid") ?? "";
+
     if (!tid.startsWith("keyword-event-")) {
       return false;
     }

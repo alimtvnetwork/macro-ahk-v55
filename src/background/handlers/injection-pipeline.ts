@@ -74,6 +74,7 @@ export function buildRequestFingerprint(
   return [...scripts]
     .sort((a, b) => {
       const orderDiff = (a.order ?? 0) - (b.order ?? 0);
+
       if (orderDiff !== 0) {
         return orderDiff;
       }
@@ -144,6 +145,7 @@ export async function injectAllScripts(
   // execute a dependent script before its prerequisites. In that case, inject
   // the full ordered chain sequentially.
   const hasCssScript = orderedScripts.some((s) => Boolean(s.injectable.assets?.css));
+
   if (hasCssScript) {
     console.log("[injection] 3/4 ORDER    — CSS-bearing chain detected, forcing sequential ordered injection (%d scripts)", orderedScripts.length);
     for (const script of orderedScripts) {
@@ -240,6 +242,7 @@ export function partitionBySyntax(
   const syntaxFailures: InjectionResult[] = [];
   for (const script of scripts) {
     const syntaxError = detectSyntaxError(script.injectable.code);
+
     if (syntaxError === null) {
       good.push(script);
       continue;
@@ -277,6 +280,7 @@ export async function injectSingleScript(
   const projectId = getActiveProjectId() ?? undefined;
 
   const syntaxError = detectSyntaxError(script.code);
+
   if (syntaxError !== null) {
     const errorMessage = `Script "${script.name}" has a syntax error: ${syntaxError}`;
     logBgWarnError(BgLogTag.INJECTION, `3/4 SYNTAX — ${errorMessage}`);
@@ -368,8 +372,10 @@ async function logInjectionSuccess(
 
   const scriptName = script.name ?? "";
   const isMacroLooping = scriptName.includes("macro-looping") || script.id.includes("macro-looping");
+
   if (isMacroLooping) {
     const injectedVersion = extractMacroVersion(script.code);
+
     if (injectedVersion && injectedVersion !== EXTENSION_VERSION) {
       const legacyMsg = `LEGACY SCRIPT DETECTED\n  Path: chrome.storage.local script="${scriptName}" id="${script.id}"\n  Missing: Current version macro-looping.js v${EXTENSION_VERSION}\n  Reason: Injected script is v${injectedVersion} but extension is v${EXTENSION_VERSION} — stale cache or embedded code fallback. Source: ${codeSource ?? "unknown"}`;
       logCaughtError(BgLogTag.INJECTION, legacyMsg, new Error(`LEGACY_SCRIPT_INJECTED v=${injectedVersion} expected=${EXTENSION_VERSION}`));

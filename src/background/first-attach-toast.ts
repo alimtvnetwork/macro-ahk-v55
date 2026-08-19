@@ -68,6 +68,7 @@ function isToastActionMessage(m: unknown): m is ToastActionMessage {
 // eslint-disable-next-line max-lines-per-function -- serialized page payload; must be self-contained (chrome.scripting.executeScript func-toString)
 function toastPagePayload(origin: string): void {
   const ID = "marco-first-attach-toast";
+
   if (document.getElementById(ID)) {
     return;
   }
@@ -130,6 +131,7 @@ function toastPagePayload(origin: string): void {
 
       r.removeEventListener(Events.CLICK, onClick);
       window.removeEventListener("pagehide", cleanup);
+
       if (r.isConnected) {
         r.remove();
       }
@@ -138,6 +140,7 @@ function toastPagePayload(origin: string): void {
     function onClick(e: Event): void {
       const t = e.target as HTMLElement;
       const a = t?.dataset?.action;
+
       if (typeof a === "string" && a.length > 0) {
         window.postMessage(
           { type: "MARCO_FIRST_ATTACH_ACTION", action: a, url: window.location.href },
@@ -181,11 +184,13 @@ function bridgePagePayload(): void {
     }
 
     const d = e.data;
+
     if (d === null || typeof d !== "object") {
       return;
     }
 
     const o = d as Record<string, unknown>;
+
     if (o.type !== "MARCO_FIRST_ATTACH_ACTION") {
       return;
     }
@@ -260,12 +265,14 @@ export async function maybeShowFirstAttachToast(
 export function registerFirstAttachToastBridge(): void {
   chrome.runtime.onMessage.addListener((message, sender) => {
     const isMissing = !isToastActionMessage(message);
+
     if (isMissing) {
       return false;
     }
 
     const tabId = sender.tab?.id;
     const url = message.url;
+
     if (typeof tabId !== "number") {
       return false;
     }

@@ -63,6 +63,7 @@ function passingExecutor(): LeafStepExecutor {
 function failingExecutor(forGroupName: string, lib: StepLibraryDb): LeafStepExecutor {
   return (step) => {
     const group = lib.listGroups(1).find((g) => g.StepGroupId === step.StepGroupId);
+
     if (group?.Name === forGroupName) {
       const fr: FailureReport = {
         Reason: "Unknown",

@@ -104,6 +104,7 @@ export function bootstrap(deps: {
 
   setupPersistenceObserver(function () {
     const mc = MacroController.getInstance();
+
     if (tryCreateUiNow(mc)) {
       updateUI();
     }
@@ -147,6 +148,7 @@ function initializeMacroDbAndCapture(): void {
     installReseedCommandGlobal();
     try {
       const result = await seedPlanNextPrompts();
+
       if (result.ok === false) {
         logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
@@ -156,6 +158,7 @@ function initializeMacroDbAndCapture(): void {
 
     const pId = extractProjectIdFromUrl();
     const pName = getProjectNameFromDom() || state.projectNameFromApi || 'Unknown';
+
     if (pId) {
       saveProjectMetadata(pId, pName, window.location.href);
     }
@@ -176,6 +179,7 @@ function initializeMacroDbAndCapture(): void {
 function scheduleUiCreationFallback(): void {
   const uiCreationTimeout = window.setTimeout(function () {
     const isContainerMissing = !document.getElementById(IDS.CONTAINER);
+
     if (isContainerMissing) {
       log('Startup: ⏱ 5s timeout, creating UI without workspace data (fallback)', 'warn');
       createUiAndObserver();
@@ -215,6 +219,7 @@ function bootstrapPassiveAttach(deps: Parameters<typeof bootstrap>[0]): void {
  */
 function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): void {
   const w = window as unknown as { __MARCO_PASSIVE_SHORTCUT__?: boolean };
+
   if (w.__MARCO_PASSIVE_SHORTCUT__) {
     return;
   }
@@ -227,12 +232,14 @@ function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): v
     }
 
     const isNotH = e.key.toLowerCase() !== 'h';
+
     if (isNotH) {
       return;
     }
 
     // Bail out if the full panel is already up, let the in-panel handler run.
     const hasContainer = !!document.getElementById(IDS.CONTAINER);
+
     if (hasContainer) {
       return;
     }
@@ -243,6 +250,7 @@ function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): v
     log('Ctrl+Alt+H pressed in passive mode → promoting to full bootstrap', 'info');
     try {
       const marker = document.getElementById(IDS.SCRIPT_MARKER);
+
       if (marker) {
         marker.remove();
       }
@@ -283,6 +291,7 @@ function _registerGlobals(deps: {
 function _logWorkspaceCacheStatus(): void {
   const cachedName = getCachedWorkspaceName();
   const projectId = extractProjectIdFromUrl() || '(unknown)';
+
   if (state.workspaceFromCache && cachedName) {
     log('Startup: 📦 Workspace name loaded from cache: "' + cachedName + '" (project: ' + projectId + ')', 'info');
   } else {
@@ -301,6 +310,7 @@ function _preWarmPrompts(attempt: number): void {
   const hasSdk = sdk !== null && sdk !== undefined;
   const hasPrompts = hasSdk && sdk!.prompts !== null && sdk!.prompts !== undefined;
   const hasPreWarm = hasPrompts && typeof sdk?.prompts?.preWarm === 'function';
+
   if (hasPreWarm) {
     sdk?.prompts?.preWarm().then(function(prompts: unknown[]) {
       if (prompts && prompts.length > 0) {
@@ -358,11 +368,13 @@ function createUiAndObserver(): void {
 
   // Read project name from DOM on first UI creation
   const domName = getProjectNameFromDom();
+
   if (domName) {
     log('Startup: Project name from DOM XPath: "' + domName + '"', 'info');
   }
 
   const mc = MacroController.getInstance();
+
   if (tryCreateUiNow(mc)) {
     timingEnd('ui', 'ok');
     log('Startup: ✅ UI rendered after workspace data loaded (Phase 01 V2)', 'success');
@@ -385,6 +397,7 @@ function _checkPendingTasksOnStartup(): void {
       const queueState = await loadTaskQueue();
       const pending = queueState.tasks.filter(t => t.status === 'pending' || t.status === 'hold');
       const isRunning = !queueState.isPaused;
+
       if (pending.length > 0 && isRunning) {
         _showStartupResumeDialog(pending.length);
       } else if (pending.length > 0 && queueState.isPaused) {
@@ -465,6 +478,7 @@ function tryCreateUiNow(mc: MacroController): boolean {
 
   const ui = mc.ui;
   const isUiMissing = !ui;
+
   if (isUiMissing) {
     return false;
   }
@@ -480,6 +494,7 @@ function ensureUiManagerRegistered(mc: MacroController): boolean {
   }
 
   const factory = nsReadTyped('_internal.createUIManager') as (() => ReturnType<typeof buildUiManagerFromFactory>) | null;
+
   if (factory) {
     try {
       mc.registerUI(factory());
@@ -492,6 +507,7 @@ function ensureUiManagerRegistered(mc: MacroController): boolean {
   }
 
   const legacyCreateFn = nsReadTyped('_internal.createUIWrapper') as (() => void) | null;
+
   if (legacyCreateFn) {
     const uiManager = new UIManager();
     uiManager.setCreateFn(legacyCreateFn);
@@ -539,6 +555,7 @@ function scheduleUiCreationRetry(mc: MacroController, attempt: number): void {
  */
 function cancelTimeoutAndCreateUi(): void {
   const timeoutId = (state as unknown as Record<string, unknown>).__uiTimeoutId as number | undefined;
+
   if (timeoutId) {
     window.clearTimeout(timeoutId);
     (state as unknown as Record<string, unknown>).__uiTimeoutId = undefined;
@@ -590,6 +607,7 @@ function handleTokenFailure(tokenResult: { waitedMs: number; reason: string }): 
 function logAuthDiag(): void {
   try {
     const authDiag = window.marco?.auth?.getLastAuthDiag?.();
+
     if (!authDiag) {
       return;
     }
@@ -604,6 +622,7 @@ function logAuthDiag(): void {
         : 'warn' as const;
     timingStart('auth-source', 'Auth Source (SDK)');
     timingEnd('auth-source', status, detail);
+
     if (authDiag.source === 'none') {
       logError('emitAuthDiag', 'Startup: SDK auth diag, no token from any source, bridge=' + authDiag.bridgeOutcome + ', ' + Math.round(authDiag.durationMs) + 'ms');
     } else {
@@ -655,6 +674,7 @@ function handleCreditSuccess(tier1Data: MarkViewedResponse | null): void {
   timingStart('workspace', 'Workspace Detection');
 
   const isResolved = tier1Data !== null && resolveTier1Workspace(tier1Data);
+
   if (isResolved) {
     return;
   }
@@ -699,11 +719,13 @@ function handleCreditError(err: unknown): void {
   timingEnd('bootstrap', 'error', 'Credit fetch failed: ' + fullDetail);
   logTimingSummary();
   logError('Startup', '❌ Credit/workspace load failed: ' + fullDetail);
+
   if (axiosStatus) {
     log('Startup: HTTP ' + (axiosStatus.status || '?') + ', check token validity, re-login, or hard refresh', 'warn');
   }
 
   const stack = err && typeof err === 'object' && 'stack' in err ? (err as Error).stack : null;
+
   if (stack) {
     log('Startup: Stack: ' + stack.split('\n').slice(0, 3).join(' → '), 'warn');
   }
@@ -718,6 +740,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
   try {
     const workspaceApi = window.marco?.api?.workspace;
     const isMissingWorkspaceApi = !workspaceApi;
+
     if (isMissingWorkspaceApi || typeof workspaceApi.markViewed !== 'function') {
       log('Startup: Tier 1 prefetch skipped, marco-sdk workspace API unavailable', 'warn');
       timingEnd(LabelType.WsPrefetch, 'warn', 'SDK workspace API unavailable');
@@ -738,6 +761,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
 
 function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknown }): MarkViewedResponse | null {
   const isFailed = resp.ok === false;
+
   if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
     timingEnd(LabelType.WsPrefetch, 'warn', 'HTTP ' + resp.status);
@@ -766,12 +790,14 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   const apiProjectName = (tier1Data.project && (tier1Data.project.name || tier1Data.project.title))
     || (tier1Data.name as string) || (tier1Data.title as string) || '';
   const isMissingProjectName = !state.projectNameFromApi;
+
   if (apiProjectName && isMissingProjectName) {
     state.projectNameFromApi = apiProjectName;
     log('Startup: 📁 Project name from Tier 1 prefetch: "' + apiProjectName + '"', 'success');
   }
 
   const hasNoWsId = !wsId;
+
   if (hasNoWsId) {
     return false;
   }
@@ -792,6 +818,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   }
 
   const hasNoMatch = !matched;
+
   if (hasNoMatch) {
     return false;
   }
@@ -817,6 +844,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
  
 function scheduleWorkspaceRetry(attempt: number): void {
   const isExhausted = attempt > STARTUP_WS_MAX_RETRIES;
+
   if (isExhausted) {
     log(
       'standalone-scripts/macro-controller/src/startup.ts scheduleWorkspaceRetry: workspace unresolved after '
@@ -836,6 +864,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
 
   setTimeout(function () {
     const isAlreadyResolved = !!state.workspaceName && !state.workspaceFromCache;
+
     if (isAlreadyResolved) {
       log('Startup: Workspace already resolved ("' + state.workspaceName + '"), skipping retry #' + attempt, 'success');
 
@@ -847,6 +876,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
     if (attempt === 1) {
       log(LabelType.StartupRetry + attempt + ', forcing cookie read before retry', 'check');
       retryToken = getBearerTokenFromCookie();
+
       if (retryToken) {
         log(LabelType.StartupRetry + attempt + ', cookie token resolved, using refreshed token for retry', 'success');
       } else {
@@ -873,6 +903,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
     }).then(function () {
       syncCreditStateFromApi();
       updateUI();
+
       if (state.workspaceName) {
         log('Startup: ✅ Retry #' + attempt + ' succeeded, workspace: "' + state.workspaceName + '"', 'success');
         cacheWorkspaceName(state.workspaceName, loopCreditState.currentWs ? loopCreditState.currentWs.id : undefined);
@@ -906,6 +937,7 @@ const authResyncState = new AuthResyncState();
 function setupAuthResync(): void {
   document.addEventListener('visibilitychange', function () {
     const isVisible = document.visibilityState === 'visible';
+
     if (isVisible) {
       tryAutoAuthResync('visibilitychange');
     }

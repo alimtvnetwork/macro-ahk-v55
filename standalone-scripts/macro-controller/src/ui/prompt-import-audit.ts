@@ -101,11 +101,13 @@ function readFile(): ImportAuditFile {
 
   try {
     const parsed = JSON.parse(raw) as unknown;
+
     if (!parsed || typeof parsed !== 'object') {
       throwDiagnostic('PROMPT_IO_AUDIT_E001', { actualType: parsed === null ? 'null' : typeof parsed });
     }
 
     const file = parsed as Partial<ImportAuditFile>;
+
     if (file.schemaVersion !== CURRENT_SCHEMA) {
       log('[ImportAudit] schemaVersion mismatch (' + String(file.schemaVersion)
         + ' != ' + CURRENT_SCHEMA + '); resetting log', 'warn');
@@ -189,6 +191,7 @@ export function finalizeImportAuditEntry(
 ): void {
   const file = readFile();
   const entry = file.entries.find((e) => e.id === id);
+
   if (!entry) {
     log('[ImportAudit] finalize: entry not found id=' + id
       + ' (evicted?) status=' + outcome.status, 'warn');
@@ -198,6 +201,7 @@ export function finalizeImportAuditEntry(
 
   entry.status = outcome.status;
   entry.counts = outcome.counts;
+
   if (outcome.status === 'rolled_back') {
     entry.error = outcome.error;
   }

@@ -48,6 +48,7 @@ export function updateUI(): void {
   const isValidName = isValidWorkspaceCandidateName(state.workspaceName);
   const isReadyToUpdate = hasWorkspaceName && !isFromCache;
   const shouldUpdate = isReadyToUpdate && isValidName;
+
   if (shouldUpdate) {
     cacheWorkspaceName(
       state.workspaceName,
@@ -87,6 +88,7 @@ export function updateProjectNameDisplay(): void {
  */
 export function updateTitleBarWorkspaceName(): void {
   const el = document.getElementById('loop-title-ws-name');
+
   if (!el) {
     return;
   }
@@ -94,6 +96,7 @@ export function updateTitleBarWorkspaceName(): void {
   clearSkeletons(el);
 
   const syncIcon = document.getElementById('loop-ws-sync-icon');
+
   if (syncIcon) {
     syncIcon.remove();
   }
@@ -114,6 +117,7 @@ export function updateButtons(): void {
   nsCallTyped('_internal.updateStartStopBtn', !!state.running);
 
   const stopBtn = document.getElementById(IDS.STOP_BTN);
+
   if (stopBtn) {
     (stopBtn as HTMLButtonElement).disabled = !state.running;
     stopBtn.style.opacity = state.running ? '1' : '0.5';
@@ -221,17 +225,20 @@ export function destroyPanel(): void {
   }
 
   const marker = document.getElementById(IDS.SCRIPT_MARKER);
+
   if (marker) {
     marker.remove();
   }
 
   const container = document.getElementById(IDS.CONTAINER);
+
   if (container) {
     container.remove();
   }
 
   // v3.60.0: also remove satellite elements with their own idempotency guards
   const recordIndicator = document.getElementById(IDS.RECORD_INDICATOR);
+
   if (recordIndicator) {
     recordIndicator.remove();
   }
@@ -270,6 +277,7 @@ export function destroyPanel(): void {
   // Tear down the singleton so the next injection bootstraps a fresh one
   try {
     const mc = MacroController.getInstance() as unknown as { destroy?: () => void };
+
     if (typeof mc.destroy === 'function') {
       mc.destroy();
     }

@@ -41,6 +41,7 @@ export function formatSequenceNumber(n: number, padding: number): string {
 
 export function renderSequenceName(input: SequenceRenameInput, index: number): string {
   const count = formatSequenceNumber(input.Start + index, input.Padding);
+
   if (input.Base.includes("{n}")) {
     return input.Base.split("{n}").join(count);
   }
@@ -110,11 +111,13 @@ function buildOutsideIndex(outsideKeywords: ReadonlyArray<string>): Map<string, 
   const outsideByKey = new Map<string, string[]>();
   for (const raw of outsideKeywords) {
     const key = normKey(raw);
+
     if (key.length === 0) {
       continue;
     }
 
     const bucket = outsideByKey.get(key);
+
     if (bucket) {
       bucket.push(raw);
     } else {
@@ -142,6 +145,7 @@ function countProposedKeys(proposed: ReadonlyArray<ProposedRename>): Map<string,
   const counts = new Map<string, number>();
   for (const p of proposed) {
     const key = normKey(p.Next);
+
     if (key.length === 0) {
       continue;
     }
@@ -161,6 +165,7 @@ function classifyProposedRow(
 ): SequencePreviewRow {
   const issues: SequencePreviewIssue[] = [];
   const key = normKey(p.Next);
+
   if (key.length === 0) {
     issues.push("empty");
     tallies.emptyCount += 1;
@@ -177,6 +182,7 @@ function classifyProposedRow(
   }
 
   const collidesWith = key.length > 0 ? (outsideByKey.get(key) ?? []) : [];
+
   if (collidesWith.length > 0) {
     issues.push("collision");
     tallies.collisionCount += 1;
@@ -215,11 +221,13 @@ export function mergeTags(
   const seen = new Map<string, string>();
   const consume = (raw: string): void => {
     const trimmed = raw.trim();
+
     if (trimmed.length === 0) {
       return;
     }
 
     const key = trimmed.toLowerCase();
+
     if (!seen.has(key)) {
       seen.set(key, trimmed);
     }
@@ -278,11 +286,13 @@ export function collectCategories(
   const seen = new Map<string, string>();
   for (const ev of events) {
     const c = normaliseCategory(ev.Category);
+
     if (c === undefined) {
       continue;
     }
 
     const key = c.toLowerCase();
+
     if (!seen.has(key)) {
       seen.set(key, c);
     }

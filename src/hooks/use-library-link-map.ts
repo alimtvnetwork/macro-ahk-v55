@@ -73,6 +73,7 @@ export function useLibraryLinkMap(projectId?: number | null): {
 
   const linkMap = useMemo(() => {
     const map = new Map<string, LinkInfo>();
+
     if (!projectId) {
       return map;
     }
@@ -82,6 +83,7 @@ export function useLibraryLinkMap(projectId?: number | null): {
 
     for (const link of projectLinks) {
       const asset = assetById.get(link.SharedAssetId);
+
       if (asset) {
         const updateAvailable = link.LinkStateType === "pinned"
           && link.PinnedVersion !== null

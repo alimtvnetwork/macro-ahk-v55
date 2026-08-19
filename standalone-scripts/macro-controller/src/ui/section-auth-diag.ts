@@ -81,6 +81,7 @@ function performAuthDiagUpdate(ctx: AuthDiagUpdateCtx): void {
   // Update header badge with SDK bridge outcome indicator
   try {
     const diag = window.marco?.auth?.getLastAuthDiag?.();
+
     if (diag) {
       const bridgeError = diag.bridgeOutcome === 'error';
       // Check controller-level bridge outcome for the actual error message
@@ -199,6 +200,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
       }
 
       const isVisible = diagBody.style.display !== 'none';
+
       if (isVisible) {
         updateAuthDiagRow();
       }

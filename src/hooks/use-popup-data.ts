@@ -247,6 +247,7 @@ async function hydrateBootFailureSnapshot(
 
   try {
     const chromeRef: typeof chrome | undefined = typeof chrome !== "undefined" ? chrome : undefined;
+
     if (chromeRef?.storage?.local === undefined) {
       // Preview / non-extension context — fall back to live state alone.
       if (liveFailed) {

@@ -104,6 +104,7 @@ async function newHarnessPage(): Promise<Page> {
               const sql = message.params?.sql ?? '';
               calls.push({ type: String(message.type ?? ''), method: message.method, sql });
               let rows: Array<Record<string, unknown>> = [];
+
               // Export path: listPromptsByRole is empty (no pre-existing DB rows),
               // so mergeDbIntoExport keeps the cache entries verbatim.
               if (/SELECT\s+MAX\(Id\)\s+AS\s+MaxId\s+FROM\s+PromptRevision/i.test(sql)) {
@@ -150,6 +151,7 @@ test.describe('prompt export -> import round trip', () => {
     });
     const download = await downloadPromise;
     const downloadPath = await download.path();
+
     if (!downloadPath) {
       throw new Error('download.path() returned null');
     }

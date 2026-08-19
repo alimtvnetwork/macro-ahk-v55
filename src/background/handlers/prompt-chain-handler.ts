@@ -78,6 +78,7 @@ export async function handleSavePromptChain(payload: MessageRequest): Promise<{ 
   const { chain } = payload as SaveChainMessage;
   const chains = await loadChains();
   const idx = chains.findIndex((c) => c.id === chain.id);
+
   if (idx >= 0) {
     chains[idx] = chain;
   } else {
@@ -151,11 +152,13 @@ async function clearPendingArg(correlationId: string): Promise<void> {
   try {
     const stored = await chrome.storage.session.get(PROMPT_ARGS_KEY);
     const map = (stored[PROMPT_ARGS_KEY] as Record<string, PendingPromptArgs> | undefined) ?? {};
+
     if (!(correlationId in map)) {
       return;
     }
 
     delete map[correlationId];
+
     if (Object.keys(map).length === 0) {
       await chrome.storage.session.remove(PROMPT_ARGS_KEY);
     } else {
@@ -212,6 +215,7 @@ export async function handleExecuteChainStep(payload: MessageRequest): Promise<{
   // Find the active tab
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   const tab = tabs[0];
+
   if (!tab?.id) {
     throw new Error("No active tab found — open a target page first");
   }

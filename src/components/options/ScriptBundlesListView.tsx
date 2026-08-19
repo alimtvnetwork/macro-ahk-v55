@@ -79,6 +79,7 @@ export function ScriptBundlesListView({
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
+
           if (e.dataTransfer.files.length > 0) {
             onFileDrop(e.dataTransfer.files);
           }

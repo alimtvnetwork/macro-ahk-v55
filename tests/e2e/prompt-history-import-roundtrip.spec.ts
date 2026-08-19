@@ -96,6 +96,7 @@ async function newHarnessPage(): Promise<Page> {
               const sql = message.params?.sql ?? '';
               calls.push({ type: String(message.type ?? ''), method: message.method, sql });
               let rows: Array<Record<string, unknown>> = [];
+
               if (/SELECT\s+MAX\(Id\)/i.test(sql)) {
                 rows = [{ MaxId: 100 }];
               }
@@ -140,6 +141,7 @@ test.describe('prompt history import round-trip', () => {
             interface DbOk<T> { ok: boolean; value?: T; error?: string }
             const listRevisions = async (): Promise<DbOk<RevRow[]>> => {
               state.openCount += 1;
+
               if (state.openCount === 1) {
                 return { ok: true, value: nativeRows.slice() };
               }

@@ -42,6 +42,7 @@ function requireGroupKey(
 
 function getDb(): SqlJsDatabase {
   const manager = dbManager;
+
   if (!manager) {
     throw new Error("[grouped-kv] DbManager not bound");
   }
@@ -59,6 +60,7 @@ export async function handleGkvGet(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(group, key)) {
     return missingFieldError(!group ? "group" : "key", "gkv:get");
   }
@@ -68,6 +70,7 @@ export async function handleGkvGet(
     "SELECT Value FROM GroupedKv WHERE GroupName = ? AND Key = ?",
     [group, key],
   ));
+
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
   }
@@ -87,6 +90,7 @@ export async function handleGkvSet(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown; value?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(group, key)) {
     return missingFieldError(!group ? "group" : "key", "gkv:set");
   }
@@ -98,6 +102,7 @@ export async function handleGkvSet(
     `INSERT OR REPLACE INTO GroupedKv (GroupName, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
     [group, key, safeValue],
   ));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -113,12 +118,14 @@ export async function handleGkvDelete(
   const raw = message as MessageRequest & { group?: unknown; key?: unknown };
   const group = requireField(raw.group);
   const key = requireKey(raw.key);
+
   if (!requireGroupKey(group, key)) {
     return missingFieldError(!group ? "group" : "key", "gkv:delete");
   }
 
   const db = getDb();
   const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -134,6 +141,7 @@ export async function handleGkvList(
   const raw = message as MessageRequest & { group?: unknown };
   const group = requireField(raw.group);
   const isGroupMissing = !group;
+
   if (isGroupMissing) {
     return missingFieldError("group", "gkv:list");
   }
@@ -142,6 +150,7 @@ export async function handleGkvList(
   const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Key, Value FROM GroupedKv WHERE GroupName = ? ORDER BY Key ASC",
   ));
+
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
   }
@@ -165,12 +174,14 @@ export async function handleGkvClearGroup(
   const raw = message as MessageRequest & { group?: unknown };
   const group = requireField(raw.group);
   const isGroupMissing = !group;
+
   if (isGroupMissing) {
     return missingFieldError("group", "gkv:clearGroup");
   }
 
   const db = getDb();
   const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }

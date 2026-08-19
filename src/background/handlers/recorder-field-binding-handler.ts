@@ -78,6 +78,7 @@ export async function handleRecorderFieldBindingList(
   message: MessageRequest,
 ): Promise<{ bindings: ReadonlyArray<PersistedFieldBinding> }> {
   const req = message as unknown as ListRequest;
+
   if (!req.projectSlug) {
     throw new Error("RECORDER_FIELD_BINDING_LIST requires projectSlug");
   }
@@ -95,6 +96,7 @@ export async function handleRecorderFieldBindingDelete(
   message: MessageRequest,
 ): Promise<{ isOk: true }> {
   const req = message as unknown as DeleteRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number") {
     throw new Error(
       "RECORDER_FIELD_BINDING_DELETE requires projectSlug and stepId",

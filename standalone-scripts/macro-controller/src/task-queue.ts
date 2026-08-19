@@ -35,6 +35,7 @@ const STATE_KEY = 'queue_state';
  */
 export async function loadTaskQueue(): Promise<TaskQueueState> {
   const projectId = extractProjectIdFromUrl();
+
   if (!projectId) {
     return { tasks: [], history: [], isPaused: false };
   }
@@ -60,6 +61,7 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
  */
 export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
   const projectId = extractProjectIdFromUrl();
+
   if (!projectId) {
     return;
   }
@@ -78,6 +80,7 @@ export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
  */
 export async function addTaskToQueue(prompt: string, projectName: string): Promise<MacroTask | null> {
   const projectId = extractProjectIdFromUrl();
+
   if (!projectId) {
     return null;
   }
@@ -106,9 +109,11 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
 export async function updateTaskStatus(taskId: string, status: MacroTask['status'], error?: string): Promise<void> {
   const queueState = await loadTaskQueue();
   const index = queueState.tasks.findIndex(t => t.id === taskId);
+
   if (index !== -1) {
     const task = queueState.tasks[index];
     task.status = status;
+
     if (error) {
       task.error = error;
     }
@@ -120,6 +125,7 @@ export async function updateTaskStatus(taskId: string, status: MacroTask['status
       }
 
       queueState.history.unshift(task);
+
       if (queueState.history.length > 50) {
         queueState.history.pop();
       }
@@ -153,6 +159,7 @@ export async function clearCompletedTasks(): Promise<void> {
  */
 export async function clearAllTasks(): Promise<void> {
   const queueState = await loadTaskQueue();
+
   if (queueState.tasks.length > 0 || (queueState.history?.length ?? 0) > 0) {
     queueState.tasks = [];
     queueState.history = [];
@@ -209,6 +216,7 @@ export async function bulkDeleteTasks(taskIds: string[]): Promise<void> {
   const initialCount = queueState.tasks.length + (queueState.history?.length ?? 0);
   
   queueState.tasks = queueState.tasks.filter(t => !taskIds.includes(t.id));
+
   if (queueState.history) {
     queueState.history = queueState.history.filter(t => !taskIds.includes(t.id));
   }
@@ -280,6 +288,7 @@ export function getQueueDelayUntil(): number {
 export async function reorderTask(taskId: string, direction: DirectionType): Promise<void> {
   const queueState = await loadTaskQueue();
   const index = queueState.tasks.findIndex(t => t.id === taskId);
+
   if (index === -1) {
     return;
   }

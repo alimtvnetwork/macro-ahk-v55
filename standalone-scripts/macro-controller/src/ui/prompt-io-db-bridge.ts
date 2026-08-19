@@ -60,6 +60,7 @@ function dbRowToCached(row: PromptRow): CachedPromptEntry {
     category: 'macro-db',
     replaceKey: row.ReplaceKey,
   };
+
   if (Array.isArray(row.ReplaceValues)) {
     out.replaceValues = [...row.ReplaceValues];
   }
@@ -71,6 +72,7 @@ async function readAllDbRows(): Promise<PromptRow[]> {
   const all: PromptRow[] = [];
   for (const role of PROMPT_ROLES) {
     const res = await listPromptsByRole(role);
+
     if (res.ok === false || !res.value) {
       logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
       continue;
@@ -107,6 +109,7 @@ export function mergeDbIntoExport(
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
   const res = await listPromptsByRole(role);
+
   if (res.ok === false || !res.value) {
     return null;
   }
@@ -121,16 +124,19 @@ type CommitOutcome =
 
 async function commitOneEntry(entry: CachedPromptEntry): Promise<CommitOutcome> {
   const role = entry.role;
+
   if (!isPromptRole(role)) {
     return { status: 'error', reason: 'missing role' };
   }
 
   const slug = (entry.slug ?? '').trim();
+
   if (slug === '') {
     return { status: 'error', reason: 'missing slug for role=' + role };
   }
 
   const existing = await findExistingRow(role, slug);
+
   // v4.400.0: never let import mutate a default-seeded row.
   if (existing && existing.IsDefault === 1) {
     return { status: 'default-protected' };
@@ -154,6 +160,7 @@ export async function commitDbEntries(entries: readonly CachedPromptEntry[]): Pr
   let defaultsProtected = 0;
   for (const entry of entries) {
     const outcome = await commitOneEntry(entry);
+
     if (outcome.status === 'ok') {
       upserted++;
     } else if (outcome.status === 'default-protected') {

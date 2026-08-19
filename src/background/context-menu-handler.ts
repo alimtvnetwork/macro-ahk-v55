@@ -33,6 +33,9 @@ const MENU_ID = {
   STATUS: "marco-status",
 } as const;
 
+const LOGGER_NAMESPACE = 'NAMESPACE';
+const LOGGER_ERR_MSG = 'Operation failed';
+
 /* ------------------------------------------------------------------ */
 /*  Create Static Menu Structure                                       */
 /* ------------------------------------------------------------------ */
@@ -142,7 +145,7 @@ function removeMenuItem(menuId: string): Promise<void> {
         resolve();
       });
     } catch (removeErr) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: removeErr });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: removeErr });
       logCaughtError(
         BgLogTag.CONTEXT_MENU,
         `chrome.contextMenus.remove("${menuId}") threw during submenu rebuild — continuing; user-visible regression possible if menu count diverges`,
@@ -157,6 +160,7 @@ function createMenuItemSafe(props: chrome.contextMenus.CreateProperties): void {
   try {
     chrome.contextMenus.create(props, () => {
       const err = chrome.runtime.lastError;
+
       if (err) {
         // Duplicate-id collisions are recoverable: log once and move on.
         logCaughtError(
@@ -167,7 +171,7 @@ function createMenuItemSafe(props: chrome.contextMenus.CreateProperties): void {
       }
     });
   } catch (createErr) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: createErr });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: createErr });
     logCaughtError(
       BgLogTag.CONTEXT_MENU,
       `chrome.contextMenus.create("${String(props.id)}") threw — dropping item this rebuild`,
@@ -215,6 +219,7 @@ async function doRebuildProjectSubmenu(): Promise<void> {
   const hasProjects = projects.length > 0;
 
   const isMissing = !hasProjects;
+
   if (isMissing) {
     createNoProjectsMenuItem();
 
@@ -335,6 +340,7 @@ async function handleMenuClick(
 async function handleRunScripts(tabId: number, forceReload = false): Promise<void> {
   const hasValidTab = tabId > 0;
   const isMissing049 = !hasValidTab;
+
   if (isMissing049) {
     return;
   }
@@ -347,6 +353,7 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
   const hasScripts = enabledScripts.length > 0;
 
   const isMissing050 = !hasScripts;
+
   if (isMissing050) {
     return;
   }
@@ -366,6 +373,7 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
 async function handleReinjectScripts(tabId: number): Promise<void> {
   const hasValidTab = tabId > 0;
   const isMissing051 = !hasValidTab;
+
   if (isMissing051) {
     return;
   }
@@ -383,6 +391,7 @@ async function handleReinjectScripts(tabId: number): Promise<void> {
         ];
         for (const id of markerIds) {
           const element = document.getElementById(id);
+
           if (element) {
             element.remove();
           }
@@ -390,7 +399,7 @@ async function handleReinjectScripts(tabId: number): Promise<void> {
       },
     });
   } catch (markerCleanupErr) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: markerCleanupErr });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: markerCleanupErr });
     // Tab may be a restricted scheme (chrome://, devtools://, web store) where
     // chrome.scripting.executeScript is denied — log at warn level so repeated
     // failures surface, then continue to handleRunScripts() which will retry
@@ -416,6 +425,7 @@ async function handleCopyLogs(tabId: number): Promise<void> {
 
   // Copy to clipboard via content script injection
   const hasValidTab = tabId > 0;
+
   if (hasValidTab) {
     try {
       await chrome.scripting.executeScript({
@@ -428,7 +438,7 @@ async function handleCopyLogs(tabId: number): Promise<void> {
         args: [logText],
       });
     } catch (err) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
       logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
     }
   }
@@ -453,7 +463,7 @@ async function handleShowStatus(tabId: number): Promise<void> {
         args: [statusText],
       });
     } catch (err) {
-      RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
       logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
     }
   }

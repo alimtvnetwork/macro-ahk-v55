@@ -87,6 +87,7 @@ function installWasmFetchShim(): void {
   const originalFetch: typeof fetch | undefined = globalThis.fetch?.bind(globalThis);
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
     if (url.includes(SQL_WASM_FILE_NAME)) {
       return new Response(wasmBytes, {
         status: 200,
@@ -175,6 +176,7 @@ async function buildCachedBundle(): Promise<CachedBundle> {
 
   // ── Export ────────────────────────────────────────────────────────
   await sqliteBundle.exportAllAsSqliteZip();
+
   if (capturedBlobs.length === 0) {
     throw new Error(
       "loadCachedBundle: exportAllAsSqliteZip() did not produce a Blob via URL.createObjectURL",
@@ -189,6 +191,7 @@ async function buildCachedBundle(): Promise<CachedBundle> {
   const JSZipCtor = JSZipMod.default;
   const zip = await JSZipCtor.loadAsync(zipBytes);
   const dbEntry = zip.file("marco-backup.db");
+
   if (!dbEntry) {
     throw new Error("loadCachedBundle: zip is missing marco-backup.db entry");
   }

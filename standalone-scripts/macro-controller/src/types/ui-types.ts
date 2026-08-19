@@ -1,4 +1,5 @@
 import { ToastEntryLevelType } from "./enums";
+import type { PromptRole } from './prompt-role';
 
 /**
  * Macro Controller — UI, Prompt & Misc Type Definitions
@@ -74,7 +75,7 @@ export interface PromptEntry {
    * v4.71.0 so the export/import bundle envelope and the DB bridge can
    * round-trip role-scoped prompts without losing classification.
    */
-  role?: import('./prompt-role').PromptRole;
+  role?: PromptRole;
 }
 
 export interface PromptsCfg {

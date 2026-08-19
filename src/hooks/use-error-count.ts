@@ -113,6 +113,7 @@ function bindVisibilityPolling(
 
   return () => {
     pollingControls.stop();
+
     if (typeof document !== "undefined") {
       document.removeEventListener("visibilitychange", handleVisibility); 
     }
@@ -128,6 +129,7 @@ function setupErrorCountSubscriptions(refresh: RefreshErrorCount, setCountValue:
 
   return () => {
     cleanupPolling();
+
     if (listenerAttached) {
       detachBroadcastListener(runtime, broadcastHandler); 
     }

@@ -85,6 +85,7 @@ let _dedupTimer: ReturnType<typeof setInterval> | null = null;
 
 function formatRequestDetail(rd: RequestDetail): string {
   const lines: string[] = [];
+
   if (rd.method || rd.url) {
     lines.push("Request: " + (rd.method || "?") + " " + (rd.url || "?"));
   }
@@ -129,6 +130,7 @@ function ensureDedupCleanup(): void {
         _recentToasts.delete(key);
       } 
     });
+
     if (_recentToasts.size === 0 && _dedupTimer) {
       clearInterval(_dedupTimer);
       _dedupTimer = null; 
@@ -138,6 +140,7 @@ function ensureDedupCleanup(): void {
 
 function pushRecentError(entry: RecentError): void {
   _recentErrors.unshift(entry);
+
   if (_recentErrors.length > RECENT_MAX) {
     _recentErrors.pop();
   }
@@ -180,11 +183,13 @@ function dismissToast(toast: HTMLElement & { _dismissed?: boolean; _dismissTimer
   }
 
   toast._dismissed = true;
+
   if (toast._dismissTimer) {
     clearTimeout(toast._dismissTimer);
   }
 
   const idx = _queue.indexOf(toast);
+
   if (idx !== -1) {
     _queue.splice(idx, 1);
   }
@@ -230,6 +235,7 @@ function showToast(message: string, level: ToastLevelType = ToastLevelType.Error
   // Dedup
   const dedupKey = level + ":" + message;
   const last = _recentToasts.get(dedupKey) || 0;
+
   if (Date.now() - last < DEDUP_MS) {
     return;
   }
@@ -286,6 +292,7 @@ function showToast(message: string, level: ToastLevelType = ToastLevelType.Error
   copyBtn.onclick = (e: MouseEvent) => {
     e.stopPropagation();
     let copyText = "[v" + _version + " " + level.toUpperCase() + " @ " + timeStr + "]\n" + message;
+
     if (opts.requestDetail) {
       copyText += "\n\n" + formatRequestDetail(opts.requestDetail);
     }
@@ -358,6 +365,7 @@ function showToast(message: string, level: ToastLevelType = ToastLevelType.Error
   const overflow = _queue.length - MAX_VISIBLE;
   for (let i = 0; i < overflow; i++) {
     const oldest = _queue[0];
+
     if (oldest) {
       dismissToast(oldest);
     } 

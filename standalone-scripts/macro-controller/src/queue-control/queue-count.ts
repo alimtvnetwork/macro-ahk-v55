@@ -42,11 +42,13 @@ function tryHeaderWalk(): HTMLElement | null {
   for (const cand of Array.from(candidates)) {
     const txt = (cand.firstChild?.textContent ?? '').trim();
     const startsWithQueue = txt === 'Queue' || txt.startsWith('Queue');
+
     if (!startsWithQueue) {
       continue;
     }
 
     const inner = cand.querySelector<HTMLElement>('span');
+
     if (inner !== null) {
       return inner;
     }
@@ -61,16 +63,19 @@ function tryAriaWalk(): HTMLElement | null {
   const btn = document.querySelector<HTMLElement>(
     'button[aria-label="Pause queue"], button[aria-label="Resume queue"]',
   );
+
   if (btn === null) {
     return null;
   }
 
   const row = btn.closest('div');
+
   if (row === null) {
     return null;
   }
 
   const header = row.querySelector<HTMLElement>('span[data-panel-open]');
+
   if (header === null) {
     return null;
   }
@@ -80,16 +85,19 @@ function tryAriaWalk(): HTMLElement | null {
 
 function resolveCountSpan(): CountSpanResult {
   const primary = tryPrimaryXPath();
+
   if (primary !== null) {
     return { element: primary, strategy: 'primary-xpath' };
   }
 
   const headerWalk = tryHeaderWalk();
+
   if (headerWalk !== null) {
     return { element: headerWalk, strategy: 'fallback-header-walk' };
   }
 
   const ariaWalk = tryAriaWalk();
+
   if (ariaWalk !== null) {
     return { element: ariaWalk, strategy: 'fallback-aria-walk' };
   }
@@ -119,16 +127,19 @@ export function readQueueCountDetailed(): QueueCountReadResult {
   }
 
   const resolved = resolveCountSpan();
+
   if (resolved.element === null) {
     return { count: null, strategy: 'none', rawText: '', parseWarning: null };
   }
 
   const rawText = (resolved.element.textContent ?? '').trim();
+
   if (rawText === '') {
     return { count: null, strategy: resolved.strategy, rawText, parseWarning: 'empty-text' };
   }
 
   const parsed = Number.parseInt(rawText, 10);
+
   if (Number.isNaN(parsed)) {
     return { count: null, strategy: resolved.strategy, rawText, parseWarning: 'non-numeric' };
   }

@@ -15,6 +15,7 @@ const files = [
 
 for (const filePath of files) {
   const sourceFile = project.getSourceFile(filePath);
+
   if (!sourceFile) {
     console.log(`ERROR: File not found: ${filePath}`);
     continue;
@@ -39,17 +40,22 @@ for (const filePath of files) {
   const calls = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
   for (const call of calls) {
     const expr = call.getExpression();
+
     if (expr.getKind() === SyntaxKind.PropertyAccessExpression) {
       const propAccess = expr as PropertyAccessExpression;
       const text = propAccess.getText();
+
       if (text === "db.run" || text === "db.exec" || text === "db.prepare") {
         // Wrap with ServiceResult.wrapDb(() => ...)
         // Check if it's already wrapped
         const parent = call.getParent();
+
         if (parent && parent.getKind() === SyntaxKind.ArrowFunction) {
           const grandParent = parent.getParent();
+
           if (grandParent && grandParent.getKind() === SyntaxKind.CallExpression) {
             const grandParentCall = grandParent as CallExpression;
+
             if (grandParentCall.getExpression().getText() === "ServiceResult.wrapDb") {
               continue; // already wrapped
             }
@@ -68,9 +74,11 @@ for (const filePath of files) {
   for (const expr of prefixUnaryExprs) {
     if (expr.getOperatorToken() === SyntaxKind.ExclamationToken) {
       const operand = expr.getOperand();
+
       if (operand.getKind() === SyntaxKind.PropertyAccessExpression) {
         const propAccess = operand as PropertyAccessExpression;
         const name = propAccess.getName();
+
         if (name === "ok" || name === "isSuccess") {
           const base = propAccess.getExpression().getText();
           expr.replaceWithText(`${base}.isFail`);

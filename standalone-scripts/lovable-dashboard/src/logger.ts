@@ -30,6 +30,7 @@ function getLogger(): NamespaceLogger | null {
 export function logError(scope: string, caught: CaughtError): void {
   const fullScope = `${SCOPE_PREFIX}${scope}`;
   const logger = getLogger();
+
   if (logger) {
     logger.error(fullScope, caught);
 
@@ -42,6 +43,7 @@ export function logError(scope: string, caught: CaughtError): void {
 export function logWarn(scope: string, message: string): void {
   const fullScope = `${SCOPE_PREFIX}${scope}`;
   const logger = getLogger();
+
   if (logger?.warn) {
     logger.warn(fullScope, message);
 

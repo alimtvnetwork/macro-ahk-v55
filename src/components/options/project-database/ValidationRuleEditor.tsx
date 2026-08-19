@@ -128,6 +128,7 @@ function testEnumValidation(value: string, v: EnumValidation): boolean {
 
 function testNumberValidation(value: string, v: NumberValidation): boolean {
   const count = Number(value);
+
   if (isNaN(count)) {
     return false;
   }
@@ -180,6 +181,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
 
   const setStrategy = (s: ValidationStrategy) => {
     const base: ValidationRule = { strategy: s };
+
     if (s === "string") {
       base.string = {};
     }

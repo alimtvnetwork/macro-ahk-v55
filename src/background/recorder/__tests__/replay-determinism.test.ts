@@ -77,6 +77,7 @@ function evaluateXPath(expr: string): Element {
     null,
   );
   const length = result.snapshotLength;
+
   if (length !== 1) {
     throw new Error(
       `XPath "${expr}" matched ${length} nodes, replay expects exactly 1`,
@@ -84,6 +85,7 @@ function evaluateXPath(expr: string): Element {
   }
 
   const node = result.snapshotItem(0);
+
   if (!(node instanceof Element)) {
     throw new Error(`XPath "${expr}" matched a non-Element node`);
   }

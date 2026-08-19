@@ -170,6 +170,7 @@ function DetailField({ label, value }: { label: string; value: string }) {
 /** Check if a headers record has at least one entry. */
 function hasNonEmptyHeaders(headers?: Record<string, string>): boolean {
   const isMissing = headers === undefined || headers === null;
+
   if (isMissing) {
     return false;
   }
@@ -183,6 +184,7 @@ function hasNonEmptyHeaders(headers?: Record<string, string>): boolean {
 function formatResponsePreview(preview?: string): string {
   const raw = preview ?? "";
   const isEmpty = raw.length === 0;
+
   if (isEmpty) {
     return "";
   }

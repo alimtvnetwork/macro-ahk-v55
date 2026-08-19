@@ -67,6 +67,7 @@ async function seedOnboardingFromServiceWorker(context: BrowserContext): Promise
   let lastError: unknown = null;
   while (Date.now() < deadline) {
     let [sw] = context.serviceWorkers();
+
     if (!sw) {
       try {
         sw = await context.waitForEvent('serviceworker', { timeout: 5_000 });
@@ -81,6 +82,7 @@ async function seedOnboardingFromServiceWorker(context: BrowserContext): Promise
         // Guard: in rare MV3 restart windows `chrome.storage` may not yet be
         // bound on the worker global. Surface that as a retryable signal.
         const c = (globalThis as unknown as { chrome?: { storage?: { local?: { set: (i: Record<string, unknown>) => Promise<void>; get: (k: string) => Promise<Record<string, unknown>> } } } }).chrome;
+
         if (!c?.storage?.local) {
           return 'chrome.storage.local unavailable';
         }
@@ -90,6 +92,7 @@ async function seedOnboardingFromServiceWorker(context: BrowserContext): Promise
 
         return result[key] === true ? true : `read-back=${JSON.stringify(result[key])}`;
       }, ONBOARDING_KEY);
+
       if (verified === true) {
         return;
       }
@@ -250,6 +253,7 @@ async function openProjectsView(context: BrowserContext, extensionId: string): P
 
   // Stage 2: re-seed from the page context to defeat MV3 SW teardown races.
   const seeded = await ensureOnboardingSeededFromPage(page);
+
   if (!seeded) {
     await captureDiagnostic(page, 'page-reseed-failed');
     throw new Error('[e2e-02] Page-side onboarding re-seed did not commit.');

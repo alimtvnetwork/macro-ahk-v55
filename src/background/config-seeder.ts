@@ -138,6 +138,7 @@ export async function seedConfigToDb(
 
   if (existing.length > 0 && existing[0].values.length > 0) {
     const storedHash = String(existing[0].values[0][0]);
+
     if (storedHash === sourceHash) {
       console.log(`[config-seeder] Hash match for "${configName}" — skipping (user edits preserved)`);
 
@@ -214,6 +215,7 @@ export function readConfigFromDb(manager: ProjectDbManager): StoredConfigRow[] {
     const result = db.exec(
       "SELECT Id, Section, Key, Value, ValueType, UpdatedAt FROM ProjectConfig ORDER BY Section, Key",
     );
+
     if (result.length === 0) {
       return [];
     }

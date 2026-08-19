@@ -44,6 +44,7 @@ function installDom(opts: { withSentinel: boolean; withRelayFlag: boolean }): {
     getElementById: (id: string) => (id === '__marco_sentinel__' ? sentinelEl : null),
   };
   const win: Record<string, unknown> = {};
+
   if (opts.withRelayFlag) {
     win.__marcoRelayActive = true;
   }

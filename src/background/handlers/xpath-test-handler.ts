@@ -20,6 +20,7 @@ export async function handleTestXPath(
 ): Promise<{ found: number; error?: string }> {
   const payload = message as MessageRequest & { xpath: string };
   const tabId = await getActiveTabId();
+
   if (tabId === null) {
     return { found: 0, error: "No active tab found" };
   }

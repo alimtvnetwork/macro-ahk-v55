@@ -12,6 +12,7 @@ export interface KeywordEventsSelectionToolbarProps {
 
 export function KeywordEventsSelectionToolbar(props: KeywordEventsSelectionToolbarProps): JSX.Element | null {
   const { count, onClear } = props;
+
   if (count === 0) {
     return null; 
   }

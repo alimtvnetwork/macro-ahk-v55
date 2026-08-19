@@ -21,6 +21,7 @@ describe("scripts-roundtrip", () => {
     const db = await openCachedDb();
     try {
       const res = db.exec("SELECT Name, Code FROM Scripts WHERE Name LIKE 'in-project-script-%'");
+
       // exportAllAsSqliteZip path emits library scripts only; inline-script
       // synthesis is exercised by exportProjectAsSqliteZip. Soft-assert.
       if (res[0] && res[0].values.length > 0) {

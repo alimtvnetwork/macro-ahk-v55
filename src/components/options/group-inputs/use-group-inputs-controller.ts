@@ -68,6 +68,7 @@ function useGroupInputFileHandlers(setText: (text: string) => void) {
   const handleFilePick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     event.target.value = "";
+
     if (file !== null) {
       void handleFile(file);
     }
@@ -77,6 +78,7 @@ function useGroupInputFileHandlers(setText: (text: string) => void) {
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files[0] ?? null;
+
     if (file !== null) {
       void handleFile(file);
     }

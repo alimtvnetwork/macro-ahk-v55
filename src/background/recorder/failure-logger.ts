@@ -322,6 +322,7 @@ function classifyReason(
   }
 
   const varClass = classifyVariableFailure(variables);
+
   if (varClass !== null) {
     return varClass; 
   }
@@ -331,16 +332,19 @@ function classifyReason(
   }
 
   const syntaxClass = classifySelectorSyntaxFailure(attempts);
+
   if (syntaxClass !== null) {
     return syntaxClass; 
   }
 
   const primaryFallbackClass = classifyPrimaryFallback(attempts);
+
   if (primaryFallbackClass !== null) {
     return primaryFallbackClass; 
   }
 
   const zeroClass = classifyZeroMatches(attempts);
+
   if (zeroClass !== null) {
     return zeroClass; 
   }
@@ -354,6 +358,7 @@ function classifyVariableFailure(
   variables: ReadonlyArray<VariableContext>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
   const failedVar = variables.find((v) => v.FailureReason !== "Resolved");
+
   if (failedVar === undefined) {
     return null; 
   }
@@ -368,6 +373,7 @@ function classifySelectorSyntaxFailure(
   attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
   const reasons = new Set(attempts.map((a) => a.FailureReason));
+
   if (reasons.has("XPathSyntaxError")) {
     return { Reason: "XPathSyntaxError", ReasonDetail: firstDetail(attempts, "XPathSyntaxError") };
   }
@@ -392,6 +398,7 @@ function classifyPrimaryFallback(
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
   const primary = attempts.find((a) => a.IsPrimary) ?? null;
   const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
+
   if (primary === null || primary.Matched || !anyFallbackMatched) {
     return null; 
   }
@@ -411,6 +418,7 @@ function classifyZeroMatches(
   attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
   const anyEvaluated = attempts.some((a) => a.FailureReason !== "NotEvaluated");
+
   if (!anyEvaluated) {
     return null; 
   }
@@ -480,6 +488,7 @@ function appendOptionalSections(lines: string[], report: FailureReport): void {
   }
 
   appendDomContextSection(lines, report.DomContext);
+
   if (report.Verbose && report.CapturedHtml !== null) {
     lines.push(`  CapturedHtml (verbose):`);
     lines.push(`    ${report.CapturedHtml}`);
@@ -506,6 +515,7 @@ export function formatFailureReport(report: FailureReport): string {
 
 function formatWhere(report: FailureReport): string {
   const where: string[] = [`at ${report.SourceFile}`];
+
   if (report.StepId !== null) {
     where.push(`StepId=${report.StepId}`);
   }
@@ -573,6 +583,7 @@ function appendDomContextSection(lines: string[], context: DomContext | null): v
   }
 
   const attrs: string[] = [];
+
   if (context.Id !== null) {
     attrs.push(`id="${context.Id}"`);
   }
@@ -596,6 +607,7 @@ function appendDomContextSection(lines: string[], context: DomContext | null): v
   const attrStr = attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
   const text = context.TextSnippet.length > 0 ? ` "${context.TextSnippet}"` : "";
   lines.push(`  DomContext: <${context.TagName}${attrStr}>${text}`);
+
   if (context.XPath !== undefined && context.XPath.length > 0) {
     lines.push(`    XPath: ${context.XPath}`);
   }

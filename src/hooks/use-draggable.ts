@@ -41,11 +41,13 @@ function loadPosition(): DragPosition | null {
 
   try {
     const raw = window.localStorage.getItem(POSITION_STORAGE_KEY);
+
     if (raw === null) {
       return null; 
     }
 
     const parsed: unknown = JSON.parse(raw);
+
     if (
       typeof parsed === "object" && parsed !== null &&
             typeof (parsed as DragPosition).x === "number" &&
@@ -118,12 +120,14 @@ function useResizeReclamp(
         }
 
         const el = containerRef.current;
+
         if (el === null) {
           return prev; 
         }
 
         const rect = el.getBoundingClientRect();
         const next = clamp(prev, rect.width, rect.height);
+
         if (next.x === prev.x && next.y === prev.y) {
           return prev; 
         }
@@ -218,6 +222,7 @@ function usePointerDragHandlers(
     }
 
     const el = containerRef.current;
+
     if (el === null) {
       return; 
     }

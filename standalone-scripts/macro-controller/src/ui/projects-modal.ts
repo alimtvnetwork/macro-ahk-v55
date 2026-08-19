@@ -107,6 +107,7 @@ async function loadCollapsedState(): Promise<void> {
 
     const r = await chrome.storage.local.get(COLLAPSED_STORAGE_KEY);
     const raw = r[COLLAPSED_STORAGE_KEY];
+
     if (Array.isArray(raw)) {
       state.collapsed = new Set(raw.filter(function (x): x is string {
         return typeof x === 'string'; 
@@ -179,6 +180,7 @@ function renderBody(body: HTMLElement): void {
 
 export function removeProjectsModal(): void {
   const existing = document.getElementById(DIALOG_ID) as DraggableElement | null;
+
   if (!existing) {
     return;
   }
@@ -197,6 +199,7 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
 
   // 1. Snapshot known workspaces.
   const workspaces = (loopCreditState.perWorkspace || []).slice();
+
   if (workspaces.length === 0) {
     body.innerHTML = ''
             + '<div style="text-align:center;padding:20px 12px;color:' + cPanelFgDim + ';font-size:11px;">'
@@ -215,6 +218,7 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
   //    fills instantly while the network fetch refreshes in the background.
   //    Refresh button passes bypassCache=true to clear and force re-fetch.
   const bypassCache = opts?.bypassCache === true;
+
   if (bypassCache) {
     for (const ws of workspaces) {
       clearProjectListCache(ws.id);
@@ -299,6 +303,7 @@ async function loadOpenTabIndex(): Promise<OpenTabIndex> {
   const idx: OpenTabIndex = { byProjectId: new Map(), byUrlProjectId: new Map() };
   try {
     const resp = await sendToExtension('GET_OPEN_LOVABLE_TABS', {}) as unknown as OpenTabsResponse;
+
     if (!resp || resp.isOk === false) {
       return idx;
     }
@@ -310,6 +315,7 @@ async function loadOpenTabIndex(): Promise<OpenTabIndex> {
       }
 
       const urlPid = extractProjectIdFromUrl(t.url);
+
       if (urlPid) {
         idx.byUrlProjectId.set(urlPid, t);
       }
@@ -323,6 +329,7 @@ async function loadOpenTabIndex(): Promise<OpenTabIndex> {
 
 async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   const sdk = window.marco;
+
   if (!sdk || !sdk.api || !sdk.api.projects || typeof sdk.api.projects.list !== 'function') {
     throwDiagnostic('SDK_NOT_READY_E001', {
       op: 'projects.list',
@@ -333,6 +340,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   }
 
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
+
   if (resp.ok === false) {
     const preview = JSON.stringify(resp.data).substring(0, 160);
     logError('Projects', 'projects.list HTTP ' + resp.status + ' for ws=' + wsId + ': ' + preview);
@@ -348,6 +356,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   const out: ProjectEntry[] = [];
   for (const p of list) {
     const id = typeof p.id === 'string' ? p.id : '';
+
     if (!id) {
       continue;
     }
@@ -367,6 +376,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
 
 function handleClearAllFilters(body: HTMLElement, target: HTMLElement): boolean {
   const clearAll = target.closest('[data-clear-filters]') as HTMLElement | null;
+
   if (!clearAll) {
     return false;
   }
@@ -374,6 +384,7 @@ function handleClearAllFilters(body: HTMLElement, target: HTMLElement): boolean 
   const panel = body.closest('#' + DIALOG_ID) as HTMLElement | null;
   state.searchQuery = '';
   const input = panel?.querySelector('[data-search-input]') as HTMLInputElement | null;
+
   if (input) {
     input.value = '';
   }
@@ -393,6 +404,7 @@ function handleClearAllFilters(body: HTMLElement, target: HTMLElement): boolean 
   state.creditsUsedMax = null;
   const minInput = panel?.querySelector('[data-credits-min]') as HTMLInputElement | null;
   const maxInput = panel?.querySelector('[data-credits-max]') as HTMLInputElement | null;
+
   if (minInput) {
     minInput.value = '';
   }
@@ -409,11 +421,13 @@ function handleClearAllFilters(body: HTMLElement, target: HTMLElement): boolean 
 
 function handleWorkspaceToggle(body: HTMLElement, target: HTMLElement): boolean {
   const toggle = target.closest('[data-ws-toggle]') as HTMLElement | null;
+
   if (!toggle) {
     return false;
   }
 
   const wsId = toggle.getAttribute('data-ws-toggle') ?? '';
+
   if (!wsId) {
     return true;
   }
@@ -432,11 +446,13 @@ function handleWorkspaceToggle(body: HTMLElement, target: HTMLElement): boolean 
 
 function handleRowClick(target: HTMLElement): boolean {
   const row = target.closest('[data-open-url]') as HTMLElement | null;
+
   if (!row) {
     return false;
   }
 
   const url = row.getAttribute('data-open-url') ?? '';
+
   if (!url) {
     return true;
   }
@@ -453,6 +469,7 @@ function handleRowClick(target: HTMLElement): boolean {
 function attachRowClicks(body: HTMLElement): void {
   body.addEventListener('click', function (e: Event): void {
     const target = e.target as HTMLElement | null;
+
     if (!target) {
       return;
     }
@@ -484,6 +501,7 @@ function buildZeroResultsPanel(
   creditsMax: number | null,
 ): string {
   const activeChips: string[] = [];
+
   if (q) {
     activeChips.push('search "' + escapeHtml(q) + '"');
   }
@@ -649,6 +667,7 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
               + (openCount > 0 ? ' <span style="color:hsl(var(--warning));font-weight:400;">· ' + openCount + ' open</span>' : '');
 
   let body = '';
+
   if (b.loading) {
     body = '<div style="color:hsl(var(--muted-foreground));font-size:10px;padding:3px 4px;font-style:italic;">Fetching projects…</div>';
   } else if (b.error) {
@@ -943,6 +962,7 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
             + 'border-radius:4px;padding:2px 6px;font-size:10px;font-family:inherit;outline:none;';
     input.addEventListener('input', function () {
       const raw = input.value.trim();
+
       if (raw === '') {
         setValue(null);
         onChange();
@@ -951,6 +971,7 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
       }
 
       const n = Number(raw);
+
       if (Number.isFinite(n) && n >= 0) {
         setValue(n);
         onChange();
@@ -1228,6 +1249,7 @@ function exportCsv(statusEl: HTMLElement): void {
 
   const blocks = state.blocks;
   const tabIndex = state.tabIndex;
+
   if (blocks.length === 0 || !tabIndex) {
     statusEl.style.color = 'hsl(var(--destructive))';
     statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
@@ -1238,6 +1260,7 @@ function exportCsv(statusEl: HTMLElement): void {
   const exportedAt = new Date().toISOString();
   const { rows, fallbackCount, normalizedLastCommunicationCount, filename } =
         _buildExportRows(blocks, tabIndex, exportedAt);
+
   if (rows.length === 0) {
     statusEl.style.color = 'hsl(var(--destructive))';
     statusEl.textContent = '⚠ No projects to export.';
@@ -1256,6 +1279,7 @@ function exportCsv(statusEl: HTMLElement): void {
   statusEl.style.color = 'hsl(var(--success))';
   statusEl.textContent = '✓ Exported ' + rows.length + ' project'
         + (rows.length === 1 ? '' : 's') + ' → ' + filename;
+
   if (fallbackCount > 0) {
     log('Projects: CSV project-name fallback used for ' + fallbackCount + ' row(s)', 'info');
   }
@@ -1276,6 +1300,7 @@ function findOpenTab(projectId: string, tabIndex: OpenTabIndex): OpenTabRow | nu
 
 export function isCsvProjectNameFallback(project: ProjectEntry, tabIndex: OpenTabIndex): boolean {
   const hasProjectName = hasListProjectName(project);
+
   if (hasProjectName) {
     return false;
   }
@@ -1287,6 +1312,7 @@ export function isCsvProjectNameFallback(project: ProjectEntry, tabIndex: OpenTa
 
 export function resolveCsvProjectName(project: ProjectEntry, tabIndex: OpenTabIndex): string {
   const hasProjectName = hasListProjectName(project);
+
   if (hasProjectName) {
     return project.name;
   }
@@ -1318,6 +1344,7 @@ export function getCsvLastCommunicationNormalizedLogMessage(normalizedCount: num
 
 export function logCsvLastCommunicationNormalization(normalizedCount: number, logger: CsvInfoLogger = log): boolean {
   const normalizedLogMessage = getCsvLastCommunicationNormalizedLogMessage(normalizedCount);
+
   if (normalizedLogMessage === null) {
     return false;
   }
@@ -1330,6 +1357,7 @@ export function logCsvLastCommunicationNormalization(normalizedCount: number, lo
 function pickString(obj: Record<string, unknown>, keys: ReadonlyArray<string>): string {
   for (const k of keys) {
     const v = obj[k];
+
     if (typeof v === 'string' && v.length > 0) {
       return v;
     }
@@ -1378,6 +1406,7 @@ function downloadCsv(filename: string, csv: string): void {
 
 function setExportButtonDisabled(disabled: boolean): void {
   const btn = document.getElementById('marco-projects-export-btn') as HTMLButtonElement | null;
+
   if (!btn) {
     return;
   }

@@ -66,6 +66,7 @@ interface ChromeApiLike {
 
 function getChrome(): ChromeApiLike | null {
   const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
+
   if (api === undefined) {
     return null; 
   }
@@ -102,6 +103,7 @@ export function parseSession(value: unknown): RecordingSession | null {
 
   const v = value as Record<string, unknown>;
   const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
+
   if (
     typeof v.SessionId !== "string" ||
         typeof v.ProjectSlug !== "string" ||
@@ -124,6 +126,7 @@ const memoryStore = { current: null as RecordingSession | null };
 
 export async function readSession(): Promise<RecordingSession | null> {
   const transport = detectTransport();
+
   if (transport === CHROME_STORAGE) {
     const local = getChrome()!.storage!.local!;
     const result = await local.get(RECORDER_SESSION_STORAGE_KEY);
@@ -134,6 +137,7 @@ export async function readSession(): Promise<RecordingSession | null> {
   if (transport === "localStorage") {
     try {
       const raw = window.localStorage.getItem(RECORDER_SESSION_STORAGE_KEY);
+
       if (raw === null) {
         return null; 
       }
@@ -151,8 +155,10 @@ export async function readSession(): Promise<RecordingSession | null> {
 
 export async function writeSession(session: RecordingSession): Promise<void> {
   const transport = detectTransport();
+
   if (transport === CHROME_STORAGE) {
     const local = getChrome()!.storage!.local!;
+
     if (session.Phase === "Idle") {
       await local.remove(RECORDER_SESSION_STORAGE_KEY);
     } else {
@@ -218,6 +224,7 @@ function dispatch(session: RecordingSession | null): void {
 
 function installChromeTransport(): void {
   const onChanged = getChrome()?.storage?.onChanged;
+
   if (onChanged !== undefined) {
     chromeListener = (changes, area) => {
       if (area !== "local") {
@@ -225,6 +232,7 @@ function installChromeTransport(): void {
       }
 
       const change = changes[RECORDER_SESSION_STORAGE_KEY];
+
       if (change === undefined) {
         return; 
       }
@@ -319,6 +327,7 @@ export function subscribeRecorderSession(listener: RecorderSessionListener): () 
 
   return () => {
     subscribers.delete(listener);
+
     if (subscribers.size === 0) {
       teardownTransport(); 
     }

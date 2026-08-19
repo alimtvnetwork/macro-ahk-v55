@@ -165,6 +165,7 @@ function useRequestExport(
         SelectedStepGroupIds: ids,
         IncludeDescendants: includeDescendants,
       });
+
       if (preview.Reason !== "Ok") {
         showError(explainExportFailure(preview));
 
@@ -210,6 +211,7 @@ function useConfirmExport(
   return useCallback(async () => {
     const pending = previewState.Pending;
     setPreviewState(INITIAL_PREVIEW);
+
     if (pending === null) {
       return;
     }
@@ -229,6 +231,7 @@ function useConfirmExport(
       SqlJs: lib.SqlJs!,
       JsZip: JSZip,
     });
+
     if (result.Reason !== "Ok") {
       showError(explainExportFailure(result));
 

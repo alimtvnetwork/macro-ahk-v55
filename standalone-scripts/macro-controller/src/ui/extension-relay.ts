@@ -40,6 +40,7 @@ function finishRelay(relay: RelayCtx, resp: ExtensionResponse): void {
   }
 
   relay.settled = true;
+
   if (relay._onResponse) {
     window.removeEventListener('message', relay._onResponse);
   }
@@ -65,6 +66,7 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
         const message = Object.assign({ type: type }, payload);
         chrome.runtime.sendMessage(message, function(resp: ExtensionResponse) {
           const lastError = chrome.runtime?.lastError;
+
           if (lastError) {
             log('Extension message error: ' + (lastError.message || ''), 'warn');
             resolve({ isOk: false, errorMessage: lastError.message || 'runtime error' });

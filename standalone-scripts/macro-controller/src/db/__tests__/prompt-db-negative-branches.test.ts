@@ -25,6 +25,7 @@ let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
   sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
     captured.push({ method: payload.method, sql: payload.params.sql });
+
     if (responsesQueue && responsesQueue.length > 0) {
       return responsesQueue.shift();
     }
@@ -35,6 +36,7 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
 vi.mock('../../ui/extension-relay', () => ({
   sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
     captured.push({ method: payload.method, sql: payload.params.sql });
+
     if (responsesQueue && responsesQueue.length > 0) {
       return responsesQueue.shift();
     }

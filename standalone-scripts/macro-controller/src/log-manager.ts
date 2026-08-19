@@ -106,6 +106,7 @@ const logConfigState = new LogConfigState();
 function loadConfig(): void {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<LogManagerConfig>;
       logConfigState.config = {
@@ -140,6 +141,7 @@ loadConfig();
 /** Check if a log at the given level should be emitted */
 export function shouldLog(level?: string): boolean {
   const config = logConfigState.config;
+
   if (!config.enabled) {
     return false; 
   }
@@ -149,6 +151,7 @@ export function shouldLog(level?: string): boolean {
   }
 
   const normalized = level.toLowerCase();
+
   if (config.levels[normalized] === undefined) {
     return true; 
   }

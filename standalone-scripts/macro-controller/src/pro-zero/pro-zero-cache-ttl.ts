@@ -39,6 +39,7 @@ function clamp(min: number): number {
 
 export function getProZeroCacheTtlMinutes(): number {
   const override = readOverrideMinutes();
+
   if (override !== undefined) {
     return clamp(override);
   }

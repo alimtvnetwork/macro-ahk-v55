@@ -67,12 +67,14 @@ function makeWs(overrides: Partial<WorkspaceCredit>): WorkspaceCredit {
 function extractSubscriptionSection(html: string): string {
   const headerToken = 'Subscription';
   const headerIdx = html.indexOf(headerToken);
+
   if (headerIdx === -1) {
     return '';
   }
 
   // Walk back to the start of the surrounding <div ...>Subscription</div>.
   const sectionOpen = html.lastIndexOf('<div', headerIdx);
+
   if (sectionOpen === -1) {
     return '';
   }

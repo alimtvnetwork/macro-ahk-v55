@@ -38,6 +38,7 @@ function walkNode(node: Node, out: string[]): void {
   }
 
   const element = node as Element;
+
   if (element.tagName === 'BR') {
     out.push('\n');
 
@@ -45,6 +46,7 @@ function walkNode(node: Node, out: string[]): void {
   }
 
   const isBlock = isBlockElement(element);
+
   if (isBlock && out.length > 0 && !out[out.length - 1].endsWith('\n')) {
     out.push('\n');
   }
@@ -77,6 +79,7 @@ export function extractEditorPlainText(target: Element): string {
 
 function selectAllInside(editor: HTMLElement): void {
   const sel = window.getSelection();
+
   if (!sel) {
     return;
   }
@@ -90,6 +93,7 @@ function selectAllInside(editor: HTMLElement): void {
 function insertLineWithBreaks(line: string, isFirst: boolean): boolean {
   if (!isFirst) {
     const isParaOk = document.execCommand('insertParagraph', false);
+
     if (!isParaOk) {
       document.execCommand('insertLineBreak', false);
     }
@@ -120,6 +124,7 @@ function writeTextInput(target: HTMLTextAreaElement | HTMLInputElement, text: st
       ? window.HTMLTextAreaElement.prototype
       : window.HTMLInputElement.prototype;
     const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+
     if (setter) {
       setter.call(target, text);
     } else {
@@ -147,6 +152,7 @@ function writeContentEditable(editor: HTMLElement, text: string): boolean {
     for (let i = 0; i < lines.length; i++) {
       const isFirst = i === 0;
       const isOk = insertLineWithBreaks(lines[i], isFirst);
+
       if (!isOk) {
         allOk = false;
       }

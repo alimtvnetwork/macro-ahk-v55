@@ -33,6 +33,7 @@ function elementSummary(el: DomContext | null): string {
   }
 
   const attrs: string[] = [];
+
   if (el.Id !== null)        {
     attrs.push(`#${el.Id}`);
   }
@@ -43,6 +44,7 @@ function elementSummary(el: DomContext | null): string {
 
   const attrSegment = attrs.length > 0 ? ` ${attrs.join("")}` : "";
   const head = `<${el.TagName}${attrSegment}>`;
+
   if (el.TextSnippet.length === 0) {
     return head;
   }

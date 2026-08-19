@@ -251,6 +251,7 @@ export function normalizeRow(row: SqlRow): Record<string, SqlValue> {
     // Convert first char to lowercase: "Timestamp" → "timestamp", "StackTrace" → "stackTrace"
     const camel = key.charAt(0).toLowerCase() + key.slice(1);
     out[camel] = value;
+
     // Also keep original key so nothing breaks if already camelCase
     if (camel !== key) {
       out[key] = value;

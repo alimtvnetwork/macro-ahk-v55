@@ -69,6 +69,7 @@ describe("buildExecutionNextPreview", () => {
     const preview = buildExecutionNextPreview({ steps, links });
     const next = preview[0].Next;
     expect(next.Kind).toBe("Project");
+
     if (next.Kind === "Project") {
       expect(next.Project.Slug).toBe("ghost-slug");
       expect(next.Project.Name).toBe("ghost-slug");

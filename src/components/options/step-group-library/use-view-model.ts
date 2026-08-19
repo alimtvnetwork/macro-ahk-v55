@@ -63,17 +63,20 @@ function sortGroupsByOrder(
 ) {
   const aKey = (a.ParentStepGroupId ?? "root") as number | "root";
   const bKey = (b.ParentStepGroupId ?? "root") as number | "root";
+
   if (aKey !== bKey) {
     return 0;
   }
 
   const positions = positionByParent.get(aKey);
+
   if (positions === undefined) {
     return 0;
   }
 
   const ai = positions.get(a.StepGroupId);
   const bi = positions.get(b.StepGroupId);
+
   if (ai === undefined || bi === undefined) {
     return 0;
   }
@@ -127,6 +130,7 @@ function useGroupOrderSettle(
         .filter((g) => (g.ParentStepGroupId ?? null) === parentId)
         .sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name))
         .map((g) => g.StepGroupId);
+
       if (actual.length !== ids.length || actual.some((id, i) => id !== ids[i])) {
         allSettled = false;
         break;
@@ -158,6 +162,7 @@ function useLibraryTreeSearch(
       for (const n of nodes) {
         const selfMatch = n.Group.Name.toLowerCase().includes(trimmedQuery);
         const kids = filterNodes(n.Children);
+
         if (selfMatch || kids.length > 0) {
           if (kids.length > 0) {
             expandIds.add(n.Group.StepGroupId);
@@ -210,6 +215,7 @@ function useActiveGroupSteps(
 
     const loaded = lib.StepsByGroup.get(activeGroupId) ?? [];
     const override = pendingStepOrder.get(activeGroupId);
+
     if (override === undefined) {
       return loaded;
     }
@@ -218,6 +224,7 @@ function useActiveGroupSteps(
     const out: StepRow[] = [];
     for (const id of override) {
       const row = byId.get(id);
+
       if (row !== undefined) {
         out.push(row);
         byId.delete(id);
@@ -239,6 +246,7 @@ function useActiveGroupSteps(
     let allSettled = true;
     for (const [gid, ids] of pendingStepOrder) {
       const actual = (lib.StepsByGroup.get(gid) ?? []).map((s) => s.StepId);
+
       if (actual.length !== ids.length || actual.some((id, i) => id !== ids[i])) {
         allSettled = false;
         break;

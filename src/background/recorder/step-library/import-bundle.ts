@@ -112,21 +112,25 @@ async function unpackBundle(
   jsZip: typeof JSZipType,
 ): Promise<UnpackedBundle | ImportFailure> {
   const zipResult = await openZip(zipBytes, jsZip);
+
   if ("Reason" in zipResult) {
     return zipResult; 
   }
 
   const manifestResult = await readManifest(zipResult);
+
   if ("Reason" in manifestResult) {
     return manifestResult; 
   }
 
   const versionCheck = checkManifestVersion(manifestResult);
+
   if (versionCheck !== null) {
     return versionCheck; 
   }
 
   const dbResult = await readAndVerifyDb(zipResult, manifestResult);
+
   if ("Reason" in dbResult) {
     return dbResult; 
   }
@@ -150,6 +154,7 @@ async function openZip(
 
 async function readManifest(zip: JSZipType): Promise<StepGroupExportManifest | ImportFailure> {
   const manifestEntry = zip.file(MANIFEST_FILE);
+
   if (manifestEntry === null) {
     return { Reason: "ManifestMissing", Detail: `Bundle has no ${MANIFEST_FILE}.` };
   }
@@ -175,6 +180,7 @@ async function readManifest(zip: JSZipType): Promise<StepGroupExportManifest | I
   }
 
   const validation = validateManifestShape(manifest);
+
   if (validation !== null) {
     return validation; 
   }
@@ -200,6 +206,7 @@ async function readAndVerifyDb(
   manifest: StepGroupExportManifest,
 ): Promise<Uint8Array | ImportFailure> {
   const dbEntry = zip.file(manifest.DbFileName);
+
   if (dbEntry === null) {
     return {
       Reason: "DbFileMissing",
@@ -227,6 +234,7 @@ async function readAndVerifyDb(
   }
 
   const observedSha = await sha256Hex(dbBytes);
+
   if (observedSha !== manifest.DbSha256) {
     return {
       Reason: "DbChecksumMismatch",
@@ -294,6 +302,7 @@ function uniqueRenameFor(
 
   for (let n = 1; n <= RENAME_MAX_ATTEMPTS; n++) {
     const candidate = n === 1 ? `${desired} (imported)` : `${desired} (imported ${n})`;
+
     if (!existingLower.has(candidate.toLowerCase())) {
       return candidate;
     }
@@ -364,6 +373,7 @@ function orderByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[] {
       const parent = r.ParentStepGroupId;
       const parentReady =
                 parent === null || !ids.has(parent) || placed.has(parent);
+
       if (parentReady) {
         out.push(r);
         placed.add(id);
@@ -397,6 +407,7 @@ export async function runStepGroupImport(
   const attachUnder = init.AttachUnderStepGroupId ?? null;
 
   const unpacked = await unpackBundle(init.ZipBytes, init.JsZip);
+
   if ("Reason" in unpacked) {
     return unpacked;
   }
@@ -404,6 +415,7 @@ export async function runStepGroupImport(
   const { Manifest: manifest, DbBytes: dbBytes } = unpacked;
 
   const sourceOpen = openSourceDb(dbBytes, init.SqlJs);
+
   if ("Reason" in sourceOpen) {
     return sourceOpen;
   }
@@ -412,11 +424,13 @@ export async function runStepGroupImport(
 
   try {
     const schemaResult = applySourceSchema(sourceDb);
+
     if (schemaResult !== null) {
       return schemaResult;
     }
 
     const destCheck = validateDestination(init, attachUnder);
+
     if ("Reason" in destCheck) {
       return destCheck;
     }
@@ -425,6 +439,7 @@ export async function runStepGroupImport(
 
     const graph = collectSourceGraph(sourceDb);
     const runGroupCheck = checkRunGroupTargets(graph);
+
     if (runGroupCheck !== null) {
       return runGroupCheck;
     }
@@ -436,6 +451,7 @@ export async function runStepGroupImport(
       attachUnder,
       conflict,
     });
+
     if ("Reason" in plan) {
       return plan;
     }
@@ -487,6 +503,7 @@ function validateDestination(
   const destLib = init.Destination;
   const destProject = destLib.listProjects()
     .find((p) => p.ProjectId === init.DestinationProjectId);
+
   if (destProject === undefined) {
     return {
       Reason: "DestinationProjectMissing",
@@ -496,8 +513,10 @@ function validateDestination(
   }
 
   const destGroups = destLib.listGroups(init.DestinationProjectId);
+
   if (attachUnder !== null) {
     const parent = destGroups.find((g) => g.StepGroupId === attachUnder);
+
     if (parent === undefined) {
       return {
         Reason: "AttachParentMissing",
@@ -535,8 +554,10 @@ function collectSourceGraph(sourceDb: Database): SourceGraph {
   for (const g of sourceGroups) {
     for (const s of readStepsForGroup(sourceDb, g.StepGroupId)) {
       allSourceSteps.push(s);
+
       if (s.StepKindId === StepKindId.RunGroup) {
         runGroupRefs += 1;
+
         if (s.TargetStepGroupId === null || !sourceIdSet.has(s.TargetStepGroupId)) {
           dangling.push(s.StepId);
         }
@@ -592,11 +613,13 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
   for (const g of sourceGroups) {
     const isRoot = g.ParentStepGroupId === null || !sourceIdSet.has(g.ParentStepGroupId);
     const notRoot = !isRoot;
+
     if (notRoot) {
       continue;
     }
 
     const outcome = resolveRootNameConflict(g, destSiblingNamesLower, conflict);
+
     if ("Reason" in outcome) {
       return outcome; 
     }
@@ -649,6 +672,7 @@ function resolveRootNameConflict(
   }
 
   const renamed = uniqueRenameFor(g.Name, destSiblingNamesLower);
+
   if (renamed === null) {
     return {
       Reason: "NameConflict",
@@ -780,6 +804,7 @@ function insertGroups(
     });
     idMap.set(g.StepGroupId, newId);
     importedGroupCount += 1;
+
     if (isRoot) {
       rootStepGroupIds.push(newId);
     }
@@ -806,6 +831,7 @@ function insertSteps(input: InsertStepsInput): number {
   const runGroupSteps: StepRow[] = [];
   for (const s of graph.allSourceSteps) {
     const newGroupId = idMap.get(s.StepGroupId);
+
     if (newGroupId === undefined) {
       continue;
     } // skipped subtree
@@ -826,12 +852,14 @@ function insertSteps(input: InsertStepsInput): number {
 
   for (const s of runGroupSteps) {
     const newGroupId = idMap.get(s.StepGroupId);
+
     if (newGroupId === undefined) {
       continue;
     }
 
     const oldTarget = s.TargetStepGroupId;
     const newTarget = oldTarget === null ? null : (idMap.get(oldTarget) ?? null);
+
     if (newTarget === null) {
       // Target was in a skipped subtree - bail and roll back.
       throw new Error(

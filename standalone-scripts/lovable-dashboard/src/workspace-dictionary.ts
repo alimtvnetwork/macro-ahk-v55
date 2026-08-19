@@ -22,6 +22,7 @@ export async function buildWorkspaceDictionary(): Promise<WorkspaceDictionary> {
 
 function scrapeWorkspaceItems(): Omit<WorkspaceRecord, "creditAvailable" | "creditTotal">[] {
   const list = resolveElement(HomepageDashboardVariables.WorkspacesList.full);
+
   if (!list) {
     logWarn("WorkspaceDictionary.scrape", `CODE RED: WorkspacesList missing at ${HomepageDashboardVariables.WorkspacesList.full}`);
 
@@ -59,6 +60,7 @@ function assembleDictionary(
 
 function mergeCredit(partial: Omit<WorkspaceRecord, "creditAvailable" | "creditTotal">, credits: CreditMap): WorkspaceRecord {
   const pair = credits.get(partial.name);
+
   if (!pair) {
     logWarn("WorkspaceDictionary.merge", `no credit for "${partial.name}"`);
   }

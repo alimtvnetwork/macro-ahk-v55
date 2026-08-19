@@ -69,6 +69,7 @@ export function registerCookieWatcher(): void {
 function scheduleCookieChange(changeInfo: chrome.cookies.CookieChangeInfo): void {
   const key = changeInfo.cookie.name;
   const existing = pendingByName.get(key);
+
   if (existing !== undefined) {
     clearTimeout(existing.timer);
   }
@@ -98,6 +99,7 @@ async function handleCookieChange(
   const isRelevantCookie = isTargetDomain && (isSessionCookie || isRefreshCookie);
 
   const isMissing = !isRelevantCookie;
+
   if (isMissing) {
     return;
   }
@@ -264,6 +266,7 @@ async function broadcastToTargetTabs(
     const hasTargetTabs = tabs.length > 0;
 
     const isMissing054 = !hasTargetTabs;
+
     if (isMissing054) {
       return;
     }

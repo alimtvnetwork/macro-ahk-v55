@@ -57,6 +57,7 @@ function removeDomSentinel(): boolean {
     }
 
     const element = document.getElementById(MARCO_SENTINEL_DOM_ID);
+
     if (!element) {
       return false;
     }
@@ -83,6 +84,7 @@ function clearRelayFlag(): boolean {
     }
 
     const bag = window as unknown as Record<string, unknown>;
+
     if (!(MARCO_RELAY_ACTIVE_KEY in bag)) {
       return false;
     }

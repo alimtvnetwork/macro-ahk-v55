@@ -119,6 +119,7 @@ export function normalizeInjectScriptsResponse(
   const safe: Partial<InjectScriptsResponse> = raw ?? { results: [] };
   const results = Array.isArray(safe.results) ? safe.results : [];
   const flag = safe.inlineSyntaxErrorDetected;
+
   if (typeof flag === "boolean") {
     return {
       results,

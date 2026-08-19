@@ -12,6 +12,7 @@ import { PRO_ZERO_DB_NAME, PRO_ZERO_DB_STORE, PRO_ZERO_DB_VERSION } from './pro-
 function ensureStore(req: IDBOpenDBRequest): void {
   req.onupgradeneeded = function (): void {
     const db = req.result;
+
     if (!db.objectStoreNames.contains(PRO_ZERO_DB_STORE)) {
       db.createObjectStore(PRO_ZERO_DB_STORE, { keyPath: 'workspaceId' });
     }

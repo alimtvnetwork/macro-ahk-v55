@@ -147,6 +147,7 @@ function SchemaToolbar({
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
+
             if (f) {
               onImport(f);
             }

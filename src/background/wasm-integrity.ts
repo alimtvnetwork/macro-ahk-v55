@@ -202,6 +202,7 @@ export async function verifyWasmChecksum(wasmBinary: ArrayBuffer): Promise<WasmC
   const checksumUrl = chrome.runtime.getURL(CHECKSUM_RESOURCE_PATH);
 
   const loaded = await loadChecksumManifest(checksumUrl);
+
   if (loaded.kind === "missing") {
     return {
       status: "manifest-missing",

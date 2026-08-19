@@ -21,6 +21,7 @@ const SCOPE_PREFIX = "Popup.";
  */
 export function logError(scope: string, message: string, caught?: unknown): void {
   const fullScope = `${SCOPE_PREFIX}${scope}`;
+
   if (caught !== undefined) {
     console.error(`[${fullScope}] ${message}`, caught);
   } else {

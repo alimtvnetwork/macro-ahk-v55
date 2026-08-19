@@ -76,6 +76,7 @@ function wireToggle(row: HTMLElement, arrow: HTMLElement, sub: HTMLElement, drop
 
   row.onclick = function(e: Event) {
     e.stopPropagation();
+
     if (count === 0) {
       return;
     }
@@ -92,6 +93,7 @@ function keepInView(dropdown: HTMLElement, sub: HTMLElement): void {
   window.requestAnimationFrame(function() {
     const dr = dropdown.getBoundingClientRect();
     const sr = sub.getBoundingClientRect();
+
     if (sr.bottom > dr.bottom) {
       dropdown.scrollTop += Math.ceil(sr.bottom - dr.bottom + 6);
     }

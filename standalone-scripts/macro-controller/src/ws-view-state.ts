@@ -41,6 +41,7 @@ class WsListViewState {
   private loadCreditSortMode(): CreditSortModeType {
     try {
       const stored = localStorage.getItem('ml_credit_sort_mode');
+
       if (stored === 'high' || stored === 'low' || stored === 'pro-high' || stored === 'pro-low') {
         return stored;
       }

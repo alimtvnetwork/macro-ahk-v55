@@ -308,6 +308,7 @@ describe("runJsStepWithDiagnostics", () => {
       Run: async () => fakeResult,
     });
     expect(outcome.IsOk).toBe(true);
+
     if (outcome.IsOk) {
       expect(outcome.Result).toBe(fakeResult);
     }
@@ -323,6 +324,7 @@ describe("runJsStepWithDiagnostics", () => {
       },
     });
     expect(outcome.IsOk).toBe(false);
+
     if (!outcome.IsOk) {
       const report = outcome.FailureReport;
       expect(report.Reason).toBe("JsThrew");

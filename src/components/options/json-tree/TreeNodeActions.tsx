@@ -65,6 +65,7 @@ function AddChildButton({ value, path, onUpdate }: AddChildButtonProps) {
     }
 
     const isArr = Array.isArray(value);
+
     if (isArr) {
       onUpdate(path, [...(value as JsonArray), ""]);
     }

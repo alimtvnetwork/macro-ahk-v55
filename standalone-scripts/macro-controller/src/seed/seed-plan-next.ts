@@ -85,12 +85,14 @@ async function selectExistingSlugs(): Promise<Set<string>> {
   const sql = 'SELECT Slug FROM Prompt WHERE Slug IN (' + list + ')';
   const resp = await rawSql('QUERY', sql);
   const out = new Set<string>();
+
   if (resp.ok === false || !Array.isArray(resp.rows)) {
     return out;
   }
 
   for (const row of resp.rows) {
     const slug = (row as { Slug?: unknown }).Slug;
+
     if (typeof slug === 'string') {
       out.add(slug);
     }
@@ -103,6 +105,7 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
   const sql = 'SELECT 1 FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
   const resp = await rawSql('QUERY', sql);
+
   if (resp.ok === false) {
     return false;
   }
@@ -114,6 +117,7 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
   const sql = 'UPDATE Prompt SET IsDefault = 1 WHERE Slug = '
         + sqlLit(slug) + ' AND Role = ' + sqlLit(role);
   const resp = await rawSql('SCHEMA', sql);
+
   if (resp.ok === false) {
     const message = resp.errorMessage ?? '?';
     logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
@@ -149,6 +153,7 @@ function tallyInsertCounts(existing: Set<string>, tel: Map<PromptRole, RoleTelem
   for (const row of PLAN_NEXT_SEED_ROWS) {
     const bucket = tel.get(row.role);
     const isBucketMissing = !bucket;
+
     if (isBucketMissing) {
       continue;
     }
@@ -166,6 +171,7 @@ async function promoteDefaultsAndTally(tel: Map<PromptRole, RoleTelemetry>): Pro
   for (const row of defaults) {
     const bucket = tel.get(row.role);
     const already = await hasDefaultForRole(row.role);
+
     if (already) {
       if (bucket) {
         bucket.alreadyDefault += 1;
@@ -176,6 +182,7 @@ async function promoteDefaultsAndTally(tel: Map<PromptRole, RoleTelemetry>): Pro
     }
 
     const ok = await promoteSeedDefault(row.role, row.slug);
+
     if (ok && bucket) {
       bucket.promotedDefault += 1;
     }
@@ -263,6 +270,7 @@ function isManagedPlanPromptDrift(slug: string, body: string): boolean {
 
 function isBundledDefaultDrift(row: typeof PLAN_NEXT_SEED_ROWS[number], body: string): boolean {
   const isRowAlternate = !row.isDefault;
+
   if (isRowAlternate) {
     return false;
   }
@@ -300,6 +308,7 @@ function isManagedNextDefault(body: string): boolean {
 
 function resolveUpgradeMatch(row: typeof PLAN_NEXT_SEED_ROWS[number], currentBody: string): UpgradeMatch {
   const legacyIndex = findLegacyBodyIndex(currentBody, legacyBodiesForSlug(row.slug));
+
   if (legacyIndex >= 0) {
     return { isMatch: true, detail: 'legacy-body', legacyIndex };
   }
@@ -322,6 +331,7 @@ function resolveUpgradeMatch(row: typeof PLAN_NEXT_SEED_ROWS[number], currentBod
 async function readCurrentBody(slug: string): Promise<string | null> {
   const readSql = 'SELECT Body FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
   const readResp = await rawSql('QUERY', readSql);
+
   if (readResp.ok === false || !Array.isArray(readResp.rows) || readResp.rows.length === 0) {
     return null;
   }
@@ -336,6 +346,7 @@ function emitLegacySkip(row: typeof PLAN_NEXT_SEED_ROWS[number], detail: string,
     event: 'seed.legacy-upgrade-skip', role: row.role, slug: row.slug,
     outcome: 'skipped', detail,
   };
+
   if (bodyLen !== undefined) {
     event.metrics = { bodyLen };
   }
@@ -374,6 +385,7 @@ async function applyLegacyBodyUpgrade(
   match: UpgradeMatch,
 ): Promise<boolean> {
   const updateResp = await rawSql('SCHEMA', buildBodyUpdateSql(row));
+
   if (updateResp.ok === false) {
     emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
 
@@ -388,11 +400,13 @@ async function applyLegacyBodyUpgrade(
 
 async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]): Promise<boolean> {
   const legacyBodies = legacyBodiesForSlug(row.slug);
+
   if (legacyBodies.length === 0) {
     return false;
   }
 
   const currentBody = await readCurrentBody(row.slug);
+
   if (currentBody === null) {
     emitLegacySkip(row, 'row-missing');
 
@@ -407,6 +421,7 @@ async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]):
 
   const match = resolveUpgradeMatch(row, currentBody);
   const isMatchFailed = !match.isMatch;
+
   if (isMatchFailed) {
     emitLegacySkip(row, match.detail, currentBody.length);
 
@@ -420,6 +435,7 @@ async function upgradeLegacyDefaultBodies(): Promise<number> {
   let upgraded = 0;
   for (const row of PLAN_NEXT_SEED_ROWS.filter(r => r.isDefault)) {
     const applied = await upgradeLegacyBodyForRow(row);
+
     if (applied) {
       upgraded += 1;
     }
@@ -451,6 +467,7 @@ async function writeSeedAuditRow(params: {
     promoted === 0 &&
     params.upgraded === 0;
   const isNoChangeBoot = isBootSuccessful && isNoNewData;
+
   if (isNoChangeBoot) {
     emitPromptSeedEvent({
       event: 'seed.audit-skip', outcome: 'skipped',
@@ -482,6 +499,7 @@ async function writeSeedAuditRow(params: {
           sqlLit(JSON.stringify(params.telemetry)),
         ].join(', ') + ')';
   const resp = await rawSql('SCHEMA', sql);
+
   if (resp.ok === false) {
     const message = resp.errorMessage ?? '?';
     logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
@@ -576,6 +594,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
     const existing = await selectExistingSlugs();
     tallyInsertCounts(existing, tel);
     const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
+
     if (insertResp.ok === false) {
       const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
 

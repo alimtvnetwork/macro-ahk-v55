@@ -22,6 +22,7 @@ interface SdkBridge {
 
 function getSdk(stage: string): SdkBridge {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+
   if (!sdk || !sdk.api || !sdk.api.credits) {
     throwDiagnostic('PROZERO_ADAPTER_E001', { stage });
   }

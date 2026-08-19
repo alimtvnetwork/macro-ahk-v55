@@ -61,12 +61,14 @@ function collectRelevantProjectIds(
   const queue = [...(activeProject.dependencies ?? []).map((d) => d.projectId)];
   while (queue.length > 0) {
     const depId = queue.shift()!;
+
     if (relevantIds.has(depId)) {
       continue;
     }
 
     relevantIds.add(depId);
     const depProject = allProjects.find((p) => p.id === depId);
+
     if (depProject?.dependencies) {
       for (const sub of depProject.dependencies) {
         if (!relevantIds.has(sub.projectId)) {
@@ -219,6 +221,7 @@ describe("Auth: buildAuthCookieHeader", () => {
       refreshLookup: CookieLookupResult,
     ): string {
       const parts: string[] = [];
+
       if (sessionLookup.value !== null) {
         parts.push(`${sessionLookup.cookieName ?? "lovable-session-id.id"}=${sessionLookup.value}`);
       }
@@ -258,6 +261,7 @@ describe("Auth: buildAuthCookieHeader", () => {
 describe("Auth: extractProjectIdFromUrl", () => {
   function extractProjectIdFromUrl(url: string): string | null {
     const pathMatch = url.match(/\/projects\/([^/?#]+)/);
+
     if (pathMatch) {
       return pathMatch[1];
     }
@@ -267,16 +271,19 @@ describe("Auth: extractProjectIdFromUrl", () => {
       const firstLabel = hostname.split(".")[0] ?? "";
 
       const idPreviewMatch = firstLabel.match(/^id-preview--([a-f0-9-]{36})$/i);
+
       if (idPreviewMatch) {
         return idPreviewMatch[1];
       }
 
       const previewSuffixMatch = firstLabel.match(/^([a-f0-9-]{36})(?:--preview|-preview)$/i);
+
       if (previewSuffixMatch) {
         return previewSuffixMatch[1];
       }
 
       const bareUuidMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
+
       if (bareUuidMatch) {
         return bareUuidMatch[1];
       }

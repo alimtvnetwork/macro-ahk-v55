@@ -79,6 +79,7 @@ const DEFAULT_PROJECT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000001";
 
 function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadError {
   const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
+
   if (stage === "sqljs") {
     return {
       Kind: "SqlJsLoad",
@@ -144,6 +145,7 @@ type StorageReadResult =
 async function readBytesFromStorage(): Promise<StorageReadResult> {
   try {
     const bytes = await WorkspaceStorage.get<Uint8Array>(STORAGE_KEY);
+
     if (!bytes) {
       return { Kind: "Empty" };
     }
@@ -190,6 +192,7 @@ function openDatabase(sqljs: SqlJsStatic, readResult: StorageReadResult): Databa
 
 async function ensureProjectSeeded(wrapper: StepLibraryDb): Promise<{ ProjectId: number; SeedError: StepLibraryLoadError | null }> {
   const existing = wrapper.listProjects();
+
   if (existing.length > 0) {
     return { ProjectId: existing[0].ProjectId, SeedError: null };
   }
@@ -200,6 +203,7 @@ async function ensureProjectSeeded(wrapper: StepLibraryDb): Promise<{ ProjectId:
   });
   seedExampleData(wrapper, projectId);
   const writeResult = await writeBytesToStorage(wrapper.exportDbBytes());
+
   if (writeResult.Ok) {
     return { ProjectId: projectId, SeedError: null };
   }
@@ -211,6 +215,7 @@ async function openLibraryAndMaybeSeed(sqljs: SqlJsStatic, readResult: StorageRe
   try {
     const wrapper = new StepLibraryDb(openDatabase(sqljs, readResult));
     const seeded = await ensureProjectSeeded(wrapper);
+
     if (seeded.SeedError !== null) {
       return { Kind: "Err", Error: seeded.SeedError };
     }

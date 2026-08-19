@@ -33,6 +33,7 @@ export interface XPathOptions {
 
 function tryIdShortcut(el: Element, id: string): string | null {
   const doc = el.ownerDocument;
+
   if (doc === null) {
     return null;
   }
@@ -40,6 +41,7 @@ function tryIdShortcut(el: Element, id: string): string | null {
   // querySelectorAll handles invalid id chars gracefully via try/catch.
   try {
     const matches = doc.querySelectorAll(`#${cssEscapeId(id)}`);
+
     if (matches.length === 1 && matches[0] === el) {
       return `//*[@id='${escapeXPathLiteral(id)}']`;
     }
@@ -56,6 +58,7 @@ function buildPositionalXPath(el: Element): string {
   while (current !== null && current.nodeType === 1 /* ELEMENT_NODE */) {
     const parent: Element | null = current.parentElement;
     const tag = current.tagName.toLowerCase();
+
     if (parent === null) {
       segments.unshift(`/${tag}`);
       break; 
@@ -76,8 +79,10 @@ export function xpathOfElement(el: Element | null, opts: XPathOptions = {}): str
 
   const useId = opts.UseIdShortcut !== false;
   const id = el.getAttribute("id");
+
   if (useId && id !== null && id.length > 0) {
     const short = tryIdShortcut(el, id);
+
     if (short !== null) {
       return short;
     }
@@ -93,6 +98,7 @@ export function xpathOfElement(el: Element | null, opts: XPathOptions = {}): str
 function positionAmongSameTagSiblings(el: Element): number {
   const tag = el.tagName;
   const parent = el.parentElement;
+
   if (parent === null) {
     return 1;
   }
@@ -117,6 +123,7 @@ function cssEscapeId(id: string): string {
   // Defer to CSS.escape when available (jsdom + browsers), otherwise fall
   // back to a conservative escape that handles the most common breakages.
   const cssNs = (globalThis as { CSS?: { escape?: (s: string) => string } }).CSS;
+
   if (cssNs?.escape !== undefined) {
     return cssNs.escape(id);
   }

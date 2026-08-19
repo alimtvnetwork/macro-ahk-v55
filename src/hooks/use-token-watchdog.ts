@@ -51,6 +51,7 @@ export interface TokenWatchdogState {
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
+
     if (parts.length !== 3) {
       return null;
     }
@@ -73,6 +74,7 @@ function extractToken(result: Record<string, unknown> | null): string | null {
 
   for (const key of ["token", "authToken", "sessionId"]) {
     const tokenValue = result[key];
+
     if (typeof tokenValue === "string" && tokenValue.length > 0) {
       return tokenValue;
     }
@@ -93,6 +95,7 @@ function formatTtl(sec: number | null): string {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
+
   if (h > 0) {
     return `${h}h ${m}m`;
   }
@@ -144,6 +147,7 @@ export function useTokenWatchdog(): TokenWatchdogState {
     }
 
     const payload = decodeJwtPayload(token);
+
     if (!payload) {
       setTtlSec(null);
       expRef.current = null;
@@ -185,6 +189,7 @@ export function useTokenWatchdog(): TokenWatchdogState {
     try {
       const result = await sendMessage<Record<string, unknown>>({ type: "REFRESH_TOKEN" });
       const token = extractToken(result);
+
       if (token) {
         updateFromToken(token, typeof result.source === "string" ? result.source : "extension");
         setLastRefreshResult("success");
@@ -207,6 +212,7 @@ export function useTokenWatchdog(): TokenWatchdogState {
   // TTL countdown + auto-refresh — visibility-paused (PERF-10).
   useVisibilityPausedInterval(() => {
     const exp = expRef.current;
+
     if (exp === null) {
       return; 
     }

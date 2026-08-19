@@ -35,6 +35,7 @@ const SidebarContext = React.createContext<SidebarContext | null>(null);
 
 function useSidebar() {
   const context = React.useContext(SidebarContext);
+
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.");
   }
@@ -61,6 +62,7 @@ const SidebarProvider = React.forwardRef<
         const setOpen = React.useCallback(
           (value: boolean | ((value: boolean) => boolean)) => {
             const openState = typeof value === "function" ? value(open) : value;
+
             if (setOpenProp) {
               setOpenProp(openState);
             } else {

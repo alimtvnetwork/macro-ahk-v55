@@ -52,12 +52,14 @@ export function isValidWorkspaceCandidateName(name: string, projectName?: string
 
 export function matchWorkspaceByName(rawName: string, perWs: WorkspaceCredit[]): WorkspaceCredit | null {
   const normalizedRaw = normalizeWorkspaceName(rawName);
+
   if (!normalizedRaw || !perWs || perWs.length === 0) {
     return null;
   }
 
   for (const ws of perWs) {
     const fullName = (ws.fullName || ws.name || '') as string;
+
     if (normalizeWorkspaceName(fullName) === normalizedRaw) {
       return ws;
     }
@@ -72,11 +74,13 @@ export function matchWorkspaceByName(rawName: string, perWs: WorkspaceCredit[]):
 
 export function pushWorkspaceNameCandidate(target: Array<{ name: string; selected: boolean }>, name: string, selected: boolean): void {
   const cleaned = (name || '').replace(/\u00a0/g, ' ').trim();
+
   if (!cleaned) {
     return;
   }
 
   const normalized = normalizeWorkspaceName(cleaned);
+
   if (!normalized) {
     return;
   }
@@ -96,6 +100,7 @@ export function pushWorkspaceNameCandidate(target: Array<{ name: string; selecte
 
 export function expandWorkspaceNameCandidates(rawText: string, selected: boolean, target: Array<{ name: string; selected: boolean }>): void {
   const base = (rawText || '').replace(/\u00a0/g, ' ').trim();
+
   if (!base) {
     return;
   }
@@ -105,6 +110,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
   const lines = base.split(/\r?\n+/);
   for (const line of lines) {
     const trimmedLine = line.trim();
+
     if (!trimmedLine) {
       continue;
     }
@@ -112,6 +118,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
     pushWorkspaceNameCandidate(target, trimmedLine, selected);
 
     const stripped = trimmedLine.replace(/^(workspace|current workspace|selected workspace|project)\s*[:\u002D]\s*/i, '').trim();
+
     if (stripped && stripped !== trimmedLine) {
       pushWorkspaceNameCandidate(target, stripped, selected);
     }
@@ -119,6 +126,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
     const tokens = trimmedLine.split(/\s*[|•·→]\s*/);
     for (const token of tokens) {
       const trimmedToken = token.trim();
+
       if (!trimmedToken) {
         continue;
       }
@@ -148,6 +156,7 @@ export function isLikelySelectedWorkspaceNode(node: Node): boolean {
   let el: Element | null = node;
   for (let i = 0; i < 4 && el; i++) {
     const className = ((el.className as string) || '').toLowerCase();
+
     if (/(^|\s)(selected|active|current|checked)(\s|$)/.test(className) || /\bis-(selected|active|current|checked)\b/.test(className)) {
       return true;
     }
@@ -170,6 +179,7 @@ function collectFromElement(
   expandWorkspaceNameCandidates((el.textContent || '').trim(), selected, candidates);
   for (const key of attrKeys) {
     const attributeValue = el.getAttribute(key);
+
     if (attributeValue) {
       expandWorkspaceNameCandidates(attributeValue, selected, candidates);
     }

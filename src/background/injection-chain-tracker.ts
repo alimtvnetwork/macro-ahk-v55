@@ -53,6 +53,7 @@ const _snapshots: ChainSnapshot[] = [];
 /** Record a new chain snapshot from a completed injection pipeline. */
 export function recordChainSnapshot(snapshot: ChainSnapshot): void {
   _snapshots.unshift(snapshot);
+
   if (_snapshots.length > MAX_SNAPSHOTS) {
     _snapshots.length = MAX_SNAPSHOTS;
   }

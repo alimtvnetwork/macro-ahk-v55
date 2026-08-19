@@ -102,6 +102,7 @@ function rowToPrompt(r: unknown): PromptRow {
 function resolveReplaceFields(input: UpsertInput): { key: string; valuesJson: string } | { error: string } {
   const key = typeof input.replaceKey === 'string' ? input.replaceKey : REPLACE_KEY_DEFAULT;
   const keyErr = validateReplaceKey(key);
+
   if (keyErr !== null) {
     return { error: keyErr };
   }
@@ -109,6 +110,7 @@ function resolveReplaceFields(input: UpsertInput): { key: string; valuesJson: st
   const values = typeof input.replaceValues === 'undefined'
     ? [...REPLACE_VALUES_DEFAULT]
     : normalizeReplaceValues(input.replaceValues);
+
   if (values === null) {
     return { error: 'replaceValues must contain at least one non-empty entry' };
   }
@@ -125,6 +127,7 @@ export async function listPromptsByRole(role: PromptRole): Promise<DbResult<Prom
   const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' ORDER BY IsDefault DESC, UpdatedAt DESC';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return fail('listPromptsByRole', resp.errorMessage || QUERY_FAILED);
   }
@@ -143,11 +146,13 @@ export async function getDefaultPromptForRole(role: PromptRole): Promise<DbResul
   const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return fail('getDefaultPromptForRole', resp.errorMessage || QUERY_FAILED);
   }
 
   const rows = Array.isArray(resp.rows) ? resp.rows : [];
+
   if (rows.length === 0) {
     return new DbResult(true, undefined);
   }
@@ -163,6 +168,7 @@ export async function getPromptBySlug(slug: string): Promise<DbResult<PromptRow 
 
   const sql = 'SELECT * FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return fail('getPromptBySlug', resp.errorMessage || QUERY_FAILED);
   }
@@ -209,6 +215,7 @@ async function resolveInsertedPromptId(input: UpsertInput): Promise<number | nul
         + ' AND Role = ' + sqlLit(input.role)
         + ' LIMIT 1';
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return null;
   }
@@ -243,6 +250,7 @@ function validateUpsert(input: UpsertInput): string | null {
 function checkTokenGuard(input: UpsertInput): string | null {
   const isRoleGuarded = input.role === 'plan' || input.role === 'next';
   const hasPrevious = typeof input.previousBody === 'string';
+
   if (!isRoleGuarded) {
     return null;
   }
@@ -270,16 +278,19 @@ function checkTokenGuard(input: UpsertInput): string | null {
  */
 export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>> {
   const invalid = validateUpsert(input);
+
   if (invalid !== null) {
     return fail('upsertPrompt', invalid);
   }
 
   const tokenErr = checkTokenGuard(input);
+
   if (tokenErr !== null) {
     return fail('upsertPrompt', tokenErr);
   }
 
   const resolved = resolveReplaceFields(input);
+
   if ('error' in resolved) {
     return fail('upsertPrompt', resolved.error);
   }
@@ -294,6 +305,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
     ? buildUpdateSql({ ...input, id: input.id as number }, resolved, now)
     : buildInsertSql(input, resolved, now);
   const resp = await runLoggedQuery('SCHEMA', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return fail('upsertPrompt', resp.errorMessage || 'write failed');
   }
@@ -301,6 +313,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
   const insertedId = Number(resp.lastInsertId ?? 0);
   const resolvedInsertedId = isUpdate || insertedId > 0 ? null : await resolveInsertedPromptId(input);
   const id = isUpdate ? (input.id as number) : insertedId > 0 ? insertedId : resolvedInsertedId;
+
   if (id === null) {
     return fail('upsertPrompt', 'insert succeeded but inserted Prompt Id could not be resolved');
   }
@@ -310,6 +323,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
     // recordPromptRevision; we never fail the upsert on history failure.
     const { recordPromptRevision } = await import('./prompt-revision-db');
     const revResult = await recordPromptRevision({ previous: preImage, reason: 'upsert' });
+
     if (revResult.ok === false) {
       logDiagnosticFromCode('DB_PROMPT_REVISION_SNAPSHOT_E001', { slug: preImage.Slug, reason: revResult.error ?? 'unknown error' });
     }
@@ -321,6 +335,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
 async function countRowsForRole(role: PromptRole): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Role = ' + sqlLit(role);
   const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+
   if (resp.ok === false) {
     return -1;
   }
@@ -333,6 +348,7 @@ async function countRowsForRole(role: PromptRole): Promise<number> {
 
 async function readPromptRow(id: number): Promise<PromptRow | null> {
   const resp = await runSql('QUERY', 'SELECT * FROM Prompt WHERE Id = ' + String(id) + ' LIMIT 1');
+
   if (resp.ok === false) {
     return null;
   }
@@ -352,16 +368,19 @@ export async function deletePromptById(id: number): Promise<DbResult<void>> {
   }
 
   const row = await readPromptRow(id);
+
   if (row === null) {
     return fail('deletePromptById', 'row ' + id + ' not found');
   }
 
   const count = await countRowsForRole(row.Role);
+
   if (count <= 1) {
     return fail('deletePromptById', 'refuse to delete last row for role ' + row.Role);
   }
 
   const resp = await runLoggedQuery('SCHEMA', 'DELETE FROM Prompt WHERE Id = ' + String(id), 'prompt-db');
+
   if (resp.ok === false) {
     return fail('deletePromptById', resp.errorMessage || 'delete failed');
   }
@@ -378,11 +397,13 @@ export async function deleteBySlug(slug: string): Promise<DbResult<void>> {
   }
 
   const rowResult = await getPromptBySlug(slug);
+
   if (rowResult.ok === false) {
     return fail('deleteBySlug', rowResult.error || QUERY_FAILED);
   }
 
   const row = rowResult.value;
+
   if (!row) {
     return fail('deleteBySlug', 'unknown slug');
   }

@@ -29,6 +29,7 @@ export async function copyFailureReportToClipboard(
 ): Promise<boolean> {
   const target = opts.Clipboard
         ?? (typeof navigator !== "undefined" ? navigator.clipboard : undefined);
+
   if (target === undefined) {
     return false; 
   }
@@ -59,6 +60,7 @@ export function showFailureToast(
 ): string | number {
   const where = formatFailureLocation(report);
   const copyAction = buildCopyReportAction(report);
+
   if (opts.OnRetry === undefined) {
     return showCopyOnlyFailureToast(report, where, copyAction);
   }

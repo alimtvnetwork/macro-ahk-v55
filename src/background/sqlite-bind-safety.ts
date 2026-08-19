@@ -69,6 +69,7 @@ function inferColumnNames(sql: string): string[] {
   const names: string[] = Array.from({ length: placeholderCount }, (_, i) => fallback(i));
 
   const insertMatch = sql.match(/INSERT(?:\s+OR\s+\w+)?\s+INTO\s+\w+\s*\(([^)]+)\)/i);
+
   if (insertMatch) {
     const cols = insertMatch[1].split(",").map((c) => c.trim());
     for (let i = 0; i < cols.length && i < names.length; i++) {
@@ -168,6 +169,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
           // sql.js Database.exec accepts an optional params array even
           // though our typings only declare the single-arg form.
           const res = ServiceResult.wrapDb(() => (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params));
+
           if (res.isFail) {
             throw res.error;
           }
@@ -179,6 +181,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
       if (prop === "prepare") {
         return function wrappedPrepare(sql: string): Statement {
           const stmtRes = ServiceResult.wrapDb(() => target.prepare(sql));
+
           if (stmtRes.isFail) {
             throw stmtRes.error;
           }

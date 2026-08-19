@@ -92,17 +92,20 @@ export async function getGitsyncCache(
   }
 
   const kv = getKv();
+
   if (!kv) {
     return null;
   }
 
   try {
     const raw = await kv.get(buildKey(wsId, pid));
+
     if (!raw) {
       return null;
     }
 
     const parsed = JSON.parse(raw) as Partial<GitsyncCacheRow>;
+
     if (typeof parsed.ExpiresAt !== 'number' || typeof parsed.Status !== 'string') {
       return null;
     }
@@ -139,6 +142,7 @@ export function setGitsyncCache(
   }
 
   const kv = getKv();
+
   if (!kv) {
     logError('GitsyncCache.write', 'marco.kv unavailable — skipping write for ws=' + wsId + ' pid=' + pid);
 
@@ -170,6 +174,7 @@ export function invalidateGitsyncCache(wsId: string, pid: string): void {
   }
 
   const kv = getKv();
+
   if (!kv) {
     return;
   }

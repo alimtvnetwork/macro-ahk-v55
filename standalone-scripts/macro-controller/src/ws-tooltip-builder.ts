@@ -11,11 +11,13 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
   const lines: string[] = ['🪪 PROFILE:'];
   lines.push('  PlanTierType: ' + (ws.planType || ws.tier || WsTierValueType.FREE));
   lines.push('  Role: ' + (ws.membershipRole || ws.role || 'N/A'));
+
   if (typeof ws.numProjects === 'number' && ws.numProjects > 0) {
     lines.push('  Projects: ' + ws.numProjects);
   }
 
   lines.push('  Git Sync: ' + (ws.gitSyncEnabled ? 'enabled' : 'disabled'));
+
   if (ws.subscriptionStatus) {
     lines.push('  Subscription Status: ' + ws.subscriptionStatus);
   }
@@ -23,6 +25,7 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
   if (ws.subscriptionStatusChangedAt) {
     const days = (function () {
       const t = Date.parse(ws.subscriptionStatusChangedAt);
+
       if (!Number.isFinite(t)) {
         return 0;
       }
@@ -68,14 +71,17 @@ function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
   lines.push('  Billing: ' + ws.used + '/' + ws.limit + ' used');
   lines.push('  Rollover: ' + ws.rolloverUsed + '/' + ws.rolloverLimit + ' used');
   lines.push('  Daily: ' + ws.dailyUsed + '/' + ws.dailyLimit + ' used');
+
   if (ws.freeGranted > 0) {
     lines.push('  Trial: ' + ws.freeRemaining + '/' + ws.freeGranted + ' remaining');
   }
 
   lines.push('  Status: ' + (ws.subscriptionStatus || 'N/A'));
+
   if (isExpiredWs(ws)) {
     const startDate = formatExpiryStartDate(ws);
     const duration = formatExpiredDuration(ws);
+
     if (startDate || duration) {
       const datePart = startDate || 'unknown date';
       const durPart = duration ? ' (' + duration + ')' : '';
@@ -85,6 +91,7 @@ function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
 
   if (ws.raw) {
     const r = ws.raw;
+
     if (r.last_trial_credit_period) {
       lines.push('  Trial Period: ' + r.last_trial_credit_period);
     }

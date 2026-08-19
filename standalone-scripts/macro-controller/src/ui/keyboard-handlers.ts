@@ -85,6 +85,7 @@ function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): 
   }
 
   const preset = TASK_NEXT_PRESETS[e.key];
+
   if (preset !== undefined) {
     e.preventDefault();
     log('Ctrl+Shift+' + (preset === 10 ? '0' : String(preset)) + ' → Task Next ×' + preset);
@@ -121,8 +122,10 @@ function handleCtrlOnlyShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): bo
     e.preventDefault();
     const hidden = jsBody.style.display === 'none';
     jsBody.style.display = hidden ? '' : 'none';
+
     if (hidden) {
       const ta = document.getElementById('marco-js-executor');
+
       if (ta) {
         ta.focus();
       }
@@ -180,6 +183,7 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
     e.preventDefault();
     const isHidden = ui.style.display === 'none';
     log('Ctrl+Alt+H pressed on MacroLoop, isHidden=' + isHidden);
+
     if (isHidden) {
       restorePanel(plCtx);
     }
@@ -197,6 +201,7 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
     e.preventDefault();
     const dir = e.key === 'ArrowUp' ? 'up' : 'down';
     log('Ctrl+Alt+' + dir.charAt(0).toUpperCase() + dir.slice(1) + ' pressed on project page -> MacroLoop toggle');
+
     if (state.running) {
       log('Loop is running, stopping via Ctrl+Alt+' + dir.charAt(0).toUpperCase() + dir.slice(1));
       stopLoop();

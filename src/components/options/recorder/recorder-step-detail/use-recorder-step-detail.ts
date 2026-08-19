@@ -97,6 +97,7 @@ function useStepTags(step: StepRow, tags: ReadonlyArray<string>, onTagsSave: (st
 
   const handleAddTag = useCallback(async () => {
     const next = draftTag.trim();
+
     if (next.length === 0) {
       return;
     }

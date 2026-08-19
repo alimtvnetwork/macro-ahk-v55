@@ -24,6 +24,7 @@ vi.mock('../auth', () => ({
   invalidateSessionBridgeKey: vi.fn(() => 'fallback'),
   recoverAuthOnce: vi.fn(async () => 'tok_abc123def456'),
   getBearerToken: vi.fn(async () => 'tok_abc123def456'),
+  isAuthFailure: (status: number) => status === 401 || status === 403,
 }));
 
 vi.mock('../workspace-detection', () => ({

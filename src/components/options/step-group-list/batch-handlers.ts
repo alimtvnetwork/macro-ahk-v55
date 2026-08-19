@@ -36,6 +36,7 @@ export function applyBatchRenameWithToast(
   changes: ReadonlyArray<BatchRenameChange>,
 ): void {
   const outcome: BatchRenameOutcome = batchActions.applyBatchRename(changes);
+
   if (outcome.Error !== null && outcome.Applied === 0) {
     toast.error("Batch rename failed", { description: outcome.Error });
 
@@ -80,6 +81,7 @@ export function runBatchDelete(input: RunBatchDeleteInput): void {
 
     return next;
   });
+
   if (activeGroupId !== null && ids.includes(activeGroupId)) {
     setActiveGroupId(null);
   }

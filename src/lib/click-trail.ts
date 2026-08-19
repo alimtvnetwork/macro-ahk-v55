@@ -37,11 +37,13 @@ let isAttached = false;
 export function readClickTrail(): ClickTrailEntry[] {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
+
     if (raw === null) {
       return [];
     }
 
     const parsed = JSON.parse(raw) as ClickTrailEntry[];
+
     if (Array.isArray(parsed) === false) {
       return [];
     }
@@ -92,8 +94,10 @@ export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
   const key = `${FROZEN_KEY_PREFIX}${failureId}`;
   try {
     const existing = sessionStorage.getItem(key);
+
     if (existing !== null) {
       const parsed = JSON.parse(existing) as ClickTrailEntry[];
+
       if (Array.isArray(parsed)) {
         return parsed;
       }
@@ -115,6 +119,7 @@ export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
 export function readFrozenClickTrail(failureId: string): ClickTrailEntry[] | null {
   try {
     const raw = sessionStorage.getItem(`${FROZEN_KEY_PREFIX}${failureId}`);
+
     if (raw === null) {
       return null;
     }
@@ -135,6 +140,7 @@ export function clearFrozenClickTrails(): void {
     const keysToRemove: string[] = [];
     for (let i = 0; i < sessionStorage.length; i += 1) {
       const k = sessionStorage.key(i);
+
       if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
         keysToRemove.push(k);
       }
@@ -152,6 +158,7 @@ function evictOldFrozenSnapshots(keepKey: string): void {
     const frozenKeys: string[] = [];
     for (let i = 0; i < sessionStorage.length; i += 1) {
       const k = sessionStorage.key(i);
+
       if (k !== null && k.startsWith(FROZEN_KEY_PREFIX)) {
         frozenKeys.push(k);
       }
@@ -191,12 +198,14 @@ export function attachClickTrail(): void {
 
 function handleClick(event: Event): void {
   const target = event.target;
+
   if (target instanceof Element === false) {
     return;
   }
 
   const element = target as Element;
   const button = element.closest("button, a, [role='button']");
+
   if (button === null) {
     return;
   }
@@ -210,11 +219,13 @@ function handleClick(event: Event): void {
 function handleKeyDown(event: Event): void {
   const keyEvent = event as KeyboardEvent;
   const isShortcut = keyEvent.metaKey || keyEvent.ctrlKey || keyEvent.altKey;
+
   if (isShortcut === false) {
     return;
   }
 
   const parts: string[] = [];
+
   if (keyEvent.metaKey) {
     parts.push("Cmd");
   }
@@ -243,16 +254,19 @@ function handlePopState(): void {
 /** Extracts a clean text label from a clickable element. */
 function extractLabel(element: Element): string {
   const aria = element.getAttribute("aria-label");
+
   if (aria !== null && aria.trim() !== "") {
     return aria.trim();
   }
 
   const text = element.textContent?.trim() ?? "";
+
   if (text !== "") {
     return text.length > 60 ? `${text.slice(0, 57)}…` : text;
   }
 
   const title = element.getAttribute("title");
+
   if (title !== null && title.trim() !== "") {
     return title.trim();
   }

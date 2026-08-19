@@ -123,6 +123,7 @@ export function SchemaDiffPreview({ projectSlug, pendingTables }: SchemaDiffPrev
       }
 
       setDiffs(entries);
+
       if (entries.length === 0) {
         toast.info("No differences detected");
       }

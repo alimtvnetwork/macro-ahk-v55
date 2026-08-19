@@ -21,6 +21,7 @@
 import { logError } from './error-utils';
 import { log as importedLog } from './logger';
 import { throwDiagnostic } from './errors/diagnostic-error';
+import { isFiniteNonNegative } from './utils/type-guards';
 
 const STORAGE_KEY = 'marco_settings_overrides_v1';
 
@@ -101,10 +102,6 @@ interface SettingsCache {
 const cache: SettingsCache = { loaded: false, overrides: {} };
 const listeners = new Set<SettingsListener>();
 
-function isFiniteNonNegative(n: unknown): n is number {
-  return typeof n === 'number' && Number.isFinite(n) && n >= 0;
-}
-
 function sanitizePerWorkspace(
   raw: unknown,
 ): Record<string, PerWorkspaceLifecycleOverride> | undefined {
@@ -122,8 +119,9 @@ function sanitizePerWorkspace(
       continue;
     }
 
-    const overrideRecord = overrideValue as Record<string, unknown>;
+    const overrideRecord = overrideValue as Record<string, number | undefined | null>;
     const entry: PerWorkspaceLifecycleOverride = {};
+
     if (isFiniteNonNegative(overrideRecord.expiryGracePeriodDays)) {
       entry.expiryGracePeriodDays = Math.floor(overrideRecord.expiryGracePeriodDays);
     }
@@ -166,7 +164,8 @@ function sanitize(raw: unknown): SettingsOverrides {
   ];
 
   numericFields.forEach(f => {
-    const fieldValue = r[f];
+    const fieldValue = r[f] as number | undefined | null;
+
     if (isFiniteNonNegative(fieldValue)) {
       (out as Record<string, unknown>)[f] = Math.floor(fieldValue);
     }
@@ -174,6 +173,7 @@ function sanitize(raw: unknown): SettingsOverrides {
 
   // creditFetchDelayMs — clamped to [500, 15000] per spec 06-settings-slider.md.
   const cfd = r.creditFetchDelayMs;
+
   if (typeof cfd === 'number' && Number.isFinite(cfd)) {
     const clamped = Math.max(500, Math.min(15000, Math.floor(cfd)));
     out.creditFetchDelayMs = clamped;
@@ -193,12 +193,14 @@ function sanitize(raw: unknown): SettingsOverrides {
 
   booleanFields.forEach(f => {
     const fieldValue = r[f];
+
     if (typeof fieldValue === 'boolean') {
       (out as Record<string, unknown>)[f] = fieldValue;
     }
   });
 
   const perWs = sanitizePerWorkspace(r.perWorkspace);
+
   if (perWs) {
     out.perWorkspace = perWs;
   }
@@ -291,11 +293,13 @@ export function getSettingsOverrides(): SettingsOverrides {
 /** Persist new overrides. Pass {} to reset to JSON defaults. */
 export async function saveSettingsOverrides(next: SettingsOverrides): Promise<void> {
   const sanitized = sanitize(next);
+
   if (hasChromeStorage()) {
     await chrome.storage.local.set({ [STORAGE_KEY]: sanitized });
   } else {
     // MAIN-world fallback: persist to localStorage so the user's edits survive reload.
     const result = writeToLocalStorage(sanitized);
+
     if (result.ok === false) {
       throwDiagnostic('SETTINGS_PERSIST_E001', {
         reason: result.reason,

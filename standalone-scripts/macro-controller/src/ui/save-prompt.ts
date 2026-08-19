@@ -112,6 +112,7 @@ export function findSavePromptContainer(): Element | null {
   // middle button when present). Buttons get prepended here, landing before button[1].
   for (const xpath of SAVE_PROMPT_ACTION_ROW_XPATHS) {
     const row = evalXPath(xpath);
+
     if (row) {
       log('Save Prompt: Container found via action-row XPath', 'check');
 
@@ -121,6 +122,7 @@ export function findSavePromptContainer(): Element | null {
 
   // Legacy left-side container (older Lovable DOM).
   const legacy = evalXPath(SAVE_PROMPT_XPATH);
+
   if (legacy) {
     log('Save Prompt: Container found via legacy XPath (left-side fallback)', 'check');
 
@@ -132,6 +134,7 @@ export function findSavePromptContainer(): Element | null {
 
 function tryToolbarButtonFallback(fallbackSelector: string, fallbackIndex: number): Element | null {
   const toolbarBtn = document.querySelector(fallbackSelector);
+
   if (toolbarBtn?.parentElement) {
     log('Save Prompt: Container found via CSS fallback #' + (fallbackIndex + 1) + ' (parent of toolbar button)', 'check');
 
@@ -143,6 +146,7 @@ function tryToolbarButtonFallback(fallbackSelector: string, fallbackIndex: numbe
 
 function tryDirectFallback(fallbackSelector: string, fallbackIndex: number): Element | null {
   const element = document.querySelector(fallbackSelector);
+
   if (element) {
     log('Save Prompt: Container found via CSS fallback #' + (fallbackIndex + 1), 'check');
 
@@ -158,6 +162,7 @@ function findContainerViaCssFallback(): Element | null {
       const result = fallbackIndex === 2
         ? tryToolbarButtonFallback(fallbackSelector, fallbackIndex)
         : tryDirectFallback(fallbackSelector, fallbackIndex);
+
       if (result) {
         return result;
       }
@@ -211,6 +216,7 @@ export function insertBeforeFirstButton(container: Element, ...wrappers: HTMLEle
   const directChildren = Array.from(container.children) as HTMLElement[];
   const firstButton = directChildren.find(function (child) {
     const isOurs = child.id === 'marco-save-prompt-btn' || child.id === 'marco-chatbox-prompts-btn';
+
     if (isOurs) {
       return false;
     }
@@ -327,6 +333,7 @@ function buildPromptsButton(deps: SavePromptDeps): HTMLElement {
 
 function renderToolbarPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDeps): void {
   const taskNextDeps = deps.taskNextDeps;
+
   if (!taskNextDeps) {
     renderChatboxPromptsDropdown(dropdown, deps);
 

@@ -30,11 +30,13 @@ export function isPrimitive(jsonValue: JsonValue): jsonValue is string | number 
 /** Format a primitive value for display. */
 export function formatPrimitive(jsonValue: JsonValue): string {
   const isNull = jsonValue === null;
+
   if (isNull) {
     return "null";
   }
 
   const isString = typeof jsonValue === "string";
+
   if (isString) {
     const isEmpty = jsonValue === "";
 
@@ -49,16 +51,19 @@ export function parseInputValue(input: string): JsonValue {
   const trimmed = input.trim();
 
   const isTrue = trimmed === "true";
+
   if (isTrue) {
     return true;
   }
 
   const isFalse = trimmed === "false";
+
   if (isFalse) {
     return false;
   }
 
   const isNullLiteral = trimmed === "null";
+
   if (isNullLiteral) {
     return null;
   }
@@ -67,6 +72,7 @@ export function parseInputValue(input: string): JsonValue {
   const isNonEmpty = trimmed !== "";
   const isValidNumber = !isNaN(asNum);
   const isNumeric = isNonEmpty && isValidNumber;
+
   if (isNumeric) {
     return asNum;
   }
@@ -79,6 +85,7 @@ function parseAsJsonOrString(trimmed: string): JsonValue {
   try {
     const parsed = JSON.parse(trimmed);
     const isComplex = typeof parsed === "object";
+
     if (isComplex) {
       return parsed;
     }
@@ -96,6 +103,7 @@ export function setNestedValue(
   value: JsonValue,
 ): JsonObject {
   const isTopLevel = path.length === 1;
+
   if (isTopLevel) {
     return { ...root, [path[0]]: value };
   }
@@ -115,11 +123,13 @@ function setNestedChild(
   value: JsonValue,
 ): JsonObject {
   const isChildObject = isObject(child);
+
   if (isChildObject) {
     return { ...root, [head]: setNestedValue(child, rest, value) };
   }
 
   const isChildArray = Array.isArray(child);
+
   if (isChildArray) {
     return { ...root, [head]: setArrayChild(child, rest, value) };
   }
@@ -180,11 +190,13 @@ function deleteNestedChild(
   restPath: string[],
 ): JsonObject {
   const isChildObject = isObject(child);
+
   if (isChildObject) {
     return { ...root, [head]: deleteNestedKey(child, restPath) };
   }
 
   const isChildArray = Array.isArray(child);
+
   if (isChildArray) {
     return { ...root, [head]: deleteArrayChild(child, restPath) };
   }
@@ -258,6 +270,7 @@ function renameTopLevelKey(
 /** Generate a unique key name within an object by appending a counter. */
 export function generateUniqueKey(obj: JsonObject, base: string): string {
   const isKeyAvailable = !(base in obj);
+
   if (isKeyAvailable) {
     return base;
   }

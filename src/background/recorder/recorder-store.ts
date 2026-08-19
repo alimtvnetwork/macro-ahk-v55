@@ -57,6 +57,7 @@ export class RecorderStateError extends Error {
 
 function assertVariableUnique(steps: ReadonlyArray<RecordedStep>, name: string, exceptStepId?: string): void {
   const collision = steps.find((s) => s.VariableName === name && s.StepId !== exceptStepId);
+
   if (collision !== undefined) {
     throw new RecorderStateError(
       `VariableName '${name}' already used by StepId '${collision.StepId}'. ` +
@@ -119,6 +120,7 @@ function applyCapture(state: RecordingSession, a: Extract<RecorderAction, { Kind
 function applyRename(state: RecordingSession, a: Extract<RecorderAction, { Kind: "Rename" }>): RecordingSession {
   assertVariableUnique(state.Steps, a.VariableName, a.StepId);
   const target = state.Steps.find((s) => s.StepId === a.StepId);
+
   if (target === undefined) {
     throw new RecorderStateError(`Unknown StepId '${a.StepId}'.`); 
   }
@@ -140,6 +142,7 @@ function rewriteAnchorOnDelete(steps: ReadonlyArray<RecordedStep>, deletedStepId
 
 function applyDelete(state: RecordingSession, a: Extract<RecorderAction, { Kind: "Delete" }>): RecordingSession {
   const remaining = state.Steps.filter((s) => s.StepId !== a.StepId);
+
   if (remaining.length === state.Steps.length) {
     throw new RecorderStateError(`Cannot delete unknown StepId '${a.StepId}'.`);
   }

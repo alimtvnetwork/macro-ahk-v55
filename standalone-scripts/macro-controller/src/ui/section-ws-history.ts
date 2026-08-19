@@ -61,12 +61,14 @@ export function createWsHistorySection(deps: WsHistoryDeps): WsHistoryResult {
     }
 
     const isVisible = wsHistoryCol.body.style.display !== 'none';
+
     if (isVisible) {
       renderWsHistory();
     }
   };
 
   const isInitiallyVisible = wsHistoryCol.body.style.display !== 'none';
+
   if (isInitiallyVisible) {
     renderWsHistory();
   }

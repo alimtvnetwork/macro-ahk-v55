@@ -39,6 +39,7 @@ function csvVal(v: string | number | boolean | null | undefined): string {
   }
 
   const s = String(v);
+
   if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
     return '"' + s.replace(/"/g, '""') + '"';
   }
@@ -181,6 +182,7 @@ function downloadCsvBlob(csvText: string, filename: string): void {
 
 export function exportWorkspacesAsCsv(): void {
   const workspaces = loopCreditState.perWorkspace;
+
   if (!workspaces || workspaces.length === 0) {
     log('CSV Export: No workspace data — fetch credits first (💳)', 'warn');
 
@@ -205,6 +207,7 @@ export function exportWorkspacesAsCsv(): void {
 
 export function exportAvailableWorkspacesAsCsv(): void {
   const workspaces = loopCreditState.perWorkspace;
+
   if (!workspaces || workspaces.length === 0) {
     log('CSV Export (available): No workspace data — fetch credits first (💳)', 'warn');
 

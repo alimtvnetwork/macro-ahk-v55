@@ -42,11 +42,13 @@ function encodeId(loc: StepLocation): string {
 /** Decode a sortable ID back to a location */
 function decodeId(id: string): StepLocation | null {
   const topMatch = id.match(/^top-(\d+)$/);
+
   if (topMatch) {
     return { container: "top", index: Number(topMatch[1]) };
   }
 
   const branchMatch = id.match(/^cond-(\d+)-(then|else)-(\d+)$/);
+
   if (branchMatch) {
     return {
       container: branchMatch[2] as BranchLabelType,
@@ -77,6 +79,7 @@ function buildDisplaySteps(steps: ChainStep[]): DisplayStep[] {
       sortableId: encodeId(loc),
       location: loc,
     });
+
     if (step.type === "condition") {
       step.then.forEach((s, i) => {
         const thenLoc: StepLocation = { container: "then", conditionIndex: topIdx, index: i };
@@ -138,6 +141,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
     }
 
     const parent = source[loc.conditionIndex!];
+
     if (!parent || parent.type !== "condition") {
       return null;
     }
@@ -150,6 +154,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
   /** Remove a step at a location, returning [newSteps, removedStep] */
   const removeAtLocation = useCallback((loc: StepLocation, source: ChainStep[]): [ChainStep[], ChainStep] => {
     const newSteps = source.map((s) => s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s);
+
     if (loc.container === "top") {
       const [removed] = newSteps.splice(loc.index, 1);
 
@@ -166,6 +171,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
   /** Insert a step at a location */
   const insertAtLocation = useCallback((loc: StepLocation, step: ChainStep, target: ChainStep[]): ChainStep[] => {
     const newSteps = target.map((s) => s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s);
+
     if (loc.container === "top") {
       newSteps.splice(loc.index, 0, step);
 
@@ -182,6 +188,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
   const updateStepAtLocation = useCallback((loc: StepLocation, updated: ChainStep) => {
     setSteps((prev) => {
       const newSteps = prev.map((s) => s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s);
+
       if (loc.container === "top") {
         newSteps[loc.index] = updated;
       } else {
@@ -201,11 +208,13 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
   const duplicateStepAtLocation = useCallback((loc: StepLocation) => {
     setSteps((prev) => {
       const newSteps = prev.map((s) => JSON.parse(JSON.stringify(s)) as ChainStep);
+
       if (loc.container === "top") {
         const clone = JSON.parse(JSON.stringify(newSteps[loc.index])) as ChainStep;
         newSteps.splice(loc.index + 1, 0, clone);
       } else {
         const parent = newSteps[loc.conditionIndex!];
+
         if (parent?.type === "condition") {
           const branch = loc.container === "then" ? parent.then : parent.else;
           const clone = JSON.parse(JSON.stringify(branch[loc.index])) as ChainStep;
@@ -219,12 +228,14 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
     if (!over || active.id === over.id) {
       return;
     }
 
     const fromLoc = decodeId(String(active.id));
     const toLoc = decodeId(String(over.id));
+
     if (!fromLoc || !toLoc) {
       return;
     }
@@ -245,6 +256,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         const parent = newSteps[fromLoc.conditionIndex!] as StepCondition;
         const branch = fromLoc.container === "then" ? parent.then : parent.else;
         const reordered = arrayMove(branch, fromLoc.index, toLoc.index);
+
         if (fromLoc.container === "then") {
           parent.then = reordered;
         } else {
@@ -262,6 +274,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
       const [afterRemove, movedStep] = removeAtLocation(fromLoc, prev);
       // Adjust toLoc index if removal shifted indices in the same parent
       const adjustedTo = { ...toLoc };
+
       if (
         fromLoc.container === toLoc.container &&
         fromLoc.conditionIndex === toLoc.conditionIndex &&

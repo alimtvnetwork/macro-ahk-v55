@@ -22,12 +22,14 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
   const prevText = opts.spinner ? element.textContent : null;
   element.setAttribute(BUSY_ATTR, '1');
   element.setAttribute('aria-busy', 'true');
+
   if ('disabled' in element) {
     (element as HTMLButtonElement).disabled = true;
   }
 
   element.style.opacity = '0.6';
   element.style.pointerEvents = 'none';
+
   if (opts.spinner && prevText !== null) {
     element.textContent = opts.spinner + ' ' + prevText;
   }
@@ -35,6 +37,7 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
   return {
     restore(): void {
       element.removeAttribute(BUSY_ATTR);
+
       if (prevAria === null) {
         element.removeAttribute('aria-busy');
       } else {
@@ -47,6 +50,7 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
 
       element.style.opacity = '';
       element.style.pointerEvents = '';
+
       if (opts.spinner && prevText !== null) {
         element.textContent = prevText;
       }

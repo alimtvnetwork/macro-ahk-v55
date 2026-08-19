@@ -22,6 +22,7 @@ export function sumGrantTypeRemaining(
   grantType: CreditGrantType,
 ): number {
   const list = balance.grant_type_balances;
+
   if (!Array.isArray(list) || list.length === 0) {
     return 0;
   }
@@ -33,6 +34,7 @@ export function sumGrantTypeRemaining(
 
 function isWithinWindow(grant: ExpiringGrant, nowMs: number, windowDays: number): boolean {
   const expiresMs = Date.parse(grant.expires_at);
+
   if (!Number.isFinite(expiresMs)) {
     return false;
   }
@@ -46,6 +48,7 @@ export function sumExpiringSoon(
   windowDays: number = EXPIRING_SOON_WINDOW_DAYS,
 ): number {
   const list = balance.expiring_grants;
+
   if (!Array.isArray(list) || list.length === 0) {
     return 0;
   }

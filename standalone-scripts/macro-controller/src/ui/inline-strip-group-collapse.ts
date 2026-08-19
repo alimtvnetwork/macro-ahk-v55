@@ -43,11 +43,13 @@ function hydrate(): void {
     }
 
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return;
     }
 
     const prefs = JSON.parse(raw) as InlineStripGroupPrefs;
+
     if (typeof prefs.collapsed === 'boolean') {
       state.collapsed = prefs.collapsed;
     }
@@ -137,6 +139,7 @@ function applyPlanCollapse(plan: HTMLElement, collapsed: boolean): void {
   plan.dataset.groupCollapsed = collapsed ? '1' : '0';
   plan.style.display = 'flex';
   const body = plan.querySelector<HTMLElement>(SEL_PLAN_BODY);
+
   if (body) {
     body.style.display = collapsed ? 'none' : 'flex';
   }
@@ -146,6 +149,7 @@ function applyPlanCollapse(plan: HTMLElement, collapsed: boolean): void {
   }
 
   const dropup = plan.querySelector<HTMLElement>(SEL_PLAN_DROPUP);
+
   if (dropup) {
     dropup.style.display = 'none';
   }

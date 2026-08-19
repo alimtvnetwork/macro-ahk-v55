@@ -28,6 +28,7 @@ interface ConfigMsg extends MessageRequest {
 
 export async function handleProjectConfigRead(payload: MessageRequest): Promise<{ isOk: boolean; rows?: ReturnType<typeof readConfigFromDb>; errorMessage?: string }> {
   const m = payload as ConfigMsg;
+
   if (!m.project) {
     return { isOk: false, errorMessage: "Missing project slug" };
   }
@@ -40,6 +41,7 @@ export async function handleProjectConfigRead(payload: MessageRequest): Promise<
 
 export async function handleProjectConfigUpdate(payload: MessageRequest): Promise<{ isOk: boolean; errorMessage?: string }> {
   const m = payload as ConfigMsg;
+
   if (!m.project || !m.section || !m.key) {
     return { isOk: false, errorMessage: "Missing project, section, or key" };
   }
@@ -52,6 +54,7 @@ export async function handleProjectConfigUpdate(payload: MessageRequest): Promis
 
 export async function handleProjectConfigReconstruct(payload: MessageRequest): Promise<{ isOk: boolean; config?: ReturnType<typeof reconstructConfigFromDb>; errorMessage?: string }> {
   const m = payload as ConfigMsg;
+
   if (!m.project) {
     return { isOk: false, errorMessage: "Missing project slug" };
   }

@@ -132,6 +132,7 @@ async function makeBundle(
     SqlJs: SQL,
     JsZip: JSZip,
   });
+
   if (r.Reason !== "Ok") {
     throw new Error(`export failed: ${r.Reason}`);
   }

@@ -162,6 +162,7 @@ function buildHtml(state: ModalState): string {
 
 function ensureBackdrop(): HTMLDivElement {
   let bd = document.getElementById(BACKDROP_ID) as HTMLDivElement | null;
+
   if (bd) {
     return bd;
   }
@@ -176,6 +177,7 @@ function ensureBackdrop(): HTMLDivElement {
 
 function ensureModalEl(): HTMLDivElement {
   let el = document.getElementById(MODAL_ID) as HTMLDivElement | null;
+
   if (el) {
     return el;
   }
@@ -200,11 +202,13 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
+
   if (!el) {
     return;
   }
 
   const store = el as HTMLElement & ModalHandlerStore;
+
   if (store._marcoSettingsKey) {
     document.removeEventListener('keydown', store._marcoSettingsKey, true);
     delete store._marcoSettingsKey;
@@ -216,6 +220,7 @@ export function hideSettingsModal(): void {
   detachKeyHandler();
   const el = document.getElementById(MODAL_ID);
   const bd = document.getElementById(BACKDROP_ID);
+
   if (el) {
     el.style.display = 'none';
   }
@@ -231,11 +236,13 @@ export function hideSettingsModal(): void {
  */
 function parseInput(raw: string, label: string): number | undefined {
   const trimmed = raw.trim();
+
   if (trimmed === '') {
     return undefined;
   }
 
   const n = Number(trimmed);
+
   if (!Number.isFinite(n) || n < 0) {
     throwDiagnostic('SETTINGS_VALIDATE_E001', { fieldLabel: label, rawValue: raw });
   }
@@ -265,6 +272,7 @@ export function showSettingsModal(): void {
     const r = el.querySelector<HTMLInputElement>('[data-marco-el="refill"]');
     const p = el.querySelector<HTMLInputElement>('[data-marco-el="proZeroTtl"]');
     const pc = el.querySelector<HTMLInputElement>('[data-marco-el="projectsCacheTtl"]');
+
     if (g) {
       state.graceInput = g.value;
     }
@@ -290,16 +298,19 @@ export function showSettingsModal(): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
+
       if (!t) {
         return;
       }
 
       const action = t.getAttribute('data-marco-action');
+
       if (!action) {
         return;
       }
 
       e.stopPropagation();
+
       if (state.submitting) {
         return;
       }
@@ -385,6 +396,7 @@ export function showSettingsModal(): void {
 
   setTimeout(function () {
     const gi = el.querySelector<HTMLInputElement>('[data-marco-el="grace"]');
+
     if (gi) {
       gi.focus();
     }

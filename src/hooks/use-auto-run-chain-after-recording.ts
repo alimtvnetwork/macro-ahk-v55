@@ -66,6 +66,7 @@ export function shouldAutoRun(
   }
 
   const wasActive = prev.Phase === "Recording" || prev.Phase === "Paused";
+
   if (!wasActive) {
     return false; 
   }
@@ -120,6 +121,7 @@ export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): voi
     }
 
     const runnable = eventsRef.current.filter((e) => e.Enabled && e.Steps.length > 0);
+
     if (runnable.length === 0) {
       return; 
     }

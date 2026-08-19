@@ -54,6 +54,7 @@ function makeAdapter(init: AdapterInit = {}): TabsAdapter & {
     },
     async dispatchClick(sel, kind) {
       calls.dispatched.push({ sel, kind });
+
       if (init.DispatchThrows !== undefined) {
         throw new Error(init.DispatchThrows);
       }
@@ -62,6 +63,7 @@ function makeAdapter(init: AdapterInit = {}): TabsAdapter & {
     },
     async waitForMatchingTab(predicate) {
       const candidate = init.SettleTab;
+
       if (candidate !== undefined && candidate !== null && predicate(candidate.Url)) {
         return candidate;
       }
@@ -81,6 +83,7 @@ describe("compileUrlPattern", () => {
   it("Exact: trailing slash insensitive (case-sensitive path)", () => {
     const c = compileUrlPattern("https://app.example.com/orders/", "Exact");
     expect(c.Ok).toBe(true);
+
     if (c.Ok === false) {
       return;
     }
@@ -92,6 +95,7 @@ describe("compileUrlPattern", () => {
   it("Exact: scheme + host case-insensitive (AC-19.1.9)", () => {
     const c = compileUrlPattern("HTTPS://APP.EXAMPLE.COM/orders", "Exact");
     expect(c.Ok).toBe(true);
+
     if (c.Ok === false) {
       return;
     }
@@ -103,6 +107,7 @@ describe("compileUrlPattern", () => {
   it("Prefix matches startsWith with case-folded host", () => {
     const c = compileUrlPattern("https://APP.example.com/orders/", "Prefix");
     expect(c.Ok).toBe(true);
+
     if (c.Ok === false) {
       return;
     }
@@ -114,6 +119,7 @@ describe("compileUrlPattern", () => {
   it("Glob: * is non-slash, ** is any", () => {
     const c = compileUrlPattern("https://app.example.com/orders/*/edit", "Glob");
     expect(c.Ok).toBe(true);
+
     if (c.Ok === false) {
       return;
     }
@@ -121,6 +127,7 @@ describe("compileUrlPattern", () => {
     expect(c.Test("https://app.example.com/orders/42/edit")).toBe(true);
     expect(c.Test("https://app.example.com/orders/42/sub/edit")).toBe(false);
     const cc = compileUrlPattern("https://app.example.com/**/edit", "Glob");
+
     if (cc.Ok === false) {
       throw new Error("compile failed");
     }
@@ -131,6 +138,7 @@ describe("compileUrlPattern", () => {
   it("Regex: invalid pattern fails compile (AC-19.1.7)", () => {
     const c = compileUrlPattern("(unclosed", "Regex");
     expect(c.Ok).toBe(false);
+
     if (c.Ok) {
       return;
     }
@@ -140,6 +148,7 @@ describe("compileUrlPattern", () => {
 
   it("Regex: valid pattern matches", () => {
     const c = compileUrlPattern("^https://app\\.example\\.com/orders/\\d+$", "Regex");
+
     if (c.Ok === false) {
       throw new Error("compile failed");
     }

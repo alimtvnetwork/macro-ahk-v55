@@ -50,6 +50,9 @@ import { logBgError } from "@/background/bg-logger";
 const DEDUP_TTL_MS = 5_000;
 const AUTO_INJECT_LAUNCH_SOURCE: InjectionLaunchSource = "passive";
 
+const LOGGER_NAMESPACE = 'NAMESPACE';
+const LOGGER_ERR_MSG = 'Operation failed';
+
 /* ------------------------------------------------------------------ */
 /*  URL Guards                                                         */
 /* ------------------------------------------------------------------ */
@@ -72,6 +75,7 @@ function isProjectPageUrl(url: string): boolean {
             || parsed.hostname.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT);
 
     const isMissing = !isTargetDomain;
+
     if (isMissing) {
       return true; // Non-platform URLs are handled by project URL rules
     }
@@ -80,6 +84,7 @@ function isProjectPageUrl(url: string): boolean {
 
     // Block root/home page
     const isHomePage = path === "/" || path === "";
+
     if (isHomePage) {
       return false;
     }
@@ -148,7 +153,7 @@ export function registerAutoInjector(): void {
   try {
     chrome.webNavigation.onCompleted.addListener(handleNavigationCompleted);
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.MARCO, "webNavigation.onCompleted registration failed", err);
   }
 
@@ -157,7 +162,7 @@ export function registerAutoInjector(): void {
       void handleTabActivated(info.tabId);
     });
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.MARCO, "tabs.onActivated registration failed", err);
   }
 
@@ -167,7 +172,7 @@ export function registerAutoInjector(): void {
       clearDismissedOriginsForTab(tabId);
     });
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.MARCO, "tabs.onRemoved cache-clear registration failed", err);
   }
 
@@ -189,8 +194,9 @@ export async function handleTabActivated(tabId: number): Promise<void> {
   try {
     tab = await chrome.tabs.get(tabId);
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     const message = err instanceof Error ? err.message : String(err);
+
     if (message.includes("No tab with id")) {
       console.debug(`[auto-injector] tab ${tabId} closed before get`);
 
@@ -203,11 +209,13 @@ export async function handleTabActivated(tabId: number): Promise<void> {
   }
 
   const url = tab.url ?? "";
+
   if (!url || isNewTabOrBlankUrl(url)) {
     return;
   }
 
   const isMissing045 = !isProjectPageUrl(url);
+
   if (isMissing045) {
     return;
   }
@@ -221,6 +229,7 @@ export async function handleTabActivated(tabId: number): Promise<void> {
   }
 
   const fp = urlFingerprint(url);
+
   if (isSameDecisionFingerprint(tabId, fp)) {
     return;
   } // T3 dedup — no work needed
@@ -255,6 +264,7 @@ export async function handleNavigationCompleted(
   const isEligible = isProjectPageUrl(details.url);
 
   const isMissing046 = !isEligible;
+
   if (isMissing046) {
     logUrlGuardSkip(details.tabId, details.url);
 
@@ -279,6 +289,7 @@ export async function handleNavigationCompleted(
   const isBurst = cached !== undefined
         && cached.urlFp === fp
         && (Date.now() - cached.decidedAt) < DEDUP_TTL_MS;
+
   if (isBurst) {
     return;
   }
@@ -360,7 +371,7 @@ async function processPageNavigation(
   try {
     await maybeShowFirstAttachToast(tabId, url);
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.MARCO, "first-attach toast inject failed", err);
   }
 }
@@ -437,7 +448,7 @@ async function injectSingleResolved(
       logInjectionError(resolved.injectable.id, result.errorMessage);
     }
   } catch (injectionError) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: injectionError });
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: injectionError });
     logInjectionError(resolved.injectable.id, injectionError);
   }
 }

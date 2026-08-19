@@ -120,6 +120,7 @@ function formatEvaluatedAt(evaluatedAt: string | null): string {
 
 function AutoAttachBody(props: { autoStart: boolean; loading: boolean; record: Record | null }): JSX.Element {
   const { autoStart, loading, record } = props;
+
   if (!autoStart) {
     return <AutoStartOffMessage />;
   }

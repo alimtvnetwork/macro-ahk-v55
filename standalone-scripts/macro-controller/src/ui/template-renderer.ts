@@ -9,6 +9,7 @@
  */
 
 import { throwDiagnostic } from '../errors/diagnostic-error';
+import { isTruthy } from '../utils/type-guards';
 
 // ── Types ──
 
@@ -76,6 +77,7 @@ export function hasTemplate(name: string): boolean {
  */
 export function renderTemplate(name: string, data: Record<string, unknown> = {}): string {
   const entry = templateState.registry[name];
+
   if (!entry) {
     const availableList = Object.keys(templateState.registry).join(', ') || '(none)';
     throwDiagnostic('UI_TEMPLATE_NOT_FOUND_E001', { templateName: name, availableList });
@@ -115,6 +117,7 @@ function processEachBlocks(html: string, data: Record<string, unknown>): string 
 
   return html.replace(eachPattern, (_, key, body) => {
     const items = data[key];
+
     if (!Array.isArray(items) || items.length === 0) {
       return '';
     }
@@ -150,12 +153,12 @@ function processEachBlocks(html: string, data: Record<string, unknown>): string 
 function processIfBlocks(html: string, data: Record<string, unknown>): string {
   const ifElsePattern = /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g;
   let result = html.replace(ifElsePattern, (_, key, truthy, falsy) => {
-    return isTruthy(data[key]) ? truthy : falsy;
+    return isTruthy(data[key] as string | number | boolean | null | undefined) ? truthy : falsy;
   });
 
   const ifPattern = /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g;
   result = result.replace(ifPattern, (_, key, body) => {
-    return isTruthy(data[key]) ? body : '';
+    return isTruthy(data[key] as string | number | boolean | null | undefined) ? body : '';
   });
 
   return result;
@@ -168,15 +171,3 @@ function replaceVariables(html: string, data: Record<string, unknown>): string {
   });
 }
 
-/** Truthiness check matching Handlebars conventions */
-function isTruthy(value: unknown): boolean {
-  if (value === undefined || value === null || value === false || value === 0 || value === '') {
-    return false;
-  }
-
-  if (Array.isArray(value) && value.length === 0) {
-    return false;
-  }
-
-  return true;
-}

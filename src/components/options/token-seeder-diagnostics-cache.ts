@@ -48,17 +48,20 @@ function getStorage(): Storage | null {
 
 export function loadDiagnosticsCache(): TokenSeederDiagnosticsCache | null {
   const storage = getStorage();
+
   if (!storage) {
     return null;
   }
 
   try {
     const raw = storage.getItem(STORAGE_KEY);
+
     if (!raw) {
       return null;
     }
 
     const parsed = JSON.parse(raw) as TokenSeederDiagnosticsCache;
+
     if (!parsed || !Array.isArray(parsed.targets)) {
       return null;
     }
@@ -77,6 +80,7 @@ function validateSnapshot(storage: Storage, parsed: TokenSeederDiagnosticsCache)
     0,
   );
   const cooldown = parsed.cooldownMs ?? 0;
+
   if (
     maxLastFailure > 0 &&
         now - maxLastFailure > cooldown + MAX_STALE_GRACE_MS
@@ -91,6 +95,7 @@ function validateSnapshot(storage: Storage, parsed: TokenSeederDiagnosticsCache)
 
 export function saveDiagnosticsCache(snapshot: TokenSeederDiagnosticsCache | null): void {
   const storage = getStorage();
+
   if (!storage) {
     return;
   }
@@ -110,6 +115,7 @@ export function saveDiagnosticsCache(snapshot: TokenSeederDiagnosticsCache | nul
 
 export function clearDiagnosticsCache(): void {
   const storage = getStorage();
+
   if (!storage) {
     return;
   }

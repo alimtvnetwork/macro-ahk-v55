@@ -29,6 +29,7 @@ export function ChainTimelineLog(props: ChainTimelineLogProps): JSX.Element | nu
     }
 
     const scroller = scrollerRef.current;
+
     if (scroller === null) {
       return; 
     }

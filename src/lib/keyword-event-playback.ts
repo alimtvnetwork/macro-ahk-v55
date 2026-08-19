@@ -53,6 +53,7 @@ export function parseCombo(combo: string): ParsedCombo {
   let Key = "";
   for (const p of parts) {
     const lower = p.toLowerCase();
+
     if (lower === "ctrl" || lower === "control") {
       Ctrl = true;
     } else if (lower === "shift") {
@@ -83,6 +84,7 @@ export function resolveEventTarget(
   doc?: Document,
 ): EventTarget {
   const d: Document | undefined = doc ?? (typeof document !== "undefined" ? document : undefined);
+
   if (d === undefined) {
     throw new Error("No DOM target available for keyboard playback");
   }
@@ -96,6 +98,7 @@ export function resolveEventTarget(
       return fallback;
     case "Selector": {
       const sel = target.Selector.trim();
+
       if (sel === "") {
         return fallback; 
       }
@@ -188,12 +191,14 @@ export async function runKeywordEvent(
       // The onStep notification still fires so UIs that highlight the
       // currently-running index stay in sync with the visible list.
       options.onStep?.(step, i);
+
       if (step.Enabled === false) {
         continue;
       }
 
       if (step.Kind === "Key") {
         const parsed = parseCombo(step.Combo);
+
         if (!parsed.Key) {
           continue;
         }

@@ -38,6 +38,7 @@ function finishTokenGate(ctx: TokenGateCtx, result: TokenReadyResult): void {
   }
 
   ctx.settled = true;
+
   if (ctx.timer !== null) {
     trackedClearInterval(ctx.timer); 
   }
@@ -52,6 +53,7 @@ function maybeRefreshFromExtension(ctx: TokenGateCtx): void {
 
   const now = Date.now();
   const isTooSoon = (now - ctx.lastRefreshAt) < REFRESH_RETRY_MS;
+
   if (isTooSoon) {
     return;
   }

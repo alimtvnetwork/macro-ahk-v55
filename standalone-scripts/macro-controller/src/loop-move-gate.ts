@@ -96,6 +96,7 @@ export async function gatedMoveToWorkspace(
   const resumeTimeout = options.resumePollTimeoutMs ?? RESUME_POLL_TIMEOUT_MS;
   const resumeInterval = options.resumePollIntervalMs ?? RESUME_POLL_INTERVAL_MS;
   const resumeReady = await pollForResumeButton(resumeTimeout, resumeInterval);
+
   if (!resumeReady) {
     log(
       'LoopRun.queueFlip ws=' + targetWorkspaceId +

@@ -65,6 +65,7 @@ const FIXED_NOW = (): Date => new Date("2026-04-26T10:00:00.000Z");
  */
 function normalize(report: FailureReport): unknown {
   const cloned = JSON.parse(JSON.stringify(report)) as Record<string, unknown>;
+
   if (typeof cloned.StackTrace === "string" && cloned.StackTrace.length > 0) {
     cloned.StackTrace = "<stripped-for-snapshot>";
   }

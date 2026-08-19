@@ -36,6 +36,7 @@ interface FormSnapshotTableProps {
 
 export function FormSnapshotTable({ snapshot, embedded = false, title }: FormSnapshotTableProps) {
   const valueByName = new Map<string, { Value: string; Masked: boolean }>();
+
   if (snapshot.Values !== null) {
     for (const v of snapshot.Values) {
       valueByName.set(v.Name, { Value: v.Value, Masked: v.Masked });

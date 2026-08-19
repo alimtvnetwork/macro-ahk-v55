@@ -54,6 +54,7 @@ const SEVERITY_STYLE: Record<ExportErrorSeverity, string> = {
 
 function SeverityIcon({ severity }: { severity: ExportErrorSeverity }) {
   const cls = `h-5 w-5 ${SEVERITY_STYLE[severity]}`;
+
   if (severity === "Selection") {
     return <AlertTriangle className={cls} />;
   }
@@ -67,6 +68,7 @@ function SeverityIcon({ severity }: { severity: ExportErrorSeverity }) {
 
 export default function ExportErrorDialog(props: ExportErrorDialogProps) {
   const { open, onOpenChange, explanation } = props;
+
   if (explanation === null) {
     return null;
   }

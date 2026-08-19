@@ -232,16 +232,19 @@ export async function handleGetToken(
   const primaryUrl = await resolvePrimaryUrl(tabUrlHint);
 
   const strat1 = await tryStrategy1DirectCookie(resolvedCookieNames.sessionNames, primaryUrl);
+
   if (strat1) {
     return strat1;
   }
 
   const strat2 = await tryStrategy2LocalStorage(tabUrlHint);
+
   if (strat2) {
     return strat2;
   }
 
   const strat3 = await tryStrategy3SignedUrl(tabUrlHint, primaryUrl);
+
   if (strat3) {
     return strat3;
   }
@@ -252,6 +255,7 @@ export async function handleGetToken(
     : { value: null, cookieName: null };
 
   const strat4 = await tryStrategy4Exchange(projectId, sessionLookup, refreshLookup);
+
   if (strat4) {
     return strat4;
   }
@@ -269,6 +273,7 @@ export async function handleGetToken(
 
 async function tryStrategy1DirectCookie(names: readonly string[] | string[], url: string): Promise<AuthStrategyTokenResult | null> {
   const lookup = await readCookieValueByNameCandidates(names, url);
+
   if (lookup.value !== null && isLikelyJwt(lookup.value)) {
     console.log("[config-auth] GET_TOKEN: found JWT directly in session cookie");
     cachedSessionId = lookup.value;
@@ -282,6 +287,7 @@ async function tryStrategy1DirectCookie(names: readonly string[] | string[], url
 
 async function tryStrategy2LocalStorage(hint?: string): Promise<AuthStrategyTokenResult | null> {
   const jwt = await readSupabaseJwtFromPlatformTabs(hint);
+
   if (jwt !== null) {
     console.log("[config-auth] GET_TOKEN: found JWT in platform tab localStorage");
     cachedSessionId = jwt;
@@ -295,6 +301,7 @@ async function tryStrategy2LocalStorage(hint?: string): Promise<AuthStrategyToke
 
 async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<AuthStrategyTokenResult | null> {
   const token = await resolveSignedUrlTokenCandidate(hint, url);
+
   if (token !== null) {
     console.log("[config-auth] GET_TOKEN: using signed URL token fallback");
     cachedSessionId = token;
@@ -312,6 +319,7 @@ async function tryStrategy4Exchange(
   refreshLookup: chrome.cookies.Cookie | null | CookieLookupResult | { value: string | null },
 ): Promise<AuthStrategyTokenResult | null> {
   const exchangeToken = await fetchAuthTokenFromSessionExchange(projectId, sessionLookup.value !== null || refreshLookup.value !== null);
+
   if (exchangeToken !== null) {
     console.log("[config-auth] GET_TOKEN: exchanged opaque session cookie for JWT");
     cachedSessionId = exchangeToken;
@@ -380,6 +388,7 @@ export async function handleRefreshToken(
 
   // Strategy 1 (preferred): Session cookie is already a JWT — no network call
   let authToken: string | null = null;
+
   if (sessionId && isLikelyJwt(sessionId)) {
     authToken = sessionId;
     console.log("[config-auth] REFRESH: found JWT directly in session cookie");
@@ -481,16 +490,19 @@ export async function fetchAuthToken(
     resolved.sessionNames,
     primaryUrl,
   );
+
   if (sessionCookieLookup.value !== null && isLikelyJwt(sessionCookieLookup.value)) {
     return sessionCookieLookup.value;
   }
 
   const localStorageJwt = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
+
   if (localStorageJwt !== null) {
     return localStorageJwt;
   }
 
   const signedUrlToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
+
   if (signedUrlToken !== null) {
     return signedUrlToken;
   }
@@ -602,6 +614,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
           try {
             const check = (raw: string | null) => {
               const isRawDataMissing = !raw;
+
               if (isRawDataMissing) {
                 return null;
               }
@@ -609,6 +622,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
               try {
                 const parsed = JSON.parse(raw);
                 const token = parsed?.access_token ?? parsed?.currentSession?.access_token ?? parsed?.session?.access_token ?? parsed?.token;
+
                 if (isJwtToken(token)) {
                   return token;
                 }
@@ -623,8 +637,10 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
 
             for (let i = 0; i < localStorage.length; i++) {
               const key = localStorage.key(i);
+
               if (isSupabaseAuthKey(key)) {
                 const res = check(localStorage.getItem(key));
+
                 if (res) {
                   return res;
                 }
@@ -634,6 +650,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
             const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
             for (const key of lovableKeys) {
               const res = check(localStorage.getItem(key));
+
               if (res) {
                 return res;
               }
@@ -645,6 +662,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
       });
 
       const token = result?.[0]?.result;
+
       if (typeof token === "string" && isLikelyJwt(token)) {
         return token;
       }
@@ -664,6 +682,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
  */
 async function getActiveTabProjectId(tabUrlHint?: string): Promise<string | null> {
   const hasTabUrlHint = typeof tabUrlHint === "string" && tabUrlHint.length > 0;
+
   if (hasTabUrlHint) {
     return extractProjectIdFromUrl(tabUrlHint);
   }
@@ -690,6 +709,7 @@ async function resolvePrimaryUrl(tabUrlHint?: string): Promise<string> {
 
 function extractSignedUrlTokenFromUrl(url: string | null | undefined): string | null {
   const isUrlMissing = !url;
+
   if (isUrlMissing) {
     return null;
   }
@@ -719,11 +739,13 @@ async function resolveSignedUrlTokenCandidate(
   primaryUrl?: string,
 ): Promise<string | null> {
   const hintedToken = extractSignedUrlTokenFromUrl(tabUrlHint);
+
   if (hintedToken) {
     return hintedToken;
   }
 
   const primaryToken = extractSignedUrlTokenFromUrl(primaryUrl);
+
   if (primaryToken) {
     return primaryToken;
   }
@@ -754,6 +776,7 @@ async function fetchAuthTokenFromSessionExchange(
       credentials: "include",
     });
     const isResponseFailed = !response.ok;
+
     if (isResponseFailed) {
       logBgWarnError(
         BgLogTag.CONFIG_AUTH,
@@ -791,6 +814,7 @@ function extractJwtFromAuthTokenPayload(payload: unknown, depth = 0): string | n
   const directCandidates = [record.token, record.authToken, record.access_token, record.jwt, record.sessionId];
   for (const candidate of directCandidates) {
     const token = extractJwtFromAuthTokenPayload(candidate, depth + 1);
+
     if (token !== null) {
       return token;
     }
@@ -799,6 +823,7 @@ function extractJwtFromAuthTokenPayload(payload: unknown, depth = 0): string | n
   const wrappers = [record.payload, record.result, record.data, record.response];
   for (const wrapper of wrappers) {
     const token = extractJwtFromAuthTokenPayload(wrapper, depth + 1);
+
     if (token !== null) {
       return token;
     }
@@ -810,26 +835,31 @@ function extractJwtFromAuthTokenPayload(payload: unknown, depth = 0): string | n
 /** Extracts project ID from a URL string. */
 function extractProjectIdFromUrl(url: string): string | null {
   const pathMatch = url.match(/\/projects\/([^/?#]+)/);
+
   if (pathMatch) {
     return pathMatch[1];
   }
 
   const fromDomain = extractProjectIdFromHostname(url);
+
   if (fromDomain) {
     return fromDomain;
   }
 
   const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);
+
   if (subdomainMatch) {
     return subdomainMatch[1];
   }
 
   const altSubdomainMatch = url.match(/([a-f0-9-]{36})(?:--preview|-preview)\./i);
+
   if (altSubdomainMatch) {
     return altSubdomainMatch[1];
   }
 
   const bareUuidSubdomainMatch = url.match(/https?:\/\/([a-f0-9-]{36})\.[^/]+/i);
+
   if (bareUuidSubdomainMatch) {
     return bareUuidSubdomainMatch[1];
   }
@@ -843,16 +873,19 @@ function extractProjectIdFromHostname(url: string): string | null {
     const firstLabel = hostname.split(".")[0] ?? "";
 
     const idPreviewLabelMatch = firstLabel.match(/^id-preview--([a-f0-9-]{36})$/i);
+
     if (idPreviewLabelMatch) {
       return idPreviewLabelMatch[1];
     }
 
     const previewSuffixLabelMatch = firstLabel.match(/^([a-f0-9-]{36})(?:--preview|-preview)$/i);
+
     if (previewSuffixLabelMatch) {
       return previewSuffixLabelMatch[1];
     }
 
     const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
+
     if (bareUuidLabelMatch) {
       return bareUuidLabelMatch[1];
     }
@@ -902,6 +935,7 @@ async function discoverAuthCookieNames(primaryUrl: string): Promise<CookieDiscov
   const canListCookies = typeof chrome.cookies?.getAll === "function";
 
   const isListCookiesProhibited = !canListCookies;
+
   if (isListCookiesProhibited) {
     return { checkedUrls, authLikeCookieNames: [] };
   }

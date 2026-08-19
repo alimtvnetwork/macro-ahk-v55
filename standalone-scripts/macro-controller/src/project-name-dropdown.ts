@@ -71,6 +71,7 @@ export function buildMenuEntries(handlers: ProjectNameDropdownHandlers): readonl
 
 export function removeProjectNameDropdown(): void {
   const old = document.getElementById(DROPDOWN_ID);
+
   if (old) {
     old.remove();
   }
@@ -138,6 +139,7 @@ export function showProjectNameDropdown(
   }
 
   const last = dd.lastElementChild as HTMLElement | null;
+
   if (last) {
     last.style.borderBottom = 'none';
   }
@@ -174,6 +176,7 @@ export function buildProjectNameCaret(
   arrow.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
+
     if (!ctx) {
       return;
     }

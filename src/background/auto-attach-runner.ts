@@ -104,6 +104,7 @@ export function runAutoAttach(
             decision.reason === "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING" ||
             decision.reason === "AUTOATTACH_SKIPPED_DEP_MISSING";
     const line = `auto-attach skip [${decision.reason}] project="${project.name}" script="${stored.name}" — ${decision.detail}`;
+
     if (isWarn) {
       logBgWarnError(TAG, line);
     } else {

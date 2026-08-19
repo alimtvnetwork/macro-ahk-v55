@@ -180,18 +180,21 @@ function asEvent(v: unknown): WebhookEventKind {
 
 export function loadWebhookConfig(): WebhookConfig {
   const ls = safeLocalStorage();
+
   if (!ls) {
     return { ...DEFAULT_WEBHOOK_CONFIG };
   }
 
   try {
     const raw = ls.getItem(CONFIG_STORAGE_KEY);
+
     if (!raw) {
       return { ...DEFAULT_WEBHOOK_CONFIG };
     }
 
     const parsed: unknown = JSON.parse(raw);
     const notPlainRecord = !isPlainRecord(parsed);
+
     if (notPlainRecord) {
       return { ...DEFAULT_WEBHOOK_CONFIG };
     }
@@ -233,6 +236,7 @@ export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
     Events: (config.Events ?? []).filter((k) => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(k)),
     SecretToken: typeof config.SecretToken === "string" ? config.SecretToken : "",
   };
+
   if (ls) {
     try {
       ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); 
@@ -267,12 +271,14 @@ function buildCorruptPlaceholder(reason: string): WebhookDeliveryFailure {
 
 export function migrateWebhookDeliveryResult(input: unknown): WebhookDeliveryResult {
   const notPlainRecord = !isPlainRecord(input);
+
   if (notPlainRecord) {
     return buildCorruptPlaceholder("entry is not an object");
   }
 
   const versionField = input.SchemaVersion;
   const hasVersion = typeof versionField === "number";
+
   if (hasVersion && versionField !== WEBHOOK_RESULT_SCHEMA_VERSION) {
     return buildCorruptPlaceholder(`unknown SchemaVersion ${String(versionField)}`);
   }
@@ -346,12 +352,14 @@ function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields)
 
 function readLogRaw(): unknown[] {
   const ls = safeLocalStorage();
+
   if (!ls) {
     return [];
   }
 
   try {
     const raw = ls.getItem(LOG_STORAGE_KEY);
+
     if (!raw) {
       return [];
     }
@@ -366,6 +374,7 @@ function readLogRaw(): unknown[] {
 
 function writeLog(entries: ReadonlyArray<WebhookDeliveryResult>): void {
   const ls = safeLocalStorage();
+
   if (!ls) {
     return;
   }
@@ -384,6 +393,7 @@ export function getDeliveryLog(): ReadonlyArray<WebhookDeliveryResult> {
 
 export function clearDeliveryLog(): void {
   const ls = safeLocalStorage();
+
   if (!ls) {
     return;
   }
@@ -409,6 +419,7 @@ export function repairDeliveryLog(): RepairReport {
   let removed = 0;
   for (const entry of raw) {
     const migrated = migrateWebhookDeliveryResult(entry);
+
     if (isWebhookFailure(migrated) && migrated.Error.startsWith(CORRUPT_PLACEHOLDER_PREFIX)) {
       removed += 1;
       errors.push(migrated.Error);
@@ -453,6 +464,7 @@ export function buildGroupRunPayload(input: GroupRunPayloadInput): WebhookPayloa
     Outcome: input.Outcome,
     EmittedAt: nowIso(),
   };
+
   if (input.FailureReason !== undefined) {
     out.FailureReason = input.FailureReason;
   }
@@ -508,6 +520,7 @@ function substitute(template: string, payload: WebhookPayload, event: WebhookEve
 
   return template.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_m, key: string) => {
     const v = lookup[key];
+
     if (v === undefined || v === null) {
       return "";
     }
@@ -537,6 +550,7 @@ export async function dispatchWebhook(
   const emittedAt = nowIso();
 
   const skip = checkSkipReason(config, event);
+
   if (skip !== null) {
     return recordEntry(buildSkipped(event, config.Url || null, skip, emittedAt, payload));
   }
@@ -591,6 +605,7 @@ function buildHeaders(
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   for (const h of config.Headers) {
     const name = (h.Name ?? "").trim();
+
     if (!name) {
       continue;
     }

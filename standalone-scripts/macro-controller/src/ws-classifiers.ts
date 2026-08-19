@@ -35,6 +35,7 @@ export function isExpiringWs(ws: WorkspaceCredit): boolean {
 export function isProExpiringWs(ws: WorkspaceCredit): boolean {
   try {
     const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
+
     if (tier === WsTierValueType.FREE) {
       return false;
     }

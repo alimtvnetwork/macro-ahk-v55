@@ -730,6 +730,7 @@ export function LibraryView() {
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
       | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
+
     if (!runtime?.onMessage) {
       return;
     }
@@ -737,6 +738,7 @@ export function LibraryView() {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const listener = (message: unknown) => {
       const msg = message as { type?: string; syncedCount?: number; pinnedNotified?: number } | null;
+
       if (msg?.type === "LIBRARY_CHANGED") {
         if (timer) {
           clearTimeout(timer);
@@ -819,6 +821,7 @@ export function LibraryView() {
     input.accept = ".json";
     input.onchange = async () => {
       const file = input.files?.[0];
+
       if (!file) {
         return;
       }

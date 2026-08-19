@@ -301,6 +301,7 @@ async function assertIsZipBlob(blob: Blob, context: string): Promise<void> {
   const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
   const ok = header[0] === 0x50 && header[1] === 0x4b
         && header[2] === 0x03 && header[3] === 0x04;
+
   if (ok) {
     return;
   }

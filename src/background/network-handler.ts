@@ -62,6 +62,7 @@ export async function handleNetworkRequest(
   const isValidEntry = entry !== undefined && entry !== null;
 
   const isMissing = !isValidEntry;
+
   if (isMissing) {
     return { isOk: false };
   }

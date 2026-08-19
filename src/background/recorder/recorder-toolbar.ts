@@ -296,6 +296,7 @@ function wireToolbarButtons(
   nodes.stopBtn.addEventListener(Events.CLICK,  () => actions.stop());
   nodes.pauseBtn.addEventListener(Events.CLICK, () => {
     const phase = sessionRef.current.Phase;
+
     if (phase === "Recording") {
       actions.pause();
 
@@ -421,6 +422,7 @@ function installToolbarLifecycle(nodes: ToolbarNodes, render: () => void): Toolb
   const state = { destroyed: false };
   const destroy = (): void => teardownToolbar(state, nodes.host, tickInterval, onVisibilityChange, onPageHide, hasWindow, hasDocument);
   const onPageHide = (): void => destroy();
+
   if (hasWindow) {
     window.addEventListener("pagehide", onPageHide, { once: true }); 
   }
@@ -442,6 +444,7 @@ function teardownToolbar(
   }
 
   state.destroyed = true;
+
   if (tickInterval !== 0 && hasWindow) {
     window.clearInterval(tickInterval); 
   }
@@ -485,11 +488,13 @@ function makeButton(action: MakeButtonActionType, label: string): HTMLButtonElem
 function formatRelative(thenIso: string, nowIso: string): string {
   const then = Date.parse(thenIso);
   const now = Date.parse(nowIso);
+
   if (Number.isNaN(then) || Number.isNaN(now)) {
     return "just now"; 
   }
 
   const deltaSec = Math.max(0, Math.round((now - then) / 1000));
+
   if (deltaSec < 5) {
     return "just now"; 
   }
@@ -499,6 +504,7 @@ function formatRelative(thenIso: string, nowIso: string): string {
   }
 
   const min = Math.floor(deltaSec / 60);
+
   if (min < 60) {
     return `${min}m ago`; 
   }

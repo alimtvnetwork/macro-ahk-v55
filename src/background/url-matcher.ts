@@ -130,6 +130,7 @@ function checkExcludePattern(
   excludePattern: string | undefined,
 ): boolean {
   const hasPattern = excludePattern !== undefined && excludePattern !== "";
+
   if (hasPattern === false) {
     return false;
   }

@@ -1,5 +1,3 @@
-import { HttpCodes } from "./constants/http";
-
 /**
  * MacroLoop Controller — Credit Fetch
  *
@@ -16,7 +14,7 @@ import { HttpCodes } from "./constants/http";
  */
 
 import { log, logSub } from './logger';
-import { resolveToken, invalidateSessionBridgeKey, markBearerTokenExpired, getLastTokenSource, getAuthDebugSnapshot, getBearerToken } from './auth';
+import { resolveToken, invalidateSessionBridgeKey, markBearerTokenExpired, getLastTokenSource, getAuthDebugSnapshot, getBearerToken, isAuthFailure } from './auth';
 import { showToast } from './toast';
 import { nsWrite, nsCallTyped } from './api-namespace';
 
@@ -73,6 +71,7 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
   // when MacroController runs before the marco-sdk has finished injecting
   // (load-order race). See mem://standards/verbose-logging-and-failure-diagnostics.
   const sdk = window.marco;
+
   if (!sdk) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco',
@@ -98,10 +97,6 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
   }
 
   return sdk.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
-}
-
-function isAuthFailure(status: number): boolean {
-  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================
@@ -156,6 +151,7 @@ async function handleAuthRecovery(
   statusText: string,
 ): Promise<string | null> {
   markBearerTokenExpired(LOG_SCOPE_CREDIT_FETCH);
+
   if (token) {
     invalidateSessionBridgeKey(token); 
   }
@@ -278,6 +274,7 @@ async function processSuccessData(
   autoDetectFn?: (token: string) => Promise<void>,
 ): Promise<void> {
   const isParseOk = parseLoopApiResponse(data);
+
   if (!isParseOk) {
     return;
   }
@@ -333,6 +330,7 @@ export function fetchLoopCredits(
         if (resp.ok === false) {
           if (isAuthFailure(resp.status) && !isRetry) {
             const recovered = await handleAuthRecovery(token, resp.status, '');
+
             if (!recovered) {
               mc().updateUI();
 
@@ -432,6 +430,7 @@ async function resolveTokenWithRecovery(isRetry?: boolean): Promise<string> {
 // CQ4: Extracted — handle auth failure in async path
 async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Promise<void> {
   markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE);
+
   if (token) {
     invalidateSessionBridgeKey(token); 
   }
@@ -504,6 +503,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
     return 0;
   });
+
   if (proZeroMutated + proOneMutated > 0) {
     syncCreditStateFromApi();
     mc().updateUI(); 

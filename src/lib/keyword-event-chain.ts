@@ -93,6 +93,7 @@ export function loadChainSettings(): KeywordEventChainSettings {
 
   try {
     const parsed: unknown = JSON.parse(raw);
+
     if (!isSettings(parsed)) {
       return DEFAULT_CHAIN_SETTINGS; 
     }
@@ -242,6 +243,7 @@ export async function runKeywordEventChain(
     });
     results.push({ EventId: ev.Id, Result: result });
     options.onEventEnd?.(ev, i, result);
+
     if (result.Completed) {
       completed += 1; 
     }
@@ -252,6 +254,7 @@ export async function runKeywordEventChain(
     }
 
     const isLast = i === enabled.length - 1;
+
     if (!isLast) {
       // Per-event override wins over the global pause when set to a
       // finite, non-negative number. Clamped to the same range as the
@@ -260,6 +263,7 @@ export async function runKeywordEventChain(
       const effective = (typeof override === "number" && Number.isFinite(override) && override >= 0)
         ? clampPause(override)
         : pauseMs;
+
       if (effective > 0) {
         try {
           await pause(effective, options.signal); 

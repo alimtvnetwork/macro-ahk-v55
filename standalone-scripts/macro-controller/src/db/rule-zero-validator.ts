@@ -90,12 +90,14 @@ export function parseDeclaredStepCount(body: string):
     }
 
     const raw = (m[1] ?? '').trim();
+
     if (raw === '{{n}}') {
       return { kind: 'template' };
     }
 
     if (/^\d+$/.test(raw)) {
       const n = Number(raw);
+
       if (Number.isInteger(n) && n >= 0) {
         return { kind: 'literal', value: n };
       }
@@ -146,6 +148,7 @@ export function countTopLevelSteps(body: string): number {
     }
 
     const m = line.match(RE_TOP_LEVEL_NUMBERED);
+
     if (!m) {
       continue;
     }
@@ -174,6 +177,7 @@ export function validateRuleZero(body: string): RuleZeroCheck {
   }
 
   const decl = parseDeclaredStepCount(body);
+
   if (decl.kind === 'template') {
     return {
       ok: true, expectedN: null, actualN: null, code: 'template',
@@ -190,6 +194,7 @@ export function validateRuleZero(body: string): RuleZeroCheck {
 
   const expected = decl.value;
   const actual = countTopLevelSteps(body);
+
   if (actual === 0) {
     return {
       ok: false, expectedN: expected, actualN: 0, code: 'no-steps',

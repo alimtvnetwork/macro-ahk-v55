@@ -113,6 +113,7 @@ export async function initSessionLogDir(sid: string, ver: string): Promise<void>
   sessionInitPromise = (async () => {
     try {
       const dir = await ensureSessionDir();
+
       if (!dir) {
         return;
       }
@@ -174,6 +175,7 @@ async function appendToFile(filename: string, text: string): Promise<void> {
   }
 
   const dir = await ensureSessionDir();
+
   if (!dir) {
     return;
   }
@@ -201,6 +203,7 @@ async function flushPending(): Promise<void> {
 
   flushScheduled = false;
   const dir = await ensureSessionDir();
+
   if (!dir) {
     return;
   }
@@ -211,6 +214,7 @@ async function flushPending(): Promise<void> {
   for (const [filename, chunks] of entries) {
     try {
       let handle = fileHandleCache.get(filename);
+
       if (!handle) {
         handle = await dir.getFileHandle(filename, { create: true });
         fileHandleCache.set(filename, handle);
@@ -275,6 +279,7 @@ export function writeLogEntry(msg: LogLine): void {
 
   // Also log injection & script lifecycle events to scripts.log
   const cat = (msg.category ?? "").toUpperCase();
+
   if (cat === "INJECTION" || cat === "SCRIPT" || cat === "BOOTSTRAP" || cat === "RESOLVE") {
     void appendToFile(SCRIPTS_LOG, line);
   }
@@ -294,11 +299,13 @@ export function writeErrorEntry(msg: ErrorLine): void {
 /** Reads all session log files and builds a comprehensive report string. */
 export async function buildSessionReport(sid?: string): Promise<string> {
   const targetSid = sid ?? sessionId;
+
   if (!targetSid) {
     return "[session-log-writer] No active session.";
   }
 
   const result = await tryReadSessionDir(targetSid);
+
   if (result.ok) {
     return result.report;
   }
@@ -312,6 +319,7 @@ export async function buildSessionReport(sid?: string): Promise<string> {
   if (available.length > 0) {
     const fallbackSid = available[0]; // most recent
     const fallback = await tryReadSessionDir(fallbackSid);
+
     if (fallback.ok) {
       const notice = [
         `[session-log-writer] Requested session #${targetSid} not found at "opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${targetSid}/".`,
@@ -351,6 +359,7 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
         const handle = await dir.getFileHandle(filename);
         const file = await handle.getFile();
         const text = await file.text();
+
         if (text.trim()) {
           sections.push(text);
         }
@@ -409,6 +418,7 @@ export async function pruneOldSessionLogs(maxAgeDays = 7): Promise<number> {
         const dir = await logsRoot.getDirectoryHandle(name);
         const fh = await dir.getFileHandle(EVENTS_LOG);
         const file = await fh.getFile();
+
         if (file.lastModified < cutoff) {
           toDelete.push(name);
         }
@@ -443,6 +453,7 @@ export interface OpfsStatusData {
 
 export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
   const sid = sessionId;
+
   if (!sid) {
     return { sessionId: null, dirExists: false, files: [], healthy: false };
   }
@@ -512,6 +523,7 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
           try {
             const fh = await dir.getFileHandle(fname);
             const file = await fh.getFile();
+
             if (file.lastModified > latestMs) {
               latestMs = file.lastModified;
             }

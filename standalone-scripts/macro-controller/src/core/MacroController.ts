@@ -122,6 +122,7 @@ export class MacroController {
   get auth(): AuthManagerInterface {
     if (!this._auth) {
       const factory = nsReadTyped('_internal.createAuthManager') as (() => AuthManagerInterface) | null;
+
       if (factory) {
         log('[MacroController] Self-healing: auto-registering AuthManager from persisted factory', 'warn');
         this._auth = factory();
@@ -138,6 +139,7 @@ export class MacroController {
   get credits(): CreditManagerInterface {
     if (!this._credits) {
       const factory = nsReadTyped('_internal.createCreditManager') as (() => CreditManagerInterface) | null;
+
       if (factory) {
         log('[MacroController] Self-healing: auto-registering CreditManager from persisted factory', 'warn');
         this._credits = factory();
@@ -154,6 +156,7 @@ export class MacroController {
   get workspaces(): WorkspaceManagerInterface {
     if (!this._workspaces) {
       const factory = nsReadTyped('_internal.createWorkspaceManager') as (() => WorkspaceManagerInterface) | null;
+
       if (factory) {
         log('[MacroController] Self-healing: auto-registering WorkspaceManager from persisted factory', 'warn');
         this._workspaces = factory();
@@ -170,6 +173,7 @@ export class MacroController {
   get loop(): LoopEngineInterface {
     if (!this._loop) {
       const factory = nsReadTyped('_internal.createLoopEngine') as (() => LoopEngineInterface) | null;
+
       if (factory) {
         log('[MacroController] Self-healing: auto-registering LoopEngine from persisted factory', 'warn');
         this._loop = factory();
@@ -190,6 +194,7 @@ export class MacroController {
   get ui(): UIManagerInterface | null {
     if (!this._ui) {
       const factory = nsReadTyped('_internal.createUIManager') as (() => UIManagerInterface) | null;
+
       if (factory) {
         log('[MacroController] Self-healing: auto-registering UIManager from persisted factory', 'warn');
         this._ui = factory();
@@ -346,6 +351,7 @@ export class MacroController {
 
   destroy(): void {
     log('[MacroController] Destroying...', 'warn');
+
     if (this._loop && this._loop.isRunning()) {
       this._loop.stop();
     }

@@ -63,6 +63,7 @@ const renames = new Map<string, string>();
 
 for (const filePath of filesToProcess) {
   const file = project.getSourceFile(filePath);
+
   if (!file) {
     console.log("ERROR: Could not find", filePath);
     continue;
@@ -72,12 +73,14 @@ for (const filePath of filesToProcess) {
   for (const varDecl of variableDeclarations) {
     const name = varDecl.getName();
     const initializer = varDecl.getInitializerIfKind(SyntaxKind.AsExpression)?.getExpressionIfKind(SyntaxKind.ObjectLiteralExpression);
+
     if (initializer) {
       const properties = initializer.getProperties();
       const values: string[] = [];
       for (const prop of properties) {
         if (prop.getKind() === SyntaxKind.PropertyAssignment) {
           const init = prop.asKind(SyntaxKind.PropertyAssignment)?.getInitializerIfKind(SyntaxKind.StringLiteral);
+
           if (init) {
             values.push(init.getLiteralValue());
           }
@@ -85,10 +88,12 @@ for (const filePath of filesToProcess) {
       }
             
       const newName = getNewName(name, values);
+
       if (newName !== name) {
         renames.set(name, newName);
         // Also rename the type alias if it exists
         const typeAlias = file.getTypeAlias(name);
+
         if (typeAlias) {
           typeAlias.rename(newName);
         }

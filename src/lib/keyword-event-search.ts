@@ -59,6 +59,7 @@ export function filterKeywordEvents(
   search: string,
 ): readonly KeywordEvent[] {
   const tokens = tokenizeSearch(search);
+
   if (tokens.length === 0) {
     return events;
   }

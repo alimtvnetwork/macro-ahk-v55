@@ -109,6 +109,7 @@ function ConflictsSection({ renames }: { renames: ImportSummary["RenamedRoots"] 
 // eslint-disable-next-line max-lines-per-function
 export default function ImportSummaryDialog(props: ImportSummaryDialogProps) {
   const { open, onOpenChange, summary, fileName } = props;
+
   if (summary === null) {
     // Render nothing meaningful until a summary is bound; Dialog
     // is still controlled by `open` so closing animations work.

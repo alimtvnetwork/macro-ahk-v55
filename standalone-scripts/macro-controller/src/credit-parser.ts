@@ -7,6 +7,7 @@
 
 import { log, logSub } from './logger';
 import { CreditSourceType } from './types';
+import type { WorkspaceCredit } from './types';
 import {
   SubscriptionStatusType,
   WsTierValueType,
@@ -90,7 +91,7 @@ export function resolveWsTier(plan: string, subStatus: string, billingLimit: num
  * Uses subscription_status (canonical signal): canceled / cancelled / past_due / unpaid.
  * Centralised here so the filter, badge, and sort code share one definition.
  */
-export function isExpiredWs(ws: import('./types').WorkspaceCredit): boolean {
+export function isExpiredWs(ws: WorkspaceCredit): boolean {
   return isExpiredSubscriptionStatus(ws.subscriptionStatus);
 }
 
@@ -99,18 +100,21 @@ export function isExpiredWs(ws: import('./types').WorkspaceCredit): boolean {
  * subscription_status last changed (i.e. since it became expired).
  * Returns null when no timestamp is available or it cannot be parsed.
  */
-export function expiredDays(ws: import('./types').WorkspaceCredit): number | null {
+export function expiredDays(ws: WorkspaceCredit): number | null {
   const iso = ws.subscriptionStatusChangedAt;
+
   if (!iso) {
     return null;
   }
 
   const t = Date.parse(iso);
+
   if (!Number.isFinite(t)) {
     return null;
   }
 
   const ms = Date.now() - t;
+
   if (ms < 0) {
     return 0;
   }
@@ -123,13 +127,15 @@ export function expiredDays(ws: import('./types').WorkspaceCredit): number | nul
  * Time is intentionally omitted per UX requirement.
  * Returns null when no timestamp is available or cannot be parsed.
  */
-export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): string | null {
+export function formatExpiryStartDate(ws: WorkspaceCredit): string | null {
   const iso = ws.subscriptionStatusChangedAt;
+
   if (!iso) {
     return null;
   }
 
   const t = Date.parse(iso);
+
   if (!Number.isFinite(t)) {
     return null;
   }
@@ -147,8 +153,9 @@ export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): st
  * Human-readable duration since expiry started, e.g. "12d", "3mo 4d", "1y 2mo".
  * Returns null when no timestamp is available.
  */
-export function formatExpiredDuration(ws: import('./types').WorkspaceCredit): string | null {
+export function formatExpiredDuration(ws: WorkspaceCredit): string | null {
   const days = expiredDays(ws);
+
   if (days === null) {
     return null;
   }
@@ -230,7 +237,7 @@ function calcProOne(
   return { totalCredits, available, totalCreditsUsed: Math.round(totalCreditsUsedInBillingPeriod) };
 }
 
-function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): import('./types').WorkspaceCredit {
+function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): WorkspaceCredit {
   const rawWs = rawItem;
   const ws = resolveWireSection(rawWs);
   // PlanTierType-10: narrow the wire row at the parse boundary through the three
@@ -258,6 +265,7 @@ function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): im
   let totalCredits: number;
   let available: number;
   let totalCreditsUsed: number;
+
   if (isProOne) {
     const calc = calcProOne(totalCreditsUsedBpRaw, dLimit, bLimit, dUsed);
     totalCredits = calc.totalCredits;
@@ -304,9 +312,10 @@ function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): im
 //
 // Idempotent — re-running on the same array is a no-op.
 // ============================================
-function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): void {
+function applyLifecycleOverrides(perWs: WorkspaceCredit[]): void {
   // Default true — only opt-out disables the override.
   const enabled = getSettingsOverrides().enableCanceledCreditOverride !== false;
+
   if (!enabled) {
     log('Lifecycle overrides disabled via enableCanceledCreditOverride=false', 'info');
 
@@ -318,6 +327,7 @@ function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): vo
     // Per-workspace override (grace/refill) trumps global config for this row.
     const wsCfg = getWorkspaceLifecycleConfigFor(ws.id);
     const status = getEffectiveStatus(ws, wsCfg);
+
     if (!shouldApplyCanceledOverride(status)) {
       continue;
     }
@@ -343,7 +353,7 @@ function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): vo
 // ============================================
 // aggregateCreditTotals — sum per-workspace credits (post-override)
 // ============================================
-function aggregateCreditTotals(perWs: import('./types').WorkspaceCredit[]): void {
+function aggregateCreditTotals(perWs: WorkspaceCredit[]): void {
   let tdf = 0, tr = 0, ta = 0, tba = 0;
   for (const ws of perWs) {
     tdf += ws.dailyFree;
@@ -361,7 +371,7 @@ function aggregateCreditTotals(perWs: import('./types').WorkspaceCredit[]): void
 // ============================================
 // matchCurrentWorkspace — find current ws by name
 // ============================================
-function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void {
+function matchCurrentWorkspace(perWs: WorkspaceCredit[]): void {
   if (!state.workspaceName || perWs.length === 0) {
     return;
   }
@@ -378,7 +388,7 @@ function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void
 // ============================================
 // buildWsByIdIndex — O(1) lookup dictionary
 // ============================================
-function buildWsByIdIndex(perWs: import('./types').WorkspaceCredit[]): void {
+function buildWsByIdIndex(perWs: WorkspaceCredit[]): void {
   loopCreditState.wsById = {};
   for (const ws of perWs) {
     if (ws.id) {
@@ -392,6 +402,7 @@ function buildWsByIdIndex(perWs: import('./types').WorkspaceCredit[]): void {
 // ============================================
 export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
   const workspaces = (data.workspaces || data || []) as Array<Record<string, unknown>>;
+
   if (!Array.isArray(workspaces)) {
     log('parseLoopApiResponse: unexpected response shape', 'warn');
 
@@ -426,11 +437,13 @@ export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
  */
 export async function applyProZeroEnrichment(): Promise<number> {
   const perWs = loopCreditState.perWorkspace || [];
+
   if (perWs.length === 0) {
     return 0;
   }
 
   const mutated = await enrichProZeroWorkspaces(perWs);
+
   if (mutated === 0) {
     return 0;
   }
@@ -454,11 +467,13 @@ export async function applyProZeroEnrichment(): Promise<number> {
  */
 export async function applyProOneEnrichment(): Promise<number> {
   const perWs = loopCreditState.perWorkspace || [];
+
   if (perWs.length === 0) {
     return 0;
   }
 
   const mutated = await enrichProOneWorkspaces(perWs);
+
   if (mutated === 0) {
     return 0;
   }
@@ -477,6 +492,7 @@ export async function applyProOneEnrichment(): Promise<number> {
 // ============================================
 export function syncCreditStateFromApi(): void {
   const cws = loopCreditState.currentWs;
+
   if (!cws) {
     logSub('syncCreditState: no currentWs — cannot determine credit', 1);
 

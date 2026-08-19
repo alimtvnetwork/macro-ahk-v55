@@ -14,7 +14,7 @@
 
 import { MacroController } from './core/MacroController';
 import { log, logSub } from './logger';
-import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce, getBearerToken } from './auth';
+import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce, getBearerToken, isAuthFailure } from './auth';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, state } from './shared-state';
@@ -28,14 +28,6 @@ import { LabelType } from './types';
 
 function mc() {
   return MacroController.getInstance(); 
-}
-
-// ============================================
-// Helper — auth failure check
-// ============================================
-
-function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
 }
 
 /**
@@ -62,6 +54,7 @@ function isCastleDenied(status: number, data: unknown): boolean {
 function extractCastleMessage(data: unknown): string {
   if (data && typeof data === 'object') {
     const body = data as Record<string, unknown>;
+
     if (typeof body.message === 'string' && body.message.length > 0) {
       return body.message;
     }
@@ -327,6 +320,7 @@ async function resolveMoveToken(isRetry: boolean): Promise<string> {
 async function buildMoveHeaders(): Promise<Record<string, string>> {
   const castleToken = await getCastleRequestToken();
   const headers: Record<string, string> = {};
+
   if (castleToken) {
     headers['x-castle-request-token'] = castleToken;
   }
@@ -383,6 +377,7 @@ async function executeMove(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveMoveToken(isRetry);
+
   if (!token) {
     handleMoveNoToken();
 
@@ -390,6 +385,7 @@ async function executeMove(
   }
 
   const currentUserId = extractUserIdFromBearer(token);
+
   if (!currentUserId) {
     logError('Move aborted', 'unable to extract user id (sub) from bearer for v2 endpoint');
     updateLoopMoveStatus('error', 'User id missing from token');
@@ -448,6 +444,7 @@ async function handleSwitchAuthFailure(
   showToast('Switch auth ' + status + ' — token "' + invalidatedKey + '" expired, retrying...', 'warn', { noStop: true });
 
   const fallbackToken = resolveToken();
+
   if (fallbackToken) {
     await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
 
@@ -456,6 +453,7 @@ async function handleSwitchAuthFailure(
 
   try {
     const recoveredToken = await recoverAuthOnce();
+
     if (recoveredToken || resolveToken()) {
       await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
 
@@ -474,6 +472,7 @@ async function executeSwitchContext(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveSwitchToken(isRetry);
+
   if (!token) {
     handleMoveNoToken();
 

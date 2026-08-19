@@ -139,6 +139,7 @@ function _isServiceWorkerSuspended(error: string): boolean {
 /** Map known bridge errors to user-friendly help text. */
 function _getBridgeErrorHelp(error: string): string {
   const lower = error.toLowerCase();
+
   if (lower.includes('extension context invalidated')) {
     return 'Normal MV3 behavior — Chrome suspended the background service worker after inactivity. ' +
       'The token is still available from localStorage. ' +
@@ -192,6 +193,7 @@ function _appendHelpIcon(diagRow: DiagRowElements, helpText: string): void {
 /** Remove existing help icon from a row. */
 function _removeHelpIcon(diagRow: DiagRowElements): void {
   const existing = diagRow.row.querySelector('[data-help-icon]');
+
   if (existing) {
     existing.remove();
   }

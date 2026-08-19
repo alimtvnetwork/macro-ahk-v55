@@ -25,6 +25,7 @@ export function clearDiffPrefs(): void {
   const doomed: string[] = [];
   for (let i = 0; i < storage.length; i += 1) {
     const key = storage.key(i);
+
     if (key !== null && key.startsWith(DIFF_PREF_PREFIX)) {
       doomed.push(key);
     }

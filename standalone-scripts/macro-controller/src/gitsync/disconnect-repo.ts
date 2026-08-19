@@ -46,6 +46,7 @@ interface SdkBridge {
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
+
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') {
     return null;
   }
@@ -70,6 +71,7 @@ export async function disconnectGithubRepo(
   }
 
   const sdk = getSdk();
+
   if (!sdk) {
     logError('GitsyncDisconnect', 'marco.api.call unavailable for ws=' + wsId + ' pid=' + pid);
 
@@ -126,6 +128,7 @@ export async function confirmAndDisconnectGithubRepo(
     ?? (typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm.bind(window)
       : null);
+
   if (!askFn) {
     logError('GitsyncDisconnect.confirm', 'window.confirm unavailable — refusing to disconnect ws='
       + wsId + ' pid=' + pid);
@@ -134,6 +137,7 @@ export async function confirmAndDisconnectGithubRepo(
   }
 
   const ok = askFn(message);
+
   if (!ok) {
     log('[GitsyncDisconnect] user cancelled ws=' + wsId + ' pid=' + pid, 'info');
 

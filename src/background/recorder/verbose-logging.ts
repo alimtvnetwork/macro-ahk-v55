@@ -34,6 +34,7 @@ export function resolveVerboseLogging(projectId: string | null | undefined): boo
 /** Mutate the toggle for a project. Idempotent; safe to call repeatedly. */
 export function setVerboseLogging(projectId: string | null | undefined, on: boolean): void {
   const key = normalizeId(projectId);
+
   if (on) {
     store.set(key, true);
   } else {

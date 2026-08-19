@@ -46,18 +46,21 @@ describe("validateCombo", () => {
   it("rejects empty / whitespace combos", () => {
     const r1 = validateCombo("");
     expect(r1.Valid).toBe(false);
+
     if (!r1.Valid) {
       expect(r1.Reason).toBe("Empty"); 
     }
 
     const r2 = validateCombo("   ");
     expect(r2.Valid).toBe(false);
+
     if (!r2.Valid) {
       expect(r2.Reason).toBe("Empty"); 
     }
 
     const r3 = validateCombo("+");
     expect(r3.Valid).toBe(false);
+
     if (!r3.Valid) {
       expect(r3.Reason).toBe("Empty"); 
     }
@@ -66,6 +69,7 @@ describe("validateCombo", () => {
   it("rejects modifier-only combos", () => {
     const r = validateCombo("Ctrl+Shift");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("ModifiersOnly");
       expect(r.Message).toMatch(/modifier/i);
@@ -75,6 +79,7 @@ describe("validateCombo", () => {
   it("rejects unknown named keys", () => {
     const r = validateCombo("Ctrl+Banana");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("UnknownKey"); 
     }
@@ -83,6 +88,7 @@ describe("validateCombo", () => {
   it("rejects combos with multiple non-modifier keys", () => {
     const r = validateCombo("Enter+Tab");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("MultipleKeys"); 
     }
@@ -99,6 +105,7 @@ describe("validateWait", () => {
   it("accepts non-negative integers", () => {
     const r = validateWait("500");
     expect(r.Valid).toBe(true);
+
     if (r.Valid) {
       expect(r.Ms).toBe(500); 
     }
@@ -107,6 +114,7 @@ describe("validateWait", () => {
   it("accepts 0", () => {
     const r = validateWait("0");
     expect(r.Valid).toBe(true);
+
     if (r.Valid) {
       expect(r.Ms).toBe(0); 
     }
@@ -115,6 +123,7 @@ describe("validateWait", () => {
   it("floors fractional values", () => {
     const r = validateWait("250.7");
     expect(r.Valid).toBe(true);
+
     if (r.Valid) {
       expect(r.Ms).toBe(250); 
     }
@@ -123,6 +132,7 @@ describe("validateWait", () => {
   it("rejects empty input", () => {
     const r = validateWait("");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("Empty"); 
     }
@@ -131,6 +141,7 @@ describe("validateWait", () => {
   it("rejects non-numeric input", () => {
     const r = validateWait("abc");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("NotANumber"); 
     }
@@ -139,6 +150,7 @@ describe("validateWait", () => {
   it("rejects negative values", () => {
     const r = validateWait("-100");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("Negative"); 
     }
@@ -147,6 +159,7 @@ describe("validateWait", () => {
   it("rejects values larger than the configured maximum", () => {
     const r = validateWait(String(KEYWORD_EVENT_VALIDATION_LIMITS.MaxWaitMs + 1));
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       expect(r.Reason).toBe("TooLarge"); 
     }
@@ -155,6 +168,7 @@ describe("validateWait", () => {
   it("rejects Infinity", () => {
     const r = validateWait("Infinity");
     expect(r.Valid).toBe(false);
+
     if (!r.Valid) {
       // Either NotFinite or TooLarge is acceptable; both block Run.
       expect(["NotFinite", "TooLarge"]).toContain(r.Reason);

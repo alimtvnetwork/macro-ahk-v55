@@ -118,6 +118,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   fileInput.style.display = 'none';
   fileInput.onchange = () => {
     const file = fileInput.files?.[0];
+
     if (file) {
       void _handleFile(file, overwriteCheck.checked);
     }
@@ -158,6 +159,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
     e.preventDefault();
     setActive(false);
     const file = e.dataTransfer?.files?.[0];
+
     if (file) {
       void _handleFile(file, overwriteCheck.checked);
     }
@@ -203,6 +205,7 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     const text = await file.text();
     const parsed = parsePromptsText(text);
     const { valid, errors } = parsed;
+
     if (errors.length > 0) {
       log('[PromptIO] Import validation issues: ' + errors.join('; '), 'warn');
     }
@@ -214,12 +217,14 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     }
 
     const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite };
+
     if (parsed.promptOrder && parsed.promptOrder.length > 0) {
       importOpts.promptOrder = parsed.promptOrder;
     }
 
     const results = await performPromptImport(valid, importOpts);
     const errCount = results.errors ? results.errors.length : 0;
+
     if (errCount > 0) {
       // PlanTierType-14 step 12 follow-up: surface per-entry DB rejections (token drift, etc.)
       // instead of silently swallowing them behind the success total.
@@ -243,6 +248,7 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
 
 export function removePromptIODialog(): void {
   const existing = document.getElementById('ahk-loop-prompt-io-dialog');
+
   if (existing) {
     existing.remove();
   }

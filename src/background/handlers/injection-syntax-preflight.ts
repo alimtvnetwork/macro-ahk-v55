@@ -51,6 +51,7 @@ export function getInlineSyntaxCheckScript(
         code?: string;
         name?: string;
     };
+
   if (typeof candidate.id !== "string" || typeof candidate.code !== "string") {
     return null;
   }
@@ -103,12 +104,14 @@ export function requestHasInlineSyntaxError(
 
   const triggered = scripts.some((script, index) => {
     const inlineScript = getInlineSyntaxCheckScript(script);
+
     if (inlineScript === null) {
       return false;
     }
 
     inlineCandidateCount += 1;
     const syntaxError = detectSyntaxError(inlineScript.code);
+
     if (syntaxError === null) {
       console.debug(
         "[injection:syntax-preflight] script #%d id=%s name=%s parsed cleanly (codeLen=%d)",
@@ -160,11 +163,13 @@ export function collectInlineSyntaxFailures(
 
   for (const script of scripts) {
     const inlineScript = getInlineSyntaxCheckScript(script);
+
     if (inlineScript === null) {
       continue;
     }
 
     const syntaxError = detectSyntaxError(inlineScript.code);
+
     if (syntaxError === null) {
       continue;
     }

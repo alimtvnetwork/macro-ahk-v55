@@ -72,6 +72,7 @@ function levelFor(outcome: PromptSeedOutcome): StepNotifyLevelType {
 
 function formatLine(evt: PromptSeedEvent): string {
   const parts: string[] = [];
+
   if (evt.role) {
     parts.push('role=' + evt.role);
   }
@@ -81,6 +82,7 @@ function formatLine(evt: PromptSeedEvent): string {
   }
 
   parts.push('outcome=' + evt.outcome);
+
   if (evt.metrics) {
     for (const [k, v] of Object.entries(evt.metrics)) {
       parts.push(k + '=' + String(v));
@@ -131,6 +133,7 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
     event: input.event,
     outcome: input.outcome ?? 'ok',
   };
+
   if (input.role !== undefined) {
     evt.role = input.role;
   }
@@ -163,6 +166,7 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
 export function readPromptSeedTrace(): PromptSeedEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
+
     if (!raw) {
       return [];
     }

@@ -29,6 +29,7 @@ const REQUIRED_ENTRIES: ReadonlyArray<string> = [
 let failed = false;
 for (const rel of REQUIRED_ENTRIES) {
   const abs = resolve(ROOT, rel);
+
   if (!existsSync(abs)) {
     process.stderr.write(`smoke: missing required entry ${rel}\n`);
     failed = true;

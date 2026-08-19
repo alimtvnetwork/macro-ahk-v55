@@ -111,16 +111,19 @@ function shouldSkipProbe(
 ): boolean {
   const hasBindings = record.lastGoodBindings !== undefined
         && record.lastGoodBindings.length > 0;
+
   if (!hasBindings) {
     return true;
   }
 
   const injectionAge = Date.now() - new Date(record.timestamp).getTime();
+
   if (injectionAge < MIN_INJECTION_AGE_MS) {
     return true;
   }
 
   const fp = urlFingerprint(url);
+
   if (lastProbedFingerprint.get(tabId) === fp) {
     return true;
   }

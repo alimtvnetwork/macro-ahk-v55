@@ -81,6 +81,7 @@ export function AuthHealthPanel() {
     ];
     await navigator.clipboard.writeText(lines.join("\n"));
     setCopied(true);
+
     if (copyTimerRef.current !== null) {
       clearTimeout(copyTimerRef.current);
     }

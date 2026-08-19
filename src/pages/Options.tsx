@@ -150,6 +150,7 @@ const OptionsPage = () => {
     if (!pLoading && !sLoading && !cLoading && !onboardingLoading) {
       const ms = Math.round((performance.now() - mountTime.current) * 10) / 10;
       const budget = mountBudgetMs.current;
+
       if (import.meta.env.MODE !== "test") {
         console.log("[Options] ── INTERACTIVE ── mount-to-interactive=%.1fms (budget=%dms)", ms, budget);
       }
@@ -187,6 +188,7 @@ const OptionsPage = () => {
       "automation", "updaters", "timing", "data", "network",
       "storage", "api", "library", SECTION_STEP_GROUPS, "settings", "about", "audit",
     ];
+
     if (hash === HASH_STEP_GROUPS_LIST) {
       return { section: SECTION_STEP_GROUPS, stepGroupView: "list" };
     }
@@ -252,6 +254,7 @@ const OptionsPage = () => {
       onboardingLoading ? "loading"
         : isComplete !== true ? "onboarding-flow"
           : "ready";
+
     if (import.meta.env.MODE !== "test") {
       console.log("[Options] render branch", {
         branch,
@@ -347,6 +350,7 @@ const OptionsPage = () => {
   const handleDeleteProject = async (id: string) => {
     await pRemove(id);
     toast.success("Project deleted");
+
     if (selection.type === "project" && selection.projectId === id) {
       setViewDirection("back");
       setSelection({ type: "section", section: "projects" });
@@ -404,6 +408,7 @@ const OptionsPage = () => {
 
   const handleDeleteScript = async (id: string) => {
     await sRemove(id);
+
     if (selection.type === "script" && selection.scriptId === id) {
       setViewDirection("back");
       setSelection({ type: "section", section: "scripts" });
@@ -474,6 +479,7 @@ const OptionsPage = () => {
                   ) : selection.type === "script" ? (
                     (() => {
                       const scriptObj = scripts.find((s) => s.id === selection.scriptId);
+
                       if (!scriptObj) {
                         return <div className="text-sm text-muted-foreground">Script not found</div>;
                       }
@@ -495,6 +501,7 @@ const OptionsPage = () => {
                   ) : selection.type === "project" ? (
                     (() => {
                       const proj = projects.find((p) => p.id === selection.projectId);
+
                       if (!proj) {
                         return <div className="text-sm text-muted-foreground">Project not found</div>;
                       }
@@ -590,6 +597,7 @@ const OptionsPage = () => {
                         setStepGroupView(v);
                         // Keep the URL in sync so refresh / share preserves the sub-view.
                         const nextHash = v === "list" ? HASH_STEP_GROUPS_LIST : SECTION_STEP_GROUPS;
+
                         if (window.location.hash !== `#${nextHash}`) {
                           history.replaceState(null, "", `#${nextHash}`);
                         }

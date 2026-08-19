@@ -36,6 +36,7 @@ const themeRoot: MacroThemeRoot = validateTheme(window.__MARCO_THEME__);
 // Flush validation warnings to activity log (deferred to break the
 // shared-state -> logging circular import; logging.ts depends on shared-state).
 const _configWarnings = drainValidationWarnings();
+
 if (_configWarnings.length > 0) {
   setTimeout(function () {
     void import('./logging').then(function (mod) {
@@ -63,6 +64,7 @@ import { StorageKeyType } from './types';
 
 export function resolvePreset(key: string): ThemePreset {
   const darkPreset = themeRoot.presets?.dark;
+
   if (darkPreset) {
     return darkPreset;
   }
@@ -108,6 +110,7 @@ try {
   const root = (typeof window !== 'undefined' ? window.RiseupAsiaMacroExt : undefined);
   const hasRoot = root !== null && root !== undefined;
   const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
+
   if (hasProjects && root!.Projects!.MacroController) {
     if (!root!.Projects!.MacroController.meta) {
 root!.Projects!.MacroController.meta = {};

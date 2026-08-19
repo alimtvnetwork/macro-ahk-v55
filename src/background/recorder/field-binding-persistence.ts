@@ -59,6 +59,7 @@ function readDataSourceColumns(
     [dataSourceId],
   );
   const raw = result[0]?.values[0]?.[0];
+
   if (raw === undefined) {
     throw new Error(`DataSource ${dataSourceId} not found`);
   }
@@ -106,6 +107,7 @@ function readBindingByStep(
     [stepId],
   );
   const row = result[0]?.values[0];
+
   if (row === undefined) {
     throw new Error(`FieldBinding row missing for StepId ${stepId} after upsert`);
   }

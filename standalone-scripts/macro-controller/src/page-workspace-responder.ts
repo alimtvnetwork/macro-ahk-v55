@@ -50,6 +50,7 @@ export function registerPageWorkspaceResponder(): void {
     }
 
     const data = event.data as Record<string, unknown> | null;
+
     if (!data) {
       return;
     }
@@ -91,6 +92,7 @@ function buildSnapshot(): DetectedWorkspaceSnapshot {
   const projectId = extractProjectIdFromUrl();
 
   let source: DetectedWorkspaceSnapshot['source'] = 'none';
+
   if (state.workspaceFromApi) {
     source = 'api';
   } else if (state.workspaceFromCache && wsName) {

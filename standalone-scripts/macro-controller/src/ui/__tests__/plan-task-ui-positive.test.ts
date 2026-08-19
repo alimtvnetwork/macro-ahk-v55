@@ -58,6 +58,7 @@ function makeCtx(): { pctx: PromptContext; dropdown: HTMLElement } {
 
 function sub(container: HTMLElement): HTMLElement {
   const node = container.querySelector<HTMLElement>('[data-plan-task-sub]');
+
   if (!node) {
     throw new Error('sub not rendered');
   }
@@ -68,6 +69,7 @@ function sub(container: HTMLElement): HTMLElement {
 function presetAt(container: HTMLElement, index: number): HTMLElement {
   const presets = sub(container).querySelectorAll<HTMLElement>('[data-plan-preset]');
   const child = presets.item(index);
+
   if (!child) {
     throw new Error('no preset at index ' + index);
   }

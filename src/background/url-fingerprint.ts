@@ -42,6 +42,7 @@ function sortSearchParams(params: URLSearchParams): string {
   });
 
   const hasParams = entries.length > 0;
+
   if (!hasParams) {
     return "";
   }
@@ -59,6 +60,7 @@ function sortSearchParams(params: URLSearchParams): string {
 /** Tuple comparator: key first, then value, both lexicographic. */
 function compareEntries(a: [string, string], b: [string, string]): number {
   const keyDelta = a[0].localeCompare(b[0]);
+
   if (keyDelta !== 0) {
     return keyDelta;
   }

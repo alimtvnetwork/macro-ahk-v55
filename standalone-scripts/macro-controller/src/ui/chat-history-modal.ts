@@ -145,6 +145,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
   statusEl.textContent = 'Loading…';
   try {
     const entries = await getProjectHistory(projectId);
+
     if (entries.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'marco-history-empty';
@@ -159,6 +160,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
       const row = renderRow(entry, async () => {
         statusEl.textContent = `Deleting entry ${entry.id}…`;
         const r = await deleteHistoryEntry(projectId, entry.id, entry.fileId);
+
         if (r.isDeleted) {
           row.remove();
           statusEl.textContent = `Deleted entry ${entry.id}.`;
@@ -229,6 +231,7 @@ function buildModalUI() {
 
 export function showChatHistoryModal(): void {
   const existing = document.getElementById(MODAL_ID);
+
   if (existing) {
     existing.remove();
 
@@ -241,6 +244,7 @@ export function showChatHistoryModal(): void {
   document.body.appendChild(container);
 
   const projectId = extractProjectIdFromUrl();
+
   if (!projectId) {
     status.textContent = 'No Lovable project detected in the current URL.';
     logError(SCOPE, 'showChatHistoryModal: no projectId in URL');

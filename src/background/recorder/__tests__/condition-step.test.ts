@@ -46,6 +46,7 @@ describe("resolveRoute", () => {
       { Steps: STEPS, CurrentIndex: 0, JumpsUsed: 0 },
     );
     expect(r.Kind).toBe("Error");
+
     if (r.Kind === "Error") {
       expect(r.Reason).toBe("InvalidRouteTarget");
     }
@@ -57,6 +58,7 @@ describe("resolveRoute", () => {
       { Steps: STEPS, CurrentIndex: 0, JumpsUsed: 0 },
     );
     expect(r.Kind).toBe("Cursor");
+
     if (r.Kind === "Cursor") {
       expect(r.NextIndex).toBe(1);
     }
@@ -84,6 +86,7 @@ describe("resolveRoute", () => {
       { Steps: STEPS, CurrentIndex: 0, JumpsUsed: MAX_ROUTE_JUMPS },
     );
     expect(r.Kind).toBe("Error");
+
     if (r.Kind === "Error") {
       expect(r.Reason).toBe("RouteLoopDetected");
     }

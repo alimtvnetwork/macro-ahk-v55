@@ -19,6 +19,7 @@ interface Props {
 function getManifestVersion(): string | null {
   try {
     const runtime = (globalThis as any).chrome?.runtime;
+
     if (typeof runtime?.getManifest === "function") {
       return runtime.getManifest().version ?? null;
     }

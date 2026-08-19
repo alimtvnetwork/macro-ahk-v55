@@ -79,6 +79,7 @@ function parseTableList(
 ): Array<{ name: string; rowCount?: number }> {
   return (response.tables || []).map((table: Record<string, unknown>) => {
     const out: { name: string; rowCount?: number } = { name: (table.name as string) || '' };
+
     if (typeof table.rowCount === 'number') {
       out.rowCount = table.rowCount;
     }

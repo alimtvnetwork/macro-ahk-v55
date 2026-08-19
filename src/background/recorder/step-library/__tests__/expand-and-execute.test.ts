@@ -212,6 +212,7 @@ describe("executeRunGroup", () => {
       db, projectId, rootGroupId: g, executeLeafStep: () => null,
     });
     expect(out.Ok).toBe(true);
+
     if (out.Ok) {
       expect(out.Result.StepsExecuted).toBe(1);
     }

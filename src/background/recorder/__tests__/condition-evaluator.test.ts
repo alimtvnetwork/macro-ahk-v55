@@ -201,6 +201,7 @@ describe("waitForCondition", () => {
       },
     );
     expect(result.Ok).toBe(false);
+
     if (result.Ok === false) {
       expect(result.Reason).toBe("ConditionTimeout");
       expect(result.LastEvaluation.length).toBeGreaterThan(0);
@@ -213,6 +214,7 @@ describe("waitForCondition", () => {
       { Doc: document, TimeoutMs: 100 },
     );
     expect(result.Ok).toBe(false);
+
     if (result.Ok === false) {
       expect(result.Reason).toBe("InvalidSelector");
     }

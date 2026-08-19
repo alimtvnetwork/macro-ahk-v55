@@ -17,6 +17,7 @@ function useSelectionToggles(
   const toggleOne = (id: number, on: boolean) => {
     setSelected((prev) => {
       const next = new Set(prev);
+
       if (on) {
         next.add(id);
       } else {
@@ -30,6 +31,7 @@ function useSelectionToggles(
   const toggleAllVisible = (on: boolean) => {
     setSelected((prev) => {
       const next = new Set(prev);
+
       if (on) {
         for (const id of visibleIds) {
           next.add(id);

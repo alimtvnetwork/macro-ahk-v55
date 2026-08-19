@@ -100,6 +100,7 @@ async function getProjectChainDb(projectSlug: string) {
 
   const db = getProjectDb(projectSlug);
   const result = ServiceResult.wrapDb(() => db.run(CHAIN_TABLE_DDL));
+
   if (result.isFail) {
     throw result.error;
   }
@@ -146,6 +147,7 @@ export async function handleGetAutomationChains(request?: MessageRequest): Promi
   const project = resolveProject((request ?? {}) as ChainMessage);
   const db = await getProjectChainDb(project);
   const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM AutomationChains ORDER BY Id"));
+
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) };
   }
@@ -170,6 +172,7 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
   const project = resolveProject(raw);
   const chain = raw.chain;
   const isChainDataInvalid = !chain || !chain.name || !chain.slug;
+
   if (isChainDataInvalid) {
     return { isOk: false, errorMessage: "Chain name and slug are required" };
   }
@@ -191,6 +194,7 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
              WHERE Id = ?`,
       [chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled, projectId, Number(chain.id)],
     ));
+
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };
     }
@@ -201,6 +205,7 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [projectId, chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled],
     ));
+
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };
     }
@@ -220,12 +225,14 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
   const project = resolveProject(raw);
   const chainId = raw.chainId;
   const isChainIdMissing = !chainId;
+
   if (isChainIdMissing) {
     return { isOk: false, errorMessage: "Missing chainId" };
   }
 
   const db = await getProjectChainDb(project);
   const res = ServiceResult.wrapDb(() => db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -244,6 +251,7 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
   const project = resolveProject(raw);
   const chainId = raw.chainId;
   const isChainIdMissing = !chainId;
+
   if (isChainIdMissing) {
     return { isOk: false, errorMessage: "Missing chainId" };
   }
@@ -253,6 +261,7 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
     "UPDATE AutomationChains SET Enabled = CASE WHEN Enabled = 1 THEN 0 ELSE 1 END, UpdatedAt = datetime('now') WHERE Id = ?",
     [Number(chainId)],
   ));
+
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
   }
@@ -271,6 +280,7 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
   const project = resolveProject(raw);
   const chains = raw.chains;
   const isChainsArrayMissing = !Array.isArray(chains);
+
   if (isChainsArrayMissing) {
     return { isOk: false, errorMessage: "Expected chains array" };
   }
@@ -292,6 +302,7 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [projectId, name, slug, stepsJson, triggerType, triggerConfigJson, enabled],
     ));
+
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };
     }

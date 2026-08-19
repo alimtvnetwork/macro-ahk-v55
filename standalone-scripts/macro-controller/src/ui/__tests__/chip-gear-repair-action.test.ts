@@ -62,6 +62,7 @@ function report(ok: boolean, codes: string[] = []): HealthReportLike {
 function findRepairRow(section: HTMLElement): HTMLElement {
   const rows = Array.from(section.querySelectorAll('button')) as HTMLElement[];
   const row = rows.find(r => r.textContent?.includes('Repair prompts'));
+
   if (!row) {
     throw new Error('Repair row not found in gear section');
   }

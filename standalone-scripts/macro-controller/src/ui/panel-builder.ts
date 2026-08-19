@@ -184,6 +184,7 @@ function assemblePanelChildren(ui: HTMLElement, c: PanelChildren): void {
 
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
+
   if (!container) {
     createUIState.increment();
     log('UI container not found at XPath: ' + CONFIG.CONTROLS_XPATH + ' — using immediate BODY fallback (floating panel)', 'warn');

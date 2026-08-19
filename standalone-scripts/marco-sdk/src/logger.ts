@@ -66,6 +66,7 @@ export class NamespaceLogger {
      */
   static error(fn: string, msg: string, error?: CaughtError): void {
     const base = `${PREFIX} [${fn}] ${msg}`;
+
     if (error !== undefined) {
       console.error(base + " — " + formatError(error));
     } else {
@@ -104,6 +105,7 @@ export class NamespaceLogger {
      */
   static console(fn: string, msg: string, ...args: RiseupAsiaLogArg[]): void {
     const base = `${PREFIX} [${fn}] ${msg}`;
+
     if (args.length > 0) {
       console.log(base, ...args);
     } else {

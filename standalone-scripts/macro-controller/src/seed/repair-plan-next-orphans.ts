@@ -44,6 +44,7 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
   for (const row of defaults) {
     const entry = await repairSingleOrphan(row);
     entries.push(entry);
+
     if (entry.outcome === 'adopted') {
       adopted += 1;
     } else if (entry.outcome === 'failed-upsert' || entry.outcome === 'skipped-lookup-failed') {
@@ -56,6 +57,7 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
 
 async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): Promise<OrphanRepairEntry> {
   const lookup = await getPromptBySlug(seedRow.slug);
+
   if (lookup.ok === false) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role,
@@ -66,6 +68,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
   }
 
   const existing = lookup.value;
+
   if (!existing) {
     return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
   }
@@ -80,6 +83,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     previousReplaceKey: existing.ReplaceKey, replaceKey: existing.ReplaceKey,
     replaceValues: existing.ReplaceValues,
   });
+
   if (saved.ok === false) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role,

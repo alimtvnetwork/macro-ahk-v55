@@ -30,6 +30,7 @@ function useAddPropertyState(onAdd: (key: string, value: JsonValue) => void) {
   const handleAdd = () => {
     const trimmed = newKey.trim();
     const isKeyEmpty = trimmed === "";
+
     if (isKeyEmpty) {
       return;
     }
@@ -41,11 +42,13 @@ function useAddPropertyState(onAdd: (key: string, value: JsonValue) => void) {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const isEnter = e.key === "Enter";
+
     if (isEnter) {
       handleAdd();
     }
 
     const isEscape = e.key === "Escape";
+
     if (isEscape) {
       setIsAdding(false);
     }

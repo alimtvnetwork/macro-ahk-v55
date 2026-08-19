@@ -78,6 +78,7 @@ export function tallyBenignWarnings(entries: ReadonlyArray<BenignWarningEntryLik
   let total = 0;
   for (const pattern of BENIGN_WARNING_PATTERNS) {
     const count = counts.get(pattern.id) ?? 0;
+
     if (count > 0) {
       matched.push({ id: pattern.id, label: pattern.label, count });
       total += count;

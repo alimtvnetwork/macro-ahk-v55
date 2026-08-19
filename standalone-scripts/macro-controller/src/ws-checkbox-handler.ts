@@ -63,6 +63,7 @@ export function getLoopWsNavIndex(): number {
 /** v2.148.0: check every visible row whose data-ws-idx falls within [lo,hi]. */
 function checkVisibleRange(lo: number, hi: number): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
+
   if (!listEl) {
     return;
   }
@@ -70,11 +71,13 @@ function checkVisibleRange(lo: number, hi: number): void {
   const visibleItems = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of Array.from(visibleItems)) {
     const visIdx = parseInt(item.getAttribute('data-ws-idx') || '-1', 10);
+
     if (visIdx < lo || visIdx > hi) {
       continue;
     }
 
     const id = item.getAttribute(DataAttrType.WsId);
+
     if (id) {
       getLoopWsCheckedIds()[id] = true;
     }
@@ -103,6 +106,7 @@ export function handleWsCheckboxClick(
   isShift: boolean,
 ): void {
   const lastIdx = getLoopWsLastCheckedIdx();
+
   if (isShift && lastIdx >= 0) {
     checkVisibleRange(Math.min(lastIdx, idx), Math.max(lastIdx, idx));
   } else {
@@ -116,6 +120,7 @@ export function handleWsCheckboxClick(
 /** Sync checkbox visuals in the workspace list to match checked state. */
 function syncCheckboxVisuals(): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
+
   if (!listEl) {
     return;
   }
@@ -123,6 +128,7 @@ function syncCheckboxVisuals(): void {
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of items) {
     const cb = item.querySelector('.loop-ws-checkbox');
+
     if (!cb) {
       continue;
     }
@@ -137,17 +143,20 @@ function syncCheckboxVisuals(): void {
 /** Update the selection count badge and rename/select-all buttons. */
 function syncSelectionControls(count: number): void {
   const badge = document.getElementById('loop-ws-sel-count');
+
   if (badge) {
     badge.textContent = count > 0 ? count + ' selected' : '';
     badge.style.display = count > 0 ? 'inline' : 'none';
   }
 
   const renameBtn = document.getElementById('loop-ws-rename-btn');
+
   if (renameBtn) {
     renameBtn.style.display = count > 0 ? 'inline-block' : 'none';
   }
 
   const allBtn = document.getElementById('loop-ws-select-all-btn');
+
   if (allBtn) {
     const total = (loopCreditState.perWorkspace || []).length;
     allBtn.textContent = count >= total && total > 0 ? '☐ None' : '☑ All';
@@ -168,12 +177,14 @@ export function updateWsSelectionUI(): void {
 function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
   const currentNavIndex = navState().getIndex();
+
   if (!listEl || currentNavIndex < 0) {
     return null;
   }
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   const navItem = items[currentNavIndex] as HTMLElement | undefined;
+
   if (!navItem) {
     return null;
   }
@@ -188,6 +199,7 @@ function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
 /** Resolve workspace from the first checked checkbox (Fallback 2). */
 function resolveFromCheckedBox(): { wsId: string; wsName: string } | null {
   const checkedIds = Object.keys(getLoopWsCheckedIds());
+
   if (checkedIds.length === 0) {
     return null;
   }
@@ -215,6 +227,7 @@ export function triggerLoopMoveFromSelection(): void {
 
   if (!wsId) {
     const fallback = resolveFromKeyboardNav() ?? resolveFromCheckedBox();
+
     if (fallback) {
       wsId = fallback.wsId;
       wsName = fallback.wsName; 
@@ -235,6 +248,7 @@ export function triggerLoopMoveFromSelection(): void {
   const hasTargetName = !!targetWorkspaceName;
   const isSameName = currentWorkspaceName === targetWorkspaceName;
   const isMatchingSelf = hasCurrentName && hasTargetName;
+
   if (isMatchingSelf && isSameName) {
     log('Move blocked: target workspace is already current -> ' + wsName, 'warn');
     updateLoopMoveStatus('error', 'Already on this workspace');
@@ -261,6 +275,7 @@ function highlightActiveItem(item: Element): void {
 /** Update the selected-workspace indicator element from the active item. */
 function updateSelectedIndicator(item: Element): void {
   const selectedEl = document.getElementById('loop-ws-selected');
+
   if (!selectedEl) {
     return;
   }
@@ -293,6 +308,7 @@ function resetItemStyles(item: Element): void {
 export function setLoopWsNavIndex(idx: number): void {
   navState().setIndex(idx);
   const listEl = document.getElementById(DomIdType.LoopWsList);
+
   if (!listEl) {
     return;
   }

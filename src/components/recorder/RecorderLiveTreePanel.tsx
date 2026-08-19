@@ -147,6 +147,7 @@ export function RecorderLiveTreePanel(): JSX.Element {
   const toggle = (id: number) => {
     setExpanded((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id); 
       } else {

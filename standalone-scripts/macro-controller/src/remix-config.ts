@@ -87,6 +87,7 @@ export function getRemixConfig(): RemixConfig {
  */
 export function openRemixRedirect(redirectUrl: string): void {
   const config = getRemixConfig();
+
   if (config.openInCurrentTab) {
     window.location.href = redirectUrl;
 

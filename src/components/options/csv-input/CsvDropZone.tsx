@@ -22,6 +22,7 @@ export function CsvDropZone(props: CsvDropZoneProps): JSX.Element {
     <div
       onDragOver={(event) => {
         event.preventDefault();
+
         if (!props.dragOver) {
           props.onDragOverChange(true);
         } 

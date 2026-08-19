@@ -15,6 +15,7 @@
 import type { PromptEntry } from '../types/ui-types';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { PromptsBundleFormatType } from "../types/enums";
+import { isPlainObject, isNonEmptyString } from '../utils/type-guards';
 
 /** Envelope schema version. Bump only for breaking changes. */
 export const PROMPTS_BUNDLE_SCHEMA_VERSION = 1 as const;
@@ -92,16 +93,6 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 // or `5.17.0-rc.1`). Kept aligned with SEMVER pattern in that script.
 const SEMVER_RE = /^\d+\.\d+\.\d+([.-].+)?$/;
 
-/** True when the value is a plain object (rejects null / arrays). */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/** True when the value is a non-empty string. */
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
-}
-
 /** Copy known string fields from raw onto entry when present and typed correctly. */
 function assignStringFields(entry: PromptEntry, raw: Record<string, unknown>): void {
   const keys: (keyof PromptEntry)[] = [
@@ -128,6 +119,7 @@ function assignBooleanFields(entry: PromptEntry, raw: Record<string, unknown>): 
 function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
   const hasName = isNonEmptyString(raw['name']);
   const hasText = typeof raw['text'] === 'string';
+
   if (!hasName || !hasText) {
     return null;
   }
@@ -136,16 +128,19 @@ function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
   assignStringFields(entry, raw);
   assignBooleanFields(entry, raw);
   const rawTags = raw['tags'];
+
   if (Array.isArray(rawTags)) {
     entry.tags = rawTags.filter((t): t is string => typeof t === 'string');
   }
 
   const rawReplaceValues = raw['replaceValues'];
+
   if (Array.isArray(rawReplaceValues)) {
     entry.replaceValues = rawReplaceValues.filter((v): v is string => typeof v === 'string');
   }
 
   const rawRole = raw['role'];
+
   if (isPromptRole(rawRole)) {
     entry.role = rawRole;
   }
@@ -156,6 +151,7 @@ function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
 /** Validate the top-level envelope fields (id, versions, timestamps). */
 function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   const errors: string[] = [];
+
   if (!UUID_RE.test(String(value['id']))) {
     errors.push('/id: Missing or malformed id (expected UUIDv4)');
   }
@@ -169,6 +165,7 @@ function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   }
 
   const exporterVersion = value['exporterVersion'];
+
   if (typeof exporterVersion !== 'string' || !SEMVER_RE.test(exporterVersion)) {
     errors.push('/exporterVersion: exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
   }
@@ -188,6 +185,7 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
     }
 
     const entry = coercePromptEntry(raw);
+
     if (!entry) {
       errors.push(`/entries/${index}: missing required name/text`);
 
@@ -208,6 +206,7 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
 
   const errors = validateEnvelopeFields(value);
   const rawEntries = value['entries'];
+
   if (!Array.isArray(rawEntries)) {
     errors.push('/entries: entries must be an array');
 
@@ -217,6 +216,7 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
   const { entries, errors: entryErrors } = validateEntries(rawEntries);
   errors.push(...entryErrors);
   const rawEntryCount = value['entryCount'];
+
   if (rawEntryCount !== entries.length) {
     errors.push(`/entryCount: entryCount (${String(rawEntryCount)}) != entries.length (${entries.length})`);
   }
@@ -234,21 +234,26 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
     entries,
   };
   const rawFormat = value['format'];
+
   if (rawFormat === 'json' || rawFormat === 'zip' || rawFormat === 'sqlite') {
     bundle.format = rawFormat;
   }
 
   const rawRevisions = value['revisions'];
+
   if (Array.isArray(rawRevisions)) {
     const validRevs = coerceBundleRevisions(rawRevisions);
+
     if (validRevs.length > 0) {
       bundle.revisions = validRevs;
     }
   }
 
   const rawOrder = value['promptOrder'];
+
   if (Array.isArray(rawOrder)) {
     const orderStrings = rawOrder.filter((v): v is string => typeof v === 'string' && v.length > 0);
+
     if (orderStrings.length > 0) {
       bundle.promptOrder = orderStrings;
     }
@@ -271,6 +276,7 @@ function coerceBundleRevisionRow(item: Record<string, unknown>): BundleRevisionR
   const createdAtRaw = item['CreatedAt'];
   const createdAt = typeof createdAtRaw === 'number' ? createdAtRaw : Number(createdAtRaw);
   const reason = typeof item['Reason'] === 'string' ? item['Reason'] : 'import';
+
   if (!slug || !name || !isPromptRole(role)) {
     return null;
   }
@@ -290,6 +296,7 @@ function coerceBundleRevisions(raw: unknown[]): BundleRevisionRow[] {
     }
 
     const row = coerceBundleRevisionRow(item);
+
     if (row) {
       out.push(row);
     }
@@ -301,6 +308,7 @@ function coerceBundleRevisions(raw: unknown[]): BundleRevisionRow[] {
 /** Generate a UUIDv4. Prefers `crypto.randomUUID`, falls back to a hand-rolled v4. */
 function newBundleId(): string {
   const hasNativeUuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function';
+
   if (hasNativeUuid) {
     return crypto.randomUUID();
   }
@@ -339,6 +347,7 @@ export function buildPromptsBundle(
     entryCount: filtered.length,
     entries: filtered,
   };
+
   if (options.format) {
     bundle.format = options.format;
   }
@@ -348,6 +357,7 @@ export function buildPromptsBundle(
     // preserves the invariant that revisions never reference dropped rows.
     const slugSet = new Set(filtered.map((e) => e.slug).filter((s): s is string => typeof s === 'string' && s.length > 0));
     const kept = options.revisions.filter((r) => slugSet.has(r.Slug));
+
     if (kept.length > 0) {
       bundle.revisions = kept;
     }

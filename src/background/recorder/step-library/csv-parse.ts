@@ -69,6 +69,7 @@ export type CsvParseResult = CsvParseSuccess | CsvParseFailure;
 export function parseCsv(raw: string, context: CsvParseContext = {}): CsvParseResult {
   const source = context.Source ?? null;
   const guard = guardSize(raw, source);
+
   if (guard !== null) {
     return guard; 
   }
@@ -77,22 +78,26 @@ export function parseCsv(raw: string, context: CsvParseContext = {}): CsvParseRe
   const delimiter = detectDelimiter(stripped);
 
   const tok = tokenize(stripped, delimiter, source);
+
   if (tok.error !== null) {
     return tok.error; 
   }
 
   const records = trimTrailingBlankRecords(tok.records);
+
   if (records.length === 0) {
     return failCsv("CSV contained no rows after trimming blank lines.", null, "no-rows", source);
   }
 
   const headers = normaliseHeaders(records[0]);
   const headerErr = validateHeaders(headers, source);
+
   if (headerErr !== null) {
     return headerErr; 
   }
 
   const dataRows = records.slice(1);
+
   if (dataRows.length > MAX_ROWS) {
     return failCsv(
       `CSV has ${dataRows.length} data rows; the limit is ${MAX_ROWS}. Reduce or split the file.`,
@@ -265,6 +270,7 @@ function trimTrailingBlankRecords(records: string[][]): string[][] {
 
 function validateHeaders(headers: ReadonlyArray<string>, source: string | null): CsvParseFailure | null {
   const dupes = findDuplicateHeaders(headers);
+
   if (dupes.length > 0) {
     const quoted = dupes.map((h) => `"${h}"`).join(", ");
 
@@ -327,6 +333,7 @@ function detectDelimiter(source: string): DelimiterType {
   let semis = 0;
   for (let i = 0; i < source.length; i++) {
     const ch = source[i];
+
     if (ch === '"' && inQuotes && source[i + 1] === '"') {
       i++;
       continue; 

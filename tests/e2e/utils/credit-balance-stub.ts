@@ -77,6 +77,7 @@ export async function installCreditBalanceStub(
 
     const payload = options.creditBalances?.[workspaceId];
     const status = options.creditBalanceStatus ?? (payload ? 200 : 404);
+
     if (status !== 200 || !payload) {
       await route.fulfill({
         status,

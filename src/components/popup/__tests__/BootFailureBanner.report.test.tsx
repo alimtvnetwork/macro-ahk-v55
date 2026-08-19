@@ -43,6 +43,7 @@ async function captureNextDownload(action: () => void): Promise<CapturedDownload
   URL.revokeObjectURL = (): void => { /* no-op */ };
   document.createElement = ((tag: string) => {
     const el = origCreateEl(tag);
+
     if (tag === "a") {
       Object.defineProperty(el, "click", { value: () => {
         capturedName = (el as HTMLAnchorElement).download;
@@ -54,6 +55,7 @@ async function captureNextDownload(action: () => void): Promise<CapturedDownload
 
   try {
     action();
+
     if (capturedBlob === null) {
       throw new Error("No blob captured, download handler did not run");
     }

@@ -254,6 +254,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
     for (let i = 0; i < len; i++) {
       const key = localStorage.key(i);
       const isKeyMissing = !key;
+
       if (isKeyMissing) {
         continue;
       }
@@ -261,12 +262,14 @@ function scanSupabaseLocalStorageForJwt(): string | null {
       // Match Supabase auth token keys: sb-<ref>-auth-token
       const isSupabaseKey = key.startsWith("sb-") && key.includes("-auth-token");
       const isNonSupabaseKey = !isSupabaseKey;
+
       if (isNonSupabaseKey) {
         continue;
       }
 
       const raw = localStorage.getItem(key);
       const isRawTokenInvalid = !raw || raw.length < MIN_TOKEN_LENGTH;
+
       if (isRawTokenInvalid) {
         continue;
       }
@@ -281,6 +284,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 
         // Check nested session object
         const session = parsed?.currentSession ?? parsed?.session;
+
         if (isValidJwtAccessToken(session)) {
           return session.access_token;
         }
@@ -529,6 +533,7 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
 
   // Pattern 1: /projects/{id} (editor URL)
   const pathMatch = url.match(/\/projects\/([^/?#]+)/);
+
   if (pathMatch) {
     return pathMatch[1];
   }
@@ -539,18 +544,21 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
 
     // Pattern 2: id-preview--{uuid}.{domain}
     const idPreviewLabelMatch = firstLabel.match(/^id-preview--([a-f0-9-]{36})$/i);
+
     if (idPreviewLabelMatch) {
       return idPreviewLabelMatch[1];
     }
 
     // Pattern 3: {uuid}--preview.{domain} or {uuid}-preview.{domain}
     const previewSuffixLabelMatch = firstLabel.match(/^([a-f0-9-]{36})(?:--preview|-preview)$/i);
+
     if (previewSuffixLabelMatch) {
       return previewSuffixLabelMatch[1];
     }
 
     // Pattern 4: bare UUID subdomain: {uuid}.lovableproject.com
     const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
+
     if (bareUuidLabelMatch) {
       return bareUuidLabelMatch[1];
     }
@@ -559,16 +567,19 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
   }
 
   const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);
+
   if (subdomainMatch) {
     return subdomainMatch[1];
   }
 
   const altSubdomainMatch = url.match(/([a-f0-9-]{36})(?:--preview|-preview)\./i);
+
   if (altSubdomainMatch) {
     return altSubdomainMatch[1];
   }
 
   const bareUuidSubdomainMatch = url.match(/https?:\/\/([a-f0-9-]{36})\.[^/]+/i);
+
   if (bareUuidSubdomainMatch) {
     return bareUuidSubdomainMatch[1];
   }

@@ -112,6 +112,7 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
   }
 
   const kv = getKv();
+
   if (!kv) {
     logError('RemixNewProjectCache',
       'marco.kv unavailable — skipping cache for sourceProjectId=' + input.sourceProjectId);
@@ -146,12 +147,14 @@ export async function readRemixNewProject(
   }
 
   const kv = getKv();
+
   if (!kv) {
     return null;
   }
 
   try {
     const raw = await kv.get(buildKey(sourceProjectId));
+
     if (!raw) {
       return null;
     }
@@ -172,6 +175,7 @@ export async function clearRemixNewProject(sourceProjectId: string): Promise<voi
   }
 
   const kv = getKv();
+
   if (!kv) {
     return;
   }

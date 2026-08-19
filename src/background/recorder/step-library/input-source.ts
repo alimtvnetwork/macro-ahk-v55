@@ -132,12 +132,14 @@ function sanitiseHeaders(raw: unknown): InputSourceHeader[] {
   const out: InputSourceHeader[] = [];
   for (const entry of raw) {
     const notPlainObject = !isPlainObject(entry);
+
     if (notPlainObject) {
       continue;
     }
 
     const name = typeof entry.Name === "string" ? entry.Name.trim() : "";
     const value = typeof entry.Value === "string" ? entry.Value : "";
+
     if (name.length === 0) {
       continue;
     }
@@ -169,12 +171,14 @@ export function loadInputSourceConfig(): InputSourceConfig {
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     if (raw === null) {
       return DEFAULT_INPUT_SOURCE_CONFIG;
     }
 
     const parsed = JSON.parse(raw) as StoredShape;
     const notPlainObject = !isPlainObject(parsed);
+
     if (notPlainObject) {
       return DEFAULT_INPUT_SOURCE_CONFIG;
     }
@@ -203,6 +207,7 @@ export function saveInputSourceConfig(config: InputSourceConfig): InputSourceCon
     OnFailure: sanitiseFailurePolicy(config.OnFailure),
     TimeoutMs: clampTimeout(config.TimeoutMs),
   };
+
   if (typeof localStorage !== "undefined") {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalised));
   }
@@ -230,6 +235,7 @@ export function mergeInputBags(
   incoming: GroupInputBag | null,
 ): GroupInputBag {
   const out: Record<string, JsonValue> = {};
+
   if (local !== null) {
     for (const [k, v] of Object.entries(local)) {
       out[k] = v;
@@ -311,6 +317,7 @@ interface FetchPreflight {
 
 function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPreflight {
   const continueOnFail = config.OnFailure === "ContinueWithLocal";
+
   if (!config.Enabled) {
     return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
   }
@@ -320,6 +327,7 @@ function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPrefli
   }
 
   const fetchImpl = deps.fetchImpl ?? (typeof fetch === "function" ? fetch : null);
+
   if (fetchImpl === null) {
     return {
       Skip: buildErrorResult({ url: config.Url, status: null, error: "fetch is not available in this environment", durationMs: 0, continueOnFail }),
@@ -338,8 +346,10 @@ function buildRequest(config: InputSourceConfig): { headers: Record<string, stri
   }
 
   let body: string | undefined;
+
   if (config.Method === "POST" && config.RequestBody.trim().length > 0) {
     body = config.RequestBody;
+
     if (!Object.prototype.hasOwnProperty.call(headers, "Content-Type")) {
       headers["Content-Type"] = "application/json";
     }
@@ -360,6 +370,7 @@ function handleResponse(
   }
 
   const parsed = parseResponseBag(text);
+
   if (parsed.Ok === false) {
     return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
   }
@@ -376,6 +387,7 @@ export async function fetchInputSource(
 ): Promise<FetchInputResult> {
   const config = deps.config ?? loadInputSourceConfig();
   const pre = preflight(deps, config);
+
   if (pre.Skip !== null || pre.FetchImpl === null) {
     return pre.Skip as FetchInputResult;
   }
@@ -432,6 +444,7 @@ export async function resolveBatchInputSnapshot(
   deps: FetchInputDeps = {},
 ): Promise<InputSourceSnapshot> {
   const result = await fetchInputSource(deps);
+
   if (result.Ok && !result.Skipped) {
     return { Bag: result.Bag, Result: result };
   }

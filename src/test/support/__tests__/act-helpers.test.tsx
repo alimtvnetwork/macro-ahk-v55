@@ -63,6 +63,7 @@ beforeEach(() => {
   actWarnings = [];
   errorSpy = vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
     const first = args[0];
+
     if (typeof first === "string" && first.includes("not wrapped in act")) {
       actWarnings.push(first);
     }

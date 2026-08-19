@@ -225,6 +225,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   const removeJsEntry = (id: string) => {
     setJsEntries((prev) => prev.filter((e) => e.id !== id).map((e, i) => ({ ...e, order: i })));
+
     if (editorTab === id) {
       setEditorTab("overview");
     }
@@ -237,6 +238,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const entries = [...prev];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
+
       if (newIdx < 0 || newIdx >= entries.length) {
         return prev;
       }
@@ -268,6 +270,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
     }
 
     const config = configs.find((c) => c.id === configId);
+
     if (!config) {
       return;
     }
@@ -283,6 +286,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   const removeConfigEntry = (id: string) => {
     setConfigEntries((prev) => prev.filter((e) => e.id !== id).map((e, i) => ({ ...e, order: i })));
+
     if (editorTab === id) {
       setEditorTab("overview");
     }
@@ -295,6 +299,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const entries = [...prev];
       const idx = entries.findIndex((e) => e.id === id);
       const newIdx = idx + direction;
+
       if (newIdx < 0 || newIdx >= entries.length) {
         return prev;
       }
@@ -463,6 +468,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                 try {
                   const fetchRes = await fetch(updateUrl.trim());
                   const res = ServiceResult.wrapFetch(fetchRes);
+
                   if (res.isFail) {
                     // HEFF: single attempt; report status and stop.
                     throw new Error(
@@ -471,12 +477,14 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                   }
 
                   const text = await fetchRes.text();
+
                   if (!text.trim()) {
                     throw new Error("Empty response");
                   }
 
                   // Update the primary JS entry with fetched code
                   const primaryId = jsEntries[0]?.id;
+
                   if (primaryId) {
                     updateJsEntry(primaryId, { code: text });
                     toast.success(`Script updated from remote (${(text.length / 1024).toFixed(1)}KB)`);

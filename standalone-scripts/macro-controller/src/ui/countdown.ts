@@ -63,6 +63,7 @@ function progressColor(pct: number): string {
 /** Update inline countdown text element if present. */
 function updateInlineCountdown(secs: number): void {
   const inlineEl = document.getElementById('marco-countdown-text');
+
   if (!inlineEl) {
     return;
   }
@@ -74,6 +75,7 @@ function updateInlineCountdown(secs: number): void {
 /** Update progress bar element if present. */
 function updateProgressBar(secs: number): void {
   const barEl = document.getElementById('marco-progress-bar');
+
   if (!barEl) {
     return;
   }
@@ -109,6 +111,7 @@ export function startCountdownTick(ctx: CountdownCtx) {
     }
 
     const secs = state.countdown;
+
     if (secs === ctx.lastCountdownVal) {
       return;
     }
@@ -134,6 +137,7 @@ export function stopCountdownTick(ctx: CountdownCtx) {
 export function updateStartStopBtn(ctx: CountdownCtx, running?: boolean) {
   const isRunning = (typeof running === 'boolean') ? running : !!state.running;
   ctx.loopIsRunning = isRunning;
+
   if (isRunning) {
     renderStopGlyph(ctx.startStopBtn);
     ctx.startStopBtn.title = 'Stop loop';

@@ -152,11 +152,13 @@ function useImportFile(
     }
 
     const bytes = await readFileBytes(file);
+
     if (bytes === null) {
       return; 
     }
 
     const result = await runImportForBytes(bytes, lib);
+
     if (result.Reason !== "Ok") {
       const explanation = explainImportFailure(result);
       setErrorState({ Open: true, Explanation: explanation, FileName: file.name });

@@ -68,17 +68,20 @@ function extractRefillSection(html: string): string {
   let cursor = 0;
   while (cursor < html.length) {
     const headerStart = html.indexOf(HEADER_MARKER, cursor);
+
     if (headerStart === -1) {
       return '';
     }
 
     const sectionOpen = html.lastIndexOf('<div', headerStart);
     const headerCloseIdx = html.indexOf('</div>', headerStart);
+
     if (headerCloseIdx === -1) {
       return '';
     }
 
     const headerBlock = html.slice(headerStart, headerCloseIdx + 6);
+
     if (headerBlock.includes('>Refill</div>')) {
       const nextHeaderIdx = html.indexOf(HEADER_MARKER, headerCloseIdx);
 

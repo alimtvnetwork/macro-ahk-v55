@@ -93,6 +93,7 @@ function appendUrlCandidate(
     const isHttpUrl = parsed.protocol === "http:" || parsed.protocol === "https:";
 
     const isMissing = !isHttpUrl;
+
     if (isMissing) {
       return;
     }

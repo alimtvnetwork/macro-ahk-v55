@@ -37,11 +37,13 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
       func: () => {
         const win = window as unknown as Record<string, unknown>;
         const isExtRootMissing = !win.RiseupAsiaMacroExt;
+
         if (isExtRootMissing) {
           win.RiseupAsiaMacroExt = { Projects: {} };
         } else {
           const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
           const isProjectsMissing = !ext.Projects;
+
           if (isProjectsMissing) {
             ext.Projects = {};
           }
@@ -91,6 +93,7 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
 
     const guideKey = `${codeName}:${slug}`;
     const isCacheMiss = !_llmGuideCache.has(guideKey);
+
     if (isCacheMiss) {
       _llmGuideCache.set(guideKey, generateLlmGuide(codeName, slug));
     }
@@ -100,6 +103,7 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
     const { settings } = await handleGetSettings();
     const settingsHash = hashSettingsKey(settings as unknown as Record<string, unknown>, guideKey);
     let script = getSettingsNsCache(settingsHash);
+
     if (script) {
       console.log("[injection:settings] Phase 10: using cached settings namespace script");
     } else {
@@ -109,6 +113,7 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
     }
 
     const result = await injectWithCspFallback(tabId, script, "MAIN");
+
     if (result.isFallback) {
       logBgWarnError(BgLogTag.INJECTION_SETTINGS, `CRITICAL — Settings namespace injected via ${result.world} fallback (tab ${tabId}). RiseupAsiaMacroExt.Settings will NOT be visible in the page console.`);
       transitionHealth("DEGRADED", "Settings namespace fell back to " + result.world + " — not visible in MAIN world");
@@ -129,12 +134,14 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
 export async function injectProjectNamespaces(tabId: number, allProjects: StoredProject[]): Promise<void> {
   const activeId = getActiveProjectId();
   const isActiveIdMissing = !activeId;
+
   if (isActiveIdMissing) {
     return;
   }
 
   const activeProject = allProjects.find((p) => p.id === activeId);
   const isActiveProjectMissing = !activeProject;
+
   if (isActiveProjectMissing) {
     return;
   }
@@ -150,15 +157,18 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
   const queue = (activeProject.dependencies ?? []).map((d) => d.projectId);
   while (queue.length > 0) {
     const depId = queue.shift()!;
+
     if (projectIds.has(depId)) {
       continue;
     }
 
     projectIds.add(depId);
     const dep = allProjects.find((p) => p.id === depId);
+
     if (dep?.dependencies) {
       for (const sub of dep.dependencies) {
         const isSubProjectExcluded = !projectIds.has(sub.projectId);
+
         if (isSubProjectExcluded) {
           queue.push(sub.projectId);
         }
@@ -187,6 +197,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
   for (const pid of projectIds) {
     const project = allProjects.find((p) => p.id === pid);
     const isProjectMissing = !project;
+
     if (isProjectMissing) {
       continue;
     }
@@ -200,6 +211,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
     }
 
     let nsScript = cachedScripts.get(pid);
+
     if (!nsScript) {
       let fileCache: Array<{ name: string; data: string }> = [];
       try {
@@ -247,6 +259,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
 
     try {
       const nsResult = await injectWithCspFallback(tabId, combinedNs, "MAIN");
+
       if (nsResult.isFallback) {
         logBgWarnError(BgLogTag.INJECTION_NS, `CRITICAL — ${nsScriptParts.length} namespaces injected via ${nsResult.world} fallback (tab ${tabId}). RiseupAsiaMacroExt.Projects.* will NOT be visible in page console.`);
         transitionHealth("DEGRADED", `Project namespaces fell back to ${nsResult.world} — not visible in MAIN world`);

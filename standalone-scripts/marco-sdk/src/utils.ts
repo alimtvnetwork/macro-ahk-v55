@@ -127,6 +127,7 @@ async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions): Promis
       return await fn();
     } catch (error: unknown) {
       NamespaceLogger.error('parseJson', 'JSON parse failed', error);
+
       if (attempt === options.maxAttempts) {
         throw error; 
       }
@@ -136,6 +137,7 @@ async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions): Promis
       }
 
       await delay(currentDelay);
+
       if (options.backoffMultiplier !== undefined) {
         currentDelay = currentDelay * options.backoffMultiplier;
       }
@@ -176,9 +178,11 @@ function createConcurrencyLock<T>(): ConcurrencyLock<T> {
       if (inFlight !== null) {
         return new Promise<ConcurrencyLockResult<T>>(function (resolve) {
           const entry: typeof waiters[0] = { resolve, timer: null };
+
           if (timeoutMs !== undefined && fallback !== undefined) {
             entry.timer = setTimeout(function () {
               const idx = waiters.indexOf(entry);
+
               if (idx !== -1) {
                 waiters.splice(idx, 1); 
               }
@@ -275,6 +279,7 @@ function pollUntil<T>(
 
       if (result) {
         stop();
+
         if (options.onFound) {
           options.onFound(elapsed); 
         }
@@ -286,6 +291,7 @@ function pollUntil<T>(
 
       if (elapsed >= timeoutMs) {
         stop();
+
         if (options.onTimeout) {
           options.onTimeout(); 
         }
@@ -349,6 +355,7 @@ function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
   return function (...args: A) {
     const now = Date.now();
     const remaining = ms - (now - last);
+
     if (remaining <= 0) {
       if (timer !== null) {
         clearTimeout(timer);

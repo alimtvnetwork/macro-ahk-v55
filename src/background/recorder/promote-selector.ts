@@ -58,6 +58,7 @@ function validatePromotion(
   }
 
   const target = selectors.find((s) => s.SelectorId === targetSelectorId);
+
   if (target === undefined) {
     return fail("TargetNotFound", `Selector ${targetSelectorId} is not part of this step's selector list.`);
   }
@@ -100,6 +101,7 @@ export function promoteSelectorToPrimary(
   targetSelectorId: number,
 ): PromotionResult {
   const validated = validatePromotion(selectors, targetSelectorId);
+
   if ("Error" in validated) {
     return validated;
   }

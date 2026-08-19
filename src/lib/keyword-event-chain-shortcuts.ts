@@ -49,6 +49,7 @@ export function isTypingTarget(target: EventTarget | null): boolean {
   // DOM-specific fields so the helper stays safe in jsdom + headless env.
   const el = target as Partial<HTMLElement> & { tagName?: string; isContentEditable: boolean };
   const tag = typeof el.tagName === "string" ? el.tagName.toUpperCase() : "";
+
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
     return true; 
   }
@@ -84,6 +85,7 @@ export function matchChainShortcut(
   // multi-line entries with Shift+Enter inside text fields.
   const isEnter = event.key === "Enter";
   const hasPrimaryMod = event.ctrlKey || event.metaKey;
+
   if (isEnter && hasPrimaryMod && !event.shiftKey && !event.altKey) {
     if (isTypingTarget(event.target)) {
       return null; 

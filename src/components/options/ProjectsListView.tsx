@@ -84,6 +84,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
       const confirmed = window.confirm(
         "⚠️ Replace All will DELETE all existing projects, scripts, and configs before importing.\n\nThis is destructive and cannot be undone. Continue?"
       );
+
       if (!confirmed) {
         return;
       }
@@ -94,6 +95,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       onImport(file);
       e.target.value = "";
@@ -115,6 +117,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
 
   const handleSqliteFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) {
       return;
     }
@@ -759,6 +762,7 @@ function SelectProjectsExportDialog({
   const toggle = (id: string, on: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
+
       if (on) {
         next.add(id);
       } else {
@@ -777,6 +781,7 @@ function SelectProjectsExportDialog({
 
   const handleExport = async () => {
     const chosen = projects.filter((p) => selectedIds.has(p.id));
+
     if (chosen.length === 0) {
       toast.error("Pick at least one project to export");
 

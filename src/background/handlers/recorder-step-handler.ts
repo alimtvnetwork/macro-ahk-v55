@@ -73,6 +73,7 @@ export async function handleRecorderStepInsert(
     selectors: ReadonlyArray<PersistedSelector>;
 }> {
   const req = message as unknown as InsertRequest;
+
   if (!req.projectSlug || !req.draft) {
     throw new Error("RECORDER_STEP_INSERT requires projectSlug and draft");
   }
@@ -90,6 +91,7 @@ export async function handleRecorderStepList(
   message: MessageRequest,
 ): Promise<{ steps: ReadonlyArray<PersistedStep> }> {
   const req = message as unknown as ListRequest;
+
   if (!req.projectSlug) {
     throw new Error("RECORDER_STEP_LIST requires projectSlug");
   }
@@ -112,6 +114,7 @@ export async function handleRecorderStepSelectorsList(
   message: MessageRequest,
 ): Promise<{ selectors: ReadonlyArray<PersistedSelector> }> {
   const req = message as unknown as SelectorsListRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number") {
     throw new Error(
       "RECORDER_STEP_SELECTORS_LIST requires projectSlug and stepId",
@@ -131,6 +134,7 @@ export async function handleRecorderStepDelete(
   message: MessageRequest,
 ): Promise<{ isOk: true }> {
   const req = message as unknown as DeleteRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number") {
     throw new Error("RECORDER_STEP_DELETE requires projectSlug and stepId");
   }
@@ -148,11 +152,13 @@ export async function handleRecorderStepResolve(
   message: MessageRequest,
 ): Promise<{ resolved: ResolvedSelector }> {
   const req = message as unknown as ResolveRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number") {
     throw new Error("RECORDER_STEP_RESOLVE requires projectSlug and stepId");
   }
 
   const selectors = await listSelectors(req.projectSlug, req.stepId);
+
   if (selectors.length === 0) {
     throw new Error(`Step ${req.stepId} has no selectors persisted`);
   }
@@ -176,6 +182,7 @@ export async function handleRecorderStepRename(
   message: MessageRequest,
 ): Promise<{ isOk: true; step: PersistedStep }> {
   const req = message as unknown as RenameRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number" || !req.newVariableName) {
     throw new Error(
       "RECORDER_STEP_RENAME requires projectSlug, stepId, and newVariableName",
@@ -205,6 +212,7 @@ export async function handleRecorderStepUpdateMeta(
   message: MessageRequest,
 ): Promise<{ isOk: true; step: PersistedStep }> {
   const req = message as unknown as UpdateMetaRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number" || !req.patch) {
     throw new Error("RECORDER_STEP_UPDATE_META requires projectSlug, stepId, patch");
   }
@@ -224,6 +232,7 @@ export async function handleRecorderStepTagsSet(
   message: MessageRequest,
 ): Promise<{ isOk: true; tags: ReadonlyArray<string> }> {
   const req = message as unknown as TagsSetRequest;
+
   if (!req.projectSlug || typeof req.stepId !== "number" || !Array.isArray(req.tags)) {
     throw new Error("RECORDER_STEP_TAGS_SET requires projectSlug, stepId, tags[]");
   }
@@ -245,6 +254,7 @@ export async function handleRecorderStepLinkSet(
 ): Promise<{ isOk: true; step: PersistedStep }> {
   const req = message as unknown as LinkSetRequest;
   const okSlot = req.slot === "OnSuccessProjectId" || req.slot === "OnFailureProjectId";
+
   if (!req.projectSlug || typeof req.stepId !== "number" || !okSlot) {
     throw new Error(
       "RECORDER_STEP_LINK_SET requires projectSlug, stepId, slot in {OnSuccessProjectId|OnFailureProjectId}",

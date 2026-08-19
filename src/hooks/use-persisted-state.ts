@@ -45,6 +45,7 @@ function readPersisted<T>(key: string, initial: T, decode: (raw: unknown) => T |
 
   try {
     const raw = window.localStorage.getItem(key);
+
     if (raw === null) {
       return initial;
     }

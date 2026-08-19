@@ -52,6 +52,7 @@ export function countTable(
   }
 
   const resultWrap = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) as cnt FROM ${table}`));
+
   if (resultWrap.ok === false) {
     throw resultWrap.error;
   }

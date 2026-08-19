@@ -59,11 +59,13 @@ function formatAge(iso: string): string {
   }
 
   const diffMs = Date.now() - new Date(iso).getTime();
+
   if (diffMs < 0) {
     return "now";
   }
 
   const mins = Math.floor(diffMs / 60_000);
+
   if (mins < 1) {
     return "now";
   }
@@ -73,6 +75,7 @@ function formatAge(iso: string): string {
   }
 
   const hrs = Math.floor(mins / 60);
+
   if (hrs < 24) {
     return `${hrs}h ago`;
   }
@@ -172,6 +175,7 @@ export function SessionCopyButton() {
 
         const withTs = res.sessionsWithTimestamps ?? (res.sessions ?? []).map((id) => ({ id, lastModified: "" }));
         setSessions(withTs);
+
         if (res.sessionId && res.sessionId !== "none") {
           setSelectedSession(res.sessionId);
         }

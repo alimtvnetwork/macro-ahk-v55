@@ -49,6 +49,7 @@ import { LabelType } from './types';
 
   // ── Domain guard ──
   timingStart(LabelType.DomainGuard, 'Domain Guard');
+
   if (!shouldInject()) {
     timingEnd(LabelType.DomainGuard, 'error', 'Injection blocked');
 
@@ -59,6 +60,7 @@ import { LabelType } from './types';
 
   // ── Idempotent check (handles re-injection, version mismatch, SPA recovery) ──
   timingStart('idempotent', 'Idempotent Check');
+
   if (runIdempotentCheck() === 'abort') {
     timingEnd('idempotent', 'warn', 'Aborted (already injected)');
 
@@ -193,6 +195,7 @@ import { LabelType } from './types';
 function buildBulkRenameFn(): (template: string, prefix: string, suffix: string, startNum?: number | Record<string, number>) => void {
   return function(template: string, prefix: string, suffix: string, startNum?: number | Record<string, number>) {
     const checkedIds = Object.keys(getLoopWsCheckedIds());
+
     if (checkedIds.length === 0) {
       log('[Rename] No workspaces checked — select some first', 'warn');
 

@@ -81,6 +81,7 @@ export function transitionHealth(
 /** Resets health to HEALTHY when recovery conditions are met. */
 export function recoverHealth(): void {
   const previousState = getHealthState();
+
   if (previousState === "HEALTHY") {
     return;
   }
@@ -138,6 +139,7 @@ function checkStorageQuota(): ApplyQuotaResultType {
 function checkErrorRate(): ApplyErrorRateResultType {
   try {
     const currentSessionId = getCurrentSessionId();
+
     if (currentSessionId === null) {
       return "ok";
     }

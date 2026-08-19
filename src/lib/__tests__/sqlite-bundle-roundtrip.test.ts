@@ -145,6 +145,7 @@ beforeEach(() => {
     "fetch",
     vi.fn(async (input: string) => {
       const path = String(input);
+
       if (path.endsWith(".wasm")) {
         const buf = readFileSync(
           resolvePath(__dirname, "../../../node_modules/sql.js/dist/sql-wasm.wasm"),
@@ -408,6 +409,7 @@ describe("sqlite-bundle, full round-trip", () => {
           createdAt: src.createdAt,
           updatedAt: src.updatedAt,
         });
+
         // Optional fields, only assert when the source had them.
         if (src.description !== undefined) {
           expect(imp.description).toBe(src.description);
@@ -459,6 +461,7 @@ describe("sqlite-bundle, full round-trip", () => {
           createdAt: src.createdAt,
           updatedAt: src.updatedAt,
         });
+
         if (src.slug !== undefined) {
           expect(imp.slug).toBe(src.slug);
         }

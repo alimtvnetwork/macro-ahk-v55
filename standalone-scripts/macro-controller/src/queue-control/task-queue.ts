@@ -58,6 +58,7 @@ export const createTaskQueue = (storage: QueueStorage) => {
     const max = options.maxQueueSize ?? DEFAULT_MAX_QUEUE_SIZE;
     const record = await readOrEmpty(storage, projectId);
     const room = max - record.items.length;
+
     if (room <= 0) {
       throwDiagnostic('QUEUE_INVARIANT_E001', {
         where: 'enqueueMany',
@@ -90,6 +91,7 @@ export const createTaskQueue = (storage: QueueStorage) => {
   const dequeue = async (projectId: string): Promise<TaskQueueItem | null> => {
     const record = await readOrEmpty(storage, projectId);
     const idx = record.items.findIndex((item) => item.status === "pending");
+
     if (idx === -1) {
       return null;
     }

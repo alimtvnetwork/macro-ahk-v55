@@ -81,9 +81,11 @@ export function trackedClearInterval(handle: Handle | null | undefined): void {
   }
 
   const entry = entries.get(handle);
+
   if (entry !== undefined) {
     entries.delete(handle);
     const next = (labelCounts.get(entry.label) ?? 1) - 1;
+
     if (next <= 0) {
       labelCounts.delete(entry.label); 
     } else {
@@ -100,6 +102,7 @@ export function getIntervalSnapshot(): IntervalSnapshot {
   let oldestAgeMs = 0;
   for (const entry of entries.values()) {
     const age = now - entry.startedAt;
+
     if (age > oldestAgeMs) {
       oldestAgeMs = age; 
     }

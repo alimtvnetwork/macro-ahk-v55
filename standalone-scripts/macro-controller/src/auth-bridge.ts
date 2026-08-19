@@ -268,6 +268,7 @@ function finishBridgeAttempt(ctx: BridgeAttemptCtxFull, result: ExtensionBridgeA
 
   ctx.isSettled = true;
   window.removeEventListener('message', ctx._onResponse!);
+
   if (ctx.timeoutRef) {
     clearTimeout(ctx.timeoutRef);
   }
@@ -440,6 +441,7 @@ export function wakeBridge(): Promise<boolean> {
 
       isSettled = true;
       window.removeEventListener('message', onResponse);
+
       if (timer) {
         clearTimeout(timer);
       }
