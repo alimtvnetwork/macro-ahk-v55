@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RequestType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -84,6 +83,12 @@ function sendNetworkEntry(entry: CapturedEntry): void {
 /*  XHR Interception                                                   */
 /* ------------------------------------------------------------------ */
 
+interface MarcoXhr extends XMLHttpRequest {
+  __marco_method?: string;
+  __marco_url?: string;
+  __marco_startTime?: number | null;
+}
+
 /** Monkey-patches XMLHttpRequest to capture request metadata. */
 function interceptXhr(): void {
   const OriginalXhr = window.XMLHttpRequest;
@@ -93,42 +98,48 @@ function interceptXhr(): void {
   OriginalXhr.prototype.open = function (
     method: string,
     url: string | URL,
-    ...rest: any[]
+    ...rest: [boolean?, (string | null)?, (string | null)?]
   ) {
-    (this as any).__marco_method = method;
-    (this as any).__marco_url = truncateUrl(String(url));
-    (this as any).__marco_startTime = null;
+    (this as MarcoXhr).__marco_method = method;
+    (this as MarcoXhr).__marco_url = truncateUrl(String(url));
+    (this as MarcoXhr).__marco_startTime = null;
 
-    return originalOpen.apply(this, [method, url, ...rest] as any);
+    return Reflect.apply(originalOpen, this, [method, url, ...rest]);
   };
 
-  OriginalXhr.prototype.send = function (...args: any[]) {
-    (this as any).__marco_startTime = performance.now();
+  OriginalXhr.prototype.send = function (
+    body?: Document | XMLHttpRequestBodyInit | null,
+  ) {
+    (this as MarcoXhr).__marco_startTime = performance.now();
 
-    this.addEventListener("loadend", function () {
-      const startTime = (this as any).__marco_startTime as number | null;
-      const hasStartTime = startTime !== null;
+    this.addEventListener(
+      "loadend",
+      function () {
+        const startTime = (this as MarcoXhr).__marco_startTime;
+        const hasStartTime = startTime !== null && startTime !== undefined;
 
-      if (hasStartTime) {
-        const entry = buildXhrEntry(this, startTime!);
-        bufferEntry(entry);
-      }
-    }, { once: true });
+        if (hasStartTime) {
+          const entry = buildXhrEntry(this as MarcoXhr, startTime);
+          bufferEntry(entry);
+        }
+      },
+      { once: true },
+    );
 
-    return originalSend.apply(this, args as any);
+    return originalSend.call(this, body);
   };
 }
 
 /** Builds a CapturedEntry from a completed XMLHttpRequest. */
 function buildXhrEntry(
-  xhr: XMLHttpRequest,
+  xhr: MarcoXhr,
   startTime: number,
 ): CapturedEntry {
   const endTime = performance.now();
 
   return {
-    method: (xhr as any).__marco_method ?? "UNKNOWN",
-    url: (xhr as any).__marco_url ?? "",
+    method: xhr.__marco_method ?? "UNKNOWN",
+    url: xhr.__marco_url ?? "",
     status: xhr.status,
     statusText: xhr.statusText || "",
     durationMs: Math.round(endTime - startTime),
@@ -293,7 +304,7 @@ function extractInitiator(): string {
   try {
     return window.location.href;
   } catch (err) {
-    void 0;
+    void 0; 
 
     return "";
   }

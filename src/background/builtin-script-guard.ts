@@ -22,6 +22,9 @@ import {
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
 import { RunAtType } from "../types/enums";
 
+const LOGGER_NAMESPACE = 'NAMESPACE';
+const LOGGER_ERR_MSG = 'Operation failed';
+
 /** Known built-in script filenames that must always exist in the store. */
 const BUILTIN_SCRIPT_NAMES = new Set([
   "macro-looping.js",
@@ -149,6 +152,7 @@ export async function ensureBuiltinScriptsExist(
       `[builtin-guard] seed-manifest.json returned 0 scripts (projects=${seedResult.projects}, errors=${seedResult.errors.length}). Falling back to instruction.json.`,
     );
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.BUILTIN_GUARD, `Manifest reseed failed\n  Path: chrome.runtime.getURL("seed-manifest.json")\n  Missing: Successful reseed of built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
     void persistInjectionError(
       "BUILTIN_GUARD_MANIFEST_RESEED_FAILED",
@@ -183,6 +187,7 @@ export async function ensureBuiltinScriptsExist(
 
     return false;
   } catch (err) {
+    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
     logCaughtError(BgLogTag.BUILTIN_GUARD, `Direct fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
     await persistInjectionError(
       "BUILTIN_GUARD_DIRECT_SEED_FAILED",
@@ -264,6 +269,7 @@ async function seedMissingBuiltinsDirectly(
         );
       }
     } catch (fetchErr) {
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: fetchErr });
       logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch instruction.json\n  Path: ${instrAbsUrl}\n  Missing: instruction.json metadata for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
       void persistInjectionError(
         "BUILTIN_GUARD_INSTRUCTION_FETCH_FAILED",
@@ -280,8 +286,9 @@ async function seedMissingBuiltinsDirectly(
 
       if (scriptResp.isSuccess) {
         const code = await scriptResp.text();
+        const isValidCode = code && code.length > 10;
 
-        if (code && code.length > 10) {
+        if (isValidCode) {
           codeStub = code;
           console.log("[builtin-guard:fallback] ✅ Loaded %s directly (%d chars) from %s",
             scriptName, code.length, scriptAbsUrl);
@@ -296,6 +303,7 @@ async function seedMissingBuiltinsDirectly(
         );
       }
     } catch (fetchErr) {
+      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: fetchErr });
       logCaughtError(BgLogTag.BUILTIN_GUARD_FALLBACK, `Failed to fetch script file\n  Path: ${scriptAbsUrl}\n  Missing: Script code for "${scriptName}"\n  Reason: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}`, fetchErr);
       void persistInjectionError(
         "BUILTIN_GUARD_SCRIPT_FETCH_FAILED",
