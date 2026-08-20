@@ -25,14 +25,20 @@ export class ServiceResult<T = unknown, E = unknown> {
     return new ServiceResult(res.ok, res, res.error);
   }
 
-  static wrapDb<T>(dbAction: () => T): ServiceResult<T, unknown> {
+  static wrapDb<T>(dbAction: () => T, queryName = "Database Query"): ServiceResult<T, unknown> {
     try {
       const result = dbAction();
 
       return new ServiceResult<T, unknown>(true, result);
     } catch (e) {
-      // eslint-disable-next-line no-restricted-syntax
-      console.error("[Marco] DB Error", e);
+      const glob = globalThis as unknown as { RiseupAsiaMacroExt?: { Logger?: { error?: (scope: string, message: string, err: unknown) => void } } };
+
+      if (typeof glob !== "undefined" && glob.RiseupAsiaMacroExt?.Logger?.error) {
+        glob.RiseupAsiaMacroExt.Logger.error("SQLITE", `[DB] ${queryName} failed`, e);
+      } else {
+        // eslint-disable-next-line no-restricted-syntax
+        console.error(`[Marco] DB Error: ${queryName}`, e);
+      }
 
       return new ServiceResult<T, unknown>(false, undefined, e);
     }

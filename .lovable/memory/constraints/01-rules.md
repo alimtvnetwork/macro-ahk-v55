@@ -20,6 +20,7 @@ Consolidated prohibitions. Do not violate. Do not "improve" or re-propose.
 - No `unknown` outside `CaughtError`.
 - No bare `log()` for errors. Use `RiseupAsiaMacroExt.Logger.error()`.
 - No swallowed errors. Every `catch` logs.
+- No swallowed DB execution errors. Use `ServiceResult.wrapDb()` for all DB queries.
 - HARD ERROR logs must include `Path`, `Missing`, `Reason`, `ReasonDetail`, `SelectorAttempts`, `VariableContext`.
 - Zero ESLint warnings/errors project-wide.
 - Banned identifiers: `arr`, `cb`, `fn`, `el`, `msg`, `ctx`, `obj`, `val`.

@@ -795,14 +795,12 @@ function resolveUid(rowObject: Record<string, unknown>, strict = false): string 
  */
 function readDependenciesTable(db: Database): Map<string, Array<{ projectId: string; version: string }>> {
   const out = new Map<string, Array<{ projectId: string; version: string }>>();
-  let rows;
-  try {
-    rows = db.exec("SELECT * FROM Dependencies"); 
-  } catch (err) {
-    void 0;
+  const result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Dependencies"), "SELECT Dependencies");
 
-    return out; 
+  if (result.isFail || !result.data) {
+    return out;
   }
+  const rows = result.data;
 
   if (rows.length === 0 || rows[0].values.length === 0) {
     return out;
@@ -833,14 +831,12 @@ function readDependenciesTable(db: Database): Map<string, Array<{ projectId: str
  */
 function readVariablesTable(db: Database): Map<string, Record<string, unknown>> {
   const out = new Map<string, Record<string, unknown>>();
-  let rows;
-  try {
-    rows = db.exec("SELECT * FROM Variables"); 
-  } catch (err) {
-    void 0;
+  const result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Variables"), "SELECT Variables");
 
-    return out; 
+  if (result.isFail || !result.data) {
+    return out;
   }
+  const rows = result.data;
 
   if (rows.length === 0 || rows[0].values.length === 0) {
     return out;
@@ -877,24 +873,19 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
 
 /* eslint-disable-next-line max-lines-per-function */
 function readProjects(db: Database, strict = false): StoredProject[] {
-  let rows;
-  try {
-    rows = db.exec("SELECT * FROM Projects"); 
-  } catch (err) {
-    void 0;
+  let result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Projects"), "SELECT Projects");
 
+  if (result.isFail || !result.data) {
     if (strict) {
       return [];
     }
+    result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM projects"), "SELECT projects fallback");
 
-    try {
-      rows = db.exec("SELECT * FROM projects"); 
-    } catch (err) {
-      void 0;
-
-      return []; 
+    if (result.isFail || !result.data) {
+      return [];
     }
   }
+  const rows = result.data;
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
 
@@ -948,24 +939,19 @@ function readProjects(db: Database, strict = false): StoredProject[] {
 }
 
 function readScripts(db: Database, strict = false): StoredScript[] {
-  let rows;
-  try {
-    rows = db.exec("SELECT * FROM Scripts"); 
-  } catch (err) {
-    void 0;
+  let result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Scripts"), "SELECT Scripts");
 
+  if (result.isFail || !result.data) {
     if (strict) {
       return [];
     }
+    result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM scripts"), "SELECT scripts fallback");
 
-    try {
-      rows = db.exec("SELECT * FROM scripts"); 
-    } catch (err) {
-      void 0;
-
-      return []; 
+    if (result.isFail || !result.data) {
+      return [];
     }
   }
+  const rows = result.data;
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
 
@@ -999,24 +985,19 @@ function readScripts(db: Database, strict = false): StoredScript[] {
 }
 
 function readConfigs(db: Database, strict = false): StoredConfig[] {
-  let rows;
-  try {
-    rows = db.exec("SELECT * FROM Configs"); 
-  } catch (err) {
-    void 0;
+  let result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Configs"), "SELECT Configs");
 
+  if (result.isFail || !result.data) {
     if (strict) {
       return [];
     }
+    result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM configs"), "SELECT configs fallback");
 
-    try {
-      rows = db.exec("SELECT * FROM configs"); 
-    } catch (err) {
-      void 0;
-
-      return []; 
+    if (result.isFail || !result.data) {
+      return [];
     }
   }
+  const rows = result.data;
 
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
 
@@ -1046,14 +1027,12 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
  */
 function readPromptCategoriesTable(db: Database): Map<string, string[]> {
   const out = new Map<string, string[]>();
-  let rows;
-  try {
-    rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); 
-  } catch (err) {
-    void 0;
+  const result = ServiceResult.wrapDb(() => db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"), "SELECT PromptsToCategory");
 
-    return out; 
+  if (result.isFail || !result.data) {
+    return out;
   }
+  const rows = result.data;
 
   if (rows.length === 0 || rows[0].values.length === 0) {
     return out;
@@ -1109,24 +1088,19 @@ function _mapPromptRow(
 
 function readPrompts(db: Database, strict = false): PromptEntry[] {
   try {
-    let rows;
-    try {
-      rows = db.exec("SELECT * FROM Prompts"); 
-    } catch (err) {
-      void 0;
+    let result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM Prompts"), "SELECT Prompts");
 
+    if (result.isFail || !result.data) {
       if (strict) {
         return [];
       }
+      result = ServiceResult.wrapDb(() => db.exec("SELECT * FROM prompts"), "SELECT prompts fallback");
 
-      try {
-        rows = db.exec("SELECT * FROM prompts"); 
-      } catch (err) {
-        void 0;
-
-        return []; 
+      if (result.isFail || !result.data) {
+        return [];
       }
     }
+    const rows = result.data;
 
     const hasRows = rows.length > 0 && rows[0].values.length > 0;
 
