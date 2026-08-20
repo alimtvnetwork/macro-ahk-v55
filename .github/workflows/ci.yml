@@ -31,11 +31,10 @@ concurrency:
   # commits race to completion. Falls back to SHA for non-branch
   # events (tags, manual dispatch) so unrelated runs don't collide.
   #
-  # cancel-in-progress is enabled for pull requests only. On `main`
-  # every commit must produce a complete, visible run — cancelled
-  # main runs were being misread as "CI never triggered".
+  # cancel-in-progress is enabled for any branch/PR push, but disabled
+  # for release tags so tag publish workflows are never cancelled.
   group: ci-${{ github.workflow }}-${{ github.ref || github.sha }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 permissions:
   contents: read
