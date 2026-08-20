@@ -36,7 +36,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
       const options = await openOptions(context, extensionId);
       options.setDefaultTimeout(90_000);
-      options.on('console', msg => console.log(`[options console] ${msg.type()}: ${msg.text()}`));
+      options.on('console', consoleMessage => console.log(`[options console] ${consoleMessage.type()}: ${consoleMessage.text()}`));
       await options.goto(`${optionsUrl(extensionId)}#library`);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
