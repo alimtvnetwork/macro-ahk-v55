@@ -1,3 +1,4 @@
+import { ServiceResult } from "../utils/result-wrapper";
 /**
  * Marco Extension — Script Resolver
  *
@@ -91,9 +92,9 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
         ? candidate.path
         : chrome.runtime.getURL(candidate.path);
       const fetchT0 = performance.now();
-      const response = ServiceResult.wrapFetch(await fetch(url));
+      const response = await fetch(url);
 
-      if (response.isFail) {
+      if (!response.ok) {
         // HEFF D-1 (ambiguity #53): an HTTP response means the server
         // received and rejected us. Stop the resolver — do NOT try the
         // next candidate. Only network errors (caught below) fall

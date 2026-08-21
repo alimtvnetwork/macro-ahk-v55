@@ -1,3 +1,4 @@
+import { ServiceResult } from "../../utils/result-wrapper";
 /**
  * Marco Extension — Script Info & Hot-Reload Handler (Issue 77)
  *
@@ -96,9 +97,9 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
   const url = chrome.runtime.getURL(
     `projects/scripts/${folder}/instruction.json`,
   );
-  const res = ServiceResult.wrapFetch(await fetch(url));
+  const res = await fetch(url);
 
-  if (res.isFail) {
+  if (!res.ok) {
     throw new Error(`Failed to fetch instruction.json: ${res.status}`);
   }
 
@@ -126,7 +127,7 @@ function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
 async function getScriptFileSize(folder: string, outputFile: string): Promise<number | null> {
   try {
     const scriptUrl = chrome.runtime.getURL(`projects/scripts/${folder}/${outputFile}`);
-    const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
+    const headRes = await fetch(scriptUrl, { method: "HEAD" });
     const cl = headRes.headers.get("content-length");
 
     if (cl) {
@@ -205,9 +206,9 @@ export async function handleHotReloadScript(
     const scriptUrl = chrome.runtime.getURL(
       `projects/scripts/${folder}/${outputFile}`,
     );
-    const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
+    const scriptRes = await fetch(scriptUrl);
 
-    if (scriptRes.isFail) {
+    if (!scriptRes.ok) {
       return {
         isOk: false,
         errorMessage: `Script fetch failed: ${scriptRes.status}`,

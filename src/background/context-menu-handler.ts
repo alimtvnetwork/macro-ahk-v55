@@ -145,7 +145,6 @@ function removeMenuItem(menuId: string): Promise<void> {
         resolve();
       });
     } catch (removeErr) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: removeErr });
       logCaughtError(
         BgLogTag.CONTEXT_MENU,
         `chrome.contextMenus.remove("${menuId}") threw during submenu rebuild — continuing; user-visible regression possible if menu count diverges`,
@@ -171,7 +170,6 @@ function createMenuItemSafe(props: chrome.contextMenus.CreateProperties): void {
       }
     });
   } catch (createErr) {
-    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: createErr });
     logCaughtError(
       BgLogTag.CONTEXT_MENU,
       `chrome.contextMenus.create("${String(props.id)}") threw — dropping item this rebuild`,
@@ -399,7 +397,6 @@ async function handleReinjectScripts(tabId: number): Promise<void> {
       },
     });
   } catch (markerCleanupErr) {
-    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: markerCleanupErr });
     // Tab may be a restricted scheme (chrome://, devtools://, web store) where
     // chrome.scripting.executeScript is denied — log at warn level so repeated
     // failures surface, then continue to handleRunScripts() which will retry
@@ -438,7 +435,6 @@ async function handleCopyLogs(tabId: number): Promise<void> {
         args: [logText],
       });
     } catch (err) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
       logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
     }
   }
@@ -463,7 +459,6 @@ async function handleShowStatus(tabId: number): Promise<void> {
         args: [statusText],
       });
     } catch (err) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: err });
       logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
     }
   }

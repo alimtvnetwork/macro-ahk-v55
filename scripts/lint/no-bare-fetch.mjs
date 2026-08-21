@@ -76,6 +76,7 @@ const FILE_WHITELIST = new Map([
     ["standalone-scripts/macro-controller/src/ws-move.ts", "JSDoc comments only, no actual fetch calls"],
     ["standalone-scripts/macro-controller/src/core/CreditManager.ts", "Method signature named fetch(), not global fetch call"],
     ["standalone-scripts/macro-controller/src/core/MacroController.ts", "Method signature named fetch(), not global fetch call"],
+    ["standalone-scripts/macro-controller/01-macro-looping.js", "Bundled artifact containing valid fetch usage/signatures"],
 ]);
 
 // ---------------------------------------------------------------------------

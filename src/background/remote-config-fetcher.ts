@@ -1,3 +1,4 @@
+import { ServiceResult } from "../utils/result-wrapper";
 /**
  * Marco Extension — Remote Config Fetcher
  *
@@ -114,15 +115,15 @@ async function fetchRemoteConfig(
       DEFAULT_TIMEOUT_MS,
     );
 
-    const response = ServiceResult.wrapFetch(await fetch(settings.endpointUrl, {
+    const response = await fetch(settings.endpointUrl, {
       method: "GET",
       headers,
       signal: controller.signal,
-    }));
+    });
 
     clearTimeout(timeoutId);
 
-    const isResponseOk = response.isSuccess;
+    const isResponseOk = response.ok;
 
     if (isResponseOk) {
       return handleSuccessfulFetch(response);

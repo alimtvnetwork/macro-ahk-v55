@@ -84,7 +84,6 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     tabUrl = tab?.url ?? null;
     projectId = extractProjectId(tabUrl);
   } catch (queryErr) {
-    RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: queryErr });
     logBgWarnError(BgLogTag.AUTH_HEALTH, "chrome.tabs.query({active,currentWindow}) failed — proceeding with tabUrl=null and projectId=null; downstream strategies will skip URL-dependent checks", queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
   }
 
@@ -137,7 +136,6 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         }
       }
     } catch (parseErr) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: parseErr });
       console.debug("[auth-health] localStorage JWT parse skipped:", parseErr); 
     }
 
@@ -168,7 +166,6 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
           return { isSuccess: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
         }
       } catch (tabErr) {
-        RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: tabErr });
         logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));
       }
     }
@@ -196,7 +193,6 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         return { isSuccess: true, detail: "JWT found in active URL" };
       }
     } catch (urlErr) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: urlErr });
       // Malformed tab URL — strategy result already returns success=false below;
       // log at warn level so a recurring pattern surfaces in diagnostics without
       // promoting a single bad URL to an error.
@@ -326,7 +322,6 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
         results.push(...tabs);
       }
     } catch (queryErr) {
-      RiseupAsiaMacroExt.Logger.error(LOGGER_NAMESPACE, LOGGER_ERR_MSG, { error: queryErr });
       logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.tabs.query({url:"${pattern}"}) failed — pattern skipped, other platform tabs (if any) still scanned`, queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
     }
   }

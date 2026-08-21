@@ -153,7 +153,6 @@ export async function persistAutoAttachDecisions(
     map[project.id] = record;
     await chrome.storage.local.set({ [STORAGE_KEY_AUTO_ATTACH_DECISIONS]: map });
   } catch (caught) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: caught });
     logCaughtError(TAG, `persistAutoAttachDecisions failed for project "${project.id}"`, caught);
   }
 }

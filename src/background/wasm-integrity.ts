@@ -1,3 +1,4 @@
+import { ServiceResult } from "../utils/result-wrapper";
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /**
@@ -114,7 +115,7 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
 > {
   let response: Response;
   try {
-    response = ServiceResult.wrapFetch(await fetch(checksumUrl));
+    response = await fetch(checksumUrl);
   } catch (err) {
     return {
       kind: "missing",
@@ -123,7 +124,7 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
     };
   }
 
-  if (response.isFail) {
+  if (!response.ok) {
     // HEFF: report non-2xx. No retry. Outcome is "missing" so caller can
     // surface a fix-step banner; no method-swap, no re-fetch loop.
     console.warn(

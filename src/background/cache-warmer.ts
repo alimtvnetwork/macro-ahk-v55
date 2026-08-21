@@ -61,7 +61,6 @@ export async function warmScriptCache(): Promise<{ warmed: number; failed: numbe
 
     console.log("[cache-warmer] ✅ Warmed %d scripts, %d failed", warmed, failed);
   } catch (err) {
-    RiseupAsiaMacroExt.Logger.error('NAMESPACE', 'Operation failed', { error: err });
     logCaughtError(BgLogTag.CACHE_WARMER, `Warming aborted\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Successful script cache warming\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
   }
 
@@ -76,9 +75,9 @@ async function warmOneScript(script: StoredScript): Promise<boolean> {
   const filePath = script.filePath!;
   try {
     const url = script.isAbsolute ? filePath : chrome.runtime.getURL(filePath);
-    const response = ServiceResult.wrapFetch(await fetch(url));
+    const response = await fetch(url);
 
-    if (response.isFail) {
+    if (!response.ok) {
       logCaughtError(BgLogTag.CACHE_WARMER, `Fetch failed for script file\n  Path: ${url}\n  Missing: Script code for "${filePath}" (HTTP ${response.status})\n  Reason: Server returned non-OK status ${response.status} — file may not exist in web_accessible_resources or dist/`, new Error(`HTTP ${response.status}`));
 
       return false;
