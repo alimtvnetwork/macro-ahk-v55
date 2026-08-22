@@ -14,3 +14,4 @@
 - [11-typecheck-isfail-missing](./11-typecheck-isfail-missing.md) - CI typecheck failure due to overzealous removal of correctly implemented ServiceResult wrappers (2026-08-22)
 - [12-eslint-indentation-failures](./12-eslint-indentation-failures.md) - CI lint failure caused by AST un-wrapper script leaving behind formatting artifacts (2026-08-22)
 - [13-vitest-prompt-handler-array-crash](./13-vitest-prompt-handler-array-crash.md) - Vitest runtime crash caused by unwrapped native array access in prompt-handler (2026-08-22)
+- [14-release-prompt-test-failure](./14-release-prompt-test-failure.md) - Vitest failure in default-prompt-content.test.ts due to prompt template mismatch (2026-08-22)
