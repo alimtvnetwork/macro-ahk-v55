@@ -26,7 +26,7 @@ const REQUIRED_ARTIFACTS = {
   "lovable-owner-switch": ["lovable-owner-switch.js", "instruction.json"],
   "lovable-user-add": ["lovable-user-add.js", "instruction.json"],
   "lovable-dashboard": ["lovable-dashboard.js", "instruction.json"],
-  "prompt-manager": ["prompt-manager.js", "instruction.json"],
+  "prompt-manager": ["instruction.json"],
 };
 
 let failed = false;

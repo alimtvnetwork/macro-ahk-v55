@@ -353,7 +353,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
       target: { tabId },
       world: "MAIN",
       // eslint-disable-next-line max-lines-per-function
-      func: (count: number, version: string, exitTransform: string, animDurationMs: number) => {
+      func: (count: number, version: string, exitTransform: string, animDurationMs: number, timeoutMs: number) => {
         const CONTAINER_ID = "__marco-inject-toast";
         let container = document.getElementById(CONTAINER_ID);
 
@@ -432,9 +432,9 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
             toast.style.transform = exitTransform;
             removeTimer = setTimeout(cleanup, animDurationMs);
           }
-        }, TOAST_TIMEOUT_MS);
+        }, timeoutMs);
       },
-      args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM, ANIMATION_DURATION_MS],
+      args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM, ANIMATION_DURATION_MS, TOAST_TIMEOUT_MS],
     });
   } catch (e) {
     logCaughtError(BgLogTag.INJECTION, "showInjectionLoadingToast failed", e);
