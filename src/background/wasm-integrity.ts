@@ -1,5 +1,5 @@
 import { ServiceResult } from "../utils/result-wrapper";
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+ 
 // @ts-nocheck
 /**
  * Marco Extension — WASM Integrity Verifier

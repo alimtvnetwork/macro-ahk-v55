@@ -148,8 +148,8 @@ export async function handleQueryLogs(
   countStmt.free();
 
   const queryStmt = db.prepare(
-      `SELECT * FROM ${table}${whereClause} ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
-    );
+    `SELECT * FROM ${table}${whereClause} ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
+  );
   queryStmt.bind([...params, payload.limit, payload.offset]);
   const rows = collectRows(queryStmt);
 

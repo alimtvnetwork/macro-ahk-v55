@@ -117,24 +117,24 @@ function insertUserScriptLogRow(
 
   return resolveCurrentSessionId(version).then((sessionId) => {
     db.run(
-            `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, Metadata, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
+      `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, Metadata, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              sessionId,
-              bindReq(payload.timestamp, new Date().toISOString()),
-              bindReq(payload.level, "INFO"),
-              "user-script",
-              bindReq(payload.category, "USER"),
-              bindReq(payload.action, "log"),
-              bindReq(payload.detail, ""),
-              sanitizedMetadata,
-              bindOpt(payload.projectId),
-              bindOpt(payload.urlRuleId),
-              bindOpt(payload.scriptId),
-              bindOpt(payload.configId),
-              bindReq(version, "0.0.0"),
-            ],
-          );
+      [
+        sessionId,
+        bindReq(payload.timestamp, new Date().toISOString()),
+        bindReq(payload.level, "INFO"),
+        "user-script",
+        bindReq(payload.category, "USER"),
+        bindReq(payload.action, "log"),
+        bindReq(payload.detail, ""),
+        sanitizedMetadata,
+        bindOpt(payload.projectId),
+        bindOpt(payload.urlRuleId),
+        bindOpt(payload.scriptId),
+        bindOpt(payload.configId),
+        bindReq(version, "0.0.0"),
+      ],
+    );
   });
 }
 
@@ -148,21 +148,21 @@ function insertUserScriptErrorRow(
 
   return resolveCurrentSessionId(version).then((sessionId) => {
     db.run(
-            `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, Context, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
+      `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, Context, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, 'ERROR', 'user-script', ?, 'USER_SCRIPT_LOG_ERROR', ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              sessionId,
-              bindReq(payload.timestamp, new Date().toISOString()),
-              bindReq(payload.category, "USER"),
-              bindReq(payload.detail, "(no message)"),
-              sanitizedMetadata,
-              bindOpt(payload.projectId),
-              bindOpt(payload.urlRuleId),
-              bindOpt(payload.scriptId),
-              bindOpt(payload.configId),
-              bindReq(version, "0.0.0"),
-            ],
-          );
+      [
+        sessionId,
+        bindReq(payload.timestamp, new Date().toISOString()),
+        bindReq(payload.category, "USER"),
+        bindReq(payload.detail, "(no message)"),
+        sanitizedMetadata,
+        bindOpt(payload.projectId),
+        bindOpt(payload.urlRuleId),
+        bindOpt(payload.scriptId),
+        bindOpt(payload.configId),
+        bindReq(version, "0.0.0"),
+      ],
+    );
   });
 }
 

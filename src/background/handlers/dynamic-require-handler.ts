@@ -238,10 +238,10 @@ function logDynamicLoad(
     }
 
     const res = db.run(
-          `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
+      `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?)`,
-          [now, requester, target, status, detail, version],
-        );
+      [now, requester, target, status, detail, version],
+    );
 
     if (res.isFail) {
       throw res.error;

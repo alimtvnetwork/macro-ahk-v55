@@ -169,9 +169,9 @@ function ensureCategoryId(categoryName: string): string {
 
   const now = new Date().toISOString();
   db.run(
-            "INSERT INTO PromptsCategory (Name, SortOrder, CreatedAt) VALUES (?, 0, ?)",
-            [trimmed, now],
-          );
+    "INSERT INTO PromptsCategory (Name, SortOrder, CreatedAt) VALUES (?, 0, ?)",
+    [trimmed, now],
+  );
   const result = db.exec("SELECT last_insert_rowid()");
 
   return String(result[0].values[0][0]);
@@ -202,9 +202,9 @@ function linkPromptToCategory(promptId: string, categoryId: string): void {
   const db = getDb();
   try {
     db.run(
-                  "INSERT OR IGNORE INTO PromptsToCategory (PromptId, CategoryId) VALUES (?, ?)",
-                  [Number(promptId), Number(categoryId)],
-                );
+      "INSERT OR IGNORE INTO PromptsToCategory (PromptId, CategoryId) VALUES (?, ?)",
+      [Number(promptId), Number(categoryId)],
+    );
   } catch (linkErr) {
     // Already linked — INSERT OR IGNORE should prevent this, but log debug
     // so unexpected SQL failures (FK violation, schema drift) are recoverable.
@@ -358,9 +358,9 @@ function insertPromptRow(prompt: PromptEntry): void {
   if (existingId !== null) {
     // Already seeded — update instead
     db.run(
-                  `UPDATE Prompts SET Slug = ?, Name = ?, Text = ?, Version = ?, SortOrder = ?, IsDefault = ?, IsFavorite = ?, UpdatedAt = ? WHERE Id = ?`,
-                  [bindOpt(slug), bindOpt(prompt.name) ?? "Untitled", bindOpt(prompt.text) ?? "", bindOpt(prompt.version) ?? "1.0.0", prompt.order ?? 0, prompt.isDefault ? 1 : 0, prompt.isFavorite ? 1 : 0, bindOpt(prompt.updatedAt) ?? now, existingId],
-                );
+      `UPDATE Prompts SET Slug = ?, Name = ?, Text = ?, Version = ?, SortOrder = ?, IsDefault = ?, IsFavorite = ?, UpdatedAt = ? WHERE Id = ?`,
+      [bindOpt(slug), bindOpt(prompt.name) ?? "Untitled", bindOpt(prompt.text) ?? "", bindOpt(prompt.version) ?? "1.0.0", prompt.order ?? 0, prompt.isDefault ? 1 : 0, prompt.isFavorite ? 1 : 0, bindOpt(prompt.updatedAt) ?? now, existingId],
+    );
     const promptId = String(existingId);
     const category = prompt.category || "";
 
@@ -373,20 +373,20 @@ function insertPromptRow(prompt: PromptEntry): void {
   }
 
   db.run(
-            `INSERT INTO Prompts (Slug, Name, Text, Version, SortOrder, IsDefault, IsFavorite, CreatedAt, UpdatedAt)
+    `INSERT INTO Prompts (Slug, Name, Text, Version, SortOrder, IsDefault, IsFavorite, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              bindOpt(slug),
-              bindOpt(prompt.name) ?? "Untitled",
-              bindOpt(prompt.text) ?? "",
-              bindOpt(prompt.version) ?? "1.0.0",
-              prompt.order ?? 0,
-              prompt.isDefault ? 1 : 0,
-              prompt.isFavorite ? 1 : 0,
-              bindOpt(prompt.createdAt) ?? now,
-              bindOpt(prompt.updatedAt) ?? now,
-            ],
-          );
+    [
+      bindOpt(slug),
+      bindOpt(prompt.name) ?? "Untitled",
+      bindOpt(prompt.text) ?? "",
+      bindOpt(prompt.version) ?? "1.0.0",
+      prompt.order ?? 0,
+      prompt.isDefault ? 1 : 0,
+      prompt.isFavorite ? 1 : 0,
+      bindOpt(prompt.createdAt) ?? now,
+      bindOpt(prompt.updatedAt) ?? now,
+    ],
+  );
 
   const result = db.exec("SELECT last_insert_rowid()");
   const promptId = String(result[0].values[0][0]);
@@ -658,19 +658,19 @@ export async function handleSavePrompt(payload: SavePromptPayload): Promise<Save
     }
   } else {
     db.run(
-                  `INSERT INTO Prompts (Name, Text, Version, SortOrder, IsDefault, IsFavorite, Tags, CreatedAt, UpdatedAt)
+      `INSERT INTO Prompts (Name, Text, Version, SortOrder, IsDefault, IsFavorite, Tags, CreatedAt, UpdatedAt)
              VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)`,
-                  [
-                    bindOpt(input.prompt.name) ?? "Untitled Prompt",
-                    bindOpt(input.prompt.text) ?? "",
-                    bindOpt(input.prompt.version) ?? "1.0.0",
-                    input.prompt.order ?? 0,
-                    input.prompt.isFavorite ? 1 : 0,
-                    parseTagsField(input.prompt.tags).join(", "),
-                    now,
-                    now,
-                  ],
-                );
+      [
+        bindOpt(input.prompt.name) ?? "Untitled Prompt",
+        bindOpt(input.prompt.text) ?? "",
+        bindOpt(input.prompt.version) ?? "1.0.0",
+        input.prompt.order ?? 0,
+        input.prompt.isFavorite ? 1 : 0,
+        parseTagsField(input.prompt.tags).join(", "),
+        now,
+        now,
+      ],
+    );
 
     const result = db.exec("SELECT last_insert_rowid()");
 

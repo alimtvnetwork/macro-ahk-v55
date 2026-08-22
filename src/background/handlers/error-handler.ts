@@ -81,7 +81,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
   }
 
   const stmtResult = db.prepare(
-      `SELECT
+    `SELECT
             Id as id,
             Timestamp as timestamp,
             Level as level,
@@ -102,7 +102,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
            AND SessionId = ?
          ORDER BY Timestamp DESC
          LIMIT 100`,
-    );
+  );
 
   if (stmtResult.isFail) {
     return [];
@@ -210,18 +210,18 @@ function insertUserScriptError(request: {
   const codeSnippet = request.scriptCode?.slice(0, 500) ?? null;
 
   const res = db.run(
-      `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
+    `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
          VALUES ('', ?, 'ERROR', 'user-script', 'INJECTION', 'USER_SCRIPT_ERROR', ?, ?, ?, ?, ?, ?)`,
-      [
-        now,
-        bindReq(request.message, "(no message)"),
-        bindOpt(request.stack),
-        bindReq(request.scriptId, "unknown"),
-        bindOpt(request.projectId),
-        codeSnippet,
-        bindReq(version, "0.0.0"),
-      ],
-    );
+    [
+      now,
+      bindReq(request.message, "(no message)"),
+      bindOpt(request.stack),
+      bindReq(request.scriptId, "unknown"),
+      bindOpt(request.projectId),
+      codeSnippet,
+      bindReq(version, "0.0.0"),
+    ],
+  );
 
   if (res.isFail) {
     throw res.error;

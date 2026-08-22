@@ -183,26 +183,26 @@ export function handleCreateUpdater(data: {
   const db = getDb();
   const now = new Date().toISOString();
   db.run(
-        `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
+    `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          name,
-          scriptUrl,
-          bindOpt(data.versionInfoUrl),
-          bindOpt(data.instructionUrl),
-          bindOpt(data.changelogUrl),
-          data.isGit ? 1 : 0,
-          data.isRedirectable !== false ? 1 : 0,
-          data.maxRedirectDepth ?? 2,
-          data.instructionUrl ? 1 : 0,
-          data.hasChangelogFromVersionInfo !== false ? 1 : 0,
-          data.hasUserConfirmBeforeUpdate ? 1 : 0,
-          data.autoCheckIntervalMinutes ?? 1440,
-          data.cacheExpiryMinutes ?? 10080,
-          now,
-          now,
-        ],
-      );
+    [
+      name,
+      scriptUrl,
+      bindOpt(data.versionInfoUrl),
+      bindOpt(data.instructionUrl),
+      bindOpt(data.changelogUrl),
+      data.isGit ? 1 : 0,
+      data.isRedirectable !== false ? 1 : 0,
+      data.maxRedirectDepth ?? 2,
+      data.instructionUrl ? 1 : 0,
+      data.hasChangelogFromVersionInfo !== false ? 1 : 0,
+      data.hasUserConfirmBeforeUpdate ? 1 : 0,
+      data.autoCheckIntervalMinutes ?? 1440,
+      data.cacheExpiryMinutes ?? 10080,
+      now,
+      now,
+    ],
+  );
 
   const result = db.exec("SELECT last_insert_rowid() AS Id");
   const newId = result[0]?.values[0]?.[0] as number;
@@ -247,9 +247,9 @@ export async function handleCheckForUpdate(updaterId: number): Promise<UpdateChe
     // Update local record
     const db = getDb();
     db.run(
-            "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
-            [versionInfo.Version, now, now, updaterId],
-          );
+      "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
+      [versionInfo.Version, now, now, updaterId],
+    );
     dbManager?.markDirty();
 
     const hasUpdate = entry.CurrentVersion !== versionInfo.Version;
@@ -367,9 +367,9 @@ export function linkUpdaterToCategory(updaterId: number, categoryName: string): 
 
   try {
     db.run(
-            "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
-            [updaterId, categoryId],
-          );
+      "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
+      [updaterId, categoryId],
+    );
     dbManager?.markDirty();
   } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
@@ -418,14 +418,14 @@ export function handleSaveUpdateSettings(data: {
 
   if (count === 0) {
     db.run(
-            "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
-            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
-          );
+      "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
+      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
+    );
   } else {
     db.run(
-            "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
-            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
-          );
+      "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
+      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
+    );
   }
 
   dbManager?.markDirty();
