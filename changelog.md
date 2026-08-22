@@ -1,5 +1,16 @@
 # Changelog
 
+## [v6.100.0] 2026-08-22 Crash Fixes and UI Consistency
+
+### Fixed
+
+- Resolved critical `SEEDER_ERROR` (`stmt.step is not a function`) on boot by removing broken `ServiceResult.wrapDb` wrappers from native SQLite calls.
+- Fixed a runtime crash in `prompt-handler.ts` (`Cannot read properties of undefined`) by correctly handling native `QueryExecResult[]` arrays when saving prompts.
+- Restored valid `ServiceResult` typings in six background handlers (`file-storage-handler.ts`, `kv-handler.ts`, etc.) to resolve CI `tsc` gate failures.
+- Fixed UI layout squishing and inconsistent button heights in the Macro Controller prompt dropdown header.
+- Auto-fixed 236 ESLint indentation failures across 11 files caused by earlier automated refactoring scripts.
+
+
 ## [v0.2.0] 2026-08-12 Prompt Library Relocate & Light Mode
 
 ### Added
