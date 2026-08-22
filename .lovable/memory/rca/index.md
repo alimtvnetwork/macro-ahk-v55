@@ -12,3 +12,4 @@
 - [09-seeder-error-stmt-step](./09-seeder-error-stmt-step.md) - TypeError: stmt.step is not a function due to ServiceResult.wrapDb blindly wrapping statements without unwrapping (2026-08-22)
 - [10-prompt-dropdown-button-styling](./10-prompt-dropdown-button-styling.md) - UI: Fixed text wrapping, inconsistent button heights, and contrast issues in the prompt dropdown header (2026-08-22)
 - [11-typecheck-isfail-missing](./11-typecheck-isfail-missing.md) - CI typecheck failure due to overzealous removal of correctly implemented ServiceResult wrappers (2026-08-22)
+- [12-eslint-indentation-failures](./12-eslint-indentation-failures.md) - CI lint failure caused by AST un-wrapper script leaving behind formatting artifacts (2026-08-22)
