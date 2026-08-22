@@ -674,11 +674,7 @@ export async function handleSavePrompt(payload: SavePromptPayload): Promise<Save
 
     const result = db.exec("SELECT last_insert_rowid()");
 
-    if (result.Ok === false) {
-      throw new Error(String(result.error));
-    }
-
-    promptId = String(result.data![0].values[0][0]);
+    promptId = String(result[0].values[0][0]);
 
     // Link category
     if (input.prompt.category) {
