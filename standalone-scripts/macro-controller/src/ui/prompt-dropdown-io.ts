@@ -54,7 +54,7 @@ export function buildHeaderPill(label: string, title: string, onClick: (e: Event
   const pill = document.createElement('span');
   pill.textContent = label;
   pill.title = title;
-  pill.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:rgba(124,58,237,0.55);border:1px solid rgba(255,255,255,0.1);';
+  pill.style.cssText = 'white-space:nowrap;display:inline-flex;align-items:center;height:22px;cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:rgba(124,58,237,0.55);border:1px solid rgba(255,255,255,0.1);';
   pill.onmouseover = function() {
     pill.style.background = 'rgba(124,58,237,0.85)'; 
   };

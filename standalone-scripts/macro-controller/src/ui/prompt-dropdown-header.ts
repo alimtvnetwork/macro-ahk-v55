@@ -97,7 +97,7 @@ function buildPlanTabMarker(): HTMLElement {
   marker.setAttribute('data-plan-toggle', '1');
   marker.setAttribute('data-tab-active', '1');
   marker.textContent = 'PlanTierType';
-  marker.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';padding:2px 6px;';
+  marker.style.cssText = 'white-space:nowrap;display:inline-flex;align-items:center;height:22px;font-size:10px;color:' + cPrimaryLight + ';padding:0 6px;';
 
   return marker;
 }
@@ -136,7 +136,7 @@ function buildLoadButton(rerender: Rerender): HTMLElement {
   const btn = document.createElement('span');
   btn.textContent = '↻ Load';
   btn.title = 'Reload prompts from database';
-  btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
+  btn.style.cssText = 'white-space:nowrap;display:inline-flex;align-items:center;height:22px;cursor:pointer;padding:0 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
   btn.onmouseover = function() {
     btn.style.background = cPrimaryLight;
     btn.style.transform = 'scale(1.05)'; 

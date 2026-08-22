@@ -150,10 +150,10 @@ function applyBadgeStyle(badge: HTMLElement, hasViolations: boolean, isSaved: bo
   const bg = hasViolations
     ? 'rgba(239,68,68,0.28)'
     : (isSaved ? 'rgba(59,130,246,0.25)' : 'rgba(107,114,128,0.25)');
-  const fg = hasViolations ? COLOR_DESTRUCTIVE : (isSaved ? 'hsl(var(--accent))' : COLOR_FOREGROUND);
+  const fg = hasViolations ? COLOR_DESTRUCTIVE : (isSaved ? '#60A5FA' : COLOR_FOREGROUND);
   const border = hasViolations ? '1px solid rgba(239,68,68,0.55)' : '1px solid transparent';
-  badge.style.cssText = 'font-size:9px;font-weight:600;color:' + fg + ';background:' + bg +
-    ';padding:1px 6px;border-radius:3px;margin-left:4px;cursor:pointer;letter-spacing:0.3px;border:' + border + ';';
+  badge.style.cssText = 'white-space:nowrap;display:inline-flex;align-items:center;height:22px;font-size:9px;font-weight:600;color:' + fg + ';background:' + bg +
+    ';padding:0 6px;border-radius:3px;margin-left:4px;cursor:pointer;letter-spacing:0.3px;border:' + border + ';';
 }
 
 let openPopover: HTMLElement | null = null;

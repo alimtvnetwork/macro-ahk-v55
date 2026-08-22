@@ -10,3 +10,4 @@
 - [07-e2e-class-serialization-2026-08-17](./07-e2e-class-serialization-2026-08-17.md) - Playwright evaluate serialization stripping ServiceResult class getter properties and data wrapper restructuring (2026-08-17)
 - [08-swallowed-db-errors](./08-swallowed-db-errors.md) - DB queries wrapped manually with void 0, rewritten to use ServiceResult.wrapDb (2026-08-20)
 - [09-seeder-error-stmt-step](./09-seeder-error-stmt-step.md) - TypeError: stmt.step is not a function due to ServiceResult.wrapDb blindly wrapping statements without unwrapping (2026-08-22)
+- [10-prompt-dropdown-button-styling](./10-prompt-dropdown-button-styling.md) - UI: Fixed text wrapping, inconsistent button heights, and contrast issues in the prompt dropdown header (2026-08-22)
