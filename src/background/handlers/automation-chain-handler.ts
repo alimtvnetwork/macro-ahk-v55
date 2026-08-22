@@ -99,7 +99,7 @@ async function getProjectChainDb(projectSlug: string) {
   }
 
   const db = getProjectDb(projectSlug);
-  const result = ServiceResult.wrapDb(() => db.run(CHAIN_TABLE_DDL));
+  const result = db.run(CHAIN_TABLE_DDL);
 
   if (result.isFail) {
     throw result.error;
@@ -146,7 +146,7 @@ function rowToChain(r: SqlRow): ChainOutput {
 export async function handleGetAutomationChains(request?: MessageRequest): Promise<{ isOk: boolean; chains?: ChainOutput[]; errorMessage?: string }> {
   const project = resolveProject((request ?? {}) as ChainMessage);
   const db = await getProjectChainDb(project);
-  const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM AutomationChains ORDER BY Id"));
+  const stmtResult = db.prepare("SELECT * FROM AutomationChains ORDER BY Id");
 
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) };
@@ -186,25 +186,25 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
 
   if (chain.id) {
     // Update
-    const res = ServiceResult.wrapDb(() => db.run(
-      `UPDATE AutomationChains
+    const res = db.run(
+          `UPDATE AutomationChains
              SET Name = ?, Slug = ?, StepsJson = ?, TriggerType = ?,
                  TriggerConfigJson = ?, Enabled = ?, ProjectId = ?,
                  UpdatedAt = datetime('now')
              WHERE Id = ?`,
-      [chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled, projectId, Number(chain.id)],
-    ));
+          [chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled, projectId, Number(chain.id)],
+        );
 
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };
     }
   } else {
     // Insert
-    const res = ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
+    const res = db.run(
+          `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [projectId, chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled],
-    ));
+          [projectId, chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled],
+        );
 
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };
@@ -231,7 +231,7 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
   }
 
   const db = await getProjectChainDb(project);
-  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]));
+  const res = db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]);
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -257,10 +257,10 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
   }
 
   const db = await getProjectChainDb(project);
-  const res = ServiceResult.wrapDb(() => db.run(
-    "UPDATE AutomationChains SET Enabled = CASE WHEN Enabled = 1 THEN 0 ELSE 1 END, UpdatedAt = datetime('now') WHERE Id = ?",
-    [Number(chainId)],
-  ));
+  const res = db.run(
+      "UPDATE AutomationChains SET Enabled = CASE WHEN Enabled = 1 THEN 0 ELSE 1 END, UpdatedAt = datetime('now') WHERE Id = ?",
+      [Number(chainId)],
+    );
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -297,11 +297,11 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
     const enabled = c.enabled !== false ? 1 : 0;
     const projectId = c.projectId || "default";
 
-    const res = ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
+    const res = db.run(
+          `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [projectId, name, slug, stepsJson, triggerType, triggerConfigJson, enabled],
-    ));
+          [projectId, name, slug, stepsJson, triggerType, triggerConfigJson, enabled],
+        );
 
     if (res.isFail) {
       return { isOk: false, errorMessage: String(res.error) };

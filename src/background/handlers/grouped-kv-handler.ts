@@ -66,10 +66,10 @@ export async function handleGkvGet(
   }
 
   const db = getDb();
-  const execRes = ServiceResult.wrapDb(() => db.exec(
-    "SELECT Value FROM GroupedKv WHERE GroupName = ? AND Key = ?",
-    [group, key],
-  ));
+  const execRes = db.exec(
+      "SELECT Value FROM GroupedKv WHERE GroupName = ? AND Key = ?",
+      [group, key],
+    );
 
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
@@ -98,10 +98,10 @@ export async function handleGkvSet(
   const safeValue = bindOpt(raw.value) ?? "";
 
   const db = getDb();
-  const res = ServiceResult.wrapDb(() => db.run(
-    `INSERT OR REPLACE INTO GroupedKv (GroupName, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
-    [group, key, safeValue],
-  ));
+  const res = db.run(
+      `INSERT OR REPLACE INTO GroupedKv (GroupName, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
+      [group, key, safeValue],
+    );
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -124,7 +124,7 @@ export async function handleGkvDelete(
   }
 
   const db = getDb();
-  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]));
+  const res = db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]);
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -147,9 +147,9 @@ export async function handleGkvList(
   }
 
   const db = getDb();
-  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
-    "SELECT Key, Value FROM GroupedKv WHERE GroupName = ? ORDER BY Key ASC",
-  ));
+  const stmtResult = db.prepare(
+      "SELECT Key, Value FROM GroupedKv WHERE GroupName = ? ORDER BY Key ASC",
+    );
 
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
@@ -180,7 +180,7 @@ export async function handleGkvClearGroup(
   }
 
   const db = getDb();
-  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]));
+  const res = db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]);
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };

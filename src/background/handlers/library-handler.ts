@@ -176,7 +176,7 @@ export async function handleGetSharedAssets(payload: AssetTypeMsg): Promise<{ as
     ? "SELECT * FROM SharedAsset WHERE Type = ? ORDER BY Name ASC"
     : "SELECT * FROM SharedAsset ORDER BY Name ASC";
   const params = assetType ? [assetType] : [];
-  const stmt = ServiceResult.wrapDb(() => db.prepare(sql)).data!;
+  const stmt = db.prepare(sql);
   stmt.bind(params);
   const assets = collectTypedRows(stmt) as SharedAsset[];
 
@@ -186,7 +186,7 @@ export async function handleGetSharedAssets(payload: AssetTypeMsg): Promise<{ as
 export async function handleGetSharedAsset(payload: AssetIdMsg): Promise<{ asset: SharedAsset | null }> {
   const { assetId } = payload;
   const db = getDb();
-  const result = (ServiceResult.wrapDb(() => db.exec("SELECT * FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+  const result = (db.exec("SELECT * FROM SharedAsset WHERE Id = ?", [assetId]) ?? []);
 
   if (result.length === 0 || result[0].values.length === 0) {
     return { asset: null };
@@ -203,10 +203,10 @@ export async function handleGetSharedAsset(payload: AssetIdMsg): Promise<{ asset
  * Record a version snapshot in AssetVersion table.
  */
 function snapshotVersion(db: ReturnType<typeof getDb>, assetId: number, version: string, contentJson: string, contentHash: string, changedBy = "user"): void {
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO AssetVersion (SharedAssetId, Version, ContentJson, ContentHash, ChangedBy) VALUES (?, ?, ?, ?, ?)`,
-    [assetId, version, contentJson, contentHash, changedBy],
-  ));
+  db.run(
+        `INSERT INTO AssetVersion (SharedAssetId, Version, ContentJson, ContentHash, ChangedBy) VALUES (?, ?, ?, ?, ?)`,
+        [assetId, version, contentJson, contentHash, changedBy],
+      );
 }
 
 export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ assetId: number } | HandlerErrorResponse> {
@@ -240,21 +240,21 @@ export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ as
   if (asset.Id) {
     // Update existing — snapshot before overwriting
     snapshotVersion(db, asset.Id, version, asset.ContentJson, contentHash);
-    ServiceResult.wrapDb(() => db.run(
-      `UPDATE SharedAsset SET Name = ?, Type = ?, ContentJson = ?, ContentHash = ?, Version = ?, Slug = ?, UpdatedAt = datetime('now') WHERE Id = ?`,
-      [asset.Name, asset.Type, asset.ContentJson, contentHash, version, asset.Slug, asset.Id],
-    ));
+    db.run(
+            `UPDATE SharedAsset SET Name = ?, Type = ?, ContentJson = ?, ContentHash = ?, Version = ?, Slug = ?, UpdatedAt = datetime('now') WHERE Id = ?`,
+            [asset.Name, asset.Type, asset.ContentJson, contentHash, version, asset.Slug, asset.Id],
+          );
     markDirty();
 
     return { assetId: asset.Id };
   }
 
   // Insert new
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, ?)`,
-    [asset.Type, asset.Name, asset.Slug, asset.ContentJson, contentHash, version],
-  ));
-  const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+  db.run(
+        `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, ?)`,
+        [asset.Type, asset.Name, asset.Slug, asset.ContentJson, contentHash, version],
+      );
+  const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
   const newId = idResult[0].values[0][0] as number;
   // Snapshot initial version
   snapshotVersion(db, newId, version, asset.ContentJson, contentHash, "create");
@@ -268,24 +268,24 @@ export async function handleDeleteSharedAsset(payload: AssetIdMsg): Promise<{ is
   const db = getDb();
 
   // Per spec §6.3: synced links become detached (preserving local copies)
-  const syncedLinks = (ServiceResult.wrapDb(() => db.exec(
-    "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
-    [assetId],
-  )).data ?? []);
+  const syncedLinks = (db.exec(
+      "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
+      [assetId],
+    ) ?? []);
   const detachedCount = syncedLinks.length > 0 ? syncedLinks[0].values.length : 0;
 
-  ServiceResult.wrapDb(() => db.run(
-    "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
-    [assetId],
-  ));
+  db.run(
+        "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
+        [assetId],
+      );
 
   // CASCADE will delete remaining links (pinned become orphans too — detach first)
-  ServiceResult.wrapDb(() => db.run(
-    "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
-    [assetId],
-  ));
+  db.run(
+        "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
+        [assetId],
+      );
 
-  ServiceResult.wrapDb(() => db.run("DELETE FROM SharedAsset WHERE Id = ?", [assetId]));
+  db.run("DELETE FROM SharedAsset WHERE Id = ?", [assetId]);
   markDirty();
 
   return { isOk: true, detachedCount };
@@ -318,7 +318,7 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
 
   sql += " ORDER BY Id ASC";
 
-  const stmt = ServiceResult.wrapDb(() => db.prepare(sql)).data!;
+  const stmt = db.prepare(sql);
   stmt.bind(params);
   const links: AssetLink[] = [];
   while (stmt.step()) {
@@ -350,20 +350,20 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
   const linkState = bindOpt(link.LinkStateType) ?? "synced";
 
   if (link.Id) {
-    ServiceResult.wrapDb(() => db.run(
-      `UPDATE AssetLink SET LinkStateType = ?, PinnedVersion = ?, LocalOverrideJson = ?, SyncedAt = datetime('now') WHERE Id = ?`,
-      [linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson), link.Id],
-    ));
+    db.run(
+            `UPDATE AssetLink SET LinkStateType = ?, PinnedVersion = ?, LocalOverrideJson = ?, SyncedAt = datetime('now') WHERE Id = ?`,
+            [linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson), link.Id],
+          );
     markDirty();
 
     return { linkId: link.Id };
   }
 
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT OR REPLACE INTO AssetLink (SharedAssetId, ProjectId, LinkStateType, PinnedVersion, LocalOverrideJson) VALUES (?, ?, ?, ?, ?)`,
-    [link.SharedAssetId, link.ProjectId, linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson)],
-  ));
-  const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+  db.run(
+        `INSERT OR REPLACE INTO AssetLink (SharedAssetId, ProjectId, LinkStateType, PinnedVersion, LocalOverrideJson) VALUES (?, ?, ?, ?, ?)`,
+        [link.SharedAssetId, link.ProjectId, linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson)],
+      );
+  const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
   const newId = idResult[0].values[0][0] as number;
   markDirty();
 
@@ -373,7 +373,7 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
 export async function handleDeleteAssetLink(payload: LinkIdMsg): Promise<{ isOk: true }> {
   const { linkId } = payload;
   const db = getDb();
-  ServiceResult.wrapDb(() => db.run("DELETE FROM AssetLink WHERE Id = ?", [linkId]));
+  db.run("DELETE FROM AssetLink WHERE Id = ?", [linkId]);
   markDirty();
 
   return { isOk: true };
@@ -388,7 +388,7 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
   const db = getDb();
 
   // Get the latest asset
-  const assetResult = (ServiceResult.wrapDb(() => db.exec("SELECT ContentJson, ContentHash, Version FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+  const assetResult = (db.exec("SELECT ContentJson, ContentHash, Version FROM SharedAsset WHERE Id = ?", [assetId]) ?? []);
 
   if (assetResult.length === 0 || assetResult[0].values.length === 0) {
     return { syncedCount: 0, pinnedNotified: 0 };
@@ -397,24 +397,24 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
   const [contentJson, contentHash, version] = assetResult[0].values[0] as [string, string, string];
 
   // Update all synced links — overwrite project copies
-  const syncedLinks = (ServiceResult.wrapDb(() => db.exec(
-    "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
-    [assetId],
-  )).data ?? []);
+  const syncedLinks = (db.exec(
+      "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
+      [assetId],
+    ) ?? []);
   const syncedCount = syncedLinks.length > 0 ? syncedLinks[0].values.length : 0;
 
   if (syncedCount > 0) {
-    ServiceResult.wrapDb(() => db.run(
-      `UPDATE AssetLink SET LocalOverrideJson = NULL, PinnedVersion = NULL, SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'`,
-      [assetId],
-    ));
+    db.run(
+            `UPDATE AssetLink SET LocalOverrideJson = NULL, PinnedVersion = NULL, SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'`,
+            [assetId],
+          );
   }
 
   // Count pinned links (they get "update available" badge — UI responsibility)
-  const pinnedLinks = (ServiceResult.wrapDb(() => db.exec(
-    "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
-    [assetId],
-  )).data ?? []);
+  const pinnedLinks = (db.exec(
+      "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
+      [assetId],
+    ) ?? []);
   const pinnedNotified = pinnedLinks.length > 0 ? pinnedLinks[0].values.length : 0;
 
   markDirty();
@@ -437,15 +437,15 @@ export async function handlePromoteAsset(payload: PromoteMsg): Promise<{
   const hash = await computeContentHash(contentJson);
 
   // Check if slug already exists
-  const existing = (ServiceResult.wrapDb(() => db.exec("SELECT Id, ContentHash, Version FROM SharedAsset WHERE Slug = ?", [slug])).data ?? []);
+  const existing = (db.exec("SELECT Id, ContentHash, Version FROM SharedAsset WHERE Slug = ?", [slug]) ?? []);
 
   if (existing.length === 0 || existing[0].values.length === 0) {
     // New asset — create
-    ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, '1.0.0')`,
-      [type, name, slug, contentJson, hash],
-    ));
-    const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+    db.run(
+            `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, '1.0.0')`,
+            [type, name, slug, contentJson, hash],
+          );
+    const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
     const newId = idResult[0].values[0][0] as number;
     snapshotVersion(db, newId, "1.0.0", contentJson, hash, "promote");
     markDirty();
@@ -471,7 +471,7 @@ export async function handleReplaceLibraryAsset(payload: ReplaceMsg): Promise<{ 
   const db = getDb();
   const hash = await computeContentHash(contentJson);
 
-  const versionResult = (ServiceResult.wrapDb(() => db.exec("SELECT Version FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+  const versionResult = (db.exec("SELECT Version FROM SharedAsset WHERE Id = ?", [assetId]) ?? []);
   const currentVersion = (versionResult[0]?.values[0]?.[0] as string) ?? "1.0.0";
   const newVersion = bumpMinor(currentVersion);
 
@@ -483,10 +483,10 @@ export async function handleReplaceLibraryAsset(payload: ReplaceMsg): Promise<{ 
   // Snapshot the new version
   snapshotVersion(db, assetId, newVersion, contentJson, hash, "replace");
 
-  ServiceResult.wrapDb(() => db.run(
-    `UPDATE SharedAsset SET ContentJson = ?, ContentHash = ?, Version = ?${nameSql}, UpdatedAt = datetime('now') WHERE Id = ?`,
-    params,
-  ));
+  db.run(
+        `UPDATE SharedAsset SET ContentJson = ?, ContentHash = ?, Version = ?${nameSql}, UpdatedAt = datetime('now') WHERE Id = ?`,
+        params,
+      );
   markDirty();
 
   return { isOk: true, newVersion };
@@ -504,7 +504,7 @@ export async function handleForkLibraryAsset(payload: ForkMsg): Promise<{ assetI
   let forkSlug = `${originalSlug}-fork`;
   let counter = 2;
   while (true) {
-    const check = (ServiceResult.wrapDb(() => db.exec("SELECT Id FROM SharedAsset WHERE Slug = ?", [forkSlug])).data ?? []);
+    const check = (db.exec("SELECT Id FROM SharedAsset WHERE Slug = ?", [forkSlug]) ?? []);
 
     if (check.length === 0 || check[0].values.length === 0) {
       break;
@@ -514,11 +514,11 @@ export async function handleForkLibraryAsset(payload: ForkMsg): Promise<{ assetI
     counter++;
   }
 
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, '1.0.0')`,
-    [type, name, forkSlug, contentJson, hash],
-  ));
-  const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+  db.run(
+        `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, '1.0.0')`,
+        [type, name, forkSlug, contentJson, hash],
+      );
+  const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
   const newId = idResult[0].values[0][0] as number;
   markDirty();
 
@@ -531,7 +531,7 @@ export async function handleForkLibraryAsset(payload: ForkMsg): Promise<{ assetI
 
 export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[] }> {
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM ProjectGroup ORDER BY Name ASC")).data!;
+  const stmt = db.prepare("SELECT * FROM ProjectGroup ORDER BY Name ASC");
   const groups: ProjectGroup[] = [];
   while (stmt.step()) {
     groups.push(stmt.getAsObject() as ProjectGroup);
@@ -557,10 +557,10 @@ export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ group
   const db = getDb();
 
   if (group.Id) {
-    ServiceResult.wrapDb(() => db.run(
-      `UPDATE ProjectGroup SET Name = ?, SharedSettingsJson = ? WHERE Id = ?`,
-      [group.Name, bindOpt(group.SharedSettingsJson), group.Id],
-    ));
+    db.run(
+            `UPDATE ProjectGroup SET Name = ?, SharedSettingsJson = ? WHERE Id = ?`,
+            [group.Name, bindOpt(group.SharedSettingsJson), group.Id],
+          );
     markDirty();
     // Auto-cascade settings to members on update
     const cascadedCount = group.SharedSettingsJson
@@ -570,11 +570,11 @@ export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ group
     return { groupId: group.Id, cascadedCount };
   }
 
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO ProjectGroup (Name, SharedSettingsJson) VALUES (?, ?)`,
-    [group.Name, bindOpt(group.SharedSettingsJson)],
-  ));
-  const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+  db.run(
+        `INSERT INTO ProjectGroup (Name, SharedSettingsJson) VALUES (?, ?)`,
+        [group.Name, bindOpt(group.SharedSettingsJson)],
+      );
+  const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
   const newId = idResult[0].values[0][0] as number;
   markDirty();
 
@@ -584,7 +584,7 @@ export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ group
 export async function handleDeleteProjectGroup(payload: GroupIdMsg): Promise<{ isOk: true }> {
   const { groupId } = payload;
   const db = getDb();
-  ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectGroup WHERE Id = ?", [groupId]));
+  db.run("DELETE FROM ProjectGroup WHERE Id = ?", [groupId]);
   markDirty();
 
   return { isOk: true };
@@ -597,7 +597,7 @@ export async function handleDeleteProjectGroup(payload: GroupIdMsg): Promise<{ i
 export async function handleGetGroupMembers(payload: GroupIdMsg): Promise<{ members: ProjectGroupMember[] }> {
   const { groupId } = payload;
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM ProjectGroupMember WHERE GroupId = ?")).data!;
+  const stmt = db.prepare("SELECT * FROM ProjectGroupMember WHERE GroupId = ?");
   stmt.bind([groupId]);
   const members: ProjectGroupMember[] = [];
   while (stmt.step()) {
@@ -612,11 +612,11 @@ export async function handleGetGroupMembers(payload: GroupIdMsg): Promise<{ memb
 export async function handleAddGroupMember(payload: GroupMemberMsg): Promise<{ memberId: number }> {
   const { groupId, projectId } = payload;
   const db = getDb();
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`,
-    [groupId, projectId],
-  ));
-  const idResult = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? []);
+  db.run(
+        `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`,
+        [groupId, projectId],
+      );
+  const idResult = (db.exec(SQL_LAST_INSERT_ROWID) ?? []);
   const newId = idResult[0].values[0][0] as number;
   markDirty();
 
@@ -626,7 +626,7 @@ export async function handleAddGroupMember(payload: GroupMemberMsg): Promise<{ m
 export async function handleRemoveGroupMember(payload: GroupMemberMsg): Promise<{ isOk: true }> {
   const { groupId, projectId } = payload;
   const db = getDb();
-  ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectIdUuid = ?", [groupId, projectId]));
+  db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectIdUuid = ?", [groupId, projectId]);
   markDirty();
 
   return { isOk: true };
@@ -651,7 +651,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
   }
 
   // Get all member project IDs (UUID strings, v9 contract)
-  const memberStmt = ServiceResult.wrapDb(() => db.prepare("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?")).data!;
+  const memberStmt = db.prepare("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?");
   memberStmt.bind([groupId]);
   const projectIds: string[] = [];
   while (memberStmt.step()) {
@@ -669,10 +669,10 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
     for (const [key, value] of entries) {
       const kvKey = `group:${key}`;
       const kvValue = typeof value === "string" ? value : JSON.stringify(value);
-      ServiceResult.wrapDb(() => db.run(
-        `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
-        [String(projectId), kvKey, kvValue],
-      ));
+      db.run(
+                `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
+                [String(projectId), kvKey, kvValue],
+              );
     }
   }
 
@@ -688,7 +688,7 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
   const { groupId } = payload;
   const db = getDb();
 
-  const result = (ServiceResult.wrapDb(() => db.exec("SELECT SharedSettingsJson FROM ProjectGroup WHERE Id = ?", [groupId])).data ?? []);
+  const result = (db.exec("SELECT SharedSettingsJson FROM ProjectGroup WHERE Id = ?", [groupId]) ?? []);
 
   if (result.length === 0 || result[0].values.length === 0) {
     throw new Error(`[library] Group ${groupId} not found\n  Path: src/background/handlers/library-handler.ts\n  Missing: ProjectGroup row\n  Reason: groupId does not exist in ProjectGroup table`);
@@ -713,7 +713,7 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
 export async function handleGetAssetVersions(payload: AssetIdMsg): Promise<{ versions: AssetVersion[] }> {
   const { assetId } = payload;
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM AssetVersion WHERE SharedAssetId = ? ORDER BY CreatedAt DESC")).data!;
+  const stmt = db.prepare("SELECT * FROM AssetVersion WHERE SharedAssetId = ? ORDER BY CreatedAt DESC");
   stmt.bind([assetId]);
   const versions: AssetVersion[] = [];
   while (stmt.step()) {
@@ -730,10 +730,10 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
   const db = getDb();
 
   // Get the target version's content
-  const versionResult = (ServiceResult.wrapDb(() => db.exec(
-    "SELECT Version, ContentJson, ContentHash FROM AssetVersion WHERE Id = ? AND SharedAssetId = ?",
-    [versionId, assetId],
-  )).data ?? []);
+  const versionResult = (db.exec(
+      "SELECT Version, ContentJson, ContentHash FROM AssetVersion WHERE Id = ? AND SharedAssetId = ?",
+      [versionId, assetId],
+    ) ?? []);
 
   if (versionResult.length === 0 || versionResult[0].values.length === 0) {
     throw new Error(`[library] Version ${versionId} not found for asset ${assetId}\n  Path: src/background/handlers/library-handler.ts\n  Missing: AssetVersion row\n  Reason: versionId does not exist or belongs to different asset`);
@@ -742,7 +742,7 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
   const [targetVersion, contentJson, contentHash] = versionResult[0].values[0] as [string, string, string];
 
   // Get current version for snapshot
-  const currentResult = (ServiceResult.wrapDb(() => db.exec("SELECT Version, ContentJson, ContentHash FROM SharedAsset WHERE Id = ?", [assetId])).data ?? []);
+  const currentResult = (db.exec("SELECT Version, ContentJson, ContentHash FROM SharedAsset WHERE Id = ?", [assetId]) ?? []);
 
   if (currentResult.length > 0 && currentResult[0].values.length > 0) {
     const [curVer, curJson, curHash] = currentResult[0].values[0] as [string, string, string];
@@ -754,10 +754,10 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
   const newVersion = bumpMinor(targetVersion);
   snapshotVersion(db, assetId, newVersion, contentJson, contentHash, "rollback");
 
-  ServiceResult.wrapDb(() => db.run(
-    `UPDATE SharedAsset SET ContentJson = ?, ContentHash = ?, Version = ?, UpdatedAt = datetime('now') WHERE Id = ?`,
-    [contentJson, contentHash, newVersion, assetId],
-  ));
+  db.run(
+        `UPDATE SharedAsset SET ContentJson = ?, ContentHash = ?, Version = ?, UpdatedAt = datetime('now') WHERE Id = ?`,
+        [contentJson, contentHash, newVersion, assetId],
+      );
   markDirty();
 
   return { isOk: true, rolledBackTo: newVersion };
@@ -785,7 +785,7 @@ export interface LibraryExport {
 }
 
 function exportAssets(db: SqlJsDatabase): LibraryExport["assets"] {
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM SharedAsset ORDER BY Name ASC")).data!;
+  const stmt = db.prepare("SELECT * FROM SharedAsset ORDER BY Name ASC");
   const assets: LibraryExport["assets"] = [];
   while (stmt.step()) {
     const row = stmt.getAsObject() as SharedAsset;
@@ -805,11 +805,11 @@ function exportAssets(db: SqlJsDatabase): LibraryExport["assets"] {
 }
 
 function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM ProjectGroup ORDER BY Name ASC")).data!;
+  const stmt = db.prepare("SELECT * FROM ProjectGroup ORDER BY Name ASC");
   const groups: LibraryExport["groups"] = [];
   while (stmt.step()) {
     const row = stmt.getAsObject() as ProjectGroup;
-    const memberResult = (ServiceResult.wrapDb(() => db.exec("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?", [row.Id])).data ?? []);
+    const memberResult = (db.exec("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?", [row.Id]) ?? []);
     const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as string) : [];
     let sharedSettings: JsonValue = null;
 
@@ -855,13 +855,13 @@ async function importAsset(
 ): Promise<void> {
   const contentJson = typeof asset.content === "string" ? asset.content : JSON.stringify(asset.content);
   const hash = await computeContentHash(contentJson);
-  const existing = (ServiceResult.wrapDb(() => db.exec("SELECT Id, ContentHash, Version FROM SharedAsset WHERE Slug = ?", [asset.slug])).data ?? []);
+  const existing = (db.exec("SELECT Id, ContentHash, Version FROM SharedAsset WHERE Slug = ?", [asset.slug]) ?? []);
 
   if (existing.length === 0 || existing[0].values.length === 0) {
-    ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, ?)`,
-      [asset.type, asset.name, asset.slug, contentJson, hash, asset.version],
-    ));
+    db.run(
+            `INSERT INTO SharedAsset (Type, Name, Slug, ContentJson, ContentHash, Version) VALUES (?, ?, ?, ?, ?, ?)`,
+            [asset.type, asset.name, asset.slug, contentJson, hash, asset.version],
+          );
     result.imported++;
   } else {
     const [, existingHash, existingVersion] = existing[0].values[0] as [number, string, string];
@@ -876,13 +876,13 @@ async function importAsset(
 
 function importGroups(db: SqlJsDatabase, groups: LibraryExport["groups"]): void {
   for (const group of groups) {
-    ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO ProjectGroup (Name, SharedSettingsJson) VALUES (?, ?)`,
-      [group.name, group.sharedSettings ? JSON.stringify(group.sharedSettings) : null],
-    ));
-    const groupId = (ServiceResult.wrapDb(() => db.exec(SQL_LAST_INSERT_ROWID)).data ?? [])[0].values[0][0] as number;
+    db.run(
+            `INSERT INTO ProjectGroup (Name, SharedSettingsJson) VALUES (?, ?)`,
+            [group.name, group.sharedSettings ? JSON.stringify(group.sharedSettings) : null],
+          );
+    const groupId = (db.exec(SQL_LAST_INSERT_ROWID) ?? [])[0].values[0][0] as number;
     for (const projectId of group.memberProjectIds) {
-      ServiceResult.wrapDb(() => db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`, [groupId, projectId]));
+      db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`, [groupId, projectId]);
     }
   }
 }

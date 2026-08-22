@@ -128,7 +128,7 @@ function getDb(): SqlJsDatabase {
 /** List all updater entries via the UpdaterDetails view. */
 export function handleListUpdaters(): UpdaterEntry[] {
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM UpdaterDetails ORDER BY Name"));
+  const stmt = db.prepare("SELECT * FROM UpdaterDetails ORDER BY Name");
   const rows: UpdaterEntry[] = [];
   while (stmt.step()) {
     rows.push(stmt.getAsObject() as UpdaterEntry);
@@ -142,7 +142,7 @@ export function handleListUpdaters(): UpdaterEntry[] {
 /** Get a single updater by ID. */
 export function handleGetUpdater(updaterId: number): UpdaterEntry | null {
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM UpdaterDetails WHERE UpdaterId = ?"));
+  const stmt = db.prepare("SELECT * FROM UpdaterDetails WHERE UpdaterId = ?");
   stmt.bind([updaterId]);
   const row = stmt.step() ? (stmt.getAsObject() as UpdaterEntry) : null;
   stmt.free();
@@ -182,29 +182,29 @@ export function handleCreateUpdater(data: {
 
   const db = getDb();
   const now = new Date().toISOString();
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
+  db.run(
+        `INSERT INTO UpdaterInfo (Name, ScriptUrl, VersionInfoUrl, InstructionUrl, ChangelogUrl, IsGit, IsRedirectable, MaxRedirectDepth, HasInstructions, HasChangelogFromVersionInfo, HasUserConfirmBeforeUpdate, AutoCheckIntervalMinutes, CacheExpiryMinutes, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      name,
-      scriptUrl,
-      bindOpt(data.versionInfoUrl),
-      bindOpt(data.instructionUrl),
-      bindOpt(data.changelogUrl),
-      data.isGit ? 1 : 0,
-      data.isRedirectable !== false ? 1 : 0,
-      data.maxRedirectDepth ?? 2,
-      data.instructionUrl ? 1 : 0,
-      data.hasChangelogFromVersionInfo !== false ? 1 : 0,
-      data.hasUserConfirmBeforeUpdate ? 1 : 0,
-      data.autoCheckIntervalMinutes ?? 1440,
-      data.cacheExpiryMinutes ?? 10080,
-      now,
-      now,
-    ],
-  ));
+        [
+          name,
+          scriptUrl,
+          bindOpt(data.versionInfoUrl),
+          bindOpt(data.instructionUrl),
+          bindOpt(data.changelogUrl),
+          data.isGit ? 1 : 0,
+          data.isRedirectable !== false ? 1 : 0,
+          data.maxRedirectDepth ?? 2,
+          data.instructionUrl ? 1 : 0,
+          data.hasChangelogFromVersionInfo !== false ? 1 : 0,
+          data.hasUserConfirmBeforeUpdate ? 1 : 0,
+          data.autoCheckIntervalMinutes ?? 1440,
+          data.cacheExpiryMinutes ?? 10080,
+          now,
+          now,
+        ],
+      );
 
-  const result = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid() AS Id"));
+  const result = db.exec("SELECT last_insert_rowid() AS Id");
   const newId = result[0]?.values[0]?.[0] as number;
   dbManager?.markDirty();
 
@@ -217,7 +217,7 @@ export function handleCreateUpdater(data: {
 
 export function handleDeleteUpdater(updaterId: number): void {
   const db = getDb();
-  ServiceResult.wrapDb(() => db.run("DELETE FROM UpdaterInfo WHERE Id = ?", [updaterId]));
+  db.run("DELETE FROM UpdaterInfo WHERE Id = ?", [updaterId]);
   dbManager?.markDirty();
 }
 
@@ -246,10 +246,10 @@ export async function handleCheckForUpdate(updaterId: number): Promise<UpdateChe
 
     // Update local record
     const db = getDb();
-    ServiceResult.wrapDb(() => db.run(
-      "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
-      [versionInfo.Version, now, now, updaterId],
-    ));
+    db.run(
+            "UPDATE UpdaterInfo SET LatestVersion = ?, LastCheckedAt = ?, UpdatedAt = ? WHERE Id = ?",
+            [versionInfo.Version, now, now, updaterId],
+          );
     dbManager?.markDirty();
 
     const hasUpdate = entry.CurrentVersion !== versionInfo.Version;
@@ -347,14 +347,14 @@ export function ensureUpdaterCategory(name: string): number {
 
   const db = getDb();
 
-  const existing = ServiceResult.wrapDb(() => db.exec("SELECT Id FROM UpdaterCategory WHERE Name = ?", [trimmed]));
+  const existing = db.exec("SELECT Id FROM UpdaterCategory WHERE Name = ?", [trimmed]);
 
   if (existing.length > 0 && existing[0].values.length > 0) {
     return existing[0].values[0][0] as number;
   }
 
-  ServiceResult.wrapDb(() => db.run("INSERT INTO UpdaterCategory (Name, CreatedAt) VALUES (?, datetime('now'))", [trimmed]));
-  const result = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid() AS Id"));
+  db.run("INSERT INTO UpdaterCategory (Name, CreatedAt) VALUES (?, datetime('now'))", [trimmed]);
+  const result = db.exec("SELECT last_insert_rowid() AS Id");
   dbManager?.markDirty();
 
   return result[0]?.values[0]?.[0] as number;
@@ -366,10 +366,10 @@ export function linkUpdaterToCategory(updaterId: number, categoryName: string): 
   const db = getDb();
 
   try {
-    ServiceResult.wrapDb(() => db.run(
-      "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
-      [updaterId, categoryId],
-    ));
+    db.run(
+            "INSERT INTO UpdaterToCategory (UpdaterId, CategoryId) VALUES (?, ?)",
+            [updaterId, categoryId],
+          );
     dbManager?.markDirty();
   } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
@@ -391,7 +391,7 @@ export interface GlobalUpdateSettings {
 /** Get the global update settings (first row). */
 export function handleGetUpdateSettings(): GlobalUpdateSettings {
   const db = getDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM UpdateSettings LIMIT 1"));
+  const stmt = db.prepare("SELECT * FROM UpdateSettings LIMIT 1");
   const row = stmt.step() ? (stmt.getAsObject() as GlobalUpdateSettings) : null;
   stmt.free();
 
@@ -413,19 +413,19 @@ export function handleSaveUpdateSettings(data: {
 }): void {
   const db = getDb();
   const now = new Date().toISOString();
-  const existing = ServiceResult.wrapDb(() => db.exec("SELECT COUNT(*) FROM UpdateSettings"));
+  const existing = db.exec("SELECT COUNT(*) FROM UpdateSettings");
   const count = existing.length > 0 ? (existing[0].values[0][0] as number) : 0;
 
   if (count === 0) {
-    ServiceResult.wrapDb(() => db.run(
-      "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
-      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
-    ));
+    db.run(
+            "INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?)",
+            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now, now],
+          );
   } else {
-    ServiceResult.wrapDb(() => db.run(
-      "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
-      [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
-    ));
+    db.run(
+            "UPDATE UpdateSettings SET AutoCheckIntervalMinutes = ?, HasUserConfirmBeforeUpdate = ?, HasChangelogFromVersionInfo = ?, CacheExpiryMinutes = ?, UpdatedAt = ?",
+            [data.autoCheckIntervalMinutes, data.hasUserConfirmBeforeUpdate ? 1 : 0, data.hasChangelogFromVersionInfo ? 1 : 0, data.cacheExpiryMinutes, now],
+          );
   }
 
   dbManager?.markDirty();

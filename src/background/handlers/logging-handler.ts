@@ -58,12 +58,12 @@ export async function startSession(version: string): Promise<string> {
   const db = getLogsDb();
   const now = new Date().toISOString();
 
-  ServiceResult.wrapDb(() => db.run("INSERT INTO Sessions (StartedAt, Version) VALUES (?, ?)", [
-    now,
-    version,
-  ]));
+  db.run("INSERT INTO Sessions (StartedAt, Version) VALUES (?, ?)", [
+        now,
+        version,
+      ]);
 
-  const result = (ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()")).data ?? []);
+  const result = (db.exec("SELECT last_insert_rowid()") ?? []);
   const sessionId = Number(result[0].values[0][0]);
   currentSessionId = sessionId;
     dbManager!.markDirty();
@@ -154,23 +154,23 @@ function insertLogRow(payload: {
   const now = new Date().toISOString();
   const version = EXTENSION_VERSION;
 
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, ScriptId, ProjectId, ConfigId, ExtVersion)
+  db.run(
+        `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, ScriptId, ProjectId, ConfigId, ExtVersion)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      sessionId,
-      now,
-      bindReq(payload.level, "INFO"),
-      bindReq(payload.source, "unknown"),
-      bindReq(payload.category, "GENERAL"),
-      bindReq(payload.action, "log"),
-      bindReq(payload.detail, ""),
-      bindOpt(payload.scriptId),
-      bindOpt(payload.projectId),
-      bindOpt(payload.configId),
-      bindReq(version, "0.0.0"),
-    ],
-  ));
+        [
+          sessionId,
+          now,
+          bindReq(payload.level, "INFO"),
+          bindReq(payload.source, "unknown"),
+          bindReq(payload.category, "GENERAL"),
+          bindReq(payload.action, "log"),
+          bindReq(payload.detail, ""),
+          bindOpt(payload.scriptId),
+          bindOpt(payload.projectId),
+          bindOpt(payload.configId),
+          bindReq(version, "0.0.0"),
+        ],
+      );
 }
 
 /* ------------------------------------------------------------------ */
@@ -218,26 +218,26 @@ function insertErrorRow(payload: {
   const now = new Date().toISOString();
   const version = EXTENSION_VERSION;
 
-  ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, Context, ScriptId, ProjectId, ConfigId, ScriptFile, ExtVersion)
+  db.run(
+        `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, Context, ScriptId, ProjectId, ConfigId, ScriptFile, ExtVersion)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      sessionId,
-      now,
-      bindReq(payload.level, "ERROR"),
-      bindReq(payload.source, "unknown"),
-      bindReq(payload.category, "GENERAL"),
-      bindReq(payload.errorCode, "UNKNOWN"),
-      bindReq(payload.message, "(no message)"),
-      bindOpt(payload.stackTrace),
-      bindOpt(payload.context),
-      bindOpt(payload.scriptId),
-      bindOpt(payload.projectId),
-      bindOpt(payload.configId),
-      bindOpt(payload.scriptFile),
-      bindReq(version, "0.0.0"),
-    ],
-  ));
+        [
+          sessionId,
+          now,
+          bindReq(payload.level, "ERROR"),
+          bindReq(payload.source, "unknown"),
+          bindReq(payload.category, "GENERAL"),
+          bindReq(payload.errorCode, "UNKNOWN"),
+          bindReq(payload.message, "(no message)"),
+          bindOpt(payload.stackTrace),
+          bindOpt(payload.context),
+          bindOpt(payload.scriptId),
+          bindOpt(payload.projectId),
+          bindOpt(payload.configId),
+          bindOpt(payload.scriptFile),
+          bindReq(version, "0.0.0"),
+        ],
+      );
 }
 
 /* ------------------------------------------------------------------ */
@@ -346,9 +346,9 @@ export async function handleGetSessionLogs(): Promise<{
 /** Queries logs for a specific session. */
 function querySessionLogs(sessionId: string): SqlRow[] {
   const db = getLogsDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare(
-    "SELECT * FROM Logs WHERE SessionId = ? ORDER BY Timestamp ASC",
-  )).data!;
+  const stmt = db.prepare(
+      "SELECT * FROM Logs WHERE SessionId = ? ORDER BY Timestamp ASC",
+    );
   stmt.bind([sessionId]);
 
   return collectRows(stmt);
@@ -357,9 +357,9 @@ function querySessionLogs(sessionId: string): SqlRow[] {
 /** Queries errors for a specific session. */
 function querySessionErrors(sessionId: string): SqlRow[] {
   const db = getErrorsDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare(
-    "SELECT * FROM Errors WHERE SessionId = ? ORDER BY Timestamp ASC",
-  )).data!;
+  const stmt = db.prepare(
+      "SELECT * FROM Errors WHERE SessionId = ? ORDER BY Timestamp ASC",
+    );
   stmt.bind([sessionId]);
 
   return collectRows(stmt);
@@ -368,9 +368,9 @@ function querySessionErrors(sessionId: string): SqlRow[] {
 /** Queries recent logs across all sessions. */
 function queryRecentLogsAll(limit: number): SqlRow[] {
   const db = getLogsDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare(
-    "SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?",
-  )).data!;
+  const stmt = db.prepare(
+      "SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?",
+    );
   stmt.bind([limit]);
 
   return collectRows(stmt);
@@ -379,9 +379,9 @@ function queryRecentLogsAll(limit: number): SqlRow[] {
 /** Queries recent errors across all sessions. */
 function queryRecentErrorsAll(limit: number): SqlRow[] {
   const db = getErrorsDb();
-  const stmt = ServiceResult.wrapDb(() => db.prepare(
-    "SELECT * FROM Errors ORDER BY Timestamp DESC LIMIT ?",
-  )).data!;
+  const stmt = db.prepare(
+      "SELECT * FROM Errors ORDER BY Timestamp DESC LIMIT ?",
+    );
   stmt.bind([limit]);
 
   return collectRows(stmt);

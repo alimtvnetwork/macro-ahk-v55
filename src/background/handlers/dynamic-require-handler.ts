@@ -237,11 +237,11 @@ function logDynamicLoad(
       logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
     }
 
-    const res = ServiceResult.wrapDb(() => db.run(
-      `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
+    const res = db.run(
+          `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?)`,
-      [now, requester, target, status, detail, version],
-    ));
+          [now, requester, target, status, detail, version],
+        );
 
     if (res.isFail) {
       throw res.error;

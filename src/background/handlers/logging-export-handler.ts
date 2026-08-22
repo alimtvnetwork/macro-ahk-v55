@@ -44,10 +44,10 @@ function purgeOldLogs(days: number): number {
   const before = countTable(db, "Logs");
 
   if (days === 0) {
-    ServiceResult.wrapDb(() => db.run("DELETE FROM Logs"));
+    db.run("DELETE FROM Logs");
   } else {
     const cutoff = new Date(Date.now() - days * 86400000).toISOString();
-    ServiceResult.wrapDb(() => db.run("DELETE FROM Logs WHERE Timestamp < ?", [cutoff]));
+    db.run("DELETE FROM Logs WHERE Timestamp < ?", [cutoff]);
   }
 
   const after = countTable(db, "Logs");
@@ -271,7 +271,7 @@ function exportTableRows(
     throw new Error(`[SQL safety] Export table name "${table}" not in allowlist`);
   }
 
-  const result = (ServiceResult.wrapDb(() => db.exec(`SELECT * FROM ${table} ORDER BY Timestamp ASC`)).data ?? []);
+  const result = (db.exec(`SELECT * FROM ${table} ORDER BY Timestamp ASC`) ?? []);
   const hasRows = result.length > 0;
 
   const rows = hasRows ? result[0].values : [];

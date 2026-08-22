@@ -80,8 +80,8 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
     return [];
   }
 
-  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
-    `SELECT
+  const stmtResult = db.prepare(
+      `SELECT
             Id as id,
             Timestamp as timestamp,
             Level as level,
@@ -102,7 +102,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
            AND SessionId = ?
          ORDER BY Timestamp DESC
          LIMIT 100`,
-  ));
+    );
 
   if (stmtResult.isFail) {
     return [];
@@ -148,7 +148,7 @@ export async function handleUserScriptError(
 function broadcastErrorCountChange(): void {
   try {
     const db = getErrorsDb();
-    const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0"));
+    const stmtResult = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0");
 
     if (stmtResult.isFail) {
       return;
@@ -183,7 +183,7 @@ function broadcastErrorCountChange(): void {
 /** Marks all unresolved errors as resolved. */
 export async function handleClearErrors(): Promise<OkResponse> {
   const db = getErrorsDb();
-  const res = ServiceResult.wrapDb(() => db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0"));
+  const res = db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0");
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -209,19 +209,19 @@ function insertUserScriptError(request: {
   const version = chrome.runtime.getManifest().version;
   const codeSnippet = request.scriptCode?.slice(0, 500) ?? null;
 
-  const res = ServiceResult.wrapDb(() => db.run(
-    `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
+  const res = db.run(
+      `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
          VALUES ('', ?, 'ERROR', 'user-script', 'INJECTION', 'USER_SCRIPT_ERROR', ?, ?, ?, ?, ?, ?)`,
-    [
-      now,
-      bindReq(request.message, "(no message)"),
-      bindOpt(request.stack),
-      bindReq(request.scriptId, "unknown"),
-      bindOpt(request.projectId),
-      codeSnippet,
-      bindReq(version, "0.0.0"),
-    ],
-  ));
+      [
+        now,
+        bindReq(request.message, "(no message)"),
+        bindOpt(request.stack),
+        bindReq(request.scriptId, "unknown"),
+        bindOpt(request.projectId),
+        codeSnippet,
+        bindReq(version, "0.0.0"),
+      ],
+    );
 
   if (res.isFail) {
     throw res.error;
