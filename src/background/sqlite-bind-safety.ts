@@ -154,7 +154,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
             assertBindable(sql, params as ReadonlyArray<unknown>);
           }
 
-          target.run(sql, params);
+          ServiceResult.wrapDb(() => target.run(sql, params));
 
           return receiver as SqlJsDatabase;
         };
@@ -168,7 +168,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
 
           // sql.js Database.exec accepts an optional params array even
           // though our typings only declare the single-arg form.
-          const res = (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params);
+          const res = ServiceResult.wrapDb(() => (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params));
 
           if (res.isFail) {
             throw res.error;
@@ -180,7 +180,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
 
       if (prop === "prepare") {
         return function wrappedPrepare(sql: string): Statement {
-          const stmtRes = target.prepare(sql);
+          const stmtRes = ServiceResult.wrapDb(() => target.prepare(sql));
 
           if (stmtRes.isFail) {
             throw stmtRes.error;

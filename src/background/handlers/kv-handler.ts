@@ -68,10 +68,10 @@ export async function handleKvGet(
   }
 
   const db = getDb();
-  const wrap = db.exec(
-      "SELECT Value FROM ProjectKv WHERE ProjectId = ? AND Key = ?",
-      [projectId, key],
-    );
+  const wrap = ServiceResult.wrapDb(() => db.exec(
+    "SELECT Value FROM ProjectKv WHERE ProjectId = ? AND Key = ?",
+    [projectId, key],
+  ));
 
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };
@@ -100,10 +100,10 @@ export async function handleKvSet(
   const stringified = typeof value === "string" ? value : JSON.stringify(value ?? null);
 
   const db = getDb();
-  const wrap = db.run(
-      `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
-      [projectId, key, stringified],
-    );
+  const wrap = ServiceResult.wrapDb(() => db.run(
+    `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
+    [projectId, key, stringified],
+  ));
 
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };
@@ -126,7 +126,7 @@ export async function handleKvDelete(
   }
 
   const db = getDb();
-  const wrap = db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]);
+  const wrap = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]));
 
   if (wrap.isFail) {
     return { isOk: false, errorMessage: String(wrap.error) };

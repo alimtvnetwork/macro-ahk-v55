@@ -99,17 +99,17 @@ function saveFileToDb(projectId: string, filename: string, mimeType: string | nu
   const db = getDb();
   const size = Math.round((dataBase64.length * 3) / 4);
 
-  const runRes = db.run(
-      `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
+  const runRes = ServiceResult.wrapDb(() => db.run(
+    `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
          VALUES (?, ?, ?, ?, ?, datetime('now'))`,
-      [projectId, filename, mimeType, dataBase64, size],
-    );
+    [projectId, filename, mimeType, dataBase64, size],
+  ));
 
   if (runRes.isFail) {
     return { isOk: false, errorMessage: String(runRes.error) };
   }
 
-  const execRes = db.exec("SELECT last_insert_rowid()");
+  const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()"));
 
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) };
@@ -135,10 +135,10 @@ export async function handleFileGet(
   }
 
   const db = getDb();
-  const execRes = db.exec(
-      "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
-      [fileId],
-    );
+  const execRes = ServiceResult.wrapDb(() => db.exec(
+    "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
+    [fileId],
+  ));
 
   if (execRes.isFail) {
     return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
@@ -177,9 +177,9 @@ export async function handleFileList(
   }
 
   const db = getDb();
-  const stmtResult = db.prepare(
-      "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
-    );
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
+    "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
+  ));
 
   if (stmtResult.isFail) {
     return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
@@ -217,7 +217,7 @@ export async function handleFileDelete(
   }
 
   const db = getDb();
-  const res = db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);
+  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]));
 
   if (res.isFail) {
     return { isOk: false, errorMessage: String(res.error) };
@@ -245,9 +245,9 @@ export function getFilesByProject(
   }
 
   const db = getDb();
-  const stmtResult = db.prepare(
-      "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
-    );
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
+    "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
+  ));
 
   if (stmtResult.isFail) {
     return [];

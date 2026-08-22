@@ -317,7 +317,7 @@ function handleRawSqlRead(
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
 
-  const execRes = db.exec(sql);
+  const execRes = ServiceResult.wrapDb(() => db.exec(sql));
 
   if (execRes.isFail) {
     throw execRes.error;
@@ -341,7 +341,7 @@ function handleRawSqlWrite(
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
 
-  db.exec(sql);
+  ServiceResult.wrapDb(() => db.exec(sql));
   const changes = getRowsModified(db);
   const lastInsertId = readLastInsertId(db);
   void markAndFlush(slug);
@@ -523,7 +523,7 @@ function rowsFromExecResults(results: ReturnType<ProjectDb["exec"]>): Array<Reco
 
 function readLastInsertId(db: ProjectDb): number | undefined {
   try {
-    const execRes = db.exec("SELECT last_insert_rowid() AS lastInsertId");
+    const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid() AS lastInsertId"));
 
     if (execRes.isFail) {
       return undefined;
