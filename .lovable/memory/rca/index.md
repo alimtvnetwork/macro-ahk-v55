@@ -9,3 +9,4 @@
 - [06-release-published-without-assets](./06-release-published-without-assets.md) - v5.9.0 to v5.22.0 published zero-asset releases; three causes, plus the rule to verify releases through the Actions API instead of a file diff (2026-08-07)
 - [07-e2e-class-serialization-2026-08-17](./07-e2e-class-serialization-2026-08-17.md) - Playwright evaluate serialization stripping ServiceResult class getter properties and data wrapper restructuring (2026-08-17)
 - [08-swallowed-db-errors](./08-swallowed-db-errors.md) - DB queries wrapped manually with void 0, rewritten to use ServiceResult.wrapDb (2026-08-20)
+- [09-seeder-error-stmt-step](./09-seeder-error-stmt-step.md) - TypeError: stmt.step is not a function due to ServiceResult.wrapDb blindly wrapping statements without unwrapping (2026-08-22)
