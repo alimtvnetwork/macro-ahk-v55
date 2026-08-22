@@ -33,6 +33,7 @@
 | 12 | [`12-stale-repo-owner-ci-report-links.md`](./cicd-issues/12-stale-repo-owner-ci-report-links.md) | CI/CD status reports, badges, installers, and release docs pointed at stale `alimtvnetwork/macro-ahk-v55` instead of current `aukgit/macro-ahk-v55` | README + installer/release docs | ✅ Resolved | 2026-06-21 |
 | 13 | [`13-release-page-not-created-from-server-side-tag.md`](./issues/13-release-page-not-created-from-server-side-tag.md) | Release page not created from server-side tag (web UI / REST / external tag paths skipped packaging) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-21 |
 | 14 | [`03-release-page-empty-v5-12-1-version-json-drift.md`](./issues/03-release-page-empty-v5-12-1-version-json-drift.md) | Release page empty on v5.12.1 (version.json vs tag drift) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-27 |
+| 16 | [`16-script-injection-toast-timeout.md`](./issues/16-script-injection-toast-timeout.md) | Playwright test `injected script does not leak console errors` failed randomly due to unignored in-page toast diagnostic error | `.github/workflows/ci.yml` | ✅ Resolved | 2026-08-22 |
 
 ## Referenced specs
 

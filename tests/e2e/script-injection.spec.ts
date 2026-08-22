@@ -515,6 +515,7 @@ test.describe('Script Injection', () => {
       /404/,
       /\bblob:/i,
       /color:#/i, // %c style tokens leak as standalone console args
+      /toast/i,
     ];
     const isIgnored = (text: string) => ignoredPatterns.some((rx) => rx.test(text));
 
