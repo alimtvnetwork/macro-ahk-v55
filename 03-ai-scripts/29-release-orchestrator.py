@@ -193,21 +193,17 @@ def execute_version_bump(next_version, scope, dry_run=False):
         print(f"[DRY RUN] Would bump version to {next_version} (scope: {scope})")
         return
 
-    # Check 1: Node bump script
+    # Check 1: Node bump script (try flag syntax first, then positional syntax)
     if NODE_BUMP_SCRIPT.is_file():
         print(f"[*] Invoking Node bump script: {NODE_BUMP_SCRIPT.relative_to(REPO_ROOT)}")
-        run_cmd(["node", str(NODE_BUMP_SCRIPT), "--version", next_version, "--scope", scope])
-        return
+        res = run_cmd(["node", str(NODE_BUMP_SCRIPT), "--version", next_version, "--scope", scope], check=False)
+        if res.returncode != 0:
+            run_cmd(["node", str(NODE_BUMP_SCRIPT), next_version, scope], check=False)
 
     # Check 2: Python bump script
-    if PYTHON_BUMP_SCRIPT.is_file():
+    elif PYTHON_BUMP_SCRIPT.is_file():
         print(f"[*] Invoking Python bump script: {PYTHON_BUMP_SCRIPT.relative_to(REPO_ROOT)}")
-        run_cmd([sys.executable, str(PYTHON_BUMP_SCRIPT), "--version", next_version, "--scope", scope])
-        return
-
-    # Check 3: Bootstrap and execute fallback in-place
-    print("[!] No bump script found. Executing standalone autonomous version bump...")
-    bootstrap_bump_script_if_needed()
+        run_cmd([sys.executable, str(PYTHON_BUMP_SCRIPT), "--version", next_version, "--scope", scope], check=False)
 
     today_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
 
@@ -235,14 +231,15 @@ def execute_version_bump(next_version, scope, dry_run=False):
         with open(CHANGELOG_MD, "r", encoding="utf-8") as f:
             cl_content = f.read()
 
-        entry_header = f"## [v{next_version}] {today_str} {scope}\n\n- {scope}\n\n"
-        if "# Changelog\n" in cl_content:
-            cl_content = cl_content.replace("# Changelog\n", f"# Changelog\n\n{entry_header}", 1)
-        else:
-            cl_content = f"# Changelog\n\n{entry_header}{cl_content}"
+        entry_header = f"## [v{next_version}] - {today_str}\n\n### Added\n- {scope}\n\n"
+        if f"[v{next_version}]" not in cl_content:
+            if "# Changelog\n" in cl_content:
+                cl_content = cl_content.replace("# Changelog\n", f"# Changelog\n\n{entry_header}", 1)
+            else:
+                cl_content = f"# Changelog\n\n{entry_header}{cl_content}"
 
-        with open(CHANGELOG_MD, "w", encoding="utf-8") as f:
-            f.write(cl_content)
+            with open(CHANGELOG_MD, "w", encoding="utf-8") as f:
+                f.write(cl_content)
 
 
 def stage_and_commit_release(next_version, scope, dry_run=False):
