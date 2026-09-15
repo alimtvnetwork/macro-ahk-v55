@@ -12,7 +12,7 @@ Specifications are authored across dozens of files by multiple contributors (hum
 
 | Issue | File A says... | File B says... | Tracking |
 |-------|---------------|---------------|----------|
-| P7 inline assignment | "All inline `if` assignments banned" | "`if err := fn(); err != nil` is correct Go" | Issue #08 <!-- external: spec/23-how-app-issues-track/08-p7-inline-assignment-contradiction.md --> |
+| P7 inline assignment | "All inline `if` assignments banned" | "`if err := fn(); err != nil` is correct Go" | Issue #08 <!-- external: 02-spec/23-how-app-issues-track/08-p7-inline-assignment-contradiction.md --> |
 | Log key casing | "camelCase log keys" (v9.x) | "PascalCase for ALL keys" (v10.x) | Fixed in key-naming-pascalcase.md |
 
 ---
@@ -65,31 +65,36 @@ These are the **canonical rule sources** (if a conflict is found, these win):
 
 | Rule Domain | Canonical Source |
 |-------------|-----------------|
-| Naming (all languages) | `spec/02-coding-guidelines/01-cross-language/15-master-coding-guidelines/00-overview.md` |
-| Key naming (PascalCase) | `spec/02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md` |
-| Boolean logic | `spec/02-coding-guidelines/03-golang/02-boolean-standards.md` + `spec/02-coding-guidelines/01-cross-language/02-boolean-principles/00-overview.md` |
-| Strict typing | `spec/02-coding-guidelines/01-cross-language/13-strict-typing.md` |
-| Error handling | `spec/03-error-manage/01-error-resolution/10-apperror-package/01-apperror-reference.md` |
-| Code style | `spec/02-coding-guidelines/01-cross-language/04-code-style/` |
-| No negatives | `spec/02-coding-guidelines/01-cross-language/12-no-negatives.md` |
-| Function naming | `spec/02-coding-guidelines/01-cross-language/10-function-naming.md` |
-| Database naming | `spec/02-coding-guidelines/01-cross-language/07-database-naming.md` |
+| Naming (all languages) | `02-spec/02-coding-guidelines/01-cross-language/15-master-coding-guidelines/01-index.md` |
+| Key naming (PascalCase) | `02-spec/02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md` |
+| Boolean logic | `02-spec/02-coding-guidelines/03-golang/02-boolean-standards.md` + `02-spec/02-coding-guidelines/01-cross-language/02-boolean-principles/01-index.md` |
+| Strict typing | `02-spec/02-coding-guidelines/01-cross-language/13-strict-typing.md` |
+| Error handling | `02-spec/03-error-manage/01-error-resolution/10-apperror-package/01-apperror-reference.md` |
+| Code style | `02-spec/02-coding-guidelines/01-cross-language/04-code-style/` |
+| No negatives | `02-spec/02-coding-guidelines/01-cross-language/12-no-negatives.md` |
+| Function naming | `02-spec/02-coding-guidelines/01-cross-language/10-function-naming.md` |
+| Database naming | `02-spec/02-coding-guidelines/01-cross-language/07-database-naming.md` |
 
 ### Step 2: Search for Contradictions
 
 For each rule domain, search ALL spec files for code examples or prose that contradict the canonical source:
 
 ```bash
+
 # Example: find camelCase log keys that should be PascalCase
+
 grep -rn '"[a-z][a-zA-Z]*"' spec/ --include="*.md" | grep -i "logkey\|log.*key\|context.*key"
 
 # Example: find type assertions in business logic examples
+
 grep -rn '\.\(\*\?[A-Z]' spec/ --include="*.md" | grep -v "EXEMPTED\|Exempt\|stdlib\|test"
 
 # Example: find raw nil checks that should use IsDefined()
+
 grep -rn 'if.*!= nil' spec/ --include="*.md" | grep -v "err\|error\|recover\|ok"
 
 # Example: find negative boolean helpers
+
 grep -rn 'isNot[A-Z]\|hasNo[A-Z]' spec/ --include="*.md" | grep -v "FORBIDDEN\|WRONG\|❌"
 ```
 
@@ -97,17 +102,17 @@ grep -rn 'isNot[A-Z]\|hasNo[A-Z]' spec/ --include="*.md" | grep -v "FORBIDDEN\|W
 
 | Classification | Action |
 |---------------|--------|
-| **True contradiction** — rule A says X, rule B says Y | Fix the non-canonical file. Create issue in `spec/23-how-app-issues-track/` |
+| **True contradiction** — rule A says X, rule B says Y | Fix the non-canonical file. Create issue in `02-spec/23-how-app-issues-track/` |
 | **Stale example** — code example predates a new rule | Update the example to match current rules |
 | **Missing exemption** — valid pattern not covered by rule | Add exemption to the canonical source with `// EXEMPTED:` annotation |
 | **False positive** — appears in "❌ WRONG" / "FORBIDDEN" example | No action needed |
 
 ### Step 4: Document & Track
 
-1. Create issue write-up at `spec/23-how-app-issues-track/{NN}-{slug}.md`
+1. Create issue write-up at `02-spec/23-how-app-issues-track/{NN}-{slug}.md`
 2. Update the canonical source if an exemption is needed
 3. Fix all non-canonical files
-4. Update the global `spec/99-consistency-report.md`
+4. Update the global `02-02-spec/99-consistency-report.md`
 5. Update `.lovable/memories/workflow/03-mistake-remediation-protocol.md`
 
 ---
@@ -132,7 +137,7 @@ Before adding any new rule to a canonical source:
 - [ ] **Count impact** — How many files contain the pattern?
 - [ ] **Check exemptions** — Does the pattern have legitimate uses? (e.g., `if err := fn(); err != nil` is idiomatic Go)
 - [ ] **Cross-validate** — Read ALL canonical sources for conflicting statements
-- [ ] **Update all prompts** — `spec/02-spec-management-software/12-prompts/` must reflect the new rule
+- [ ] **Update all prompts** — `02-spec/02-spec-management-software/12-prompts/` must reflect the new rule
 - [ ] **Version bump** — Canonical source and global consistency report
 
 ---
@@ -152,9 +157,9 @@ These areas have historically produced contradictions and need extra scrutiny:
 
 ## Cross-References
 
-- Global Consistency Report <!-- external: spec/99-consistency-report.md -->
+- Global Consistency Report <!-- external: 02-02-spec/99-consistency-report.md -->
 - Mistake Remediation Protocol <!-- external: .lovable/memories/workflow/03-mistake-remediation-protocol.md -->
-- Issue Template <!-- external: spec/23-how-app-issues-track/01-issue-template.md -->
-- [Master Coding Guidelines](./15-master-coding-guidelines/00-overview.md)
+- Issue Template <!-- external: 02-spec/23-how-app-issues-track/01-issue-template.md -->
+- [Master Coding Guidelines](./15-master-coding-guidelines/01-index.md)
 - [PascalCase Key Naming](./11-key-naming-pascalcase.md)
 - [Boolean Standards](../03-golang/02-boolean-standards.md)

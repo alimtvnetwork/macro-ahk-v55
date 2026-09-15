@@ -1,7 +1,7 @@
 # Cross-Language Database Naming Convention — PascalCase
 
-> **Version:** 1.0.0  
-> **Updated:** 2026-03-09  
+> **Version:** 1.0.0
+> **Updated:** 2026-03-09
 > **Applies to:** PHP (SQLite), Go (SQLite), TypeScript (frontend references)
 
 ---
@@ -305,8 +305,8 @@ type Project struct {
 
 ## Cross-Reference
 
-- [Cross-Language Code Style](./04-code-style/00-overview.md) — Formatting rules
-- [PHP Naming Conventions](../04-php/00-overview.md) — PHP-specific naming
-- [Go Coding Standards](../03-golang/04-golang-standards-reference/00-overview.md) — Go-specific naming
-- [Master Coding Guidelines](./15-master-coding-guidelines/00-overview.md) — Consolidated cross-language reference
-- [Issues & Fixes Log](./01-issues-and-fixes-log.md) — Full historical fixes
+- [Cross-Language Code Style](./04-code-style/01-index.md) — Formatting rules
+- [PHP Naming Conventions](../04-php/01-index.md) — PHP-specific naming
+- [Go Coding Standards](../03-golang/04-golang-standards-reference/01-index.md) — Go-specific naming
+- [Master Coding Guidelines](./15-master-coding-guidelines/01-index.md) — Consolidated cross-language reference
+- [Issues & Fixes Log](./02-issues-and-fixes-log.md) — Full historical fixes

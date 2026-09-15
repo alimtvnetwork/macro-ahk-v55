@@ -1,7 +1,7 @@
 # Consistency Report — AI Optimization
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
+**Version:** 3.2.0
+**Updated:** 2026-04-16
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | Criterion | Status |
 |-----------|--------|
-| `00-overview.md` present | ✅ |
+| `01-index.md` present | ✅ |
 | `97-acceptance-criteria.md` present | ✅ |
 | `99-consistency-report.md` present | ✅ |
 | Lowercase kebab-case naming | ✅ |
@@ -22,7 +22,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 00 | `00-overview.md` | ✅ Present |
+| 00 | `01-index.md` | ✅ Present |
 | 01 | `01-anti-hallucination-rules.md` | ✅ Present |
 | 02 | `02-ai-quick-reference-checklist.md` | ✅ Present |
 | 03 | `03-common-ai-mistakes.md` | ✅ Present |

@@ -1,7 +1,7 @@
 # Consistency Report — Coding Guidelines
 
-**Version:** 3.2.0  
-**Last Updated:** 2026-04-16  
+**Version:** 3.2.0
+**Last Updated:** 2026-04-16
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | Criterion | Status |
 |-----------|--------|
-| `00-overview.md` present | ✅ |
+| `01-index.md` present | ✅ |
 | `99-consistency-report.md` present | ✅ |
 | Lowercase kebab-case naming | ✅ All files compliant |
 | Unique numeric sequence prefixes | ✅ |
@@ -23,9 +23,9 @@
 
 | # | File | Status |
 |---|------|--------|
-| 00 | `00-overview.md` | ✅ Present |
-| — | `consolidated-review-guide.md` | ✅ Present |
-| — | `consolidated-review-guide-condensed.md` | ✅ Present |
+| 00 | `01-index.md` | ✅ Present |
+| — | `05-consolidated-review-guide.md` | ✅ Present |
+| — | `04-consolidated-review-guide-condensed.md` | ✅ Present |
 | 97 | `97-acceptance-criteria.md` | ✅ Present |
 | 99 | `99-consistency-report.md` | ✅ Present |
 
@@ -46,8 +46,8 @@
 | 11 | `11-security/` | 6 | ✅ | ✅ | — |
 | 21 | `21-app/` | 1 | ✅ | — | — |
 | 22 | `22-app-issues/` | 1 | ✅ | — | — |
-| 23 | `23-app-database/` | 1 | ✅ | — | — |
-| 24 | `24-app-design-system-and-ui/` | 1 | ✅ | — | — |
+| 23 | `23-app-db/` | 1 | ✅ | — | — |
+| 24 | `24-app-ui-design-system/` | 1 | ✅ | — | — |
 
 **Total:** 5 root files + 14 subfolders (~121 files)
 

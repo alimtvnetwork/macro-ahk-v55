@@ -1,8 +1,8 @@
 # Types Folder Convention & Common Type Aliases
 
-**Version:** 3.2.0  
-**Updated:** 2026-04-16  
-**Applies to:** All languages (Go, TypeScript, PHP, Rust, C#)  
+**Version:** 3.2.0
+**Updated:** 2026-04-16
+**Applies to:** All languages (Go, TypeScript, PHP, Rust, C#)
 **Source:** Derived from `apperror` package patterns, content type conventions, and real-world `riseup-asia-uploader` codebase
 
 ---
@@ -428,7 +428,7 @@ func Toggle() apperror.BoolResult { ... }
 - [Code Mutation Avoidance](./18-code-mutation-avoidance.md) — Immutable type values
 - [Strict Typing](./13-strict-typing.md) — No `any`/`interface{}`
 - [Generic Return Types](./25-generic-return-types.md) — Result[T] patterns
-- [Boolean Principles](./02-boolean-principles.md) — Boolean naming in type definitions
+- [Boolean Principles](./03-boolean-principles.md) — Boolean naming in type definitions
 
 ---
 

@@ -1,7 +1,7 @@
 # HttpMethod Enum — `pkg/enums/httpmethodtype/variant.go`
 
-> **Version**: 3.0.0  
-> **Last updated**: 2026-02-28  
+> **Version**: 3.0.0
+> **Last updated**: 2026-02-28
 > **Shared package**: All CLIs import from `pkg/enums/httpmethodtype`
 
 ---
@@ -243,6 +243,6 @@ type Request struct {
 
 ## Cross-References
 
-- Enum architecture: `spec/10-brun-cli/01-backend/19-enum-architecture.md` §7
-- Audit report: `spec/23-how-app-issues-track/07-magic-string-tuple-return-audit.md`
+- Enum architecture: `02-spec/10-brun-cli/01-backend/19-enum-architecture.md` §7
+- Audit report: `02-spec/23-how-app-issues-track/07-magic-string-tuple-return-audit.md`
 - Enum standard memory: `architecture/enum-standard`

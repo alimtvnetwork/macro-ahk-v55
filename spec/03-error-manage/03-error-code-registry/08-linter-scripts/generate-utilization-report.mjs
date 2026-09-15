@@ -2,7 +2,7 @@
 
 /**
  * Auto-generates error-code-utilization-report.md from error-codes-master.json.
- * Usage: node spec/07-error-code-registry/linter-scripts/generate-utilization-report.mjs
+ * Usage: node 02-spec/07-error-code-registry/linter-scripts/generate-utilization-report.mjs
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -11,8 +11,8 @@ import { fileURLToPath } from 'url';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dir, '../../..');
-const MASTER = resolve(ROOT, 'spec/07-error-code-registry/error-codes-master.json');
-const OUTPUT = resolve(ROOT, 'spec/07-error-code-registry/error-code-utilization-report.md');
+const MASTER = resolve(ROOT, '02-spec/07-error-code-registry/error-codes-master.json');
+const OUTPUT = resolve(ROOT, '02-spec/07-error-code-registry/error-code-utilization-report.md');
 
 const master = JSON.parse(readFileSync(MASTER, 'utf-8'));
 const today = new Date().toISOString().slice(0, 10);
@@ -110,7 +110,7 @@ ${unallocRows.join('\n')}
 
 ---
 
-*Report auto-generated from \`spec/07-error-code-registry/error-codes-master.json\`. Run \`npm run validate:errors\` to verify integrity.*
+*Report auto-generated from \`02-spec/07-error-code-registry/error-codes-master.json\`. Run \`npm run validate:errors\` to verify integrity.*
 `;
 
 writeFileSync(OUTPUT, report, 'utf-8');

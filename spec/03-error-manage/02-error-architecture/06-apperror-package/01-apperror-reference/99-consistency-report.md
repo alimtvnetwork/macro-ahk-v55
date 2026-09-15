@@ -1,7 +1,7 @@
 # Consistency Report: AppError Package Reference
 
-**Version:** 3.2.0  
-**Generated:** 2026-04-02  
+**Version:** 3.2.0
+**Generated:** 2026-04-02
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
 | 2 | `01-overview-and-stack.md` | ✅ Present |
 | 3 | `02-apperror-struct.md` | ✅ Present |
 | 4 | `03-result-types.md` | ✅ Present |

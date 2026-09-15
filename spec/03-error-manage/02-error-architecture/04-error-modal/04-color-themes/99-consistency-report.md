@@ -1,7 +1,7 @@
 # Consistency Report: Color Themes
 
-**Version:** 3.2.0  
-**Generated:** 2026-04-02  
+**Version:** 3.2.0
+**Generated:** 2026-04-02
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
 | 2 | `01-design-tokens.md` | ✅ Present |
 | 3 | `02-backend-tab-colors.md` | ✅ Present |
 | 4 | `03-frontend-and-ui-colors.md` | ✅ Present |
@@ -25,7 +25,7 @@
 |-------|--------|
 | Lowercase kebab-case | ✅ All files compliant |
 | Numeric prefixes | ✅ All files prefixed |
-| `00-overview.md` present | ✅ Yes |
+| `01-index.md` present | ✅ Yes |
 
 ---
 
@@ -42,9 +42,9 @@
 
 | Source | Target | Status |
 |--------|--------|--------|
-| `00-overview.md` → `../00-overview.md` | ✅ Valid |
-| `00-overview.md` → `../03-error-modal-reference/00-overview.md` | ✅ Valid |
-| `00-overview.md` → `../../03-notification-colors.md` | ✅ Valid |
+| `01-index.md` → `../01-index.md` | ✅ Valid |
+| `01-index.md` → `../03-error-modal-reference/01-index.md` | ✅ Valid |
+| `01-index.md` → `../../03-notification-colors.md` | ✅ Valid |
 
 ---
 

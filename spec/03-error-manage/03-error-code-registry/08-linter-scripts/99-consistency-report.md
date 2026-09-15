@@ -1,7 +1,7 @@
 # Consistency Report: Linter Scripts
 
-**Version:** 3.2.0  
-**Generated:** 2026-03-22  
+**Version:** 3.2.0
+**Generated:** 2026-03-22
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
 | 2 | `check-utilization-threshold.mjs` | ✅ Present |
 | 3 | `detect-collisions.mjs` | ✅ Present |
 | 4 | `generate-utilization-report.mjs` | ✅ Present |

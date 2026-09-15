@@ -5,7 +5,7 @@
  * Validates that no two modules have overlapping ecosystem integer codes
  * across all error-codes.json index files.
  * 
- * Usage: node spec/07-error-code-registry/scripts/detect-collisions.mjs
+ * Usage: node 02-spec/07-error-code-registry/scripts/detect-collisions.mjs
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../..');
 
-const MASTER_INDEX = resolve(ROOT, 'spec/07-error-code-registry/error-codes-master.json');
+const MASTER_INDEX = resolve(ROOT, '02-spec/07-error-code-registry/error-codes-master.json');
 
 // ── Helpers ──────────────────────────────────────────────────────────
 

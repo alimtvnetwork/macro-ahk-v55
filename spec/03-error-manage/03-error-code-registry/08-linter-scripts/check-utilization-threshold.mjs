@@ -3,7 +3,7 @@
 /**
  * Flags modules whose error code utilization exceeds a threshold.
  * Emits GitHub Actions warnings but does not fail the build.
- * Usage: node spec/07-error-code-registry/scripts/check-utilization-threshold.mjs
+ * Usage: node 02-spec/07-error-code-registry/scripts/check-utilization-threshold.mjs
  */
 
 import { readFileSync } from 'fs';
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 const THRESHOLD = 0.30; // 30%
 
 const __dir = dirname(fileURLToPath(import.meta.url));
-const MASTER = resolve(__dir, '../../..', 'spec/07-error-code-registry/error-codes-master.json');
+const MASTER = resolve(__dir, '../../..', '02-spec/07-error-code-registry/error-codes-master.json');
 const master = JSON.parse(readFileSync(MASTER, 'utf-8'));
 
 function rangeCapacity(mod) {

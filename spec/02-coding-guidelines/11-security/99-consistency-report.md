@@ -1,6 +1,6 @@
 # Consistency Report — Security Guidelines
 
-**Version:** 3.2.0  
+**Version:** 3.2.0
 **Last Updated:** 2026-04-16
 
 ---
@@ -9,7 +9,7 @@
 
 | Criterion | Status |
 |-----------|--------|
-| `00-overview.md` present | ✅ |
+| `01-index.md` present | ✅ |
 | `99-consistency-report.md` present | ✅ |
 | Lowercase kebab-case naming | ✅ |
 | Unique numeric sequence prefixes | ✅ |
@@ -22,7 +22,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 00 | `00-overview.md` | ✅ Present |
+| 00 | `01-index.md` | ✅ Present |
 | 01 | `01-axios-version-control/` | ✅ Present (subfolder, 4 files) |
 | 99 | `99-consistency-report.md` | ✅ Present |
 
@@ -40,4 +40,4 @@ All internal links verified valid. ✅
 
 | Date | Version | Action |
 |------|---------|--------|
-| 2026-04-02 | 1.0.0 | Initial module created; moved Axios version control from `spec/01-app/` |
+| 2026-04-02 | 1.0.0 | Initial module created; moved Axios version control from `02-spec/01-app/` |

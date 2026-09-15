@@ -1,7 +1,7 @@
 # Consistency Report: Error Modal
 
-**Version:** 3.2.0  
-**Generated:** 2026-04-02  
+**Version:** 3.2.0
+**Generated:** 2026-04-02
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Type | Status |
 |---|------|------|--------|
-| 1 | `00-overview.md` | Active | ✅ Present |
+| 1 | `01-index.md` | Active | ✅ Present |
 | 2 | `01-copy-formats.md` | Redirect stub | ✅ Present → `01-copy-formats/` |
 | 3 | `02-react-components.md` | ⚠️ DEPRECATED (v3.0.0 frozen) | ✅ Present → `02-react-components/` |
 | 4 | `03-error-modal-reference.md` | Redirect stub | ✅ Present → `03-error-modal-reference/` |
@@ -48,7 +48,7 @@
 
 | Source | Target | Status |
 |--------|--------|--------|
-| `04-color-themes.md` → `00-overview.md` | ✅ Valid |
+| `04-color-themes.md` → `01-index.md` | ✅ Valid |
 | `04-color-themes.md` → `03-error-modal-reference.md` | ✅ Valid |
 | `04-color-themes.md` → `../03-notification-colors.md` | ✅ Valid |
 | `05-error-history-persistence.md` → `06-suppress-global-error.md` | ✅ Valid |

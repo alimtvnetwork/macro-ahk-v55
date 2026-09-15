@@ -1,7 +1,7 @@
 # Consistency Report: Error Management
 
-**Version:** 3.2.0  
-**Generated:** 2026-03-31  
+**Version:** 3.2.0
+**Generated:** 2026-03-31
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
 | 2 | `97-acceptance-criteria.md` | ✅ Present |
 | 3 | `98-changelog.md` | ✅ Present |
 
@@ -18,7 +18,7 @@
 
 ## Subfolder Compliance
 
-| # | Folder | `00-overview.md` | `99-consistency-report.md` | Status |
+| # | Folder | `01-index.md` | `99-consistency-report.md` | Status |
 |---|--------|-------------------|----------------------------|--------|
 | 1 | `01-error-resolution/` | ✅ | ✅ | ✅ Compliant |
 | 2 | `02-error-architecture/` | ✅ | ✅ | ✅ Compliant |
@@ -26,7 +26,7 @@
 
 ### Nested Subfolder Compliance
 
-| Parent | Subfolder | `00-overview.md` | `99-consistency-report.md` | Status |
+| Parent | Subfolder | `01-index.md` | `99-consistency-report.md` | Status |
 |--------|-----------|-------------------|----------------------------|--------|
 | `01-error-resolution/` | `03-retrospectives/` | ✅ | ✅ | ✅ |
 | `01-error-resolution/` | `04-verification-patterns/` | ✅ | ✅ | ✅ |

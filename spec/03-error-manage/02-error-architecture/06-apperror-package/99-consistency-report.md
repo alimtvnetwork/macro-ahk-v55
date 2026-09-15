@@ -1,7 +1,7 @@
 # Consistency Report: Apperror Package
 
-**Version:** 3.2.0  
-**Generated:** 2026-03-21  
+**Version:** 3.2.0
+**Generated:** 2026-03-21
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
 | 2 | `01-apperror-reference.md` | ✅ Present |
 
 **Total:** 2 files (excluding this report)

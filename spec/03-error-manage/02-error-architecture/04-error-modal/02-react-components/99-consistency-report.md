@@ -1,7 +1,7 @@
 # Consistency Report: React Components
 
-**Version:** 3.2.0  
-**Generated:** 2026-04-01  
+**Version:** 3.2.0
+**Generated:** 2026-04-01
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,7 +10,7 @@
 
 | # | File | Version | Status |
 |---|------|---------|--------|
-| 1 | `00-overview.md` | 4.0.0 | ✅ Present |
+| 1 | `01-index.md` | 4.0.0 | ✅ Present |
 | 2 | `01-typescript-interfaces.md` | 4.0.0 | ✅ Present |
 | 3 | `02-error-store.md` | 4.0.0 | ✅ Present |
 | 4 | `03-api-types.md` | 4.0.0 | ✅ Present |
@@ -30,7 +30,7 @@
 |-------|--------|
 | Lowercase kebab-case | ✅ All files compliant |
 | Numeric prefixes | ✅ All files prefixed |
-| `00-overview.md` present | ✅ Yes |
+| `01-index.md` present | ✅ Yes |
 
 ---
 
@@ -58,11 +58,11 @@ All 9 files are at **v4.0.0** (updated 2026-04-01). ✅
 
 | Source | Target | Status |
 |--------|--------|--------|
-| `00-overview.md` → `../00-overview.md` | ✅ Valid |
-| `00-overview.md` → `../03-error-modal-reference/00-overview.md` | ✅ Valid |
-| `00-overview.md` → `../01-copy-formats/00-overview.md` | ✅ Valid |
-| `00-overview.md` → `../../01-error-handling-reference.md` | ✅ Valid |
-| `00-overview.md` → `../../05-response-envelope/envelope.schema.json` | ✅ Valid |
+| `01-index.md` → `../01-index.md` | ✅ Valid |
+| `01-index.md` → `../03-error-modal-reference/01-index.md` | ✅ Valid |
+| `01-index.md` → `../01-copy-formats/01-index.md` | ✅ Valid |
+| `01-index.md` → `../../01-error-handling-reference.md` | ✅ Valid |
+| `01-index.md` → `../../05-response-envelope/envelope.schema.json` | ✅ Valid |
 | `06-component-source.md` → `../03-error-modal-reference/07-request-chain.md` | ✅ Valid |
 | `06-component-source.md` → `../03-error-modal-reference/08-traversal-details.md` | ✅ Valid |
 

@@ -1,6 +1,6 @@
 # Coding Guidelines — Acceptance Criteria
 
-**Version:** 3.2.0  
+**Version:** 3.2.0
 **Last Updated:** 2026-04-16
 
 ---
@@ -15,10 +15,10 @@
 
 | # | Criterion | Source |
 |---|-----------|--------|
-| AC-001 | Boolean principles define naming (`isX`, `hasX`, `canX`) and evaluation patterns | `01-cross-language/02-boolean-principles/00-overview.md` |
+| AC-001 | Boolean principles define naming (`isX`, `hasX`, `canX`) and evaluation patterns | `01-cross-language/02-boolean-principles/01-index.md` |
 | AC-002 | Casting elimination patterns cover type-safe alternatives to type assertions | `01-cross-language/03-casting-elimination-patterns.md` |
-| AC-003 | Code style defines formatting, naming, and structural conventions | `01-cross-language/04-code-style/00-overview.md` |
-| AC-004 | All guidelines include ❌ (forbidden) and ✅ (compliant) code examples | `01-cross-language/15-master-coding-guidelines/00-overview.md` |
+| AC-003 | Code style defines formatting, naming, and structural conventions | `01-cross-language/04-code-style/01-index.md` |
+| AC-004 | All guidelines include ❌ (forbidden) and ✅ (compliant) code examples | `01-cross-language/15-master-coding-guidelines/01-index.md` |
 | AC-005 | DRY principles documented with refactoring patterns | `01-cross-language/08-dry-principles.md` |
 | AC-006 | Cyclomatic complexity limits defined with enforcement rules | `01-cross-language/06-cyclomatic-complexity.md` |
 
@@ -70,9 +70,9 @@
 
 ## Cross-References
 
-- [Overview](./00-overview.md)
-- [Cross-Language Standards](./01-cross-language/00-overview.md)
-- [TypeScript Standards](./02-typescript/00-overview.md)
-- [Golang Standards](./03-golang/00-overview.md)
-- [PHP Standards](./04-php/00-overview.md)
-- [Rust Standards](./05-rust/00-overview.md)
+- [Overview](./01-index.md)
+- [Cross-Language Standards](./01-cross-language/01-index.md)
+- [TypeScript Standards](./02-typescript/01-index.md)
+- [Golang Standards](./03-golang/01-index.md)
+- [PHP Standards](./04-php/01-index.md)
+- [Rust Standards](./05-rust/01-index.md)

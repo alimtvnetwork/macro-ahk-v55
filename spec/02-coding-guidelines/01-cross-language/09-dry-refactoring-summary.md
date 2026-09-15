@@ -1,9 +1,9 @@
 # DRY Refactoring Project — Complete Summary
 
-> **Status:** 100% Complete  
-> **Duration:** 10 Phases  
-> **Updated:** 2026-03-09  
-**Version:** 3.2.0  
+> **Status:** 100% Complete
+> **Duration:** 10 Phases
+> **Updated:** 2026-03-09
+**Version:** 3.2.0
 
 ---
 
@@ -135,13 +135,13 @@ The 10-phase DRY (Don't Repeat Yourself) refactoring initiative modernized the f
 
 **Goal:** Establish a machine-readable contract for the Universal Response Envelope.
 
-- Created `spec/response-envelope/envelope.schema.json` (JSON Schema Draft 2020-12, v1.0.0)
+- Created `02-spec/response-envelope/envelope.schema.json` (JSON Schema Draft 2020-12, v1.0.0)
 - Pinned Go (`envelope.go`), TypeScript (`types.ts`), and PHP (`EnvelopeBuilder.php`) to schema v1.0.0
 - Added `@schema` reference comments to all three implementations
 - Validated all reference samples against the schema
 - Documented decision in ADR #7
 
-**Files affected:** `spec/response-envelope/envelope.schema.json`, `spec/response-envelope/adr.md`, `spec/response-envelope/changelog.md`
+**Files affected:** `02-spec/response-envelope/envelope.schema.json`, `02-spec/response-envelope/adr.md`, `02-spec/response-envelope/changelog.md`
 
 ---
 
@@ -171,10 +171,10 @@ The 10-phase DRY (Don't Repeat Yourself) refactoring initiative modernized the f
 
 ## Cross-References
 
-- Response Envelope Spec <!-- external: spec/03-error-manage/01-error-resolution/09-response-envelope/04-response-envelope-reference.md -->
-- Envelope JSON Schema <!-- external: spec/03-error-manage/01-error-resolution/09-response-envelope/envelope.schema.json -->
-- ADR #7: JSON Schema Strategy <!-- external: spec/03-error-manage/01-error-resolution/09-response-envelope/01-adr.md -->
-- Response Envelope Overview <!-- external: spec/03-error-manage/01-error-resolution/09-response-envelope/00-overview.md -->
+- Response Envelope Spec <!-- external: 02-spec/03-error-manage/01-error-resolution/09-response-envelope/04-response-envelope-reference.md -->
+- Envelope JSON Schema <!-- external: 02-spec/03-error-manage/01-error-resolution/09-response-envelope/envelope.schema.json -->
+- ADR #7: JSON Schema Strategy <!-- external: 02-spec/03-error-manage/01-error-resolution/09-response-envelope/01-adr.md -->
+- Response Envelope Overview <!-- external: 02-spec/03-error-manage/01-error-resolution/09-response-envelope/01-index.md -->
 
 ---
 

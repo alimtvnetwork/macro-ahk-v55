@@ -1,7 +1,7 @@
 # Consistency Report: Retrospectives
 
-**Version:** 3.2.0  
-**Generated:** 2026-03-21  
+**Version:** 3.2.0
+**Generated:** 2026-03-21
 **Health Score:** 100/100 (A+)
 
 ---
@@ -10,13 +10,14 @@
 
 | # | File | Status |
 |---|------|--------|
-| 1 | `00-overview.md` | ✅ Present |
-| 2 | `01-health-endpoint-mismatch.md` | ✅ Present |
-| 3 | `02-retry-debounce-dedup-fixes.md` | ✅ Present |
-| 4 | `03-zip-finalization-before-return.md` | ✅ Present |
-| 5 | `04-activation-endpoint-mismatch.md` | ✅ Present |
+| 1 | `01-index.md` | ✅ Present |
+| 2 | `02-health-endpoint-mismatch.md` | ✅ Present |
+| 3 | `03-retry-debounce-dedup-fixes.md` | ✅ Present |
+| 4 | `04-zip-finalization-before-return.md` | ✅ Present |
+| 5 | `05-activation-endpoint-mismatch.md` | ✅ Present |
+| 6 | `06-appfault-package-migration.md` | ✅ Present |
 
-**Total:** 5 files (excluding this report)
+**Total:** 6 files (excluding this report)
 
 ---
 
