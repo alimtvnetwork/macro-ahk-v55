@@ -174,9 +174,62 @@ if isCloneTargetFresh {
 }
 ```
 
+#### Pattern F: Boolean Evaluation BEFORE the `if` Statement (Simple One-Variable `if` Checking)
+
+```go
+// ❌ BANNED ANTI-PATTERN:
+// 1. Cramming type assertion assignment and compound condition into one line.
+// 2. Hardcoding magic strings ("Version", "version", "unknown") inline.
+// 3. Returning raw fallback literal instead of a defined constant.
+func extractVersionValue(rawMap map[string]interface{}) string {
+    for _, key := range []string{"Version", "version"} {
+        if v, isString := rawMap[key].(string); isString && len(v) > 0 {
+            return v
+        }
+    }
+
+    return "unknown"
+}
+
+// ✅ MANDATORY CLEAN PATTERN:
+// 1. Zero magic strings: extract lookup keys and defaults into constants.
+// 2. Merge repeated/related strings into reusable collections (versionKeys).
+// 3. Assignment on its own dedicated line.
+// 4. Affirmative boolean (hasContent) pre-evaluated BEFORE the if statement.
+// 5. Clean vertical breathing room (blank line before if).
+// 6. Dead-simple if statement evaluating exactly ONE variable.
+// 7. Return defined constant (VersionUnknown) instead of raw magic string literal.
+const (
+    VersionUnknown  = "unknown"
+    versionKeyUpper = "Version"
+    versionKeyLower = "version"
+)
+
+var versionKeys = []string{versionKeyUpper, versionKeyLower}
+
+func extractVersionValue(rawMap map[string]interface{}) string {
+    for _, key := range versionKeys {
+        v, isString := rawMap[key].(string)
+        hasContent := isString && len(v) > 0
+
+        if hasContent {
+            return v
+        }
+    }
+
+    return VersionUnknown
+}
+```
+
 3. **No Inverted Success Checks:**
    - Never invert positive success checks (e.g. `!response.isSuccess`).
    - Use explicit failure states (e.g. `response.isFail`, `isError`).
+
+7. **Boolean Evaluation Must Occur BEFORE the `if` Statement (Simple One-Variable `if` Checking):**
+   - **Total Ban on Inline Compound Assignments (`if init; cond`):** NEVER cram variable declarations, type assertions, or multi-part boolean checks into the `if` header (e.g. `if v, isString := rawMap[key].(string); isString && len(v) > 0 {`).
+   - **Multi-Line Statement Separation:** Put assignments on their own dedicated line, evaluate booleans affirmatively on their own line *before* the `if`, and place a blank line before the `if`.
+   - **Simple One-Variable Checking:** The `if` statement itself must be dead simple, evaluating exactly ONE clean boolean variable (e.g. `if hasContent { ... }`).
+   - **Zero Magic Strings & Constant Returns:** Replace raw literals (`"unknown"`, `"Version"`, `"version"`) with named constants (`VersionUnknown`, `versionKeys`). Functions must return defined constants rather than raw string literals.
 
 4. **Zero Tolerance for Nested `if` (Nesting Depth <= 1):**
    - No `if` statements inside another `if` block.
@@ -195,8 +248,20 @@ if isCloneTargetFresh {
 
 - **No Releases:** Strictly forbidden from bumping versions or cutting releases.
 - **No Test Execution:** Test execution is disabled unless explicitly commanded by the repository owner.
-- **Atomic Change Tracking:** Append all modified files to `.lovable/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.lovable/test-inventory.json`.
+- **Atomic Change Tracking:** Append all modified files to `.ai-memory/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.ai-memory/test-inventory.json`.
 - **Linter:** `python linter-scripts/check-enum-and-boolean.py`
+
+## Fast File Discovery & Reading via Python Toolchain (Mandatory Acceleration)
+
+To avoid 50-result tool truncation limits and eliminate multi-turn exploratory roundtrips, the AI agent MUST use the repository's dedicated Python discovery scripts first:
+- **Inventory Target Files:** `python 03-ai-scripts/11-fast-file-scanner.py --lang go,ts --limit 100 --stats`
+- **Fast Cached Grep (<15ms):** `python 03-ai-scripts/12-fast-cached-grep.py --pattern "<pattern>" --lang go --limit 50`
+- **Sub-Millisecond Folder Explorer & Reader:** `python 03-ai-scripts/17-fast-file-reader.py --list-folder <dir> --ext .go --limit 50`
+- **Read Target File:** `python 03-ai-scripts/17-fast-file-reader.py --read-file <file-path> --max-bytes 100000`
+- **Fast Pattern Search:** `python 03-ai-scripts/17-fast-file-reader.py --search-pattern "<pattern>" --limit 50`
+- **Codebase Topology:** `python 03-ai-scripts/18-codebase-topology-discoverer.py --summary`
+
+---
 
 ## Routine Execution Policy
 

@@ -20,10 +20,11 @@ Autonomously refactors code violations against `02-spec/02-coding-guidelines/` i
 - **Fluent Predicates:** Enforce `IsCountOtherThan(N)`, `IsEmpty()`, `HasRecord()`, `IsDefined()` at call sites instead of compound checks (`err != nil || len(...) != N`).
 - **No Releases (Strict Policy):** Strictly forbidden from bumping versions or cutting releases at the end of this task.
 - **TOTAL BAN on Test Running & Build Checking:** Test execution (`go test`, `pytest`, python runners) and build checks (`go build`, compiler verification) are strictly banned. Testing and builds are verified later on in CI/CD.
-- **Atomic Change Tracking:** Append all modified files to `.lovable/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.lovable/test-inventory.json` for subsequent CI/CD verification.
+- **Atomic Change Tracking:** Append all modified files to `.ai-memory/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.ai-memory/test-inventory.json` for subsequent CI/CD verification.
 - **Targeted Batch Verification:** Run targeted linter / autofixer on the modified files in the batch (e.g. `python linter-scripts/check-nested-ifs.py <files>` or `08-naming-autofixer.py <files>`). DO NOT run `06-cicd-local-runner.py`, test runners, or full builds (`npm run build`, `go build ./...`) during routine batch fixes.
 - **Consolidated Commits:** NEVER commit isolated 1-2 plan/doc files alone. Commit all modified source files, tests, and plans together as a single atomic batch.
 - **Immediate Git Push:** Always push immediately to remote (`git push origin <branch>`) after every commit.
+- **Remote CI/CD Monitoring & Dynamic Waiting (GitMap Pipeline-AI):** When monitoring or checking remote CI/CD status, agents MUST follow GitMap (`gitmap pipeline-ai status --json` or alias `gitmap pl-ai status -t <sec>`) and strictly sleep based on `etaSeconds` (ETA > 120s: wait 20s-30s; 60s < ETA <= 120s: wait 10s-20s; ETA <= 60s: wait 5s-10s) rather than rapid polling (`gh run view` in tight loops) to eliminate credit waste.
 
 ## Banned Operations Checklist (TOTAL BAN — Auto-Reject on Violation)
 
@@ -32,6 +33,19 @@ Autonomously refactors code violations against `02-spec/02-coding-guidelines/` i
 - [ ] **NO RUNNER SCRIPTS (TOTAL BAN):** NEVER launch background test runners, worker pools, or test inventory loops during routine execution.
 - [ ] **NO AUTOMATIC RELEASES (TOTAL BAN):** NEVER bump versions, update changelogs, or trigger releases unless explicitly commanded by the user.
 - [ ] **NO PER-FILE COMMITTING (TOTAL BAN):** NEVER commit each file individually as you work (e.g. running `git commit` after editing File 1, then another commit after File 2). Committing file-by-file pollutes git history, creates subagent lock collisions, and breaks atomic changes. All modified files across the turn must be accumulated and committed together in a single atomic commit at the final step.
+- [ ] **NO RAPID CI/CD POLLING (TOTAL BAN):** NEVER query or loop rapidly (`gh run view` in tight loops) when inspecting remote CI/CD pipelines. Agents MUST query pipeline state using GitMap Pipeline-AI (`gitmap pipeline-ai status --json` or `gitmap pl-ai status -t <sec>`) and strictly wait/sleep based on `etaSeconds` to eliminate credit waste.
+
+---
+
+## Fast File Discovery & Reading via Python Toolchain (Mandatory Acceleration)
+
+To avoid 50-result tool truncation limits and eliminate multi-turn exploratory roundtrips, the AI agent MUST use the repository's dedicated Python discovery scripts first:
+- **Inventory Target Files:** `python 03-ai-scripts/11-fast-file-scanner.py --lang go,ts --limit 100 --stats`
+- **Fast Cached Grep (<15ms):** `python 03-ai-scripts/12-fast-cached-grep.py --pattern "<pattern>" --lang go --limit 50`
+- **Sub-Millisecond Folder Explorer & Reader:** `python 03-ai-scripts/17-fast-file-reader.py --list-folder <dir> --ext .go --limit 50`
+- **Read Target File:** `python 03-ai-scripts/17-fast-file-reader.py --read-file <file-path> --max-bytes 100000`
+- **Fast Pattern Search:** `python 03-ai-scripts/17-fast-file-reader.py --search-pattern "<pattern>" --limit 50`
+- **Codebase Topology:** `python 03-ai-scripts/18-codebase-topology-discoverer.py --summary`
 
 ---
 

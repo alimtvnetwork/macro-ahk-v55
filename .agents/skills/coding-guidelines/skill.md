@@ -11,7 +11,7 @@ description: >-
 
 /goal You are the Chief Software Architect and Code Reviewer. Enforce, audit, and execute every coding standard, return new line concept, boolean principle, function constraint, error management rule, and type-safety guideline across all languages (Go, TypeScript/React, Python, Rust, Java, C#, PHP). Zero hallucination, zero drive-by refactoring, zero tolerance for guideline violations.
 
-/learn Ingest, understand, and internalize all coding standards from `02-spec/02-coding-guidelines/`, `02-spec/03-error-manage/`, `02-spec/17-consolidated-guidelines/`, and `.lovable/coding-guidelines.md` before reading, modifying, or creating any code.
+/learn Ingest, understand, and internalize all coding standards from `02-spec/02-coding-guidelines/`, `02-spec/03-error-manage/`, `02-spec/17-consolidated-guidelines/`, and `.ai-memory/coding-guidelines.md` before reading, modifying, or creating any code.
 
 ---
 
@@ -41,8 +41,8 @@ When auditing, applying fixes, or creating skills, navigate and respect these ca
 
 | Component | Path / Location | Purpose |
 | :--- | :--- | :--- |
-| **Master Guideline** | `.lovable/coding-guidelines.md` | Single standalone source of truth for AI agents |
-| **Consolidated Spec** | `02-spec/17-consolidated-guidelines/34-compiled-simple-coding-guidelines.md` | Authoritative root spec matching .lovable mirror |
+| **Master Guideline** | `.ai-memory/coding-guidelines.md` | Single standalone source of truth for AI agents |
+| **Consolidated Spec** | `02-spec/17-consolidated-guidelines/34-compiled-simple-coding-guidelines.md` | Authoritative root spec matching .ai-memory mirror |
 | **Cross-Language Specs** | `02-spec/02-coding-guidelines/01-cross-language/` | Detailed chapters (00-overview through 29-no-generated-artifacts) |
 | **Newline Examples** | `02-spec/02-coding-guidelines/01-cross-language/21-newline-styling-examples.md` | Canonical Before/After examples for return new lines |
 | **TypeScript / React** | `02-spec/02-coding-guidelines/02-typescript/` | Strict TS, immutability, React hook guards |
@@ -486,6 +486,59 @@ interface UserDto {
 
 ---
 
+### I. Multi-Line Statement Separation, Simple If Checking & Zero Magic Strings
+
+- **Total Ban on Inline Compound Cramming (`if init; cond`):** NEVER cram variable declarations, type assertions, or multi-part boolean checks into an `if` header to fake vertical line count reduction.
+- **Decomposition Over Compression:** Reducing file size (<100 lines) and function size (<=8-15 lines) MUST be achieved through modular decomposition into sibling files (`_validator.go`, `_helpers.go`), NEVER by compressing statements onto fewer lines.
+- **Zero Magic Strings & Returning Constants:** Never hardcode raw string literals (`"unknown"`, `"Version"`, `"version"`) into function logic or return statements. Merge repeated strings into named constants and return defined constants (`return VersionUnknown`).
+
+```go
+// ❌ BANNED ANTI-PATTERN:
+// 1. Cramming type assertion assignment and compound condition into one line.
+// 2. Hardcoding magic strings ("Version", "version", "unknown") inline.
+// 3. Returning raw fallback literal instead of a defined constant.
+func extractVersionValue(rawMap map[string]interface{}) string {
+    for _, key := range []string{"Version", "version"} {
+        if v, isString := rawMap[key].(string); isString && len(v) > 0 {
+            return v
+        }
+    }
+
+    return "unknown"
+}
+
+// ✅ MANDATORY CLEAN PATTERN:
+// 1. Zero magic strings: extract lookup keys and defaults into constants.
+// 2. Merge repeated/related strings into reusable collections (versionKeys).
+// 3. Assignment on its own dedicated line.
+// 4. Affirmative boolean (hasContent) pre-evaluated BEFORE the if statement.
+// 5. Clean vertical breathing room (blank line before if).
+// 6. Dead-simple if statement evaluating exactly ONE variable.
+// 7. Return defined constant (VersionUnknown) instead of raw magic string literal.
+const (
+    VersionUnknown  = "unknown"
+    versionKeyUpper = "Version"
+    versionKeyLower = "version"
+)
+
+var versionKeys = []string{versionKeyUpper, versionKeyLower}
+
+func extractVersionValue(rawMap map[string]interface{}) string {
+    for _, key := range versionKeys {
+        v, isString := rawMap[key].(string)
+        hasContent := isString && len(v) > 0
+
+        if hasContent {
+            return v
+        }
+    }
+
+    return VersionUnknown
+}
+```
+
+---
+
 ## 2. Hard Rules (Zero Tolerance)
 
 1. **No Generated Code or Artifacts:** Never commit generated code (`*.generated.*`, gRPC/ORM models), cache files (`__pycache__`, `*.pyc`), test reports (`.test-report.*`), compiled binaries (`.exe`, `.dll`, `.so`), or output directories (`build/`, `bin/`) to Git. Proactively ignore them via `.gitignore`.
@@ -495,7 +548,7 @@ interface UserDto {
 5. **No Swallowed Errors:** Every `catch` or error block must log with context (`op` name + key inputs) and rethrow or return typed `AppError`. Silent `catch {}` is a build-fail.
 6. **Narrow Types Only:** No `any`, `unknown`, `interface{}`, `object`, `dynamic`. Narrow trust boundaries immediately with type guards. `Generic<T>` is the only wide-scope tool.
 7. **File Size Caps:** Any file 300 lines max; React component (.tsx) 100 lines max; class or struct 120 lines max.
-8. **No Magic Strings or Numbers:** Use enums or typed constants. Every comparison must be against a named symbol.
+8. **No Magic Strings or Numbers & Return Defined Constants:** Use enums or typed constants. Every comparison, dictionary lookup key, or status return must be against a named symbol. Never return raw string literals (like `"unknown"`, `"error"`, `"default"`) from functions—always return defined constants (`return VersionUnknown`). Merge related string keys into named constants and aggregate them into reusable slices (`var versionKeys = []string{versionKeyUpper, versionKeyLower}`), eliminating inline magic strings.
 9. **Definitions in Dedicated Files:** Types, enums, constants, and interfaces get their own files (e.g., `src/types/`, `src/enums/`), never defined inline next to first use.
 10. **DRY is Priority One:** Duplicate logic across two sites must be extracted immediately.
 11. **Component Modularity:** Small, reusable components. For features with 3+ components, produce a Mermaid diagram first.
@@ -510,6 +563,12 @@ interface UserDto {
 20. **Version Source of Truth:** `version.json` at root is the sole version authority. All languages import or read this file dynamically.
 21. **Affirmative Boolean Parameter & Field Naming (TOTAL BAN on Single-Letter & Bare Names):** Never use single-letter boolean parameters (`v bool`, `b bool`, `val bool`, `flag bool`) or bare verbs/nouns (`stop bool`, `pause bool`, `force bool`, `dryRun bool`, `header bool`, `defined bool`). Always use affirmative prefixes: `isStopOnFail bool`, `isStopped bool`, `isPaused bool`, `isForced bool`, `isDryRun bool`, `hasHeader bool`, `isDefined bool`.
 22. **Result Container Return Types, Pointer Null-Safety & types.go Mandate (`pkg/appfault`):** Multi-value returns returning errors (`(map[K]V, error)`, `([]T, error)`, `(T, error)`) are strictly banned in Go. Functions MUST return `appfault.ResultMap[K, V]`, `appfault.ResultSlice[T]`, or `appfault.Result[T]`, and side-effects MUST return `*appfault.AppError`. All domain payload structs (e.g. `User`, `ScheduleExportBundle`) and repeated generic Result aliases (`type UserSliceResult = appfault.ResultSlice[User]`) MUST be defined in a dedicated `types.go` file within each package as a single reusable named type. All Result inspection methods MUST attach to pointer receivers (`(r *Result[T])`, `(rs *ResultSlice[T])`, `(rm *ResultMap[K, V])`) with line-1 `if r == nil` guards returning safe defaults. Enforce the 4 core predicates: `IsCountOtherThan(N)`, `IsEmpty()`, `HasRecord()`, `IsDefined()`.
+23. **Multi-Line Statement Separation & Simple If Condition Checking:** NEVER cram variable declarations, type assertions, and compound boolean checks into an `if` header (e.g. `if v, isString := rawMap[key].(string); isString && len(v) > 0 {`). You MUST separate them across lines:
+    - **Step 1:** Assignment or type assertion on its own dedicated line (`v, isString := rawMap[key].(string)`).
+    - **Step 2:** Affirmative boolean evaluation on its own dedicated line *before* the `if` (`hasContent := isString && len(v) > 0`).
+    - **Step 3:** One blank line before the `if` statement for vertical breathing room.
+    - **Step 4:** Dead-simple `if` check evaluating exactly ONE boolean variable (`if hasContent { return v }`).
+    - **Step 5:** Zero magic strings: define named constants (`VersionUnknown = "unknown"`, `versionKeyUpper`, `versionKeyLower`), aggregate them (`versionKeys`), and return defined constants (`return VersionUnknown`).
 
 ---
 
@@ -700,7 +759,7 @@ When tasked with auditing, reviewing, or fixing coding guidelines across a codeb
 4. **Step 4: Local CI/CD Pipeline Quality Gate:**
    - Execute targeted file linters / autofixers on modified files ensuring `exit 0`. DO NOT run the full `06-cicd-local-runner.py` during routine guideline turns.
 5. **Step 5: Atomic File Change Tracking:**
-   - Append all modified files to `.lovable/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.lovable/test-inventory.json`.
+   - Append all modified files to `.ai-memory/temp/recent-file-changes.json` under lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`), mapping to associated tests in `.ai-memory/test-inventory.json`.
 6. **Step 6: File Change Summary:**
    - Output a detailed summary in chat listing exactly which files changed, what changed, and why.
 
@@ -723,7 +782,7 @@ When tasked with auditing, reviewing, or fixing coding guidelines across a codeb
 - **NO RELEASES (Strict Policy):** You MUST NOT bump versions, update changelogs, or cut a release at the end of this task. Commits must remain standard development commits. You may only trigger a release if the user explicitly commands you to do so (e.g., "cut a release" or "bump the version").
 - **NO TEST RUNNING (Strict Policy):** Test execution is strictly disabled. You MUST NOT execute unit tests, integration tests, or test suites unless explicitly commanded by the repository owner.
 - **NO FULL CI/CD RUNNER (Strict Policy):** DO NOT run `python 03-ai-scripts/06-cicd-local-runner.py` during routine coding guideline execution turns or micro-batch loops. Running the heavy 28-38 gate pipeline across the entire repository wastes massive amounts of time. Verify code strictly using targeted file-level linters / autofixers on the specific modified files.
-- **Test Inventory & Recent Changes Tracking:** Whenever any file is modified, append its repository-relative path to `.lovable/temp/recent-file-changes.json` under atomic file lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <path>`), cross-referencing `.lovable/test-inventory.json` so associated tests are known for future release verification.
+- **Test Inventory & Recent Changes Tracking:** Whenever any file is modified, append its repository-relative path to `.ai-memory/temp/recent-file-changes.json` under atomic file lock (`python 03-ai-scripts/33-test-inventory-generator.py --record <path>`), cross-referencing `.ai-memory/test-inventory.json` so associated tests are known for future release verification.
 
 ---
 
@@ -753,6 +812,18 @@ When tasked with auditing, reviewing, or fixing coding guidelines across a codeb
 - [ ] **Temp Storage & Pre-Build Clean (R17):** All OS/user temporary files are scoped under `<temp>/gitmap/<category>/` (build, test, purge, downloads). Before running any build, previous build artifacts in the target directory are purged to respect storage and prevent disk bloat.
 - [ ] **GitHub Actions Zero Storage (R18):** Never upload build binaries, logs, test artifacts, or reports in CI workflows (`actions/upload-artifact` is strictly banned in CI). Free tier accounts have an account-wide cap of 0.5 GB (500 MB). Releases belong exclusively in GitHub Releases (`release.yml`), never in Actions artifact storage.
 - [ ] **File Change Summary:** I provided a detailed summary in chat of what files changed, what changed inside them, and why.
+
+---
+
+## Fast File Discovery & Reading via Python Toolchain (Mandatory Acceleration)
+
+To avoid 50-result tool truncation limits and eliminate multi-turn exploratory roundtrips, the AI agent MUST use the repository's dedicated Python discovery scripts first:
+- **Inventory Target Files:** `python 03-ai-scripts/11-fast-file-scanner.py --lang go,ts --limit 100 --stats`
+- **Fast Cached Grep (<15ms):** `python 03-ai-scripts/12-fast-cached-grep.py --pattern "<pattern>" --lang go --limit 50`
+- **Sub-Millisecond Folder Explorer & Reader:** `python 03-ai-scripts/17-fast-file-reader.py --list-folder <dir> --ext .go --limit 50`
+- **Read Target File:** `python 03-ai-scripts/17-fast-file-reader.py --read-file <file-path> --max-bytes 100000`
+- **Fast Pattern Search:** `python 03-ai-scripts/17-fast-file-reader.py --search-pattern "<pattern>" --limit 50`
+- **Codebase Topology:** `python 03-ai-scripts/18-codebase-topology-discoverer.py --summary`
 
 ---
 

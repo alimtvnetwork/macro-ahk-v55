@@ -11,7 +11,25 @@ N = 200
 
 N = total self-loop steps budget. The user may override this number when triggering the prompt.
 
-### Master Task Checklist (Atomic Numbered Steps)
+#### Fast File Discovery & Diagnostic Toolchain (Mandatory Acceleration)
+
+To rapidly locate failing pipeline definitions, broken source files, test fixtures, and error logs without hitting 50-result tool caps, the AI agent MUST utilize the diagnostic toolchain:
+- **Remote Pipeline AI Status (<50ms):** `gitmap pipeline-ai status --json` (or alias `gitmap pl-ai status --json`)
+- **Remote Dynamic Timeout Wait:** `gitmap pipeline-ai status -t <etaSeconds>` (or alias `gitmap pl-ai status -t <sec>`)
+- **Scan Source & Test Files:** `python 03-ai-scripts/11-fast-file-scanner.py --lang go,ts,py --limit 100 --stats`
+- **Fast Cached Pattern Search (<15ms):** `python 03-ai-scripts/12-fast-cached-grep.py --pattern "<error-or-symbol>" --limit 50`
+- **Sub-Millisecond Folder Listing & Reader:** `python 03-ai-scripts/17-fast-file-reader.py --list-folder .github/workflows --limit 20`
+- **Read Workflow or Log File:** `python 03-ai-scripts/17-fast-file-reader.py --read-file .github/workflows/ci.yml`
+- **Codebase Topology Overview:** `python 03-ai-scripts/18-codebase-topology-discoverer.py --summary`
+- **Record Modified Files Under Lock:** `python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`
+
+> [!IMPORTANT]
+> **EXCLUSIVE TEST EXECUTION & RELEASE AUTHORITY:**
+> This prompt (`04-ci-cd-fix-with-release.md`) IS the designated workflow authorized to run the full unit test suites (`python 03-ai-scripts/06-cicd-local-runner.py --all` or `--run-tests`) and trigger the automated version bump and release. Standard `ci-cd-fix` does NOT run unit tests; only `ci-cd-fix-with-release` runs full tests to verify complete green gates before releasing.
+
+---
+
+## Master Task Checklist (Atomic Numbered Steps)
 
 1. [ ] /goal First `N/2` steps (Phase 1): Review the central CI/CD pipeline definitions (`.github/workflows`, `.gitlab-ci.yml`, etc.) and cross-reference them with the local Python runner (`03-ai-scripts/06-cicd-local-runner.py`).
    - **Condition:** If `03-ai-scripts/06-cicd-local-runner.py` does not exist, you must create it immediately.
@@ -19,8 +37,8 @@ N = total self-loop steps budget. The user may override this number when trigger
 2. [ ] /goal Second `N/2` steps (Phase 2): Run the local runner script (`python 03-ai-scripts/06-cicd-local-runner.py --all`) to catch all errors. Singly execute the script in an autonomous self-loop, zeroing in on one failing error per turn (4-part RCA -> surgical fix -> guideline autofixer -> re-verify).
 3. [ ] /goal Finalize CI/CD: Your ultimate goal is to fix and finalize the CI/CD. You must loop until the Python local runner script executes flawlessly with **no errors** (exit code 0) for all registered cases.
 4. [ ] /goal Once Phase 2 exits green, proceed immediately to Phase 3: Final Verification, then Phase 4: Release (version bump, changelog update, git tag, Quick Install one-liners, push, and release creation) using `03-ai-scripts/29-release-orchestrator.py`.
-5. [ ] /learn Ingest `.lovable/cicd-issues/` for domain-specific architectural specifications.
-6. [ ] /learn Ingest `.lovable/strictly-avoid.md` for banned anti-patterns and strict constraints.
+5. [ ] /learn Ingest `.ai-memory/cicd-issues/` for domain-specific architectural specifications.
+6. [ ] /learn Ingest `.ai-memory/strictly-avoid.md` for banned anti-patterns and strict constraints.
 7. [ ] /learn Ingest `02-spec/02-coding-guidelines/02-canonical-size-tier.md` for canonical file and function size tiers.
 8. [ ] /learn Ingest `02-spec/02-coding-guidelines/01-cross-language/01-index.md` for hallucination prevention and micro-tasking.
 9. [ ] /learn Ingest `02-spec/02-coding-guidelines/01-cross-language/01-index.md` for strict relative path citation requirements.
@@ -41,41 +59,44 @@ N, PHASE_1_STEPS, and PHASE_2_STEPS are read-only after the user sets them. Neve
 
 ## Phase 0: Antigravity Skill Bootstrap (Memory Optimization)
 
-Before any execution, check if `.agents/skills/ci-cd-fix/skill.md` exists. If it does NOT exist, create it now with YAML frontmatter:
+Before any execution, check if `.agents/skills/ci-cd-fix-with-release/skill.md` and `.agents/skills/ci-cd-fix/skill.md` exist. If either does NOT exist, create it now with YAML frontmatter:
 
 ```yaml
 ---
-name: ci-cd-fix
+name: ci-cd-fix-with-release
 description: >-
-  Use this skill to autonomously diagnose, fix, and verify CI/CD pipelines using local runner scripts, 4-part RCA, and self-looping.
+  Use this skill to autonomously diagnose and fix CI/CD pipelines using local runner scripts, GitMap pipeline AI with dynamic waiting, 4-part RCA, and execute full release ceremony.
 ---
 ```
 
 ---
 
-## Strict In-Repository Execution & `.lovable/` Bounding Mandate
+## Strict In-Repository Execution & `.ai-memory/` Bounding Mandate
 
 > [!IMPORTANT]
-> **STRICT IN-REPOSITORY EXECUTION & `.lovable/` STORAGE CONTRACT:**
+> **STRICT IN-REPOSITORY EXECUTION & `.ai-memory/` STORAGE CONTRACT:**
 >
 > 1. **In-Codebase Execution Only:** Whenever a Python script (runner, autofixer, linter, test aggregator) is executed or created, it MUST be executed **strictly within the repository root** (current working directory), NEVER outside the codebase or against external arbitrary directories.
-> 2. **Strict Folder Bounding (`.lovable/`):** All AI scripts, local runners, autofixers, helper utilities, memory issue logs, and planning files MUST be created inside the `.lovable/` folder:
+> 2. **Strict Folder Bounding (`.ai-memory/`):** All AI scripts, local runners, autofixers, helper utilities, memory issue logs, and planning files MUST be created inside the `.ai-memory/` folder:
 >    - Python AI Scripts: `03-ai-scripts/` (e.g. `01-file-manipulator.py`, `05-guideline-autofixer.py`, `06-cicd-local-runner.py`).
->    - RCA & Issue Logs: `.lovable/memory/issues/` and `.lovable/cicd-issues/`.
->    - Execution Plans & Subtasks: `.lovable/plans/pending/`, `.lovable/plans/subtasks/`.
->    - Coding Guidelines Mirror: `.lovable/coding-guidelines.md`.
-> 3. **Strict Relative Git Paths (TOTAL BAN on Absolute Paths / `file:///` URIs):** All file paths, markdown links, citations, and subtask paths inside plans, RCA logs (`.lovable/memory/issues/`), scripts, and code comments MUST be strictly relative paths from the git root (e.g., `02-spec/03-error-manage/01-index.md`, `.lovable/plans/01-index.md`, `cmd/main.go`). NEVER write absolute OS paths (`/absolute/path/to/...`, `/absolute/path/to/...`, `/home/...`) or absolute file URIs (`file:///...`).
+>    - RCA & Issue Logs: `.ai-memory/memory/issues/` and `.ai-memory/cicd-issues/`.
+>    - Execution Plans & Subtasks: `.ai-memory/plans/pending/`, `.ai-memory/plans/subtasks/`.
+>    - Coding Guidelines Mirror: `.ai-memory/coding-guidelines.md`.
+> 3. **Strict Relative Git Paths (TOTAL BAN on Absolute Paths / `file:///` URIs):** All file paths, markdown links, citations, and subtask paths inside plans, RCA logs (`.ai-memory/memory/issues/`), scripts, and code comments MUST be strictly relative paths from the git root (e.g., `02-spec/03-error-manage/01-index.md`, `.ai-memory/plans/01-index.md`, `cmd/main.go`). NEVER write absolute OS paths (`/absolute/path/to/...`, `/absolute/path/to/...`, `/home/...`) or absolute file URIs (`file:///...`).
 >    - ❌ **BAD:** `[SSH Commands](file:///absolute/path/to/...)`
 >    - ✅ **GOOD:** `[SSH Commands]`02-spec/13-generic-cli/01-index.md)`
 > 4. **No External or Random File Creation:** NEVER write scripts, temporary test scripts, or scratch files to root, `/tmp`, global system paths, or outside the repository boundary.
 > 5. **Cross-Platform Python CI Mandate (TOTAL BAN on new `.sh` scripts in CI):** All newly created or refactored CI/CD verification tools, determinism checks, fixtures, and linter jobs MUST be implemented in pure, cross-platform Python (`.py`). Legacy `.sh` scripts must be converted to `.py` scripts so all pipelines run natively across Linux, macOS, and Windows without relying on bash emulation.
-> 6. **Temp & Failure Folder Isolation:** All temporary directories, runner caches, and test artifacts MUST be strictly placed in `.lovable/temp/`. Creating `.tmp/` at the repository root or outside `.lovable/` is strictly forbidden.
->    - Dedicated Failure Directory: `.lovable/temp/failures/` is the dedicated folder where failed tests and failed quality gates write error logs (`<test-or-job-name>.log`).
+> 6. **Temp & Failure Folder Isolation:** All temporary directories, runner caches, and test artifacts MUST be strictly placed in `.ai-memory/temp/`. Creating `.tmp/` at the repository root or outside `.ai-memory/` is strictly forbidden.
+>    - Dedicated Failure Directory: `.ai-memory/temp/failures/` is the dedicated folder where failed tests and failed quality gates write error logs (`<test-or-job-name>.log`).
 >    - Passing Tests Completely Silent: Passing tests must produce ZERO filesystem artifacts (zero files written) and remain completely silent in output logs.
-> 7. **Runner In-Flight ETA Wait Protocol:** When running background commands, the runner dynamically writes live status and remaining ETA to `.lovable/temp/runner-eta.json` (emitting in-flight heartbeats strictly every 25 seconds or more). If an agent inspects an active background job and it is still running, the agent MUST sleep/wait for **1 minute (60 seconds) each time**, or dynamically sleep for the remaining ETA duration read from `.lovable/temp/runner-eta.json` (or based on previous total approximate delay) instead of busy-polling or querying in loops.
-> 8. **Centralized Test Inventory & Incremental Caching:** All unit tests are cataloged in `.lovable/test-inventory.json` with strictly repository-relative paths (`target_file`, `test_file`). First run executes all tests to establish baseline timings; subsequent runs execute incrementally only if target code files or test files change. Slow test threshold defaults to `4.0s` (configurable via `GITMAP_SLOW_TEST_THRESHOLD`).
+> 7. **Runner In-Flight ETA Wait & GitMap Dynamic Waiting Protocol:**
+>    - **Local Runner:** The runner dynamically writes live status and remaining ETA to `.ai-memory/temp/runner-eta.json` (emitting in-flight heartbeats strictly every 25 seconds or more). If an agent inspects an active background job and it is still running, the agent MUST sleep/wait for **1 minute (60 seconds) each time**, or dynamically sleep for the remaining ETA duration read from `.ai-memory/temp/runner-eta.json` instead of busy-polling or querying in loops.
+>    - **Remote CI/CD Pipelines (GitMap Mandate):** When checking remote pipeline workflows, the agent MUST use `gitmap pipeline-ai status --json` (or alias `gitmap pl-ai status --json`). To inspect running pipelines without burning tokens or user credits, use `gitmap pipeline-ai status -t <etaSeconds>` (or alias `gitmap pl-ai status -t <sec>`). Tight-loop polling (e.g. `gh run view` in rapid loops) is STRICTLY BANNED. Adaptive sleep intervals: ETA > 120s wait 20s-30s; 60s < ETA <= 120s wait 10s-20s; ETA <= 60s wait 5s-10s.
+>    - **Targeted Failure Extraction:** Extract targeted failure lines (`##[error]`, `FAIL:`, compile errors) from GitMap output directly into 4-part RCA files without reading noisy passing step logs.
+> 8. **Centralized Test Inventory & Incremental Caching:** All unit tests are cataloged in `.ai-memory/test-inventory.json` with strictly repository-relative paths (`target_file`, `test_file`). Modified files MUST be recorded safely under lock via `python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`. First run executes all tests to establish baseline timings; subsequent runs execute incrementally only if target code files or test files change. Slow test threshold defaults to `4.0s` (configurable via `GITMAP_SLOW_TEST_THRESHOLD`).
 > 9. **Dual-Queue Worker Pools:** Slow tests run in a dedicated 4-worker pool running at most 2 tests at a time per batch. Fast tests run in a 4-worker pool running at most 4 tests at a time, pulling in chunks of 100 tests from the test inventory queue until all are complete.
-> 10. **Dynamic ETA Sleep Protocol:** The AI agent reads `.lovable/temp/runner-eta.json`, sleeps for the estimated wait time rather than looping, and if still active upon waking, re-checks remaining ETA and sleeps again to avoid burning tokens.
+> 10. **Dynamic ETA Sleep Protocol:** The AI agent reads `.ai-memory/temp/runner-eta.json` (or `gitmap pipeline-ai status --json`), sleeps for the estimated wait time rather than looping, and if still active upon waking, re-checks remaining ETA and sleeps again to avoid burning tokens.
 > 11. **Zero-Storage GitHub Actions Mandate (Total Ban on CI Artifact Uploads):** Workflows MUST NOT upload test outputs, coverage files, Playwright reports, or drift summaries via `actions/upload-artifact`. Free-tier accounts have a strict 0.5 GB shared quota across all repositories. All reports, failures, and summaries MUST be emitted directly to `$GITHUB_STEP_SUMMARY`, console stdout (`cat log.txt`), or sticky PR comments with zero storage consumption. Only true GitHub release assets (binaries/tarballs on tagged releases) are permitted.
 
 ---
@@ -90,11 +111,11 @@ description: >-
 
 Every step must be **singly done** using bounded self-looping turns. Do NOT try to do scanning, fixing, updating runner, and releasing in a single turn.
 
-- **Self-Loop Step 1 (Extract Pipeline Name from Screenshot):**
-  1. Carefully read the image to extract:
+- **Self-Loop Step 1 (Extract Pipeline Name from Screenshot or GitMap):**
+  1. Carefully read the image or query `gitmap pipeline-ai status --json` (or alias `gitmap pl-ai status -t <etaSeconds>`) to extract:
      - The **pipeline or workflow name** (e.g. `"build-and-test"`, `"CI / lint"`, `"Deploy to staging"`, `"test-matrix"`).
      - The **failing job/step name** (marked with ❌ or "Failure").
-     - The **error text, log snippets, or stack traces** visible in the screenshot.
+     - The **error text, log snippets, or stack traces** (using GitMap's targeted failure extraction for `##[error]`, `FAIL:`, compile errors).
   2. Scan repository CI/CD files (`.github/workflows/*.yml`, `.gitlab-ci.yml`, etc.) to locate whatever newly added pipeline jobs, steps, or linter scripts correspond to that pipeline name.
 
 - **Self-Loop Step 2 (FIRST ACTION: Update Python Runner Script):**
@@ -115,10 +136,10 @@ Every step must be **singly done** using bounded self-looping turns. Do NOT try 
 
 - **Self-Loop Step 4 (RCA & Zero In on the Specific Error):**
   1. For the zeroed-in failure, write a mandatory 4-part RCA file:
-     - Path: `.lovable/memory/issues/xx-<slug>.md` (next sequential number)
+     - Path: `.ai-memory/memory/issues/xx-<slug>.md` (next sequential number)
      - Sections: **Why it happened / How it happened / Root Cause / Code Fix**
-  2. Update `.lovable/01-index.md` and `.lovable/cicd-index.md`.
-  3. Append any newly identified anti-pattern to `.lovable/strictly-avoid.md`.
+  2. Update `.ai-memory/01-index.md` and `.ai-memory/cicd-index.md`.
+  3. Append any newly identified anti-pattern to `.ai-memory/strictly-avoid.md`.
 
 - **Self-Loop Step 5 (Surgical Code Fix):**
   1. Open the specific offending source file and line identified in the RCA.
@@ -126,6 +147,10 @@ Every step must be **singly done** using bounded self-looping turns. Do NOT try 
   3. Run the guideline autofixer on modified files:
      ```text
      python 03-ai-scripts/05-guideline-autofixer.py <modified-files>
+     ```
+  4. Record modified files safely under lock:
+     ```text
+     python 03-ai-scripts/33-test-inventory-generator.py --record <modified-files>
      ```
 
 - **Self-Loop Step 6 (Re-Verify & Loop):**
@@ -328,9 +353,9 @@ WHILE (STEP < PHASE_2_STEPS):
 
     ELSE:
         3. Parse failure: identify exact failing job, error message, file, and line.
-        4. Enqueue into .lovable/plans/pending/XX-cicd-<slug>.md (see Error Enqueuing section).
-        5. Record in .lovable/cicd-issues/xx-<slug>.md and update index.
-        6. Document 4-part RCA in .lovable/memory/issues/xx-<slug>.md.
+        4. Enqueue into .ai-memory/plans/pending/XX-cicd-<slug>.md (see Error Enqueuing section).
+        5. Record in .ai-memory/cicd-issues/xx-<slug>.md and update index.
+        6. Document 4-part RCA in .ai-memory/memory/issues/xx-<slug>.md.
         7. Apply the minimal surgical code fix.
         8. Run: python 03-ai-scripts/05-guideline-autofixer.py <modified-files>
         9. Loop immediately to step 1. DO NOT stop.
@@ -369,7 +394,7 @@ If any job shows ⏱ TIMEOUT:
    - Job hangs with no output for >30s → fix the subprocess call, not the timer.
    - Open `06-cicd-local-runner.py`, update `JOB_TIMEOUT_SEC`, save, re-run.
 4. Re-run the runner. The timeout adjustment counts as one Phase 2 loop step.
-5. Document the timeout change in `.lovable/cicd-issues/`.
+5. Document the timeout change in `.ai-memory/cicd-issues/`.
 
 ---
 
@@ -377,7 +402,7 @@ If any job shows ⏱ TIMEOUT:
 
 On every ❌ FAIL or ⏱ TIMEOUT, BEFORE applying any code fix, do both:
 
-### A. Enqueue into Plan Tasks (`.lovable/plans/pending/XX-cicd-<slug>.md`)
+### A. Enqueue into Plan Tasks (`.ai-memory/plans/pending/XX-cicd-<slug>.md`)
 
 ```markdown
 # CI/CD Task: <short failure description>
@@ -401,9 +426,9 @@ On every ❌ FAIL or ⏱ TIMEOUT, BEFORE applying any code fix, do both:
 - [ ] pending
 ```
 
-Update `.lovable/plans/01-index.md` immediately.
+Update `.ai-memory/plans/01-index.md` immediately.
 
-### B. Record in CI/CD Issues (`.lovable/cicd-issues/xx-<slug>.md`)
+### B. Record in CI/CD Issues (`.ai-memory/cicd-issues/xx-<slug>.md`)
 
 ```markdown
 # CI/CD Issue: <short failure description>
@@ -423,10 +448,10 @@ Update `.lovable/plans/01-index.md` immediately.
 <what was changed>
 
 ## Plan Task
-Enqueued at `.lovable/plans/pending/XX-cicd-<slug>.md`
+Enqueued at `.ai-memory/plans/pending/XX-cicd-<slug>.md`
 ```
 
-Update `.lovable/cicd-index.md` in the same operation. Never delete existing entries.
+Update `.ai-memory/cicd-index.md` in the same operation. Never delete existing entries.
 
 ---
 
@@ -437,9 +462,9 @@ Update `.lovable/cicd-index.md` in the same operation. Never delete existing ent
 > If any item fails, loop back to Phase 2 immediately.
 
 - [ ] **Full Unit Test & CI/CD Verification (MANDATORY Before Release):** Run `python 03-ai-scripts/06-cicd-local-runner.py --run-tests` one final time. All unit test suites, AST checks, and quality gates MUST pass 100% green (`exit 0`). The release MUST NOT start if any test fails.
-- [ ] **Test Inventory Validation:** Check `.lovable/temp/recent-file-changes.json` against `.lovable/test-inventory.json` and verify all tests associated with modified files pass.
-- [ ] **No open plan tasks from this run:** All `.lovable/plans/pending/XX-cicd-*.md` files created in this run are marked `resolved` or closed.
-- [ ] **All RCA files written:** Every failure encountered has a `.lovable/memory/issues/xx-<slug>.md` with all 4 sections.
+- [ ] **Test Inventory Validation:** Check `.ai-memory/temp/recent-file-changes.json` against `.ai-memory/test-inventory.json` and verify all tests associated with modified files pass.
+- [ ] **No open plan tasks from this run:** All `.ai-memory/plans/pending/XX-cicd-*.md` files created in this run are marked `resolved` or closed.
+- [ ] **All RCA files written:** Every failure encountered has a `.ai-memory/memory/issues/xx-<slug>.md` with all 4 sections.
 - [ ] **Coding standards pass:** Run `python 03-ai-scripts/05-guideline-autofixer.py` on all modified files. Zero violations remain.
 - [ ] **Git working tree is clean:** Run `git status`. No untracked or unstaged files. Commit any remaining changes with `fix(ci): final pre-release fixes`.
 
@@ -465,7 +490,7 @@ Update `.lovable/cicd-index.md` in the same operation. Never delete existing ent
 **Primary path — use the exact script at this path:**
 
 ```text
-python .lovable/release/bump_versions.py --type minor --create-release
+python .ai-memory/release/bump_versions.py --type minor --create-release
 ```
 
 The `--create-release` flag handles:
@@ -486,7 +511,7 @@ The `--create-release` flag handles:
 >
 > Every published GitHub / GitLab release page MUST have the **Quick Install One-Liners** prominently placed right at the top of the release body!
 
-Before calling `gh release create` or `glab release create`, the release automation MUST assemble a release notes file (e.g. `.lovable/release/release-notes-vX.Y.Z.md` or `/tmp/release-body.md`) containing:
+Before calling `gh release create` or `glab release create`, the release automation MUST assemble a release notes file (e.g. `.ai-memory/release/release-notes-vX.Y.Z.md` or `/tmp/release-body.md`) containing:
 
 #### 1. Quick Install One-Liners by Project Type
 
@@ -514,13 +539,13 @@ curl -fsSL https://github.com/<owner>/<repo>/releases/download/vX.Y.Z/install.sh
 
 ### Windows (PowerShell)
 ```powershell
-Invoke-WebRequest -Uri https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.ps1 -OutFile install.ps1; .\install.ps1 -TargetDir ".lovable/prompts" -Version "vX.Y.Z"
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.ps1 -OutFile install.ps1; .\install.ps1 -TargetDir ".ai-memory/prompts" -Version "vX.Y.Z"
 ```
 
 ### Unix / Bash
 
 ```bash
-curl -sL https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.sh | bash -s -- ".lovable/prompts" "vX.Y.Z"
+curl -sL https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.sh | bash -s -- ".ai-memory/prompts" "vX.Y.Z"
 ```
 ```
 
@@ -533,16 +558,16 @@ Directly below the Quick Install block, include the extracted `[vX.Y.Z]` section
 Pass the generated notes file via `--notes-file`:
 
 ```bash
-gh release create "vX.Y.Z" --title "vX.Y.Z" --notes-file ".lovable/release/release-notes-vX.Y.Z.md" --generate-notes
+gh release create "vX.Y.Z" --title "vX.Y.Z" --notes-file ".ai-memory/release/release-notes-vX.Y.Z.md" --generate-notes
 ```
 
 *(Note: `--generate-notes` may be appended so GitHub adds commit logs below the install one-liners and changelog, but `--notes-file` is MANDATORY).*
 
 ---
 
-**Fallback chain (if `.lovable/release/bump_versions.py` is missing):**
+**Fallback chain (if `.ai-memory/release/bump_versions.py` is missing):**
 
-1. **Fallback 1:** Read `.lovable/release/release-method.md` to identify all version pin sites. Regenerate `bump_versions.py` from that documentation. Ensure it generates the release notes file with the Quick Install one-liners before running `gh release create`.
+1. **Fallback 1:** Read `.ai-memory/release/release-method.md` to identify all version pin sites. Regenerate `bump_versions.py` from that documentation. Ensure it generates the release notes file with the Quick Install one-liners before running `gh release create`.
 2. **Fallback 2:** If `release-method.md` is also missing, walk the repository with Python `os.walk` (ignoring `.git`, `node_modules`, `.venv`) to discover all version pin sites. Write `release-method.md` documenting them. Generate `bump_versions.py` with the correct `FILES_TO_BUMP`, release notes generator, `git checkout -b`, `git commit`, `git tag`, `git push`, and `gh release create ... --notes-file` logic. Run it.
 3. **Fallback 3:** If discovery fails, stop and ask the user to specify the version pin sites explicitly.
 
@@ -563,10 +588,10 @@ Add the following block at the top of `changelog.md`, directly under `# Changelo
 ### Install <Project Name> vX.Y.Z
 
 Unix/Bash:
-`curl -sL https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.sh | bash -s -- ".lovable/prompts" "vX.Y.Z"`
+`curl -sL https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.sh | bash -s -- ".ai-memory/prompts" "vX.Y.Z"`
 
 PowerShell:
-`Invoke-WebRequest -Uri https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.ps1 -OutFile install.ps1; .\install.ps1 -TargetDir ".lovable/prompts" -Version "vX.Y.Z"`
+`Invoke-WebRequest -Uri https://raw.githubusercontent.com/<owner>/<repo>/vX.Y.Z/install.ps1 -OutFile install.ps1; .\install.ps1 -TargetDir ".ai-memory/prompts" -Version "vX.Y.Z"`
 
 ### Added / Changed / Fixed / Removed
 
@@ -574,7 +599,7 @@ PowerShell:
 
 ### Issues (only if any step failed)
 
-- [xx-<slug>](.lovable/release/issues/XX-vX.Y.Z-<slug>.md) short description
+- [xx-<slug>](.ai-memory/release/issues/XX-vX.Y.Z-<slug>.md) short description
 ```
 
 Dynamically discover `<owner>/<repo>` by running `git config --get remote.origin.url`. Do NOT hardcode URLs.
@@ -582,7 +607,7 @@ Dynamically discover `<owner>/<repo>` by running `git config --get remote.origin
 ### Step R-5: Final Verification After Bump
 
 1. Run the version-sync check if one exists (`scripts/check-version-sync.*`, `scripts/verify-versions.*`). It MUST exit 0.
-2. Verify ALL pin sites reference the new version. No previous-version strings outside the historic allow-list (`changelog.md`, `release_notes.md`, `.lovable/release/`, dated archives).
+2. Verify ALL pin sites reference the new version. No previous-version strings outside the historic allow-list (`changelog.md`, `release_notes.md`, `.ai-memory/release/`, dated archives).
 3. All markdown filenames in the repository MUST be strictly lowercase. Rename any uppercase files with `git mv` in the same turn.
 
 ### Step R-6: Issue Logging (If Anything Goes Wrong)
@@ -590,7 +615,7 @@ Dynamically discover `<owner>/<repo>` by running `git config --get remote.origin
 If any release step fails, write an issue file at:
 
 ```text
-.lovable/release/issues/XX-vX.Y.Z-<slug>.md
+.ai-memory/release/issues/XX-vX.Y.Z-<slug>.md
 ```
 
 Include: previous version, new version, step number and name, command run, full error output, files involved, resolution or `unresolved`. Link it from the `### Issues` bullet in the changelog entry.
@@ -604,7 +629,7 @@ Include: previous version, new version, step number and name, command run, full 
 - [ ] Git working tree was clean before release steps.
 - [ ] `git pull` completed with no conflicts.
 - [ ] Previous and new versions both stated explicitly.
-- [ ] `python .lovable/release/bump_versions.py --type minor --create-release` ran successfully (or fallback used and documented).
+- [ ] `python .ai-memory/release/bump_versions.py --type minor --create-release` ran successfully (or fallback used and documented).
 - [ ] All version pin sites updated to the new version.
 - [ ] `readme.md` pinned to new version. No previous version strings remain.
 - [ ] Changelog entry added with real bullets. No `TBD` or empty entries.
@@ -614,7 +639,7 @@ Include: previous version, new version, step number and name, command run, full 
 - [ ] Release commit tagged `vX.Y.Z` and pushed to remote.
 - [ ] GitHub/GitLab release created via `gh release create --notes-file` or `glab release create --notes-file` (NEVER bare `--generate-notes`).
 - [ ] Release description on GitHub/GitLab verified to contain the Quick Install one-liners, NOT just raw commit hashes.
-- [ ] Verified `.agents/skills/ci-cd-fix/skill.md` is present and synchronized with the latest rules.
+- [ ] Verified `.agents/skills/ci-cd-fix-with-release/skill.md` and `.agents/skills/ci-cd-fix/skill.md` are present and synchronized with the latest rules.
 - [ ] Report posted in chat: previous version, new version, bump tier, exact files changed.
 
 ---
@@ -641,6 +666,8 @@ Include: previous version, new version, step number and name, command run, full 
 
 ## Non-Negotiable Coding Standards
 
+- [ ] **GitMap Pipeline-AI & Dynamic Waiting:** If inspecting remote pipeline status, used `gitmap pipeline-ai status --json` / `gitmap pl-ai status -t <sec>` with adaptive sleep to prevent credit waste, and extracted targeted diagnostics (`##[error]`, `FAIL:`, compile errors).
+- [ ] **Atomic Change Tracking:** All modified files were recorded safely under lock via `python 03-ai-scripts/33-test-inventory-generator.py --record <files...>`.
 - [ ] **No Disabling CLI Linting (Zero Bypassing):** All CLI linters and CI/CD quality gates executed fully without `|| true`, `continue-on-error`, or suppression comments. Code was legitimately fixed.
 - [ ] **Zero Actions Storage (Total Ban on CI Artifacts):** Confirmed that NO `actions/upload-artifact` steps exist in CI workflows; all diagnostic outputs stream to `$GITHUB_STEP_SUMMARY` or console logs.
 - [ ] **Legitimate Multi-Step Self-Looping:** If complex errors occurred, I performed dedicated, single-step self-loop iterations to resolve each underlying failure instead of taking shortcuts.
@@ -658,3 +685,11 @@ Include: previous version, new version, step number and name, command run, full 
 
 - slug: cicd-fix-with-release
 - status: active
+
+---
+
+## Final Step Git Commit & Push Mandate (Strict Checklist)
+
+- [ ] **MANDATORY FINAL COMMIT & PUSH TO GIT (ANYHOW):** At the conclusion of Phase 4 Release, after version manifests, changelog entries, and release notes are updated, you MUST stage everything (`git add -A`), commit with clean semantic messages, and push directly to the remote repository. Leaving uncommitted changes or unpushed commits on the active branch at the end of a turn is an immediate failure.
+- [ ] **TOTAL BAN ON PER-FILE COMMITS (DO NOT COMMIT EACH FILE INDIVIDUALLY):** You MUST NOT create separate git commits for each individual file as you edit them. All modified files across the turn MUST be accumulated in the working tree and committed together in a SINGLE grouped atomic commit at the final step before pushing!
+
