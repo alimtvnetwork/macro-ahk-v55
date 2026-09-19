@@ -1,4 +1,4 @@
-# .lovable/ - AI Entry Index
+# .ai-memory/ - AI Entry Index
 
 Read this file first. Then `MAP.md` for path-level detail. Then targeted files only when needed.
 
@@ -8,13 +8,13 @@ Read this file first. Then `MAP.md` for path-level detail. Then targeted files o
 
 ## Read order (fresh session)
 
-1. `.lovable/README.md` (this file)
-2. `.lovable/MAP.md` (path map)
-3. `.lovable/rules.md` (hard prohibitions)
-4. `.lovable/memory/index.md` (always-in-context core rules)
-5. `.lovable/plan.md` (active backlog)
-6. `.lovable/plans/pending/` (next work units)
-7. Targeted spec under `spec/` only when the task requires it.
+1. `.ai-memory/README.md` (this file)
+2. `.ai-memory/MAP.md` (path map)
+3. `.ai-memory/rules.md` (hard prohibitions)
+4. `.ai-memory/memory/index.md` (always-in-context core rules)
+5. `.ai-memory/plan.md` (active backlog)
+6. `.ai-memory/plans/pending/` (next work units)
+7. Targeted spec under `02-spec/` only when the task requires it.
 
 ## Hard constraints (also in `rules.md`)
 
@@ -41,14 +41,14 @@ Read this file first. Then `MAP.md` for path-level detail. Then targeted files o
 ## How-tos
 
 - **New prompt slide:** create `standalone-scripts/prompts/NN-<slug>/{prompt.md,info.json}` → `node scripts/aggregate-prompts.mjs` → bump version → changelog.
-- **New config key:** default in `config-validator.ts` → seed JSON → spec entry under `spec/26-macro-controller/` or `spec/06-seedable-config-architecture/` → unit test → version bump.
+- **New config key:** default in `config-validator.ts` → seed JSON → spec entry under `02-spec/26-macro-controller/` or `02-spec/06-seedable-config-architecture/` → unit test → version bump.
 - **New standalone script:** scaffold `standalone-scripts/<name>/{src/instruction.ts,build entry}` → register in build → register injection in `src/background/` → spec + memory entry.
 - **New feature (end-to-end):** spec → `plan.md` row → code (guidelines) → matching test → memory entry if new contract → changelog + version bump.
-- **New spec:** slot 01-20 = foundations, 21+ = app tier. Follow `spec/01-spec-authoring-guide/`. Cross-ref in `spec/00-overview.md`.
+- **New spec:** slot 01-20 = foundations, 21+ = app tier. Follow `02-spec/01-spec-authoring-guide/`. Cross-ref in `02-spec/00-overview.md`.
 
 ## Reusable AI prompts (canonical mirrors)
 
-Live under `.lovable/prompts/`. Trigger by phrase:
+Live under `.ai-memory/prompts/`. Trigger by phrase:
 
 | Prompt | File | Trigger phrases |
 |---|---|---|
@@ -84,4 +84,4 @@ Convention: `NN-<slug>.md`, versioned inline (`version: X.Y`). Every prompt refe
 - `plan.md` - living roadmap.
 - `coding-guidelines.md` - function size, naming, error handling.
 - `memory/index.md` - full memory index (always in context).
-- `MAP.md` - path-to-purpose map for the whole `.lovable/` tree.
+- `MAP.md` - path-to-purpose map for the whole `.ai-memory/` tree.
