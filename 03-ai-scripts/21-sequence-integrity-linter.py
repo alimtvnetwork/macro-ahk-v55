@@ -21,21 +21,22 @@ PLACEHOLDER_TOKENS = (
     "<category>", "<area>", "<name>", "<ext>", "<owner>", "<repo>",
     "XX-", "NN-", "01-<", "00-<", "{", "}", "*", "path/to/", "...",
     "<version-slug>", "<work_slug>", "<subtask_slug>", "<target>", "<module>",
-    "/XX/", "xx-", "vX.Y.Z", "vX.", "/<", "XX", "recent-file-changes.json", "recent-file-changes.lock"
+    "/XX/", "xx-", "vX.Y.Z", "vX.", "/<", "XX", "recent-file-changes.json", "recent-file-changes.lock", "runner-eta.json",
+    "test-heatmap.json", "02-macro-step-open-command-behavior.md"
 )
 
 # Target directories to audit for sequence integrity
 AUDIT_DIRS = (
-    ".lovable/prompts",
-    ".lovable/plans",
+    ".ai-memory/prompts",
+    ".ai-memory/plans",
     ".agents/skills",
-    ".lovable/coding-guidelines",
-    ".lovable/memory/standards"
+    ".ai-memory/coding-guidelines",
+    ".ai-memory/memory/standards"
 )
 
 # Directories/files explicitly exempt (e.g., historical archives and migration transaction logs)
 EXEMPT_PATHS = {
-    ".lovable/memory/transactions/spec-migration-transaction-log.md",
+    ".ai-memory/memory/transactions/spec-migration-transaction-log.md",
 }
 
 EXEMPT_DIR_PARTS = {
@@ -45,7 +46,7 @@ EXEMPT_DIR_PARTS = {
 # Regex to match markdown links: [text](target)
 MD_LINK_RE = re.compile(r'\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)')
 
-# Regex to match single-backtick path references: `spec/...` or `.lovable/...`
+# Regex to match single-backtick path references: `spec/...` or `.ai-memory/...`
 PATH_BACKTICK_RE = re.compile(r'`([^`\n]+)`')
 
 
@@ -146,7 +147,7 @@ def audit_file(file_path: Path, repo_root: Path) -> list[tuple[int, str, str]]:
         for m in PATH_BACKTICK_RE.finditer(line):
             candidate = m.group(1).strip()
             # Only test strings that look like actual file paths in tracked folders
-            if candidate.startswith(("spec/", ".lovable/", ".agents/", "linter-scripts/", "scripts/")):
+            if candidate.startswith(("spec/", ".ai-memory/", ".agents/", "linter-scripts/", "scripts/")):
                 if is_valid_file_extension(candidate) and not is_placeholder(candidate):
                     resolved = resolve_reference(file_path, candidate, repo_root)
                     if resolved is None:

@@ -91,10 +91,10 @@ def resolve_job_command(job_name: str, command: list[str]) -> list[str]:
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-TMP_CACHE_DIR = REPO_ROOT / ".lovable" / "temp"
+TMP_CACHE_DIR = REPO_ROOT / ".ai-memory" / "temp"
 FAILURES_DIR = TMP_CACHE_DIR / "failures"
 RUNNER_ETA_FILE = TMP_CACHE_DIR / "runner-eta.json"
-TEST_INVENTORY_PATH = REPO_ROOT / ".lovable" / "test-inventory.json"
+TEST_INVENTORY_PATH = REPO_ROOT / ".ai-memory" / "test-inventory.json"
 
 
 def compute_file_hash(filepath: Path) -> str:
@@ -840,7 +840,7 @@ Examples:
         "--changed-only",
         action="store_true",
         dest="changed_only",
-        help="Run quality gates scoped strictly to files modified in .lovable/temp/recent-file-changes.json."
+        help="Run quality gates scoped strictly to files modified in .ai-memory/temp/recent-file-changes.json."
     )
     parser.add_argument(
         "--pkg", "--package", "-p", "--target-file",
@@ -851,7 +851,7 @@ Examples:
     return parser.parse_args()
 
 
-CICD_LAST_RUN_CACHE = Path(".lovable/cicd/last_run_cache.json")
+CICD_LAST_RUN_CACHE = Path(".ai-memory/cicd/last_run_cache.json")
 
 
 def check_recent_run_cache(cache_file: Path, signature: str, normal_ttl: float = 15.0) -> int | None:
@@ -897,8 +897,8 @@ def save_recent_run_cache(cache_file: Path, signature: str, exit_code: int, summ
 def clean_stale_locks(max_age_sec: float = 300.0) -> None:
     """Removes stale lock files older than max_age_sec to prevent pipeline deadlocks."""
     lock_paths = [
-        Path(".lovable/temp/recent-file-changes.lock"),
-        Path(".lovable/temp/active-locks.json"),
+        Path(".ai-memory/temp/recent-file-changes.lock"),
+        Path(".ai-memory/temp/active-locks.json"),
     ]
     for lock_file in lock_paths:
         if not lock_file.exists():
@@ -925,11 +925,11 @@ def clean_stale_locks(max_age_sec: float = 300.0) -> None:
             pass
 
 
-RECENT_CHANGES_FILE = Path(".lovable/temp/recent-file-changes.json")
+RECENT_CHANGES_FILE = Path(".ai-memory/temp/recent-file-changes.json")
 
 
 def filter_jobs_for_changed_files(all_jobs: dict[str, list[str]]) -> dict[str, list[str]] | None:
-    """Filters CI jobs based on modified files tracked in .lovable/temp/recent-file-changes.json."""
+    """Filters CI jobs based on modified files tracked in .ai-memory/temp/recent-file-changes.json."""
     if not RECENT_CHANGES_FILE.exists():
         return None
     try:

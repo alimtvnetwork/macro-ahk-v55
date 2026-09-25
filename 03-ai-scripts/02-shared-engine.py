@@ -384,8 +384,8 @@ SUBSYSTEM_DIR_HINTS: dict[SubsystemType, tuple[str, ...]] = {
     SubsystemType.DATABASE: ("db", "database", "migrations", "migration", "sql", "schemas", "schema", "prisma", "drizzle"),
     SubsystemType.BACKEND: ("cmd", "internal", "pkg", "api", "routes", "controllers", "handlers", "server", "services", "backend"),
     SubsystemType.FRONTEND: ("components", "views", "pages", "ui", "web", "frontend", "client", "app", "slides-app"),
-    SubsystemType.CICD: (".github", "workflows", "scripts", "linter-scripts", "linters-cicd", "ci", ".lovable"),
-    SubsystemType.DOCS: ("02-spec", "docs", "doc", "documentation", "prompts", ".lovable/prompts"),
+    SubsystemType.CICD: (".github", "workflows", "scripts", "linter-scripts", "linters-cicd", "ci", ".ai-memory"),
+    SubsystemType.DOCS: ("02-spec", "docs", "doc", "documentation", "prompts", ".ai-memory/prompts"),
     SubsystemType.TESTS: ("tests", "test", "02-spec", "__tests__", "testing", "fixtures"),
     SubsystemType.CLI: ("cli", "cmd", "commands", "bin"),
 }
@@ -548,8 +548,11 @@ def format_keys(mapping: Any, separator: str = COMMA_SPACE_SEPARATOR) -> str:
 
 def is_ignored_directory(dir_name: str, custom_excludes: set[str] | None = None) -> bool:
     """Checks if directory name is in the global or custom exclusion list."""
+    low_name = dir_name.lower()
+    if low_name.startswith("backup-") or low_name.startswith("backup_") or low_name == "backup":
+        return True
     excludes = EXCLUDE_DIRS if custom_excludes is None else EXCLUDE_DIRS | custom_excludes
-    return dir_name.lower() in {d.lower() for d in excludes}
+    return low_name in {d.lower() for d in excludes}
 
 def is_ignored_path(path: str | Path, custom_excludes: set[str] | None = None) -> bool:
     """Checks if any segment of the path matches an excluded directory."""

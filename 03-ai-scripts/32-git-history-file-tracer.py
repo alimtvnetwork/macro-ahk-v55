@@ -9,7 +9,7 @@ All Enums, Constants, and Base Path Utilities are imported directly from
 03-ai-scripts/02-shared-engine.py.
 
 Usage Examples:
-  # 1. Pre-flight inspection of removed markdown files in .lovable/ (default mode):
+  # 1. Pre-flight inspection of removed markdown files in .ai-memory/ (default mode):
   python 03-ai-scripts/32-git-history-file-tracer.py --preset-lovable
 
   # 2. Pre-flight inspection of removed markdown files in 02-spec/:
@@ -66,9 +66,9 @@ normalize_extensions = engine.normalize_extensions
 is_ignored_directory = engine.is_ignored_directory
 
 RECORD_DELIMITER = "TRACE_COMMIT_RECORD"
-PRESET_LOVABLE_PATH = ".lovable"
-PRESET_PLANS_PATH = ".lovable/plans"
-PRESET_SUBTASKS_PATH = ".lovable/plans/subtasks"
+PRESET_LOVABLE_PATH = ".ai-memory"
+PRESET_PLANS_PATH = ".ai-memory/plans"
+PRESET_SUBTASKS_PATH = ".ai-memory/plans/subtasks"
 PRESET_SPEC_PATH = "02-spec"
 PRESET_AUDIT_PATH = "02-spec/25-app-spec-audit"
 DEFAULT_MD_EXT = {".md"}
@@ -604,7 +604,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Pre-flight inspection of removed markdown files in .lovable/ (Default):
+  # Pre-flight inspection of removed markdown files in .ai-memory/ (Default):
   python 03-ai-scripts/32-git-history-file-tracer.py --preset-lovable
 
   # Pre-flight inspection of removed markdown files in 02-spec/:

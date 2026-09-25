@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Transactional Repository Layout Migrator & History Engine
-Migrates legacy repository layouts (spec/, .lovable/prompts/, .lovable/ai-fix-scripts/)
+Migrates legacy repository layouts (spec/, .ai-memory/prompts/, .ai-memory/ai-fix-scripts/)
 to the standardized root layout (01-prompts/, 02-spec/, 03-ai-scripts/).
 
 Features:
@@ -80,18 +80,18 @@ PATTERN_SPEC_SLASH = re.compile(r"(?<![a-zA-Z0-9_-])spec/((?:[0-9]{2}-|[a-zA-Z0-
 PATTERN_SPEC_BACKSLASH = re.compile(r"(?<![a-zA-Z0-9_-])spec\\\\((?:[0-9]{2}-|[a-zA-Z0-9_.-]+\\\\)[a-zA-Z0-9_.-]*)")
 
 DIRECT_STRING_REPLACEMENTS = [
-    (".lovable/prompts/01-prompts-category/", "01-prompts/"),
-    (".lovable/prompts/", "01-prompts/"),
-    (".lovable\\prompts\\01-prompts-category\\", "01-prompts\\\\"),
-    (".lovable\\prompts\\", "01-prompts\\\\"),
-    (".lovable/ai-fix-scripts/", "03-ai-scripts/"),
-    (".lovable\\ai-fix-scripts\\", "03-ai-scripts\\\\"),
+    (".ai-memory/prompts/01-prompts-category/", "01-prompts/"),
+    (".ai-memory/prompts/", "01-prompts/"),
+    (".ai-memory\\prompts\\01-prompts-category\\", "01-prompts\\\\"),
+    (".ai-memory\\prompts\\", "01-prompts\\\\"),
+    (".ai-memory/ai-fix-scripts/", "03-ai-scripts/"),
+    (".ai-memory\\ai-fix-scripts\\", "03-ai-scripts\\\\"),
     ("lovable/ai-fix-scripts/", "03-ai-scripts/"),
-    (".lovable/coding-guidelines/coding-guidelines.md", ".lovable/coding-guidelines.md"),
-    (".lovable\\coding-guidelines\\coding-guidelines.md", ".lovable\\coding-guidelines.md"),
-    (".lovable/coding-guidelines/", ".lovable/coding-guidelines.md"),
+    (".ai-memory/coding-guidelines/coding-guidelines.md", ".ai-memory/coding-guidelines.md"),
+    (".ai-memory\\coding-guidelines\\coding-guidelines.md", ".ai-memory\\coding-guidelines.md"),
+    (".ai-memory/coding-guidelines/", ".ai-memory/coding-guidelines.md"),
     ("\"spec\"", "\"02-spec\""),
-    ("spec/01-index.md", "02-spec/01-index.md"),
+    ("spec/readme.md", "02-spec/readme.md"),
     ("spec/spec-index.md", "02-spec/spec-index.md"),
     ("spec/health-dashboard.md", "02-spec/health-dashboard.md"),
     ("spec/dashboard-data.json", "02-spec/dashboard-data.json"),
@@ -190,8 +190,8 @@ class MigrationPlanner:
 
     def plan(self) -> None:
         # 1. Plan Directory & Key File Moves
-        prompts_cat = self.repo_root / ".lovable" / "prompts" / "01-prompts-category"
-        prompts_root_dir = self.repo_root / ".lovable" / "prompts"
+        prompts_cat = self.repo_root / ".ai-memory" / "prompts" / "01-prompts-category"
+        prompts_root_dir = self.repo_root / ".ai-memory" / "prompts"
         target_prompts = self.repo_root / "01-prompts"
 
         if prompts_cat.exists() and not target_prompts.exists():
@@ -204,18 +204,18 @@ class MigrationPlanner:
         if spec_dir.exists() and not target_spec.exists():
             self.moves.append((spec_dir, target_spec, "MOVE_DIR"))
 
-        ai_scripts = self.repo_root / ".lovable" / "ai-fix-scripts"
+        ai_scripts = self.repo_root / ".ai-memory" / "ai-fix-scripts"
         target_ai_scripts = self.repo_root / "03-ai-scripts"
         if ai_scripts.exists() and not target_ai_scripts.exists():
             self.moves.append((ai_scripts, target_ai_scripts, "MOVE_DIR"))
 
-        nested_guidelines = self.repo_root / ".lovable" / "coding-guidelines" / "coding-guidelines.md"
-        target_guidelines = self.repo_root / ".lovable" / "coding-guidelines.md"
+        nested_guidelines = self.repo_root / ".ai-memory" / "coding-guidelines" / "coding-guidelines.md"
+        target_guidelines = self.repo_root / ".ai-memory" / "coding-guidelines.md"
         if nested_guidelines.exists() and not target_guidelines.exists():
             self.moves.append((nested_guidelines, target_guidelines, "MOVE_FILE"))
 
         # 2. Plan Stale Items Cleanup
-        nested_cg_dir = self.repo_root / ".lovable" / "coding-guidelines"
+        nested_cg_dir = self.repo_root / ".ai-memory" / "coding-guidelines"
         if nested_cg_dir.exists():
             self.stale_files.append(nested_cg_dir)
 
@@ -322,6 +322,11 @@ def execute_migration(repo_root: Path, is_plan_only: bool = False, is_force: boo
             # 2. Execute File Modifications
             for p, old_txt, new_txt in planner.modifications:
                 seq += 1
+                # Adjust path if it was moved
+                for src, dst, kind in planner.moves:
+                    if str(p).startswith(str(src)):
+                        p = Path(str(p).replace(str(src), str(dst), 1))
+                        break
                 p.write_text(new_txt, encoding="utf-8")
                 conn.execute("""
                     INSERT INTO operations (transaction_id, seq_num, op_type, source_path, target_path, original_content, new_content, status)
