@@ -7,7 +7,7 @@
 
 ## Purpose
 
-This is the **standalone consolidated reference** for spec authoring conventions. An AI reading only this file must be able to create, organize, and validate specification files correctly — including folder structure, naming, required files, templates, cross-references, validation, exceptions, and the `.lovable/` context layer.
+This is the **standalone consolidated reference** for spec authoring conventions. An AI reading only this file must be able to create, organize, and validate specification files correctly — including folder structure, naming, required files, templates, cross-references, validation, exceptions, and the `.ai-memory/` context layer.
 
 ---
 
@@ -55,7 +55,7 @@ This is the **standalone consolidated reference** for spec authoring conventions
 
 | File | Required When |
 |------|---------------|
-| `01-index.md` | **Always** — every module |
+| `readme.md` | **Always** — every module |
 | `99-consistency-report.md` | Every module with 3+ files |
 | `97-acceptance-criteria.md` | App/feature modules |
 | `98-changelog.md` | Modules with version history |
@@ -104,9 +104,9 @@ Every `.md` file **must** begin with:
 
 ---
 
-## `01-index.md` — Required Content
+## `readme.md` — Required Content
 
-Every `01-index.md` must include:
+Every `readme.md` must include:
 
 ### Scoring Metrics
 
@@ -122,7 +122,7 @@ Every `01-index.md` must include:
 - **Keywords** for searchability
 - **Document Inventory** table listing all files with status
 - **Cross-References** to related modules
-- **Scoring table** with `01-index.md` present check
+- **Scoring table** with `readme.md` present check
 
 ---
 
@@ -130,7 +130,7 @@ Every `01-index.md` must include:
 
 - Use **file-relative paths only** — never root-relative `/spec/...`
 - Always include `.md` extension
-- Example: `[Split DB](../05-split-db-architecture/01-index.md)`
+- Example: `[Split DB](../05-split-db-architecture/readme.md)`
 - Broken links are **blocking errors** in the dashboard scanner
 
 ---
@@ -141,13 +141,13 @@ Every `01-index.md` must include:
 
 ```
 NN-module-name/
-├── 01-index.md
+├── readme.md
 ├── 02-fundamentals.md
 ├── 02-features/
-│   ├── 01-index.md
+│   ├── readme.md
 │   └── 01-feature-name.md
 ├── 03-issues/
-│   └── 01-index.md
+│   └── readme.md
 ├── 97-acceptance-criteria.md
 ├── 98-changelog.md
 └── 99-consistency-report.md
@@ -159,20 +159,20 @@ NN-module-name/
 
 ```
 {NN}-{app-name}/
-├── 01-index.md
+├── readme.md
 ├── 02-fundamentals.md
 ├── 02-features/
-│   ├── 01-index.md
+│   ├── readme.md
 │   └── 01-{feature-name}/
-│       ├── 01-index.md
+│       ├── readme.md
 │       ├── 01-backend.md
 │       ├── 02-frontend.md
 │       ├── 03-wp-admin.md          # WordPress only
 │       └── 99-consistency-report.md
 ├── 03-issues/
-│   ├── 01-index.md
+│   ├── readme.md
 │   ├── 01-{issue-name}/            # Multi-file issues
-│   │   ├── 01-index.md
+│   │   ├── readme.md
 │   │   ├── 01-investigation.md
 │   │   └── 02-resolution.md
 │   └── 02-{issue-name}.md          # Simple single-file issues
@@ -187,7 +187,7 @@ NN-module-name/
 
 ```
 NN-module-name/
-├── 01-index.md
+├── readme.md
 ├── 01-topic-a.md
 ├── 02-topic-b.md
 └── 99-consistency-report.md
@@ -204,14 +204,14 @@ NN-module-name/
 
 ---
 
-## `.lovable/` Folder — AI Context Layer
+## `.ai-memory/` Folder — AI Context Layer
 
-The `.lovable/` directory holds all AI-readable project knowledge.
+The `.ai-memory/` directory holds all AI-readable project knowledge.
 
 ### Canonical Structure
 
 ```
-.lovable/
+.ai-memory/
 ├── overview.md                     # AI onboarding — read FIRST
 ├── user-preferences                # Communication preferences
 ├── 29-plan.md                         # Current roadmap
@@ -240,10 +240,10 @@ The `.lovable/` directory holds all AI-readable project knowledge.
 
 ### Critical Rules
 
-- **Memory folder is `.lovable/memory/`** — never `.lovable/memories/` (no trailing `s`)
+- **Memory folder is `.ai-memory/memory/`** — never `.ai-memory/memories/` (no trailing `s`)
 - Memory subfolders use **kebab-case WITHOUT numeric prefixes**
-- When adding a memory file, **always** update `memory/01-index.md`
-- AI reading order: `overview.md` → `strictly-avoid.md` → `user-preferences` → `memory/01-index.md` → `29-plan.md`
+- When adding a memory file, **always** update `memory/readme.md`
+- AI reading order: `overview.md` → `strictly-avoid.md` → `user-preferences` → `memory/readme.md` → `29-plan.md`
 
 ### Task & Suggestion Lifecycle
 
@@ -258,7 +258,7 @@ The `.lovable/` directory holds all AI-readable project knowledge.
 
 1. **Select module number** — next available after highest existing (do NOT fill gaps)
 2. **Create folder** — `{NN}-{module-name}/` using kebab-case
-3. **Create `01-index.md`** — with all required sections (scoring, inventory, cross-refs)
+3. **Create `readme.md`** — with all required sections (scoring, inventory, cross-refs)
 4. **Write content files** — numbered sequentially (`01-`, `02-`, etc.)
 5. **Create `99-consistency-report.md`** — structural health check
 6. **Add `97-acceptance-criteria.md`** — if app/feature module
@@ -307,7 +307,7 @@ python linter-scripts/validate-guidelines.py
 
 | Check | Severity | Rule |
 |-------|----------|------|
-| `01-index.md` present in every module | CODE-RED | Blocking |
+| `readme.md` present in every module | CODE-RED | Blocking |
 | Lowercase kebab-case naming | STYLE | Blocking |
 | Unique numeric prefixes per folder | STYLE | Blocking |
 | Metadata header (H1 + Version + Updated) | STYLE | Warning |
@@ -358,7 +358,7 @@ These exceptions are permanent and tracked in `02-spec/01-spec-authoring-guide/1
 | 3 | Non-markdown data files (`.json`) | `02-spec/` modules |
 | 4 | Legacy `C-XXX` suggestion file names | `suggestions/completed/` |
 | 5 | Dual-purpose prefix `02` | `02-spec/` root |
-| 6 | Memory folders without numeric prefixes | `.lovable/memory/` |
+| 6 | Memory folders without numeric prefixes | `.ai-memory/memory/` |
 | 7 | CLI module without `02-frontend/` folder | Headless CLIs |
 | 8 | Extra CLI subfolders beyond core 3 | Complex CLIs |
 | 9 | Legacy `suggestions.md` without prefix | Memory root |
@@ -383,7 +383,7 @@ When specs change, update **all three** targets:
 - [ ] New module added to `spec-index.md` with correct number and description
 - [ ] `specTree.json` updated with new entry (including full `content` field)
 - [ ] Consolidated guideline file created or updated in `17-consolidated-guidelines/`
-- [ ] `17-consolidated-guidelines/01-index.md` file inventory updated
+- [ ] `17-consolidated-guidelines/readme.md` file inventory updated
 - [ ] `17-consolidated-guidelines/99-consistency-report.md` updated
 - [ ] Gap analysis (`22-gap-analysis.md`) scores recalculated
 

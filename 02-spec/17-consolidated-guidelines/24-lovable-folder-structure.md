@@ -1,4 +1,4 @@
-# Consolidated: `.lovable/` Folder Structure
+# Consolidated: `.ai-memory/` Folder Structure
 
 **Version:** 4.0.0
 **Updated:** 2026-08-31
@@ -8,14 +8,14 @@
 
 ## Purpose
 
-This is the **standalone consolidated reference** for the `.lovable/` folder structure — the AI context layer. An AI reading only this file must be able to create, maintain, and navigate the `.lovable/` directory correctly.
+This is the **standalone consolidated reference** for the `.ai-memory/` folder structure — the AI context layer. An AI reading only this file must be able to create, maintain, and navigate the `.ai-memory/` directory correctly.
 
 ---
 
 ## Canonical Structure
 
 ```
-.lovable/
+.ai-memory/
 ├── 01-overview.md                   # AI onboarding — read FIRST
 ├── 02-user-preferences              # User communication preferences
 ├── 03-strictly-avoid.md             # ⛔ Quick-read prohibition summary
@@ -24,18 +24,18 @@ This is the **standalone consolidated reference** for the `.lovable/` folder str
 ├── 06-what-to-read.md               # Router and reading sequence
 │
 ├── ai-fix-scripts/                  # Persistent AI automation toolchain
-│   ├── 01-index.md                  # Master catalog & search tag registry
+│   ├── readme.md                  # Master catalog & search tag registry
 │   ├── 02-shared-engine.py          # Shared engine: constants, lazy regex, cache
 │   └── 03..20-*.py                  # Specialized linters and runners
 │
 ├── plans/                           # Execution hub
-│   ├── 01-index.md                  # Master plan index
+│   ├── readme.md                  # Master plan index
 │   ├── pending/                     # Active parent task specs
 │   ├── subtasks/                    # Bounded micro-tasks (XX-<slug>/)
 │   └── completed/                   # Archived completed plans
 │
 ├── memory/                          # Institutional knowledge (SINGULAR)
-│   ├── 01-index.md                  # Canonical index of all memory files
+│   ├── readme.md                  # Canonical index of all memory files
 │   ├── architecture/                # System architecture decisions
 │   ├── constraints/                 # Hard constraints and rules
 │   ├── done/                        # Completed tasks archive
@@ -68,9 +68,9 @@ This is the **standalone consolidated reference** for the `.lovable/` folder str
 
 ## Critical Rules
 
-> **There is exactly ONE memory folder: `.lovable/memory/` (singular).** The variant `.lovable/memories/` (plural) is **prohibited**. If found, migrate contents and delete it.
+> **There is exactly ONE memory folder: `.ai-memory/memory/` (singular).** The variant `.ai-memory/memories/` (plural) is **prohibited**. If found, migrate contents and delete it.
 
-> **`memory/01-index.md` is the single source of truth** for all memory files. Every memory file must be listed there. Orphaned files (in `memory/` but not in `index.md`) must be indexed or removed.
+> **`memory/readme.md` is the single source of truth** for all memory files. Every memory file must be listed there. Orphaned files (in `memory/` but not in `index.md`) must be indexed or removed.
 
 ---
 
@@ -79,7 +79,7 @@ This is the **standalone consolidated reference** for the `.lovable/` folder str
 1. `01-overview.md` → understand the project
 2. `03-strictly-avoid.md` → know what NOT to do
 3. `02-user-preferences` → adapt communication style
-4. `memory/01-index.md` → survey all institutional knowledge
+4. `memory/readme.md` → survey all institutional knowledge
 5. `05-plan.md` → understand current work context
 6. `04-suggestions.md` → see pending ideas
 
@@ -88,7 +88,7 @@ This is the **standalone consolidated reference** for the `.lovable/` folder str
 ## Naming Conventions
 
 - **Folders:** kebab-case, 2-digit zero-padded prefix when sequenced (`01-prompts-category/`, `ai-fix-scripts/`)
-- **Files:** strictly lowercase, kebab-case, numeric prefix where sequenced (`01-index.md`, `02-shared-engine.py`)
+- **Files:** strictly lowercase, kebab-case, numeric prefix where sequenced (`readme.md`, `02-shared-engine.py`)
 - **No spaces**, no uppercase letters, no camelCase in filenames.
 
 ---
@@ -103,13 +103,13 @@ This is the **standalone consolidated reference** for the `.lovable/` folder str
 
 ---
 
-*Consolidated .lovable folder structure — v4.0.0 — 2026-08-31*
+*Consolidated .ai-memory folder structure — v4.0.0 — 2026-08-31*
 
 ---
 
 ## §X Project Memory — Active Core Rules (Mirror)
 
-This section **mirrors** the operational rules stored in `.lovable/memory/01-index.md` Core section. A blind AI receiving only the consolidated folder would otherwise miss these — and violate at least three on its first PR. This mirror is **read-only documentation** of the rules; the canonical source remains `mem://index.md`.
+This section **mirrors** the operational rules stored in `.ai-memory/memory/readme.md` Core section. A blind AI receiving only the consolidated folder would otherwise miss these — and violate at least three on its first PR. This mirror is **read-only documentation** of the rules; the canonical source remains `mem://index.md`.
 
 ### X.1 Code-Red Quality Rules
 
@@ -155,7 +155,7 @@ Enforcement: see `18-database-conventions.md` §18 (rule presence) and §19 (wai
 |------|---------|
 | Spec changes | Spec-First — edit `02-spec/` then implement |
 | Bug fixes | Issue-First — create `03-issues/<issue>.md` then fix |
-| `.lovable/` structure | Single-file convention — `plan.md`, `suggestions.md`, `strictly-avoid.md` each hold their full history. **Never** create per-task folders |
+| `.ai-memory/` structure | Single-file convention — `plan.md`, `suggestions.md`, `strictly-avoid.md` each hold their full history. **Never** create per-task folders |
 | Multi-step requests | Break into discrete tasks. Wait for "next" prompt to continue |
 
 ### X.7 Dependency Pinning
