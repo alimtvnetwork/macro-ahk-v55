@@ -1,10 +1,16 @@
 # Changelog
 
+## [v6.101.9] - 2026-10-01
+
+### Added
+- Synchronize V6 prompts, SQLite task manager, skills, and coding guidelines
+
+---
+
 ## [v6.101.0] - 2026-09-15
 
 ### Added
 - Adopt canonical folder structure, sync prompts, skills, ai-scripts, and restructure spec
-
 
 ## [v6.100.0] 2026-08-22 Crash Fixes and UI Consistency
 
@@ -15,7 +21,6 @@
 - Restored valid `ServiceResult` typings in six background handlers (`file-storage-handler.ts`, `kv-handler.ts`, etc.) to resolve CI `tsc` gate failures.
 - Fixed UI layout squishing and inconsistent button heights in the Macro Controller prompt dropdown header.
 - Auto-fixed 236 ESLint indentation failures across 11 files caused by earlier automated refactoring scripts.
-
 
 ## [v0.2.0] 2026-08-12 Prompt Library Relocate & Light Mode
 
