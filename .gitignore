@@ -1,6 +1,5 @@
 # =============================================================================
 # Core ignores (Node/Next/Python + common tooling)
-# =============================================================================
 
 # OS
 .DS_Store
@@ -17,9 +16,7 @@ yarn-error.log*
 lerna-debug.log*
 *.log
 
-# =============================================================================
 # Node.js / package managers
-# =============================================================================
 node_modules/
 .pnp/
 .pnp.js
@@ -33,9 +30,7 @@ node_modules/
 !.yarn/sdks/
 .yarn/install-state.gz
 
-# =============================================================================
 # Next.js / TypeScript
-# =============================================================================
 .next/
 out/
 next-env.d.ts
@@ -50,9 +45,7 @@ build/
 .turbo/
 .eslintcache
 
-# =============================================================================
 # Environment + secrets (do not commit)
-# =============================================================================
 .env
 .env.*
 *token.json*
@@ -60,31 +53,23 @@ build/
 *.pem
 *.key
 
-# =============================================================================
 # Python
-# =============================================================================
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 venv/
 .venv/
 
-# =============================================================================
 # Deployment
-# =============================================================================
 .vercel/
 
-# =============================================================================
 # Project-specific paths
-# =============================================================================
 agenthub/agents/youtube/db/
 marco-script-ahk-v4/logs/
 **/logs/
 **/logs/*.*
 
-# =============================================================================
 # Archives / binaries (optional but typically safe to ignore)
-# =============================================================================
 *.zip
 *.crx
 *.xpi
@@ -101,7 +86,6 @@ marco-script-ahk-v4/logs/activity.txt
 /standalone-scripts/_generated
 /chrome-extension
 /standalone-scripts/macro-controller/dist
-/standalone-scripts/_generated
 standalone-scripts/_generated/seed-manifest.json
 .gitmap/release-assets
 release-assets
@@ -112,9 +96,7 @@ pnpm-lock.yaml
 scripts/check-spec-links.baseline.json
 /.gitmap/backup
 
-# =============================================================================
 # Test outputs and reports
-# =============================================================================
 test-results/
 test_reports/
 test-reports/
@@ -129,3 +111,7 @@ scratch/tsc-errors.txt
 antigravity-resume_task.json
 antigravity_resume_task.json
 .antigravity-resume_task.json
+
+
+# GitMap & Task Persistence
+.gitmap/backup/
