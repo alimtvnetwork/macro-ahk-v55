@@ -1,4 +1,4 @@
-# `.lovable/` Folder Structure Guide
+# `.ai-memory/` Folder Structure Guide
 
 **Version:** 3.2.0
 **Updated:** 2026-04-16
@@ -7,16 +7,16 @@
 
 ## Overview
 
-The `.lovable/` directory is the **canonical location** for all AI-readable project knowledge — memory, tasks, suggestions, constraints, and onboarding context. Any AI model reading this folder should be able to fully understand the project's conventions, active work, and hard constraints.
+The `.ai-memory/` directory is the **canonical location** for all AI-readable project knowledge — memory, tasks, suggestions, constraints, and onboarding context. Any AI model reading this folder should be able to fully understand the project's conventions, active work, and hard constraints.
 
-> **CRITICAL:** There is exactly ONE memory folder: `.lovable/memory/`. The variant `.lovable/memories/` is **prohibited** and must be deleted if found. Never maintain two memory folders.
+> **CRITICAL:** There is exactly ONE memory folder: `.ai-memory/memory/`. The variant `.ai-memory/memories/` is **prohibited** and must be deleted if found. Never maintain two memory folders.
 
 ---
 
 ## Canonical Folder Structure
 
 ```
-.lovable/
+.ai-memory/
 ├── overview.md                     # AI onboarding — read this FIRST
 ├── user-preferences                # User communication preferences
 │
@@ -109,7 +109,7 @@ This folder contains things the AI must **NEVER** do. Each rule gets its own `.m
 
 Example files:
 
-- `no-memories-folder.md` — Never create `.lovable/memories/` (use `memory/` only)
+- `no-memories-folder.md` — Never create `.ai-memory/memories/` (use `memory/` only)
 - `no-error-swallowing.md` — Never catch and ignore errors
 - `no-uuid-primary-keys.md` — Never use UUIDs for primary keys
 
@@ -133,12 +133,12 @@ The root `strictly-avoid.md` file provides a **quick-read summary** of all rules
 
 ## AI Reading Order
 
-When an AI model first encounters this project, it should read `.lovable/` files in this order:
+When an AI model first encounters this project, it should read `.ai-memory/` files in this order:
 
 1. **`overview.md`** — Understand the project
 2. **`strictly-avoid.md`** — Know what NOT to do
 3. **`user-preferences`** — Adapt communication style
-4. **`memory/01-index.md`** — Survey all institutional knowledge
+4. **`memory/readme.md`** — Survey all institutional knowledge
 5. **`29-plan.md`** — Understand current work context
 6. **`suggestions.md`** — See pending improvement ideas
 7. **Individual memory files** — Deep-dive as needed per task
@@ -172,11 +172,11 @@ suggestions.md (summary) → suggestions/ (details) → suggestions/completed/
 
 ## Relationship to `02-spec/`
 
-| Aspect | `02-spec/` | `.lovable/` |
+| Aspect | `02-spec/` | `.ai-memory/` |
 |--------|---------|-------------|
 | Purpose | Formal specifications | Institutional knowledge & AI context |
 | Naming | Numeric prefix **required** | Numeric prefix **optional** |
-| Required files | `01-index.md`, `99-consistency-report.md` | `overview.md`, `memory/01-index.md` |
+| Required files | `readme.md`, `99-consistency-report.md` | `overview.md`, `memory/readme.md` |
 | Health scoring | ✅ Tracked by dashboard | ❌ Not scored |
 | AI consumption | Referenced during implementation | Referenced during **all** interactions |
 | Depth | Up to 3 levels | Up to 2 levels (category/file) |
@@ -185,8 +185,8 @@ suggestions.md (summary) → suggestions/ (details) → suggestions/completed/
 
 ## Consolidation Rule
 
-> **There is only ONE memory folder: `.lovable/memory/`.** The legacy `.lovable/memories/` variant is prohibited. If found, its contents must be migrated to `.lovable/memory/` and the folder deleted.
+> **There is only ONE memory folder: `.ai-memory/memory/`.** The legacy `.ai-memory/memories/` variant is prohibited. If found, its contents must be migrated to `.ai-memory/memory/` and the folder deleted.
 
 ---
 
-*`.lovable/` folder structure guide — v3.2.0 — 2026-04-16*
+*`.ai-memory/` folder structure guide — v3.2.0 — 2026-04-16*
