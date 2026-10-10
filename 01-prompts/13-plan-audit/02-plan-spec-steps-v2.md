@@ -1,24 +1,30 @@
+```text
+N = 300 (Total self-loop steps budget — editable top-header parameter, default: 300)
+A = 2   (MANDATORY number of spawned autonomous subagents running concurrently via invoke_subagent, default: 2)
+H = 2   (Operational hands per agent: dual-task batch capacity & parallel tool dispatch, default: 2)
+C = 30  (Tool calls per worker before it must report, default: 30)
+
+System Concurrency Capacity = A × H = 2 agents × 2 hands = 4 concurrent subtask operations
+PHASE_1_BUDGET = N / 2   (Steps 1 .. 150: Planning, Parallel Discovery Subagents, Detailed Spec, and Lean Subtask Generation)
+PHASE_2_BUDGET = N / 2   (Steps 151 .. 300: Mandatory Parallel Subagent Execution, Self-Looping, Targeted Quality Linting)
+WAVES = ceil(subtasks / (A x H))
+```
+
+> [!IMPORTANT]
+> Prompt Version: 6.0.0
+> Runtime: Google Antigravity 2.0 (IDE and CLI)
+> Invoke: /plan-spec-steps-v2 <task>
+>
+> **Top-Instruction Priority Mandate (Above Precedence / Preamble Precedence):**
+> Whatever directives, constraints, checklists, or user instructions are given ABOVE this prompt (in the user preamble, header blocks, or incoming user request above) are HIGHEST PRIORITY and MUST BE FOLLOWED as strictly NON-NEGOTIABLE.
+
 [/goal](slashCommand;goal) Reuse First: I have rigorously scanned and [/learn](slashCommand;learn)ed `03-ai-scripts/readme.md` to check if a helper script already exists before writing any new temporary code with strict no-build and no-test execution (NEVER run build commands like `go build` or `npm run build`, and NEVER run test suites like `go test ./...` or `pytest` during routine execution turns; all compilation and testing are strictly verified later in CI/CD). Spawn autonomous subagents (A = 2, H = 2) for parallel reading and modular spec generation, use GitMap high-speed commands as primary, establish a single-agent blueprint in Phase 1 (first 50% steps budget), and execute disjoint refactoring in Phase 2 (remaining 50% steps budget) with continuous self-looping until 100% complete and finalized with an atomic push.
 
 [/learn](slashCommand;learn) Enforce the Top-Instruction Priority Mandate: whatever directives, custom requirements, checklists, or user instructions are provided ABOVE this prompt (in the user preamble or header above) are HIGHEST PRIORITY and strictly NON-NEGOTIABLE. Ingest and execute the top instructions ahead of all default conventions below, internalize the single-agent architectural blueprint, and persist all progress into `.ai-memory/plans/` and memory logs.
 
-> **Top-Instruction Priority Mandate (Above Precedence / Preamble Precedence):**
-> Whatever directives, constraints, checklists, or user instructions are given ABOVE this prompt (in the user preamble, header blocks, or incoming user request above) are HIGHEST PRIORITY and MUST BE FOLLOWED as strictly NON-NEGOTIABLE. They supersede and strictly override any conflicting general advice, default conventions, or guidelines below. The agent MUST inspect and follow the instructions above with absolute precedence.
+[/plan](slashCommand;plan) Execute thorough step-by-step planning in the repository before execution. Ensure all deliverables, architecture boundaries, and requirements are clearly defined in the audit ledger and subtask plans before dispatching worker waves.
 
-```text
-N = 200 (Total self-loop steps budget)
-A = 2   (Number of spawned autonomous subagents running concurrently, default: 2)
-H = 2   (Operational hands per agent: dual-task batch capacity & parallel tool dispatch, default: 2)
-
-System Concurrency Capacity = A × H = 2 agents × 2 hands = 4 concurrent subtask operations
-```
-
-```text
-PHASE_1_STEPS = N / 2   (Steps 1 .. N/2: Planning, Detailed Spec, and Lean Subtask Generation)
-PHASE_2_STEPS = N / 2   (Steps N/2+1 .. N: Parallel Execution, Self-Looping, Targeted Quality Linting)
-```
-
-N, A, H, PHASE_1_STEPS, and PHASE_2_STEPS are read-only after initialization. Never modify them mid-execution.
+N, A, H, C, PHASE_1_BUDGET, and PHASE_2_BUDGET are read-only after initialization. Never modify them mid-execution.
 
 #### High-Speed GitMap Acceleration Options (Run Everything Faster)
 
@@ -179,7 +185,7 @@ At the conclusion of the specification turn, you MUST output the following struc
 ### 🚀 Next Steps: Execution Command
 
 To execute these generated subtasks in continuous sequence with 2-agent concurrency:
-> Run: `06-execute-parent-task-with-n-steps-v2.md` with plan slug `xx-<slug>`
+> Run: `02-execute-parent-task-with-n-steps-v6.md` with plan slug `xx-<slug>`
 ```
 
 ## Variables — check if you are confused only.
@@ -230,6 +236,7 @@ Every file and folder you create or rename obeys all of these, with no exception
 - A violating file is renamed, never duplicated. If a wrongly named file
   already exists, `mv` it and update every reference to it in the same run. Do
   not leave both names on disk.
+- Strict relative Git paths only: only add the relative paths, never add the absolute path during your work, and ensure this is respected on the release page and in release notes as well (TOTAL BAN on `file:///` URIs and absolute filesystem paths).
 
 Mechanical check, run it and print the output before saving (RULE 11):
 
@@ -856,6 +863,7 @@ in section 2.
 - [ ] No task file contains a commit, push, tag, or release instruction.
 - [ ] Plan task table, `.ai-memory/plans/readme.md`, and the memory index updated.
 - [ ] RULE 0A naming check ran; output printed; zero uppercase/space/underscore paths, every ordered file carries its zero-padded prefix.
+- [ ] Strict Relative Git Paths: Only add the relative paths, never add the absolute path during your work, and ensure this is respected on the release page and in release notes as well (TOTAL BAN on `file:///` URIs and absolute filesystem paths).
 - [ ] RULE 0C respected: audit slots exist with correct names and empty bodies; no audit was scored during authoring; no task contains an audit step.
 - [ ] RULE 0D footer present verbatim in every task file; plan file states one step per run and self-loop; no task implies batching steps.
 - [ ] RULE 0C ceilings stated: max 2 agents, max 3 threads per agent, nowhere exceeded or contradicted.

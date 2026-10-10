@@ -5,14 +5,14 @@ description: Autonomously synchronize prompts, skills, coding guidelines, and AI
 
 # Cross-Repository Synchronization & Safe Propagation Engine
 
-> **[/goal](slashCommand:goal)** Autonomously synchronize canonical prompts, Antigravity skills, coding guidelines, and automation scripts from a source repository into specified target repositories using dynamic parameter-driven paths, pre-flight safety backups, and strict isolation boundaries.  
+> **[/goal](slashCommand:goal)** Autonomously synchronize canonical prompts, Antigravity skills, coding guidelines, and automation scripts from a source repository into specified target repositories using dynamic parameter-driven paths, pre-flight safety backups, and strict isolation boundaries.
 > **[/learn](slashCommand:learn)** Enforce the 5 Non-Negotiable Boundaries (Spec 21 Exclusion, Bump Script Protection, Additive-Only AI Scripts, Memory & Plans Protection, Zero Secrets), pre-flight backup branch creation, SemVer release ceremonies, and parameter-driven inputs without hardcoding source or target repository paths.
 
-**Version:** 1.0.0  
-**Updated:** 2026-10-02  
-**Status:** Active  
-**AI Confidence:** Production-Ready  
-**Ambiguity:** None  
+**Version:** 1.0.0
+**Updated:** 2026-10-02
+**Status:** Active
+**AI Confidence:** Production-Ready
+**Ambiguity:** None
 
 ---
 
@@ -206,9 +206,26 @@ The following canonical directories are synchronized:
 
 ## 6. Execution Commands & Automation Engine
 
-Synchronization is driven by `03-ai-scripts/38-sync-prompts-skills-scripts.py`, which encapsulates the pre-flight checks, 5 boundaries, directory mirroring, atomic commits, and post-sync release ceremony.
+Synchronization is driven natively by `gitmap sync` (compiled Go engine, primary) with `03-ai-scripts/38-sync-prompts-skills-scripts.py` as backward-compatible fallback.
 
-### Core Script Invocation Workflow
+### Primary GitMap Sync Commands (`gitmap sync` — Go Native)
+
+```bash
+# Step 1: Pre-flight dry run inspection
+gitmap sync --repo <target-repo-name> --dry-run
+
+# Step 2: Live synchronization execution
+gitmap sync --repo <target-repo-name>
+
+# Step 3: Custom projects via JSON file or inline JSON
+gitmap sync --projects path/to/projects.json
+gitmap sync --projects '[{"folder": "cat-my"}]'
+
+# Step 4: Batch execution across all registered repositories concurrently
+gitmap sync --workers 8
+```
+
+### Legacy Python Fallback (`03-ai-scripts/38-sync-prompts-skills-scripts.py`)
 
 ```bash
 # Step 1: Pre-flight dry run inspection
@@ -268,8 +285,7 @@ target-repo-gamma                  | OK       | v2.1.0     | v2.1.1     | +14/-0
 
 ## 8. Traceability & Related Prompts
 
-- **Canonical Execution Prompt:** `01-prompts/23-sync/01-sync-other-codebase.md`
-- **Category Index:** `01-prompts/23-sync/readme.md`
+- **Canonical Execution Prompt:** `01-prompts/24-sync/02-sync-other-codebase.md`
+- **Category Index:** `01-prompts/24-sync/readme.md`
 - **Architecture Specification:** `02-spec/21-app/03-sync-other-codebase/01-architecture-spec.md`
 - **Automation Engine:** `03-ai-scripts/38-sync-prompts-skills-scripts.py`
-

@@ -9,6 +9,14 @@ PHASE_1_BUDGET = N / 2   (Steps 1 .. 150: Planning, Parallel Discovery Subagents
 PHASE_2_BUDGET = N / 2   (Steps 151 .. 300: Mandatory Parallel Subagent Execution, Self-Looping, Targeted Quality Linting)
 WAVES = ceil(subtasks / (A x H))
 ```
+> [!IMPORTANT]
+> Prompt Version: 6.0.0
+> Runtime: Google Antigravity 2.0 (IDE and CLI)
+> Invoke: /string-normalization-and-equalfoldany <task>
+>
+> **Top-Instruction Priority Mandate (Above Precedence / Preamble Precedence):**
+> Whatever directives, constraints, checklists, or user instructions are given ABOVE this prompt (including in the user preamble, header blocks, or incoming user request above) are HIGHEST PRIORITY and MUST BE FOLLOWED as strictly NON-NEGOTIABLE. They supersede and strictly override any conflicting general advice, default conventions, or lower-level guidelines below. The agent MUST inspect and follow the instructions above with absolute precedence.
+
 
 [/goal](slashCommand;goal) Autonomously scan, plan, refactor, and fix all repetitive string normalization, manual trimming, and chained equality comparisons across Go, TypeScript, and Rust codebases. Modifying source files directly, enforce the Search First Directive for `<repo>/pkg/strutil/strutil.go` (or repo string utility), replace manual trimming and `EqualFold` / `ToLower` OR-chains with canonical helpers (`strutil.EqualFoldAny`, `strutil.EqualFoldAnyTrim`, `strutil.NormalizeLowerTrim`), eliminate redundant allocations, enforce positive boolean conventions (`is`/`has` only), maintain functions <= 8-15 lines, and defer verification strictly to targeted linters without running intermediate tests or builds: FIRST showcase and list out the given task in visible chat during Turn 1, capture it verbatim, plan it in the repo, spawn autonomous subagents via `invoke_subagent` (A = 2, H = 2; solo execution without calling `invoke_subagent` is an auto-reject failure) in disjoint file boxes using GitMap high-speed commands as primary, prove every single claim with concrete evidence, enforce coding guidelines to 100%, and finish with one atomic GitMap commit that holds strictly this task's files.
 
@@ -105,7 +113,7 @@ If sources conflict, follow stricter one and record under `Conflicts:` in ledger
 - **R7 Git Safety & Isolation.** Subagents never run git commands or alter git state. Nobody runs `git reset --hard`, `git checkout --`, `git clean`, `git stash`, or force pushes.
 - **R8/R9 Atomic Commit & Push via GitMap.** The run ends with one GitMap call: `gitmap cpf "<module> - <summary>"` (features) or `gitmap cpb "<module> - <summary>"` (fixes). GitMap stages, commits, and pushes. Never commit file-by-file. Before GitMap, all push gates must pass (targeted checks, secrets gate, and `.gitignore` hygiene; untrack any ignored files: `git rm --cached`). Push rejected: `git pull --rebase`, re-run command. Miss after push: allow one follow-up `gitmap cpb "<module> - <summary>"`, logged as `FOLLOW_UP_PUSH: <sha>`. Never amend pushed commits. Workers never run git commands or GitMap commit tools; only lead does.
 - **R10 Zero Unauthorized Releases.** Never bump versions, edit `version.json`, update changelogs, or trigger release scripts unless user explicitly requested release.
-- **R11 Strict Relative Git Paths & Lowercase Hygiene.** Strict ban on absolute paths (`C:\...`, `/home/...`) and `file:///` URIs. Paths relative from git root. New filenames and specs strictly lowercase.
+- **R11 Strict Relative Git Paths & Lowercase Hygiene.** Strict ban on absolute paths (`C:\...`, `/home/...`) and `file:///` URIs. Only add the relative paths, never add the absolute path during your work, and ensure this is respected on the release page and in release notes as well. Paths relative from git root. All filenames, documentation, and specs strictly lowercase (e.g. `readme.md`, `agents.md`, `skill.md`).
 - **R12 No Polling / Immediate Turn Yielding.** Print progress line (`Dispatched Worker 01 .. Worker <A> (wave k / WAVES); waiting for their results.`) and **STOP CALLING TOOLS**. Never poll in loop. Check `manage_subagents` once if wave runs long.
 - **R13 Two-Strike Retry Cap & Anti-Looping.** Tool failing twice: worker replies `STATUS: BLOCKED` with exact error and stops. Lead takes over and logs `LEAD_FALLBACK: <reason>`. Subtask failing two remediation rounds is marked `FAILED` with RCA.
 - **R14 100% Ambiguity & Decision Boundaries.** Non-blocking: choose conservative option, log in ledger `Assumptions:`, proceed. Blocking: `ask_question` once, log in `.ai-memory/ambiguous-questions/01-new-ambiguity/`, continue unblocked tasks.
@@ -393,8 +401,10 @@ Subagents spawn with clean context. The prompt envelope MUST inject complete ins
 ```text
 You are Worker <NN> for task NN-<slug>. You have no prior chat context; this brief is your complete specification.
 
-### Boundaries:
-- Read any file in the workspace; edit only your Owned Files: <relative paths>.
+### Boundaries & Crash Prevention:
+- Read any file in the workspace; edit ONLY your Owned Files: <relative paths>.
+- TOTAL BAN ON GIT COMMANDS (LOCK COLLISION PREVENTION): NEVER run ANY git commands (`git add`, `git commit`, `git push`, `git status`, `git diff`, `git checkout`). In shared workspaces, worker git calls create `.git/index.lock` collisions that immediately crash parallel agents. Only the lead orchestrator runs git commands after workers complete.
+- TOTAL BAN ON COMMITS: Workers NEVER commit, stage, or push. Committing is exclusively reserved for the Lead Agent at Phase 3 via GitMap (`gitmap cpf "<module> - <summary>"` using hyphen `-`; no colon needed in GitMap cpf as colon is already provided).
 - Code & Symbol Search: Use GitMap exclusively: `gitmap aum search "<pattern>" [dir] [-e <.ext>] [-r] [-i]` or `gitmap search`. TOTAL BAN on PowerShell `Select-String`, `Get-ChildItem -Recurse`, `git grep`, `grep`, or `findstr`.
 - After C tool calls, stop and report what you have.
 - A tool failing twice: reply "STATUS: BLOCKED" with exact error and stop. Never guess paths and never troubleshoot machine.
@@ -536,7 +546,7 @@ Confirm scripts exist via harmless workspace call before invoking (R4). Run on c
 - [ ] Multi-Line Arguments (Rule 9a/9b): Signatures and call sites with >2 arguments formatted one argument per line with trailing commas.
 - [ ] Line Endings & Encoding: Strictly Unix LF (`\n`) and UTF-8 without BOM.
 - [ ] Function Sizing: Functions <= 8 lines preferred (hard cap 15 lines).
-- [ ] Strict Relative Git Paths: Zero absolute paths (`/absolute/path/to/...`) or `file:///` URIs.
+- [ ] Strict Relative Git Paths: Only add relative paths, never add absolute paths or `file:///` URIs during your work, and ensure this is respected on the release page and in release notes as well.
 
 ---
 

@@ -5,12 +5,12 @@ description: Autonomously synchronize prompts, skills, coding guidelines, and AI
 
 # Multi-Repository Codebase Synchronization (Alias)
 
-Source prompt: `01-prompts/23-sync/01-sync-other-codebase.md`  
+Source prompt: `01-prompts/24-sync/02-sync-other-codebase.md`
 Companion skill: `.agents/skills/sync-other-codebase/skill.md`
 
 ## Instructions
 
-1. Read `01-prompts/23-sync/01-sync-other-codebase.md` in full before doing the task.
+1. Read `01-prompts/24-sync/02-sync-other-codebase.md` in full before doing the task.
 2. Follow `sync-other-codebase` specifications.
 3. Pre-flight pull on base branches (`git pull origin <base> --no-rebase`).
 4. Create and push safety backup branches (`backup/sync-<timestamp>`).
@@ -20,4 +20,5 @@ Companion skill: `.agents/skills/sync-other-codebase/skill.md`
    - Additive-Only AI Scripts: Copy new scripts, diff and inspect existing scripts before modifying.
    - Memory & Plans Protection: Never overwrite or delete `.ai-memory/memory/` or `.ai-memory/plans/` in target repositories.
    - Zero Secrets: Never copy `.env` or credentials.
-6. Commit changes and push safely per repository.
+6. Prefer `gitmap sync [--projects <path|json>]` as the primary high-speed Go synchronization engine (fallback: `03-ai-scripts/38-sync-prompts-skills-scripts.py`).
+7. Commit changes and push safely per repository.
