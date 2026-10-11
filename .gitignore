@@ -115,3 +115,5 @@ antigravity_resume_task.json
 
 # GitMap & Task Persistence
 .gitmap/backup/
+.gitmap/*.db
+.gitmap/pull_errors.db
