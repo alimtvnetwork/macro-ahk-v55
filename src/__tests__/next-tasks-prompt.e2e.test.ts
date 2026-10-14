@@ -9,7 +9,7 @@
  *
  * Verifies:
  *   1. Canonical (standalone-scripts/prompts/13-next-tasks/prompt.md)
- *      and mirror (.lovable/prompts/12-next-steps-v7.md) are
+ *      and mirror (.ai-memory/prompts/12-next-steps-v7.md) are
  *      byte-identical.
  *   2. Body contains multiple `{{n}}` occurrences (RULE 0 anchor plus
  *      body references).
@@ -26,7 +26,7 @@ import { substituteToken } from '../../standalone-scripts/macro-controller/src/u
 
 const ROOT = resolve(__dirname, '..', '..');
 const CANONICAL = resolve(ROOT, 'standalone-scripts/prompts/13-next-tasks/prompt.md');
-const MIRROR = resolve(ROOT, '.lovable/prompts/12-next-steps-v7.md');
+const MIRROR = resolve(ROOT, '.ai-memory/prompts/12-next-steps-v7.md');
 const INFO = resolve(ROOT, 'standalone-scripts/prompts/13-next-tasks/info.json');
 
 const canonicalBody = readFileSync(CANONICAL, 'utf-8');

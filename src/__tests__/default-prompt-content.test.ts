@@ -45,7 +45,7 @@ describe('default prompt content', () => {
 
   it('release prompt (22-release) enforces MINOR-bump ceremony v7 contract', () => {
     const prompt = readPrompt('standalone-scripts/prompts/22-release/prompt.md');
-    const mirror = readPrompt('.lovable/prompts/14-release.md');
+    const mirror = readPrompt('.ai-memory/prompts/14-release.md');
 
     for (const body of [prompt, mirror]) {
       expect(body).toContain('Release, MINOR bump, MUST enforcement');

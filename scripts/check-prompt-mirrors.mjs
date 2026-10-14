@@ -2,10 +2,10 @@
 /**
  * check-prompt-mirrors.mjs
  *
- * Verifies every canonical prompt listed in .lovable/prompt-mirrors.json has:
- *   1. A mirror file at .lovable/prompts/<XX-slug>.md
+ * Verifies every canonical prompt listed in .ai-memory/prompt-mirrors.json has:
+ *   1. A mirror file at .ai-memory/prompts/<XX-slug>.md
  *   2. A matching slug between info.json (canonical) and the mirror filename
- *   3. A registry row in .lovable/prompts/README.md that references the mirror filename
+ *   3. A registry row in .ai-memory/prompts/README.md that references the mirror filename
  *
  * Exits non-zero with a clear report when any expectation fails.
  *
@@ -17,10 +17,10 @@ import { existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
-const MANIFEST = join(ROOT, ".lovable", "prompt-mirrors.json");
+const MANIFEST = join(ROOT, ".ai-memory", "prompt-mirrors.json");
 const CANON_DIR = join(ROOT, "standalone-scripts", "prompts");
-const MIRROR_DIR = join(ROOT, ".lovable", "prompts");
-const REGISTRY = join(ROOT, ".lovable", "prompts/readme.md");
+const MIRROR_DIR = join(ROOT, ".ai-memory", "prompts");
+const REGISTRY = join(ROOT, ".ai-memory", "prompts/readme.md");
 
 const errors = [];
 
@@ -66,7 +66,7 @@ async function main() {
         }
 
         if (!registry.includes(mirror)) {
-            fail(`[MISSING-REGISTRY-ROW] .lovable/prompts/readme.md has no row referencing "${mirror}"`);
+            fail(`[MISSING-REGISTRY-ROW] .ai-memory/prompts/readme.md has no row referencing "${mirror}"`);
         }
     }
 

@@ -3,7 +3,7 @@
  *
  * Root contract this test locks:
  *   1. Canonical (standalone-scripts/prompts/16-read-memory/prompt.md) and
- *      mirror (.lovable/prompts/05-read-memory.md) MUST be byte-identical.
+ *      mirror (.ai-memory/prompts/05-read-memory.md) MUST be byte-identical.
  *      `scripts/check-prompt-mirrors.mjs` only checks existence, not content.
  *   2. The prompt is STATIC (no `ReplaceKey` in info.json). It MUST NOT
  *      contain any `{{token}}` / `${token}` placeholders — running
@@ -21,9 +21,9 @@ import { substituteToken } from '../../standalone-scripts/macro-controller/src/u
 
 const ROOT = resolve(__dirname, '..', '..');
 const CANONICAL = resolve(ROOT, 'standalone-scripts/prompts/16-read-memory/prompt.md');
-const MIRROR = resolve(ROOT, '.lovable/prompts/05-read-memory.md');
+const MIRROR = resolve(ROOT, '.ai-memory/prompts/05-read-memory.md');
 const INFO = resolve(ROOT, 'standalone-scripts/prompts/16-read-memory/info.json');
-const MIRROR_MANIFEST = resolve(ROOT, '.lovable/prompt-mirrors.json');
+const MIRROR_MANIFEST = resolve(ROOT, '.ai-memory/prompt-mirrors.json');
 const GENERATED_PROMPTS = resolve(ROOT, 'standalone-scripts/macro-controller/03-macro-prompts.json');
 
 interface ReadMemoryInfo {

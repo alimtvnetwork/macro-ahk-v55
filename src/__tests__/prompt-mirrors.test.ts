@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
 describe("prompt mirrors", () => {
-  it("every canonical prompt in .lovable/prompt-mirrors.json has a matching mirror in .lovable/prompts/", () => {
+  it("every canonical prompt in .ai-memory/prompt-mirrors.json has a matching mirror in .ai-memory/prompts/", () => {
     const script = resolve(__dirname, "../../scripts/check-prompt-mirrors.mjs");
     const result = spawnSync("node", [script], { encoding: "utf-8" });
 
