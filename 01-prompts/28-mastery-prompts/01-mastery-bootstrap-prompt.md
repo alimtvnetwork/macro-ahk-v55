@@ -86,7 +86,7 @@ Read ALL of these (skip only the ones that don't exist — fresh machine):
 - `~/workspace/repos/README.md` — the repo legend: what each cloned repo is and which side chat belongs to it.
 
 Context that is always true (use when memory files are missing):
-- User: **MD ALIM UL KARIM**, developer, Malaysia (timezone **Asia/Kuala_Lumpur**), uses Cursor editor and an Android phone.
+- User: **MD ALIM UL KARIM**, developer, Malaysia (timezone **Asia/Kuala_Lumpur**), uses Cursor editor and an Android phone. <!-- allow-timezone-example -->
 - GitHub: `alimtvnetwork`. Turbo mode always on. Never delete anything unasked.
 - Layout: `~/.local/bin` holds the `gitmap` binary (must be on PATH); `~/go/bin` holds the Go toolchain; `~/workspace/repos` is the handpicked work directory and gitmap's default scan root.
 

@@ -26,7 +26,7 @@ Forbidden:
 
 ## readme.txt timestamp generator — TOTAL BAN
 
-🔴 **NEVER build, suggest, propose, design, spec, or even mention any feature that writes a timestamp / date / time / "Malaysia-formatted" content into `readme.txt` (or any other file).**
+🔴 **NEVER build, suggest, propose, design, spec, or even mention any feature that writes a timestamp / date / time / "Malaysia-formatted" content into `readme.txt` (or any other file).** <!-- allow-timezone-example -->
 
 This includes — but is not limited to:
 - ❌ A `refresh-readme.ps1` / `refresh-readme.sh` / any script that writes time into readme.txt
@@ -34,7 +34,7 @@ This includes — but is not limited to:
 - ❌ An npm script (`npm run refresh-readme`, etc.) that writes time into readme.txt
 - ❌ Hooking timestamp-writing into `npm run sync` or any other workflow
 - ❌ Hard-coded prefix variants (`let's start now`, etc.), configurable prefix, curated lists, random phrases
-- ❌ Any timezone discussion (Asia/Kuala_Lumpur, UTC, local) tied to readme.txt
+- ❌ Any timezone discussion (Asia/Kuala_Lumpur, UTC, local) tied to readme.txt <!-- allow-timezone-example -->
 - ❌ Any 12-hr / 24-hr / `dd-MMM-yyyy` format discussion tied to readme.txt
 - ❌ Any idempotency variant (always rewrite, skip if same day, write if missing)
 - ❌ "Instructions" / "how it works" / "how to run" / "how to test" sections about any such generator

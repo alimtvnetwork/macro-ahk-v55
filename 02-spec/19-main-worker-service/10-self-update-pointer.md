@@ -100,7 +100,7 @@ Schedule shape and defaults: see `07-core-api-endpoints.md` §4.
 | `Cadence` | `Hourly`, `EveryNHours`, `Daily`, `Weekly`, `Monthly`, `Yearly` | `Weekly` |
 | `EveryNHours` | 5, 6, 12, 24 | null |
 | `SpecificTimeOfDay` | `HH:mm` | `04:00` |
-| `TimeZone` | IANA TZ string | `Asia/Kuala_Lumpur` |
+| `TimeZone` | IANA TZ string | `Asia/Kuala_Lumpur` | <!-- allow-timezone-example -->
 | `Enabled` | bool | true |
 
 Implementer wires this to a scheduler (Laravel scheduler / cron / systemd timer). The scheduler invokes `/SelfUpdate` — body of that endpoint is the deferred bit.

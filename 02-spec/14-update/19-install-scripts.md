@@ -353,7 +353,7 @@ Every spec repo MUST publish a `version.json` at its root:
 | Field | Required | Source of truth |
 |-------|----------|-----------------|
 | `version` | ✅ | Mirrors `package.json#version` (auto-synced) |
-| `updated` | ✅ | ISO date (UTC+8) of last sync |
+| `updated` | ✅ | ISO date (UTC+8) of last sync | <!-- allow-timezone-example -->
 | `name` | ✅ | Short slug — appears in installer output |
 | `description` | ⚠️ optional | One-line human summary |
 

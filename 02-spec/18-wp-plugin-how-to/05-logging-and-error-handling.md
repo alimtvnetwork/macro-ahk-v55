@@ -794,7 +794,7 @@ All timestamps flow through a centralised `DateHelper` class:
 - All storage is UTC
 - All display converts to the WordPress-configured timezone (`Settings > General > Timezone`)
 - The timezone is resolved once and cached for the request lifetime
-- Supports both named timezones (`Asia/Kuala_Lumpur`) and GMT offset fallback
+- Supports both named timezones (`Asia/Kuala_Lumpur`) and GMT offset fallback <!-- allow-timezone-example -->
 
 ---
 
