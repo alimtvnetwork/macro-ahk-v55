@@ -1,7 +1,7 @@
 # Readiness Score (v2 — Honest 100/100)
 **Date:** 2026-06-02
 **Method:** Every cell verified by direct file-system read on 2026-06-02. No phantom citations.
-**Smoke test:** `spec/21-app/05-prompts/blind-ai-smoke-test.md` — **20 / 20** pass.
+**Smoke test:** `02-spec/21-app/05-prompts/blind-ai-smoke-test.md` — **20 / 20** pass.
 ## Rubric
 | # | Dimension | Weight | Score | Evidence (verified existing files) |
 |---|---|---:|---:|---|

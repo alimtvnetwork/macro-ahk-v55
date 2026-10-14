@@ -233,16 +233,20 @@ function sendInternalMessage<T>(message: Record<string, unknown>): Promise<T> {
 /* ------------------------------------------------------------------ */
 
 /**
- * Advances the recorder state machine via the toolbar's primary control:
+ * Advances the recorder state machine from the keyboard shortcut:
  *   Idle      → Start recording
  *   Recording → Pause
- *   Paused    → Resume
+ *   Paused    → Stop (detach listeners; Resume stays available in the
+ *               in-page toolbar and the React UI)
  *
  * Loaded lazily so the recorder modules (which import sql.js indirectly)
  * do not bloat service-worker cold start. See Phase 05 spec
  * `spec/26-chrome-extension-generic/06-ui-and-design-system/10-toolbar-recording-ux.md`.
+ *
+ * Exported so the legacy TOGGLE_XPATH_RECORDER handler can alias to this
+ * canonical toggle instead of running its own in-memory state machine.
  */
-async function toggleRecordingFromShortcut(): Promise<void> {
+export async function toggleRecordingFromShortcut(): Promise<void> {
   try {
     const current = (await loadSession()) ?? IDLE_SESSION;
     const projectSlug = await getActiveProjectSlug();
@@ -270,12 +274,22 @@ async function toggleRecordingFromShortcut(): Promise<void> {
         console.log("[Marco] Injected xpath-recorder.js into tab %d", target.id);
       }
     }
+
+    // Stopping detaches the content-script listeners. The session-key
+    // removal notifies every injected tab via chrome.storage.onChanged;
+    // the active tab additionally gets an immediate marco-xpath-stop.
+    if (next.Phase === "Idle" && current.Phase !== "Idle") {
+      await signalRecorderStop();
+    }
   } catch (err) {
     logCaughtError(BgLogTag.SHORTCUT, "Toggle-recording shortcut failed", err);
   }
 }
 
-/** Returns the recorder action that the primary toolbar button maps to. */
+/**
+ * Returns the recorder action for one shortcut press. Paused → Stop so the
+ * toggle can always reach Stop; Resume is offered by the toolbar/UI instead.
+ */
 function chooseToggleAction(
   phase: PhaseType,
   projectSlug: string,
@@ -285,10 +299,30 @@ function chooseToggleAction(
   }
 
   if (phase === "Recording") {
-    return { Kind: "Pause" }; 
+    return { Kind: "Pause" };
   }
 
-  return { Kind: "Resume" };
+  return { Kind: "Stop" };
+}
+
+/** Dispatches marco-xpath-stop into the active tab so an injected recorder detaches immediately. */
+async function signalRecorderStop(): Promise<void> {
+  try {
+    const target = await getActiveTab();
+
+    if (target && target.id) {
+      await chrome.scripting.executeScript({
+        target: { tabId: target.id },
+        func: () => {
+          window.dispatchEvent(new CustomEvent("marco-xpath-stop"));
+        },
+      });
+      console.log("[Marco] Dispatched marco-xpath-stop into tab %d", target.id);
+    }
+  } catch (err) {
+    // Non-fatal: the storage.onChanged path still notifies injected tabs.
+    logCaughtError(BgLogTag.SHORTCUT, "Stop signal dispatch failed", err);
+  }
 }
 
 function generateSessionId(): string {

@@ -83,7 +83,7 @@ The Sweet Digs specification suite is organized into modular documents:
 
 To verify and experience the Sweet Digs Design System in real-time, launch the standalone interactive test application:
 
-- **Interactive Test Application:** [`theme-tester/index.html`](../../../theme-tester/index.html)
+- **Interactive Test Application:** `theme-tester/index.html`
 - **Features Verified in Demo:**
   1. **Live 5-Theme Switcher:** Instant runtime switching between Emerald Green, Pink/Red, Obsidian Navy, Sunset Amber, and Cyber Indigo.
   2. **Live Split Hero:** Rendered with two-tone typography and responsive spacing.

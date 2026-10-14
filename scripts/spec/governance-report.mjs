@@ -3,7 +3,7 @@
 // quarterly review workflow. Pure read-only; no retry.
 import { readFileSync, existsSync, statSync } from 'node:fs';
 
-const INDEX = 'spec/21-app/05-prompts/INDEX.json';
+const INDEX = '02-spec/21-app/05-prompts/INDEX.json';
 if (!existsSync(INDEX)) {
   console.error(`Missing ${INDEX} — run build-index first`);
   process.exit(2);
@@ -12,7 +12,7 @@ const idx = JSON.parse(readFileSync(INDEX, 'utf8'));
 
 const byTopDir = {};
 for (const f of idx.files) {
-  const parts = f.path.replace('spec/21-app/05-prompts/', '').split('/');
+  const parts = f.path.replace('02-spec/21-app/05-prompts/', '').split('/');
   const top = parts.length > 1 ? parts[0] : '(root)';
   byTopDir[top] = (byTopDir[top] || 0) + 1;
 }

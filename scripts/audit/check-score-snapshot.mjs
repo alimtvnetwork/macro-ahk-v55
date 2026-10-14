@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT_ARG = '--root=';
 const SNAPSHOT_ARG = '--snapshot=';
 const UPDATE_FLAG = '--update';
-const DEFAULT_SPEC_ROOT = 'spec/2026-spec';
-const DEFAULT_SNAPSHOT = 'spec/2026-spec/_audit-2026-06-05/scores.snapshot.json';
+const DEFAULT_SPEC_ROOT = '02-spec/2026-spec';
+const DEFAULT_SNAPSHOT = '02-spec/2026-spec/_audit-2026-06-05/scores.snapshot.json';
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const AUDIT_SCAN_SCRIPT = resolve(SCRIPT_DIR, 'audit-scan.py');
 

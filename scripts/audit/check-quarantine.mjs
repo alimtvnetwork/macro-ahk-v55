@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Spec audit: every quarantined draft under `spec/2026-spec/_quarantine/`
+ * Spec audit: every quarantined draft under `02-spec/2026-spec/_quarantine/`
  * MUST declare a `## Graduation Plan` section so it cannot drift into an
  * orphan rule. The directory `README.md` is the policy file and is exempt.
  *
@@ -11,7 +11,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const ROOT_ARG = '--root=';
-const DEFAULT_ROOT = 'spec/2026-spec/_quarantine';
+const DEFAULT_ROOT = '02-spec/2026-spec/_quarantine';
 const SPEC_ROOT = resolve(getArg(ROOT_ARG, DEFAULT_ROOT));
 const GRADUATION_RX = /^##\s+Graduation Plan\s*$/im;
 

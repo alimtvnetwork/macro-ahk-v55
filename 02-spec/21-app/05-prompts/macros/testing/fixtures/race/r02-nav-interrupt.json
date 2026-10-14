@@ -1,6 +1,6 @@
 {
   "id": "r02-nav-interrupt",
-  "spec": "spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-02",
+  "spec": "02-spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-02",
   "macro": {
     "id": "m-r02",
     "steps": [

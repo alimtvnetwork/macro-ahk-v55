@@ -41,7 +41,7 @@ The run banner Status flips to `WaitingVars`; the dialog mounts inline above the
 | `boolean`       | toggle (default OFF)                                       | Always valid; no `Required` enforcement (toggle implies a value).        |
 | `enum`          | radio group from `EnumValues[]`                            | One option required.                                                     |
 | `path`          | single-line text input + monospace font, leading `/` hint  | Non-empty; rejects characters `\0`, `\n`, `\r`; max 256 chars.            |
-Widget choice is driven purely by `Type` — no per-prompt customisation. Type coercion follows `spec/21-app/05-prompts/variables/04-types.md`.
+Widget choice is driven purely by `Type` — no per-prompt customisation. Type coercion follows `02-spec/21-app/05-prompts/variables/04-types.md`.
 ## Sensitive variables
 When `Sensitive === true` on a missing var:
 - Widget is `<input type="password">`.

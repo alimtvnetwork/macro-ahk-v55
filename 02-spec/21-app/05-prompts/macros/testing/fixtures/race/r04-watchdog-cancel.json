@@ -1,6 +1,6 @@
 {
   "id": "r04-watchdog-cancel",
-  "spec": "spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-04",
+  "spec": "02-spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-04",
   "macro": {
     "id": "m-r04",
     "watchdog": { "timeoutMs": 2000 },

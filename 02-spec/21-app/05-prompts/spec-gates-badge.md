@@ -3,7 +3,7 @@
 Status: Reference · v1.0.0 · 2026-06-02
 
 Paste the following badge row near the top of root `README.md` (or
-`spec/21-app/05-prompts/readme.md`). Replace `<owner>/<repo>` with the
+`02-spec/21-app/05-prompts/readme.md`). Replace `<owner>/<repo>` with the
 actual GitHub slug at integration time.
 
 ```md

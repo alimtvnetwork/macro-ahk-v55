@@ -27,7 +27,12 @@ import { suggestVariableName } from "./xpath-label-suggester";
 import { enqueueCapture, flushNow } from "./xpath-capture-coalescer";
 import { mountRecorderToolbar, type RecorderToolbarHandle, type RecorderToolbarOptions } from "../background/recorder/recorder-toolbar";
 import { mountDropZoneOverlay, type DropZoneHandle } from "../background/recorder/dropzone-overlay";
-import type { RecordingPhase, RecordingSession } from "../background/recorder/recorder-session-types";
+import {
+  RECORDER_SESSION_STORAGE_KEY,
+  type RecordingPhase,
+  type RecordingSession,
+} from "../background/recorder/recorder-session-types";
+import { persistSession } from "../background/recorder/recorder-session-storage";
 import { FullStrategyType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -37,6 +42,88 @@ import { FullStrategyType } from "../../standalone-scripts/macro-controller/src/
 let isActive = true;
 let toolbarHandle: RecorderToolbarHandle | null = null;
 let dropzoneHandle: DropZoneHandle | null = null;
+
+/** Window sentinel — skips duplicate init when the script is injected twice. */
+const RECORDER_SENTINEL = "__marcoXPathRecorderActive";
+
+/** True once this page has an initialised recorder (duplicate-injection guard). */
+function hasActiveRecorder(): boolean {
+  return Boolean((window as unknown as Record<string, unknown>)[RECORDER_SENTINEL]);
+}
+
+function markRecorderActive(): void {
+  (window as unknown as Record<string, unknown>)[RECORDER_SENTINEL] = true;
+}
+
+function clearRecorderSentinel(): void {
+  delete (window as unknown as Record<string, unknown>)[RECORDER_SENTINEL];
+}
+
+/**
+ * Drives the page-local toolbar to the given phase without re-firing
+ * redundant transitions (each toolbar action re-persists via OnPhaseChange,
+ * so this must be a no-op when already in phase to avoid ping-pong).
+ */
+function syncToolbarPhase(phase: RecordingPhase): void {
+  if (toolbarHandle === null) {
+    return;
+  }
+
+  const current = toolbarHandle.GetSession().Phase;
+
+  if (current === phase) {
+    return;
+  }
+
+  if (phase === "Recording") {
+    if (current === "Idle") {
+      toolbarHandle.Start();
+    } else if (current === "Paused") {
+      toolbarHandle.Resume();
+    }
+
+    return;
+  }
+
+  if (phase === "Paused" && current === "Recording") {
+    toolbarHandle.Pause();
+  }
+}
+
+/**
+ * Applies an externally changed session (shortcut toggle, popup UI) to the
+ * page-local capture gate + toolbar. The key removal means Idle → full stop.
+ */
+function handleSessionStorageChange(
+  changes: Record<string, chrome.storage.StorageChange>,
+  areaName: string,
+): void {
+  if (areaName !== "local") {
+    return;
+  }
+
+  const change = changes[RECORDER_SESSION_STORAGE_KEY];
+
+  if (change === undefined) {
+    return;
+  }
+
+  const next = change.newValue as RecordingSession | undefined;
+
+  if (next === undefined) {
+    stopRecorder();
+
+    return;
+  }
+
+  isActive = next.Phase === "Recording";
+  syncToolbarPhase(next.Phase);
+}
+
+/** Window-event entry for the background stop signal. */
+function onStopEvent(): void {
+  stopRecorder();
+}
 
 /* ------------------------------------------------------------------ */
 /*  XPath Generation — Priority Strategy                               */
@@ -306,6 +393,51 @@ function highlightElement(element: Element): void {
 /*  Lifecycle                                                          */
 /* ------------------------------------------------------------------ */
 
+/** Toolbar phase transitions: persist via the canonical key + gate captures. */
+function handleToolbarPhaseChange(phase: RecordingPhase, nextSession: RecordingSession): void {
+  // Sync back to background through the canonical session key
+  // (Idle removes the key, mirroring persistSession). The capture
+  // gate follows the live phase: Paused suspends capture.
+  persistSession(nextSession).catch((err: unknown) => {
+    console.warn("[Marco] recorder session persist failed", err);
+  });
+  isActive = phase === "Recording";
+}
+
+/** Mounts the recorder toolbar + drop-zone overlay for the loaded session. */
+function mountRecorderUi(session: RecordingSession | undefined): void {
+  const projectSlug = session?.ProjectSlug || "default";
+
+  toolbarHandle = mountRecorderToolbar({
+    ProjectSlug: projectSlug,
+    NewSessionId: () => `sess-${Date.now().toString(36)}`,
+    Now: () => new Date().toISOString(),
+    OnPhaseChange: handleToolbarPhaseChange,
+  });
+
+  // Sync the toolbar to the current session state
+  if (session) {
+    if (session.Phase === "Recording") {
+      toolbarHandle.Start();
+    } else if (session.Phase === "Paused") {
+      toolbarHandle.Start();
+      toolbarHandle.Pause();
+    }
+  }
+
+  dropzoneHandle = mountDropZoneOverlay({
+    OnFileDropped: (file) => {
+      chrome.runtime.sendMessage({
+        type: "RECORDER_DATA_SOURCE_ADD",
+        projectSlug: session?.ProjectSlug || "default",
+        filePath: file.FileName,
+        mimeKind: file.MimeKind,
+        rawText: file.RawText
+      });
+    }
+  });
+}
+
 /** Starts the XPath recorder. */
 function startRecorder(): void {
   document.addEventListener(Events.CLICK, onElementClick, true);
@@ -315,41 +447,10 @@ function startRecorder(): void {
   console.log("[Marco] XPath recorder started");
 
   if (typeof chrome !== "undefined" && chrome.storage) {
-    chrome.storage.local.get("marco.recorder.session", (data) => {
-      const session = data["marco.recorder.session"] as RecordingSession | undefined;
-      const projectSlug = session?.ProjectSlug || "default";
-            
-      toolbarHandle = mountRecorderToolbar({
-        ProjectSlug: projectSlug,
-        NewSessionId: () => `sess-${Date.now().toString(36)}`,
-        Now: () => new Date().toISOString(),
-        OnPhaseChange: (phase, nextSession) => {
-          // Sync back to background
-          chrome.storage.local.set({ "marco.recorder.session": nextSession });
-        }
-      });
-            
-      // Sync the toolbar to the current session state
-      if (session) {
-        if (session.Phase === "Recording") {
-          toolbarHandle.Start();
-        } else if (session.Phase === "Paused") {
-          toolbarHandle.Start();
-          toolbarHandle.Pause();
-        }
-      }
-
-      dropzoneHandle = mountDropZoneOverlay({
-        OnFileDropped: (file) => {
-          chrome.runtime.sendMessage({
-            type: "RECORDER_DATA_SOURCE_ADD",
-            projectSlug: session?.ProjectSlug || "default",
-            filePath: file.FileName,
-            mimeKind: file.MimeKind,
-            rawText: file.RawText
-          });
-        }
-      });
+    chrome.storage.onChanged.addListener(handleSessionStorageChange);
+    chrome.storage.local.get(RECORDER_SESSION_STORAGE_KEY, (data) => {
+      const session = data[RECORDER_SESSION_STORAGE_KEY] as RecordingSession | undefined;
+      mountRecorderUi(session);
     });
   }
 }
@@ -363,6 +464,14 @@ function stopRecorder(): void {
   document.removeEventListener(Events.KEYDOWN, onElementKeydown, true);
   clearAllHighlights();
   window.removeEventListener("pagehide", onPageHide);
+  window.removeEventListener("marco-xpath-stop", onStopEvent);
+
+  if (typeof chrome !== "undefined" && chrome.storage?.onChanged) {
+    chrome.storage.onChanged.removeListener(handleSessionStorageChange);
+  }
+
+  // Drop the duplicate-injection sentinel so the next Start re-injects cleanly.
+  clearRecorderSentinel();
   // PERF-R6: drain any queued captures before teardown.
   void flushNow();
     
@@ -384,11 +493,17 @@ function onPageHide(): void {
   stopRecorder();
 }
 
-/** Listens for the stop event from the background handler. */
-window.addEventListener("marco-xpath-stop", () => {
-  stopRecorder();
-});
+if (hasActiveRecorder()) {
+  // Duplicate injection (e.g. shortcut pressed twice): the running instance
+  // already owns the listeners + toolbar — do not double-mount.
+  console.log("[Marco] XPath recorder already active — skipping duplicate init");
+} else {
+  markRecorderActive();
 
-window.addEventListener("pagehide", onPageHide);
+  /** Listens for the stop event from the background handler. */
+  window.addEventListener("marco-xpath-stop", onStopEvent);
 
-startRecorder();
+  window.addEventListener("pagehide", onPageHide);
+
+  startRecorder();
+}

@@ -14,7 +14,7 @@ standalone-scripts/
 ## File contract
 - One macro per file.
 - Extension: **`.macro.json`** (not `.json` — keeps editors / aggregator unambiguous).
-- Filename: `<NNN>-<kebab-slug>.macro.json` — same numbering/slug grammar as `macro-prompts/` (`spec/21-app/05-prompts/macro-prompts/01-naming-and-numbering.md`).
+- Filename: `<NNN>-<kebab-slug>.macro.json` — same numbering/slug grammar as `macro-prompts/` (`02-spec/21-app/05-prompts/macro-prompts/01-naming-and-numbering.md`).
 - Slug in file equals slug segment of filename (mismatch → `Reason="SlugFilenameMismatch"`).
 ## Why one-file-per-macro (not a folder)
 A macro is a single JSON document — no Markdown body, no sidecar assets. A flat file beats a folder for:
@@ -33,7 +33,7 @@ Wrapper schema is shared with prompts bundles (`schemas/prompts-bundle.schema.js
 - User overrides of bundled macros mirror the prompts pattern: sibling `MacrosUserOverride` table.
 - No Supabase (`mem://constraints/no-supabase`).
 ## Cross-references
-- Naming rules: `spec/21-app/05-prompts/macros/folder-layout/01-naming.md`
+- Naming rules: `02-spec/21-app/05-prompts/macros/folder-layout/01-naming.md`
 - Schema: `schemas/macro.schema.json` (Task 34)
-- Aggregation: `spec/21-app/05-prompts/macros/folder-layout/03-aggregation.md` (Task 38)
-- Starter macros: `spec/21-app/05-prompts/macros/folder-layout/04-starter-macros.md` (Task 39)
+- Aggregation: `02-spec/21-app/05-prompts/macros/folder-layout/03-aggregation.md` (Task 38)
+- Starter macros: `02-spec/21-app/05-prompts/macros/folder-layout/04-starter-macros.md` (Task 39)

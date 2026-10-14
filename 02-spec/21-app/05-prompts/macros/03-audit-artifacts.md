@@ -40,7 +40,7 @@ parseable score line:
 Score: 87 / 100
 ```
 Regex (single source of truth, lives in
-`spec/21-app/05-prompts/macros/engine/03-score-extraction.md`):
+`02-spec/21-app/05-prompts/macros/engine/03-score-extraction.md`):
 ```
 /^\s*Score\s*:\s*(\d{1,3})\s*\/\s*100\s*$/im
 ```
@@ -54,7 +54,7 @@ Regex (single source of truth, lives in
     {
       "Id": "F-001",
       "Severity": "P1",
-      "Path": "spec/21-app/05-prompts/macros/01-step-kinds.md",
+      "Path": "02-spec/21-app/05-prompts/macros/01-step-kinds.md",
       "Title": "Missing watchdog timeout default",
       "Detail": "…",
       "Suggestion": "…"

@@ -15,3 +15,4 @@ End-to-end specification for the **Macro Controller** Chrome extension app — t
 - [`04-design-diagrams/`](./04-design-diagrams/) — Mermaid + XMind diagrams
 - [`05-prompts/`](./05-prompts/) — prompt library + cache, **Macros**, **Variables** (5-tier resolution), **MacroPrompts** (aggregated from `standalone-scripts/macro-prompts/`)
 - [`06-tasks/`](./06-tasks/) — master task breakdown + seeding
+- [`cicd-failure-investigation-and-recorder-functionality/`](./cicd-failure-investigation-and-recorder-functionality/) — CI/CD failure RCA + recorder repair program spec (2026-10-15)

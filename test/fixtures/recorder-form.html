@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recorder Fixture - Contact Form</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  label { display: block; margin: 12px 0 4px; }
+  #formStatus { margin-top: 16px; padding: 8px; border: 1px solid #999; min-height: 20px; }
+  nav a { margin-right: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Contact Form</h1>
+  <nav>
+    <a id="panelLink" href="#details">Details panel</a>
+  </nav>
+
+  <form id="contactForm">
+    <label for="fullName">Full Name</label>
+    <input id="fullName" name="fullName" type="text" autocomplete="off">
+
+    <label for="email">Email Address</label>
+    <input id="email" name="email" type="email" autocomplete="off">
+
+    <label for="phone">Phone Number</label>
+    <input data-testid="phone-input" name="phone" type="tel" autocomplete="off">
+
+    <label for="country">Country</label>
+    <select id="country" name="country">
+      <option value="">Choose…</option>
+      <option value="ca">Canada</option>
+      <option value="jp">Japan</option>
+      <option value="br">Brazil</option>
+    </select>
+
+    <div role="group" aria-label="Preferences">
+      <label><input id="newsletter" type="checkbox" value="yes"> Subscribe to newsletter</label>
+    </div>
+
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes" rows="3"></textarea>
+
+    <div>
+      <button id="submitBtn" type="submit">Submit Form</button>
+      <button id="resetBtn" type="button">Reset</button>
+    </div>
+  </form>
+
+  <div id="formStatus" aria-live="polite"></div>
+</main>
+<script>
+  (function () {
+    var form = document.getElementById('contactForm');
+    var status = document.getElementById('formStatus');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var parts = [
+        'name=' + document.getElementById('fullName').value,
+        'email=' + document.getElementById('email').value,
+        'phone=' + document.querySelector('[data-testid="phone-input"]').value,
+        'country=' + document.getElementById('country').value,
+        'newsletter=' + (document.getElementById('newsletter').checked ? 'yes' : 'no'),
+        'notes=' + document.getElementById('notes').value
+      ];
+      status.textContent = 'SUBMITTED:' + parts.join('|');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function () {
+      form.reset();
+      status.textContent = '';
+    });
+
+    document.getElementById('panelLink').addEventListener('click', function () {
+      status.textContent = 'PANEL:details';
+    });
+  })();
+</script>
+</body>
+</html>

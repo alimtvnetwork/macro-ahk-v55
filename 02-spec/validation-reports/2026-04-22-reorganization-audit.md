@@ -165,7 +165,7 @@ These items are not part of the reorganization but were surfaced during it:
 
 - Master spec index: [`/spec/00-overview.md`](../00-overview.md)
 - Root consistency report: [`/spec/99-consistency-report.md`](../99-consistency-report.md)
-- Spec authoring guide: [`/spec/01-spec-authoring-guide/`](../01-spec-authoring-guide/00-overview.md)
+- Spec authoring guide: [`/spec/01-spec-authoring-guide/`](../01-spec-authoring-guide/)
 - Migration record: [`/spec/99-archive/governance-history/2026-04-22-reorganization-plan.md`](../99-archive/governance-history/2026-04-22-reorganization-plan.md)
 - Live phase tracker: `.lovable/spec-reorganization-plan-2026-04-22.md`
 - Memory layout doc: `.lovable/memory/architecture/spec-tree-v3-2-0-layout.md`

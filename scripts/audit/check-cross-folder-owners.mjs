@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT_ARG = '--root=';
-const ROOT = getArg(ROOT_ARG, 'spec/2026-spec');
+const ROOT = getArg(ROOT_ARG, '02-spec/2026-spec');
 
 const RULES = [
   {

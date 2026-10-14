@@ -28,4 +28,4 @@
 - Migrators run inside the same SQLite transaction as the consuming op (Import / Replace); rollback on failure.
 
 ## Changelog
-- Every `SchemaVersion` bump appends an entry to `spec/21-app/05-prompts/macros/changelog.md`.
+- Every `SchemaVersion` bump appends an entry to `02-spec/21-app/05-prompts/macros/changelog.md`.

@@ -17,7 +17,7 @@
  *   - Default: prints per-flag error counts, exits 0.
  *   - --strict: ratchet gate. Exits 1 when any pending flag's error count
  *     exceeds the recorded baseline in
- *     `spec/33-missing-coding-guideline/99-baselines.json`
+ *     `02-spec/33-missing-coding-guideline/99-baselines.json`
  *     (`baselines.strictFlagFallout`). Also exits 1 when a flag listed as
  *     `already-enabled` regresses back to `pending`.
  *   - --json: machine-readable output.
@@ -33,7 +33,7 @@ import { spawnSync } from 'node:child_process';
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CFG = join(REPO_ROOT, 'tsconfig.macro.json');
 const BUILD_CFG = 'tsconfig.macro.build.json';
-const BASELINES = join(REPO_ROOT, 'spec/33-missing-coding-guideline/99-baselines.json');
+const BASELINES = join(REPO_ROOT, '02-spec/33-missing-coding-guideline/99-baselines.json');
 
 const args = new Set(process.argv.slice(2));
 const STRICT = args.has('--strict');

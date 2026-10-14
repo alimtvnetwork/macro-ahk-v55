@@ -83,6 +83,6 @@
 ## Cross-References
 
 - Master index: [`./00-overview.md`](./00-overview.md)
-- Authoring guide: [`./01-spec-authoring-guide/`](./01-spec-authoring-guide/00-overview.md)
+- Authoring guide: [`./01-spec-authoring-guide/`](./01-spec-authoring-guide/)
 - Link checker: `scripts/check-spec-links.mjs`
 - Validation reports: [`./validation-reports/`](./validation-reports/readme.md)

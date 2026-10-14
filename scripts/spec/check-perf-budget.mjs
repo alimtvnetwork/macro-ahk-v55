@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Perf-budget gate — reads spec/21-app/05-prompts/macros/performance/10-budgets.md
+// Perf-budget gate — reads 02-spec/21-app/05-prompts/macros/performance/10-budgets.md
 // and runs synthetic fixture timings. Fail-fast (no retry/backoff per no-retry policy).
 import { readFileSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 
-const BUDGET_DOC = 'spec/21-app/05-prompts/macros/performance/10-budgets.md';
+const BUDGET_DOC = '02-spec/21-app/05-prompts/macros/performance/10-budgets.md';
 if (!existsSync(BUDGET_DOC)) {
   console.error(`[perf-budget] Missing budget doc: ${BUDGET_DOC}`);
   process.exit(2);

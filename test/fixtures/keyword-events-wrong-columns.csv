@@ -1,0 +1,4 @@
+Uid,Keyword,Description,Enabled
+ke-1,Login,Open the app,1,EXTRA-COLUMN
+ke-2,Logout
+ke-3,Search,Find things,1

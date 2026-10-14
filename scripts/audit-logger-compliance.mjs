@@ -41,6 +41,9 @@ const ALLOWLIST = new Set([
   'src/background/handlers/injection-wrapper.ts',
   // Monaco editor snippets shown to USERS as code-completion templates:
   'src/components/options/monaco-js-intellisense.ts',
+  // Expected-JSON-shape documentation snippet shown to USERS in the Options
+  // audit panel (mirrors the Monaco snippet precedent — not a logging call):
+  'src/components/options/ErrorSwallowAuditView.tsx',
   // Documented bare console.error (DB mid-migration; rollback path):
   'src/background/schema-migration.ts',
   // Failure-formatter — itself the surfacing layer for failure reports:

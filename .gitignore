@@ -117,3 +117,4 @@ antigravity_resume_task.json
 .gitmap/backup/
 .gitmap/*.db
 .gitmap/pull_errors.db
+.ai-memory/temp-agents/

@@ -4,8 +4,8 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const SRC = [
-  { file: 'spec/21-app/05-prompts/glossary.md', refBase: 'spec/21-app/05-prompts/glossary.md' },
-  { file: 'spec/21-app/05-prompts/acronyms.md', refBase: 'spec/21-app/05-prompts/acronyms.md' },
+  { file: '02-spec/21-app/05-prompts/glossary.md', refBase: '02-spec/21-app/05-prompts/glossary.md' },
+  { file: '02-spec/21-app/05-prompts/acronyms.md', refBase: '02-spec/21-app/05-prompts/acronyms.md' },
 ];
 const OUT = 'public/spec-tooltips.json';
 

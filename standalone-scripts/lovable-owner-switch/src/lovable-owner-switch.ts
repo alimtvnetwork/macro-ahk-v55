@@ -5,8 +5,8 @@
  * SQLite migration; P7 mounts the popup UI; P8–P10 wire the per-row
  * login → promote → sign-out flow via the shared `LovableApiClient`.
  *
- * No retry logic (mem://constraints/no-retry-policy). All errors are
- * routed through `console.error()`.
+ * No retry logic (mem://constraints/no-retry-policy). Errors follow the
+ * namespace Logger convention; no direct console calls.
  */
 
 const PROJECT_NAMESPACE = "LovableOwnerSwitch";

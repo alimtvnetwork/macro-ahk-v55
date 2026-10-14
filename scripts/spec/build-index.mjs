@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Build INDEX.json — machine-readable map of spec/21-app/05-prompts/**
+// Build INDEX.json — machine-readable map of 02-spec/21-app/05-prompts/**
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-const ROOT = 'spec/21-app/05-prompts';
+const ROOT = '02-spec/21-app/05-prompts';
 const OUT = join(ROOT, 'INDEX.json');
 
 function walk(dir) {

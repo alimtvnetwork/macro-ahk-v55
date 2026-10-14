@@ -1,3 +1,5 @@
+import { logError } from "../lib/lib-logger";
+
 export class ServiceResult<T = unknown, E = unknown> {
   constructor(
         public readonly ok: boolean,
@@ -36,8 +38,7 @@ export class ServiceResult<T = unknown, E = unknown> {
       if (typeof glob !== "undefined" && glob.RiseupAsiaMacroExt?.Logger?.error) {
         glob.RiseupAsiaMacroExt.Logger.error("SQLITE", `[DB] ${queryName} failed`, e);
       } else {
-        // eslint-disable-next-line no-restricted-syntax
-        console.error(`[Marco] DB Error: ${queryName}`, e);
+        logError("SQLITE", `[DB] ${queryName} failed`, e);
       }
 
       return new ServiceResult<T, unknown>(false, undefined, e);

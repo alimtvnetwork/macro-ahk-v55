@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT_ARG = '--root=';
 const MIN_FILE_ARG = '--min-file=';
 const MIN_COMPOSITE_ARG = '--min-composite=';
-const DEFAULT_SPEC_ROOT = 'spec/2026-spec';
+const DEFAULT_SPEC_ROOT = '02-spec/2026-spec';
 const DEFAULT_MIN_FILE = '100';
 const DEFAULT_MIN_COMPOSITE = '99.5';
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));

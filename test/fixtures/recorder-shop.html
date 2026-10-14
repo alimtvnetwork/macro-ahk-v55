@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recorder Fixture - Mock Shop</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  .product { border: 1px solid #999; padding: 12px; margin: 12px 0; max-width: 420px; }
+  #cartBar { position: sticky; top: 0; background: #eee; padding: 8px; }
+  #orderStatus { margin-top: 16px; padding: 8px; border: 1px solid #999; min-height: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Mock Shop</h1>
+
+  <div id="cartBar">
+    Cart: <span id="cartCount">0</span> items ·
+    Total: $<span id="cartTotal">0.00</span>
+  </div>
+
+  <section class="product" data-product="keyboard">
+    <h2>Keyboard</h2>
+    <p class="price" data-price="49.99">Price: $49.99</p>
+    <label>Qty <input class="qty" data-testid="qty-keyboard" type="number" value="1" min="1"></label>
+    <button data-testid="add-keyboard" data-price="49.99" aria-label="Add keyboard to cart">Add Keyboard to Cart</button>
+  </section>
+
+  <section class="product" data-product="mouse">
+    <h2>Mouse</h2>
+    <p class="price" data-price="29.50">Price: $29.50</p>
+    <label>Qty <input class="qty" data-testid="qty-mouse" type="number" value="1" min="1"></label>
+    <button data-testid="add-mouse" data-price="29.50" aria-label="Add mouse to cart">Add Mouse to Cart</button>
+  </section>
+
+  <section class="product" data-product="monitor">
+    <h2>Monitor</h2>
+    <p class="price" data-price="199.00">Price: $199.00</p>
+    <label>Qty <input class="qty" data-testid="qty-monitor" type="number" value="1" min="1"></label>
+    <button role="button" data-testid="add-monitor" data-price="199.00">Add Monitor to Cart</button>
+  </section>
+
+  <div>
+    <button id="checkoutBtn" type="button">Checkout</button>
+    <button id="clearCartBtn" type="button">Clear Cart</button>
+  </div>
+
+  <div id="orderStatus" aria-live="polite"></div>
+</main>
+<script>
+  (function () {
+    var count = 0;
+    var total = 0;
+    var cartCount = document.getElementById('cartCount');
+    var cartTotal = document.getElementById('cartTotal');
+    var orderStatus = document.getElementById('orderStatus');
+
+    function render() {
+      cartCount.textContent = String(count);
+      cartTotal.textContent = total.toFixed(2);
+    }
+
+    document.querySelectorAll('[data-testid^="add-"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var section = btn.closest('.product');
+        var qtyInput = section.querySelector('.qty');
+        var qty = Math.max(1, parseInt(qtyInput.value || '1', 10));
+        var price = parseFloat(btn.getAttribute('data-price'));
+        count += qty;
+        total += price * qty;
+        render();
+      });
+    });
+
+    document.getElementById('checkoutBtn').addEventListener('click', function () {
+      orderStatus.textContent = 'ORDERED:' + count + ':' + total.toFixed(2);
+    });
+
+    document.getElementById('clearCartBtn').addEventListener('click', function () {
+      count = 0;
+      total = 0;
+      render();
+      orderStatus.textContent = '';
+    });
+  })();
+</script>
+</body>
+</html>

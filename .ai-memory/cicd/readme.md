@@ -34,16 +34,17 @@
 | 13 | [`13-release-page-not-created-from-server-side-tag.md`](./issues/13-release-page-not-created-from-server-side-tag.md) | Release page not created from server-side tag (web UI / REST / external tag paths skipped packaging) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-21 |
 | 14 | [`03-release-page-empty-v5-12-1-version-json-drift.md`](./issues/03-release-page-empty-v5-12-1-version-json-drift.md) | Release page empty on v5.12.1 (version.json vs tag drift) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-27 |
 | 16 | [`16-script-injection-toast-timeout.md`](./issues/16-script-injection-toast-timeout.md) | Playwright test `injected script does not leak console errors` failed randomly due to unignored in-page toast diagnostic error | `.github/workflows/ci.yml` | ✅ Resolved | 2026-08-22 |
+| 17 | [`08-cicd-failure-investigation-and-recorder-functionality.md`](./issues/08-cicd-failure-investigation-and-recorder-functionality.md) | CI red after spec/ + .lovable/ restructure — 13 stale-path failures across ci.yml / spec-gates.yml / spec-audit.yml | `.github/workflows/ci.yml` + `spec-gates.yml` + `spec-audit.yml` | ✅ Resolved | 2026-10-15 |
 
 ## Referenced specs
 
-- [`02 - Chrome Extension CI/CD`](../spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md) - generic Manifest V3 CI/CD, release artifact, installer, probing, and no-committed-ZIP standard.
+- [`02 - Chrome Extension CI/CD`](../../02-spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md) - generic Manifest V3 CI/CD, release artifact, installer, probing, and no-committed-ZIP standard.
 
 
 ---
 
 ## Conventions
 
-- File names: `.lovable/cicd-issues/XX-issue-name.md` (lowercase-hyphenated, numeric prefix starting at `01`).
+- File names: `.ai-memory/cicd/issues/XX-issue-name.md` (lowercase-hyphenated, numeric prefix starting at `01`).
 - Required sections per file: `## Pipeline / Workflow`, `## Description`, `## First Seen`, `## Root Cause`, `## Status`, `## Fix`, `## Prevention`, `## References`.
 - Update this index in the **same operation** as creating or modifying any CI/CD issue file.

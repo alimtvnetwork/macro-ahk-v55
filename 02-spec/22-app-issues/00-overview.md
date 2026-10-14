@@ -64,5 +64,5 @@ This folder consolidates the previous two issue trackers:
 ## Cross-References
 
 - App overview: [`../21-app/00-overview.md`](../21-app/00-overview.md)
-- Error management contract: [`../03-error-manage/`](../03-error-manage/00-overview.md)
-- Retrospectives (cross-tool): [`../03-error-manage/01-error-resolution/03-retrospectives/`](../03-error-manage/01-error-resolution/03-retrospectives/00-overview.md)
+- Error management contract: [`../03-error-manage/`](../03-error-manage/)
+- Retrospectives (cross-tool): [`../03-error-manage/01-error-resolution/03-retrospectives/`](../03-error-manage/01-error-resolution/03-retrospectives/)

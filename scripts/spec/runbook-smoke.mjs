@@ -4,8 +4,8 @@
 // Fail-fast; no retry.
 import { readFileSync, existsSync } from 'node:fs';
 
-const QUICKREF = 'spec/21-app/05-prompts/macros/observability/14-error-taxonomy-quickref.md';
-const RUNBOOKS = 'spec/21-app/05-prompts/macros/observability/15-runbooks-top15.md';
+const QUICKREF = '02-spec/21-app/05-prompts/macros/observability/14-error-taxonomy-quickref.md';
+const RUNBOOKS = '02-spec/21-app/05-prompts/macros/observability/15-runbooks-top15.md';
 
 for (const f of [QUICKREF, RUNBOOKS]) {
   if (!existsSync(f)) { console.error(`Missing: ${f}`); process.exit(2); }

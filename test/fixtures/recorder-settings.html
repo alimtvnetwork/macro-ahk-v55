@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recorder Fixture - Settings</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  label { display: block; margin: 12px 0; }
+  #settingsStatus { margin-top: 16px; padding: 8px; border: 1px solid #999; min-height: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Settings</h1>
+
+  <form id="settingsForm">
+    <label for="displayName">Display Name</label>
+    <input id="displayName" name="displayName" type="text" autocomplete="off">
+
+    <div role="group" aria-label="Notifications">
+      <label><input id="emailAlerts" type="checkbox"> Email alerts</label>
+      <label><input id="smsAlerts" type="checkbox"> SMS alerts</label>
+    </div>
+
+    <label for="theme">Theme</label>
+    <select id="theme" name="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="system">System</option>
+    </select>
+
+    <div>
+      <button id="saveSettingsBtn" type="submit">Save Settings</button>
+    </div>
+  </form>
+
+  <div id="settingsStatus" aria-live="polite"></div>
+</main>
+<script>
+  (function () {
+    var form = document.getElementById('settingsForm');
+    var status = document.getElementById('settingsStatus');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var parts = [
+        'displayName=' + document.getElementById('displayName').value,
+        'emailAlerts=' + (document.getElementById('emailAlerts').checked ? 'on' : 'off'),
+        'smsAlerts=' + (document.getElementById('smsAlerts').checked ? 'on' : 'off'),
+        'theme=' + document.getElementById('theme').value
+      ];
+      status.textContent = 'SAVED:' + parts.join('|');
+    });
+  })();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 /**
  * scripts/audit-p0-rules.mjs
  *
- * Aggregator for the 10 P0 items in spec/33-missing-coding-guideline/14-*.
+ * Aggregator for the 10 P0 items in 02-spec/33-missing-coding-guideline/14-*.
  * Measures each category against the baselines in 99-baselines.json, prints a
  * table, and writes a machine-readable rollup to public/p0-rules-audit.json.
  *
@@ -31,7 +31,7 @@ import { dirname, join, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const BASELINES_PATH = join(ROOT, "spec/33-missing-coding-guideline/99-baselines.json");
+const BASELINES_PATH = join(ROOT, "02-spec/33-missing-coding-guideline/99-baselines.json");
 const OUT_PATH = join(ROOT, "public/p0-rules-audit.json");
 const STRICT = process.argv.includes("--strict");
 
@@ -241,7 +241,7 @@ for (const r of rows) {
 const report = {
   schemaVersion: 1,
   generated: new Date().toISOString(),
-  baselinesSource: "spec/33-missing-coding-guideline/99-baselines.json",
+  baselinesSource: "02-spec/33-missing-coding-guideline/99-baselines.json",
   strict: STRICT,
   regressedCount: regressed,
   findings: rows,

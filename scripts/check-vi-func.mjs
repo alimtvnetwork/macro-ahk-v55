@@ -30,6 +30,7 @@ const SKIP_DIRS = new Set([
   "build",
   ".git",
   ".lovable",
+  ".ai-memory",
   ".old-github",
   ".next",
   ".turbo",

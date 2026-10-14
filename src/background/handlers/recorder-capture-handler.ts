@@ -182,6 +182,14 @@ async function resolveProjectSlug(override?: string): Promise<string> {
     );
   }
 
+  // Captures arriving while Paused are dropped (fail-fast): the sender logs
+  // the failure and discards the batch, honouring the no-retry policy.
+  if (session.Phase === "Paused") {
+    throw new Error(
+      "RECORDER_CAPTURE_PERSIST: session is Paused — resume recording before capturing",
+    );
+  }
+
   if (!session.ProjectSlug) {
     throw new Error(
       "RECORDER_CAPTURE_PERSIST: active session has empty ProjectSlug",

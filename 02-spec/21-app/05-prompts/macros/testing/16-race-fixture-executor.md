@@ -34,7 +34,7 @@ type RaceResult = {
 
 ## CLI
 ```bash
-node scripts/spec/run-race-fixture.mjs spec/21-app/05-prompts/macros/testing/fixtures/race/r01-stop-during-dispatch.json
+node scripts/spec/run-race-fixture.mjs 02-spec/21-app/05-prompts/macros/testing/fixtures/race/r01-stop-during-dispatch.json
 # Exit 0 = pass; 1 = mismatch; 2 = missing/invalid fixture
 ```
 

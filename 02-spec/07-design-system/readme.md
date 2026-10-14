@@ -59,7 +59,7 @@ Before authoring components or generating code, AI agents MUST read and master t
   - Read [`02-ai-system-design/readme.md`](./02-ai-system-design/readme.md) — Variable-driven theme swapping (Pink to Green), sticky nav, search module, "Join Us" CSS3 text-slide animation, "Climate AI" highlight, and "Team Greenhouse" section.
 - [ ] `/learn` **Phase 8: Sweet Digs Design System & Interactive Theme Tester**
   - Read [`03-sweet-digs-design-system/readme.md`](./03-sweet-digs-design-system/readme.md) — Master index and token flow for the Sweet Digs system.
-  - Explore interactive demo: [`theme-tester/index.html`](../../theme-tester/index.html) — Live interactive theme tester with theme switcher, split hero, search card, filter chips, expanding underline menu, and interactive buttons.
+  - Explore interactive demo: `theme-tester/index.html` — Live interactive theme tester with theme switcher, split hero, search card, filter chips, expanding underline menu, and interactive buttons.
 - [ ] `/learn` **Phase 9: White Blue Theme Design System (3-Format Color Standard)**
   - Read [`04-white-blue-theme/readme.md`](./04-white-blue-theme/readme.md) — Master index, 4-tier token flow, alternating band rhythm (`light` -> `soft` -> `dark` -> `void`), and blind-AI checklist.
   - Read [`04-white-blue-theme/01-colors-typography-and-tokens.md`](./04-white-blue-theme/01-colors-typography-and-tokens.md) — Complete 3-format color tables (`HEX`, `RGB`/`RGBA`, `HSL` + `OKLCH`), `Ubuntu` + `Poppins` + `JetBrains Mono` typography, gradients, and brand-tinted shadows.
@@ -214,7 +214,7 @@ All animations and transitions prioritize **GPU-composited CSS3 transforms and o
 | 03b | [03-sweet-digs-design-system/readme.md](./03-sweet-digs-design-system/readme.md) | Sub-System | Sweet Digs HSL multi-theme architecture and zoom-free interaction suite |
 | 04b | [04-white-blue-theme/readme.md](./04-white-blue-theme/readme.md) | Sub-System | White Blue Theme 3-format color architecture (`HEX`, `RGB`/`RGBA`, `HSL` + `OKLCH`), 3D flip Mega-Menu, `WhiteBlueButton`, and enterprise section library |
 | 97 | [97-acceptance-criteria.md](./97-acceptance-criteria.md) | Testing | Testable criteria for design system compliance |
-| 99 | [99-consistency-report.md](./99-consistency-report.md) | Meta | Consistency validation report |
+| 99 | 99-consistency-report.md | Meta | Consistency validation report |
 
 ---
 
@@ -297,5 +297,5 @@ Every heading gradient, link color, button, code block glow, and hover effect up
 
 ## Verification
 
-Full compliance criteria and automated verification suites are defined in [`97-acceptance-criteria.md`](./97-acceptance-criteria.md) and tracked in [`99-consistency-report.md`](./99-consistency-report.md).
+Full compliance criteria and automated verification suites are defined in [`97-acceptance-criteria.md`](./97-acceptance-criteria.md) and tracked in `99-consistency-report.md`.
 

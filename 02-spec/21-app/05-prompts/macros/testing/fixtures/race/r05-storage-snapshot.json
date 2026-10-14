@@ -1,6 +1,6 @@
 {
   "id": "r05-storage-snapshot",
-  "spec": "spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-05",
+  "spec": "02-spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-05",
   "setup": {
     "storageKey": "Project:proj-r05",
     "initialValue": { "version": 1, "name": "before" }

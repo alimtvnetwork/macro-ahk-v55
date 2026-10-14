@@ -1,6 +1,6 @@
 {
   "id": "r01-stop-during-dispatch",
-  "spec": "spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-01",
+  "spec": "02-spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-01",
   "macro": {
     "id": "m-r01",
     "steps": [

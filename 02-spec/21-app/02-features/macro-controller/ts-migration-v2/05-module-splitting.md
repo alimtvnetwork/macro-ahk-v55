@@ -6,7 +6,7 @@
 
 ## Goal
 
-Split all monolithic files (>200 lines) in `standalone-scripts/macro-controller/src/` into focused sub-modules following the [200-line file limit](../../../../02-coding-guidelines/00-overview.md) (Rule ORG1). Each extraction uses a barrel re-export in the original file to preserve backward compatibility.
+Split all monolithic files (>200 lines) in `standalone-scripts/macro-controller/src/` into focused sub-modules following the [200-line file limit](../../../../02-coding-guidelines/) (Rule ORG1). Each extraction uses a barrel re-export in the original file to preserve backward compatibility.
 
 ---
 
@@ -90,7 +90,7 @@ Split all monolithic files (>200 lines) in `standalone-scripts/macro-controller/
 ## Constraints
 
 1. **Barrel re-export pattern**: Every split file's original path becomes a barrel that re-exports all public symbols. No consumer imports change.
-2. **No `any` or `Record<string, any>`**: All new files follow [TypeScript standards](../../../../../.lovable/memory/standards/macro-controller-typescript-standards.md).
+2. **No `any` or `Record<string, any>`**: All new files follow [TypeScript standards](../../../../../.ai-memory/memory/standards/macro-controller-typescript-standards.md).
 3. **Error handling via `toErrorMessage()`**: All catch blocks use the centralized helper.
 4. **Build verification**: Each phase must pass `tsc --noEmit -p tsconfig.macro.json` and `npm run build` before merge.
 5. **Test preservation**: Pre-existing test results must not regress (new failures are tracked separately).

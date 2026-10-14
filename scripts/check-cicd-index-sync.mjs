@@ -2,8 +2,8 @@
 /**
  * check-cicd-index-sync.mjs
  *
- * Cross-checks `.lovable/cicd/README.md` against the per-issue files in
- * `.lovable/cicd/issues/*.md` and fails the build when they drift.
+ * Cross-checks `.ai-memory/cicd/readme.md` against the per-issue files in
+ * `.ai-memory/cicd/issues/*.md` and fails the build when they drift.
  *
  * What this guards against:
  *   1. An issue file exists on disk but is NOT listed in the index.
@@ -26,8 +26,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
-const INDEX_PATH = join(REPO_ROOT, '.lovable', 'cicd', 'readme.md');
-const ISSUES_DIR = join(REPO_ROOT, '.lovable', 'cicd', 'issues');
+const INDEX_PATH = join(REPO_ROOT, '.ai-memory', 'cicd', 'readme.md');
+const ISSUES_DIR = join(REPO_ROOT, '.ai-memory', 'cicd', 'issues');
 
 const errors = [];
 
@@ -101,7 +101,7 @@ for (const f of diskFiles) {
     fail(
       INDEX_PATH,
       null,
-      `cicd/issues/${f} exists on disk but is not listed in .lovable/cicd/README.md (add it under ## Active or ## Resolved).`,
+      `cicd/issues/${f} exists on disk but is not listed in .ai-memory/cicd/readme.md (add it under ## Active or ## Resolved).`,
     );
   }
 }
@@ -153,7 +153,7 @@ for (const row of allIndexRows) {
     fail(
       diskPath,
       fileStatus.lineNumber,
-      `Issue file is Resolved but index lists it under ## Active. Move row to ## Resolved in .lovable/cicd/README.md.`,
+      `Issue file is Resolved but index lists it under ## Active. Move row to ## Resolved in .ai-memory/cicd/readme.md.`,
     );
   }
   if (fileStatus.kind === 'active' && row.section === 'resolved') {
@@ -184,12 +184,12 @@ for (const row of allIndexRows) {
 // ─────────────────────────────────────────────────────────────
 
 if (errors.length > 0) {
-  console.error('\n❌ .lovable/cicd/README.md is out of sync with cicd-issues/:\n');
+  console.error('\n❌ .ai-memory/cicd/readme.md is out of sync with cicd/issues/:\n');
   for (const e of errors) console.error(`   - ${e}`);
   console.error(`\n${errors.length} mismatch${errors.length === 1 ? '' : 'es'} found.\n`);
   process.exit(1);
 }
 
 console.log(
-  `✓ .lovable/cicd/README.md in sync with ${diskFiles.length} cicd-issues/*.md file${diskFiles.length === 1 ? '' : 's'}.`,
+  `✓ .ai-memory/cicd/readme.md in sync with ${diskFiles.length} cicd/issues/*.md file${diskFiles.length === 1 ? '' : 's'}.`,
 );

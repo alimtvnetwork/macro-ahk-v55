@@ -1,15 +1,128 @@
 {
-  "generatedAt": "2026-08-12T16:15:01.945Z",
+  "generatedAt": "2026-10-14T18:16:51.268Z",
   "totals": {
-    "filesWithConsoleError": 0,
-    "allowedFiles": 0,
+    "filesWithConsoleError": 36,
+    "allowedFiles": 28,
     "violatingFiles": 0,
-    "totalCalls": 0,
-    "allowedCalls": 0,
+    "totalCalls": 57,
+    "allowedCalls": 57,
     "violationCalls": 0,
     "compliancePercent": 100
   },
-  "allowedFiles": [],
+  "allowedFiles": [
+    {
+      "file": "src/background/__tests__/allow-swallow-fallbacks.test.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/bg-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/background/builtin-script-guard.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/context-menu-handler.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/db-manager.ts",
+      "count": 2
+    },
+    {
+      "file": "src/background/handlers/injection-namespace-bootstrap.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/handlers/injection-wrapper.ts",
+      "count": 2
+    },
+    {
+      "file": "src/background/injection-diagnostics.ts",
+      "count": 2
+    },
+    {
+      "file": "src/background/manifest-seeder.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/project-namespace-builder.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/recorder/failure-logger.ts",
+      "count": 1
+    },
+    {
+      "file": "src/background/schema-migration.ts",
+      "count": 3
+    },
+    {
+      "file": "src/background/session-log-writer.ts",
+      "count": 4
+    },
+    {
+      "file": "src/components/ErrorBoundary.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/options/ErrorSwallowAuditView.tsx",
+      "count": 1
+    },
+    {
+      "file": "src/components/options/monaco-js-intellisense.ts",
+      "count": 4
+    },
+    {
+      "file": "src/components/options/options-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/components/recorder/recorder-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/content-scripts/prompt-injector-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/hooks/hook-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/hooks/popup-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "src/lib/developer-guide-data.generated.ts",
+      "count": 4
+    },
+    {
+      "file": "src/lib/lib-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "standalone-scripts/lovable-common/src/logger.ts",
+      "count": 2
+    },
+    {
+      "file": "standalone-scripts/lovable-dashboard/src/logger.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/error-utils.ts",
+      "count": 5
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/logger.ts",
+      "count": 3
+    },
+    {
+      "file": "standalone-scripts/payment-banner-hider/src/logger.ts",
+      "count": 2
+    }
+  ],
   "violatingFiles": [],
   "policy": "spec/audit/blind-ai-implementation-audit/coverage/logging-sweep-targets.md"
 }

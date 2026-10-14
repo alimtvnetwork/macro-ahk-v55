@@ -65,6 +65,6 @@ npm run build:macro-controller
 ## Cross-References
 
 - [Check Button Master Overview](01-overview.md)
-- [Check Button Spec](../../../spec/21-app/02-features/chrome-extension/60-check-button-spec.md)
+- [Check Button Spec](../../21-app/02-features/chrome-extension/60-check-button-spec.md)
 - [Issue #08: workspaceFromApi Race](08-workspace-detection-race.md)
 - [Issue #09: Dialog Close Before Progress Read](09-dialog-close-before-progress-read.md)

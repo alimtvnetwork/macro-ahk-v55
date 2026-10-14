@@ -7,8 +7,8 @@
  * promotion via shared `LovableApiClient.promoteToOwner`) → sign-out
  * flow.
  *
- * No retry logic (mem://constraints/no-retry-policy). All errors are
- * routed through `console.error()`.
+ * No retry logic (mem://constraints/no-retry-policy). Errors follow the
+ * namespace Logger convention; no direct console calls.
  */
 
 const PROJECT_NAMESPACE = "LovableUserAdd";

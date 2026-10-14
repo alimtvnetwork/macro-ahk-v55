@@ -1,6 +1,6 @@
 {
   "id": "r03-busy-reject",
-  "spec": "spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-03",
+  "spec": "02-spec/21-app/05-prompts/macros/testing/15-race-fixture-pack.md#R-03",
   "setup": {
     "tabId": 42,
     "runnerActive": { "macroId": "m-a", "state": "Running" }

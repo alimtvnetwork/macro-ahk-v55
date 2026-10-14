@@ -1,0 +1,4 @@
+Uid,Keyword,Description,Enabled,Category,PauseAfterMs,Tags
+ke-1,Login,"Open the app, then sign in",1,Auth,100,"smoke;auth"
+ke-2,Logout,"Say ""goodbye"" and quit",0,,,
+ke-3,Search,"Find cafés near München, naïve query",1,Navigation,250,"i18n;unicode"

@@ -585,7 +585,7 @@ This document defines the complete end-to-end (E2E) test suite for the Chrome Ex
 
 - [Pre-Release Regression Checklist](02-pre-release-regression-checklist.md) — Manual QA sign-off form
 - [Overview](00-overview.md) — Architecture references
-- [Unified Testing Index](../../../../02-coding-guidelines/imported/00-testing-index.md) — Cross-product test matrix
+- Unified Testing Index — Cross-product test matrix
 
 ---
 

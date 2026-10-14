@@ -23,7 +23,7 @@ Each folder follows the contract in `00-folder-structure.md` and `02-info-json-s
 - Removing any of the five breaks the reference chain; adding more is fine but they ship as optional.
 - Each prompt is genuinely **template-heavy** (requires `RunId` at minimum), justifying placement under `macro-prompts/` rather than `prompts/` (per `README.md` decision matrix).
 ## Score-extract is special
-`score-extract` does not call the model — it's a deterministic post-step the engine evaluates against the previous assistant response using the canonical regex from `spec/21-app/05-prompts/macros/04-loop-and-score.md`:
+`score-extract` does not call the model — it's a deterministic post-step the engine evaluates against the previous assistant response using the canonical regex from `02-spec/21-app/05-prompts/macros/04-loop-and-score.md`:
 ```
 /^\s*Score\s*:\s*(\d{1,3})\s*\/\s*100\s*$/im
 ```

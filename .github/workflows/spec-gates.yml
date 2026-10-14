@@ -19,7 +19,7 @@ jobs:
 
   # Fails CI if a new hardcoded owner/repo literal for
   # macro-ahk-v{N} sneaks into tracked sources. See
-  # .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+  # .ai-memory/memory/features/release-pipeline-repo-url-agnostic.md.
   verify-no-hardcoded-repo:
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
         run: node scripts/spec/build-index.mjs
       - name: Verify INDEX.json committed and current
         run: |
-          git diff --exit-code spec/21-app/05-prompts/INDEX.json \
+          git diff --exit-code 02-spec/21-app/05-prompts/INDEX.json \
             || (echo "INDEX.json out of date — run scripts/spec/build-index.mjs" && exit 1)
 
   runbook-smoke:

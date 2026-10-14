@@ -24,7 +24,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BASELINE_PATH = join(REPO_ROOT, 'spec/33-missing-coding-guideline/99-baselines.json');
+const BASELINE_PATH = join(REPO_ROOT, '02-spec/33-missing-coding-guideline/99-baselines.json');
 const ROOT = join(REPO_ROOT, 'standalone-scripts');
 const UI_GLOB_HINT = 'standalone-scripts/**/ui/**';
 

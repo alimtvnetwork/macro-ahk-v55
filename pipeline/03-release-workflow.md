@@ -176,6 +176,7 @@ CI workflow only needs `contents: read`.
 | `auto-fix-markdown-filenames.yml` | push to non-main branches + dispatch | Auto-fixes lowercase hyphen-case markdown filenames |
 | `installer-tests.yml` | pull_request + dispatch | Runs installer (`install.sh`/`install.ps1`) contract tests |
 | `prompt-creator-cli.yml` | prompt-cli-v* tags + dispatch | Builds prompt creator CLI binaries |
+| `prompt-manager-desktop.yml` | prompt-manager-v* tags + dispatch | Builds prompt-manager desktop app |
 | `quality-badges.yml` | push to main | Regenerates README quality / coverage badges |
 | `readonly-paths-guard.yml` | pull_request | Blocks edits to `skipped/` and `.release/` |
 | `spec-gates.yml` | pull_request | Enforces spec link checks and structural gates |

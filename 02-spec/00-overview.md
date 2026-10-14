@@ -28,7 +28,7 @@
 
 ## Purpose
 
-Master index of the entire `spec/` tree. Structure follows **Spec Authoring Guide v3.2.0** ([`01-spec-authoring-guide/`](./01-spec-authoring-guide/00-overview.md)).
+Master index of the entire `spec/` tree. Structure follows **Spec Authoring Guide v3.2.0** ([`01-spec-authoring-guide/`](./01-spec-authoring-guide/)).
 
 The numbering convention is:
 
@@ -47,20 +47,20 @@ The numbering convention is:
 
 | # | Folder | Purpose | Status |
 |---|--------|---------|--------|
-| 01 | [`01-spec-authoring-guide/`](./01-spec-authoring-guide/00-overview.md) | Authoring rules, templates, naming conventions | ✅ Active |
-| 02 | [`02-coding-guidelines/`](./02-coding-guidelines/00-overview.md) | Cross-language coding standards | ✅ Active |
-| 03 | [`03-error-manage/`](./03-error-manage/00-overview.md) | Error handling, codes, retrospectives, debugging | ✅ Active |
-| 04 | [`04-database-conventions/`](./04-database-conventions/00-overview.md) | Schema, naming, ORM, REST format | ✅ Active |
-| 05 | [`05-split-db-architecture/`](./05-split-db-architecture/00-overview.md) | Multi-database split-DB pattern | ✅ Active |
-| 06 | [`06-seedable-config-architecture/`](./06-seedable-config-architecture/00-overview.md) | Declarative seeding from instruction manifests | ✅ Active |
-| 07 | [`07-design-system/`](./07-design-system/00-overview.md) | Tokens, typography, layout, motion, components | ✅ Active |
-| 08 | [`08-docs-viewer-ui/`](./08-docs-viewer-ui/00-overview.md) | Docs viewer UI spec | 🟡 Planned (stub) |
-| 09 | [`09-code-block-system/`](./09-code-block-system/00-overview.md) | Code-block rendering & syntax highlighting | 🟡 Planned (stub) |
-| 10 | [`10-research/`](./10-research/00-overview.md) | Research notes, prototypes, references | 🟡 Planned (stub) |
-| 11 | [`11-powershell-integration/`](./11-powershell-integration/00-overview.md) | PowerShell deploy & integration scripts | ✅ Active |
-| 12 | [`12-cicd-pipeline-workflows/`](./12-cicd-pipeline-workflows/00-overview.md) | CI/CD pipeline definitions, release procedure, and Chrome-extension CI/CD hardening | ✅ Active |
-| 14 | [`14-update/`](./14-update/00-overview.md) | Extension auto-update mechanics | 🟡 Planned (stub) |
-| 17 | [`17-consolidated-guidelines/`](./17-consolidated-guidelines/00-overview.md) | Consolidated quick-reference guide | 🟡 Planned (stub) |
+| 01 | [`01-spec-authoring-guide/`](./01-spec-authoring-guide/) | Authoring rules, templates, naming conventions | ✅ Active |
+| 02 | [`02-coding-guidelines/`](./02-coding-guidelines/) | Cross-language coding standards | ✅ Active |
+| 03 | [`03-error-manage/`](./03-error-manage/) | Error handling, codes, retrospectives, debugging | ✅ Active |
+| 04 | [`04-database-conventions/`](./04-database-conventions/) | Schema, naming, ORM, REST format | ✅ Active |
+| 05 | [`05-split-db-architecture/`](./05-split-db-architecture/) | Multi-database split-DB pattern | ✅ Active |
+| 06 | [`06-seedable-config-architecture/`](./06-seedable-config-architecture/) | Declarative seeding from instruction manifests | ✅ Active |
+| 07 | [`07-design-system/`](./07-design-system/) | Tokens, typography, layout, motion, components | ✅ Active |
+| 08 | [`08-docs-viewer-ui/`](./08-docs-viewer-ui/) | Docs viewer UI spec | 🟡 Planned (stub) |
+| 09 | [`09-code-block-system/`](./09-code-block-system/) | Code-block rendering & syntax highlighting | 🟡 Planned (stub) |
+| 10 | [`10-research/`](./10-research/) | Research notes, prototypes, references | 🟡 Planned (stub) |
+| 11 | [`11-powershell-integration/`](./11-powershell-integration/) | PowerShell deploy & integration scripts | ✅ Active |
+| 12 | [`12-cicd-pipeline-workflows/`](./12-cicd-pipeline-workflows/) | CI/CD pipeline definitions, release procedure, and Chrome-extension CI/CD hardening | ✅ Active |
+| 14 | [`14-update/`](./14-update/) | Extension auto-update mechanics | 🟡 Planned (stub) |
+| 17 | [`17-consolidated-guidelines/`](./17-consolidated-guidelines/) | Consolidated quick-reference guide | 🟡 Planned (stub) |
 
 ### App-Specific (21+)
 
@@ -99,6 +99,6 @@ This structure was finalized on **2026-04-22** via a 10-phase reorganization. Se
 
 ## Cross-References
 
-- Authoring guide: [`01-spec-authoring-guide/`](./01-spec-authoring-guide/00-overview.md)
+- Authoring guide: [`01-spec-authoring-guide/`](./01-spec-authoring-guide/)
 - Memory index: `.lovable/memory/index.md`
 - Project roadmap: `.lovable/plan.md`

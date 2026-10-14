@@ -64,7 +64,7 @@
 
 - [Check Button Master Overview](01-overview.md)
 - [Issue #10: Runtime Seed Drift](10-runtime-seed-drift.md)
-- [Self-Healing Script Storage Memory](../../../.lovable/memory/index.md)
+- [Self-Healing Script Storage Memory](../../../.ai-memory/memory/index.md)
 - Sources: `src/background/handlers/injection-request-resolver.ts`, `src/background/auto-injector.ts`, `src/background/spa-reinject.ts`
 - Guard: `src/background/builtin-script-guard.ts`
 

@@ -4,7 +4,7 @@
  *
  * Runs `madge --circular --extensions ts --json` against
  * standalone-scripts/macro-controller/src and compares the observed cycle
- * count with `spec/33-missing-coding-guideline/99-baselines.json`
+ * count with `02-spec/33-missing-coding-guideline/99-baselines.json`
  * (`baselines.macroControllerCycles`, currently pinned at 57).
  *
  * Behavior:
@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BASELINE_PATH = join(REPO_ROOT, 'spec/33-missing-coding-guideline/99-baselines.json');
+const BASELINE_PATH = join(REPO_ROOT, '02-spec/33-missing-coding-guideline/99-baselines.json');
 const TARGET = 'standalone-scripts/macro-controller/src';
 
 const args = new Set(process.argv.slice(2));

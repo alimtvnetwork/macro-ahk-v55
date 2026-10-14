@@ -1,7 +1,7 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-export const DEFAULT_SPEC_ROOT = 'spec/2026-spec';
+export const DEFAULT_SPEC_ROOT = '02-spec/2026-spec';
 
 export function listMarkdownFiles(specRoot = DEFAULT_SPEC_ROOT) {
   return listFiles(resolve(specRoot)).filter(isMarkdownPath).sort();

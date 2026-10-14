@@ -41,7 +41,7 @@ Runs all quality gates before any build work begins.
 | Step | Command | Purpose |
 |------|---------|---------|
 | Checkout | `actions/checkout@v4 (fetch-depth: 1)` | Shallow clone — saves bandwidth |
-| Enforce lowercase .md | `find + grep` | Block uppercase `.md` filenames |
+| Enforce lowercase .md | `node scripts/check-markdown-filenames.mjs` | Block uppercase `.md` filenames |
 | Setup Node.js | `actions/setup-node@v4 (node 20)` | Runtime environment |
 | Setup pnpm | `pnpm/action-setup@v4 (pnpm 9, run_install: false)` | Package manager (no auto-install — caches run first) |
 | Cache pnpm store | `actions/cache@v4` keyed on lockfile | Content-addressable store reuse across runs |
@@ -112,12 +112,13 @@ After build, a **source map verification** step scans `chrome-extension/dist` fo
 
 ```yaml
 concurrency:
-  group: ci-main-${{ github.sha }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref || github.sha }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 ```
 
-A new push to `main` cancels any in-progress CI run. This saves runner minutes
-since only the latest commit matters.
+A new push to a branch or PR cancels any in-progress CI run for that ref.
+This saves runner minutes since only the latest commit matters. Tag-triggered
+runs are never cancelled so releases always complete.
 
 ## Artifact Passing Between Jobs
 
@@ -142,7 +143,7 @@ The `setup` job runs the test suite via Vitest:
 - Tests located in `src/__tests__/`, `src/test/`, and `**/__tests__/`
 
 > See the canonical generic spec at
-> [`spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/`](../spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md)
+> [`02-spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/`](../02-spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md)
 > for the repo-agnostic CI/CD contract this workflow implements.
 
 ## What "Build Extension" Does Internally

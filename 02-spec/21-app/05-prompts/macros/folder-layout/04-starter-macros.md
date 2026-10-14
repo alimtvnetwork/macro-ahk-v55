@@ -30,5 +30,5 @@ Together they exercise **every** `Kind` defined in `macro.schema.json` at least 
 `scripts/__tests__/starter-macros.test.mjs`:
 - All starter `.macro.json` files validate against `schemas/macro.schema.json`.
 - The union of `Steps[].Kind` across the three covers all 8 documented kinds.
-- Every `Slug` referenced by `prompt | audit | fix-from-audit | final-audit` steps exists in the starter macro-prompts pack (`spec/21-app/05-prompts/macro-prompts/07-starter-pack.md`).
+- Every `Slug` referenced by `prompt | audit | fix-from-audit | final-audit` steps exists in the starter macro-prompts pack (`02-spec/21-app/05-prompts/macro-prompts/07-starter-pack.md`).
 - `loop-if.GotoStep` values resolve to a strictly-earlier step index.

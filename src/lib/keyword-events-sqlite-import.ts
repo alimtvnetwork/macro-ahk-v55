@@ -6,8 +6,9 @@
  *
  * Shape contract (matches the exporter):
  *   • ZIP contains `keyword-events.db` (real SQLite via sql.js) and an
- *     optional `keyword-events.json` snapshot. We trust the .db as source
- *     of truth; JSON is only used as a fallback when sql.js fails to load.
+ *     optional `keyword-events.json` snapshot. We trust the .db as the
+ *     source of truth; the JSON snapshot is for human diffing only and
+ *     is not consumed by the importer.
  *   • `KeywordEvents` table columns: Uid, Keyword, Description, Enabled,
  *     Steps (JSON), Target (JSON|null), Tags (JSON|null), Category,
  *     PauseAfterMs, SortOrder, CreatedAt, UpdatedAt.
@@ -30,7 +31,7 @@ import type {
 import {
   KEYWORD_EVENTS_BUNDLE_KIND,
 } from "@/lib/keyword-events-sqlite-export";
-import { MatchedByType } from "../types/enums";
+import type { MatchedByType } from "../types/enums";
 
 const DB_FILENAME = "keyword-events.db";
 const WASM_URL = "https://sql.js.org/dist/sql-wasm.wasm";
@@ -93,38 +94,58 @@ async function loadJSZip(): Promise<typeof JSZipType> {
 /*  Parsers                                                            */
 /* ------------------------------------------------------------------ */
 
-function parseJsonField<T>(raw: unknown): T | undefined {
+function parseJsonField<T>(raw: unknown, field: string): T | undefined {
   if (typeof raw !== "string" || raw.length === 0) {
     return undefined;
   }
 
   try {
     return JSON.parse(raw) as T;
-  } catch (err) {
-    void 0;
-
-    return undefined;
+  } catch {
+    // Malformed JSON here means the bundle is corrupt — surfacing it beats
+    // silently importing an event with its Steps/Target/Tags dropped.
+    throw new Error(
+      `Invalid keyword-events bundle: column "${field}" holds malformed `
+            + `JSON. The bundle is corrupt or was not produced by the `
+            + `keyword-events exporter.`,
+    );
   }
 }
 
-function rowToEvent(row: Record<string, unknown>): ImportedKeywordEvent | null {
-  const uid = typeof row.Uid === "string" ? row.Uid : null;
-  const keyword = typeof row.Keyword === "string" ? row.Keyword : null;
+/** Non-empty string cell, or undefined when the cell is missing/blank. */
+function textCell(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
 
-  if (!uid || !keyword) {
-    return null;
+  if (value.length === 0) {
+    return undefined;
+  }
+
+  return value;
+}
+
+function rowToEvent(row: Record<string, unknown>, order: number): ImportedKeywordEvent {
+  const uid = textCell(row.Uid);
+  const keyword = textCell(row.Keyword);
+
+  if (uid === undefined || keyword === undefined) {
+    // Dropping the row silently would import fewer events than the bundle
+    // claims — fail loudly so the caller can report the corrupt row.
+    throw new Error(
+      `Invalid keyword-events bundle: row #${order} is missing a usable `
+            + `Uid or Keyword. Every KeywordEvents row must carry both.`,
+    );
   }
 
   const description = typeof row.Description === "string" ? row.Description : undefined;
   const enabled = row.Enabled === undefined || row.Enabled === null
     ? undefined
     : Number(row.Enabled) !== 0;
-  const steps = parseJsonField<readonly KeywordEventStep[]>(row.Steps);
-  const target = parseJsonField<KeywordEventTarget>(row.Target);
-  const tags = parseJsonField<readonly string[]>(row.Tags);
-  const category = typeof row.Category === "string" && row.Category.length > 0
-    ? row.Category
-    : undefined;
+  const steps = parseJsonField<readonly KeywordEventStep[]>(row.Steps, "Steps");
+  const target = parseJsonField<KeywordEventTarget>(row.Target, "Target");
+  const tags = parseJsonField<readonly string[]>(row.Tags, "Tags");
+  const category = textCell(row.Category);
   const pauseAfterMs = typeof row.PauseAfterMs === "number"
     ? row.PauseAfterMs
     : undefined;
@@ -238,14 +259,12 @@ function assertKeywordEventsSchema(db: Database): void {
 function readKeywordEvents(db: Database): ImportedKeywordEvent[] {
   const stmt = db.prepare(`SELECT * FROM KeywordEvents ORDER BY SortOrder ASC, Id ASC`);
   const rows: ImportedKeywordEvent[] = [];
+  let order = 0;
   try {
     while (stmt.step()) {
+      order += 1;
       const row = stmt.getAsObject() as Record<string, unknown>;
-      const ev = rowToEvent(row);
-
-      if (ev) {
-        rows.push(ev);
-      }
+      rows.push(rowToEvent(row, order));
     }
   } finally {
     stmt.free();
@@ -352,15 +371,58 @@ export interface PlanImportMatchesOptions {
     readonly strictUidOnly?: boolean;
 }
 
-/* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */
+/** Uid match that has not been consumed by an earlier imported row. */
+function findUnusedUidMatch(
+  byUid: ReadonlyMap<string, KeywordEvent>,
+  consumedSelectedIds: ReadonlySet<string>,
+  uid: string,
+): KeywordEvent | undefined {
+  const candidate = byUid.get(uid);
+
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  if (consumedSelectedIds.has(candidate.Id)) {
+    return undefined;
+  }
+
+  return candidate;
+}
+
+/** Case-insensitive keyword match that has not been consumed yet. */
+function findUnusedKeywordMatch(
+  byKeyword: ReadonlyMap<string, KeywordEvent>,
+  consumedSelectedIds: ReadonlySet<string>,
+  keyword: string,
+): KeywordEvent | undefined {
+  const key = keyword.trim().toLowerCase();
+
+  if (key.length === 0) {
+    return undefined;
+  }
+
+  const candidate = byKeyword.get(key);
+
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  if (consumedSelectedIds.has(candidate.Id)) {
+    return undefined;
+  }
+
+  return candidate;
+}
+
+/* eslint-disable-next-line max-lines-per-function */
 export function planImportMatches(
   selected: ReadonlyArray<KeywordEvent>,
   imported: ReadonlyArray<ImportedKeywordEvent>,
   options: PlanImportMatchesOptions = {},
 ): ImportMatchPlan {
-  const strictUidOnly = options.strictUidOnly === true;
+  const strictUidOnly = options.strictUidOnly ?? false;
   const consumedSelectedIds = new Set<string>();
-  const matches: ImportMatchPlan["matches"] = [];
   const unmatchedImports: ImportedKeywordEvent[] = [];
 
   const byUid = new Map<string, KeywordEvent>();
@@ -369,9 +431,15 @@ export function planImportMatches(
     byUid.set(ev.Id, ev);
     const key = ev.Keyword.trim().toLowerCase();
 
-    if (key && !byKeyword.has(key)) {
-      byKeyword.set(key, ev);
+    if (key.length === 0) {
+      continue;
     }
+
+    if (byKeyword.has(key)) {
+      continue;
+    }
+
+    byKeyword.set(key, ev);
   }
 
   const matchesMutable: Array<{
@@ -381,22 +449,14 @@ export function planImportMatches(
     }> = [];
 
   for (const src of imported) {
-    let target = byUid.get(src.Uid);
+    let target = findUnusedUidMatch(byUid, consumedSelectedIds, src.Uid);
     let matchedBy: MatchedByType = "uid";
 
-    if (!target || consumedSelectedIds.has(target.Id)) {
-      if (strictUidOnly) {
-        target = undefined;
-      } else {
-        const key = src.Keyword.trim().toLowerCase();
-        const candidate = key ? byKeyword.get(key) : undefined;
+    if (target === undefined && !strictUidOnly) {
+      target = findUnusedKeywordMatch(byKeyword, consumedSelectedIds, src.Keyword);
 
-        if (candidate && !consumedSelectedIds.has(candidate.Id)) {
-          target = candidate;
-          matchedBy = "keyword";
-        } else {
-          target = undefined;
-        }
+      if (target) {
+        matchedBy = "keyword";
       }
     }
 
@@ -408,7 +468,6 @@ export function planImportMatches(
     }
   }
 
-  void matches;
   const unmatchedSelected = selected.filter(ev => !consumedSelectedIds.has(ev.Id));
 
   return {

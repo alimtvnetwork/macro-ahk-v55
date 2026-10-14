@@ -52,7 +52,7 @@ This document indexes all coding guideline sub-specs for the Chrome Extension. E
 
 ## Cross-References
 
-- [Engineering Standards](../../../02-coding-guidelines/00-overview.md) — Project-wide engineering rules
+- [Engineering Standards](../../../02-coding-guidelines/) — Project-wide engineering rules
 - [Go Boolean Standards](../../../99-archive/duplicates/03-coding-guidelines-stale/03-coding-guidelines-spec/01-cross-language/02-boolean-principles.md) — Parallel boolean rules for Go
 - [Go Readable Conditions](../../../99-archive/duplicates/03-coding-guidelines-stale/03-coding-guidelines-spec/01-cross-language/02-boolean-principles/02-guards-and-extraction.md) — Named boolean patterns (RC1–RC4)
 - [Build System (Spec 17)](17-build-system.md) — Vite config and project structure

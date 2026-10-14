@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BASELINE_PATH = join(REPO_ROOT, 'spec/33-missing-coding-guideline/99-baselines.json');
+const BASELINE_PATH = join(REPO_ROOT, '02-spec/33-missing-coding-guideline/99-baselines.json');
 const TSCONFIG = 'tsconfig.macro.build.json';
 
 const args = new Set(process.argv.slice(2));

@@ -2,7 +2,7 @@
 /**
  * check-coding-guidelines-coverage.mjs — Batch B step 20.
  *
- * Fails CI if `.lovable/coding-guidelines.md` is missing any required token from
+ * Fails CI if `.ai-memory/memory/standards/01-coding-guidelines.md` is missing any required token from
  * the coverage matrix (spec/audit/blind-ai-implementation-audit/coverage/coverage-gap.md).
  *
  * Rationale: the summary file is the entry point blind AI agents read first.
@@ -16,7 +16,7 @@
  */
 import { readFileSync, existsSync } from 'node:fs';
 
-const SUMMARY_PATH = '.lovable/coding-guidelines.md';
+const SUMMARY_PATH = '.ai-memory/memory/standards/01-coding-guidelines.md';
 
 // Each entry: [token-or-regex, severity, human label]. Token must literally appear
 // in the summary. Regex (RegExp instance) is matched against the summary as-is.

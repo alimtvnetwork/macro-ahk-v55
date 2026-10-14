@@ -48,6 +48,6 @@ This folder contains **all app-specific documentation** for the Riseup Asia Macr
 ## Cross-References
 
 - App issues: [`spec/22-app-issues/`](../22-app-issues/00-overview.md)
-- Coding guidelines (apply to this app): [`spec/02-coding-guidelines/`](../02-coding-guidelines/00-overview.md)
-- Design system (used by this app): [`spec/07-design-system/`](../07-design-system/00-overview.md)
-- Error management contract: [`spec/03-error-manage/`](../03-error-manage/00-overview.md)
+- Coding guidelines (apply to this app): [`spec/02-coding-guidelines/`](../02-coding-guidelines/)
+- Design system (used by this app): [`spec/07-design-system/`](../07-design-system/)
+- Error management contract: [`spec/03-error-manage/`](../03-error-manage/)

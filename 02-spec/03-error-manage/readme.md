@@ -115,7 +115,7 @@ All errors use the three-tier architecture documented in [02-error-architecture/
 
 ## 💻 Concrete Go Code Samples (Production Architecture)
 
-> Real-world implementations are maintained in [`04-code/golang/examples/database_query.go`](../../04-code/golang/examples/database_query.go) and [`04-code/golang/examples/workflow_service.go`](../../04-code/golang/examples/workflow_service.go).
+> Real-world implementations are maintained in `04-code/golang/examples/database_query.go` and `04-code/golang/examples/workflow_service.go`.
 > Always inspect those source files as the canonical ground truth.
 
 ### 1. Creating and Wrapping Errors (`pkg/appfault`)

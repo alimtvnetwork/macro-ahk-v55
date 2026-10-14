@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Spec cross-reference linter — scans spec/21-app/05-prompts/** for `spec/...`
+// Spec cross-reference linter — scans 02-spec/21-app/05-prompts/** for `02-spec/...`
 // or `mem://...` references and verifies targets exist. Sequential fail-fast.
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
-const ROOT = 'spec/21-app/05-prompts';
-const MEM_ROOT = '.lovable/memory';
+const ROOT = '02-spec/21-app/05-prompts';
+const MEM_ROOT = '.ai-memory/memory';
 
 function walk(dir) {
   const out = [];

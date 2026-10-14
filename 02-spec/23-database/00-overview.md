@@ -42,8 +42,8 @@ labels.
 
 | Spec | What it covers |
 |---|---|
-| [`spec/04-database-conventions/`](../04-database-conventions/00-overview.md) | Naming, ID convention, ORM/views, testing strategy |
-| [`spec/05-split-db-architecture/`](../05-split-db-architecture/02-features/00-overview.md) | Split-DB CLI examples, reset API, RBAC, user isolation |
+| [`spec/04-database-conventions/`](../04-database-conventions/) | Naming, ID convention, ORM/views, testing strategy |
+| [`spec/05-split-db-architecture/`](../21-app/02-features/00-overview.md) | Split-DB CLI examples, reset API, RBAC, user isolation |
 | [`spec/06-seedable-config-architecture/`](../06-seedable-config-architecture/) | Seedable config layer |
 
 ### Schema sources (code)

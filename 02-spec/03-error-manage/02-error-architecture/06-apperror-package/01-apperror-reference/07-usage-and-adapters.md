@@ -8,7 +8,7 @@
 
 ## 9. Usage Examples (Canonical Reference: `04-code/golang/examples/`)
 
-> Real-world implementations are maintained in [`04-code/golang/examples/database_query.go`](../../../../../04-code/golang/examples/database_query.go) and [`04-code/golang/examples/workflow_service.go`](../../../../../04-code/golang/examples/workflow_service.go).
+> Real-world implementations are maintained in `04-code/golang/examples/database_query.go` and `04-code/golang/examples/workflow_service.go`.
 
 ### Service Method Returning Concrete Result Type (`types.go`)
 

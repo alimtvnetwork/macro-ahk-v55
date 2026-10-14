@@ -30,6 +30,8 @@ export interface UseRecordingSessionResult {
     readonly session: RecordingSession | null;
     /** True while the initial storage read is in flight. */
     readonly loading: boolean;
+    /** Last dispatch failure message, or null. Cleared on the next successful dispatch. */
+    readonly error: string | null;
     readonly start: (projectSlug?: string) => Promise<void>;
     readonly pause: () => Promise<void>;
     readonly resume: () => Promise<void>;
@@ -72,26 +74,43 @@ function useSessionSubscription(
 async function dispatchAction(
   action: RecorderAction,
   setSession: (s: RecordingSession | null) => void,
+  setError: (message: string | null) => void,
 ): Promise<void> {
-  const current = await readSession();
+  try {
+    // Start always goes through the dedicated seed path so an illegal
+    // Start can never throw out of the shared dispatcher.
+    if (action.Kind === "Start") {
+      await startSession(action.ProjectSlug, setSession, setError);
 
-  if (current === null) {
-    return; 
+      return;
+    }
+
+    const current = await readSession();
+
+    if (current === null) {
+      return;
+    }
+
+    const next = recorderReducer(current, action);
+    await writeSession(next);
+    setSession(next.Phase === "Idle" ? null : next);
+    setError(null);
+  } catch (err) {
+    // Illegal transitions (e.g. Pause while Idle) surface on the hook's
+    // error channel instead of escaping as an unhandled rejection.
+    setError(err instanceof Error ? err.message : String(err));
   }
-
-  const next = recorderReducer(current, action);
-  await writeSession(next);
-  setSession(next.Phase === "Idle" ? null : next);
 }
 
 async function startSession(
   projectSlug: string | undefined,
   setSession: (s: RecordingSession) => void,
+  setError: (message: string | null) => void,
 ): Promise<void> {
   const current = await readSession();
 
   if (current !== null && current.Phase !== "Idle") {
-    return; 
+    return;
   }
 
   const seed: RecordingSession = {
@@ -106,20 +125,22 @@ async function startSession(
   });
   await writeSession(next);
   setSession(next);
+  setError(null);
 }
 
 export function useRecordingSession(): UseRecordingSessionResult {
   const [session, setSession] = useState<RecordingSession | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useSessionSubscription(setSession, setLoading);
 
-  const dispatch = useCallback((a: RecorderAction) => dispatchAction(a, setSession), []);
-  const start = useCallback((projectSlug?: string) => startSession(projectSlug, setSession), []);
+  const dispatch = useCallback((a: RecorderAction) => dispatchAction(a, setSession, setError), []);
+  const start = useCallback((projectSlug?: string) => startSession(projectSlug, setSession, setError), []);
   const pause = useCallback(() => dispatch({ Kind: "Pause" }), [dispatch]);
   const resume = useCallback(() => dispatch({ Kind: "Resume" }), [dispatch]);
   const stop = useCallback(() => dispatch({ Kind: "Stop" }), [dispatch]);
 
-  return { session, loading, start, pause, resume, stop };
+  return { session, loading, error, start, pause, resume, stop };
 }
 

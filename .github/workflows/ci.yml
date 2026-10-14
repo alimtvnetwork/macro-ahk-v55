@@ -44,7 +44,7 @@ jobs:
   # Job 0: Spec Links — fail-fast guard, no install needed
   #
   # Runs the strict spec-link checker (no baseline, ignores rot)
-  # against every .md file under spec/. Surfaces a Top-N failing-files
+  # against every .md file under 02-spec/. Surfaces a Top-N failing-files
   # leaderboard in the GitHub Actions Step Summary and emits inline
   # `::error file=…,line=…::` annotations so each broken link shows
   # up on the PR diff view.
