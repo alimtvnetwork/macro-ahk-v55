@@ -3,6 +3,47 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 17 Consolidated Guidelines.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+Consolidated quick-reference guidelines: the distilled, cross-cutting rule set for AI agents.
+
+## Files
+
+- [`02-ai-review-overview.md`](./02-ai-review-overview.md)
+- [`03-strictly-avoid-quickref.md`](./03-strictly-avoid-quickref.md)
+- [`04-spec-authoring.md`](./04-spec-authoring.md)
+- [`05-coding-guidelines.md`](./05-coding-guidelines.md)
+- [`06-error-management.md`](./06-error-management.md)
+- [`07-enum-standards.md`](./07-enum-standards.md)
+- [`08-split-db-architecture.md`](./08-split-db-architecture.md)
+- [`09-seedable-config.md`](./09-seedable-config.md)
+- [`10-design-system.md`](./10-design-system.md)
+- [`11-docs-viewer-ui.md`](./11-docs-viewer-ui.md)
+- [`12-code-block-system.md`](./12-code-block-system.md)
+- [`13-powershell-integration.md`](./13-powershell-integration.md)
+- [`14-research.md`](./14-research.md)
+- [`15-root-research.md`](./15-root-research.md)
+- [`16-app.md`](./16-app.md)
+- [`17-app-issues.md`](./17-app-issues.md)
+- [`18-cicd-pipeline-workflows.md`](./18-cicd-pipeline-workflows.md)
+- [`19-app-design-system-and-ui.md`](./19-app-design-system-and-ui.md)
+- [`20-self-update-app-update.md`](./20-self-update-app-update.md)
+- [`21-database-conventions.md`](./21-database-conventions.md)
+- [`22-gap-analysis.md`](./22-gap-analysis.md)
+- [`23-wp-plugin-conventions.md`](./23-wp-plugin-conventions.md)
+- [`24-lovable-folder-structure.md`](./24-lovable-folder-structure.md)
+- [`25-app-database.md`](./25-app-database.md)
+- [`26-generic-cli.md`](./26-generic-cli.md)
+- [`27-folder-mapping.md`](./27-folder-mapping.md)
+- [`28-blind-ai-implementability-audit.md`](./28-blind-ai-implementability-audit.md)
+- [`29-blind-ai-audit-v2.md`](./29-blind-ai-audit-v2.md)
+- [`30-linter-authoring-guide.md`](./30-linter-authoring-guide.md)
+- [`31-distribution-and-runner.md`](./31-distribution-and-runner.md)
+- [`32-blind-ai-audit-v3.md`](./32-blind-ai-audit-v3.md)
+- [`33-readme-improvement-suggestions.md`](./33-readme-improvement-suggestions.md)
+- [`34-compiled-simple-coding-guidelines.md`](./34-compiled-simple-coding-guidelines.md)
+- [`35-ai-code-review-guide.md`](./35-ai-code-review-guide.md)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `17-consolidated-guidelines/`.

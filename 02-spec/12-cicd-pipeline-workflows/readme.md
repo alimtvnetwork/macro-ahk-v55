@@ -3,6 +3,38 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for CI/CD Pipeline Workflows.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+CI/CD pipeline definitions: the GitHub Actions workflows, gates, and release automation that keep the repo green.
+
+## Files
+
+- [`01-browser-extension-deploy/`](./01-browser-extension-deploy/)
+- [`02-ci-pipeline.md`](./02-ci-pipeline.md)
+- [`02-go-binary-deploy/`](./02-go-binary-deploy/)
+- [`03-reusable-ci-guards/`](./03-reusable-ci-guards/)
+- [`03-shared-conventions.md`](./03-shared-conventions.md)
+- [`04-github-release-standard.md`](./04-github-release-standard.md)
+- [`05-release-pipeline.md`](./05-release-pipeline.md)
+- [`06-vulnerability-scanning.md`](./06-vulnerability-scanning.md)
+- [`07-install-script-generation.md`](./07-install-script-generation.md)
+- [`08-installation-flow.md`](./08-installation-flow.md)
+- [`09-changelog-integration.md`](./09-changelog-integration.md)
+- [`10-code-signing.md`](./10-code-signing.md)
+- [`11-self-update-mechanism.md`](./11-self-update-mechanism.md)
+- [`12-version-and-help.md`](./12-version-and-help.md)
+- [`13-environment-variable-setup.md`](./13-environment-variable-setup.md)
+- [`14-release-body-and-changelog.md`](./14-release-body-and-changelog.md)
+- [`15-terminal-output-standards.md`](./15-terminal-output-standards.md)
+- [`16-binary-icon-branding.md`](./16-binary-icon-branding.md)
+- [`17-release-pipeline-issues-rca.md`](./17-release-pipeline-issues-rca.md)
+- [`18-lint-gating-rules.md`](./18-lint-gating-rules.md)
+- [`19-blue-green-deployment.md`](./19-blue-green-deployment.md)
+- [`20-flaky-test-quarantine.md`](./20-flaky-test-quarantine.md)
+- [`21-contract-testing.md`](./21-contract-testing.md)
+- [`22-e2e-testing-pattern.md`](./22-e2e-testing-pattern.md)
+- [`images/`](./images/)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 1. [ ] `/goal` Read and understand all numbered specifications under `12-cicd-pipeline-workflows/`.

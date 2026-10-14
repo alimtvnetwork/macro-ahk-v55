@@ -3,6 +3,35 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 18 Wp Plugin How To.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+WordPress plugin how-to: REST API conventions and implementation guidance for the WP plugin surface.
+
+## Files
+
+- [`02-enums-and-coding-style/`](./02-enums-and-coding-style/)
+- [`02-quick-start.md`](./02-quick-start.md)
+- [`03-foundation-and-architecture.md`](./03-foundation-and-architecture.md)
+- [`04-traits-and-composition.md`](./04-traits-and-composition.md)
+- [`05-logging-and-error-handling.md`](./05-logging-and-error-handling.md)
+- [`06-helpers-responses-and-integration.md`](./06-helpers-responses-and-integration.md)
+- [`07-input-validation-patterns.md`](./07-input-validation-patterns.md)
+- [`08-reference-implementations.md`](./08-reference-implementations.md)
+- [`09-wordpress-integration-patterns.md`](./09-wordpress-integration-patterns.md)
+- [`10-testing-patterns.md`](./10-testing-patterns.md)
+- [`11-deployment-patterns.md`](./11-deployment-patterns.md)
+- [`12-frontend-and-template-patterns.md`](./12-frontend-and-template-patterns.md)
+- [`13-design-system.md`](./13-design-system.md)
+- [`14-admin-ui-patterns.md`](./14-admin-ui-patterns.md)
+- [`15-rest-api-conventions.md`](./15-rest-api-conventions.md)
+- [`16-settings-architecture.md`](./16-settings-architecture.md)
+- [`17-error-handling-extraction.md`](./17-error-handling-extraction.md)
+- [`18-data-file-patterns.md`](./18-data-file-patterns.md)
+- [`19-frontend-javascript-patterns.md`](./19-frontend-javascript-patterns.md)
+- [`20-micro-orm-and-root-db.md`](./20-micro-orm-and-root-db.md)
+- [`21-end-to-end-walkthrough.md`](./21-end-to-end-walkthrough.md)
+- [`22-ping-endpoint.md`](./22-ping-endpoint.md)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `18-wp-plugin-how-to/`.

@@ -3,6 +3,20 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 04 Database Conventions.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+Database schema, naming, ORM, and REST-format conventions for the SQLite-backed stores used by the extension and tooling.
+
+## Files
+
+- [`02-naming-conventions.md`](./02-naming-conventions.md)
+- [`03-schema-design.md`](./03-schema-design.md)
+- [`04-orm-and-views.md`](./04-orm-and-views.md)
+- [`05-testing-strategy.md`](./05-testing-strategy.md)
+- [`06-relationship-diagrams.md`](./06-relationship-diagrams.md)
+- [`07-rest-api-format.md`](./07-rest-api-format.md)
+- [`08-split-db-pattern.md`](./08-split-db-pattern.md)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `04-database-conventions/`.

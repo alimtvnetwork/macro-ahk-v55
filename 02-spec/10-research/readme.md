@@ -3,6 +3,9 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 10 Research.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Files
+
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `10-research/`.

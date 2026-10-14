@@ -235,6 +235,7 @@ const SKIP_DIRS = new Set([
     "dist",
     ".cache",
     ".lovable",
+    ".ai-memory", // agent memory/docs tree — may describe forbidden forms (self-doc)
     "v1.133-working", // archived snapshot — read-only per project policy
 ]);
 

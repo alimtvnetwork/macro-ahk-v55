@@ -7,6 +7,19 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 03 Error Manage.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+Error handling, error codes, failure modes, and debugging standards: how errors are classified, logged, and surfaced across the extension and standalone scripts.
+
+## Files
+
+- [`01-error-resolution/`](./01-error-resolution/)
+- [`02-error-architecture/`](./02-error-architecture/)
+- [`02-improvements.md`](./02-improvements.md)
+- [`03-error-code-registry/`](./03-error-code-registry/)
+- [`03-structure.md`](./03-structure.md)
+- [`97-acceptance-criteria.md`](./97-acceptance-criteria.md)
+
 ## 🎯 Actionable CI/CD & Agent Checklist (Learnable Items)
 
 - [ ] `/goal` **Read and understand** all numbered specifications under `03-error-manage/`.

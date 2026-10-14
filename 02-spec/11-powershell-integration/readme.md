@@ -3,6 +3,26 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 11 Powershell Integration.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+PowerShell integration specifications: installer, runner, and module contracts for Windows PowerShell automation.
+
+## Files
+
+- [`02-configuration-schema.md`](./02-configuration-schema.md)
+- [`03-template-vs-project-differences.md`](./03-template-vs-project-differences.md)
+- [`04-script-reference.md`](./04-script-reference.md)
+- [`05-integration-guide.md`](./05-integration-guide.md)
+- [`06-error-codes.md`](./06-error-codes.md)
+- [`07-firewall-rules.md`](./07-firewall-rules.md)
+- [`08-php-known-issues.md`](./08-php-known-issues.md)
+- [`09-multi-site-deployment.md`](./09-multi-site-deployment.md)
+- [`11-parallel-work-sync-output.md`](./11-parallel-work-sync-output.md)
+- [`25-multi-site-deployment.md`](./25-multi-site-deployment.md)
+- [`examples/`](./examples/)
+- [`schemas/`](./schemas/)
+- [`templates/`](./templates/)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `11-powershell-integration/`.

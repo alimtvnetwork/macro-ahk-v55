@@ -3,7 +3,7 @@
 import { readdirSync, statSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const SPEC = 'spec';
+const SPEC = '02-spec';
 const REQUIRED = [/^#\s+\S/m, /^##\s+Overview\b/m, /^##\s+Files\b/m];
 const errors = [];
 

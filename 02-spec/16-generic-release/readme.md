@@ -3,6 +3,22 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 16 Generic Release.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
+## Overview
+
+Generic release process: versioning, release notes, and publication mechanics.
+
+## Files
+
+- [`02-cross-compilation.md`](./02-cross-compilation.md)
+- [`03-release-pipeline.md`](./03-release-pipeline.md)
+- [`04-install-scripts.md`](./04-install-scripts.md)
+- [`05-checksums-verification.md`](./05-checksums-verification.md)
+- [`06-release-assets.md`](./06-release-assets.md)
+- [`07-release-metadata.md`](./07-release-metadata.md)
+- [`08-known-issues-and-fixes.md`](./08-known-issues-and-fixes.md)
+- [`09-version-pinned-release-installers.md`](./09-version-pinned-release-installers.md)
+- [`images/`](./images/)
+
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `16-generic-release/`.
