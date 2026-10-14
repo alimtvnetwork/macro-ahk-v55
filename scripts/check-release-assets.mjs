@@ -23,16 +23,29 @@
 
 import { appendFileSync } from "node:fs";
 
-/** Required asset name templates and their minimum acceptable byte size. */
+/** Required asset name templates and their minimum acceptable byte size.
+ * The full healthy set is 18 assets (grounded on the v6.99.0 release:
+ * alimtvnetwork/macro-ahk-v55): the 10 plugin/extension zips, the 4
+ * installer/helper scripts, and VERSION.txt, changelog.md, checksums.txt,
+ * RELEASE_NOTES.md. */
 const REQUIRED_ASSETS = [
     { template: "marco-extension-${TAG}.zip", minBytes: 500 * 1024 },
     { template: "prompts-${TAG}.zip", minBytes: 10 * 1024 },
     { template: "macro-controller-${TAG}.zip", minBytes: 100 * 1024 },
     { template: "marco-sdk-${TAG}.zip", minBytes: 5 * 1024 },
     { template: "xpath-${TAG}.zip", minBytes: 1024 },
+    { template: "payment-banner-hider-${TAG}.zip", minBytes: 1024 },
+    { template: "lovable-common-${TAG}.zip", minBytes: 1024 },
+    { template: "lovable-owner-switch-${TAG}.zip", minBytes: 1024 },
+    { template: "lovable-user-add-${TAG}.zip", minBytes: 1024 },
+    { template: "lovable-dashboard-${TAG}.zip", minBytes: 1024 },
     { template: "install.ps1", minBytes: 1024 },
     { template: "install.sh", minBytes: 1024 },
+    { template: "clone-repo.ps1", minBytes: 1024 },
+    { template: "download-extension.ps1", minBytes: 1024 },
     { template: "checksums.txt", minBytes: 64 },
+    { template: "changelog.md", minBytes: 1024 },
+    { template: "RELEASE_NOTES.md", minBytes: 1024 },
     { template: "VERSION.txt", minBytes: 2 },
 ];
 

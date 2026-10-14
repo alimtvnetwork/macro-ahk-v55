@@ -91,6 +91,9 @@ jobs:
   # tests, or builds. Guarantees the Release page exists for every
   # v* tag even if downstream jobs fail. The `release` job below
   # uploads the built assets to the same tag when it finishes.
+  # The page is created as a DRAFT and stays a draft until the release
+  # job's asset gate passes and explicitly undrafts it, so a failed
+  # pipeline never leaves a live 0-asset page.
   # ════════════════════════════════════════════════════════════
   create-release-page:
     name: Create Release Page (early)
@@ -167,7 +170,7 @@ jobs:
             3. Open `chrome://extensions`.
             4. Enable **Developer mode**.
             5. Click **Load unpacked** and select the extracted folder.
-          draft: false
+          draft: true
           prerelease: ${{ contains(steps.pick.outputs.tag, '-') }}
           make_latest: ${{ !contains(steps.pick.outputs.tag, '-') }}
           fail_on_unmatched_files: false
@@ -932,7 +935,10 @@ jobs:
             release-assets/checksums.txt
             release-assets/*.zip
 
-      # ── Create GitHub Release ─────────────────────────────
+      # ── Upload assets to the draft release ────────────────
+      # The release stays a DRAFT until the asset gate below passes and the
+      # final step undrafts it, so a failed pipeline never leaves a live
+      # 0-asset page. See .ai-memory/cicd/09-release-asset-rca.md.
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -940,9 +946,21 @@ jobs:
           name: "Marco Extension ${{ needs.setup.outputs.publish_tag }}"
           body_path: release-assets/RELEASE_NOTES.md
           files: release-assets/*
-          draft: false
+          draft: true
           prerelease: ${{ contains(needs.setup.outputs.publish_tag, '-') }}
           make_latest: ${{ !contains(needs.setup.outputs.publish_tag, '-') }}
+
+      # ── Final gate: the draft release MUST carry the built assets ──
+      # Releases v5.9.0 through v5.22.0 published a page with zero assets and
+      # nothing failed, because no step ever inspected the finished release.
+      # See .lovable/memory/rca/06-release-published-without-assets.md and
+      # .ai-memory/cicd/09-release-asset-rca.md. The page is undrafted only
+      # after this gate passes.
+      - name: Verify published release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.setup.outputs.publish_tag }}
+        run: node scripts/check-release-assets.mjs
 
       # ── Force release body to the rich RELEASE_NOTES.md ──
       # The create-release-page early job creates the release with a
@@ -967,14 +985,20 @@ jobs:
             --title "Marco Extension $TAG"
           echo "Forced rich body onto release $TAG"
 
-      # ── Final gate: the published release MUST carry the built assets ──
-      # Releases v5.9.0 through v5.22.0 published a page with zero assets and
-      # nothing failed, because no step ever inspected the finished release.
-      # See .lovable/memory/rca/06-release-published-without-assets.md.
-      - name: Verify published release assets
+      # ── Publish the release page (undraft) ──
+      # The page was created as a draft by the early job and stayed a draft
+      # through asset upload, the asset gate, and the rich-notes edit. This
+      # is the FIRST step that makes the page public, so a failed or skipped
+      # release job can never leave a live 0-asset page.
+      - name: Publish release page (undraft)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ needs.setup.outputs.publish_tag }}
-        run: node scripts/check-release-assets.mjs
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.setup.outputs.publish_tag }}
+        run: |
+          set -euo pipefail
+          gh release edit "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --draft=false
+          echo "Published release $TAG (draft=false)"
 
 

@@ -16,3 +16,4 @@ End-to-end specification for the **Macro Controller** Chrome extension app — t
 - [`05-prompts/`](./05-prompts/) — prompt library + cache, **Macros**, **Variables** (5-tier resolution), **MacroPrompts** (aggregated from `standalone-scripts/macro-prompts/`)
 - [`06-tasks/`](./06-tasks/) — master task breakdown + seeding
 - [`cicd-failure-investigation-and-recorder-functionality/`](./cicd-failure-investigation-and-recorder-functionality/) — CI/CD failure RCA + recorder repair program spec (2026-10-15)
+- [`cicd-asset-inclusion-and-release-fix/`](./cicd-asset-inclusion-and-release-fix/) — release asset pipeline fix: draft-first publish + 18-asset gate + prevention doc (2026-10-15)

@@ -35,6 +35,7 @@
 | 14 | [`03-release-page-empty-v5-12-1-version-json-drift.md`](./issues/03-release-page-empty-v5-12-1-version-json-drift.md) | Release page empty on v5.12.1 (version.json vs tag drift) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-27 |
 | 16 | [`16-script-injection-toast-timeout.md`](./issues/16-script-injection-toast-timeout.md) | Playwright test `injected script does not leak console errors` failed randomly due to unignored in-page toast diagnostic error | `.github/workflows/ci.yml` | ✅ Resolved | 2026-08-22 |
 | 17 | [`08-cicd-failure-investigation-and-recorder-functionality.md`](./issues/08-cicd-failure-investigation-and-recorder-functionality.md) | CI red after spec/ + .lovable/ restructure — 13 stale-path failures across ci.yml / spec-gates.yml / spec-audit.yml | `.github/workflows/ci.yml` + `spec-gates.yml` + `spec-audit.yml` | ✅ Resolved | 2026-10-15 |
+| 18 | [`17-release-asset-pipeline-zero-assets.md`](./issues/17-release-asset-pipeline-zero-assets.md) | v6.100.0–v6.101.18 published with 0 assets: prompt-mirror contamination failed setup (v6.100.0), markdown filename policy failed setup (v6.101.x); needs:-skip + early non-draft page published silently; gate covered only 9/18 assets | `.github/workflows/release.yml` | ✅ Resolved | 2026-10-15 |
 
 ## Referenced specs
 
