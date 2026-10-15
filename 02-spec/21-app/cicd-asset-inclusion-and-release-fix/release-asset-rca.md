@@ -101,3 +101,15 @@ The pipeline didn't break between v6.99.0 and v6.100.0 — a docs commit broke
 a test, and the pipeline's *structure* (publish early, validate late) turned a
 loud test failure into a silent empty release. The fix is structural too:
 never publish before validating.
+
+## Addendum: the gate must read drafts (learned during the v6.102.0 release)
+
+The first v6.102.0 Release Build failed at the asset gate itself, for a new
+reason: `scripts/check-release-assets.mjs` fetched the release via
+`GET /repos/{owner}/{repo}/releases/tags/{tag}`, which returns **404 for draft
+releases**. Since the pipeline now keeps the release a draft until the gate
+passes, the gate could never see the release it was supposed to validate.
+Fixed by listing releases (`GET /repos/{owner}/{repo}/releases?per_page=100`)
+and matching `tag_name` instead — authenticated list calls include drafts.
+Rule of thumb: any check that runs *before* publication must query in a way
+that can see drafts, or it will always fail exactly when it matters most.

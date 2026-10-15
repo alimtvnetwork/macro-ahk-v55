@@ -56,17 +56,26 @@ function writeStepSummary(line) {
     appendFileSync(summaryPath, `${line}\n`, "utf8");
 }
 
-/** Fetch the published release payload for a tag. */
+/** Fetch the release payload for a tag, including DRAFT releases.
+ * NOTE: GET /releases/tags/{tag} returns 404 for draft releases, and the
+ * pipeline now keeps the release a draft until this gate passes. Listing
+ * releases and matching by tag_name works for drafts and published releases
+ * alike (authenticated calls include drafts in the list). */
 async function fetchRelease(slug, tag) {
     const headers = { Accept: "application/vnd.github+json" };
     const token = process.env.GITHUB_TOKEN;
     if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch(`https://api.github.com/repos/${slug}/releases/tags/${tag}`, { headers });
+    const response = await fetch(`https://api.github.com/repos/${slug}/releases?per_page=100`, { headers });
     if (!response.ok) {
         const details = await response.text();
-        throw new Error(`GitHub API ${response.status} for /repos/${slug}/releases/tags/${tag}: ${details}`);
+        throw new Error(`GitHub API ${response.status} for /repos/${slug}/releases: ${details}`);
     }
-    return response.json();
+    const releases = await response.json();
+    const release = releases.find((candidate) => candidate.tag_name === tag);
+    if (!release) {
+        throw new Error(`No release (draft or published) found for tag ${tag} in /repos/${slug}/releases`);
+    }
+    return release;
 }
 
 /** Compare published assets against the required list. Returns failure strings. */
