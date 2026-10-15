@@ -26,12 +26,18 @@ CI/CD does not contain the assets like the `gitmap` and Antigravity Tools Manage
 
 ## Must follow and spawn agent using
 
-`[execute-parent-task-with-n-steps-v6](file;.agents/skills/execute-parent-task-with-n-steps-v6)`
+```text
+[execute-parent-task-with-n-steps-v6](file;.agents/skills/execute-parent-task-with-n-steps-v6)
+```
 
 ## Additional Instructions
 
 - [/plan](slashCommand;plan) first before doing the work to reduce the credits.
-- [/learn](slashCommand;learn) from `[gitmap](file;.agents/skills/gitmap)` skill to leverage GitMap high-speed search, toolchain discovery, and caching.
+- [/learn](slashCommand;learn) from the skill referenced below to leverage GitMap high-speed search, toolchain discovery, and caching.
+
+```text
+[gitmap](file;.agents/skills/gitmap)
+```
 - Only add the relative paths, never add the absolute path during your work; this should be respected on the release page and in release notes as well.
 
 ## Confirmed Task Breakdown
