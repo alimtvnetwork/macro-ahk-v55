@@ -100,7 +100,7 @@ Authoritative REST surface for both tiers. All paths are `/API/V1/...`. JSON req
   "CompanyName": "Riseup Asia LLC",
   "CompanyWebsite": "https://riseup-asia.com",
   "CompanySlug": "riseup-asia",
-  "Address": "Kuala Lumpur, Malaysia", <!-- allow-timezone-example -->
+  "Address": "Kuala Lumpur, Malaysia",
   "PhoneNumber": "+60-...",
   "NumberOfPeople": 25,
   "Calendar": "https://cal.com/...",
@@ -163,12 +163,12 @@ Field nullability (resolves F-A-01 — replaces prior "Most fields Non-Nullable"
   "Cadence": "Weekly",
   "EveryNHours": null,
   "SpecificTimeOfDay": "04:00",
-  "TimeZone": "Asia/Kuala_Lumpur", <!-- allow-timezone-example -->
+  "TimeZone": "Asia/Kuala_Lumpur",
   "Enabled": true
 }
 ```
 
-`Cadence` enum: `Hourly`, `EveryNHours`, `Daily`, `Weekly`, `Monthly`, `Yearly`. When `EveryNHours`, populate `EveryNHours` (allowed values 5, 6, 12, 24). `SpecificTimeOfDay` is null unless `Cadence` ∈ {Daily, Weekly, Monthly, Yearly}. Default: `Weekly @ 04:00 Asia/Kuala_Lumpur`. <!-- allow-timezone-example -->
+`Cadence` enum: `Hourly`, `EveryNHours`, `Daily`, `Weekly`, `Monthly`, `Yearly`. When `EveryNHours`, populate `EveryNHours` (allowed values 5, 6, 12, 24). `SpecificTimeOfDay` is null unless `Cadence` ∈ {Daily, Weekly, Monthly, Yearly}. Default: `Weekly @ 04:00 Asia/Kuala_Lumpur`.
 
 ---
 

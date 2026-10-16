@@ -3,46 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 19 Main Worker Service.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Main worker service specification: the background worker runtime, responsibilities, and contracts.
-
-## Files
-
-- [`02-architecture.md`](./02-architecture.md)
-- [`03-glossary.md`](./03-glossary.md)
-- [`04-main-db-schema.md`](./04-main-db-schema.md)
-- [`05-worker-routing.md`](./05-worker-routing.md)
-- [`06-auth-and-2fa.md`](./06-auth-and-2fa.md)
-- [`07-core-api-endpoints.md`](./07-core-api-endpoints.md)
-- [`08-role-based-dashboards.md`](./08-role-based-dashboards.md)
-- [`09-error-contract.md`](./09-error-contract.md)
-- [`10-self-update-pointer.md`](./10-self-update-pointer.md)
-- [`11-worker-bootstrap-protocol.md`](./11-worker-bootstrap-protocol.md)
-- [`12-split-db-tier-reconciliation.md`](./12-split-db-tier-reconciliation.md)
-- [`13-jwt-delivery-contract.md`](./13-jwt-delivery-contract.md)
-- [`14-error-codes.md`](./14-error-codes.md)
-- [`15-rbac-and-status-seed.md`](./15-rbac-and-status-seed.md)
-- [`16-tunable-constants.md`](./16-tunable-constants.md)
-- [`17-update-channels.md`](./17-update-channels.md)
-- [`18-cascading-roles-and-cache-bin.md`](./18-cascading-roles-and-cache-bin.md)
-- [`19-backup-nodes.md`](./19-backup-nodes.md)
-- [`20-incremental-backup-sync.md`](./20-incremental-backup-sync.md)
-- [`21-backup-encryption-and-keys.md`](./21-backup-encryption-and-keys.md)
-- [`22-backup-endpoints.md`](./22-backup-endpoints.md)
-- [`23-backup-apply-logic.md`](./23-backup-apply-logic.md)
-- [`24-snapshot-storage-and-restore.md`](./24-snapshot-storage-and-restore.md)
-- [`25-threat-model.md`](./25-threat-model.md)
-- [`26-inherited-rules.md`](./26-inherited-rules.md)
-- [`27-trust-boundaries-and-isolation.md`](./27-trust-boundaries-and-isolation.md)
-- [`28-git-backup-targets.md`](./28-git-backup-targets.md)
-- [`29-plan.md`](./29-plan.md)
-- [`96-linter-audit.md`](./96-linter-audit.md)
-- [`97-acceptance-criteria.md`](./97-acceptance-criteria.md)
-- [`diagrams/`](./diagrams/)
-- [`fixtures/`](./fixtures/)
-- [`images/`](./images/)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `19-main-worker-service/`.

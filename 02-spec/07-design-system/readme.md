@@ -3,61 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 07 Design System.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Files
-
-- [`01-svg/`](./01-svg/)
-- [`02-ai-system-design/`](./02-ai-system-design/)
-- [`02-design-principles.md`](./02-design-principles.md)
-- [`03-sweet-digs-design-system/`](./03-sweet-digs-design-system/)
-- [`03-theme-variable-architecture.md`](./03-theme-variable-architecture.md)
-- [`04-typography.md`](./04-typography.md)
-- [`04-white-blue-theme/`](./04-white-blue-theme/)
-- [`05-bright-gold-tech/`](./05-bright-gold-tech/)
-- [`05-spacing-layout.md`](./05-spacing-layout.md)
-- [`06-borders-shapes.md`](./06-borders-shapes.md)
-- [`07-css-modularity.md`](./07-css-modularity.md)
-- [`08-motion-transitions.md`](./08-motion-transitions.md)
-- [`09-code-blocks.md`](./09-code-blocks.md)
-- [`10-header-navigation.md`](./10-header-navigation.md)
-- [`11-button-system.md`](./11-button-system.md)
-- [`12-sidebar-system.md`](./12-sidebar-system.md)
-- [`13-section-patterns.md`](./13-section-patterns.md)
-- [`14-page-creation-rules.md`](./14-page-creation-rules.md)
-- [`15-wordpress-migration.md`](./15-wordpress-migration.md)
-- [`16-theme-catalogue-and-palettes.md`](./16-theme-catalogue-and-palettes.md)
-- [`18-dark-mode-and-materiality.md`](./18-dark-mode-and-materiality.md)
-- [`19-modern-motion-and-sliding-interactions.md`](./19-modern-motion-and-sliding-interactions.md)
-- [`20-ai-training-and-checklist-guide.md`](./20-ai-training-and-checklist-guide.md)
-- [`21-css3-animations-and-interactions.md`](./21-css3-animations-and-interactions.md)
-- [`22-native-css-select-and-border-shapes.md`](./22-native-css-select-and-border-shapes.md)
-- [`23-building-block-components.md`](./23-building-block-components.md)
-- [`24-slide-presentation-system.md`](./24-slide-presentation-system.md)
-- [`25-page-assembly.md`](./25-page-assembly.md)
-- [`26-visual-builder.md`](./26-visual-builder.md)
-- [`27-slide-canvas-and-themes.md`](./27-slide-canvas-and-themes.md)
-- [`28-slide-layouts.md`](./28-slide-layouts.md)
-- [`29-slide-navigation-and-builder.md`](./29-slide-navigation-and-builder.md)
-- [`30-slide-palette-type-and-shell.md`](./30-slide-palette-type-and-shell.md)
-- [`31-slide-controller-buttons.md`](./31-slide-controller-buttons.md)
-- [`32-slide-color-options.md`](./32-slide-color-options.md)
-- [`33-mega-menu-components.md`](./33-mega-menu-components.md)
-- [`34-slide-layout-catalog.md`](./34-slide-layout-catalog.md)
-- [`35-slide-builder-canvas-inspector.md`](./35-slide-builder-canvas-inspector.md)
-- [`36-website-content-builder-mode.md`](./36-website-content-builder-mode.md)
-- [`37-image-specifications.md`](./37-image-specifications.md)
-- [`38-card-and-pricing-components.md`](./38-card-and-pricing-components.md)
-- [`39-logo-construction.md`](./39-logo-construction.md)
-- [`40-theme-switch.md`](./40-theme-switch.md)
-- [`41-homepage-and-blog-sections.md`](./41-homepage-and-blog-sections.md)
-- [`42-slide-quiz-preview-chrome-and-default-shadows.md`](./42-slide-quiz-preview-chrome-and-default-shadows.md)
-- [`42-slide-step-and-sound-system.md`](./42-slide-step-and-sound-system.md)
-- [`43-slide-webcam-overlay.md`](./43-slide-webcam-overlay.md)
-- [`44-slide-presenter-inspector-and-handouts.md`](./44-slide-presenter-inspector-and-handouts.md)
-- [`45-ai-visual-whitespace-discipline.md`](./45-ai-visual-whitespace-discipline.md)
-- [`97-acceptance-criteria.md`](./97-acceptance-criteria.md)
-- [`98-confidence-report.md`](./98-confidence-report.md)
-- [`tokens/`](./tokens/)
-
 ## 🎯 Actionable AI Agent Reading & Learning Checklist
 
 Before authoring components or generating code, AI agents MUST read and master the specifications in this directory in the following sequence:
@@ -114,7 +59,7 @@ Before authoring components or generating code, AI agents MUST read and master t
   - Read [`02-ai-system-design/readme.md`](./02-ai-system-design/readme.md) — Variable-driven theme swapping (Pink to Green), sticky nav, search module, "Join Us" CSS3 text-slide animation, "Climate AI" highlight, and "Team Greenhouse" section.
 - [ ] `/learn` **Phase 8: Sweet Digs Design System & Interactive Theme Tester**
   - Read [`03-sweet-digs-design-system/readme.md`](./03-sweet-digs-design-system/readme.md) — Master index and token flow for the Sweet Digs system.
-  - Explore interactive demo: `theme-tester/index.html` — Live interactive theme tester with theme switcher, split hero, search card, filter chips, expanding underline menu, and interactive buttons.
+  - Explore interactive demo: [`theme-tester/index.html`](../../theme-tester/index.html) — Live interactive theme tester with theme switcher, split hero, search card, filter chips, expanding underline menu, and interactive buttons.
 - [ ] `/learn` **Phase 9: White Blue Theme Design System (3-Format Color Standard)**
   - Read [`04-white-blue-theme/readme.md`](./04-white-blue-theme/readme.md) — Master index, 4-tier token flow, alternating band rhythm (`light` -> `soft` -> `dark` -> `void`), and blind-AI checklist.
   - Read [`04-white-blue-theme/01-colors-typography-and-tokens.md`](./04-white-blue-theme/01-colors-typography-and-tokens.md) — Complete 3-format color tables (`HEX`, `RGB`/`RGBA`, `HSL` + `OKLCH`), `Ubuntu` + `Poppins` + `JetBrains Mono` typography, gradients, and brand-tinted shadows.
@@ -269,7 +214,7 @@ All animations and transitions prioritize **GPU-composited CSS3 transforms and o
 | 03b | [03-sweet-digs-design-system/readme.md](./03-sweet-digs-design-system/readme.md) | Sub-System | Sweet Digs HSL multi-theme architecture and zoom-free interaction suite |
 | 04b | [04-white-blue-theme/readme.md](./04-white-blue-theme/readme.md) | Sub-System | White Blue Theme 3-format color architecture (`HEX`, `RGB`/`RGBA`, `HSL` + `OKLCH`), 3D flip Mega-Menu, `WhiteBlueButton`, and enterprise section library |
 | 97 | [97-acceptance-criteria.md](./97-acceptance-criteria.md) | Testing | Testable criteria for design system compliance |
-| 99 | 99-consistency-report.md | Meta | Consistency validation report |
+| 99 | [99-consistency-report.md](./99-consistency-report.md) | Meta | Consistency validation report |
 
 ---
 
@@ -352,5 +297,5 @@ Every heading gradient, link color, button, code block glow, and hover effect up
 
 ## Verification
 
-Full compliance criteria and automated verification suites are defined in [`97-acceptance-criteria.md`](./97-acceptance-criteria.md) and tracked in `99-consistency-report.md`.
+Full compliance criteria and automated verification suites are defined in [`97-acceptance-criteria.md`](./97-acceptance-criteria.md) and tracked in [`99-consistency-report.md`](./99-consistency-report.md).
 

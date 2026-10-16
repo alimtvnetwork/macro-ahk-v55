@@ -3,23 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 09 Code Block System.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Code-block rendering and syntax-highlighting system: HTML structure, interactions, styling, and constants for fenced code display.
-
-## Files
-
-- [`02-architecture.md`](./02-architecture.md)
-- [`03-html-structure.md`](./03-html-structure.md)
-- [`04-syntax-highlighting.md`](./04-syntax-highlighting.md)
-- [`05-interactions.md`](./05-interactions.md)
-- [`06-styling.md`](./06-styling.md)
-- [`07-constants-and-maps.md`](./07-constants-and-maps.md)
-- [`08-clipboard.md`](./08-clipboard.md)
-- [`09-checklist-blocks.md`](./09-checklist-blocks.md)
-- [`10-tree-structure-rendering.md`](./10-tree-structure-rendering.md)
-- [`11-selection-bar.md`](./11-selection-bar.md)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `09-code-block-system/`.

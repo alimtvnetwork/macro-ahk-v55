@@ -3,35 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 13 Generic Cli.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Generic CLI specification: command surface, conventions, and architecture for the command-line interfaces.
-
-## Files
-
-- [`02-project-structure.md`](./02-project-structure.md)
-- [`03-subcommand-architecture.md`](./03-subcommand-architecture.md)
-- [`04-flag-parsing.md`](./04-flag-parsing.md)
-- [`05-configuration.md`](./05-configuration.md)
-- [`06-output-formatting.md`](./06-output-formatting.md)
-- [`07-error-handling.md`](./07-error-handling.md)
-- [`08-code-style.md`](./08-code-style.md)
-- [`09-help-system.md`](./09-help-system.md)
-- [`10-database.md`](./10-database.md)
-- [`11-build-deploy.md`](./11-build-deploy.md)
-- [`12-testing.md`](./12-testing.md)
-- [`13-checklist.md`](./13-checklist.md)
-- [`14-date-formatting.md`](./14-date-formatting.md)
-- [`15-constants-reference.md`](./15-constants-reference.md)
-- [`16-verbose-logging.md`](./16-verbose-logging.md)
-- [`17-progress-tracking.md`](./17-progress-tracking.md)
-- [`18-batch-execution.md`](./18-batch-execution.md)
-- [`19-shell-completion.md`](./19-shell-completion.md)
-- [`20-terminal-output-design.md`](./20-terminal-output-design.md)
-- [`21-post-install-shell-activation.md`](./21-post-install-shell-activation.md)
-- [`22-self-update-gold-standard.md`](./22-self-update-gold-standard.md)
-- [`images/`](./images/)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `13-generic-cli/`.

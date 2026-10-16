@@ -3,37 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 02 Coding Guidelines.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Cross-language coding standards and AI execution prompts: the normative rule set (booleans, naming, errors, sizing, types) that every code change must satisfy, enforced by CI linters.
-
-## Files
-
-- [`01-cross-language/`](./01-cross-language/)
-- [`01-specification-and-coding-guideline-standard.md`](./01-specification-and-coding-guideline-standard.md)
-- [`02-canonical-size-tier.md`](./02-canonical-size-tier.md)
-- [`02-typescript/`](./02-typescript/)
-- [`03-coding-style-checklist.md`](./03-coding-style-checklist.md)
-- [`03-golang/`](./03-golang/)
-- [`04-consolidated-review-guide-condensed.md`](./04-consolidated-review-guide-condensed.md)
-- [`04-php/`](./04-php/)
-- [`05-consolidated-review-guide.md`](./05-consolidated-review-guide.md)
-- [`05-rust/`](./05-rust/)
-- [`06-ai-optimization/`](./06-ai-optimization/)
-- [`06-cicd-integration/`](./06-cicd-integration/)
-- [`07-csharp/`](./07-csharp/)
-- [`08-file-folder-naming/`](./08-file-folder-naming/)
-- [`09-powershell-integration/`](./09-powershell-integration/)
-- [`10-research/`](./10-research/)
-- [`11-security/`](./11-security/)
-- [`12-python/`](./12-python/)
-- [`13-cpp/`](./13-cpp/)
-- [`21-app/`](./21-app/)
-- [`22-app-issues/`](./22-app-issues/)
-- [`23-app-db/`](./23-app-db/)
-- [`24-app-ui-design-system/`](./24-app-ui-design-system/)
-- [`97-acceptance-criteria.md`](./97-acceptance-criteria.md)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Internalize and enforce `01-specification-and-coding-guideline-standard.md` as the overarching 4-part execution meta-standard across all guidelines.

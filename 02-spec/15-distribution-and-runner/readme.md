@@ -3,18 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 15 Distribution And Runner.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Distribution and runner contracts: installers, runners, and the fix-repo forwarding sub-command.
-
-## Files
-
-- [`02-install-contract.md`](./02-install-contract.md)
-- [`03-runner-contract.md`](./03-runner-contract.md)
-- [`04-release-pipeline.md`](./04-release-pipeline.md)
-- [`05-install-config.md`](./05-install-config.md)
-- [`06-fix-repo-forwarding.md`](./06-fix-repo-forwarding.md)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `15-distribution-and-runner/`.
@@ -112,7 +100,7 @@ This list is the contract. It MUST stay in sync with §"Distributable artifacts"
 
 ## Cross-references
 
-- Slides app spec: [`spec-slides/readme.md`](../)
+- Slides app spec: [`spec-slides/readme.md`](../readme.md)
 - CICD pipeline conventions: [`02-spec/12-cicd-pipeline-workflows/`](../12-cicd-pipeline-workflows/)
 - Generic CLI conventions: [`02-spec/13-generic-cli/`](../13-generic-cli/)
 - Generic release standard: [`02-spec/16-generic-release/`](../16-generic-release/)

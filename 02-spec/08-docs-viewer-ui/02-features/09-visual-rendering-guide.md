@@ -19,43 +19,43 @@ This document is a **complete implementation reference** for how the docs viewer
 
 Shows gradient headings (H1/H2 purple→pink), sidebar navigation, TOC with scroll-spy, inline code badges, blockquote, ordered list, and table with hover states.
 
-!Overview in dark mode
+![Overview in dark mode](../../../public/images/guide/01-overview-dark.png)
 
 ### Full Page — Light Mode
 
 Same layout with light theme tokens — note how heading gradients, inline code, and table headers adapt.
 
-!Overview in light mode
+![Overview in light mode](../../../public/images/guide/04-overview-light.png)
 
 ### Tree Structure — Dark Mode
 
 Tree block with 📁 folder icons, 📄 file icons, muted guide lines, italic comments, and the STRUCTURE language badge.
 
-!Tree structure dark
+![Tree structure dark](../../../public/images/guide/02-tree-dark.png)
 
 ### Tree Structure — Light Mode
 
 Same tree content — code block background stays dark regardless of app theme.
 
-!Tree structure light
+![Tree structure light](../../../public/images/guide/03-tree-light.png)
 
 ### Code Blocks with Syntax Highlighting — Dark Mode
 
 BASH and MARKDOWN language badges with per-language accent colors, line numbers, font controls, copy/download buttons.
 
-!Code blocks dark
+![Code blocks dark](../../../public/images/guide/06-codeblocks-dark.png)
 
 ### Code Blocks — Light Mode
 
 Same blocks in light theme — note the dark code background is preserved while the surrounding UI adapts.
 
-!Code blocks light
+![Code blocks light](../../../public/images/guide/05-codeblocks-light.png)
 
 ### Split View — Editor + Live Preview
 
 Monaco editor on the left with markdown source, live rendered preview on the right, draggable divider in between.
 
-!Split view
+![Split view](../../../public/images/guide/07-split-view-dark.png)
 
 ### Hover States — Dark Mode
 
@@ -63,31 +63,31 @@ Monaco editor on the left with markdown source, live rendered preview on the rig
 
 On hover, `filter: brightness(1.2) saturate(1.1)` boosts the purple→pink gradient. The entire heading glows brighter without changing the gradient direction.
 
-!Heading hover dark
+![Heading hover dark](../../../public/images/guide/08-heading-hover-dark.png)
 
 #### H3 Border Slide
 
 H3 headings transition from `muted-foreground` to `primary` color. A 3px left border appears and `padding-left` increases by `0.2rem`, creating a slide-in effect.
 
-!H3 hover dark
+![H3 hover dark](../../../public/images/guide/09-h3-hover-dark.png)
 
 #### Link Underline Sweep
 
 Links use a `::after` pseudo-element underline that sweeps from right-to-left on hover (`transform-origin: left` → `scaleX(1)`). The text color shifts from `primary` to `accent` (pink).
 
-!Link hover dark
+![Link hover dark](../../../public/images/guide/10-link-hover-dark.png)
 
 #### Inline Code Glow & Lift
 
 Inline `code` elements lift 1px (`translateY(-1px)`) and gain a subtle ring glow (`box-shadow: 0 0 0 2px hsl(var(--primary) / 0.15)`) on hover.
 
-!Inline code hover dark
+![Inline code hover dark](../../../public/images/guide/11-inline-code-hover-dark.png)
 
 #### Code Block Hover Glow
 
 The entire `.code-block-wrapper` gains a box-shadow tinted with the language's accent HSL color on hover, creating a colored glow border effect.
 
-!Code block hover dark
+![Code block hover dark](../../../public/images/guide/12-codeblock-hover-dark.png)
 
 ### Hover States — Light Mode
 
@@ -95,19 +95,19 @@ The entire `.code-block-wrapper` gains a box-shadow tinted with the language's a
 
 The gradient brightness boost works identically in light mode — the purple→pink gradient becomes more vivid.
 
-!Heading hover light
+![Heading hover light](../../../public/images/guide/13-heading-hover-light.png)
 
 #### Inline Code Glow (Light Theme)
 
 Same lift + ring glow, but the muted background contrasts differently against the light page background.
 
-!Inline code hover light
+![Inline code hover light](../../../public/images/guide/14-inline-code-hover-light.png)
 
 #### Link Sweep + Table Row Highlight (Light Theme)
 
 The underline sweep animation and table row hover (inset 3px left bar in primary color) are visible together in a table context.
 
-!Link hover light
+![Link hover light](../../../public/images/guide/15-link-hover-light.png)
 
 ---
 

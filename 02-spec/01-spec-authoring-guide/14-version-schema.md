@@ -249,4 +249,4 @@ legacy keys entirely.
 - [Enum Standards](../17-consolidated-guidelines/07-enum-standards.md)
 - [Root README Conventions](./13-root-readme-conventions.md)
 - [Author Attribution](mem://project/author-attribution)
-- CI/CD Issue 06 — Version Drift
+- [CI/CD Issue 06 — Version Drift](../../.ai-memory/resolved-issues/07-version-drift-after-package-bump.md)

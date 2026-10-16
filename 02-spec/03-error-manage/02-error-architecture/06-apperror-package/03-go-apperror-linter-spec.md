@@ -306,7 +306,7 @@ The linter checks:
 | StackTrace | [01-overview-and-stack.md](./readme.md) |
 | Result types | [03-result-types.md](./readme.md) |
 | AppErrType Enums | [05-apperrtype-enums.md](./02-apperror-reference.md) |
-| Linter Script | linter-scripts/validate-guidelines.go |
-| golangci-lint Config | linters/golangci-lint/.golangci.yml |
+| Linter Script | [linter-scripts/validate-guidelines.go](../../../../linter-scripts/validate-guidelines.go) |
+| golangci-lint Config | [linters/golangci-lint/.golangci.yml](../../../../linters/golangci-lint/.golangci.yml) |
 | codestack package | `gitlab.com/auk-go/core/codestack` |
-| Error Management Overview | [02-spec/03-error-manage/readme.md](../../../) |
+| Error Management Overview | [02-spec/03-error-manage/readme.md](../../../readme.md) |

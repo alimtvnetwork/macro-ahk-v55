@@ -79,8 +79,8 @@ This split preserves the existing Go behavior while restoring P1 enforcement for
 
 - [P1 — Naming prefixes](./02-naming-prefixes.md)
 - [P7 — No assignments in conditions (comma-ok exemption)](./04-parameters-and-conditions.md)
-- Linter source — `validate-guidelines.py`
-- Linter source — `validate-guidelines.go`
+- [Linter source — `validate-guidelines.py`](../../../../linter-scripts/validate-guidelines.py)
+- [Linter source — `validate-guidelines.go`](../../../../linter-scripts/validate-guidelines.go)
 
 ---
 

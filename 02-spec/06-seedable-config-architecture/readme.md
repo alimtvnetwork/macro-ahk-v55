@@ -3,18 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 06 Seedable Config Architecture.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Declarative seeding from instruction manifests: seedable configuration architecture for reproducible project setup.
-
-## Files
-
-- [`02-features/`](./02-features/)
-- [`02-fundamentals.md`](./02-fundamentals.md)
-- [`03-issues/`](./03-issues/)
-- [`97-acceptance-criteria.md`](./97-acceptance-criteria.md)
-- [`99-acceptance-criteria.md`](./99-acceptance-criteria.md)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `06-seedable-config-architecture/`.

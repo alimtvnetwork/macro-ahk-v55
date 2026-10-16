@@ -1,6 +1,6 @@
 # README Improvement Suggestions
 
-> **Created:** 2026-04-22 (Asia/Kuala_Lumpur) <!-- allow-timezone-example -->
+> **Created:** 2026-04-22 (Asia/Kuala_Lumpur)
 > **Owner:** Md. Alim Ul Karim
 > **Status:** ✅ Phases A–E shipped in v3.56.0 (2026-04-22)
 > **Source:** Audit of `readme.md` (1354 lines, last touched in v3.51.0)

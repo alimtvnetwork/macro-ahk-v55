@@ -5,7 +5,7 @@
 **Status:** Normative
 **Companion to:** [03-runner-contract.md](./03-runner-contract.md)
 **Inner scripts:** `fix-repo.sh`, `fix-repo.ps1`
-**Inner spec:** `spec-authoring/22-fix-repo/01-spec.md`
+**Inner spec:** [`spec-authoring/22-fix-repo/01-spec.md`](../../spec-authoring/22-fix-repo/01-spec.md)
 
 ---
 
@@ -239,6 +239,6 @@ Any change to the flag set, mapping, or forwarding semantics requires:
 3. Updating the help-text files in `scripts/runner-help{,.ps}.txt`.
 4. Updating or adding conformance tests in `tests/installer/`.
 
-The sub-command spec (`spec-authoring/22-fix-repo/01-spec.md`)
+The sub-command spec ([`spec-authoring/22-fix-repo/01-spec.md`](../../spec-authoring/22-fix-repo/01-spec.md))
 remains the authority on inner-script behavior; this document is the
 authority only on **how the runners reach it**.

@@ -3,20 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 04 Database Conventions.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Database schema, naming, ORM, and REST-format conventions for the SQLite-backed stores used by the extension and tooling.
-
-## Files
-
-- [`02-naming-conventions.md`](./02-naming-conventions.md)
-- [`03-schema-design.md`](./03-schema-design.md)
-- [`04-orm-and-views.md`](./04-orm-and-views.md)
-- [`05-testing-strategy.md`](./05-testing-strategy.md)
-- [`06-relationship-diagrams.md`](./06-relationship-diagrams.md)
-- [`07-rest-api-format.md`](./07-rest-api-format.md)
-- [`08-split-db-pattern.md`](./08-split-db-pattern.md)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `04-database-conventions/`.
@@ -96,7 +82,7 @@ Comprehensive database design and implementation conventions covering naming, sc
 | 05 | [06-relationship-diagrams.md](./06-relationship-diagrams.md) | Visual relationship patterns and AI-readable schema diagrams |
 | 06 | [07-rest-api-format.md](./07-rest-api-format.md) | PascalCase REST API response format, full CRUD sample, response envelope |
 | 07 | [08-split-db-pattern.md](./08-split-db-pattern.md) | Split DB pattern — one SQLite file per bounded context |
-| 99 | 99-consistency-report.md | Module health and validation |
+| 99 | [99-consistency-report.md](./99-consistency-report.md) | Module health and validation |
 
 ---
 
@@ -135,7 +121,7 @@ Comprehensive database design and implementation conventions covering naming, sc
 
 | Reference | Location |
 |-----------|----------|
-| Spec Root | [../readme.md](../) |
+| Spec Root | [../readme.md](../readme.md) |
 | Coding Guidelines | [../02-coding-guidelines/readme.md](../02-coding-guidelines/readme.md) |
 | Cross-Language DB Naming | [../02-coding-guidelines/01-cross-language/07-database-naming.md](../02-coding-guidelines/01-cross-language/07-database-naming.md) |
 | Split DB Architecture | [../05-split-db-architecture/readme.md](../05-split-db-architecture/readme.md) |

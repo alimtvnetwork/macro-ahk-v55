@@ -99,7 +99,7 @@ under `linters-cicd/action.yml`.
 
 - [Code Red Guidelines](../../17-consolidated-guidelines/readme.md)
 - [CI/CD Pipeline Workflows](../../12-cicd-pipeline-workflows/readme.md)
-- Linter Scripts — existing in-repo guards
+- [Linter Scripts](../../../linter-scripts/) — existing in-repo guards
 
 ---
 

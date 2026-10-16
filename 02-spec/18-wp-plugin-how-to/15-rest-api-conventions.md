@@ -323,7 +323,7 @@ public function checkSettingsPermission(): bool|WP_Error
 
 The CI linter pack ships rule `WP-PERM-001` (PHP) which fails the
 build on any of the forbidden patterns above. See
-`linters-cicd/checks/wp-permission-callback/php.py`.
+[`linters-cicd/checks/wp-permission-callback/php.py`](../../linters-cicd/checks/).
 
 ---
 
@@ -396,7 +396,7 @@ The CI linter pack ships rule `WP-NONCE-001` (PHP) which scans every
 `register_rest_route()` with a non-GET method, every
 `add_action('admin_post_*')`, and every `add_action('wp_ajax_*')`,
 and asserts a nonce verification call appears in the handler. See
-`linters-cicd/checks/wp-nonce-verification/php.py`.
+[`linters-cicd/checks/wp-nonce-verification/php.py`](../../linters-cicd/checks/).
 
 ---
 

@@ -3,43 +3,6 @@
 > **/goal** Master and enforce the architectural standards, specifications, and CI/CD validation rules for 14 Update.
 > **/learn** Read the sequentially ordered specification files in this directory, follow the actionable CI/CD checklist, and apply mandatory rules before generating code.
 
-## Overview
-
-Extension auto-update mechanics: update checks, deploy-path resolution, and cleanup.
-
-## Files
-
-- [`02-self-update-overview.md`](./02-self-update-overview.md)
-- [`03-deploy-path-resolution.md`](./03-deploy-path-resolution.md)
-- [`04-rename-first-deploy.md`](./04-rename-first-deploy.md)
-- [`05-build-scripts.md`](./05-build-scripts.md)
-- [`06-handoff-mechanism.md`](./06-handoff-mechanism.md)
-- [`07-cleanup.md`](./07-cleanup.md)
-- [`08-console-safe-handoff.md`](./08-console-safe-handoff.md)
-- [`09-repo-path-sync.md`](./09-repo-path-sync.md)
-- [`10-version-verification.md`](./10-version-verification.md)
-- [`11-last-release-detection.md`](./11-last-release-detection.md)
-- [`12-windows-icon-embedding.md`](./12-windows-icon-embedding.md)
-- [`13-code-signing.md`](./13-code-signing.md)
-- [`14-release-assets.md`](./14-release-assets.md)
-- [`15-checksums-verification.md`](./15-checksums-verification.md)
-- [`16-release-versioning.md`](./16-release-versioning.md)
-- [`17-cross-compilation.md`](./17-cross-compilation.md)
-- [`18-release-pipeline.md`](./18-release-pipeline.md)
-- [`19-install-scripts.md`](./19-install-scripts.md)
-- [`20-updater-binary.md`](./20-updater-binary.md)
-- [`21-network-requirements.md`](./21-network-requirements.md)
-- [`22-config-file.md`](./22-config-file.md)
-- [`23-update-command-workflow.md`](./23-update-command-workflow.md)
-- [`24-install-script-version-probe.md`](./24-install-script-version-probe.md)
-- [`24-update-check-mechanism/`](./24-update-check-mechanism/)
-- [`25-release-pinned-installer.md`](./25-release-pinned-installer.md)
-- [`26-repo-major-version-migrator.md`](./26-repo-major-version-migrator.md)
-- [`27-generic-installer-behavior.md`](./27-generic-installer-behavior.md)
-- [`28-worker-push-instruction.md`](./28-worker-push-instruction.md)
-- [`diagrams/`](./diagrams/)
-- [`images/`](./images/)
-
 ## 🎯 Actionable CI/CD & Agent Checklist
 
 - [ ] `/goal` Read and understand all numbered specifications under `14-update/`.
@@ -153,7 +116,7 @@ file-lock errors and guarantees rollback is always one rename away.
 
 | File | Description |
 |------|-------------|
-| 99-consistency-report.md | Per-folder consistency audit |
+| [99-consistency-report.md](./99-consistency-report.md) | Per-folder consistency audit |
 | [diagrams/](./diagrams/) | Mermaid flow diagrams (handoff, cleanup, deploy) |
 
 ---
