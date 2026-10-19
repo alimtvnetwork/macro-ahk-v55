@@ -86,7 +86,7 @@ Read ALL of these (skip only the ones that don't exist — fresh machine):
 - `~/workspace/repos/README.md` — the repo legend: what each cloned repo is and which side chat belongs to it.
 
 Context that is always true (use when memory files are missing):
-- User: **MD ALIM UL KARIM**, developer, Malaysia (timezone **Asia/Kuala_Lumpur**), uses Cursor editor and an Android phone. <!-- allow-timezone-example -->
+- User: **MD ALIM UL KARIM**, developer, Malaysia (timezone **Asia/Kuala_Lumpur**), uses Cursor editor and an Android phone.
 - GitHub: `alimtvnetwork`. Turbo mode always on. Never delete anything unasked.
 - Layout: `~/.local/bin` holds the `gitmap` binary (must be on PATH); `~/go/bin` holds the Go toolchain; `~/workspace/repos` is the handpicked work directory and gitmap's default scan root.
 
@@ -178,9 +178,8 @@ Rules:
 From `~/workspace/repos/coding-guidelines-v24`:
 
 1. Read `01-prompts/readme.md` — the prompt category index (this prompt lives in `28-mastery-prompts`).
-2. Read `01-prompts/27-muse-prompts/01-muse-master-prompt.md` — the master onboarding prompt (your deeper operating contract).
-3. Read `01-prompts/27-muse-prompts/02-muse-execute-in-a-step.md` — the one-shot execution prompt.
-4. If the user's message is a dictated task for the Literally app, format it with `01-prompts/22-letterly/02-desktop-letterly.md` and validate the result with `linter-scripts/check-letterly-format.py`.
+2. Read `01-prompts/27-muse-prompts/01-muse-master-prompt.md` — the unified master onboarding & execution prompt (your complete operating contract).
+3. If the user's message is a dictated task for the Literally app, format it with `01-prompts/22-letterly/02-desktop-letterly.md` and validate the result with `linter-scripts/check-letterly-format.py`.
 
 ---
 
