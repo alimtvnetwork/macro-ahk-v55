@@ -34,13 +34,13 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/d
 **Windows · PowerShell - pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
-$env:MARCO_DL_VERSION='v6.102.29'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
+$env:MARCO_DL_VERSION='v6.102.30'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
 **Windows · PowerShell - run a local clone with explicit flags:**
 
 ```powershell
-.\scripts\download-extension.ps1 -Version v6.102.29 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v6.102.30 -FolderName marco-extension
 
 ```
 
@@ -50,7 +50,7 @@ $env:MARCO_DL_VERSION='v6.102.29'; $env:MARCO_DL_FOLDER='marco'; irm https://raw
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
 ```
 
-After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v6.102.29.zip` backup sits next to it.
+After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v6.102.30.zip` backup sits next to it.
 
 ### 🪟 Windows · PowerShell installer (latest)
 
@@ -68,19 +68,19 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 
 ```powershell
 ## Windows · PowerShell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.ps1 | iex
 
 
 ```
 
 ```bash
 ## macOS · Linux · Bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.sh | bash
 
 
 ```
 
-**Pinned version:** `v6.102.29` &nbsp;•&nbsp; **Macro Controller:** `v6.102.29`
+**Pinned version:** `v6.102.30` &nbsp;•&nbsp; **Macro Controller:** `v6.102.30`
 
 > **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself - see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
@@ -107,12 +107,12 @@ Pick your platform - each section is a self-contained install path with the reco
 **Recommended path.** Open **PowerShell** (Win + X → "Windows PowerShell" or "Terminal") and run:
 
 ```powershell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.ps1 | iex
 
 
 ```
 
-- 🔒 Pinned to `v6.102.29` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
+- 🔒 Pinned to `v6.102.30` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
 - 🌊 Want auto-update? Use the [latest channel](#-latest-channel-auto-update) one-liner
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -122,12 +122,12 @@ irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/i
 Open your terminal and run:
 
 ```bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.sh | bash
 
 
 ```
 
-- 🔒 Pinned to `v6.102.29` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
+- 🔒 Pinned to `v6.102.30` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
 - 🌊 Auto-update channel → [latest channel](#-latest-channel-auto-update)
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -141,13 +141,13 @@ The unified installer auto-derives the pinned version from its download URL. Use
 #### 🔒 Pinned to a specific release
 
 ```powershell
-## PowerShell (Windows) - replace v6.102.29 with any released tag
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.ps1 | iex
+## PowerShell (Windows) - replace v6.102.30 with any released tag
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.ps1 | iex
 ```
 
 ```bash
 ## Bash (Linux / macOS)
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.29/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v6.102.30/install.sh | bash
 ```
 
 #### 🌊 Latest channel (auto-update)
@@ -185,11 +185,11 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 #### Override the resolved version
 
 ```powershell
-& { $Version = "v6.102.29"; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.ps1 | iex }
+& { $Version = "v6.102.30"; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.ps1 | iex }
 ```
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | sh -s -- --version v6.102.29
+curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | sh -s -- --version v6.102.30
 ```
 
 ### Custom Directory Install
