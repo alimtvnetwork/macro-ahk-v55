@@ -1,5 +1,12 @@
 # Changelog
 
+## [v6.102.45] - 2026-11-05
+
+### Added
+- Synchronize prompts, skills, AI scripts, and coding guidelines
+
+---
+
 ## [v6.102.44] - 2026-11-05
 
 ### Added
